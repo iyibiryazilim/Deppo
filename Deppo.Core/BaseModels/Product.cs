@@ -15,7 +15,7 @@ public class Product : INotifyPropertyChanged, IDisposable
     private int _unitsetReferenceId;
     private Unitset? _unitset;
     private bool _isVariant;
-    private bool _trackingType;
+    private int _trackingType;
     private double _stockQuantity;
 
     public Product()
@@ -102,7 +102,7 @@ public class Product : INotifyPropertyChanged, IDisposable
         }
     }
 
-    public bool TrackingType
+    public int TrackingType
     {
         get => _trackingType;
         set

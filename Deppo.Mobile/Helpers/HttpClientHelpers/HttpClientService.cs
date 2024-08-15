@@ -21,9 +21,10 @@ public class HttpClientService : IHttpClientService
     public HttpClient GetOrCreateHttpClient()
     {
         var httpClient = _httpClient.Value;
-        httpClient.BaseAddress = new Uri(BaseUri);
+        if (httpClient.BaseAddress == null)
+            httpClient.BaseAddress = new Uri(BaseUri);
 
-        if (string.IsNullOrEmpty(BaseUri))
+        if (!string.IsNullOrEmpty(BaseUri))
         {
             if (!string.IsNullOrEmpty(Token))
             {
