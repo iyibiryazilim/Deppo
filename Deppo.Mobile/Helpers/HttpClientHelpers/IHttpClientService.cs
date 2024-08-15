@@ -1,0 +1,11 @@
+using System;
+
+namespace Deppo.Mobile.Helpers.HttpClientHelpers;
+
+
+public interface IHttpClientService
+{
+    HttpClient GetOrCreateHttpClient();
+    string BaseUri { get; set; }
+    string Token { get; set; }
+}

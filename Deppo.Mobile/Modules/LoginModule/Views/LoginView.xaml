@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Deppo.Mobile.Modules.LoginModule.Views.LoginView"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:dx="http://schemas.devexpress.com/maui"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.LoginModule.ViewModels"
+    x:DataType="viewModel:LoginViewModel"
+    Title="LoginView">
+
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+    <ScrollView>
+        <Grid RowDefinitions="Auto,Auto">
+            <Image
+                Grid.Row="0"
+                Aspect="AspectFit"
+                HeightRequest="400"
+                HorizontalOptions="Center"
+                Source="iyibir_dikey"
+                VerticalOptions="Start" />
+
+            <VerticalStackLayout
+                Grid.Row="1"
+                Padding="20"
+                Spacing="10"
+                VerticalOptions="Start">
+
+                <dx:TextEdit
+                    BackgroundColor="{StaticResource White}"
+                    Keyboard="Default"
+                    LabelText="Kullanıcı Adı"
+                    Text="{Binding UserName}" />
+                
+                <dx:TextEdit
+                    BackgroundColor="{StaticResource White}"
+                    Keyboard="Default"
+                    LabelText="Şifre"                  
+                    Text="{Binding Password}"/>
+
+
+                <Button
+                    Margin="0,30,0,0"
+                    Padding="15"
+                    BackgroundColor="{StaticResource Primary}"
+                    Command="{Binding LoginCommand}"
+                    CornerRadius="10"
+                    FontSize="Subtitle"
+                    Text="Oturum Açma" />
+            </VerticalStackLayout>
+
+
+        </Grid>
+    </ScrollView>
+
+</ContentPage>
