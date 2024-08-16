@@ -190,11 +190,10 @@ public class ProductListViewModel : BaseViewModel
             ProductDetailModel productDetailModel = new();
             productDetailModel.Product = product;
 
-            await Shell.Current.GoToAsync($"{nameof(ProductDetailView)}", new Dictionary<string, object> { {
-
-                nameof(ProductDetailModel), productDetailModel
-                }
-                });
+            await Shell.Current.GoToAsync($"{nameof(ProductDetailView)}", new Dictionary<string, object>
+            {
+                [nameof(ProductDetailModel)] = productDetailModel
+            });
 
         }
         catch (Exception ex)
