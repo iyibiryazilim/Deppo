@@ -123,6 +123,18 @@ public static class MauiProgram
 				#endregion
 			});
 
+		#region Remove Underline from SearchBar
+		Microsoft.Maui.Handlers.SearchBarHandler.Mapper.AppendToMapping(nameof(SearchBar), (handler, view) =>
+		{
+#if ANDROID
+			Android.Widget.LinearLayout? linearLayout = handler.PlatformView.GetChildAt(0) as Android.Widget.LinearLayout;
+			linearLayout = linearLayout?.GetChildAt(2) as Android.Widget.LinearLayout;
+			linearLayout = linearLayout?.GetChildAt(1) as Android.Widget.LinearLayout;
+			linearLayout.Background = null;
+#endif
+		}); 
+		#endregion
+
 #if DEBUG
 		builder.Logging.AddDebug();
 #endif
@@ -151,6 +163,7 @@ public static class MauiProgram
 		#region Product Modules
 		builder.Services.AddSingletonWithShellRoute<ProductPanelView, ProductPanelViewModel>(nameof(ProductPanelView));
 		builder.Services.AddSingletonWithShellRoute<ProductListView, ProductListViewModel>(nameof(ProductListView));
+		builder.Services.AddScopedWithShellRoute<ProductDetailView, ProductDetailViewModel>(nameof(ProductDetailView));
 		builder.Services.AddSingletonWithShellRoute<WarehouseListView, WarehouseListViewModel>(nameof(WarehouseListView));
 		builder.Services.AddSingletonWithShellRoute<ProductProcessView, ProductProcessViewModel>(nameof(ProductProcessView));
 

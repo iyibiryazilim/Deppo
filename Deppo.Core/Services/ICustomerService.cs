@@ -1,3 +1,6 @@
+using Deppo.Core.DataResultModel;
+using Deppo.Core.SortModels;
+using Deppo.Mobile.Core.Models;
 using System;
 using Deppo.Core.DataResultModel;
 using Deppo.Core.SortModels;

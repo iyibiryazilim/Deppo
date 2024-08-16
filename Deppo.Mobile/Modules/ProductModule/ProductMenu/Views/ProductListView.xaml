@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage
-    x:Class="Deppo.Mobile.Modules.ProductModule.ProductMenu.Views.ProductListView"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
-    xmlns:model="clr-namespace:Deppo.Core.BaseModels;assembly=Deppo.Core"
-    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-    xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels"
-    Title="{Binding Title}"
-    x:DataType="viewModel:ProductListViewModel"
-    Shell.NavBarIsVisible="False">
-
-
+<ContentPage x:Class="Deppo.Mobile.Modules.ProductModule.ProductMenu.Views.ProductListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:model="clr-namespace:Deppo.Core.BaseModels;assembly=Deppo.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:ProductListViewModel"
+             Shell.NavBarIsVisible="False">
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
@@ -29,98 +26,87 @@
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
     <Grid RowDefinitions="Auto,*">
+        <Grid Grid.Row="0"
+              Margin="10,20"
+              ColumnDefinitions="Auto, *"
+              ColumnSpacing="10"
+              VerticalOptions="Center">
+            <Label Grid.Column="0"
+                   FontFamily="FAS"
+                   FontSize="28"
+                   Text="{x:Static fontAwesome:FontAwesomeIcons.List}"
+                   TextColor="{StaticResource WhiteSmoke}"
+                   VerticalOptions="Center" />
+            <Label Grid.Column="1"
+                   FontFamily="RobotoRegular"
+                   FontSize="32"
+                   VerticalOptions="Center"
+                   Text="{Binding Title}"
+                   TextColor="{StaticResource White}" />
+        </Grid>
 
-        <Label
-            HorizontalOptions="Start"
-            Text="Servisler"
-            TextColor="{StaticResource OffBlack}"
-            VerticalOptions="Center">
-            <Label.FormattedText>
-                <FormattedString>
-                    <Span
-                        FontFamily="FAS"
-                        FontSize="Subtitle"
-                        Text="{x:Static fontAwesome:FontAwesomeIcons.Box}" />
-                    <Span Text=" " />
-                    <Span
-                        FontAttributes="Bold"
-                        FontSize="Subtitle"
-                        Text="Malzemeler" />
-                </FormattedString>
-            </Label.FormattedText>
 
-        </Label>
-
-        <Grid Grid.Row="1" RowDefinitions="Auto,*">
-            <SearchBar
-                x:Name="searchBar"
-                Grid.Row="0"
-                Placeholder="Ara..."
-                PlaceholderColor="{StaticResource OffBlack}"
-                TextColor="{StaticResource OffBlack}">
+        <Grid Grid.Row="1" RowDefinitions="Auto,*" RowSpacing="10">
+            <Border Grid.Row="0" StrokeShape="RoundRectangle 5" Margin="5,0,5,0" Padding="0" HeightRequest="35" StrokeThickness="0.5" Stroke="{StaticResource Primary}" BackgroundColor="{StaticResource PrimaryLight}">
+            <SearchBar x:Name="searchBar"                       
+                       Placeholder="Ara..."
+                       PlaceholderColor="{StaticResource OffBlack}"
+                       TextColor="{StaticResource OffBlack}">
                 <SearchBar.Behaviors>
-                    <toolkit:EventToCommandBehavior
-                        Command="{Binding PerformSearchCommand}"
-                        CommandParameter="{Binding ., Source={x:Reference searchBar}}"
-                        EventName="TextChanged" />
+                    <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                    CommandParameter="{Binding ., Source={x:Reference searchBar}}"
+                                                    EventName="TextChanged" />
                 </SearchBar.Behaviors>
             </SearchBar>
-            <RefreshView
-                Grid.Row="1"
-                Command="{Binding LoadItemsCommand}"
-                IsRefreshing="{Binding IsBusy, Mode=OneWay}"
-                RefreshColor="Transparent">
-                <CollectionView
-                    ItemsSource="{Binding Items}"
-                    RemainingItemsThreshold="2"
-                    RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+            </Border>
+            <RefreshView Grid.Row="1"
+                         Command="{Binding LoadItemsCommand}"
+                         IsRefreshing="{Binding IsBusy, Mode=OneWay}"
+                         RefreshColor="Transparent">
+                <CollectionView ItemsSource="{Binding Items}"
+                                RemainingItemsThreshold="2"
+                                RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+                    </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="model:Product">
-                            <Border StrokeShape="RoundRectangle 6" StrokeThickness="0.2">
-                                <Grid
-                                    Padding="10"
-                                    ColumnDefinitions="Auto,Auto,*"
-                                    ColumnSpacing="10">
-                                    <Border
-                                        BackgroundColor="{StaticResource Secondary}"
-                                        StrokeShape="RoundRectangle 5"
-                                        StrokeThickness="0.5">
-                                        <Image
-                                            Grid.Column="0"
-                                            HeightRequest="50"
-                                            Source="dotnet_bot.png"
-                                            WidthRequest="50" />
+                            <Border Padding="10"
+                                    BackgroundColor="Transparent"
+                                    StrokeThickness="0.1">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                    <Border BackgroundColor="{StaticResource Secondary}"
+                                            StrokeShape="RoundRectangle 5"
+                                            StrokeThickness="0.5">
+                                        <Image Grid.Column="0"
+                                               HeightRequest="50"
+                                               Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                               WidthRequest="50" />
                                     </Border>
 
-
                                     <VerticalStackLayout Grid.Column="1" Spacing="2">
-                                        <Label
-                                            FontAttributes="Bold"
-                                            LineBreakMode="TailTruncation"
-                                            Text="{Binding Code}" />
-                                        <Label
-                                            LineBreakMode="TailTruncation"
-                                            Text="{Binding Name}"
-                                            TextColor="{StaticResource Gray600}" />
+                                        <Label FontAttributes="Bold"
+                                               LineBreakMode="TailTruncation"
+                                               Text="{Binding Code}" />
+                                        <Label LineBreakMode="TailTruncation"
+                                               Text="{Binding Name}"
+                                               TextColor="{StaticResource Gray600}" />
 
                                         <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
-                                            <Image
-                                                Aspect="AspectFit"
-                                                HeightRequest="16"
-                                                VerticalOptions="Center"
-                                                WidthRequest="16">
+                                            <Image Aspect="AspectFit"
+                                                   HeightRequest="16"
+                                                   VerticalOptions="Center"
+                                                   WidthRequest="16">
                                                 <Image.Source>
-                                                    <FontImageSource
-                                                        FontFamily="FAS"
-                                                        Glyph="{x:Static fontAwesome:FontAwesomeIcons.BusinessTime}"
-                                                        Size="16"
-                                                        Color="{StaticResource Primary}" />
+                                                    <FontImageSource FontFamily="FAS"
+                                                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.BusinessTime}"
+                                                                     Size="16"
+                                                                     Color="{StaticResource Primary}" />
                                                 </Image.Source>
                                             </Image>
-                                            <Label
-                                                Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
-                                                TextColor="{StaticResource Gray600}"
-                                                VerticalOptions="Center" />
+                                            <Label Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                                   TextColor="{StaticResource Gray600}"
+                                                   VerticalOptions="Center" />
                                         </HorizontalStackLayout>
                                     </VerticalStackLayout>
 
