@@ -1,6 +1,5 @@
 using System;
 using System.Text.Json;
-using Deppo.Core.BaseModels;
 using Deppo.Core.DataResultModel;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
@@ -11,120 +10,6 @@ namespace Deppo.Core.DataStores;
 public class SupplierDataStore : ISupplierService
 {
     public string postUrl = $"/gateway/purchase/" + typeof(Supplier).Name;
-
-    public async Task<DataResult<Supplier>> GetObjectByCode(HttpClient httpClient, string Code, int firmNumber)
-    {
-        HttpResponseMessage responseMessage = await httpClient.GetAsync($"{postUrl}/Code/{Code}?firmNumber={firmNumber}");
-        DataResult<Supplier> dataResult = new DataResult<Supplier>();
-        if (responseMessage.IsSuccessStatusCode)
-        {
-            var data = await responseMessage.Content.ReadAsStringAsync();
-            if (data != null)
-            {
-                if (!string.IsNullOrEmpty(data))
-                {
-                    var result = JsonSerializer.Deserialize<DataResult<Supplier>>(data, new JsonSerializerOptions
-                    {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                    });
-
-                    dataResult.Data = result?.Data;
-                    dataResult.IsSuccess = true;
-                    dataResult.Message = "success";
-                    return dataResult;
-                }
-                else
-                {
-                    var result = JsonSerializer.Deserialize<DataResult<Supplier>>(data, new JsonSerializerOptions
-                    {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                    });
-
-                    dataResult.Data = result?.Data;
-                    dataResult.IsSuccess = true;
-                    dataResult.Message = "empty";
-                    return dataResult;
-                }
-            }
-            else
-            {
-                var result = JsonSerializer.Deserialize<DataResult<Supplier>>(data, new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                });
-
-                dataResult.Data = null;
-                dataResult.IsSuccess = false;
-                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
-
-                return dataResult;
-            }
-        }
-        else
-        {
-            dataResult.Data = null;
-            dataResult.IsSuccess = false;
-            dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
-            return dataResult;
-        }
-    }
-
-    public async Task<DataResult<Supplier>> GetObjectById(HttpClient httpClient, int ReferenceId, int firmNumber)
-    {
-        HttpResponseMessage responseMessage = await httpClient.GetAsync($"{postUrl}/Id/{ReferenceId}?firmNumber={firmNumber}");
-        DataResult<Supplier> dataResult = new DataResult<Supplier>();
-        if (responseMessage.IsSuccessStatusCode)
-        {
-            var data = await responseMessage.Content.ReadAsStringAsync();
-            if (data != null)
-            {
-                if (!string.IsNullOrEmpty(data))
-                {
-                    var result = JsonSerializer.Deserialize<DataResult<Supplier>>(data, new JsonSerializerOptions
-                    {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                    });
-
-                    dataResult.Data = result?.Data;
-                    dataResult.IsSuccess = true;
-                    dataResult.Message = "success";
-                    return dataResult;
-                }
-                else
-                {
-                    var result = JsonSerializer.Deserialize<DataResult<Supplier>>(data, new JsonSerializerOptions
-                    {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                    });
-
-                    dataResult.Data = result?.Data;
-                    dataResult.IsSuccess = true;
-                    dataResult.Message = "empty";
-                    return dataResult;
-                }
-            }
-            else
-            {
-                var result = JsonSerializer.Deserialize<DataResult<Supplier>>(data, new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                });
-
-                dataResult.Data = null;
-                dataResult.IsSuccess = false;
-                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
-
-                return dataResult;
-            }
-        }
-        else
-        {
-            dataResult.Data = null;
-            dataResult.IsSuccess = false;
-            dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
-            return dataResult;
-        }
-    }
 
     public async Task<DataResult<IEnumerable<Supplier>>> GetObjects(HttpClient httpClient, string search, string groupCode, SortModel? orderBy, int page, int pageSize, int firmNumber)
     {
@@ -146,6 +31,7 @@ public class SupplierDataStore : ISupplierService
                     dataResult.IsSuccess = true;
                     dataResult.Message = "success";
                     return dataResult;
+
                 }
                 else
                 {
@@ -159,6 +45,7 @@ public class SupplierDataStore : ISupplierService
                     dataResult.Message = "empty";
                     return dataResult;
                 }
+
             }
             else
             {
@@ -173,10 +60,72 @@ public class SupplierDataStore : ISupplierService
 
                 return dataResult;
             }
+
+
         }
         else
         {
             dataResult.Data = Enumerable.Empty<Supplier>();
+            dataResult.IsSuccess = false;
+            dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+            return dataResult;
+        }
+    }
+    public async Task<DataResult<Supplier>> GetObjectById(HttpClient httpClient, int ReferenceId, int firmNumber)
+    {
+        HttpResponseMessage responseMessage = await httpClient.GetAsync($"{postUrl}/Id/{ReferenceId}?firmNumber={firmNumber}");
+        DataResult<Supplier> dataResult = new DataResult<Supplier>();
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            var data = await responseMessage.Content.ReadAsStringAsync();
+            if (data != null)
+            {
+                if (!string.IsNullOrEmpty(data))
+                {
+                    var result = JsonSerializer.Deserialize<DataResult<Supplier>>(data, new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                    });
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "success";
+                    return dataResult;
+
+                }
+                else
+                {
+                    var result = JsonSerializer.Deserialize<DataResult<Supplier>>(data, new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                    });
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "empty";
+                    return dataResult;
+                }
+
+            }
+            else
+            {
+                var result = JsonSerializer.Deserialize<DataResult<Supplier>>(data, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                });
+
+                dataResult.Data = null;
+                dataResult.IsSuccess = false;
+                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+                return dataResult;
+            }
+
+
+        }
+        else
+        {
+            dataResult.Data = null;
             dataResult.IsSuccess = false;
             dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
             return dataResult;
