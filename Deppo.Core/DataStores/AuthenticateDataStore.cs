@@ -22,6 +22,7 @@ public async Task<string> Authenticate(HttpClient httpClient, string username, s
 				{
 					var data = await responseMessage.Content.ReadAsStringAsync();
 					token = data.Trim('"');
+					httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 				}
 			}
         }
