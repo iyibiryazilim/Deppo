@@ -24,9 +24,13 @@ public class Current : INotifyPropertyChanged, IDisposable
     private string _taxNumber = string.Empty;
     private bool _isActive;
 
+    //
+    private string _name = string.Empty;
+
+    public string TitleName => Name?.Length > 2 ? Name.Substring(0, 2) : Name;
+
     public Current()
     {
-
     }
 
     [Key]
@@ -206,6 +210,17 @@ public class Current : INotifyPropertyChanged, IDisposable
         }
     }
 
+    public string Name
+    {
+        get => _name;
+        set
+        {
+            if (_name == value) return;
+            _name = value;
+            NotifyPropertyChanged();
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -217,7 +232,6 @@ public class Current : INotifyPropertyChanged, IDisposable
     {
         Dispose(true);
         GC.SuppressFinalize(this);
-
     }
 
     protected virtual void Dispose(bool disposing)
