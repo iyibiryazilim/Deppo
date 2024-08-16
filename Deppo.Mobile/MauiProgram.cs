@@ -50,149 +50,170 @@ namespace Deppo.Mobile;
 
 public static class MauiProgram
 {
-	public static MauiApp CreateMauiApp()
-	{
-		var builder = MauiApp.CreateBuilder();
-		builder
-			.UseMauiApp<App>()
-			.UseMauiCommunityToolkit(options =>
-			{
-				options.SetShouldSuppressExceptionsInConverters(true);
-				options.SetShouldSuppressExceptionsInBehaviors(true);
-				options.SetShouldSuppressExceptionsInAnimations(true);
-			})
-			.UseDevExpressCollectionView()
-			.UseDevExpressControls()
-			.UseDevExpressEditors()
-			.UseDevExpress()
-			.UseUserDialogs(() =>
-			{
-				#region AlertConfig
-				AlertConfig.DefaultBackgroundColor = Colors.White;
-				AlertConfig.DefaultOkText = "Tamam";
-				AlertConfig.DefaultTitleFontSize = 16;
-				AlertConfig.DefaultMessageFontSize = 14;
-				AlertConfig.DefaultMessageColor = Colors.DarkGray;
-				AlertConfig.DefaultPositiveButtonFontSize = 14;
+    public static MauiApp CreateMauiApp()
+    {
+        var builder = MauiApp.CreateBuilder();
+        builder
+            .UseMauiApp<App>()
+            .UseMauiCommunityToolkit(options =>
+            {
+                options.SetShouldSuppressExceptionsInConverters(true);
+                options.SetShouldSuppressExceptionsInBehaviors(true);
+                options.SetShouldSuppressExceptionsInAnimations(true);
+            })
+            .UseDevExpressCollectionView()
+            .UseDevExpressControls()
+            .UseDevExpressEditors()
+            .UseDevExpress()
+            .UseUserDialogs(() =>
+            {
+                #region AlertConfig
+
+                AlertConfig.DefaultBackgroundColor = Colors.White;
+                AlertConfig.DefaultOkText = "Tamam";
+                AlertConfig.DefaultTitleFontSize = 16;
+                AlertConfig.DefaultMessageFontSize = 14;
+                AlertConfig.DefaultMessageColor = Colors.DarkGray;
+                AlertConfig.DefaultPositiveButtonFontSize = 14;
 #if ANDROID
-				AlertConfig.DefaultMessageFontFamily = "Roboto-Regular.ttf";
+                AlertConfig.DefaultMessageFontFamily = "Roboto-Regular.ttf";
 #else
 				AlertConfig.DefaultMessageFontFamily = "Roboto-Regular";
 #endif
-				#endregion
 
-				#region ToastConfig
-				ToastConfig.DefaultCornerRadius = 15;
-				#endregion
+                #endregion AlertConfig
 
-				#region Confirm Config
-				ConfirmConfig.DefaultBackgroundColor = Colors.White;
-				ConfirmConfig.DefaultTitleFontSize = 16;
-				ConfirmConfig.DefaultTitleColor = Colors.Black;
-				ConfirmConfig.DefaultMessageFontSize = 14;
-				ConfirmConfig.DefaultPositiveButtonFontSize = 14;
-				ConfirmConfig.DefaultNegativeButtonFontSize = 14;
-				ConfirmConfig.DefaultCancelText = "İptal";
-				ConfirmConfig.DefaultOkText = "Evet";
-				#endregion
-			})
+                #region ToastConfig
+
+                ToastConfig.DefaultCornerRadius = 15;
+
+                #endregion ToastConfig
+
+                #region Confirm Config
+
+                ConfirmConfig.DefaultBackgroundColor = Colors.White;
+                ConfirmConfig.DefaultTitleFontSize = 16;
+                ConfirmConfig.DefaultTitleColor = Colors.Black;
+                ConfirmConfig.DefaultMessageFontSize = 14;
+                ConfirmConfig.DefaultPositiveButtonFontSize = 14;
+                ConfirmConfig.DefaultNegativeButtonFontSize = 14;
+                ConfirmConfig.DefaultCancelText = "İptal";
+                ConfirmConfig.DefaultOkText = "Evet";
+
+                #endregion Confirm Config
+            })
 #if DEBUG
-			.EnableHotReload()
+            .EnableHotReload()
 #endif
-			.ConfigureFonts(fonts =>
-			{
-				#region Roboto font
-				fonts.AddFont("Roboto-Black.ttf", "RobotoBlack");
-				fonts.AddFont("Roboto-BlackItalic.ttf", "RobotoBlackItalic");
-				fonts.AddFont("Roboto-Bold.ttf", "RobotoBold");
-				fonts.AddFont("Roboto-BoldItalic.ttf", "RobotoBoldItalic");
-				fonts.AddFont("Roboto-Italic.ttf", "RobotoItalic");
-				fonts.AddFont("Roboto-Light.ttf", "RobotoLight");
-				fonts.AddFont("Roboto-LightItalic.ttf", "RobotoLightItalic");
-				fonts.AddFont("Roboto-Medium.ttf", "RobotoMedium");
-				fonts.AddFont("Roboto-MediumItalic.ttf", "RobotoMediumItalic");
-				fonts.AddFont("Roboto-Regular.ttf", "RobotoRegular");
-				fonts.AddFont("Roboto-Thin.ttf", "RobotoThin");
-				fonts.AddFont("Roboto-ThinItalic.ttf", "RobotoThinItalic");
-				#endregion
+            .ConfigureFonts(fonts =>
+            {
+                #region Roboto font
 
-				#region FontAwesome
-				fonts.AddFont("fa-solid.otf", "FAS");
-				fonts.AddFont("fa-regular.otf", "FAR");
-				fonts.AddFont("fa-brands.otf", "FAB");
-				#endregion
-			});
+                fonts.AddFont("Roboto-Black.ttf", "RobotoBlack");
+                fonts.AddFont("Roboto-BlackItalic.ttf", "RobotoBlackItalic");
+                fonts.AddFont("Roboto-Bold.ttf", "RobotoBold");
+                fonts.AddFont("Roboto-BoldItalic.ttf", "RobotoBoldItalic");
+                fonts.AddFont("Roboto-Italic.ttf", "RobotoItalic");
+                fonts.AddFont("Roboto-Light.ttf", "RobotoLight");
+                fonts.AddFont("Roboto-LightItalic.ttf", "RobotoLightItalic");
+                fonts.AddFont("Roboto-Medium.ttf", "RobotoMedium");
+                fonts.AddFont("Roboto-MediumItalic.ttf", "RobotoMediumItalic");
+                fonts.AddFont("Roboto-Regular.ttf", "RobotoRegular");
+                fonts.AddFont("Roboto-Thin.ttf", "RobotoThin");
+                fonts.AddFont("Roboto-ThinItalic.ttf", "RobotoThinItalic");
 
-		#region Remove Underline from SearchBar
-		Microsoft.Maui.Handlers.SearchBarHandler.Mapper.AppendToMapping(nameof(SearchBar), (handler, view) =>
-		{
+                #endregion Roboto font
+
+                #region FontAwesome
+
+                fonts.AddFont("fa-solid.otf", "FAS");
+                fonts.AddFont("fa-regular.otf", "FAR");
+                fonts.AddFont("fa-brands.otf", "FAB");
+
+                #endregion FontAwesome
+            });
+
+        #region Remove Underline from SearchBar
+
+        Microsoft.Maui.Handlers.SearchBarHandler.Mapper.AppendToMapping(nameof(SearchBar), (handler, view) =>
+        {
 #if ANDROID
-			Android.Widget.LinearLayout? linearLayout = handler.PlatformView.GetChildAt(0) as Android.Widget.LinearLayout;
-			linearLayout = linearLayout?.GetChildAt(2) as Android.Widget.LinearLayout;
-			linearLayout = linearLayout?.GetChildAt(1) as Android.Widget.LinearLayout;
-			linearLayout.Background = null;
+            Android.Widget.LinearLayout? linearLayout = handler.PlatformView.GetChildAt(0) as Android.Widget.LinearLayout;
+            linearLayout = linearLayout?.GetChildAt(2) as Android.Widget.LinearLayout;
+            linearLayout = linearLayout?.GetChildAt(1) as Android.Widget.LinearLayout;
+            linearLayout.Background = null;
 #endif
-		}); 
-		#endregion
+        });
+
+        #endregion Remove Underline from SearchBar
 
 #if DEBUG
-		builder.Logging.AddDebug();
+        builder.Logging.AddDebug();
 #endif
 
-		builder.Services.AddSingleton(UserDialogs.Instance);
-		builder.Services.AddSingleton<IHttpClientService, HttpClientService>();
-		builder.Services.AddSingleton<IAuthenticationService, AuthenticateDataStore>();
-		builder.Services.AddSingleton<ICustomQueryService, CustomQueryDataStore>();
-		builder.Services.AddSingleton<IProductService, ProductDataStore>();
-		builder.Services.AddSingleton<IWarehouseService, WarehouseDataStore>();
-		builder.Services.AddSingleton<ICustomerService, CustomerDataStore>();
-		builder.Services.AddSingleton<IWaitingSalesOrderService, WaitingSalesOrderDataStore>();
-		builder.Services.AddSingleton<ISupplierService, SupplierDataStore>();
+        builder.Services.AddSingleton(UserDialogs.Instance);
+        builder.Services.AddSingleton<IHttpClientService, HttpClientService>();
+        builder.Services.AddSingleton<IAuthenticationService, AuthenticateDataStore>();
+        builder.Services.AddSingleton<ICustomQueryService, CustomQueryDataStore>();
+        builder.Services.AddSingleton<IProductService, ProductDataStore>();
+        builder.Services.AddSingleton<IWarehouseService, WarehouseDataStore>();
+        builder.Services.AddSingleton<ICustomerService, CustomerDataStore>();
+        builder.Services.AddSingleton<IWaitingSalesOrderService, WaitingSalesOrderDataStore>();
+        builder.Services.AddSingleton<ISupplierService, SupplierDataStore>();
 
-		builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
-		builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
+        builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
+        builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
 
-		#region Analysis Modules
-		builder.Services.AddSingletonWithShellRoute<OverviewAnalysisView, OverviewAnalysisViewModel>(nameof(OverviewAnalysisView));
-		builder.Services.AddSingletonWithShellRoute<ProductAnalysisView, ProductAnalysisViewModel>(nameof(ProductAnalysisView));
-		builder.Services.AddSingletonWithShellRoute<PurchaseAnalysisView, PurchaseAnalysisViewModel>(nameof(PurchaseAnalysisView));
-		builder.Services.AddSingletonWithShellRoute<SalesAnalysisView, SalesAnalysisViewModel>(nameof(SalesAnalysisView));
+        #region Analysis Modules
 
-		#endregion
+        builder.Services.AddSingletonWithShellRoute<OverviewAnalysisView, OverviewAnalysisViewModel>(nameof(OverviewAnalysisView));
+        builder.Services.AddSingletonWithShellRoute<ProductAnalysisView, ProductAnalysisViewModel>(nameof(ProductAnalysisView));
+        builder.Services.AddSingletonWithShellRoute<PurchaseAnalysisView, PurchaseAnalysisViewModel>(nameof(PurchaseAnalysisView));
+        builder.Services.AddSingletonWithShellRoute<SalesAnalysisView, SalesAnalysisViewModel>(nameof(SalesAnalysisView));
 
-		#region Product Modules
-		builder.Services.AddSingletonWithShellRoute<ProductPanelView, ProductPanelViewModel>(nameof(ProductPanelView));
-		builder.Services.AddSingletonWithShellRoute<ProductListView, ProductListViewModel>(nameof(ProductListView));
-		builder.Services.AddScopedWithShellRoute<ProductDetailView, ProductDetailViewModel>(nameof(ProductDetailView));
-		builder.Services.AddSingletonWithShellRoute<WarehouseListView, WarehouseListViewModel>(nameof(WarehouseListView));
-		builder.Services.AddSingletonWithShellRoute<ProductProcessView, ProductProcessViewModel>(nameof(ProductProcessView));
+        #endregion Analysis Modules
 
-		#endregion
+        #region Product Modules
 
-		#region Sales Modules
-		builder.Services.AddSingletonWithShellRoute<SalesPanelView, SalesPanelViewModel>(nameof(SalesPanelView));
-		builder.Services.AddSingletonWithShellRoute<CustomerListView, CustomerListViewModel>(nameof(CustomerListView));
-		builder.Services.AddSingletonWithShellRoute<WaitingSalesOrderListView, WaitingSalesOrderListViewModel>(nameof(WaitingSalesOrderListView));
-		builder.Services.AddSingletonWithShellRoute<SalesProcessView, SalesProcessViewModel>(nameof(SalesProcessView));
-		#endregion
+        builder.Services.AddSingletonWithShellRoute<ProductPanelView, ProductPanelViewModel>(nameof(ProductPanelView));
+        builder.Services.AddSingletonWithShellRoute<ProductListView, ProductListViewModel>(nameof(ProductListView));
+        builder.Services.AddScopedWithShellRoute<ProductDetailView, ProductDetailViewModel>(nameof(ProductDetailView));
+        builder.Services.AddSingletonWithShellRoute<WarehouseListView, WarehouseListViewModel>(nameof(WarehouseListView));
+        builder.Services.AddSingletonWithShellRoute<ProductProcessView, ProductProcessViewModel>(nameof(ProductProcessView));
 
-		#region Purchase Modules
-		builder.Services.AddSingletonWithShellRoute<PurchasePanelView, PurchasePanelViewModel>(nameof(PurchasePanelView));
-		builder.Services.AddSingletonWithShellRoute<SupplierListView, SupplierListViewModel>(nameof(SupplierListView));
-		builder.Services.AddSingletonWithShellRoute<WaitingPurchaseOrderListView, WaitingPurchaseOrderListViewModel>(nameof(WaitingPurchaseOrderListView));
-		builder.Services.AddSingletonWithShellRoute<PurchaseProcessView, PurchaseProcessViewModel>(nameof(PurchaseProcessView));
-		#endregion
+        #endregion Product Modules
 
-		#region Counting Modules
-		builder.Services.AddSingletonWithShellRoute<CountingWarehouseListView, CountingWarehouseListViewModel>(nameof(CountingWarehouseListView));
+        #region Sales Modules
 
-		#endregion
+        builder.Services.AddSingletonWithShellRoute<SalesPanelView, SalesPanelViewModel>(nameof(SalesPanelView));
+        builder.Services.AddSingletonWithShellRoute<CustomerListView, CustomerListViewModel>(nameof(CustomerListView));
+        builder.Services.AddSingletonWithShellRoute<WaitingSalesOrderListView, WaitingSalesOrderListViewModel>(nameof(WaitingSalesOrderListView));
+        builder.Services.AddSingletonWithShellRoute<SalesProcessView, SalesProcessViewModel>(nameof(SalesProcessView));
 
-		#region Fast Production Modules
-		builder.Services.AddSingletonWithShellRoute<FastProductionProductView, FastProductionProductViewModel>(nameof(FastProductionProductView));
-			
-		#endregion
+        #endregion Sales Modules
 
-		return builder.Build();
-	}
+        #region Purchase Modules
+
+        builder.Services.AddSingletonWithShellRoute<PurchasePanelView, PurchasePanelViewModel>(nameof(PurchasePanelView));
+        builder.Services.AddSingletonWithShellRoute<SupplierListView, SupplierListViewModel>(nameof(SupplierListView));
+        builder.Services.AddSingletonWithShellRoute<SupplierDetailView, SupplierDetailViewModel>(nameof(SupplierDetailView));
+        builder.Services.AddSingletonWithShellRoute<WaitingPurchaseOrderListView, WaitingPurchaseOrderListViewModel>(nameof(WaitingPurchaseOrderListView));
+        builder.Services.AddSingletonWithShellRoute<PurchaseProcessView, PurchaseProcessViewModel>(nameof(PurchaseProcessView));
+
+        #endregion Purchase Modules
+
+        #region Counting Modules
+
+        builder.Services.AddSingletonWithShellRoute<CountingWarehouseListView, CountingWarehouseListViewModel>(nameof(CountingWarehouseListView));
+
+        #endregion Counting Modules
+
+        #region Fast Production Modules
+
+        builder.Services.AddSingletonWithShellRoute<FastProductionProductView, FastProductionProductViewModel>(nameof(FastProductionProductView));
+
+        #endregion Fast Production Modules
+
+        return builder.Build();
+    }
 }

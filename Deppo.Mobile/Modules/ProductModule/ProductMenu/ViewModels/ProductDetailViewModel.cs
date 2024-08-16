@@ -12,6 +12,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels;
 [QueryProperty(name: nameof(ProductDetailModel), queryId: nameof(ProductDetailModel))]
 public partial class ProductDetailViewModel : BaseViewModel
 {
+
     private readonly IHttpClientService _httpClientService;
     private readonly ICustomQueryService _customQueryService;
     private readonly IUserDialogs _userDialogs;
@@ -21,7 +22,7 @@ public partial class ProductDetailViewModel : BaseViewModel
 
     public ProductDetailViewModel(IHttpClientService httpClientService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
     {
-        Title = "Ürün Detayý";
+        Title = "ÃœrÃ¼n DetayÃ½";
         _httpClientService = httpClientService;
         _customQueryService = customQueryService;
         _userDialogs = userDialogs;
@@ -40,7 +41,7 @@ public partial class ProductDetailViewModel : BaseViewModel
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             await Task.Delay(1000);
 
-            // Query'de yer alan firma numarasý dinamik olarak alýnacak
+            // Query'de yer alan firma numarasÃ½ dinamik olarak alÃ½nacak
             var query = @$"[InputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_01_STLINE WHERE IOCODE IN(1, 2) AND STOCKREF = {ProductDetailModel.Product.ReferenceId}),
                [OutputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_01_STLINE WHERE IOCODE IN(3, 4) AND STOCKREF = {ProductDetailModel.Product.ReferenceId}";
 
