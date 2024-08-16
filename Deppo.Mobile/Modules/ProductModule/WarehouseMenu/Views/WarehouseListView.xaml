@@ -1,15 +1,115 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage
-    x:Class="Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views.WarehouseListView"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels"
-    Title="{Binding Title}"
-    x:DataType="viewModel:WarehouseListViewModel">
-    <VerticalStackLayout>
-        <Label
-            HorizontalOptions="Center"
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" />
-    </VerticalStackLayout>
+<ContentPage x:Class="Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views.WarehouseListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:WarehouseListViewModel"
+             Shell.NavBarIsVisible="False">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PrimaryLight}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+    <Grid RowDefinitions="Auto, *">
+        <!--#region Custom Navigation Bar-->
+        <Grid Grid.Row="0"
+              Padding="10,10,10,10"
+              VerticalOptions="Center">
+            <Label FontSize="Title"
+                   Text="{Binding Title}"
+                   TextColor="{StaticResource White}" />
+        </Grid>
+        <!--#endregion-->
+
+        <!--#region Loading-->
+        <ActivityIndicator Grid.Row="1"
+                           HorizontalOptions="Center"
+                           IsRunning="{Binding IsBusy}"
+                           VerticalOptions="Center" />
+        <!--#endregion-->
+
+        <!--#region Warehouse List -->
+        <Grid Grid.Row="1"
+              RowDefinitions="Auto, *"
+              RowSpacing="10">
+            <!--#region Search area-->
+            <Border Grid.Row="0"
+                    Margin="10,0,10,0"
+                    BackgroundColor="{StaticResource Primary}"
+                    StrokeShape="RoundRectangle 5"
+                    StrokeThickness="0.1">
+                <Grid ColumnDefinitions="*">
+                    <SearchBar x:Name="searchBar"
+                               Grid.Column="0"
+                               HeightRequest="40"
+                               Placeholder="Ambar ara" />
+
+                </Grid>
+            </Border>
+            <!--#endregion-->
+
+            <!--#region Main List-->
+            <RefreshView Grid.Row="1" IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshPageCommand}">
+                <CollectionView ItemsSource="{Binding Items}"
+                                RemainingItemsThreshold="2"
+                                RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:Warehouse">
+                            <Border Padding="10"
+                                    BackgroundColor="Transparent"
+                                    StrokeThickness="0.1">
+                                <Grid ColumnDefinitions="Auto, *">
+                                    <Border Grid.Column="0"
+                                            Padding="0,0,10,0"
+                                            BackgroundColor="Transparent"
+                                            StrokeThickness="0">
+                                        <toolkit:AvatarView BackgroundColor="{StaticResource Primary}"
+                                                            BorderWidth="0.1"
+                                                            CornerRadius="50"
+                                                            FontAttributes="Bold"
+                                                            HorizontalOptions="Start"
+                                                            Text="{Binding Number}"
+                                                            TextColor="{StaticResource White}" />
+                                    </Border>
+
+                                    <VerticalStackLayout Grid.Column="1"
+                                                         Padding="5"
+                                                         Spacing="5"
+                                                         VerticalOptions="Start">
+                                        <Label FontAttributes="Bold"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1"
+                                               Text="{Binding Name}" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+            <!--#endregion-->
+        </Grid>
+        <!--#endregion-->
+    </Grid>
+
+
+
 </ContentPage>
