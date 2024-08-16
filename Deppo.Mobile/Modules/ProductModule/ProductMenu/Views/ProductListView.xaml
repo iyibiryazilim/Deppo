@@ -29,25 +29,26 @@
         <Grid Grid.Row="0"
               Margin="10,20"
               ColumnDefinitions="Auto, *"
-              ColumnSpacing="5"
+              ColumnSpacing="10"
               VerticalOptions="Center">
             <Label Grid.Column="0"
                    FontFamily="FAS"
-                   FontSize="Title"
-                   Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                   FontSize="28"
+                   Text="{x:Static fontAwesome:FontAwesomeIcons.List}"
                    TextColor="{StaticResource WhiteSmoke}"
                    VerticalOptions="Center" />
             <Label Grid.Column="1"
-                   FontAttributes="None"
-                   FontSize="Title"
+                   FontFamily="RobotoRegular"
+                   FontSize="32"
+                   VerticalOptions="Center"
                    Text="{Binding Title}"
                    TextColor="{StaticResource White}" />
         </Grid>
 
 
-        <Grid Grid.Row="1" RowDefinitions="Auto,*">
-            <SearchBar x:Name="searchBar"
-                       Grid.Row="0"
+        <Grid Grid.Row="1" RowDefinitions="Auto,*" RowSpacing="10">
+            <Border Grid.Row="0" StrokeShape="RoundRectangle 5" Margin="5,0,5,0" Padding="0" HeightRequest="35" StrokeThickness="0.5" Stroke="{StaticResource Primary}" BackgroundColor="{StaticResource PrimaryLight}">
+            <SearchBar x:Name="searchBar"                       
                        Placeholder="Ara..."
                        PlaceholderColor="{StaticResource OffBlack}"
                        TextColor="{StaticResource OffBlack}">
@@ -57,6 +58,7 @@
                                                     EventName="TextChanged" />
                 </SearchBar.Behaviors>
             </SearchBar>
+            </Border>
             <RefreshView Grid.Row="1"
                          Command="{Binding LoadItemsCommand}"
                          IsRefreshing="{Binding IsBusy, Mode=OneWay}"
