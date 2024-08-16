@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Deppo.Core.Models;
 
 namespace Deppo.Core.BaseModels;
@@ -12,11 +13,12 @@ public class Product : INotifyPropertyChanged, IDisposable
     private string _code = string.Empty;
     private string _name = string.Empty;
     private int _vatRate;
-    private int _unitsetReferenceId;
+    private int? _unitsetReferenceId = default;
     private Unitset? _unitset;
     private bool _isVariant;
     private int _trackingType;
     private double _stockQuantity;
+    private string? _image;
 
     public Product()
     {
@@ -69,7 +71,7 @@ public class Product : INotifyPropertyChanged, IDisposable
     }
 
     [Browsable(false)]
-    public int UnitsetReferenceId
+    public int? UnitsetReferenceId
     {
         get => _unitsetReferenceId;
         set
@@ -124,6 +126,17 @@ public class Product : INotifyPropertyChanged, IDisposable
         }
     }
 
+    public string? Image
+    {
+        get => _image;
+        set
+        {
+            if (_image == value) return;
+            _image = value;
+            NotifyPropertyChanged();
+        }
+    }
+   
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")

@@ -46,7 +46,7 @@ public class ProductListViewModel : BaseViewModel
             _userDialogs.Loading("Loading Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             await Task.Delay(1000);
-            var result = await _productService.GetObjects(httpClient, string.Empty, string.Empty, null, 1, 20, 1);
+            var result = await _productService.GetObjects(httpClient, string.Empty, string.Empty, null, 0, 20, 1);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
