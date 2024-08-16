@@ -3,8 +3,10 @@ using System.Collections.ObjectModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.BaseModels;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels;
 
@@ -25,6 +27,7 @@ public class ProductListViewModel : BaseViewModel
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         PerformSearchCommand = new Command<SearchBar>(async (searchBar) => await PerformSearchAsync(searchBar));
+        ItemTappedCommand = new Command<Product>(async (product) => await ItemTappedAsync(product));
     }
 
     public ObservableCollection<Product> Items { get; } = new();
@@ -32,6 +35,7 @@ public class ProductListViewModel : BaseViewModel
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command<SearchBar> PerformSearchCommand { get; }
+    public Command<Product> ItemTappedCommand { get; }
 
     public async Task LoadItemsAsync()
     {
@@ -170,4 +174,39 @@ public class ProductListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+    private async Task ItemTappedAsync(Product product)
+    {
+        if (product == null)
+            return;
+
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            ProductDetailModel productDetailModel = new();
+            productDetailModel.Product = product;
+
+            await Shell.Current.GoToAsync($"{nameof(ProductDetailView)}", new Dictionary<string, object> { {
+
+                nameof(ProductDetailModel), productDetailModel
+                }
+                });
+
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+
+
+    }
+
 }
