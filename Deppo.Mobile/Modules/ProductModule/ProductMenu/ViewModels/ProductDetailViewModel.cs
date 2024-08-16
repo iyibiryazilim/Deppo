@@ -9,7 +9,6 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels;
 [QueryProperty(name: nameof(ProductDetailModel), queryId: nameof(ProductDetailModel))]
 public partial class ProductDetailViewModel : BaseViewModel
 {
-
     [ObservableProperty]
-    ProductDetailModel productDetailModel = null!;
+    private ProductDetailModel productDetailModel = null!;
 }

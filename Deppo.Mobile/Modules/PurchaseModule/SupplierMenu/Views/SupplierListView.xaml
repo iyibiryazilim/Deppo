@@ -29,7 +29,11 @@
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
     <Grid RowDefinitions="Auto,*">
-        <Grid Grid.Row="0" Padding="10" ColumnDefinitions="Auto" ColumnSpacing="5" VerticalOptions="Center">
+        <Grid Grid.Row="0"
+              Padding="10"
+              ColumnDefinitions="Auto"
+              ColumnSpacing="5"
+              VerticalOptions="Center">
 
             <Label Grid.Row="0"
                    HorizontalOptions="Start">
@@ -46,9 +50,8 @@
                     </FormattedString>
                 </Label.FormattedText>
             </Label>
-
         </Grid>
-       
+
         <Grid Grid.Row="1"
               RowDefinitions="Auto,*">
             <SearchBar x:Name="searchBar"
@@ -143,6 +146,10 @@
                                         </VerticalStackLayout>
                                     </VerticalStackLayout>
                                 </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:SupplierListViewModel}}, Path=ItemTappedCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views.SupplierDetailView"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels"
+             x:DataType="viewModel:SupplierDetailViewModel"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             Title="{Binding Title}">
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android"
+                Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid Margin="10"
+          RowDefinitions="Auto, Auto, Auto, *"
+          RowSpacing="10">
+        <!--#region Image-->
+        <Border Grid.Row="0"
+                BackgroundColor="{StaticResource Secondary}"
+                HeightRequest="100"
+                StrokeShape="RoundRectangle 50"
+                StrokeThickness="0"
+                VerticalOptions="Center"
+                WidthRequest="100">
+            <!--<Image Source="{Binding SupplierDetailModel.Supplier.Ima, Converter={StaticResource ByteArrayToImageSourceConverter}}" />-->
+        </Border>
+        <!--#endregion-->
+
+        <!--#region Code, Name, StockQuantity -->
+        <VerticalStackLayout Grid.Row="1"
+                             HorizontalOptions="Center"
+                             Spacing="4">
+            <Label FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   Text="{Binding SupplierDetailModel.Supplier.Code}" />
+            <Label HorizontalOptions="Center"
+                   Text="{Binding SupplierDetailModel.Supplier.Name}" />
+        </VerticalStackLayout>
+        <!--#endregion-->
+
+        <!--#region Input, Output -->
+        <Grid Grid.Row="2"
+              Padding="10,0,10,0"
+              ColumnDefinitions=".50*, .50*"
+              ColumnSpacing="10">
+            <Border Grid.Column="0"
+                    Padding="20,10,20,10"
+                    BackgroundColor="{StaticResource PrimaryLight}"
+                    StrokeThickness="0">
+                <VerticalStackLayout VerticalOptions="Center">
+                    <Label HorizontalOptions="Center"
+                           Text="0" />
+                    <Label HorizontalOptions="Center"
+                           Text="Giriş" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Grid.Column="1"
+                    Padding="20,10,20,10"
+                    BackgroundColor="{StaticResource PrimaryLight}"
+                    StrokeThickness="0">
+                <VerticalStackLayout VerticalOptions="Center">
+                    <Label HorizontalOptions="Center"
+                           Text="0" />
+                    <Label HorizontalOptions="Center"
+                           Text="Çıkış" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+        <!--#endregion-->
+
+        <!--#region Last Transactions List -->
+        <Grid Grid.Row="3"
+              RowDefinitions="Auto, *"
+              RowSpacing="5">
+            <Label Text="Son Hareketler"
+                   FontSize="Subtitle" />
+        </Grid>
+        <!--#endregion-->
+    </Grid>
+</ContentPage>

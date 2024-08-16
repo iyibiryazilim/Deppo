@@ -4,12 +4,10 @@
              x:Class="Deppo.Mobile.Modules.ProductModule.ProductMenu.Views.ProductDetailView"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels"
              x:DataType="viewModel:ProductDetailViewModel"
-             xmlns:model="clr-namespace:Deppo.Mobile.Core.Models;assembly=Deppo.Mobile.Core"
              Title="{Binding Title}">
     <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+        <Label Text="Welcome to .NET MAUI!"
+               VerticalOptions="Center"
+               HorizontalOptions="Center" />
     </VerticalStackLayout>
 </ContentPage>

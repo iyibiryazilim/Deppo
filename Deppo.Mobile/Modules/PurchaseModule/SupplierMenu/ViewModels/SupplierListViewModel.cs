@@ -4,8 +4,12 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.ProductModels;
+using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
+using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels;
 
@@ -29,6 +33,7 @@ public partial class SupplierListViewModel : BaseViewModel
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         PerformSearchCommand = new Command<SearchBar>(async (searchBar) => await PerformSearchAsync(searchBar));
+        ItemTappedCommand = new Command<Supplier>(async (supplier) => await ItemTappedAsync(supplier));
     }
 
     public ObservableCollection<Supplier> Items { get; } = new();
@@ -36,6 +41,8 @@ public partial class SupplierListViewModel : BaseViewModel
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command<SearchBar> PerformSearchCommand { get; }
+
+    public Command<Supplier> ItemTappedCommand { get; }
 
     public async Task LoadItemsAsync()
     {
@@ -162,6 +169,36 @@ public partial class SupplierListViewModel : BaseViewModel
             }
         }
         catch (System.Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ItemTappedAsync(Supplier supplier)
+    {
+        if (supplier == null)
+            return;
+
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            SupplierDetailModel supplierDetailModel = new();
+            supplierDetailModel.Supplier = supplier;
+
+            await Shell.Current.GoToAsync($"{nameof(SupplierDetailView)}", new Dictionary<string, object> { {
+                nameof(SupplierDetailModel), supplierDetailModel
+                }
+                });
+        }
+        catch (Exception ex)
         {
             _userDialogs.Alert(ex.Message, "Hata");
         }
