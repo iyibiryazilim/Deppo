@@ -11,9 +11,9 @@ public class WarehouseDataStore : IWarehouseService
 {
     public string postUrl = $"/gateway/product/" + typeof(Warehouse).Name;
 
-    public async Task<DataResult<IEnumerable<Warehouse>>> GetObjects(HttpClient httpClient, string search, string groupCode, SortModel? orderBy, int page, int pageSize, int firmNumber)
+    public async Task<DataResult<IEnumerable<Warehouse>>> GetObjects(HttpClient httpClient, string search, SortModel? orderBy, int page, int pageSize, int firmNumber)
     {
-        HttpResponseMessage responseMessage = await httpClient.GetAsync(postUrl + $"?search={search}&groupCode={groupCode}&orderBy={orderBy}&page={page}&pageSize={pageSize}&firmNumber={firmNumber}");
+        HttpResponseMessage responseMessage = await httpClient.GetAsync(postUrl + $"?search={search}&orderBy={orderBy}&page={page}&pageSize={pageSize}&firmNumber={firmNumber}");
         DataResult<IEnumerable<Warehouse>> dataResult = new DataResult<IEnumerable<Warehouse>>();
         if (responseMessage.IsSuccessStatusCode)
         {
