@@ -28,9 +28,20 @@
     <Grid RowDefinitions="Auto, *">
         <!--#region Custom Navigation Bar-->
         <Grid Grid.Row="0"
-              Padding="10,10,10,10"
+              Margin="10,20"
+              ColumnDefinitions="Auto, *"
+              ColumnSpacing="5"
               VerticalOptions="Center">
-            <Label FontSize="Title"
+            <Label Grid.Column="0"
+                   FontFamily="FAS"
+                   FontSize="Title"
+                   Text="{x:Static fontAwesome:FontAwesomeIcons.Warehouse}"
+                   TextColor="{StaticResource WhiteSmoke}"
+                   VerticalOptions="Center" />
+            <Label Grid.Column="1"
+                   FontAttributes="None"
+                   FontSize="Title"
+                   VerticalOptions="Center"
                    Text="{Binding Title}"
                    TextColor="{StaticResource White}" />
         </Grid>
@@ -43,28 +54,35 @@
                            VerticalOptions="Center" />
         <!--#endregion-->
 
-        <!--#region Warehouse List -->
+        <!--#region Warehouse List-->
         <Grid Grid.Row="1"
               RowDefinitions="Auto, *"
               RowSpacing="10">
             <!--#region Search area-->
             <Border Grid.Row="0"
-                    Margin="10,0,10,0"
-                    BackgroundColor="{StaticResource Primary}"
+                    Margin="0,0,0,0"
                     StrokeShape="RoundRectangle 5"
-                    StrokeThickness="0.1">
+                    StrokeThickness="0">
                 <Grid ColumnDefinitions="*">
                     <SearchBar x:Name="searchBar"
                                Grid.Column="0"
-                               HeightRequest="40"
-                               Placeholder="Ambar ara" />
-
+                               Placeholder="Ara..."
+                               PlaceholderColor="{StaticResource OffBlack}"
+                               TextColor="{StaticResource OffBlack}">
+                        <SearchBar.Behaviors>
+                            <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                            CommandParameter="{Binding ., Source={x:Reference searchBar}}"
+                                                            EventName="TextChanged" />
+                        </SearchBar.Behaviors>
+                    </SearchBar>
                 </Grid>
             </Border>
             <!--#endregion-->
 
             <!--#region Main List-->
-            <RefreshView Grid.Row="1" IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshPageCommand}">
+            <RefreshView Grid.Row="1"
+                         Command="{Binding RefreshPageCommand}"
+                         IsRefreshing="{Binding IsRefreshing}">
                 <CollectionView ItemsSource="{Binding Items}"
                                 RemainingItemsThreshold="2"
                                 RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
@@ -98,6 +116,11 @@
                                                LineBreakMode="TailTruncation"
                                                MaxLines="1"
                                                Text="{Binding Name}" />
+                                        <Label FontAttributes="None"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1"
+                                               Text="{Binding City, FallbackValue='-', TargetNullValue='-'}"
+                                               TextColor="{StaticResource Gray600}" />
                                     </VerticalStackLayout>
                                 </Grid>
                             </Border>
