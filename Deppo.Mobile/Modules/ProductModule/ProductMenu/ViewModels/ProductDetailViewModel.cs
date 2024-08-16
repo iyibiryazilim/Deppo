@@ -38,17 +38,19 @@ public partial class ProductDetailViewModel : BaseViewModel
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            //await Task.Delay(1000);
-            //var query = @$"[InputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_01_STLINE WHERE IOCODE IN(1, 2) AND STOCKREF = {ProductDetailModel.Product.ReferenceId}),
-            //   [OutputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_01_STLINE WHERE IOCODE IN(3, 4) AND STOCKREF = {ProductDetailModel.Product.ReferenceId}";
+            await Task.Delay(1000);
 
-            //var result = await _customQueryService.GetObjectsAsync(httpClient, query);
+            // Query'de yer alan firma numarasý dinamik olarak alýnacak
+            var query = @$"[InputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_01_STLINE WHERE IOCODE IN(1, 2) AND STOCKREF = {ProductDetailModel.Product.ReferenceId}),
+               [OutputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_01_STLINE WHERE IOCODE IN(3, 4) AND STOCKREF = {ProductDetailModel.Product.ReferenceId}";
 
-            //if(result.IsSuccess)
-            //{
-            //    if (result.Data == null)
-            //        return;
-            //}
+            var result = await _customQueryService.GetObjectsAsync(httpClient, query);
+
+            if(result.IsSuccess)
+            {
+                if (result.Data == null)
+                    return;
+            }
 
         }
         catch (Exception ex)
