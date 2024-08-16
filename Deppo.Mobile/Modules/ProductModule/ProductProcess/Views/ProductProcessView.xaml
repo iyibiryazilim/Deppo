@@ -3,13 +3,266 @@
     x:Class="Deppo.Mobile.Modules.ProductModule.ProductProcess.Views.ProductProcessView"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:dx="http://schemas.devexpress.com/maui"
+    xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.ViewModels"
     Title="{Binding Title}"
-    x:DataType="viewModel:ProductProcessViewModel">
-    <VerticalStackLayout>
-        <Label
-            HorizontalOptions="Center"
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" />
-    </VerticalStackLayout>
+    x:DataType="viewModel:ProductProcessViewModel"
+    Shell.NavBarIsVisible="False">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid RowDefinitions=".30*,.70*">
+
+        <Grid
+            Grid.Row="1"
+            RowDefinitions="Auto,Auto,Auto"
+            RowSpacing="20">
+            <VerticalStackLayout
+                Grid.Row="0"
+                Padding="5"
+                Spacing="5">
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="Subtitle"
+                    Text="Giriş İşlemleri"
+                    TextColor="{StaticResource OffBlack}" />
+
+                <Grid RowDefinitions="Auto,Auto" RowSpacing="5">
+                    <Border
+                        Grid.Row="0"
+                        Padding="5"
+                        StrokeShape="RoundRectangle 5"
+                        StrokeThickness="0.2">
+                        <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="10">
+                            <Border
+                                Padding="5"
+                                BackgroundColor="{StaticResource Primary}"
+                                StrokeShape="RoundRectangle 5">
+                                <Label
+                                    FontFamily="FAS"
+                                    FontSize="24"
+                                    HorizontalOptions="Center"
+                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                    TextColor="{StaticResource White}"
+                                    VerticalOptions="Center" />
+
+                            </Border>
+                            <Label
+                                Grid.Column="1"
+                                FontAttributes="Bold"
+                                FontSize="Subtitle"
+                                Text="Üretimden Giriş İşlemleri"
+                                TextColor="{StaticResource Gray500}"
+                                VerticalOptions="Center" />
+
+                            <toolkit:AvatarView
+                                Grid.Column="3"
+                                Padding="2"
+                                BorderColor="{StaticResource Primary}"
+                                CornerRadius="15"
+                                FontFamily="FAS"
+                                FontSize="14"
+                                HeightRequest="30"
+                                HorizontalOptions="End"
+                                Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
+                                TextColor="{StaticResource Primary}"
+                                WidthRequest="30" />
+
+
+                        </Grid>
+                    </Border>
+                    <Border
+                        Grid.Row="1"
+                        Padding="5"
+                        StrokeShape="RoundRectangle 5"
+                        StrokeThickness="0.2">
+                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10">
+                            <Border
+                                Padding="5"
+                                BackgroundColor="{StaticResource Primary}"
+                                StrokeShape="RoundRectangle 5">
+                                <Label
+                                    FontFamily="FAS"
+                                    FontSize="24"
+                                    HorizontalOptions="Center"
+                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                    TextColor="{StaticResource White}"
+                                    VerticalOptions="Center" />
+
+                            </Border>
+                            <Label
+                                Grid.Column="1"
+                                FontAttributes="Bold"
+                                FontSize="Subtitle"
+                                Text="Sayım Fazlası İşlemleri"
+                                TextColor="{StaticResource Gray500}"
+                                VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+                </Grid>
+
+            </VerticalStackLayout>
+            <VerticalStackLayout
+                Grid.Row="1"
+                Padding="5"
+                Spacing="5">
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="Subtitle"
+                    Text="Çıkış İşlemleri"
+                    TextColor="{StaticResource OffBlack}" />
+
+                <Grid RowDefinitions="Auto,Auto" RowSpacing="0">
+                    <Border
+                        Grid.Row="0"
+                        Padding="5"
+                        StrokeShape="RoundRectangle 2"
+                        StrokeThickness="0.2">
+                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10">
+                            <Border
+                                Padding="5"
+                                BackgroundColor="{StaticResource Primary}"
+                                StrokeShape="RoundRectangle 5">
+                                <Label
+                                    FontFamily="FAS"
+                                    FontSize="24"
+                                    HorizontalOptions="Center"
+                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                    TextColor="{StaticResource White}"
+                                    VerticalOptions="Center" />
+
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label
+                                    FontAttributes="Bold"
+                                    Text="Sarf Fişi"
+                                    TextColor="{StaticResource Gray500}" />
+                                <Label Text="Malzeme için Üretimden Giriş işlemleri yapabilirsiniz." TextColor="{StaticResource Gray400}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                    <Border
+                        Grid.Row="1"
+                        Padding="5"
+                        StrokeShape="RoundRectangle 2"
+                        StrokeThickness="0.2">
+                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10">
+                            <Border
+                                Padding="5"
+                                BackgroundColor="{StaticResource Primary}"
+                                StrokeShape="RoundRectangle 5">
+                                <Label
+                                    FontFamily="FAS"
+                                    FontSize="24"
+                                    HorizontalOptions="Center"
+                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                    TextColor="{StaticResource White}"
+                                    VerticalOptions="Center" />
+
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label
+                                    FontAttributes="Bold"
+                                    Text="Sayım Eksiği"
+                                    TextColor="{StaticResource Gray500}" />
+                                <Label Text="Malzeme için Üretimden Giriş işlemleri yapabilirsiniz." TextColor="{StaticResource Gray400}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+            </VerticalStackLayout>
+
+            <VerticalStackLayout
+                Grid.Row="2"
+                Padding="5"
+                Spacing="5">
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="Subtitle"
+                    Text="Transfer İşlemleri"
+                    TextColor="{StaticResource OffBlack}" />
+
+                <Grid RowDefinitions="Auto,Auto" RowSpacing="0">
+                    <Border
+                        Grid.Row="0"
+                        Padding="5"
+                        StrokeShape="RoundRectangle 2"
+                        StrokeThickness="0.2">
+                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10">
+                            <Border
+                                Padding="5"
+                                BackgroundColor="{StaticResource Secondary}"
+                                StrokeShape="RoundRectangle 5">
+                                <Label
+                                    FontFamily="FAS"
+                                    FontSize="24"
+                                    HorizontalOptions="Center"
+                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                    TextColor="{StaticResource White}"
+                                    VerticalOptions="Center" />
+
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label
+                                    FontAttributes="Bold"
+                                    Text="Ambar Transferi"
+                                    TextColor="{StaticResource Gray500}" />
+                                <Label Text="Malzeme için Üretimden Giriş işlemleri yapabilirsiniz." TextColor="{StaticResource Gray400}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                    <Border
+                        Grid.Row="1"
+                        Padding="5"
+                        StrokeShape="RoundRectangle 2"
+                        StrokeThickness="0.2">
+                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10">
+                            <Border
+                                Padding="5"
+                                BackgroundColor="{StaticResource Secondary}"
+                                StrokeShape="RoundRectangle 5">
+                                <Label
+                                    FontFamily="FAS"
+                                    FontSize="24"
+                                    HorizontalOptions="Center"
+                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                    TextColor="{StaticResource White}"
+                                    VerticalOptions="Center" />
+
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label
+                                    FontAttributes="Bold"
+                                    Text="Malzeme Virmanı"
+                                    TextColor="{StaticResource Gray500}" />
+                                <Label Text="Malzeme için Üretimden Giriş işlemleri yapabilirsiniz." TextColor="{StaticResource Gray400}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+            </VerticalStackLayout>
+
+
+        </Grid>
+
+
+    </Grid>
 </ContentPage>
