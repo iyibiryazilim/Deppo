@@ -1,8 +1,7 @@
-using System;
-using System.Text;
-using System.Text.Json;
 using Deppo.Core.DataResultModel;
 using Deppo.Core.Services;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace Deppo.Core.DataStores;
 
@@ -11,7 +10,7 @@ public class CustomQueryDataStore : ICustomQueryService
     private string postUrl = "/gateway/customQuery/CustomQuery";
     public async Task<DataResult<dynamic>> GetObjectAsync(HttpClient httpClient, string query)
     {
-        var content = new StringContent(JsonSerializer.Serialize(query), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(query), Encoding.UTF8, "application/json");
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<dynamic> dataResult = new();
         if (responseMessage.IsSuccessStatusCode)
@@ -21,7 +20,7 @@ public class CustomQueryDataStore : ICustomQueryService
             {
                 if (!string.IsNullOrEmpty(data))
                 {
-                    var result = JsonSerializer.Deserialize<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
 
                     dataResult.Data = result?.Data.FirstOrDefault();
                     dataResult.IsSuccess = true;
@@ -31,7 +30,7 @@ public class CustomQueryDataStore : ICustomQueryService
                 }
                 else
                 {
-                    var result = JsonSerializer.Deserialize<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
 
                     dataResult.Data = result?.Data.FirstOrDefault();
                     dataResult.IsSuccess = true;
@@ -42,7 +41,7 @@ public class CustomQueryDataStore : ICustomQueryService
             }
             else
             {
-                var result = JsonSerializer.Deserialize<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+                var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
 
                 dataResult.Data = null;
                 dataResult.IsSuccess = false;
@@ -64,9 +63,8 @@ public class CustomQueryDataStore : ICustomQueryService
 
     public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsAsync(HttpClient httpClient, string query)
     {
-        var content = new StringContent(JsonSerializer.Serialize(query), Encoding.UTF8, "application/json");
-        //var content = new StringContent($"\"{query}\"", null, "application/json");
-
+        var content = new StringContent(JsonConvert.SerializeObject(query), Encoding.UTF8, "application/json");
+        
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
         if (responseMessage.IsSuccessStatusCode)
@@ -76,7 +74,7 @@ public class CustomQueryDataStore : ICustomQueryService
             {
                 if (!string.IsNullOrEmpty(data))
                 {
-                    var result = JsonSerializer.Deserialize<DataResult<IEnumerable<dynamic>>>(data);
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
 
                     dataResult.Data = result?.Data;
                     dataResult.IsSuccess = true;
@@ -86,7 +84,7 @@ public class CustomQueryDataStore : ICustomQueryService
                 }
                 else
                 {
-                    var result = JsonSerializer.Deserialize<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
 
                     dataResult.Data = result?.Data;
                     dataResult.IsSuccess = true;
@@ -97,7 +95,7 @@ public class CustomQueryDataStore : ICustomQueryService
             }
             else
             {
-                var result = JsonSerializer.Deserialize<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+                var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
 
                 dataResult.Data = Enumerable.Empty<dynamic>();
                 dataResult.IsSuccess = false;
