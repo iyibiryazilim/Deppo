@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Deppo.Core.Models
 {
-    public class SupplierTransaction : BaseTransaction
+    public class CustomerTransaction : BaseTransaction
     {
         private string _currentName = string.Empty;
 

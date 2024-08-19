@@ -19,8 +19,10 @@
         </ToolbarItem>
     </ContentPage.ToolbarItems>
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                        EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -31,7 +33,8 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android" Value="artboard.png" />
+            <On Platform="Android"
+                Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
@@ -57,8 +60,10 @@
             <Label FontAttributes="Bold"
                    HorizontalOptions="Center"
                    Text="{Binding ProductDetailModel.Product.Code}" />
-            <Label HorizontalOptions="Center" Text="{Binding ProductDetailModel.Product.Name}" />
-            <Label HorizontalOptions="Center" Text="{Binding ProductDetailModel.Product.StockQuantity}" />
+            <Label HorizontalOptions="Center"
+                   Text="{Binding ProductDetailModel.Product.Name}" />
+            <Label HorizontalOptions="Center"
+                   Text="{Binding ProductDetailModel.Product.StockQuantity}" />
         </VerticalStackLayout>
         <!--#endregion-->
 
@@ -72,8 +77,10 @@
                     BackgroundColor="{StaticResource PrimaryLight}"
                     StrokeThickness="0">
                 <VerticalStackLayout VerticalOptions="Center">
-                    <Label HorizontalOptions="Center" Text="{Binding ProductDetailModel.InputQuantity}" />
-                    <Label HorizontalOptions="Center" Text="Giriş" />
+                    <Label HorizontalOptions="Center"
+                           Text="{Binding ProductDetailModel.InputQuantity}" />
+                    <Label HorizontalOptions="Center"
+                           Text="Giriş" />
                 </VerticalStackLayout>
             </Border>
 
@@ -82,8 +89,10 @@
                     BackgroundColor="{StaticResource PrimaryLight}"
                     StrokeThickness="0">
                 <VerticalStackLayout VerticalOptions="Center">
-                    <Label HorizontalOptions="Center" Text="{Binding ProductDetailModel.OutputQuantity}" />
-                    <Label HorizontalOptions="Center" Text="Çıkış" />
+                    <Label HorizontalOptions="Center"
+                           Text="{Binding ProductDetailModel.OutputQuantity}" />
+                    <Label HorizontalOptions="Center"
+                           Text="Çıkış" />
                 </VerticalStackLayout>
             </Border>
         </Grid>
@@ -93,7 +102,8 @@
         <Grid Grid.Row="3"
               RowDefinitions="Auto, *"
               RowSpacing="5">
-            <Label FontSize="Subtitle" Text="Son Hareketler" />
+            <Label FontSize="Subtitle"
+                   Text="Son Hareketler" />
 
             <!--#region Loading-->
             <ActivityIndicator Grid.Row="1"
@@ -103,6 +113,7 @@
             <!--#endregion-->
 
             <CollectionView Grid.Row="1" ItemsSource="{Binding ProductDetailModel.LastTransactions}">
+
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:ProductTransaction">
                         <Border Padding="5"
@@ -110,6 +121,7 @@
                                 StrokeThickness="0.2">
                             <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
                                 <VerticalStackLayout Grid.Column="0" Spacing="5">
+
                                     <Label FontAttributes="None"
                                            FontSize="Title"
                                            HorizontalOptions="Center"
@@ -119,7 +131,8 @@
                                            HorizontalOptions="Center"
                                            Text="{Binding TransactionDate, StringFormat='{0:MM/yyyy}'}"
                                            TextColor="{StaticResource Gray600}" />
-                                    <Label Text="{Binding TransactionTime, StringFormat='{0:hh:mm:ss}'}" TextColor="{StaticResource Gray500}" />
+                                    <Label Text="{Binding TransactionTime, StringFormat='{0:hh:mm:ss}'}"
+                                           TextColor="{StaticResource Gray500}" />
                                 </VerticalStackLayout>
 
                                 <VerticalStackLayout Grid.Column="1" Spacing="3">
@@ -150,16 +163,12 @@
                                         </Image>
                                         <Label Text="{Binding IOTypeName}" FontAttributes="None" />
                                     </HorizontalStackLayout>
-
-
                                 </VerticalStackLayout>
                             </Grid>
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
-
             </CollectionView>
-
         </Grid>
         <!--#endregion-->
     </Grid>

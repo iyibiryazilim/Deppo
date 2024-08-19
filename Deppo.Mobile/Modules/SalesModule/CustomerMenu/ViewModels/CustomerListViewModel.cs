@@ -2,10 +2,15 @@ using System;
 using System.Collections.ObjectModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.BaseModels;
+using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models;
+using Deppo.Mobile.Core.Models.PurchaseModels;
+using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views;
+using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views;
 
 namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels;
 
@@ -29,9 +34,11 @@ public partial class CustomerListViewModel : BaseViewModel
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         PerformSearchCommand = new Command<SearchBar>(async (searchBar) => await PerformSearchAsync(searchBar));
+        ItemTappedCommand = new Command<Customer>(async (customer) => await ItemTappedAsync(customer));
     }
 
     public ObservableCollection<Customer> Items { get; } = new();
+    public Command<Customer> ItemTappedCommand { get; }
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
@@ -162,6 +169,36 @@ public partial class CustomerListViewModel : BaseViewModel
             }
         }
         catch (System.Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ItemTappedAsync(Customer customer)
+    {
+        if (customer == null)
+            return;
+
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            CustomerDetailModel customerDetailModel = new();
+            customerDetailModel.Customer = customer;
+
+            await Shell.Current.GoToAsync($"{nameof(CustomerDetailView)}", new Dictionary<string, object> { {
+                nameof(CustomerDetailModel), customerDetailModel
+                }
+                });
+        }
+        catch (Exception ex)
         {
             _userDialogs.Alert(ex.Message, "Hata");
         }

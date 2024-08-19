@@ -27,8 +27,5 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Deppo.Core\Deppo.Core.csproj" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Models\SalesModels\" />
-	</ItemGroup>
 
 </Project>
