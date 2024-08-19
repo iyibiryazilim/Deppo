@@ -2,8 +2,8 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
-using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
+using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -13,28 +13,33 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
+namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels
 {
-    [QueryProperty(name: nameof(SupplierDetailModel), queryId: nameof(SupplierDetailModel))]
-    public partial class SupplierDetailViewModel : BaseViewModel
+    public partial class CustomerDetailViewModel : BaseViewModel
     {
         private readonly IHttpClientService _httpClientService;
-        private readonly ICustomQueryService _customQueryService;
+        private readonly ICustomerService _customerService;
         private readonly IUserDialogs _userDialogs;
+        private readonly ICustomQueryService _customQueryService;
 
-        [ObservableProperty]
-        private SupplierDetailModel supplierDetailModel = null!;
-
-        public SupplierDetailViewModel(IHttpClientService httpClientService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
+        public CustomerDetailViewModel(IHttpClientService httpClientService,
+        ICustomerService customerService,
+        IUserDialogs userDialogs,
+        ICustomQueryService customQueryService)
         {
-            Title = "Tedarikçi Detayı";
-
             _httpClientService = httpClientService;
-            _customQueryService = customQueryService;
+            _customerService = customerService;
             _userDialogs = userDialogs;
+            _customQueryService = customQueryService;
+
+            Title = "Müşteri Detayı";
 
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+            _customQueryService = customQueryService;
         }
+
+        [ObservableProperty]
+        private CustomerDetailModel customerDetailModel = null!;
 
         public Command LoadItemsCommand { get; }
 
@@ -59,7 +64,6 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
             }
             finally
             {
-                Console.WriteLine(SupplierDetailModel);
                 IsBusy = false;
             }
         }
@@ -69,8 +73,8 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
             try
             {
                 var query = @$"SELECT
-                    [InputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(1, 2) AND STOCKREF = {SupplierDetailModel.Supplier.ReferenceId}),
-                    [OutputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(3, 4) AND STOCKREF = {SupplierDetailModel.Supplier.ReferenceId})";
+                    [InputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_01_STLINE WHERE IOCODE IN(1, 2) AND STOCKREF = {CustomerDetailModel.Customer.ReferenceId}),
+                    [OutputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_01_STLINE WHERE IOCODE IN(3, 4) AND STOCKREF = {CustomerDetailModel.Customer.ReferenceId})";
 
                 var result = await _customQueryService.GetObjectAsync(httpClient, query);
 
@@ -78,9 +82,9 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
                 {
                     if (result.Data == null)
                         return;
-                    var obj = Mapping.Mapper.Map<SupplierDetailModel>(result.Data);
-                    SupplierDetailModel.InputQuantity = obj.InputQuantity;
-                    SupplierDetailModel.OutputQuantity = obj.OutputQuantity;
+                    var obj = Mapping.Mapper.Map<CustomerDetailModel>(result.Data);
+                    CustomerDetailModel.InputQuantity = obj.InputQuantity;
+                    CustomerDetailModel.OutputQuantity = obj.OutputQuantity;
                 }
             }
             catch (Exception ex)
@@ -131,7 +135,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
 
                     foreach (var item in result.Data)
                     {
-                        SupplierDetailModel.LastTransactions.Add(Mapping.Mapper.Map<SupplierTransaction>(item));
+                        CustomerDetailModel.LastTransactions.Add(Mapping.Mapper.Map<CustomerTransaction>(item));
                     }
                 }
             }

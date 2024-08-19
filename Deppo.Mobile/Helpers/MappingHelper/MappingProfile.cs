@@ -1,14 +1,20 @@
 ﻿using AutoMapper;
 using Deppo.Core.Models;
 using Deppo.Mobile.Core.Models.ProductModels;
+using Deppo.Mobile.Core.Models.PurchaseModels;
+using Deppo.Mobile.Core.Models.SalesModels;
 
 namespace Deppo.Mobile.Helpers.MappingHelper;
 
 public class MappingProfile : Profile
 {
-	public MappingProfile()
-	{
-		CreateMap<ProductDetailModel, dynamic>();
-		CreateMap<ProductTransaction, dynamic>();
-	}
+    public MappingProfile()
+    {
+        CreateMap<ProductDetailModel, dynamic>();
+        CreateMap<ProductTransaction, dynamic>();
+        CreateMap<SupplierDetailModel, dynamic>();
+        CreateMap<SupplierTransaction, dynamic>();
+        CreateMap<CustomerTransaction, dynamic>();
+        CreateMap<CustomerDetailModel, dynamic>();
+    }
 }
