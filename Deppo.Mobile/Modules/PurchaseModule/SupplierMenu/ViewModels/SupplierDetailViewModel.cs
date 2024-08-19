@@ -69,8 +69,8 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
             try
             {
                 var query = @$"SELECT
-                    [InputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(1, 2) AND STOCKREF = {SupplierDetailModel.Supplier.ReferenceId}),
-                    [OutputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(3, 4) AND STOCKREF = {SupplierDetailModel.Supplier.ReferenceId})";
+                    [InputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(1, 2) AND CLIENTREF = {SupplierDetailModel.Supplier.ReferenceId}),
+                    [OutputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(3, 4) AND CLIENTREF = {SupplierDetailModel.Supplier.ReferenceId})";
 
                 var result = await _customQueryService.GetObjectAsync(httpClient, query);
 
@@ -120,7 +120,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
         LEFT JOIN LG_001_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF AND MAINUNIT = 1
         LEFT JOIN LG_001_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
 		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = 1
-		WHERE STLINE.IOCODE IN (1,2,3,4) AND STFICHE.TRCODE IN (1,6) ORDER BY STLINE.DATE_ DESC";
+		WHERE STLINE.IOCODE IN (1,2,3,4) AND STFICHE.TRCODE IN (1,6)  AND  CLCARD.LOGICALREF = {SupplierDetailModel.Supplier.ReferenceId}  ORDER BY STLINE.DATE_ DESC";
 
                 var result = await _customQueryService.GetObjectsAsync(httpclient, query);
 

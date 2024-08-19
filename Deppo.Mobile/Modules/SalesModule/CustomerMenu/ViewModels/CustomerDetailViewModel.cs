@@ -13,94 +13,94 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels
+namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels;
+
+[QueryProperty(name: nameof(CustomerDetailModel), queryId: nameof(CustomerDetailModel))]
+public partial class CustomerDetailViewModel : BaseViewModel
 {
-    public partial class CustomerDetailViewModel : BaseViewModel
+    private readonly IHttpClientService _httpClientService;
+    private readonly ICustomerService _customerService;
+    private readonly IUserDialogs _userDialogs;
+    private readonly ICustomQueryService _customQueryService;
+
+    [ObservableProperty]
+    private CustomerDetailModel customerDetailModel = null!;
+
+    public CustomerDetailViewModel(IHttpClientService httpClientService,
+    ICustomerService customerService,
+    IUserDialogs userDialogs,
+    ICustomQueryService customQueryService)
     {
-        private readonly IHttpClientService _httpClientService;
-        private readonly ICustomerService _customerService;
-        private readonly IUserDialogs _userDialogs;
-        private readonly ICustomQueryService _customQueryService;
+        _httpClientService = httpClientService;
+        _customerService = customerService;
+        _userDialogs = userDialogs;
+        _customQueryService = customQueryService;
 
-        public CustomerDetailViewModel(IHttpClientService httpClientService,
-        ICustomerService customerService,
-        IUserDialogs userDialogs,
-        ICustomQueryService customQueryService)
+        Title = "Müşteri Detayı";
+        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+    }
+
+    public Command LoadItemsCommand { get; }
+
+    private async Task LoadItemsAsync()
+    {
+        try
         {
-            _httpClientService = httpClientService;
-            _customerService = customerService;
-            _userDialogs = userDialogs;
-            _customQueryService = customQueryService;
+            IsBusy = true;
 
-            Title = "Müşteri Detayı";
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            await Task.Delay(1000);
 
-            LoadItemsCommand = new Command(async () => await LoadItemsAsync());
-            _customQueryService = customQueryService;
+            // Querylerde yer alan firma numarasi dinamik olarak alinacak
+            await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastTransactionsAsync(httpClient));
         }
-
-        [ObservableProperty]
-        private CustomerDetailModel customerDetailModel = null!;
-
-        public Command LoadItemsCommand { get; }
-
-        private async Task LoadItemsAsync()
+        catch (Exception ex)
         {
-            try
-            {
-                IsBusy = true;
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
 
-                var httpClient = _httpClientService.GetOrCreateHttpClient();
-                await Task.Delay(1000);
-
-                // Querylerde yer alan firma numarasi dinamik olarak alinacak
-                await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastTransactionsAsync(httpClient));
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
-
-                _userDialogs.Alert(message: ex.Message, title: "Hata");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
         }
-
-        private async Task GetInputOutputQuantityAsync(HttpClient httpClient)
+        finally
         {
-            try
+            Console.WriteLine(CustomerDetailModel);
+            IsBusy = false;
+        }
+    }
+
+    private async Task GetInputOutputQuantityAsync(HttpClient httpClient)
+    {
+        try
+        {
+            var query = @$"SELECT
+                    [InputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(1, 2) AND CLIENTREF = {CustomerDetailModel.Customer.ReferenceId}),
+                    [OutputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(3, 4) AND CLIENTREF = {CustomerDetailModel.Customer.ReferenceId})";
+
+            var result = await _customQueryService.GetObjectAsync(httpClient, query);
+
+            if (result.IsSuccess)
             {
-                var query = @$"SELECT
-                    [InputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_01_STLINE WHERE IOCODE IN(1, 2) AND STOCKREF = {CustomerDetailModel.Customer.ReferenceId}),
-                    [OutputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_01_STLINE WHERE IOCODE IN(3, 4) AND STOCKREF = {CustomerDetailModel.Customer.ReferenceId})";
-
-                var result = await _customQueryService.GetObjectAsync(httpClient, query);
-
-                if (result.IsSuccess)
-                {
-                    if (result.Data == null)
-                        return;
-                    var obj = Mapping.Mapper.Map<CustomerDetailModel>(result.Data);
-                    CustomerDetailModel.InputQuantity = obj.InputQuantity;
-                    CustomerDetailModel.OutputQuantity = obj.OutputQuantity;
-                }
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
-
-                _userDialogs.Alert(message: ex.Message, title: "Hata");
+                if (result.Data == null)
+                    return;
+                var obj = Mapping.Mapper.Map<CustomerDetailModel>(result.Data);
+                CustomerDetailModel.InputQuantity = obj.InputQuantity;
+                CustomerDetailModel.OutputQuantity = obj.OutputQuantity;
             }
         }
-
-        private async Task GetLastTransactionsAsync(HttpClient httpclient)
+        catch (Exception ex)
         {
-            try
-            {
-                var query = @$"SELECT Top 5
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
+
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+    }
+
+    private async Task GetLastTransactionsAsync(HttpClient httpclient)
+    {
+        try
+        {
+            var query = @$"SELECT Top 5
 
         [TransactionDate] = STLINE.DATE_,
         [TransactionTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
@@ -124,28 +124,27 @@ namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels
         LEFT JOIN LG_001_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF AND MAINUNIT = 1
         LEFT JOIN LG_001_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
 		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = 1
-		WHERE STLINE.IOCODE IN (1,2,3,4) AND STFICHE.TRCODE IN (1,6) ORDER BY STLINE.DATE_ DESC";
+		WHERE STLINE.IOCODE IN (1,2,3,4) AND STFICHE.TRCODE IN (1,6)  AND  CLCARD.LOGICALREF = {CustomerDetailModel.Customer.ReferenceId}  ORDER BY STLINE.DATE_ DESC";
 
-                var result = await _customQueryService.GetObjectsAsync(httpclient, query);
+            var result = await _customQueryService.GetObjectsAsync(httpclient, query);
 
-                if (result.IsSuccess)
+            if (result.IsSuccess)
+            {
+                if (result.Data == null)
+                    return;
+
+                foreach (var item in result.Data)
                 {
-                    if (result.Data == null)
-                        return;
-
-                    foreach (var item in result.Data)
-                    {
-                        CustomerDetailModel.LastTransactions.Add(Mapping.Mapper.Map<CustomerTransaction>(item));
-                    }
+                    CustomerDetailModel.LastTransactions.Add(Mapping.Mapper.Map<CustomerTransaction>(item));
                 }
             }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
 
-                _userDialogs.Alert(message: ex.Message, title: "Hata");
-            }
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
         }
     }
 }
