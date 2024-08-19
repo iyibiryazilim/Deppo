@@ -4,8 +4,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
+using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views;
 
 namespace Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels;
 
@@ -26,6 +29,7 @@ public partial class WarehouseListViewModel : BaseViewModel
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
 		RefreshPageCommand = new Command(async () => await RefreshPageAsync());
 		PerformSearchCommand = new Command<SearchBar>(async (searchBar) => await PerformSearchAsync(searchBar));
+		ItemTappedCommand = new Command<Warehouse>(async (warehouse) => await ItemTappedAsync(warehouse));
     }
 
 	#region Commands
@@ -33,6 +37,7 @@ public partial class WarehouseListViewModel : BaseViewModel
 	public Command LoadMoreItemsCommand { get; }
 	public Command<SearchBar> PerformSearchCommand { get; }
 	public Command RefreshPageCommand { get; }
+	public Command ItemTappedCommand { get; }
 	#endregion
 
 	#region Collections
@@ -200,6 +205,34 @@ public partial class WarehouseListViewModel : BaseViewModel
 		catch(Exception ex)
 		{
 			_userDialogs.Alert(message: ex.Message, title: "Hata");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	async Task ItemTappedAsync(Warehouse warehouse)
+	{
+		if (warehouse is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			WarehouseDetailModel warehouseDetailModel = new();
+			warehouseDetailModel.Warehouse = warehouse;
+
+			await Shell.Current.GoToAsync($"{nameof(WarehouseDetailView)}", new Dictionary<string, object>
+			{
+				[nameof(WarehouseDetailModel)] = warehouseDetailModel
+			});
+		}
+		catch (Exception ex)
+		{
+			_userDialogs.Alert(ex.Message, "Hata");
 		}
 		finally
 		{

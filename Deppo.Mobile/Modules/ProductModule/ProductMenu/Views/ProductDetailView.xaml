@@ -9,7 +9,15 @@
              Title="{Binding Title}"
              x:DataType="viewModel:ProductDetailViewModel"
              Shell.TabBarIsVisible="False">
-    <ContentPage.ToolbarItems />
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Order="Primary">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.EllipsisVertical}"
+                                 Size="20" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
@@ -87,6 +95,13 @@
               RowSpacing="5">
             <Label FontSize="Subtitle" Text="Son Hareketler" />
 
+            <!--#region Loading-->
+            <ActivityIndicator Grid.Row="1"
+                               HorizontalOptions="Center"
+                               IsRunning="{Binding IsBusy}"
+                               VerticalOptions="Center" />
+            <!--#endregion-->
+
             <CollectionView Grid.Row="1" ItemsSource="{Binding ProductDetailModel.LastTransactions}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:ProductTransaction">
@@ -94,7 +109,7 @@
                                 BackgroundColor="Transparent"
                                 StrokeThickness="0.2">
                             <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
-                                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                <VerticalStackLayout Grid.Column="0" Spacing="5">
                                     <Label FontAttributes="None"
                                            FontSize="Title"
                                            HorizontalOptions="Center"
@@ -107,8 +122,35 @@
                                     <Label Text="{Binding TransactionTime, StringFormat='{0:hh:mm:ss}'}" TextColor="{StaticResource Gray500}" />
                                 </VerticalStackLayout>
 
-                                <VerticalStackLayout Grid.Column="1">
-                                    <Label Text="{Binding WarehouseName}" />
+                                <VerticalStackLayout Grid.Column="1" Spacing="3">
+                                    <Label FontAttributes="Bold" Text="{Binding TransactionNumber}" />
+                                    <Label Text="{Binding TransactionTypeName}" TextColor="{StaticResource Gray600}" />
+                                    <Label Text="{Binding WarehouseName}" TextColor="{StaticResource Gray500}" />
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Label FontFamily="FAS"
+                                               Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
+                                               TextColor="{StaticResource Primary}"
+                                               VerticalOptions="Center" />
+                                        <Label>
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span FontAttributes="Bold" Text="{Binding Quantity}" />
+                                                    <Span Text=" " />
+                                                    <Span FontAttributes="Bold" Text="{Binding SubUnitsetCode}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                        <Image>
+                                            <Image.Source>
+                                                <FontImageSource FontFamily="FAS"
+                                                                 Glyph="{Binding IOTypeImageSource}"
+                                                                 Size="16"
+                                                                 Color="{StaticResource Primary}" />
+                                            </Image.Source>
+                                        </Image>
+                                        <Label Text="{Binding IOTypeName}" FontAttributes="None" />
+                                    </HorizontalStackLayout>
+
 
                                 </VerticalStackLayout>
                             </Grid>
