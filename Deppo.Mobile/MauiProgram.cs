@@ -179,6 +179,7 @@ public static class MauiProgram
         builder.Services.AddSingletonWithShellRoute<ProductListView, ProductListViewModel>(nameof(ProductListView));
         builder.Services.AddScopedWithShellRoute<ProductDetailView, ProductDetailViewModel>(nameof(ProductDetailView));
         builder.Services.AddSingletonWithShellRoute<WarehouseListView, WarehouseListViewModel>(nameof(WarehouseListView));
+        builder.Services.AddScopedWithShellRoute<WarehouseDetailView, WarehouseDetailViewModel>(nameof(WarehouseDetailView));
         builder.Services.AddSingletonWithShellRoute<ProductProcessView, ProductProcessViewModel>(nameof(ProductProcessView));
 
         #endregion Product Modules

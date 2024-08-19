@@ -94,6 +94,9 @@
                             <Border Padding="10"
                                     BackgroundColor="Transparent"
                                     StrokeThickness="0.1">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WarehouseListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
                                 <Grid ColumnDefinitions="Auto, *">
                                     <Border Grid.Column="0"
                                             Padding="0,0,10,0"
