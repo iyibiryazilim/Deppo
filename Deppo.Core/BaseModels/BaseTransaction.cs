@@ -8,6 +8,8 @@ public class BaseTransaction : INotifyPropertyChanged, IDisposable
 {
     private int _transactionType;
     private string _transactionTypeName = string.Empty;
+    private DateTime _transactionDate;
+    private TimeSpan _transactionTime;
     private int _referenceId;
     private double _quantity;
 
@@ -61,6 +63,28 @@ public class BaseTransaction : INotifyPropertyChanged, IDisposable
             NotifyPropertyChanged(nameof(Quantity));
         }
     }
+
+    public DateTime TransactionDate
+	{
+		get => _transactionDate;
+		set
+		{
+			if (_transactionDate == value) return;
+			_transactionDate = value;
+			NotifyPropertyChanged(nameof(TransactionDate));
+		}
+	}
+
+    public TimeSpan TransactionTime
+    {
+        get => _transactionTime;
+		set
+		{
+			if (_transactionTime == value) return;
+			_transactionTime = value;
+			NotifyPropertyChanged(nameof(TransactionTime));
+		}
+	}
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
