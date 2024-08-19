@@ -96,8 +96,9 @@ public partial class ProductDetailViewModel : BaseViewModel
 			var query = @$"SELECT TOP 5
 				[TransactionDate] = STLINE.DATE_,
 				[TransactionTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
-				[BaseTransactionCode] = STFICHE.FICHENO,
+				[TransactionNumber] = STFICHE.FICHENO,
 				[TransactionType] = STLINE.TRCODE,
+                [IOType] = STLINE.IOCODE,
 				[SubUnitsetCode] = SUBUNITSET.CODE,
 				[SubUnitsetReferenceId] = SUBUNITSET.LOGICALREF,
 				[UnitsetCode] = UNITSET.CODE,
