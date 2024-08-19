@@ -10,6 +10,8 @@ namespace Deppo.Core.Models
     public class SupplierTransaction : BaseTransaction
     {
         private string _currentName = string.Empty;
+        private string _currrentCode = string.Empty;
+        private string _ficheCode = string.Empty;
 
         public string CurrentName
         {
@@ -22,8 +24,6 @@ namespace Deppo.Core.Models
             }
         }
 
-        private string _currrentCode = string.Empty;
-
         public string CurrentCode
         {
             get => _currrentCode;
@@ -31,6 +31,17 @@ namespace Deppo.Core.Models
             {
                 if (_currrentCode == value) return;
                 _currrentCode = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public string FicheCode
+        {
+            get => _ficheCode;
+            set
+            {
+                if (_ficheCode == value) return;
+                _ficheCode = value;
                 NotifyPropertyChanged();
             }
         }

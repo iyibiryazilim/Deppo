@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views.SupplierDetailView"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels"
              x:DataType="viewModel:SupplierDetailViewModel"
              xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
@@ -26,70 +27,80 @@
                 Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
+    <Grid RowDefinitions=".40*,.60*"
+          RowSpacing="10"
+          Padding="10">
 
-    <Grid Margin="10"
-          RowDefinitions="Auto, Auto, Auto, *"
-          RowSpacing="10">
-        <!--#region Image-->
-        <Border Grid.Row="0"
-                BackgroundColor="{StaticResource Secondary}"
-                HeightRequest="100"
-                StrokeShape="RoundRectangle 50"
-                StrokeThickness="0"
-                VerticalOptions="Center"
-                WidthRequest="100">
-            <!--<Image Source="{Binding SupplierDetailModel.Supplier.Ima, Converter={StaticResource ByteArrayToImageSourceConverter}}" />-->
-        </Border>
-        <!--#endregion-->
+        <VerticalStackLayout Grid.Row="0"
+                             Spacing="5">
+            <Border BackgroundColor="{StaticResource Secondary}"
+                    HeightRequest="100"
+                    StrokeShape="RoundRectangle 50"
+                    StrokeThickness="0"
+                    VerticalOptions="Center"
+                    WidthRequest="100">
+                <!--<Image Source="{Binding SupplierDetailModel.Supplier.Ima, Converter={StaticResource ByteArrayToImageSourceConverter}}" />-->
+            </Border>
 
-        <!--#region Code, Name, StockQuantity -->
-        <VerticalStackLayout Grid.Row="1"
-                             HorizontalOptions="Center"
-                             Spacing="4">
-            <Label FontAttributes="Bold"
-                   HorizontalOptions="Center"
-                   Text="{Binding SupplierDetailModel.Supplier.Code}" />
-            <Label HorizontalOptions="Center"
-                   Text="{Binding SupplierDetailModel.Supplier.Name}" />
+            <!--#endregion-->
+
+            <!--#region Code, Name, StockQuantity -->
+            <VerticalStackLayout HorizontalOptions="Center"
+                                 Spacing="4">
+                <Label FontAttributes="Bold"
+                       HorizontalOptions="Center"
+                       FontSize="Large"
+                       Text="{Binding SupplierDetailModel.Supplier.Code}" />
+                <Label HorizontalOptions="Center"
+                       FontSize="Medium"
+                       Text="{Binding SupplierDetailModel.Supplier.Name}" />
+            </VerticalStackLayout>
+            <!--#endregion-->
+
+            <!--#region Input, Output -->
+            <Grid Padding="10,0,10,0"
+                  ColumnDefinitions=".50*, .50*"
+                  ColumnSpacing="10">
+                <Border Grid.Column="0"
+                        StrokeShape="RoundRectangle 10"
+                        Padding="20,10,20,10"
+                        BackgroundColor="{StaticResource PrimaryLight}"
+                        StrokeThickness="0">
+                    <VerticalStackLayout VerticalOptions="Center">
+                        <Label HorizontalOptions="Center"
+                               Text="{Binding SupplierDetailModel.InputQuantity}"
+                               TextColor="{StaticResource White}"
+                               FontSize="Medium" />
+                        <Label HorizontalOptions="Center"
+                               Text="Giriş"
+                               TextColor="{StaticResource WhiteSmoke}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Grid.Column="1"
+                        Padding="20,10,20,10"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="{StaticResource PrimaryLight}"
+                        StrokeThickness="0">
+                    <VerticalStackLayout VerticalOptions="Center">
+                        <Label HorizontalOptions="Center"
+                               Text="{Binding SupplierDetailModel.OutputQuantity}"
+                               TextColor="{StaticResource White}"
+                               FontSize="Medium" />
+                        <Label HorizontalOptions="Center"
+                               Text="Çıkış"
+                               TextColor="{StaticResource WhiteSmoke}" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
         </VerticalStackLayout>
-        <!--#endregion-->
-
-        <!--#region Input, Output -->
-        <Grid Grid.Row="2"
-              Padding="10,0,10,0"
-              ColumnDefinitions=".50*, .50*"
-              ColumnSpacing="10">
-            <Border Grid.Column="0"
-                    Padding="20,10,20,10"
-                    BackgroundColor="{StaticResource PrimaryLight}"
-                    StrokeThickness="0">
-                <VerticalStackLayout VerticalOptions="Center">
-                    <Label HorizontalOptions="Center"
-                           Text="{Binding SupplierDetailModel.InputQuantity}" />
-                    <Label HorizontalOptions="Center"
-                           Text="Giriş" />
-                </VerticalStackLayout>
-            </Border>
-
-            <Border Grid.Column="1"
-                    Padding="20,10,20,10"
-                    BackgroundColor="{StaticResource PrimaryLight}"
-                    StrokeThickness="0">
-                <VerticalStackLayout VerticalOptions="Center">
-                    <Label HorizontalOptions="Center"
-                           Text="{Binding SupplierDetailModel.OutputQuantity}" />
-                    <Label HorizontalOptions="Center"
-                           Text="Çıkış" />
-                </VerticalStackLayout>
-            </Border>
-        </Grid>
-        <!--#endregion-->
 
         <!--#region Last Transactions List -->
-        <Grid Grid.Row="3"
+        <Grid Grid.Row="1"
               RowDefinitions="Auto, *"
-              RowSpacing="5">
+              RowSpacing="10">
             <Label FontSize="Subtitle"
+                   FontAttributes="Bold"
                    Text="Son Hareketler" />
 
             <CollectionView Grid.Row="1"
@@ -98,26 +109,30 @@
                     <DataTemplate x:DataType="model:SupplierTransaction">
                         <Border Padding="5"
                                 BackgroundColor="Transparent"
-                                StrokeThickness="0.2">
+                                StrokeThickness="0.1">
                             <Grid ColumnDefinitions="Auto, *"
                                   ColumnSpacing="10">
                                 <VerticalStackLayout Grid.Column="0"
                                                      Spacing="2">
                                     <Label FontAttributes="None"
-                                           FontSize="Title"
+                                           FontSize="Large"
                                            HorizontalOptions="Center"
-                                           Text="{Binding TransactionDate, StringFormat='{0:dd}'}" />
+                                           Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
+                                           TextColor="{StaticResource OffBlack}" />
                                     <Label FontAttributes="None"
-                                           FontSize="Subtitle"
+                                           FontSize="Medium"
                                            HorizontalOptions="Center"
                                            Text="{Binding TransactionDate, StringFormat='{0:MM/yyyy}'}"
                                            TextColor="{StaticResource Gray600}" />
-                                    <Label Text="{Binding TransactionTime, StringFormat='{0:hh:mm:ss}'}"
-                                           TextColor="{StaticResource Gray500}" />
+                                    <Label Text="{Binding TransactionTime, StringFormat='{0:HH:mm}'}"
+                                           TextColor="{StaticResource Gray400}"
+                                           HorizontalOptions="Center" />
                                 </VerticalStackLayout>
 
-                                <VerticalStackLayout Grid.Column="1">
-                                    <Label Text="{Binding CurrentCode}" />
+                                <VerticalStackLayout Grid.Column="1"
+                                                     Spacing="5"
+                                                     VerticalOptions="Center">
+                                    <Label Text="{Binding FicheCode}" />
                                     <Label Text="{Binding CurrentName}" />
 
                                     <HorizontalStackLayout Spacing="5">
@@ -154,6 +169,5 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </Grid>
-        <!--#endregion-->
     </Grid>
 </ContentPage>
