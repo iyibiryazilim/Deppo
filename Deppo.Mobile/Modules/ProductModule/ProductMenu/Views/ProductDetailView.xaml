@@ -11,7 +11,7 @@
              Shell.TabBarIsVisible="False">
     <ContentPage.ToolbarItems />
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior EventName="Loaded" Command="{Binding LoadItemsCommand}" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
@@ -42,7 +42,7 @@
         </Border>
         <!--#endregion-->
 
-        <!--#region Code, Name, StockQuantity -->
+        <!--#region Code, Name, StockQuantity-->
         <VerticalStackLayout Grid.Row="1"
                              HorizontalOptions="Center"
                              Spacing="4">
@@ -54,7 +54,7 @@
         </VerticalStackLayout>
         <!--#endregion-->
 
-        <!--#region Input, Output -->
+        <!--#region Input, Output-->
         <Grid Grid.Row="2"
               Padding="10,0,10,0"
               ColumnDefinitions=".50*, .50*"
@@ -81,23 +81,43 @@
         </Grid>
         <!--#endregion-->
 
-        <!--#region Last Transactions List -->
-        <Grid Grid.Row="3" RowDefinitions="Auto, *" RowSpacing="5">
-            <Label Text="Son Hareketler" FontSize="Subtitle" />
+        <!--#region Last Transactions List-->
+        <Grid Grid.Row="3"
+              RowDefinitions="Auto, *"
+              RowSpacing="5">
+            <Label FontSize="Subtitle" Text="Son Hareketler" />
 
-            <!--<CollectionView Grid.Row="1" ItemsSource="{Binding ProductDetailModel.LastTransactions}">
+            <CollectionView Grid.Row="1" ItemsSource="{Binding ProductDetailModel.LastTransactions}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:ProductTransaction">
-                        <Border Padding="5" BackgroundColor="Transparent" StrokeThickness="0.2">
-                            <Grid ColumnDefinitions="Auto, *">
-                                
+                        <Border Padding="5"
+                                BackgroundColor="Transparent"
+                                StrokeThickness="0.2">
+                            <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
+                                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                    <Label FontAttributes="None"
+                                           FontSize="Title"
+                                           HorizontalOptions="Center"
+                                           Text="{Binding TransactionDate, StringFormat='{0:dd}'}" />
+                                    <Label FontAttributes="None"
+                                           FontSize="Subtitle"
+                                           HorizontalOptions="Center"
+                                           Text="{Binding TransactionDate, StringFormat='{0:MM/yyyy}'}"
+                                           TextColor="{StaticResource Gray600}" />
+                                    <Label Text="{Binding TransactionTime, StringFormat='{0:hh:mm:ss}'}" TextColor="{StaticResource Gray500}" />
+                                </VerticalStackLayout>
+
+                                <VerticalStackLayout Grid.Column="1">
+                                    <Label Text="{Binding WarehouseName}" />
+
+                                </VerticalStackLayout>
                             </Grid>
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
-                
-            </CollectionView>-->
-            
+
+            </CollectionView>
+
         </Grid>
         <!--#endregion-->
     </Grid>

@@ -91,6 +91,8 @@ public partial class ProductDetailViewModel : BaseViewModel
 	{
 		try
 		{
+			ProductDetailModel.LastTransactions.Clear();
+
 			var query = @$"SELECT TOP 5
 				[TransactionDate] = STLINE.DATE_,
 				[TransactionTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
