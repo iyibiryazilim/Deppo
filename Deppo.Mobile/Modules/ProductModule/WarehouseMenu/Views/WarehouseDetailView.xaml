@@ -4,11 +4,169 @@
              x:Class="Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views.WarehouseDetailView"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             Title="{Binding Title}"
+              Shell.TabBarIsVisible="False"
              x:DataType="viewModel:WarehouseDetailViewModel">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Order="Primary">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                             Glyph="{x:Static fontAwesome:FontAwesomeIcons.EllipsisVertical}"
+                             Size="20" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
+    <ContentPage.Behaviors>
+        <!--<toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                    EventName="Loaded" />-->
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                               StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android"
+            Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid Margin="10"
+       RowDefinitions="Auto, Auto, Auto, *"
+       RowSpacing="10">
+        <!--#region Image-->
+        <Border Grid.Row="0"
+             BackgroundColor="{StaticResource Primary}"
+             HeightRequest="100"
+             StrokeShape="RoundRectangle 50"
+             StrokeThickness="0"
+             VerticalOptions="Center"
+             WidthRequest="100">
+            <!--<Image Source="{Binding WarehouseDetailModel.Warehouse.Number, Converter={StaticResource ByteArrayToImageSourceConverter}}" />-->
+        </Border>
+        <!--#endregion-->
+
+        <!--#region Name, Number-->
+        <VerticalStackLayout Grid.Row="1"
+                          HorizontalOptions="Center"
+                          Spacing="4">
+            <Label FontAttributes="Bold"
+                HorizontalOptions="Center"
+                Text="{Binding WarehouseDetailModel.Warehouse.Name}" />
+            <Label HorizontalOptions="Center"
+                Text="{Binding WarehouseDetailModel.Warehouse.Number}" />
+        </VerticalStackLayout>
+        <!--#endregion-->
+
+        <!--#region Input, Output-->
+        <Grid Grid.Row="2"
+           Padding="10,0,10,0"
+           ColumnDefinitions=".50*, .50*"
+           ColumnSpacing="10">
+            <Border Grid.Column="0"
+                 Padding="20,10,20,10"
+                 BackgroundColor="{StaticResource PrimaryLight}"
+                 StrokeThickness="0">
+                <VerticalStackLayout VerticalOptions="Center">
+                    <Label HorizontalOptions="Center"
+                        Text="{Binding WarehouseDetailModel.InputQuantity}" />
+                    <Label HorizontalOptions="Center"
+                        Text="Giriş" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Grid.Column="1"
+                 Padding="20,10,20,10"
+                 BackgroundColor="{StaticResource PrimaryLight}"
+                 StrokeThickness="0">
+                <VerticalStackLayout VerticalOptions="Center">
+                    <Label HorizontalOptions="Center"
+                        Text="{Binding WarehouseDetailModel.OutputQuantity}" />
+                    <Label HorizontalOptions="Center"
+                        Text="Çıkış" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+        <!--#endregion-->
+
+        <!--#region Last Transactions List-->
+        <Grid Grid.Row="3"
+           RowDefinitions="Auto, *"
+           RowSpacing="5">
+            <Label FontSize="Subtitle"
+                Text="Son Hareketler" />
+
+            <!--#region Loading-->
+            <ActivityIndicator Grid.Row="1"
+                            HorizontalOptions="Center"
+                            IsRunning="{Binding IsBusy}"
+                            VerticalOptions="Center" />
+            <!--#endregion-->
+
+            <!--<CollectionView Grid.Row="1" ItemsSource="{Binding WarehouseDetailModel.LastTransactions}">
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="model:WarehouseTransaction">
+                        <Border Padding="5"
+                             BackgroundColor="Transparent"
+                             StrokeThickness="0.2">
+                            <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
+                                <VerticalStackLayout Grid.Column="0" Spacing="5">
+
+                                    <Label FontAttributes="None"
+                                        FontSize="Title"
+                                        HorizontalOptions="Center"
+                                        Text="{Binding TransactionDate, StringFormat='{0:dd}'}" />
+                                    <Label FontAttributes="None"
+                                        FontSize="Subtitle"
+                                        HorizontalOptions="Center"
+                                        Text="{Binding TransactionDate, StringFormat='{0:MM/yyyy}'}"
+                                        TextColor="{StaticResource Gray600}" />
+                                    <Label Text="{Binding TransactionTime, StringFormat='{0:hh:mm:ss}'}"
+                                        TextColor="{StaticResource Gray500}" />
+                                </VerticalStackLayout>
+
+                                <VerticalStackLayout Grid.Column="1" Spacing="3">
+                                    <Label FontAttributes="Bold" Text="{Binding TransactionNumber}" />
+                                    <Label Text="{Binding TransactionTypeName}" TextColor="{StaticResource Gray600}" />
+                                    <Label Text="{Binding WarehouseName}" TextColor="{StaticResource Gray500}" />
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Label FontFamily="FAS"
+                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
+                                            TextColor="{StaticResource Primary}"
+                                            VerticalOptions="Center" />
+                                        <Label>
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span FontAttributes="Bold" Text="{Binding Quantity}" />
+                                                    <Span Text=" " />
+                                                    <Span FontAttributes="Bold" Text="{Binding SubUnitsetCode}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                        <Image>
+                                            <Image.Source>
+                                                <FontImageSource FontFamily="FAS"
+                                                              Glyph="{Binding IOTypeImageSource}"
+                                                              Size="16"
+                                                              Color="{StaticResource Primary}" />
+                                            </Image.Source>
+                                        </Image>
+                                        <Label Text="{Binding IOTypeName}" FontAttributes="None" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>-->
+        </Grid>
+        <!--#endregion-->
+    </Grid>
 </ContentPage>

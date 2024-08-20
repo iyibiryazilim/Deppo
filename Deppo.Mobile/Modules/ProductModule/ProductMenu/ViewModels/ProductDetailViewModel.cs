@@ -39,11 +39,13 @@ public partial class ProductDetailViewModel : BaseViewModel
 			IsBusy = true;
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			_userDialogs.Loading("Loading Items...");
 			await Task.Delay(1000);
 
 			// Querylerde yer alan firma numarasi dinamik olarak alinacak
 			await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastTransactionsAsync(httpClient));
 
+			_userDialogs.HideHud();
 		}
 		catch (Exception ex)
 		{
@@ -54,7 +56,6 @@ public partial class ProductDetailViewModel : BaseViewModel
 		}
 		finally
 		{
-			Console.WriteLine(ProductDetailModel);
 			IsBusy = false;
 		}
 	}
@@ -111,7 +112,7 @@ public partial class ProductDetailViewModel : BaseViewModel
 				LEFT JOIN LG_001_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF AND MAINUNIT = 1
 				LEFT JOIN LG_001_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
 				LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = 1
-				WHERE ITEMS.LOGICALREF= 19277 ORDER BY STLINE.DATE_ DESC";
+				WHERE ITEMS.LOGICALREF= {ProductDetailModel.Product.ReferenceId} ORDER BY STLINE.DATE_ DESC";
 
 			var result = await _customQueryService.GetObjectsAsync(httpclient, query);
 

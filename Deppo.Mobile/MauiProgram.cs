@@ -118,7 +118,7 @@ public static class MauiProgram
                 fonts.AddFont("Roboto-LightItalic.ttf", "RobotoLightItalic");
                 fonts.AddFont("Roboto-Medium.ttf", "RobotoMedium");
                 fonts.AddFont("Roboto-MediumItalic.ttf", "RobotoMediumItalic");
-                fonts.AddFont("Roboto-Regular.ttf", "RobotoRegular");
+                fonts.AddFont("Roboto-Regular.ttf", "Roboto");
                 fonts.AddFont("Roboto-Thin.ttf", "RobotoThin");
                 fonts.AddFont("Roboto-ThinItalic.ttf", "RobotoThinItalic");
 

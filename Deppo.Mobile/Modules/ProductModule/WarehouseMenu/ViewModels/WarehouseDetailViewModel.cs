@@ -1,8 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 
 namespace Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels;
@@ -41,7 +43,10 @@ public partial class WarehouseDetailViewModel : BaseViewModel
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            await Task.Delay(1000);
+			_userDialogs.Loading("Loading Items...");
+
+			await Task.Delay(1000);
+            await Task.WhenAll(GetInputOutputQuantityAsync(httpClient));
         }
         catch (Exception ex)
         {
@@ -53,6 +58,85 @@ public partial class WarehouseDetailViewModel : BaseViewModel
         finally
         {
            IsBusy = false;
-        }
+			_userDialogs.Loading().Hide();
+		}
     }
+
+	async Task GetInputOutputQuantityAsync(HttpClient httpClient)
+	{
+		try
+		{
+			var query = @$"SELECT 
+                    [InputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_01_STLINE WHERE IOCODE IN(1, 2) AND STOCKREF = {WarehouseDetailModel.Warehouse.ReferenceId}),
+                    [OutputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_01_STLINE WHERE IOCODE IN(3, 4) AND STOCKREF = {WarehouseDetailModel.Warehouse.ReferenceId})";
+
+			var result = await _customQueryService.GetObjectAsync(httpClient, query);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data == null)
+					return;
+				var obj = Mapping.Mapper.Map<WarehouseDetailModel>(result.Data);
+				WarehouseDetailModel.InputQuantity = obj.InputQuantity;
+				WarehouseDetailModel.OutputQuantity = obj.OutputQuantity;
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			_userDialogs.Alert(message: ex.Message, title: "Hata");
+		}
+	}
+
+	async Task GetLastTransactionsAsync(HttpClient httpclient)
+	{
+		try
+		{
+			WarehouseDetailModel.LastTransactions.Clear();
+
+			var query = @$"SELECT TOP 5
+				[TransactionDate] = STLINE.DATE_,
+				[TransactionTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
+				[TransactionNumber] = STFICHE.FICHENO,
+				[TransactionType] = STLINE.TRCODE,
+                [IOType] = STLINE.IOCODE,
+				[SubUnitsetCode] = SUBUNITSET.CODE,
+				[SubUnitsetReferenceId] = SUBUNITSET.LOGICALREF,
+				[UnitsetCode] = UNITSET.CODE,
+				[UnitsetReferenceId] = UNITSET.LOGICALREF,
+				[Quantity] = STLINE.AMOUNT,
+				[WarehouseNumber] = CAPUWHOUSE.NR,
+				[WarehouseName] = CAPIWHOUSE.NAME
+				FROM LG_001_01_STLINE AS STLINE
+				LEFT JOIN LG_001_01_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+				LEFT JOIN LG_001_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF
+				LEFT JOIN LG_001_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF AND MAINUNIT = 1
+				LEFT JOIN LG_001_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
+				LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = 1
+				WHERE CAPIWHOUSE.LOGICALREF= {WarehouseDetailModel.Warehouse.ReferenceId} ORDER BY STLINE.DATE_ DESC";
+
+			var result = await _customQueryService.GetObjectsAsync(httpclient, query);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data == null)
+					return;
+
+				foreach (var item in result.Data)
+				{
+					WarehouseDetailModel.LastTransactions.Add(Mapping.Mapper.Map<WarehouseTransaction>(item));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			_userDialogs.Alert(message: ex.Message, title: "Hata");
+		}
+	}
 }
