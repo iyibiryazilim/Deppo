@@ -42,7 +42,7 @@
        RowSpacing="10">
         <!--#region Image-->
         <Border Grid.Row="0"
-             BackgroundColor="{StaticResource Secondary}"
+             BackgroundColor="{StaticResource Primary}"
              HeightRequest="100"
              StrokeShape="RoundRectangle 50"
              StrokeThickness="0"
@@ -52,7 +52,7 @@
         </Border>
         <!--#endregion-->
 
-        <!--#region Code, Name, StockQuantity-->
+        <!--#region Name, Number-->
         <VerticalStackLayout Grid.Row="1"
                           HorizontalOptions="Center"
                           Spacing="4">
@@ -109,10 +109,10 @@
                             VerticalOptions="Center" />
             <!--#endregion-->
 
-            <!--<CollectionView Grid.Row="1" ItemsSource="{Binding ProductDetailModel.LastTransactions}">
+            <!--<CollectionView Grid.Row="1" ItemsSource="{Binding WarehouseDetailModel.LastTransactions}">
 
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="model:ProductTransaction">
+                    <DataTemplate x:DataType="model:WarehouseTransaction">
                         <Border Padding="5"
                              BackgroundColor="Transparent"
                              StrokeThickness="0.2">

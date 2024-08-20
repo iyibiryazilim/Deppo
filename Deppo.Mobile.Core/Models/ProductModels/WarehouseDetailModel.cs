@@ -15,5 +15,5 @@ public partial class WarehouseDetailModel : ObservableObject
 	[ObservableProperty]
 	private double outputQuantity;
 
-	//public ObservableCollection<WarehouseTransaction> LastTransactions { get; } = new();
+	public ObservableCollection<WarehouseTransaction> LastTransactions { get; } = new();
 }

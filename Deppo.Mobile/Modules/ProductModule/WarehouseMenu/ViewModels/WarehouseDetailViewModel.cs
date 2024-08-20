@@ -94,7 +94,7 @@ public partial class WarehouseDetailViewModel : BaseViewModel
 	{
 		try
 		{
-			
+			WarehouseDetailModel.LastTransactions.Clear();
 
 			var query = @$"SELECT TOP 5
 				[TransactionDate] = STLINE.DATE_,
@@ -107,6 +107,7 @@ public partial class WarehouseDetailViewModel : BaseViewModel
 				[UnitsetCode] = UNITSET.CODE,
 				[UnitsetReferenceId] = UNITSET.LOGICALREF,
 				[Quantity] = STLINE.AMOUNT,
+				[WarehouseNumber] = CAPUWHOUSE.NR,
 				[WarehouseName] = CAPIWHOUSE.NAME
 				FROM LG_001_01_STLINE AS STLINE
 				LEFT JOIN LG_001_01_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
@@ -125,7 +126,7 @@ public partial class WarehouseDetailViewModel : BaseViewModel
 
 				foreach (var item in result.Data)
 				{
-					//WarehouseDetailModel.LastTransactions.Add(Mapping.Mapper.Map<WarehouseTransaction>(item));
+					WarehouseDetailModel.LastTransactions.Add(Mapping.Mapper.Map<WarehouseTransaction>(item));
 				}
 			}
 		}

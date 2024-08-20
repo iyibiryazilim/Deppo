@@ -13,6 +13,7 @@ public class MappingProfile : Profile
         CreateMap<ProductDetailModel, dynamic>();
         CreateMap<ProductTransaction, dynamic>();
         CreateMap<WarehouseDetailModel, dynamic>();
+        CreateMap<WarehouseTransaction, dynamic>();
         CreateMap<SupplierDetailModel, dynamic>();
         CreateMap<SupplierTransaction, dynamic>();
         CreateMap<CustomerDetailModel, dynamic>();

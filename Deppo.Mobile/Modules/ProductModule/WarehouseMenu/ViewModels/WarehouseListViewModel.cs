@@ -47,8 +47,6 @@ public partial class WarehouseListViewModel : BaseViewModel
 	#region Properties
 	[ObservableProperty]
 	string searchText = string.Empty;
-	[ObservableProperty]
-	int page = 0;
 	#endregion
 
 	public async Task LoadItemsAsync()
@@ -61,7 +59,6 @@ public partial class WarehouseListViewModel : BaseViewModel
 			IsBusy = true;
 
 			Items.Clear();
-			//string? token = await SecureStorage.GetAsync("token");
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			var result = await _warehouseService.GetObjects(httpClient,search: SearchText, orderBy: null, page: 0, pageSize: 20, firmNumber: 1);
@@ -90,37 +87,40 @@ public partial class WarehouseListViewModel : BaseViewModel
 
 	public async Task LoadMoreItemsAsync()
 	{
-		if (Items.Count < (20 - 2))
+		if (IsBusy)
 			return;
 
 		try
 		{
 			IsBusy = true;
-
+			_userDialogs.Loading("Refreshing Items...");
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			Page += 1;
-
-			var result = await _warehouseService.GetObjects(httpClient, SearchText, null, page: Page, 20, 1);
+			var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, Items.Count, 20, 1);
 			if (result.IsSuccess)
 			{
 				if (result.Data == null)
 					return;
-				if(!result.Data.Any())
-				{
-					Page -= 1;
-					return;
-				}
 
 				foreach (var item in result.Data)
 					Items.Add(item);
+
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.Loading().Hide();
 			}
 			else
 			{
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.Loading().Hide();
+
 				_userDialogs.Alert(message: result.Message, title: "Load Items");
 			}
 		}
 		catch (Exception ex)
 		{
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
 			_userDialogs.Alert(message: ex.Message, title: "Load Items Error");
 		}
 		finally
