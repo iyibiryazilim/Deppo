@@ -55,7 +55,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.Loading().Hide();
 
-                _userDialogs.Alert(message: ex.Message, title: "Hata");
+                _userDialogs.Alert(message: ex.Message, title: "Hata...");
             }
             finally
             {
