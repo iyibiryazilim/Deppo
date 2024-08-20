@@ -74,6 +74,7 @@
                     <VerticalStackLayout VerticalOptions="Center">
                         <Label HorizontalOptions="Center"
                                Text="{Binding CustomerDetailModel.InputQuantity}"
+                               FontAttributes="Bold"
                                TextColor="{StaticResource White}"
                                FontSize="Medium" />
                         <Label HorizontalOptions="Center"
@@ -91,6 +92,7 @@
                         <Label HorizontalOptions="Center"
                                Text="{Binding CustomerDetailModel.OutputQuantity}"
                                TextColor="{StaticResource White}"
+                               FontAttributes="Bold"
                                FontSize="Medium" />
                         <Label HorizontalOptions="Center"
                                Text="Çıkış"
@@ -104,7 +106,7 @@
         <Grid Grid.Row="1"
               RowDefinitions="Auto, *"
               RowSpacing="10">
-            <Label FontSize="Subtitle"
+            <Label FontSize="Title"
                    FontAttributes="Bold"
                    Text="Son Hareketler" />
 
@@ -118,18 +120,16 @@
                             <Grid ColumnDefinitions="Auto, *"
                                   ColumnSpacing="10">
                                 <VerticalStackLayout Grid.Column="0"
-                                                     Spacing="2">
-                                    <Label FontAttributes="None"
-                                           FontSize="Large"
+                                                     Spacing="1">
+                                    <Label FontSize="Large"
                                            HorizontalOptions="Center"
                                            Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
                                            TextColor="{StaticResource OffBlack}" />
-                                    <Label FontAttributes="None"
-                                           FontSize="Medium"
+                                    <Label FontSize="Medium"
                                            HorizontalOptions="Center"
                                            Text="{Binding TransactionDate, StringFormat='{0:MM/yyyy}'}"
-                                           TextColor="{StaticResource Gray600}" />
-                                    <Label Text="{Binding TransactionTime, StringFormat='{0:HH:mm}'}"
+                                           TextColor="{StaticResource OffBlack}" />
+                                    <Label Text="{Binding TransactionTime,StringFormat='{0:hh\\:mm}'}"
                                            TextColor="{StaticResource Gray400}"
                                            HorizontalOptions="Center" />
                                 </VerticalStackLayout>
@@ -137,11 +137,15 @@
                                 <VerticalStackLayout Grid.Column="1"
                                                      Spacing="5"
                                                      VerticalOptions="Center">
-                                    <Label Text="{Binding FicheCode}" />
-                                    <Label Text="{Binding CurrentName}" />
+                                    <Label FontAttributes="Bold"
+                                           Text="{Binding FicheCode}"
+                                           FontSize="Medium" />
+                                    <Label Text="{Binding CurrentName}" LineBreakMode="TailTruncation"
+                                           FontSize="13" />
 
                                     <HorizontalStackLayout Spacing="5">
                                         <Label FontFamily="FAS"
+                                               FontSize="Small"
                                                Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
                                                TextColor="{StaticResource Primary}"
                                                VerticalOptions="Center" />
@@ -165,7 +169,7 @@
                                             </Image.Source>
                                         </Image>
                                         <Label Text="{Binding IOTypeName}"
-                                               FontAttributes="None" />
+                                               FontAttributes="Bold" />
                                     </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Grid>

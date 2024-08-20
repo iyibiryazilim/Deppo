@@ -15,6 +15,7 @@ public class Warehouse : INotifyPropertyChanged, IDisposable
     private string _name = string.Empty;
     private string _city = string.Empty;
     private string _country = string.Empty;
+    private int _quantity;
 
     public Warehouse()
     {
@@ -76,6 +77,22 @@ public class Warehouse : INotifyPropertyChanged, IDisposable
 			NotifyPropertyChanged();
 		}
     }
+
+    public int Quantity
+    {
+        get => _quantity;
+        set
+        {
+            if (_quantity == value) return;
+            _quantity = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+
+
+
+
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
