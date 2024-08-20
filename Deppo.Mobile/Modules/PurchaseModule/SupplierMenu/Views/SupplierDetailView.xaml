@@ -47,7 +47,7 @@
 
             <!--#endregion-->
 
-            <!--#region Code, Name, StockQuantity -->
+            <!--#region Code, Name -->
             <VerticalStackLayout HorizontalOptions="Center"
                                  Spacing="4">
                 <Label FontAttributes="Bold"
