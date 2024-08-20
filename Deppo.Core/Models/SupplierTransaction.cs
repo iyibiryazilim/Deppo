@@ -1,6 +1,7 @@
 ﻿using Deppo.Core.BaseModels;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,39 +10,45 @@ namespace Deppo.Core.Models
 {
     public class SupplierTransaction : BaseTransaction
     {
-        private string _currentName = string.Empty;
-        private string _currrentCode = string.Empty;
-        private string _ficheCode = string.Empty;
+        private int _supplierReferenceId;
+        private string _supplierCode = string.Empty;
+        private string _supplierName = string.Empty;
 
-        public string CurrentName
+        public SupplierTransaction()
         {
-            get => _currentName;
+
+        }
+
+        [Browsable(false)]
+        public int SupplierReferenceId
+        {
+            get => _supplierReferenceId;
             set
             {
-                if (_currentName == value) return;
-                _currentName = value;
+                if (_supplierReferenceId == value) return;
+                _supplierReferenceId = value;
                 NotifyPropertyChanged();
             }
         }
 
-        public string CurrentCode
+        public string SupplierCode
         {
-            get => _currrentCode;
+            get => _supplierCode;
             set
             {
-                if (_currrentCode == value) return;
-                _currrentCode = value;
+                if (_supplierCode == value) return;
+                _supplierCode = value;
                 NotifyPropertyChanged();
             }
         }
 
-        public string FicheCode
+        public string SupplierName
         {
-            get => _ficheCode;
+            get => _supplierName;
             set
             {
-                if (_ficheCode == value) return;
-                _ficheCode = value;
+                if (_supplierName == value) return;
+                _supplierName = value;
                 NotifyPropertyChanged();
             }
         }

@@ -1,19 +1,26 @@
-﻿using Deppo.Core.BaseModels;
+﻿using System.ComponentModel;
+using Deppo.Core.BaseModels;
 
 namespace Deppo.Core.Models;
 
 public class WarehouseTransaction : BaseTransaction
 {
-	private int _warehouseNumber;
+	private int _warehouseReferenceId;
 	private string _warehouseName = string.Empty;
 
-	public int WarehouseNumber
+	public WarehouseTransaction()
 	{
-		get => _warehouseNumber;
+
+	}
+
+	[Browsable(false)]
+	public int WarehouseReferenceId
+	{
+		get => _warehouseReferenceId;
 		set
 		{
-			if (_warehouseNumber == value) return;
-			_warehouseNumber = value;
+			if (_warehouseReferenceId == value) return;
+			_warehouseReferenceId = value;
 			NotifyPropertyChanged();
 		}
 	}
