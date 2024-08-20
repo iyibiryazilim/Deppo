@@ -32,7 +32,10 @@
           Padding="10">
 
         <VerticalStackLayout Grid.Row="0"
-                             Spacing="5">
+                             Padding="10"
+                             HorizontalOptions="Fill"
+                             Spacing="10"
+                             VerticalOptions="Center">
             <Border BackgroundColor="{StaticResource Secondary}"
                     HeightRequest="100"
                     StrokeShape="RoundRectangle 50"
@@ -44,7 +47,7 @@
 
             <!--#endregion-->
 
-            <!--#region Code, Name, StockQuantity -->
+            <!--#region Code, Name -->
             <VerticalStackLayout HorizontalOptions="Center"
                                  Spacing="4">
                 <Label FontAttributes="Bold"
@@ -53,6 +56,7 @@
                        Text="{Binding SupplierDetailModel.Supplier.Code}" />
                 <Label HorizontalOptions="Center"
                        FontSize="Medium"
+                       LineBreakMode="TailTruncation"
                        Text="{Binding SupplierDetailModel.Supplier.Name}" />
             </VerticalStackLayout>
             <!--#endregion-->

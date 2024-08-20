@@ -33,7 +33,10 @@
           Padding="10">
 
         <VerticalStackLayout Grid.Row="0"
-                             Spacing="5">
+                             Padding="10"
+                             HorizontalOptions="Fill"
+                             Spacing="10"
+                             VerticalOptions="Center">
             <Border BackgroundColor="{StaticResource Secondary}"
                     HeightRequest="100"
                     StrokeShape="RoundRectangle 50"
@@ -54,6 +57,7 @@
                        Text="{Binding CustomerDetailModel.Customer.Code}" />
                 <Label HorizontalOptions="Center"
                        FontSize="Medium"
+                       LineBreakMode="TailTruncation"
                        Text="{Binding CustomerDetailModel.Customer.Name}" />
             </VerticalStackLayout>
             <!--#endregion-->
