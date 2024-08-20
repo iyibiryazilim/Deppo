@@ -86,18 +86,20 @@
             <!--#endregion-->
 
             <!--#region Input, Output-->
-            <Grid ColumnDefinitions=".50*, .50*" ColumnSpacing="10">
+            <Grid Padding="10,0,10,0"
+                  ColumnDefinitions=".50*, .50*"
+                  ColumnSpacing="10">
                 <Border Grid.Column="0"
-                        Padding="10"
-                        BackgroundColor="{StaticResource Primary}"
                         StrokeShape="RoundRectangle 10"
+                        Padding="20,10,20,10"
+                        BackgroundColor="{StaticResource PrimaryLight}"
                         StrokeThickness="0">
                     <VerticalStackLayout VerticalOptions="Center">
-                        <Label FontAttributes="Bold"
-                               FontSize="Medium"
-                               HorizontalOptions="Center"
+                        <Label HorizontalOptions="Center"
                                Text="{Binding ProductDetailModel.InputQuantity}"
-                               TextColor="{StaticResource White}" />
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource White}"
+                               FontSize="Medium" />
                         <Label HorizontalOptions="Center"
                                Text="Giriş"
                                TextColor="{StaticResource WhiteSmoke}" />
@@ -105,16 +107,16 @@
                 </Border>
 
                 <Border Grid.Column="1"
-                        Padding="10"
-                        BackgroundColor="{StaticResource Primary}"
+                        Padding="20,10,20,10"
                         StrokeShape="RoundRectangle 10"
+                        BackgroundColor="{StaticResource PrimaryLight}"
                         StrokeThickness="0">
                     <VerticalStackLayout VerticalOptions="Center">
-                        <Label FontAttributes="Bold"
-                               FontSize="Medium"
-                               HorizontalOptions="Center"
+                        <Label HorizontalOptions="Center"
                                Text="{Binding ProductDetailModel.OutputQuantity}"
-                               TextColor="{StaticResource White}" />
+                               TextColor="{StaticResource White}"
+                               FontAttributes="Bold"
+                               FontSize="Medium" />
                         <Label HorizontalOptions="Center"
                                Text="Çıkış"
                                TextColor="{StaticResource WhiteSmoke}" />
@@ -130,7 +132,7 @@
               RowDefinitions="Auto, *"
               RowSpacing="10">
             <Label FontAttributes="Bold"
-                   FontSize="Subtitle"
+                   FontSize="Title"
                    Text="Son Hareketler"
                    TextColor="{StaticResource OffBlack}" />
 
@@ -143,38 +145,48 @@
                                 StrokeShape="RoundRectangle 5"
                                 StrokeThickness="0.1">
                             <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
-                                <VerticalStackLayout Grid.Column="0" Spacing="5">
-
+                                <VerticalStackLayout Grid.Column="0"
+                                                     Spacing="1">
                                     <Label FontSize="Large"
                                            HorizontalOptions="Center"
                                            Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
                                            TextColor="{StaticResource OffBlack}" />
-                                    <Label FontAttributes="None"
-                                           FontSize="Medium"
+                                    <Label FontSize="Medium"
                                            HorizontalOptions="Center"
-                                           Text="{Binding TransactionDate, StringFormat='{0:MM/yyyy}'}"
+                                           Text="{Binding TransactionDate, StringFormat='{0:MM.yyyy}'}"
                                            TextColor="{StaticResource OffBlack}" />
-                                    <Label Text="{Binding TransactionTime, StringFormat='{0:hh:mm:ss}'}" TextColor="{StaticResource Gray400}" />
+                                    <Label Text="{Binding TransactionTime,StringFormat='{0:hh\\:mm}'}"
+                                           TextColor="{StaticResource Gray400}"
+                                           HorizontalOptions="Center" />
                                 </VerticalStackLayout>
 
-                                <VerticalStackLayout Grid.Column="1" Spacing="3">
+                                <VerticalStackLayout Grid.Column="1"
+                                                     Spacing="5"
+                                                     VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
+                                           Text="{Binding TransactionNumber}"
+                                           FontSize="Medium" />
+                                    <Label Text="{Binding TransactionTypeName}"
                                            LineBreakMode="TailTruncation"
-                                           MaxLines="1"
-                                           Text="{Binding TransactionNumber}" />
-                                    <Label Text="{Binding TransactionTypeName}" TextColor="{StaticResource Gray600}" />
-                                    <Label Text="{Binding WarehouseName}" TextColor="{StaticResource Gray500}" />
+                                           FontSize="13" />
+                                    <Label Text="{Binding WarehouseName}"
+                                           LineBreakMode="TailTruncation"
+                                           FontSize="13" />
+
                                     <HorizontalStackLayout Spacing="5">
                                         <Label FontFamily="FAS"
+                                               FontSize="Small"
                                                Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
                                                TextColor="{StaticResource Primary}"
                                                VerticalOptions="Center" />
                                         <Label>
                                             <Label.FormattedText>
                                                 <FormattedString>
-                                                    <Span FontAttributes="None" Text="{Binding Quantity}" />
+                                                    <Span FontAttributes="Bold"
+                                                          Text="{Binding Quantity}" />
                                                     <Span Text=" " />
-                                                    <Span FontAttributes="None" Text="{Binding SubUnitsetCode}" />
+                                                    <Span FontAttributes="Bold"
+                                                          Text="{Binding SubUnitsetCode}" />
                                                 </FormattedString>
                                             </Label.FormattedText>
                                         </Label>
@@ -186,7 +198,8 @@
                                                                  Color="{StaticResource Primary}" />
                                             </Image.Source>
                                         </Image>
-                                        <Label FontAttributes="None" Text="{Binding IOTypeName}" />
+                                        <Label Text="{Binding IOTypeName}"
+                                               FontAttributes="Bold" />
                                     </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Grid>

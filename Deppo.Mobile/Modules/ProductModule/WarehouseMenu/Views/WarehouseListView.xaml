@@ -34,13 +34,13 @@
               VerticalOptions="Center">
             <Label Grid.Column="0"
                    FontFamily="FAS"
-                   FontSize="Title"
+                   FontSize="28"
                    Text="{x:Static fontAwesome:FontAwesomeIcons.Warehouse}"
                    TextColor="{StaticResource WhiteSmoke}"
                    VerticalOptions="Center" />
             <Label Grid.Column="1"
                    FontAttributes="None"
-                   FontSize="Title"
+                   FontSize="32"
                    VerticalOptions="Center"
                    Text="{Binding Title}"
                    TextColor="{StaticResource White}" />
@@ -64,17 +64,25 @@
                     StrokeShape="RoundRectangle 5"
                     StrokeThickness="0">
                 <Grid ColumnDefinitions="*">
-                    <SearchBar x:Name="searchBar"
-                               Grid.Column="0"
-                               Placeholder="Ara..."
-                               PlaceholderColor="{StaticResource OffBlack}"
-                               TextColor="{StaticResource OffBlack}">
-                        <SearchBar.Behaviors>
-                            <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
-                                                            CommandParameter="{Binding ., Source={x:Reference searchBar}}"
-                                                            EventName="TextChanged" />
-                        </SearchBar.Behaviors>
-                    </SearchBar>
+                    <Border Grid.Row="0"
+                            Margin="5,0,5,0"
+                            Padding="0"
+                            BackgroundColor="{StaticResource PrimaryLight}"
+                            HeightRequest="35"
+                            Stroke="{StaticResource Primary}"
+                            StrokeShape="RoundRectangle 5"
+                            StrokeThickness="0.5">
+                        <SearchBar x:Name="searchBar"
+                                   Placeholder="Ara..."
+                                   PlaceholderColor="{StaticResource OffBlack}"
+                                   TextColor="{StaticResource OffBlack}">
+                            <SearchBar.Behaviors>
+                                <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                                CommandParameter="{Binding ., Source={x:Reference searchBar}}"
+                                                                EventName="TextChanged" />
+                            </SearchBar.Behaviors>
+                        </SearchBar>
+                    </Border>
                 </Grid>
             </Border>
             <!--#endregion-->

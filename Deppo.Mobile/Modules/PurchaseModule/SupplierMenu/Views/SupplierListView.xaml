@@ -30,9 +30,9 @@
     </ContentPage.BackgroundImageSource>
     <Grid RowDefinitions="Auto,*">
         <Grid Grid.Row="0"
-              Padding="10"
+              Margin="10,20"
               ColumnDefinitions="Auto"
-              ColumnSpacing="5"
+              ColumnSpacing="10"
               VerticalOptions="Center">
 
             <Label Grid.Row="0"
@@ -40,13 +40,14 @@
                 <Label.FormattedText>
                     <FormattedString>
                         <Span FontFamily="FAS"
-                              FontSize="Title"
+                              FontSize="28"
                               TextColor="{StaticResource WhiteSmoke}"
                               Text="{x:Static fontAwesome:FontAwesomeIcons.UserGroup}" />
                         <Span Text=" " />
-                        <Span TextColor="{StaticResource WhiteSmoke}"
-                              FontSize="Title"
-                              Text="Tedarikçiler" />
+                        <Span TextColor="{StaticResource White}"
+                              FontFamily="RobotoRegular"
+                              FontSize="32"
+                              Text="{Binding Title}" />
                     </FormattedString>
                 </Label.FormattedText>
             </Label>
@@ -54,17 +55,25 @@
 
         <Grid Grid.Row="1"
               RowDefinitions="Auto,*">
-            <SearchBar x:Name="searchBar"
-                       Grid.Row="0"
-                       Placeholder="Ara..."
-                       PlaceholderColor="{StaticResource OffBlack}"
-                       TextColor="{StaticResource OffBlack}">
-                <SearchBar.Behaviors>
-                    <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
-                                                    CommandParameter="{Binding ., Source={x:Reference searchBar}}"
-                                                    EventName="TextChanged" />
-                </SearchBar.Behaviors>
-            </SearchBar>
+            <Border Grid.Row="0"
+                    Margin="5,0,5,0"
+                    Padding="0"
+                    BackgroundColor="{StaticResource PrimaryLight}"
+                    HeightRequest="35"
+                    Stroke="{StaticResource Primary}"
+                    StrokeShape="RoundRectangle 5"
+                    StrokeThickness="0.5">
+                <SearchBar x:Name="searchBar"
+                           Placeholder="Ara..."
+                           PlaceholderColor="{StaticResource OffBlack}"
+                           TextColor="{StaticResource OffBlack}">
+                    <SearchBar.Behaviors>
+                        <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                        CommandParameter="{Binding ., Source={x:Reference searchBar}}"
+                                                        EventName="TextChanged" />
+                    </SearchBar.Behaviors>
+                </SearchBar>
+            </Border>
             <RefreshView Grid.Row="1"
                          Command="{Binding LoadItemsCommand}"
                          IsRefreshing="{Binding IsBusy, Mode=OneWay}"

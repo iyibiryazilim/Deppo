@@ -6,22 +6,23 @@
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              Title="{Binding Title}"
-              Shell.TabBarIsVisible="False"
+             Shell.TabBarIsVisible="False"
+             xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              x:DataType="viewModel:WarehouseDetailViewModel">
     <ContentPage.ToolbarItems>
         <ToolbarItem Order="Primary">
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="FAS"
-                             Glyph="{x:Static fontAwesome:FontAwesomeIcons.EllipsisVertical}"
-                             Size="20" />
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.EllipsisVertical}"
+                                 Size="20" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </ContentPage.ToolbarItems>
     <ContentPage.Behaviors>
-        <!--<toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
-                                    EventName="Loaded" />-->
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                        EventName="Loaded" />
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
-                               StatusBarStyle="Default" />
+                                   StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -33,140 +34,172 @@
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
             <On Platform="Android"
-            Value="artboard.png" />
+                Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
-    <Grid Margin="10"
-       RowDefinitions="Auto, Auto, Auto, *"
-       RowSpacing="10">
-        <!--#region Image-->
-        <Border Grid.Row="0"
-             BackgroundColor="{StaticResource Primary}"
-             HeightRequest="100"
-             StrokeShape="RoundRectangle 50"
-             StrokeThickness="0"
-             VerticalOptions="Center"
-             WidthRequest="100">
-            <!--<Image Source="{Binding WarehouseDetailModel.Warehouse.Number, Converter={StaticResource ByteArrayToImageSourceConverter}}" />-->
-        </Border>
-        <!--#endregion-->
-
-        <!--#region Name, Number-->
-        <VerticalStackLayout Grid.Row="1"
-                          HorizontalOptions="Center"
-                          Spacing="4">
-            <Label FontAttributes="Bold"
-                HorizontalOptions="Center"
-                Text="{Binding WarehouseDetailModel.Warehouse.Name}" />
-            <Label HorizontalOptions="Center"
-                Text="{Binding WarehouseDetailModel.Warehouse.Number}" />
-        </VerticalStackLayout>
-        <!--#endregion-->
-
-        <!--#region Input, Output-->
-        <Grid Grid.Row="2"
-           Padding="10,0,10,0"
-           ColumnDefinitions=".50*, .50*"
-           ColumnSpacing="10">
-            <Border Grid.Column="0"
-                 Padding="20,10,20,10"
-                 BackgroundColor="{StaticResource PrimaryLight}"
-                 StrokeThickness="0">
-                <VerticalStackLayout VerticalOptions="Center">
-                    <Label HorizontalOptions="Center"
-                        Text="{Binding WarehouseDetailModel.InputQuantity}" />
-                    <Label HorizontalOptions="Center"
-                        Text="Giriş" />
-                </VerticalStackLayout>
+    <Grid RowDefinitions=".40*,.60*"
+          RowSpacing="10"
+          Padding="10">
+        <VerticalStackLayout  Padding="10"
+                              HorizontalOptions="Fill"
+                              Spacing="10"
+                              VerticalOptions="Center">
+            <Border Grid.Row="0"
+                    BackgroundColor="{StaticResource Primary}"
+                    HeightRequest="100"
+                    StrokeShape="RoundRectangle 50"
+                    StrokeThickness="0"
+                    VerticalOptions="Center"
+                    WidthRequest="100">
+                <!--<Image Source="{Binding WarehouseDetailModel.Warehouse.Number, Converter={StaticResource ByteArrayToImageSourceConverter}}" />-->
             </Border>
+            <!--#region Code, Name -->
+            <VerticalStackLayout HorizontalOptions="Center"
+                                 Spacing="4">
+                <Label FontAttributes="Bold"
+                       HorizontalOptions="Center"
+                       FontSize="Large"
+                       Text="{Binding WarehouseDetailModel.Warehouse.Name}" />
 
-            <Border Grid.Column="1"
-                 Padding="20,10,20,10"
-                 BackgroundColor="{StaticResource PrimaryLight}"
-                 StrokeThickness="0">
-                <VerticalStackLayout VerticalOptions="Center">
-                    <Label HorizontalOptions="Center"
-                        Text="{Binding WarehouseDetailModel.OutputQuantity}" />
-                    <Label HorizontalOptions="Center"
-                        Text="Çıkış" />
-                </VerticalStackLayout>
-            </Border>
-        </Grid>
-        <!--#endregion-->
+                <Label HorizontalOptions="Center"
+                       FontSize="Medium"
+                       LineBreakMode="TailTruncation"
+                       Text="{Binding WarehouseDetailModel.Warehouse.Number}" />
 
-        <!--#region Last Transactions List-->
-        <Grid Grid.Row="3"
-           RowDefinitions="Auto, *"
-           RowSpacing="5">
-            <Label FontSize="Subtitle"
-                Text="Son Hareketler" />
-
-            <!--#region Loading-->
-            <ActivityIndicator Grid.Row="1"
-                            HorizontalOptions="Center"
-                            IsRunning="{Binding IsBusy}"
-                            VerticalOptions="Center" />
+                <Label FontAttributes="Bold"
+                       HorizontalOptions="Center"
+                       TextColor="{StaticResource White}"
+                       VerticalOptions="Center">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span FontFamily="FAS"
+                                  Text="{x:Static fontAwesome:FontAwesomeIcons.BoxArchive}" />
+                            <Span Text=" " />
+                            <Span Text="{Binding WarehouseDetailModel.Warehouse.Quantity}" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+            </VerticalStackLayout>
             <!--#endregion-->
 
-            <!--<CollectionView Grid.Row="1" ItemsSource="{Binding WarehouseDetailModel.LastTransactions}">
+            <!--#region Input, Output -->
+            <Grid Padding="10,0,10,0"
+                  ColumnDefinitions=".50*, .50*"
+                  ColumnSpacing="10">
+                <Border Grid.Column="0"
+                        StrokeShape="RoundRectangle 10"
+                        Padding="20,10,20,10"
+                        BackgroundColor="{StaticResource PrimaryLight}"
+                        StrokeThickness="0">
+                    <VerticalStackLayout VerticalOptions="Center">
+                        <Label HorizontalOptions="Center"
+                               Text="{Binding WarehouseDetailModel.InputQuantity}"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource White}"
+                               FontSize="Medium" />
+                        <Label HorizontalOptions="Center"
+                               Text="Giriş"
+                               TextColor="{StaticResource WhiteSmoke}" />
+                    </VerticalStackLayout>
+                </Border>
 
+                <Border Grid.Column="1"
+                        Padding="20,10,20,10"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="{StaticResource PrimaryLight}"
+                        StrokeThickness="0">
+                    <VerticalStackLayout VerticalOptions="Center">
+                        <Label HorizontalOptions="Center"
+                               Text="{Binding WarehouseDetailModel.OutputQuantity}"
+                               TextColor="{StaticResource White}"
+                               FontAttributes="Bold"
+                               FontSize="Medium" />
+                        <Label HorizontalOptions="Center"
+                               Text="Çıkış"
+                               TextColor="{StaticResource WhiteSmoke}" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+        </VerticalStackLayout>
+        <Grid Grid.Row="1"
+              RowDefinitions="Auto, *"
+              RowSpacing="10">
+            <Label FontSize="Subtitle"
+                   FontAttributes="Bold"
+                   Text="Son Hareketler" />
+
+            <CollectionView Grid.Row="1"
+                            ItemsSource="{Binding WarehouseDetailModel.LastTransactions}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:WarehouseTransaction">
                         <Border Padding="5"
-                             BackgroundColor="Transparent"
-                             StrokeThickness="0.2">
-                            <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
-                                <VerticalStackLayout Grid.Column="0" Spacing="5">
-
-                                    <Label FontAttributes="None"
-                                        FontSize="Title"
-                                        HorizontalOptions="Center"
-                                        Text="{Binding TransactionDate, StringFormat='{0:dd}'}" />
-                                    <Label FontAttributes="None"
-                                        FontSize="Subtitle"
-                                        HorizontalOptions="Center"
-                                        Text="{Binding TransactionDate, StringFormat='{0:MM/yyyy}'}"
-                                        TextColor="{StaticResource Gray600}" />
-                                    <Label Text="{Binding TransactionTime, StringFormat='{0:hh:mm:ss}'}"
-                                        TextColor="{StaticResource Gray500}" />
+                                BackgroundColor="Transparent"
+                                StrokeThickness="0.1">
+                            <Grid ColumnDefinitions="Auto, *"
+                                  ColumnSpacing="10">
+                                <VerticalStackLayout Grid.Column="0"
+                                                     Spacing="1">
+                                    <Label FontSize="Large"
+                                           HorizontalOptions="Center"
+                                           Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
+                                           TextColor="{StaticResource OffBlack}" />
+                                    <Label FontSize="Medium"
+                                           HorizontalOptions="Center"
+                                           Text="{Binding TransactionDate, StringFormat='{0:MM.yyyy}'}"
+                                           TextColor="{StaticResource OffBlack}" />
+                                    <Label Text="{Binding TransactionTime,StringFormat='{0:hh\\:mm}'}"
+                                           TextColor="{StaticResource Gray400}"
+                                           HorizontalOptions="Center" />
                                 </VerticalStackLayout>
 
-                                <VerticalStackLayout Grid.Column="1" Spacing="3">
-                                    <Label FontAttributes="Bold" Text="{Binding TransactionNumber}" />
-                                    <Label Text="{Binding TransactionTypeName}" TextColor="{StaticResource Gray600}" />
-                                    <Label Text="{Binding WarehouseName}" TextColor="{StaticResource Gray500}" />
+                                <VerticalStackLayout Grid.Column="1"
+                                                     Spacing="5"
+                                                     VerticalOptions="Center">
+                                    <Label FontAttributes="Bold"
+                                           Text="{Binding TransactionNumber}"
+                                           FontSize="Medium" />
+                                    <Label Text="{Binding TransactionTypeName}"
+                                           LineBreakMode="TailTruncation"
+                                           FontSize="13" />
+                                    <Label Text="{Binding WarehouseName}"
+                                           LineBreakMode="TailTruncation"
+                                           FontSize="13" />
+
                                     <HorizontalStackLayout Spacing="5">
                                         <Label FontFamily="FAS"
-                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
-                                            TextColor="{StaticResource Primary}"
-                                            VerticalOptions="Center" />
+                                               FontSize="Small"
+                                               Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
+                                               TextColor="{StaticResource Primary}"
+                                               VerticalOptions="Center" />
                                         <Label>
                                             <Label.FormattedText>
                                                 <FormattedString>
-                                                    <Span FontAttributes="Bold" Text="{Binding Quantity}" />
+                                                    <Span FontAttributes="Bold"
+                                                          Text="{Binding Quantity}" />
                                                     <Span Text=" " />
-                                                    <Span FontAttributes="Bold" Text="{Binding SubUnitsetCode}" />
+                                                    <Span FontAttributes="Bold"
+                                                          Text="{Binding SubUnitsetCode}" />
                                                 </FormattedString>
                                             </Label.FormattedText>
                                         </Label>
                                         <Image>
                                             <Image.Source>
                                                 <FontImageSource FontFamily="FAS"
-                                                              Glyph="{Binding IOTypeImageSource}"
-                                                              Size="16"
-                                                              Color="{StaticResource Primary}" />
+                                                                 Glyph="{Binding IOTypeImageSource}"
+                                                                 Size="16"
+                                                                 Color="{StaticResource Primary}" />
                                             </Image.Source>
                                         </Image>
-                                        <Label Text="{Binding IOTypeName}" FontAttributes="None" />
+                                        <Label Text="{Binding IOTypeName}"
+                                               FontAttributes="Bold" />
                                     </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Grid>
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
-            </CollectionView>-->
+            </CollectionView>
         </Grid>
-        <!--#endregion-->
     </Grid>
 </ContentPage>
