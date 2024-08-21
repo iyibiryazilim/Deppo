@@ -116,43 +116,43 @@ public class BaseTransaction : INotifyPropertyChanged, IDisposable
 			switch (_transactionType)
 			{
 				case 1:
-					return "Mal Al�m �rsaliyesi";
+					return "Mal Alım İrsaliyesi";
 				case 2:
-					return "Perakende Sat�� �ade �rsaliyesi";
+					return "Perakende Satış İade İrsaliyesi";
 				case 3:
-					return "Toptan Sat�� �ade �rsaliyesi";
+					return "Toptan Satış İade İrsaliyesi";
 				case 4:
-					return "Konsinye ��k�� �ade �rsaliyesi";
+					return "Konsinye Çıkış İade İrsaliyesi";
 				case 5:
-					return "Konsinye Giri� �ade �rsaliyesi";
+					return "Konsinye Giriş İade İrsaliyesi";
 				case 6:
-					return "Al�m �ade �rsaliyesi";
+					return "Alım İade İrsaliyesi";
 				case 7:
-					return "Perakende Sat�� �rsaliyesi";
+					return "Perakende Satış İrsaliyesi";
 				case 8:
-					return "Toptan Sat�� �rsaliyesi";
+					return "Toptan Satış İrsaliyesi";
 				case 9:
-					return "Konsinye ��k�� �rsaliyesi";
+					return "Konsinye Çıkış İrsaliyesi";
 				case 10:
-					return "Konsinye Giri� �ade �rsaliyesi";
+					return "Konsinye Giriş İade İrsaliyesi";
 				case 13:
-					return "�retimden Giri� Fi�i";
+					return "Üretimden Giriş Fişi";
 				case 14:
-					return "Devir Fi�i";
+					return "Devir Fişi";
 				case 12:
-					return "Sarf Fi�i";
+					return "Sarf Fişi";
 				case 11:
-					return "Fire Fi�i";
+					return "Fire Fişi";
 				case 25:
-					return "Ambar Fi�i";
+					return "Ambar Fişi";
 				case 26:
-					return "Mustahsil �rsaliyesi";
+					return "Mustahsil İrsaliyesi";
 				case 50:
-					return "Say�m Fazlas� Fi�i";
+					return "Sayım Fazlası Fişi";
 				case 51:
-					return "Say�m Eksi�i Fi�i";
+					return "Sayım Eksiği Fişi";
 				default:
-					return "Di�er";
+					return "Diğer";
 			}
 		}
 	}
@@ -178,15 +178,15 @@ public class BaseTransaction : INotifyPropertyChanged, IDisposable
 			switch (_iOType)
 			{
 				case 1:
-					return "Giri�";
+					return "Giriş";
 				case 2:
-					return "Giri�";
+					return "Giriş";
 				case 3:
-					return "��k��";
+					return "Çıkış";
 				case 4:
-					return "��k��";
+					return "Çıkış";
 				default:
-					return "Di�er";
+					return "Diğer";
 			}
 		}
 	}
@@ -197,9 +197,9 @@ public class BaseTransaction : INotifyPropertyChanged, IDisposable
 		{
 			switch (_iOTypeName)
 			{
-				case "Giri�":
+				case "Giriş":
 					return "\uf062";
-				case "��k��":
+				case "Çıkış":
 					return "\uf063";
 				default:
 					return "";
