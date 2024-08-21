@@ -35,9 +35,14 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
             _userDialogs = userDialogs;
 
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+            InputQuantityTappedCommand = new Command(async () => await InputQuantityTappedAsync());
+            OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
         }
 
         public Command LoadItemsCommand { get; }
+        public Command InputQuantityTappedCommand { get; }
+
+        public Command OutputQuantityTappedCommand { get; }
 
         private async Task LoadItemsAsync()
         {
@@ -142,6 +147,56 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
                     _userDialogs.Loading().Hide();
 
                 _userDialogs.Alert(message: ex.Message, title: "Hata");
+            }
+        }
+
+        private async Task InputQuantityTappedAsync()
+        {
+            try
+            {
+                IsBusy = true;
+
+                await Task.Delay(300);
+                await Shell.Current.GoToAsync($"{nameof(SupplierInputTransactionView)}", new Dictionary<string, object>
+                {
+                    ["Supplier"] = SupplierDetailModel.Supplier
+                });
+            }
+            catch (Exception ex)
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.Loading().Hide();
+
+                _userDialogs.Alert(message: ex.Message, title: "Hata");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task OutputQuantityTappedAsync()
+        {
+            try
+            {
+                IsBusy = true;
+
+                await Task.Delay(300);
+                await Shell.Current.GoToAsync($"{nameof(SupplierOutputTransactionView)}", new Dictionary<string, object>
+                {
+                    ["Supplier"] = SupplierDetailModel.Supplier
+                });
+            }
+            catch (Exception ex)
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.Loading().Hide();
+
+                _userDialogs.Alert(message: ex.Message, title: "Hata");
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
     }

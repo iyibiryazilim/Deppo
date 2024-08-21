@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views.SupplierInputTransactionView"
+             x:Class="Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views.CustomerOutputTransactionView"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels"
              Title="{Binding Title}"
-             x:DataType="viewModel:SupplierInputTransactionViewModel"
+             x:DataType="viewModel:CustomerOutputTransactionViewModel"
              Shell.NavBarIsVisible="False"
              Shell.PresentationMode="ModalAnimated"
              Shell.TabBarIsVisible="False">
@@ -82,7 +82,7 @@
                                        Orientation="Vertical" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="model:SupplierTransaction">
+                    <DataTemplate x:DataType="model:CustomerTransaction">
                         <Border Padding="5"
                                 BackgroundColor="Transparent"
                                 StrokeShape="RoundRectangle 5"
@@ -115,7 +115,7 @@
                                            Text="{Binding TransactionTypeName}" />
                                     <Label FontSize="13"
                                            LineBreakMode="TailTruncation"
-                                           Text="{Binding SupplierName}" />
+                                           Text="{Binding CustomerName}" />
 
                                     <HorizontalStackLayout Spacing="5">
                                         <Label FontFamily="FAS"

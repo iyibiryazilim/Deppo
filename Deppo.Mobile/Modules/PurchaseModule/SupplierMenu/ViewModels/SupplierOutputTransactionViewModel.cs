@@ -8,12 +8,14 @@ using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
 {
+    [QueryProperty(name: nameof(Supplier), queryId: nameof(Supplier))]
     public partial class SupplierOutputTransactionViewModel : BaseViewModel
     {
         private readonly IHttpClientService _httpClientService;
@@ -23,52 +25,41 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
         [ObservableProperty]
         private SupplierDetailModel supplierDetailModel = null!;
 
+        [ObservableProperty]
+        private Supplier supplier = null!;
+
         public SupplierOutputTransactionViewModel(IHttpClientService httpClientService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
         {
             _httpClientService = httpClientService;
             _customQueryService = customQueryService;
             _userDialogs = userDialogs;
-            Title = "Tedarikçi Çıkış İşlemleri";
+            Title = "Tedarikçi Çıkış Hareketleri";
 
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+            GoToBackCommand = new Command(async () => await GoToBackAsync());
         }
 
+        public ObservableCollection<SupplierTransaction> Items { get; } = new();
+
         public Command LoadItemsCommand { get; }
+        public Command GoToBackCommand { get; }
 
         private async Task LoadItemsAsync()
         {
+            if (IsBusy)
+                return;
             try
             {
                 IsBusy = true;
 
-                var httpClient = _httpClientService.GetOrCreateHttpClient();
-                await Task.Delay(1000);
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
-
-                _userDialogs.Alert(message: ex.Message, title: "Hata...");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
-
-        private async Task GetLastTransactionsAsync(HttpClient httpclient)
-        {
-            try
-            {
                 var query = @$"SELECT
         [TransactionDate] = STLINE.DATE_,
         [TransactionTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
 		[TransactionReferenceId] = STFICHE.LOGICALREF,
         [TransactionNumber] = STFICHE.FICHENO,
         [TransactionType] = STLINE.TRCODE,
-        [SubUnitsetCode] = SUBUNITSET.CODE,
-        [SubUnitsetReferenceId] = SUBUNITSET.LOGICALREF,
+        [SubUnitsetCode] = ISNULL(SUBUNITSET.CODE,''),
+        [SubUnitsetReferenceId] = ISNULL(SUBUNITSET.LOGICALREF,0),
         [UnitsetCode] = UNITSET.CODE,
         [UnitsetReferenceId] = UNITSET.LOGICALREF,
         [Quantity] = STLINE.AMOUNT,
@@ -84,19 +75,32 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
         LEFT JOIN LG_001_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF AND MAINUNIT = 1
         LEFT JOIN LG_001_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
 		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = 1
-		WHERE STLINE.IOCODE IN (3,4) AND STFICHE.TRCODE IN (1,2,3,7,6,8) AND  CLCARD.LOGICALREF = {SupplierDetailModel.Supplier.ReferenceId}  ORDER BY STLINE.DATE_ DESC";
+		WHERE STLINE.IOCODE IN (3,4) AND STFICHE.TRCODE IN (1,2,3,7,6,8) AND  CLCARD.LOGICALREF = {Supplier.ReferenceId}  ORDER BY STLINE.DATE_ DESC"; ;
 
-                var result = await _customQueryService.GetObjectsAsync(httpclient, query);
+                Items.Clear();
+
+                _userDialogs.Loading("Loading Items...");
+                await Task.Delay(1000);
+
+                var httpClient = _httpClientService.GetOrCreateHttpClient();
+                var result = await _customQueryService.GetObjectsAsync(httpClient, query);
 
                 if (result.IsSuccess)
                 {
-                    if (result.Data == null)
+                    if (result.Data is null)
                         return;
-
                     foreach (var item in result.Data)
                     {
-                        SupplierDetailModel.LastTransactions.Add(Mapping.Mapper.Map<SupplierTransaction>(item));
+                        Items.Add(Mapping.Mapper.Map<SupplierTransaction>(item));
                     }
+                    _userDialogs.Loading().Hide();
+                }
+                else
+                {
+                    if (_userDialogs.IsHudShowing)
+                        _userDialogs.Loading().Hide();
+
+                    _userDialogs.Alert(message: result.Message, title: "Load Items");
                 }
             }
             catch (Exception ex)
@@ -104,7 +108,33 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.Loading().Hide();
 
+                _userDialogs.Alert(message: ex.Message, title: "Load Items Error");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task GoToBackAsync()
+        {
+            try
+            {
+                IsBusy = true;
+
+                await Task.Delay(300);
+                await Shell.Current.GoToAsync("..");
+            }
+            catch (Exception ex)
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.Loading().Hide();
+
                 _userDialogs.Alert(message: ex.Message, title: "Hata");
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
     }

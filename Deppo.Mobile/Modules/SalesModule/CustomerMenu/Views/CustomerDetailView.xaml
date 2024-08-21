@@ -81,6 +81,9 @@
                                Text="Giriş"
                                TextColor="{StaticResource WhiteSmoke}" />
                     </VerticalStackLayout>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding InputQuantityTappedCommand}" />
+                    </Border.GestureRecognizers>
                 </Border>
 
                 <Border Grid.Column="1"
@@ -98,6 +101,9 @@
                                Text="Çıkış"
                                TextColor="{StaticResource WhiteSmoke}" />
                     </VerticalStackLayout>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OutputQuantityTappedCommand}" />
+                    </Border.GestureRecognizers>
                 </Border>
             </Grid>
         </VerticalStackLayout>

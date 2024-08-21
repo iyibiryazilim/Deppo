@@ -81,8 +81,7 @@
                                TextColor="{StaticResource WhiteSmoke}" />
                     </VerticalStackLayout>
                     <Border.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:SupplierDetailViewModel}}, Path=ItemTappedCommand}"
-                                              CommandParameter="{Binding .}" />
+                        <TapGestureRecognizer Command="{Binding InputQuantityTappedCommand}" />
                     </Border.GestureRecognizers>
                 </Border>
 
@@ -101,6 +100,9 @@
                                Text="Çıkış"
                                TextColor="{StaticResource WhiteSmoke}" />
                     </VerticalStackLayout>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OutputQuantityTappedCommand}" />
+                    </Border.GestureRecognizers>
                 </Border>
             </Grid>
         </VerticalStackLayout>
@@ -131,7 +133,7 @@
                                            TextColor="{StaticResource OffBlack}" />
                                     <Label FontSize="Medium"
                                            HorizontalOptions="Center"
-                                           Text="{Binding TransactionDate, StringFormat='{0:MM.yyyy}'}"
+                                           Text="{Binding TransactionDate, StringFormat='{0:MM/yyyy}'}"
                                            TextColor="{StaticResource OffBlack}" />
                                     <Label Text="{Binding TransactionTime,StringFormat='{0:hh\\:mm}'}"
                                            TextColor="{StaticResource Gray400}"

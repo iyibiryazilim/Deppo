@@ -1,41 +1,48 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
-using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models;
 using Deppo.Mobile.Core.Models.PurchaseModels;
+using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
+namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels
 {
-    [QueryProperty(name: nameof(Supplier), queryId: nameof(Supplier))]
-    public partial class SupplierInputTransactionViewModel : BaseViewModel
+    [QueryProperty(name: nameof(Customer), queryId: nameof(Customer))]
+    public partial class CustomerInputTransactionViewModel : BaseViewModel
     {
         private readonly IHttpClientService _httpClientService;
         private readonly ICustomQueryService _customQueryService;
         private readonly IUserDialogs _userDialogs;
 
-        
+        [ObservableProperty]
+        private CustomerDetailModel customerDetailMode = null!;
 
         [ObservableProperty]
-        private Supplier supplier = null!;
+        private Customer customer = null!;
 
-        public SupplierInputTransactionViewModel(IHttpClientService httpClientService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
+        public CustomerInputTransactionViewModel(IHttpClientService httpClientService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
         {
             _httpClientService = httpClientService;
             _customQueryService = customQueryService;
             _userDialogs = userDialogs;
 
-            Title = "Tedarikçi Giriş Hareketleri";
+            Title = "Müşteri Giriş Hareketleri";
 
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
             GoToBackCommand = new Command(async () => await GoToBackAsync());
         }
 
-        public ObservableCollection<SupplierTransaction> Items { get; } = new();
+        public ObservableCollection<CustomerTransaction> Items { get; } = new();
 
         public Command LoadItemsCommand { get; }
         public Command GoToBackCommand { get; }
@@ -61,9 +68,9 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
         [Quantity] = STLINE.AMOUNT,
         [IOType] = STLINE.IOCODE,
         [WarehouseName] = CAPIWHOUSE.NAME,
-		[SupplierReferenceId] = CLCARD.LOGICALREF,
-		[SupplierCode] = CLCARD.CODE,
-		[SupplierName] = CLCARD.DEFINITION_
+		[CustomerReferenceId] = CLCARD.LOGICALREF,
+		[CustomerCode] = CLCARD.CODE,
+		[CustomerName] = CLCARD.DEFINITION_
         FROM LG_001_02_STLINE AS STLINE
         LEFT JOIN LG_001_02_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
         LEFT JOIN LG_001_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF
@@ -71,7 +78,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
         LEFT JOIN LG_001_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF AND MAINUNIT = 1
         LEFT JOIN LG_001_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
 		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = 1
-		WHERE STLINE.IOCODE IN (1,2) AND  CLCARD.LOGICALREF = {Supplier.ReferenceId}  ORDER BY STLINE.DATE_ DESC"; ;
+		WHERE STLINE.IOCODE IN (1,2) AND STFICHE.TRCODE IN (1,2,3,7,6,8) AND  CLCARD.LOGICALREF = {Customer.ReferenceId}  ORDER BY STLINE.DATE_ DESC"; ;
 
                 Items.Clear();
 
@@ -87,7 +94,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
                         return;
                     foreach (var item in result.Data)
                     {
-                        Items.Add(Mapping.Mapper.Map<SupplierTransaction>(item));
+                        Items.Add(Mapping.Mapper.Map<CustomerTransaction>(item));
                     }
                     _userDialogs.Loading().Hide();
                 }
