@@ -6,6 +6,7 @@ using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views;
 
 namespace Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels;
 
@@ -26,14 +27,18 @@ public partial class WarehouseDetailViewModel : BaseViewModel
         _userDialogs = userDialogs;
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+        InputQuantityTappedCommand = new Command(async () => await InputQuantityTappedAsync());
+        OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
+
     }
 
     [ObservableProperty]
     WarehouseDetailModel warehouseDetailModel = null!;
 
     #region Commands
-
     public Command LoadItemsCommand { get; }
+    public Command InputQuantityTappedCommand { get; }
+    public Command OutputQuantityTappedCommand { get; }
 
     #endregion Commands
 
@@ -140,6 +145,62 @@ public partial class WarehouseDetailViewModel : BaseViewModel
                 _userDialogs.Loading().Hide();
 
             _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+    }
+
+	private async Task InputQuantityTappedAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			await Task.Delay(300);
+			await Shell.Current.GoToAsync($"{nameof(WarehouseInputTransactionView)}", new Dictionary<string, object>
+			{
+				["Warehouse"] = WarehouseDetailModel.Warehouse
+			});
+		}
+		catch (Exception ex)
+		{
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			_userDialogs.Alert(message: ex.Message, title: "Hata");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task OutputQuantityTappedAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            await Task.Delay(300);
+            await Shell.Current.GoToAsync($"{nameof(WarehouseOutputTransactionView)}", new Dictionary<string, object>
+            {
+                ["Warehouse"] = WarehouseDetailModel.Warehouse
+            });
+        }
+        catch (Exception ex)
+        {
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			_userDialogs.Alert(message: ex.Message, title: "Hata");
+		}
+        finally
+        {
+            IsBusy = false;
         }
     }
 }
