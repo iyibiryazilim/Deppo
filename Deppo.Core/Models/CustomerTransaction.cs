@@ -16,7 +16,6 @@ namespace Deppo.Core.Models
 
         public CustomerTransaction()
         {
-
         }
 
         [Browsable(false)]
