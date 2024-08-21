@@ -94,6 +94,9 @@
                         Padding="20,10,20,10"
                         BackgroundColor="{StaticResource PrimaryLight}"
                         StrokeThickness="0">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding InputQuantityTappedCommand}" />
+                    </Border.GestureRecognizers>
                     <VerticalStackLayout VerticalOptions="Center">
                         <Label HorizontalOptions="Center"
                                Text="{Binding ProductDetailModel.InputQuantity}"

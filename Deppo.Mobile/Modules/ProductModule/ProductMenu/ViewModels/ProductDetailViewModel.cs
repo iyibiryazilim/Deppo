@@ -6,6 +6,7 @@ using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels;
 
@@ -28,9 +29,13 @@ public partial class ProductDetailViewModel : BaseViewModel
 		_userDialogs = userDialogs;
 
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+		InputQuantityTappedCommand = new Command(async() => await InputQuantityTappedAsync());
 	}
 
+	#region Commands
 	public Command LoadItemsCommand { get; }
+	public Command InputQuantityTappedCommand { get; } 
+	#endregion
 
 	async Task LoadItemsAsync()
 	{
@@ -65,8 +70,8 @@ public partial class ProductDetailViewModel : BaseViewModel
 		try
 		{
 			var query = @$"SELECT 
-                    [InputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_01_STLINE WHERE IOCODE IN(1, 2) AND STOCKREF = {ProductDetailModel.Product.ReferenceId}),
-                    [OutputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_01_STLINE WHERE IOCODE IN(3, 4) AND STOCKREF = {ProductDetailModel.Product.ReferenceId})";
+                    [InputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(1, 2) AND STOCKREF = {ProductDetailModel.Product.ReferenceId}),
+                    [OutputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(3, 4) AND STOCKREF = {ProductDetailModel.Product.ReferenceId})";
 
 			var result = await _customQueryService.GetObjectAsync(httpClient, query);
 
@@ -134,6 +139,31 @@ public partial class ProductDetailViewModel : BaseViewModel
 				_userDialogs.Loading().Hide();
 
 			_userDialogs.Alert(message: ex.Message, title: "Hata");
+		}
+	}
+
+	async Task InputQuantityTappedAsync()
+	{
+		try
+		{
+			IsBusy = true;
+
+			await Task.Delay(300);
+			await Shell.Current.GoToAsync($"{nameof(ProductInputTransactionView)}", new Dictionary<string, object>
+			{
+				["Product"] = ProductDetailModel.Product
+			});
+		}
+		catch(Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			_userDialogs.Alert(message: ex.Message, title: "Hata");
+		}
+		finally
+		{
+			IsBusy = false;
 		}
 	}
 }
