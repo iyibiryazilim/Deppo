@@ -7,6 +7,8 @@ using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views;
+using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,9 +40,14 @@ public partial class CustomerDetailViewModel : BaseViewModel
 
         Title = "Müşteri Detayı";
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+        InputQuantityTappedCommand = new Command(async () => await InputQuantityTappedAsync());
+        OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
     }
 
     public Command LoadItemsCommand { get; }
+    public Command InputQuantityTappedCommand { get; }
+
+    public Command OutputQuantityTappedCommand { get; }
 
     private async Task LoadItemsAsync()
     {
@@ -145,6 +152,56 @@ public partial class CustomerDetailViewModel : BaseViewModel
                 _userDialogs.Loading().Hide();
 
             _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+    }
+
+    private async Task InputQuantityTappedAsync()
+    {
+        try
+        {
+            IsBusy = true;
+
+            await Task.Delay(300);
+            await Shell.Current.GoToAsync($"{nameof(CustomerInputTransactionView)}", new Dictionary<string, object>
+            {
+                ["Customer"] = CustomerDetailModel.Customer
+            });
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
+
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task OutputQuantityTappedAsync()
+    {
+        try
+        {
+            IsBusy = true;
+
+            await Task.Delay(300);
+            await Shell.Current.GoToAsync($"{nameof(CustomerOutputTransactionView)}", new Dictionary<string, object>
+            {
+                ["Customer"] = CustomerDetailModel.Customer
+            });
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
+
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 }
