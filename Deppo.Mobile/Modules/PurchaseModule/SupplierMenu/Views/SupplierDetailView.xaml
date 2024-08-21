@@ -80,6 +80,10 @@
                                Text="Giriş"
                                TextColor="{StaticResource WhiteSmoke}" />
                     </VerticalStackLayout>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:SupplierDetailViewModel}}, Path=ItemTappedCommand}"
+                                              CommandParameter="{Binding .}" />
+                    </Border.GestureRecognizers>
                 </Border>
 
                 <Border Grid.Column="1"

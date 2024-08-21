@@ -199,6 +199,8 @@ public static class MauiProgram
         builder.Services.AddSingletonWithShellRoute<PurchasePanelView, PurchasePanelViewModel>(nameof(PurchasePanelView));
         builder.Services.AddSingletonWithShellRoute<SupplierListView, SupplierListViewModel>(nameof(SupplierListView));
         builder.Services.AddSingletonWithShellRoute<SupplierDetailView, SupplierDetailViewModel>(nameof(SupplierDetailView));
+        builder.Services.AddSingletonWithShellRoute<SupplierInputTransactionView, SupplierInputTransactionViewModel>(nameof(SupplierInputTransactionView));
+        builder.Services.AddSingletonWithShellRoute<SupplierOutputTransactionView, SupplierOutputTransactionViewModel>(nameof(SupplierOutputTransactionView));
         builder.Services.AddSingletonWithShellRoute<WaitingPurchaseOrderListView, WaitingPurchaseOrderListViewModel>(nameof(WaitingPurchaseOrderListView));
         builder.Services.AddSingletonWithShellRoute<PurchaseProcessView, PurchaseProcessViewModel>(nameof(PurchaseProcessView));
 
