@@ -24,6 +24,7 @@ public partial class ProductInputTransactionViewModel : BaseViewModel
 		_userDialogs = userDialogs;
 
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+		GoToBackCommand = new Command(async () => await GoToBackAsync());
 	}
 
 	#region Collections
@@ -32,6 +33,7 @@ public partial class ProductInputTransactionViewModel : BaseViewModel
 
 	#region Commands
 	public Command LoadItemsCommand { get; }
+	public Command GoToBackCommand { get; }
 	#endregion
 
 	#region Properties
@@ -51,8 +53,7 @@ public partial class ProductInputTransactionViewModel : BaseViewModel
 		[ReferenceId] = STLINE.LOGICALREF,
         [TransactionDate] = STLINE.DATE_,
         [TransactionTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
-		[BaseTransactionReferenceId] = STFICHE.LOGICALREF,
-        [BaseTransactionCode] = STFICHE.FICHENO,
+        [TransactionNumber] = STFICHE.FICHENO,
         [TransactionType] = STLINE.TRCODE,
         [ProductReferenceId] = STLINE.STOCKREF,
         [ProductCode] = ITEMS.CODE,
@@ -62,16 +63,10 @@ public partial class ProductInputTransactionViewModel : BaseViewModel
         [UnitsetCode] = UNITSET.CODE,
         [UnitsetReferenceId] = UNITSET.LOGICALREF,
         [Quantity] = STLINE.AMOUNT,
-        [Description] = STLINE.LINEEXP,
         [IOType] = STLINE.IOCODE,
 		[UnitPrice] = STLINE.PRICE,
         [WarehouseNumber] = CAPIWHOUSE.NR,
-        [WarehouseName] = CAPIWHOUSE.NAME,
-		[CurrentReferenceId] = CLCARD.LOGICALREF,
-		[CurrentCode] = CLCARD.CODE,
-        [DocumentNumber] = STFICHE.DOCODE,
-		[DocumentTrackingNumber] = STFICHE.DOCTRACKINGNR,
-		[CurrentName] = CLCARD.DEFINITION_
+        [WarehouseName] = CAPIWHOUSE.NAME
         FROM LG_001_02_STLINE AS STLINE
         LEFT JOIN LG_001_02_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
         LEFT JOIN LG_001_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF
@@ -113,6 +108,28 @@ public partial class ProductInputTransactionViewModel : BaseViewModel
 				_userDialogs.Loading().Hide();
 
 			_userDialogs.Alert(message: ex.Message, title: "Load Items Error");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	async Task GoToBackAsync()
+	{
+		try
+		{
+			IsBusy = true;
+
+			await Task.Delay(300);
+			await Shell.Current.GoToAsync("..");
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			_userDialogs.Alert(message: ex.Message, title: "Hata");
 		}
 		finally
 		{
