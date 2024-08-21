@@ -29,7 +29,7 @@ public partial class WarehouseDetailViewModel : BaseViewModel
     }
 
     [ObservableProperty]
-    private WarehouseDetailModel warehouseDetailModel = null!;
+    WarehouseDetailModel warehouseDetailModel = null!;
 
     #region Commands
 
@@ -48,7 +48,9 @@ public partial class WarehouseDetailViewModel : BaseViewModel
             _userDialogs.Loading("Loading Items...");
 
             await Task.Delay(1000);
-            await Task.WhenAll(GetInputOutputQuantityAsync(httpClient));
+            await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastTransactionsAsync(httpClient));
+
+            _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
@@ -60,7 +62,6 @@ public partial class WarehouseDetailViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
-            _userDialogs.Loading().Hide();
         }
     }
 
@@ -68,9 +69,14 @@ public partial class WarehouseDetailViewModel : BaseViewModel
     {
         try
         {
-            var query = @$"SELECT
-                    [InputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(1, 2) AND STOCKREF = {WarehouseDetailModel.Warehouse.ReferenceId}),
-                    [OutputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(3, 4) AND STOCKREF = {WarehouseDetailModel.Warehouse.ReferenceId})";
+            var query = @$"SELECT 
+                [InputQuantity] = COUNT(CASE WHEN STLINE.IOCODE IN (1, 2) THEN STLINE.LOGICALREF END),
+                [OutputQuantity] = COUNT(CASE WHEN STLINE.IOCODE IN (3, 4) THEN STLINE.LOGICALREF END)
+            FROM LG_001_02_STLINE AS STLINE
+            LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE 
+            ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = 1
+            WHERE STLINE.SOURCEINDEX = {WarehouseDetailModel.Warehouse.Number};
+            ";
 
             var result = await _customQueryService.GetObjectAsync(httpClient, query);
 
@@ -82,7 +88,7 @@ public partial class WarehouseDetailViewModel : BaseViewModel
                 WarehouseDetailModel.InputQuantity = obj.InputQuantity;
                 WarehouseDetailModel.OutputQuantity = obj.OutputQuantity;
             }
-        }
+		}
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
@@ -105,11 +111,7 @@ public partial class WarehouseDetailViewModel : BaseViewModel
 				[TransactionType] = STLINE.TRCODE,
                 [IOType] = STLINE.IOCODE,
 				[SubUnitsetCode] = SUBUNITSET.CODE,
-				[SubUnitsetReferenceId] = SUBUNITSET.LOGICALREF,
-				[UnitsetCode] = UNITSET.CODE,
-				[UnitsetReferenceId] = UNITSET.LOGICALREF,
 				[Quantity] = STLINE.AMOUNT,
-				[WarehouseNumber] = CAPUWHOUSE.NR,
 				[WarehouseName] = CAPIWHOUSE.NAME
 				FROM LG_001_02_STLINE AS STLINE
 				LEFT JOIN LG_001_02_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
