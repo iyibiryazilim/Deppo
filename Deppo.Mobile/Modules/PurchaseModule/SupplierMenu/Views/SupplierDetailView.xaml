@@ -138,9 +138,9 @@
                                                      Spacing="5"
                                                      VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
-                                           Text="{Binding FicheCode}"
+                                           Text="{Binding TransactionNumber}"
                                            FontSize="Medium" />
-                                    <Label Text="{Binding CurrentName}"
+                                    <Label Text="{Binding SupplierName}"
                                            LineBreakMode="TailTruncation"
                                            FontSize="13" />
 

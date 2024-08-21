@@ -101,7 +101,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
         [TransactionDate] = STLINE.DATE_,
         [TransactionTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
 		[FicheReferenceId] = STFICHE.LOGICALREF,
-        [FicheCode] = STFICHE.FICHENO,
+        [TransactionNumber] = STFICHE.FICHENO,
         [TransactionType] = STLINE.TRCODE,
         [SubUnitsetCode] = SUBUNITSET.CODE,
         [SubUnitsetReferenceId] = SUBUNITSET.LOGICALREF,
@@ -110,9 +110,9 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
         [Quantity] = STLINE.AMOUNT,
         [IOType] = STLINE.IOCODE,
         [WarehouseName] = CAPIWHOUSE.NAME,
-		[CurrentReferenceId] = CLCARD.LOGICALREF,
-		[CurrentCode] = CLCARD.CODE,
-		[CurrentName] = CLCARD.DEFINITION_
+		[SupplierReferenceId] = CLCARD.LOGICALREF,
+		[SupplierCode] = CLCARD.CODE,
+		[SupplierName] = CLCARD.DEFINITION_
         FROM LG_001_02_STLINE AS STLINE
         LEFT JOIN LG_001_02_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
         LEFT JOIN LG_001_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF
