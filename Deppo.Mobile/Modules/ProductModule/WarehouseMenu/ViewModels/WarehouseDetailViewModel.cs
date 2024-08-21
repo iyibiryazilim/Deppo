@@ -6,6 +6,7 @@ using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views;
 
 namespace Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels;
 
@@ -26,14 +27,18 @@ public partial class WarehouseDetailViewModel : BaseViewModel
         _userDialogs = userDialogs;
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+        InputQuantityTappedCommand = new Command(async () => await InputQuantityTappedAsync());
+        OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
+
     }
 
     [ObservableProperty]
-    private WarehouseDetailModel warehouseDetailModel = null!;
+    WarehouseDetailModel warehouseDetailModel = null!;
 
     #region Commands
-
     public Command LoadItemsCommand { get; }
+    public Command InputQuantityTappedCommand { get; }
+    public Command OutputQuantityTappedCommand { get; }
 
     #endregion Commands
 
@@ -48,7 +53,9 @@ public partial class WarehouseDetailViewModel : BaseViewModel
             _userDialogs.Loading("Loading Items...");
 
             await Task.Delay(1000);
-            await Task.WhenAll(GetInputOutputQuantityAsync(httpClient));
+            await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastTransactionsAsync(httpClient));
+
+            _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
@@ -60,7 +67,6 @@ public partial class WarehouseDetailViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
-            _userDialogs.Loading().Hide();
         }
     }
 
@@ -68,9 +74,14 @@ public partial class WarehouseDetailViewModel : BaseViewModel
     {
         try
         {
-            var query = @$"SELECT
-                    [InputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(1, 2) AND STOCKREF = {WarehouseDetailModel.Warehouse.ReferenceId}),
-                    [OutputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(3, 4) AND STOCKREF = {WarehouseDetailModel.Warehouse.ReferenceId})";
+            var query = @$"SELECT 
+                [InputQuantity] = COUNT(CASE WHEN STLINE.IOCODE IN (1, 2) THEN STLINE.LOGICALREF END),
+                [OutputQuantity] = COUNT(CASE WHEN STLINE.IOCODE IN (3, 4) THEN STLINE.LOGICALREF END)
+            FROM LG_001_02_STLINE AS STLINE
+            LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE 
+            ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = 1
+            WHERE STLINE.SOURCEINDEX = {WarehouseDetailModel.Warehouse.Number};
+            ";
 
             var result = await _customQueryService.GetObjectAsync(httpClient, query);
 
@@ -82,7 +93,7 @@ public partial class WarehouseDetailViewModel : BaseViewModel
                 WarehouseDetailModel.InputQuantity = obj.InputQuantity;
                 WarehouseDetailModel.OutputQuantity = obj.OutputQuantity;
             }
-        }
+		}
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
@@ -105,11 +116,7 @@ public partial class WarehouseDetailViewModel : BaseViewModel
 				[TransactionType] = STLINE.TRCODE,
                 [IOType] = STLINE.IOCODE,
 				[SubUnitsetCode] = SUBUNITSET.CODE,
-				[SubUnitsetReferenceId] = SUBUNITSET.LOGICALREF,
-				[UnitsetCode] = UNITSET.CODE,
-				[UnitsetReferenceId] = UNITSET.LOGICALREF,
 				[Quantity] = STLINE.AMOUNT,
-				[WarehouseNumber] = CAPUWHOUSE.NR,
 				[WarehouseName] = CAPIWHOUSE.NAME
 				FROM LG_001_02_STLINE AS STLINE
 				LEFT JOIN LG_001_02_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
@@ -138,6 +145,62 @@ public partial class WarehouseDetailViewModel : BaseViewModel
                 _userDialogs.Loading().Hide();
 
             _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+    }
+
+	private async Task InputQuantityTappedAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			await Task.Delay(300);
+			await Shell.Current.GoToAsync($"{nameof(WarehouseInputTransactionView)}", new Dictionary<string, object>
+			{
+				["Warehouse"] = WarehouseDetailModel.Warehouse
+			});
+		}
+		catch (Exception ex)
+		{
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			_userDialogs.Alert(message: ex.Message, title: "Hata");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task OutputQuantityTappedAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            await Task.Delay(300);
+            await Shell.Current.GoToAsync($"{nameof(WarehouseOutputTransactionView)}", new Dictionary<string, object>
+            {
+                ["Warehouse"] = WarehouseDetailModel.Warehouse
+            });
+        }
+        catch (Exception ex)
+        {
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			_userDialogs.Alert(message: ex.Message, title: "Hata");
+		}
+        finally
+        {
+            IsBusy = false;
         }
     }
 }

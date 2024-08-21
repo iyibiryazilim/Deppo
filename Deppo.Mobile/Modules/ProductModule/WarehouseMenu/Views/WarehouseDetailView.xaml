@@ -42,6 +42,7 @@
           RowSpacing="10"
           Padding="10">
         <VerticalStackLayout  Padding="10"
+                              Grid.Row="0"
                               HorizontalOptions="Fill"
                               Spacing="10"
                               VerticalOptions="Center">
@@ -52,7 +53,13 @@
                     StrokeThickness="0"
                     VerticalOptions="Center"
                     WidthRequest="100">
-                <!--<Image Source="{Binding WarehouseDetailModel.Warehouse.Number, Converter={StaticResource ByteArrayToImageSourceConverter}}" />-->
+                <Image HeightRequest="40">
+                    <Image.Source>
+                        <FontImageSource FontFamily="FAS"
+                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Warehouse}"
+                                         Color="{StaticResource White}" />
+                    </Image.Source>
+                </Image>
             </Border>
             <!--#region Code, Name -->
             <VerticalStackLayout HorizontalOptions="Center"
@@ -92,6 +99,9 @@
                         Padding="20,10,20,10"
                         BackgroundColor="{StaticResource PrimaryLight}"
                         StrokeThickness="0">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding InputQuantityTappedCommand}" />
+                    </Border.GestureRecognizers>
                     <VerticalStackLayout VerticalOptions="Center">
                         <Label HorizontalOptions="Center"
                                Text="{Binding WarehouseDetailModel.InputQuantity}"
@@ -109,6 +119,9 @@
                         StrokeShape="RoundRectangle 10"
                         BackgroundColor="{StaticResource PrimaryLight}"
                         StrokeThickness="0">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OutputQuantityTappedCommand}" />
+                    </Border.GestureRecognizers>
                     <VerticalStackLayout VerticalOptions="Center">
                         <Label HorizontalOptions="Center"
                                Text="{Binding WarehouseDetailModel.OutputQuantity}"
@@ -125,9 +138,10 @@
         <Grid Grid.Row="1"
               RowDefinitions="Auto, *"
               RowSpacing="10">
-            <Label FontSize="Subtitle"
+            <Label FontSize="Title"
                    FontAttributes="Bold"
-                   Text="Son Hareketler" />
+                   Text="Son Hareketler"
+                   TextColor="{StaticResource OffBlack}"/>
 
             <CollectionView Grid.Row="1"
                             ItemsSource="{Binding WarehouseDetailModel.LastTransactions}">
@@ -135,11 +149,13 @@
                     <DataTemplate x:DataType="model:WarehouseTransaction">
                         <Border Padding="5"
                                 BackgroundColor="Transparent"
+                                StrokeShape="RoundRectangle 5"
                                 StrokeThickness="0.1">
                             <Grid ColumnDefinitions="Auto, *"
                                   ColumnSpacing="10">
                                 <VerticalStackLayout Grid.Column="0"
-                                                     Spacing="1">
+                                                     VerticalOptions="Center"
+                                                     Spacing="3">
                                     <Label FontSize="Large"
                                            HorizontalOptions="Center"
                                            Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
@@ -154,7 +170,7 @@
                                 </VerticalStackLayout>
 
                                 <VerticalStackLayout Grid.Column="1"
-                                                     Spacing="5"
+                                                     Spacing="2"
                                                      VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
                                            Text="{Binding TransactionNumber}"
