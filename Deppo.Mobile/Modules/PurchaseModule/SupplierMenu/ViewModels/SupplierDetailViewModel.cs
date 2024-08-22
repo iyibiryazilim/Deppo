@@ -159,6 +159,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
                 await Task.Delay(300);
                 await Shell.Current.GoToAsync($"{nameof(SupplierInputTransactionView)}", new Dictionary<string, object>
                 {
+                   
                     ["Supplier"] = SupplierDetailModel.Supplier
                 });
             }
