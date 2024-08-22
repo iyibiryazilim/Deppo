@@ -3,9 +3,9 @@
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels"
-             xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              Title="{Binding Title}"
              x:DataType="viewModel:WarehouseInputTransactionViewModel"
              Shell.NavBarIsVisible="False"
@@ -21,105 +21,115 @@
     </ContentPage.BackgroundImageSource>
     <Grid RowDefinitions="Auto, *">
         <!--#region Custom Navigationbar-->
-        <Grid Padding="5,15,15,15"
-          ColumnDefinitions="Auto, *"
-          ColumnSpacing="10"
-          VerticalOptions="Center">
+        <Grid Padding="10,15,10,15"
+              ColumnDefinitions=".90*, .10*"
+              ColumnSpacing="10"
+              BackgroundColor="Transparent"
+              VerticalOptions="Center">
 
-            <Border Grid.Column="0"
-                Padding="10,0,10,0"
-                BackgroundColor="Transparent"
-                StrokeThickness="0">
+            <Label Grid.Column="0"
+                   FontSize="Title"
+                   MaxLines="1"
+                   LineBreakMode="TailTruncation"
+                   Text="{Binding Warehouse.Name, StringFormat='{0} Ambarı Giriş Hareketleri'}"
+                   ToolTipProperties.Text="{Binding Warehouse.Name, StringFormat='{0} Ambarı Giriş Hareketleri'}"
+                   TextColor="{StaticResource White}" />
+
+            <Border Grid.Column="1"
+                    Padding="0,0,0,0"
+                    BackgroundColor="Transparent"
+                    StrokeThickness="0">
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding GoToBackCommand}" />
                 </Border.GestureRecognizers>
                 <Image Aspect="AspectFit"
-                   BackgroundColor="Transparent"
-                   HeightRequest="18"
-                   WidthRequest="18">
+                       BackgroundColor="Transparent"
+                       HeightRequest="30"
+                       WidthRequest="30">
                     <Image.Source>
                         <FontImageSource FontFamily="FAS"
-                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.ArrowLeft}"
-                                     Color="{StaticResource White}" />
+                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                                         Color="{StaticResource White}" />
                     </Image.Source>
                 </Image>
             </Border>
 
-            <Label Grid.Column="1"
-               FontSize="Title"
-               Text="{Binding Title}"
-               TextColor="{StaticResource White}" />
+
         </Grid>
         <!--#endregion-->
 
         <Grid Grid.Row="1"
-          Padding="0,0,0,5"
-          RowDefinitions="Auto, *"
-          RowSpacing="10">
+              Padding="0,0,0,5"
+              RowDefinitions="Auto, *"
+              RowSpacing="10">
             <!--#region Searchbar-->
             <Border Grid.Row="0"
-                Margin="5,0,5,0"
-                Padding="0"
-                BackgroundColor="{StaticResource PrimaryLight}"
-                HeightRequest="35"
-                Stroke="{StaticResource Primary}"
-                StrokeShape="RoundRectangle 5"
-                StrokeThickness="0.5">
+                    Margin="5,0,5,0"
+                    Padding="0"
+                    BackgroundColor="{StaticResource PrimaryLight}"
+                    HeightRequest="35"
+                    Stroke="{StaticResource Primary}"
+                    StrokeShape="RoundRectangle 5"
+                    StrokeThickness="0.5">
                 <SearchBar x:Name="searchBar"
-                       Placeholder="Ara..."
-                       PlaceholderColor="{StaticResource OffBlack}"
-                       TextColor="{StaticResource OffBlack}" />
+                           Placeholder="Ara..."
+                           PlaceholderColor="{StaticResource OffBlack}"
+                           TextColor="{StaticResource OffBlack}" />
             </Border>
             <!--#endregion-->
 
             <CollectionView Grid.Row="1"
-                        Margin="5,0,5,0"
-                        ItemsSource="{Binding Items}"
-                        RemainingItemsThreshold="2"
-                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+                            Margin="5,0,5,0"
+                            ItemsSource="{Binding Items}"
+                            RemainingItemsThreshold="2"
+                            RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:WarehouseTransaction">
                         <Border Padding="5"
-                            BackgroundColor="Transparent"
-                            StrokeShape="RoundRectangle 5"
-                            StrokeThickness="0.1">
+                                BackgroundColor="Transparent"
+                                StrokeShape="RoundRectangle 5"
+                                StrokeThickness="0.1">
                             <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
                                 <VerticalStackLayout Grid.Column="0" Spacing="3">
                                     <Label FontSize="Large"
-                                       HorizontalOptions="Center"
-                                       Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
-                                       TextColor="{StaticResource OffBlack}" />
+                                           HorizontalOptions="Center"
+                                           Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
+                                           TextColor="{StaticResource OffBlack}" />
                                     <Label FontSize="Medium"
-                                       HorizontalOptions="Center"
-                                       Text="{Binding TransactionDate, StringFormat='{0:MM.yyyy}'}"
-                                       TextColor="{StaticResource OffBlack}" />
+                                           HorizontalOptions="Center"
+                                           Text="{Binding TransactionDate, StringFormat='{0:MM.yyyy}'}"
+                                           TextColor="{StaticResource OffBlack}" />
                                     <Label HorizontalOptions="Center"
-                                       Text="{Binding TransactionTime, StringFormat='{0:hh\\:mm}'}"
-                                       TextColor="{StaticResource Gray400}" />
+                                           Text="{Binding TransactionTime, StringFormat='{0:hh\\:mm}'}"
+                                           TextColor="{StaticResource Gray400}" />
                                 </VerticalStackLayout>
 
                                 <VerticalStackLayout Grid.Column="1"
-                                                 Spacing="2"
-                                                 VerticalOptions="Center">
+                                                     Spacing="2"
+                                                     VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
-                                       FontSize="Medium"
-                                       Text="{Binding TransactionNumber}" />
+                                           FontSize="Medium"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="1"
+                                           Text="{Binding ProductName}" />
                                     <Label FontSize="13"
-                                       LineBreakMode="TailTruncation"
-                                       Text="{Binding TransactionTypeName}" />
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="1"
+                                           Text="{Binding TransactionTypeName}" />
                                     <Label FontSize="13"
-                                       LineBreakMode="TailTruncation"
-                                       Text="{Binding WarehouseName}" />
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="1"
+                                           Text="{Binding CurrentCode}" />
 
                                     <HorizontalStackLayout Spacing="5">
                                         <Label FontFamily="FAS"
-                                           FontSize="Small"
-                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
-                                           TextColor="{StaticResource Primary}"
-                                           VerticalOptions="Center" />
+                                               FontSize="Small"
+                                               Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
+                                               TextColor="{StaticResource Primary}"
+                                               VerticalOptions="Center" />
                                         <Label>
                                             <Label.FormattedText>
                                                 <FormattedString>
@@ -132,9 +142,9 @@
                                         <Image>
                                             <Image.Source>
                                                 <FontImageSource FontFamily="FAS"
-                                                             Glyph="{Binding IOTypeImageSource}"
-                                                             Size="16"
-                                                             Color="{StaticResource Primary}" />
+                                                                 Glyph="{Binding IOTypeImageSource}"
+                                                                 Size="16"
+                                                                 Color="{StaticResource Primary}" />
                                             </Image.Source>
                                         </Image>
                                         <Label FontAttributes="None" Text="{Binding IOTypeName}" />

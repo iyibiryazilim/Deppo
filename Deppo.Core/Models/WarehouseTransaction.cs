@@ -7,6 +7,8 @@ public class WarehouseTransaction : BaseTransaction
 {
 	private int _warehouseReferenceId;
 	private string _warehouseName = string.Empty;
+	private int _currentReferenceId;
+	private string _currentCode = string.Empty;
 
 	public WarehouseTransaction()
 	{
@@ -32,6 +34,31 @@ public class WarehouseTransaction : BaseTransaction
 		{
 			if (_warehouseName == value) return;
 			_warehouseName = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	[Browsable(false)]
+	public int CurrentReferenceId
+	{
+		get => _currentReferenceId;
+		set
+		{
+			if (_currentReferenceId == value)
+				return;
+			_currentReferenceId = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	public string CurrentCode
+	{
+		get => _currentCode;
+		set
+		{
+			if (_currentCode == value)
+				return;
+			_currentCode = value;
 			NotifyPropertyChanged();
 		}
 	}

@@ -21,13 +21,22 @@
     </ContentPage.BackgroundImageSource>
     <Grid RowDefinitions="Auto, *">
         <!--#region Custom Navigationbar-->
-        <Grid Padding="5,15,15,15"
-              ColumnDefinitions="Auto, *"
+        <Grid Padding="10,15,10,15"
+              BackgroundColor="Transparent"
+              ColumnDefinitions=".90*, .10*"
               ColumnSpacing="10"
               VerticalOptions="Center">
 
-            <Border Grid.Column="0"
-                    Padding="10,0,10,0"
+            <Label Grid.Column="0"
+                   FontSize="Title"
+                   LineBreakMode="TailTruncation"
+                   MaxLines="1"
+                   Text="{Binding Product.Code, StringFormat='{0} Ürünü Giriş Hareketleri'}"
+                   TextColor="{StaticResource White}"
+                   ToolTipProperties.Text="{Binding Product.Code, StringFormat='{0} Ürünü Giriş Hareketleri'}" />
+
+            <Border Grid.Column="1"
+                    Padding="0,0,0,0"
                     BackgroundColor="Transparent"
                     StrokeThickness="0">
                 <Border.GestureRecognizers>
@@ -35,20 +44,17 @@
                 </Border.GestureRecognizers>
                 <Image Aspect="AspectFit"
                        BackgroundColor="Transparent"
-                       HeightRequest="18"
-                       WidthRequest="18">
+                       HeightRequest="30"
+                       WidthRequest="30">
                     <Image.Source>
                         <FontImageSource FontFamily="FAS"
-                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.ArrowLeft}"
+                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
                                          Color="{StaticResource White}" />
                     </Image.Source>
                 </Image>
             </Border>
 
-            <Label Grid.Column="1"
-                   FontSize="Title"
-                   Text="{Binding Title}"
-                   TextColor="{StaticResource White}" />
+
         </Grid>
         <!--#endregion-->
 
@@ -104,7 +110,7 @@
                                                      VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
                                            FontSize="Medium"
-                                           Text="{Binding TransactionNumber}" />
+                                           Text="{Binding BaseTransactionCode}" />
                                     <Label FontSize="13"
                                            LineBreakMode="TailTruncation"
                                            Text="{Binding TransactionTypeName}" />

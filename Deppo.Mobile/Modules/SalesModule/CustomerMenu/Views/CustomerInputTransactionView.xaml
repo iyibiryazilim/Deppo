@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentPage x:Class="Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views.CustomerInputTransactionView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views.CustomerInputTransactionView"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -12,24 +12,31 @@
              Shell.PresentationMode="ModalAnimated"
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
-                                        EventName="Loaded" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
     </ContentPage.Behaviors>
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android"
-                Value="artboard.png" />
+            <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
     <Grid RowDefinitions="Auto, *">
         <!--#region Custom Navigationbar-->
-        <Grid Padding="5,15,15,15"
-              ColumnDefinitions="Auto, *"
+        <Grid Padding="10,15,10,15"
+              BackgroundColor="Transparent"
+              ColumnDefinitions=".90*, .10*"
               ColumnSpacing="10"
               VerticalOptions="Center">
 
-            <Border Grid.Column="0"
-                    Padding="10,0,10,0"
+            <Label Grid.Column="0"
+                   FontSize="Title"
+                   LineBreakMode="TailTruncation"
+                   MaxLines="1"
+                   Text="{Binding Customer.Name, StringFormat='{0} - Giriş Hareketleri'}"
+                   TextColor="{StaticResource White}"
+                   ToolTipProperties.Text="{Binding Customer.Name, StringFormat='{0} - Giriş Hareketleri'}" />
+
+            <Border Grid.Column="1"
+                    Padding="0,0,0,0"
                     BackgroundColor="Transparent"
                     StrokeThickness="0">
                 <Border.GestureRecognizers>
@@ -37,23 +44,17 @@
                 </Border.GestureRecognizers>
                 <Image Aspect="AspectFit"
                        BackgroundColor="Transparent"
-                       HeightRequest="18"
-                       WidthRequest="18">
+                       HeightRequest="30"
+                       WidthRequest="30">
                     <Image.Source>
                         <FontImageSource FontFamily="FAS"
-                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.ArrowLeft}"
+                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
                                          Color="{StaticResource White}" />
                     </Image.Source>
                 </Image>
             </Border>
-
-            <Label Grid.Column="1"
-                   FontSize="Title"
-                   Text="{Binding Title}"
-                   TextColor="{StaticResource White}" />
         </Grid>
         <!--#endregion-->
-
         <Grid Grid.Row="1"
               Padding="0,0,0,5"
               RowDefinitions="Auto, *"
@@ -78,8 +79,7 @@
                             Margin="5,0,5,0"
                             ItemsSource="{Binding Items}">
                 <CollectionView.ItemsLayout>
-                    <LinearItemsLayout ItemSpacing="0"
-                                       Orientation="Vertical" />
+                    <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:CustomerTransaction">
@@ -87,10 +87,8 @@
                                 BackgroundColor="Transparent"
                                 StrokeShape="RoundRectangle 5"
                                 StrokeThickness="0.1">
-                            <Grid ColumnDefinitions="Auto, *"
-                                  ColumnSpacing="10">
-                                <VerticalStackLayout Grid.Column="0"
-                                                     Spacing="3">
+                            <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
+                                <VerticalStackLayout Grid.Column="0" Spacing="3">
                                     <Label FontSize="Large"
                                            HorizontalOptions="Center"
                                            Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
@@ -109,7 +107,7 @@
                                                      VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
                                            FontSize="Medium"
-                                           Text="{Binding TransactionNumber}" />
+                                           Text="{Binding BaseTransactionCode}" />
                                     <Label FontSize="13"
                                            LineBreakMode="TailTruncation"
                                            Text="{Binding TransactionTypeName}" />
@@ -126,11 +124,9 @@
                                         <Label>
                                             <Label.FormattedText>
                                                 <FormattedString>
-                                                    <Span FontAttributes="None"
-                                                          Text="{Binding Quantity}" />
+                                                    <Span FontAttributes="None" Text="{Binding Quantity}" />
                                                     <Span Text=" " />
-                                                    <Span FontAttributes="None"
-                                                          Text="{Binding SubUnitsetCode}" />
+                                                    <Span FontAttributes="None" Text="{Binding SubUnitsetCode}" />
                                                 </FormattedString>
                                             </Label.FormattedText>
                                         </Label>
@@ -142,8 +138,7 @@
                                                                  Color="{StaticResource Primary}" />
                                             </Image.Source>
                                         </Image>
-                                        <Label FontAttributes="None"
-                                               Text="{Binding IOTypeName}" />
+                                        <Label FontAttributes="None" Text="{Binding IOTypeName}" />
                                     </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Grid>
