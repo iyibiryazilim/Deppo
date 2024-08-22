@@ -176,7 +176,7 @@
                                             </Image.Source>
                                         </Image>
                                         <Label Text="{Binding IOTypeName}"
-                                               FontAttributes="Bold" />
+                                               />
                                     </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Grid>

@@ -13,95 +13,96 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels;
 [QueryProperty(name: nameof(ProductDetailModel), queryId: nameof(ProductDetailModel))]
 public partial class ProductDetailViewModel : BaseViewModel
 {
+    private readonly IHttpClientService _httpClientService;
+    private readonly ICustomQueryService _customQueryService;
+    private readonly IUserDialogs _userDialogs;
 
-	private readonly IHttpClientService _httpClientService;
-	private readonly ICustomQueryService _customQueryService;
-	private readonly IUserDialogs _userDialogs;
+    [ObservableProperty]
+    private ProductDetailModel productDetailModel = null!;
 
-	[ObservableProperty]
-	ProductDetailModel productDetailModel = null!;
+    public ProductDetailViewModel(IHttpClientService httpClientService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
+    {
+        Title = "Ürün Detayı";
+        _httpClientService = httpClientService;
+        _customQueryService = customQueryService;
+        _userDialogs = userDialogs;
 
-	public ProductDetailViewModel(IHttpClientService httpClientService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
-	{
-		Title = "Ürün Detayı";
-		_httpClientService = httpClientService;
-		_customQueryService = customQueryService;
-		_userDialogs = userDialogs;
+        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+        InputQuantityTappedCommand = new Command(async () => await InputQuantityTappedAsync());
+        OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
+    }
 
-		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
-		InputQuantityTappedCommand = new Command(async() => await InputQuantityTappedAsync());
-		OutputQuantityTappedCommand = new Command(async() => await OutputQuantityTappedAsync());
-	}
+    #region Commands
 
-	#region Commands
-	public Command LoadItemsCommand { get; }
-	public Command InputQuantityTappedCommand { get; } 
-	public Command OutputQuantityTappedCommand { get; }
-	#endregion
+    public Command LoadItemsCommand { get; }
+    public Command InputQuantityTappedCommand { get; }
+    public Command OutputQuantityTappedCommand { get; }
 
-	async Task LoadItemsAsync()
-	{
-		try
-		{
-			IsBusy = true;
+    #endregion Commands
 
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			_userDialogs.Loading("Loading Items...");
-			await Task.Delay(1000);
+    private async Task LoadItemsAsync()
+    {
+        try
+        {
+            IsBusy = true;
 
-			// Querylerde yer alan firma numarasi dinamik olarak alinacak
-			await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastTransactionsAsync(httpClient));
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            _userDialogs.Loading("Loading Items...");
+            await Task.Delay(1000);
 
-			_userDialogs.HideHud();
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.Loading().Hide();
+            // Querylerde yer alan firma numarasi dinamik olarak alinacak
+            await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastTransactionsAsync(httpClient));
 
-			_userDialogs.Alert(message: ex.Message, title: "Hata");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+            _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
 
-	async Task GetInputOutputQuantityAsync(HttpClient httpClient)
-	{
-		try
-		{
-			var query = @$"SELECT 
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task GetInputOutputQuantityAsync(HttpClient httpClient)
+    {
+        try
+        {
+            var query = @$"SELECT
                     [InputQuantity] = (SELECT ISNULL(COUNT(DISTINCT STOCKREF), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(1, 2) AND STOCKREF = {ProductDetailModel.Product.ReferenceId}),
                     [OutputQuantity] = (SELECT ISNULL(COUNT(DISTINCT STOCKREF), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(3, 4) AND STOCKREF = {ProductDetailModel.Product.ReferenceId})";
 
-			var result = await _customQueryService.GetObjectAsync(httpClient, query);
+            var result = await _customQueryService.GetObjectAsync(httpClient, query);
 
-			if (result.IsSuccess)
-			{
-				if (result.Data == null)
-					return;
-				var obj = Mapping.Mapper.Map<ProductDetailModel>(result.Data);
-				ProductDetailModel.InputQuantity = obj.InputQuantity;
-				ProductDetailModel.OutputQuantity = obj.OutputQuantity;
-			}
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.Loading().Hide();
+            if (result.IsSuccess)
+            {
+                if (result.Data == null)
+                    return;
+                var obj = Mapping.Mapper.Map<ProductDetailModel>(result.Data);
+                ProductDetailModel.InputQuantity = obj.InputQuantity;
+                ProductDetailModel.OutputQuantity = obj.OutputQuantity;
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
 
-			_userDialogs.Alert(message: ex.Message, title: "Hata");
-		}
-	}
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+    }
 
-	async Task GetLastTransactionsAsync(HttpClient httpclient)
-	{
-		try
-		{
-			ProductDetailModel.LastTransactions.Clear();
+    private async Task GetLastTransactionsAsync(HttpClient httpclient)
+    {
+        try
+        {
+            ProductDetailModel.LastTransactions.Clear();
 
-			var query = @$"SELECT TOP 5
+            var query = @$"SELECT TOP 5
 				[TransactionDate] = STLINE.DATE_,
 				[TransactionTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
 				[BaseTransactionCode] = STFICHE.FICHENO,
@@ -112,7 +113,9 @@ public partial class ProductDetailViewModel : BaseViewModel
 				[UnitsetCode] = UNITSET.CODE,
 				[UnitsetReferenceId] = UNITSET.LOGICALREF,
 				[Quantity] = STLINE.AMOUNT,
-				[WarehouseName] = CAPIWHOUSE.NAME
+				[WarehouseName] = CAPIWHOUSE.NAME,
+                [ProductCode]=ITEMS.CODE,
+                [ProductName]=ITEMS.NAME
 				FROM LG_001_02_STLINE AS STLINE
 				LEFT JOIN LG_001_02_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
 				LEFT JOIN LG_001_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF
@@ -121,80 +124,79 @@ public partial class ProductDetailViewModel : BaseViewModel
 				LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = 1
 				WHERE ITEMS.LOGICALREF= {ProductDetailModel.Product.ReferenceId} AND STLINE.STFICHEREF <> 0 AND STLINE.USREF <> 0 AND STLINE.UOMREF <> 0 ORDER BY STLINE.DATE_ DESC";
 
-			var result = await _customQueryService.GetObjectsAsync(httpclient, query);
+            var result = await _customQueryService.GetObjectsAsync(httpclient, query);
 
-			if (result.IsSuccess)
-			{
-				if (result.Data == null)
-					return;
+            if (result.IsSuccess)
+            {
+                if (result.Data == null)
+                    return;
 
-				foreach (var item in result.Data)
-				{
-					ProductDetailModel.LastTransactions.Add(Mapping.Mapper.Map<ProductTransaction>(item));
-				}
-			}
-		}
-		catch (Exception ex)
-		{
+                foreach (var item in result.Data)
+                {
+                    ProductDetailModel.LastTransactions.Add(Mapping.Mapper.Map<ProductTransaction>(item));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
 
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.Loading().Hide();
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+    }
 
-			_userDialogs.Alert(message: ex.Message, title: "Hata");
-		}
-	}
+    private async Task InputQuantityTappedAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
 
-	async Task InputQuantityTappedAsync()
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
+            await Task.Delay(300);
+            await Shell.Current.GoToAsync($"{nameof(ProductInputTransactionView)}", new Dictionary<string, object>
+            {
+                ["Product"] = ProductDetailModel.Product
+            });
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
 
-			await Task.Delay(300);
-			await Shell.Current.GoToAsync($"{nameof(ProductInputTransactionView)}", new Dictionary<string, object>
-			{
-				["Product"] = ProductDetailModel.Product
-			});
-		}
-		catch(Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.Loading().Hide();
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-			_userDialogs.Alert(message: ex.Message, title: "Hata");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+    private async Task OutputQuantityTappedAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
 
-	async Task OutputQuantityTappedAsync()
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
+            await Task.Delay(300);
+            await Shell.Current.GoToAsync($"{nameof(ProductOutputTransactionView)}", new Dictionary<string, object>
+            {
+                ["Product"] = ProductDetailModel.Product
+            });
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
 
-			await Task.Delay(300);
-			await Shell.Current.GoToAsync($"{nameof(ProductOutputTransactionView)}", new Dictionary<string, object>
-			{
-				["Product"] = ProductDetailModel.Product
-			});
-		}
-		catch(Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.Loading().Hide();
-
-			_userDialogs.Alert(message: ex.Message, title: "Hata");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 }

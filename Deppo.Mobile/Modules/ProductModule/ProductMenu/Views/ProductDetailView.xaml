@@ -152,9 +152,10 @@
                                 StrokeThickness="0.1">
                             <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
                                 <VerticalStackLayout Grid.Column="0"
-                                                     VerticalOptions="Center"
-                                                     Spacing="3">
+                                                     VerticalOptions="Center" 
+                                                     Spacing="1">
                                     <Label FontSize="Large"
+                                           FontAttributes="Bold"
                                            HorizontalOptions="Center"
                                            Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
                                            TextColor="{StaticResource OffBlack}" />
@@ -168,7 +169,7 @@
                                 </VerticalStackLayout>
 
                                 <VerticalStackLayout Grid.Column="1"
-                                                     Spacing="2"
+                                                     Spacing="1"
                                                      VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
                                            Text="{Binding BaseTransactionCode}"

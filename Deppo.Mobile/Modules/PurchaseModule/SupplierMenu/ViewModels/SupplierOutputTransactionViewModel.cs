@@ -56,7 +56,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
         [TransactionDate] = STLINE.DATE_,
         [TransactionTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
 		[TransactionReferenceId] = STFICHE.LOGICALREF,
-        [TransactionNumber] = STFICHE.FICHENO,
+        [BaseTransactionCode] = STFICHE.FICHENO,
         [TransactionType] = STLINE.TRCODE,
         [SubUnitsetCode] = ISNULL(SUBUNITSET.CODE,''),
         [SubUnitsetReferenceId] = ISNULL(SUBUNITSET.LOGICALREF,0),

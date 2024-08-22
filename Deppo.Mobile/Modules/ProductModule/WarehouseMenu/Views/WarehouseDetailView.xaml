@@ -144,9 +144,9 @@
                                   ColumnSpacing="10">
                                 <VerticalStackLayout Grid.Column="0"
                                                      VerticalOptions="Center"
-                                                     Spacing="3">
+                                                     Spacing="1">
                                     <Label FontSize="Large"
-                                           HorizontalOptions="Center"
+                                           HorizontalOptions="Center" FontAttributes="Bold"
                                            Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
                                            TextColor="{StaticResource OffBlack}" />
                                     <Label FontSize="Medium"
@@ -159,7 +159,7 @@
                                 </VerticalStackLayout>
 
                                 <VerticalStackLayout Grid.Column="1"
-                                                     Spacing="2"
+                                                     Spacing="1"
                                                      VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
                                            Text="{Binding ProductName}"
@@ -201,7 +201,7 @@
                                             </Image.Source>
                                         </Image>
                                         <Label Text="{Binding IOTypeName}"
-                                               FontAttributes="Bold" />
+                                                />
                                     </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Grid>
