@@ -11,7 +11,6 @@ using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
 {
-   
     [QueryProperty(name: nameof(Supplier), queryId: nameof(Supplier))]
     public partial class SupplierInputTransactionViewModel : BaseViewModel
     {
@@ -22,15 +21,11 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
         [ObservableProperty]
         private Supplier supplier = null!;
 
-       
-
         public SupplierInputTransactionViewModel(IHttpClientService httpClientService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
         {
             _httpClientService = httpClientService;
             _customQueryService = customQueryService;
             _userDialogs = userDialogs;
-
-        
 
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
             GoToBackCommand = new Command(async () => await GoToBackAsync());
@@ -53,7 +48,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
         [TransactionDate] = STLINE.DATE_,
         [TransactionTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
 		[TransactionReferenceId] = STFICHE.LOGICALREF,
-        [TransactionNumber] = STFICHE.FICHENO,
+        [BaseTransactionCode] = STFICHE.FICHENO,
         [TransactionType] = STLINE.TRCODE,
         [SubUnitsetCode] = ISNULL(SUBUNITSET.CODE,''),
         [SubUnitsetReferenceId] = ISNULL(SUBUNITSET.LOGICALREF,0),
@@ -64,7 +59,9 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
         [WarehouseName] = CAPIWHOUSE.NAME,
 		[SupplierReferenceId] = CLCARD.LOGICALREF,
 		[SupplierCode] = CLCARD.CODE,
-		[SupplierName] = CLCARD.DEFINITION_
+		[SupplierName] = CLCARD.DEFINITION_,
+        [ProductName]=ITEMS.NAME,
+        [ProductCode]=ITEMS.CODE
         FROM LG_001_02_STLINE AS STLINE
         LEFT JOIN LG_001_02_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
         LEFT JOIN LG_001_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF

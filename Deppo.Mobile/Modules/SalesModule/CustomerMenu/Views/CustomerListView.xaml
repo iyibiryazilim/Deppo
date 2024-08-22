@@ -93,7 +93,7 @@
                                                         BorderColor="{StaticResource Primary}"
                                                         Background="{StaticResource PrimaryLight}"
                                                         Text="{Binding TitleName}"
-                                                        TextColor="{StaticResource OffBlack}"
+                                                        TextColor="{StaticResource White}"
                                                         FontSize="16"
                                                         FontAttributes="Bold"
                                                         WidthRequest="50"

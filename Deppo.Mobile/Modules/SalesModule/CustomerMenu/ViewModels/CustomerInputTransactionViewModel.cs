@@ -59,7 +59,7 @@ namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels
         [TransactionDate] = STLINE.DATE_,
         [TransactionTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
 		[TransactionReferenceId] = STFICHE.LOGICALREF,
-        [TransactionNumber] = STFICHE.FICHENO,
+        [BaseTransactionCode] = STFICHE.FICHENO,
         [TransactionType] = STLINE.TRCODE,
         [SubUnitsetCode] = ISNULL(SUBUNITSET.CODE,''),
         [SubUnitsetReferenceId] = ISNULL(SUBUNITSET.LOGICALREF,0),
@@ -70,7 +70,9 @@ namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels
         [WarehouseName] = CAPIWHOUSE.NAME,
 		[CustomerReferenceId] = CLCARD.LOGICALREF,
 		[CustomerCode] = CLCARD.CODE,
-		[CustomerName] = CLCARD.DEFINITION_
+		[CustomerName] = CLCARD.DEFINITION_,
+        [ProductCode]=ITEMS.CODE,
+        [ProductName]=ITEMS.NAME
         FROM LG_001_02_STLINE AS STLINE
         LEFT JOIN LG_001_02_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
         LEFT JOIN LG_001_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF

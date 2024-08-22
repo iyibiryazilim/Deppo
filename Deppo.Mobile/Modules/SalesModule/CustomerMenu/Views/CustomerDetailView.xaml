@@ -126,10 +126,12 @@
                             <Grid ColumnDefinitions="Auto, *"
                                   ColumnSpacing="10">
                                 <VerticalStackLayout Grid.Column="0"
-                                                     Spacing="1">
+                                                     Spacing="1"
+                                                     VerticalOptions="Center">
                                     <Label FontSize="Large"
                                            HorizontalOptions="Center"
                                            Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
+                                           FontAttributes="Bold"
                                            TextColor="{StaticResource OffBlack}" />
                                     <Label FontSize="Medium"
                                            HorizontalOptions="Center"
@@ -141,12 +143,12 @@
                                 </VerticalStackLayout>
 
                                 <VerticalStackLayout Grid.Column="1"
-                                                     Spacing="5"
+                                                     Spacing="1"
                                                      VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
                                            Text="{Binding BaseTransactionCode}"
                                            FontSize="Medium" />
-                                    <Label Text="{Binding CustomerName}"
+                                    <Label Text="{Binding ProductName}"
                                            LineBreakMode="TailTruncation"
                                            FontSize="13" />
 
@@ -175,8 +177,7 @@
                                                                  Color="{StaticResource Primary}" />
                                             </Image.Source>
                                         </Image>
-                                        <Label Text="{Binding IOTypeName}"
-                                               FontAttributes="Bold" />
+                                        <Label Text="{Binding IOTypeName}" />
                                     </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Grid>

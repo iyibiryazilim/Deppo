@@ -118,7 +118,9 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
         [WarehouseName] = CAPIWHOUSE.NAME,
 		[SupplierReferenceId] = CLCARD.LOGICALREF,
 		[SupplierCode] = CLCARD.CODE,
-		[SupplierName] = CLCARD.DEFINITION_
+		[SupplierName] = CLCARD.DEFINITION_,
+        [ProductCode]=ITEMS.CODE,
+        [ProductName]=ITEMS.NAME
         FROM LG_001_02_STLINE AS STLINE
         LEFT JOIN LG_001_02_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
         LEFT JOIN LG_001_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF
@@ -159,7 +161,6 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
                 await Task.Delay(300);
                 await Shell.Current.GoToAsync($"{nameof(SupplierInputTransactionView)}", new Dictionary<string, object>
                 {
-                   
                     ["Supplier"] = SupplierDetailModel.Supplier
                 });
             }
