@@ -12,14 +12,16 @@
              Shell.PresentationMode="ModalAnimated"
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                        EventName="Loaded" />
     </ContentPage.Behaviors>
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android" Value="artboard.png" />
+            <On Platform="Android"
+                Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
-    <Grid RowDefinitions="Auto, *">
+    <Grid RowDefinitions="Auto, *,Auto">
         <!--#region Custom Navigationbar-->
         <Grid Padding="10,15,10,15"
               BackgroundColor="Transparent"
@@ -27,13 +29,18 @@
               ColumnSpacing="10"
               VerticalOptions="Center">
 
-            <Label Grid.Column="0"
-                   FontSize="Title"
-                   LineBreakMode="TailTruncation"
-                   MaxLines="1"
-                   Text="{Binding Customer.Name, StringFormat='{0} - Giriş Hareketleri'}"
-                   TextColor="{StaticResource White}"
-                   ToolTipProperties.Text="{Binding Customer.Name, StringFormat='{0} - Giriş Hareketleri'}" />
+            <VerticalStackLayout>
+                <Label Text="Müşteri Giriş Hareketleri"
+                       FontSize="Title"
+                       TextColor="{StaticResource White}" />
+                <Label Grid.Column="0"
+                       FontSize="Subtitle"
+                       TextColor="{StaticResource WhiteSmoke}"
+                       LineBreakMode="TailTruncation"
+                       MaxLines="1"
+                       Text="{Binding Customer.Name}"
+                       ToolTipProperties.Text="{Binding Customer.Name, StringFormat='{0} - Giriş Hareketleri'}" />
+            </VerticalStackLayout>
 
             <Border Grid.Column="1"
                     Padding="0,0,0,0"
@@ -42,16 +49,6 @@
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding GoToBackCommand}" />
                 </Border.GestureRecognizers>
-                <Image Aspect="AspectFit"
-                       BackgroundColor="Transparent"
-                       HeightRequest="30"
-                       WidthRequest="30">
-                    <Image.Source>
-                        <FontImageSource FontFamily="FAS"
-                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
-                                         Color="{StaticResource White}" />
-                    </Image.Source>
-                </Image>
             </Border>
         </Grid>
         <!--#endregion-->
@@ -79,7 +76,8 @@
                             Margin="5,0,5,0"
                             ItemsSource="{Binding Items}">
                 <CollectionView.ItemsLayout>
-                    <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+                    <LinearItemsLayout ItemSpacing="0"
+                                       Orientation="Vertical" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:CustomerTransaction">
@@ -87,9 +85,12 @@
                                 BackgroundColor="Transparent"
                                 StrokeShape="RoundRectangle 5"
                                 StrokeThickness="0.1">
-                            <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
-                                <VerticalStackLayout Grid.Column="0" Spacing="3">
+                            <Grid ColumnDefinitions="Auto, *"
+                                  ColumnSpacing="10">
+                                <VerticalStackLayout Grid.Column="0"
+                                                     Spacing="1">
                                     <Label FontSize="Large"
+                                           FontAttributes="Bold"
                                            HorizontalOptions="Center"
                                            Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
                                            TextColor="{StaticResource OffBlack}" />
@@ -103,7 +104,7 @@
                                 </VerticalStackLayout>
 
                                 <VerticalStackLayout Grid.Column="1"
-                                                     Spacing="2"
+                                                     Spacing="1"
                                                      VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
                                            FontSize="Medium"
@@ -113,7 +114,7 @@
                                            Text="{Binding TransactionTypeName}" />
                                     <Label FontSize="13"
                                            LineBreakMode="TailTruncation"
-                                           Text="{Binding CustomerName}" />
+                                           Text="{Binding ProductName}" />
 
                                     <HorizontalStackLayout Spacing="5">
                                         <Label FontFamily="FAS"
@@ -124,9 +125,11 @@
                                         <Label>
                                             <Label.FormattedText>
                                                 <FormattedString>
-                                                    <Span FontAttributes="None" Text="{Binding Quantity}" />
+                                                    <Span FontAttributes="None"
+                                                          Text="{Binding Quantity}" />
                                                     <Span Text=" " />
-                                                    <Span FontAttributes="None" Text="{Binding SubUnitsetCode}" />
+                                                    <Span FontAttributes="None"
+                                                          Text="{Binding SubUnitsetCode}" />
                                                 </FormattedString>
                                             </Label.FormattedText>
                                         </Label>
@@ -138,7 +141,8 @@
                                                                  Color="{StaticResource Primary}" />
                                             </Image.Source>
                                         </Image>
-                                        <Label FontAttributes="None" Text="{Binding IOTypeName}" />
+                                        <Label FontAttributes="None"
+                                               Text="{Binding IOTypeName}" />
                                     </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Grid>
@@ -147,5 +151,10 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </Grid>
+        <Button Grid.Row="2"
+                Margin="10,10,10,20"
+                Text="Geri"
+                Command="{Binding GoToBackCommand}">
+        </Button>
     </Grid>
 </ContentPage>

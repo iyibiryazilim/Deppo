@@ -123,7 +123,9 @@ public partial class CustomerDetailViewModel : BaseViewModel
         [WarehouseName] = CAPIWHOUSE.NAME,
 		[CustomerReferenceId] = CLCARD.LOGICALREF,
 		[CustomerCode] = CLCARD.CODE,
-		[CustomerName] = CLCARD.DEFINITION_
+		[CustomerName] = CLCARD.DEFINITION_,
+        [ProductCode]=ITEMS.CODE,
+        [ProductName]=ITEMS.NAME
         FROM LG_001_02_STLINE AS STLINE
         LEFT JOIN LG_001_02_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
         LEFT JOIN LG_001_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF

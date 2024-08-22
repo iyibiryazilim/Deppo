@@ -19,7 +19,7 @@
             <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
-    <Grid RowDefinitions="Auto, *">
+    <Grid RowDefinitions="Auto, *,Auto">
         <!--#region Custom Navigationbar-->
         <Grid Padding="10,15,10,15"
               BackgroundColor="Transparent"
@@ -27,32 +27,20 @@
               ColumnSpacing="10"
               VerticalOptions="Center">
 
-            <Label Grid.Column="0"
-                   FontSize="Title"
-                   LineBreakMode="TailTruncation"
-                   MaxLines="1"
-                   Text="{Binding Supplier.Name, StringFormat='{0} - Çıkış Hareketleri'}"
-                   TextColor="{StaticResource White}"
-                   ToolTipProperties.Text="{Binding Supplier.Name, StringFormat='{0} - Çıkış Hareketleri'}" />
+            <VerticalStackLayout>
+                <Label Text="Tedarikçi Giriş Hareketleri"
+                       FontSize="Title"
+                       TextColor="{StaticResource White}" />
+                <Label Grid.Column="0"
+                       FontSize="Subtitle"
+                       TextColor="{StaticResource WhiteSmoke}"
+                       LineBreakMode="TailTruncation"
+                       MaxLines="1"
+                       Text="{Binding Supplier.Name}"
+                       ToolTipProperties.Text="{Binding Supplier.Name, StringFormat='{0} - Giriş Hareketleri'}" />
+            </VerticalStackLayout>
 
-            <Border Grid.Column="1"
-                    Padding="0,0,0,0"
-                    BackgroundColor="Transparent"
-                    StrokeThickness="0">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding GoToBackCommand}" />
-                </Border.GestureRecognizers>
-                <Image Aspect="AspectFit"
-                       BackgroundColor="Transparent"
-                       HeightRequest="30"
-                       WidthRequest="30">
-                    <Image.Source>
-                        <FontImageSource FontFamily="FAS"
-                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
-                                         Color="{StaticResource White}" />
-                    </Image.Source>
-                </Image>
-            </Border>
+           
         </Grid>
         <!--#endregion-->
 
@@ -148,5 +136,11 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </Grid>
+        <Button Grid.Row="2"
+                Margin="10,10,10,20"
+                Text="Geri"
+                Command="{Binding GoToBackCommand}">
+            
+        </Button>
     </Grid>
 </ContentPage>

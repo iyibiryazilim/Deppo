@@ -40,55 +40,10 @@
                        Text="Giriş İşlemleri"
                        TextColor="{StaticResource OffBlack}" />
 
-                <Grid RowDefinitions="Auto,Auto,Auto,Auto"
+                <Grid RowDefinitions="Auto,Auto"
                       RowSpacing="5">
+                    
                     <Border Grid.Row="0"
-                            Padding="5"
-                            StrokeShape="RoundRectangle 5"
-                            StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*"
-                              ColumnSpacing="0">
-                            <Grid Grid.Column="0"
-                                  ColumnDefinitions="Auto,*"
-                                  ColumnSpacing="10">
-                                <Border Padding="5"
-                                        BackgroundColor="{StaticResource Primary}"
-                                        StrokeShape="RoundRectangle 5">
-                                    <Label FontFamily="FAS"
-                                           FontSize="24"
-                                           HorizontalOptions="Center"
-                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
-                                           TextColor="{StaticResource White}"
-                                           VerticalOptions="Center" />
-
-                                </Border>
-                                <Label Grid.Column="1"
-                                       FontAttributes="Bold"
-                                       FontSize="Subtitle"
-                                       Text="Ürün Toplama"
-                                       TextColor="{StaticResource Gray500}"
-                                       VerticalOptions="Center" />
-                            </Grid>
-
-                            <Border Grid.Column="1"
-                                    StrokeThickness="0">
-                                <toolkit:AvatarView Padding="2"
-                                                    BorderColor="{StaticResource Primary}"
-                                                    CornerRadius="15"
-                                                    FontFamily="FAS"
-                                                    FontSize="14"
-                                                    HeightRequest="30"
-                                                    HorizontalOptions="End"
-                                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
-                                                    TextColor="{StaticResource Primary}"
-                                                    WidthRequest="30" />
-                            </Border>
-
-
-
-                        </Grid>
-                    </Border>
-                    <Border Grid.Row="1"
                             Padding="5"
                             StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.2">
@@ -134,7 +89,7 @@
 
                         </Grid>
                     </Border>
-                    <Border Grid.Row="2"
+                    <Border Grid.Row="1"
                             Padding="5"
                             StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.2">
@@ -180,52 +135,7 @@
 
                         </Grid>
                     </Border>
-                    <Border Grid.Row="3"
-                            Padding="5"
-                            StrokeShape="RoundRectangle 5"
-                            StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*"
-                              ColumnSpacing="0">
-                            <Grid Grid.Column="0"
-                                  ColumnDefinitions="Auto,*"
-                                  ColumnSpacing="10">
-                                <Border Padding="5"
-                                        BackgroundColor="{StaticResource Primary}"
-                                        StrokeShape="RoundRectangle 5">
-                                    <Label FontFamily="FAS"
-                                           FontSize="24"
-                                           HorizontalOptions="Center"
-                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
-                                           TextColor="{StaticResource White}"
-                                           VerticalOptions="Center" />
-
-                                </Border>
-                                <Label Grid.Column="1"
-                                       FontAttributes="Bold"
-                                       FontSize="Subtitle"
-                                       Text="Ürüne Bağlı Sevk İşlemleri"
-                                       TextColor="{StaticResource Gray500}"
-                                       VerticalOptions="Center" />
-                            </Grid>
-
-                            <Border Grid.Column="1"
-                                    StrokeThickness="0">
-                                <toolkit:AvatarView Padding="2"
-                                                    BorderColor="{StaticResource Primary}"
-                                                    CornerRadius="15"
-                                                    FontFamily="FAS"
-                                                    FontSize="14"
-                                                    HeightRequest="30"
-                                                    HorizontalOptions="End"
-                                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
-                                                    TextColor="{StaticResource Primary}"
-                                                    WidthRequest="30" />
-                            </Border>
-
-
-
-                        </Grid>
-                    </Border>
+                   
                 </Grid>
 
             </VerticalStackLayout>
@@ -331,52 +241,7 @@
 
                         </Grid>
                     </Border>
-                    <Border Grid.Row="2"
-                            Padding="5"
-                            StrokeShape="RoundRectangle 5"
-                            StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*"
-                              ColumnSpacing="0">
-                            <Grid Grid.Column="0"
-                                  ColumnDefinitions="Auto,*"
-                                  ColumnSpacing="10">
-                                <Border Padding="5"
-                                        BackgroundColor="{StaticResource Primary}"
-                                        StrokeShape="RoundRectangle 5">
-                                    <Label FontFamily="FAS"
-                                           FontSize="24"
-                                           HorizontalOptions="Center"
-                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
-                                           TextColor="{StaticResource White}"
-                                           VerticalOptions="Center" />
-
-                                </Border>
-                                <Label Grid.Column="1"
-                                       FontAttributes="Bold"
-                                       FontSize="Subtitle"
-                                       Text="Ürüne Bağlı Satış İade İşlemleri"
-                                       TextColor="{StaticResource Gray500}"
-                                       VerticalOptions="Center" />
-                            </Grid>
-
-                            <Border Grid.Column="1"
-                                    StrokeThickness="0">
-                                <toolkit:AvatarView Padding="2"
-                                                    BorderColor="{StaticResource Primary}"
-                                                    CornerRadius="15"
-                                                    FontFamily="FAS"
-                                                    FontSize="14"
-                                                    HeightRequest="30"
-                                                    HorizontalOptions="End"
-                                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
-                                                    TextColor="{StaticResource Primary}"
-                                                    WidthRequest="30" />
-                            </Border>
-
-
-
-                        </Grid>
-                    </Border>
+                    
                 </Grid>
 
             </VerticalStackLayout>
