@@ -142,6 +142,9 @@ public partial class CompanyListViewModel : BaseViewModel
 
 			if (SelectedCompany is not null)
             {
+                _httpClientService.FirmNumber = SelectedCompany.Number;
+                _httpClientService.PeriodNumber = SelectedCompany.PeriodNumber;
+                
                 await SecureStorage.SetAsync("CompanyNumber", SelectedCompany.Number.ToString());
 				await SecureStorage.SetAsync("CompanyPeriod", SelectedCompany.PeriodNumber.ToString());
 			}
