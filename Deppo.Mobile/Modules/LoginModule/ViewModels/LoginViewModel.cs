@@ -5,6 +5,7 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.LoginModule.Views;
+using DevExpress.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.LoginModule.ViewModels;
 
@@ -21,7 +22,8 @@ public partial class LoginViewModel : BaseViewModel
         _authenticationService = authenticationService;
 
         LoginCommand = new Command(async () => await LoginAsync());
-        ShowParameterCommand = new Command(async () => await ShowParameterAsync());
+        ShowParameterCommand = new Command<BottomSheet>(ShowParameterAsync);
+        SaveCommand = new Command(async () => await SaveAsync());
     }
 
     [ObservableProperty]
@@ -30,8 +32,12 @@ public partial class LoginViewModel : BaseViewModel
     [ObservableProperty]
     string password = string.Empty;
 
+    [ObservableProperty]
+    string baseUri = string.Empty;
+
     public Command LoginCommand { get; }
-    public Command ShowParameterCommand { get; }
+    public Command<BottomSheet> ShowParameterCommand { get; }
+    public Command SaveCommand { get; }
 
     private async Task LoginAsync()
     {
@@ -43,11 +49,11 @@ public partial class LoginViewModel : BaseViewModel
             IsBusy = true;
 
             string baseUri = await SecureStorage.GetAsync("baseUri");
-            if (string.IsNullOrEmpty(baseUri))            
+            if (string.IsNullOrEmpty(baseUri))
                 _httpClientService.BaseUri = "http://172.16.1.25:52789";
             else
                 _httpClientService.BaseUri = baseUri;
-            
+
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
@@ -78,8 +84,35 @@ public partial class LoginViewModel : BaseViewModel
         }
     }
 
-    private async Task ShowParameterAsync()
+    private void ShowParameterAsync(BottomSheet bottomSheet)
     {
-        await Shell.Current.GoToAsync($"{nameof(LoginParameterView)}");
+        bottomSheet.State = BottomSheetState.HalfExpanded;
+        //await Shell.Current.GoToAsync($"{nameof(LoginParameterView)}");
+    }
+
+    private async Task SaveAsync()
+    {
+         if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+            if (string.IsNullOrEmpty(BaseUri))
+            {
+                _userDialogs.Alert("Please enter base uri", "Error", "OK");
+                return;
+            }
+            else
+            {
+                // Save base uri to local storage
+                await SecureStorage.SetAsync("baseUri", BaseUri);
+                _userDialogs.Alert("Base uri saved successfully", "Success", "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Error", "OK");
+        }
     }
 }
