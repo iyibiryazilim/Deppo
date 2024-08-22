@@ -53,7 +53,7 @@ public partial class ProductInputTransactionViewModel : BaseViewModel
 		[ReferenceId] = STLINE.LOGICALREF,
         [TransactionDate] = STLINE.DATE_,
         [TransactionTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
-        [TransactionNumber] = STFICHE.FICHENO,
+        [BaseTransactionCode] = STFICHE.FICHENO,
         [TransactionType] = STLINE.TRCODE,
         [ProductReferenceId] = STLINE.STOCKREF,
         [ProductCode] = ITEMS.CODE,

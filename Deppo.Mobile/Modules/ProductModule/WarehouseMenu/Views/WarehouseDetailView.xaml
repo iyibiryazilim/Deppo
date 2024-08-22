@@ -53,13 +53,7 @@
                     StrokeThickness="0"
                     VerticalOptions="Center"
                     WidthRequest="100">
-                <Image HeightRequest="40">
-                    <Image.Source>
-                        <FontImageSource FontFamily="FAS"
-                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Warehouse}"
-                                         Color="{StaticResource White}" />
-                    </Image.Source>
-                </Image>
+                <toolkit:AvatarView Text="{Binding WarehouseDetailModel.Warehouse.Number}" TextColor="White" BorderColor="Transparent" FontSize="Title" FontAttributes="Bold" />
             </Border>
             <!--#region Code, Name -->
             <VerticalStackLayout HorizontalOptions="Center"
@@ -68,11 +62,6 @@
                        HorizontalOptions="Center"
                        FontSize="Large"
                        Text="{Binding WarehouseDetailModel.Warehouse.Name}" />
-
-                <Label HorizontalOptions="Center"
-                       FontSize="Medium"
-                       LineBreakMode="TailTruncation"
-                       Text="{Binding WarehouseDetailModel.Warehouse.Number}" />
 
                 <Label FontAttributes="Bold"
                        HorizontalOptions="Center"
@@ -173,12 +162,16 @@
                                                      Spacing="2"
                                                      VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
-                                           Text="{Binding TransactionNumber}"
+                                           Text="{Binding ProductName}"
+                                           MaxLines="1"
+                                           LineBreakMode="TailTruncation"
                                            FontSize="Medium" />
                                     <Label Text="{Binding TransactionTypeName}"
                                            LineBreakMode="TailTruncation"
+                                           MaxLines="1"
                                            FontSize="13" />
-                                    <Label Text="{Binding WarehouseName}"
+                                    <Label Text="{Binding CurrentCode, TargetNullValue='-', FallbackValue='-'}"
+                                           MaxLines="1"
                                            LineBreakMode="TailTruncation"
                                            FontSize="13" />
 

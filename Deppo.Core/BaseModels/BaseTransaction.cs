@@ -8,17 +8,17 @@ namespace Deppo.Core.BaseModels;
 public class BaseTransaction : INotifyPropertyChanged, IDisposable
 {
 	private int _referenceId;
-	private int _transactionReferenceId;
-	private string _transactionNumber = string.Empty;
+	private int _baseTransactionReferenceId;
+	private string _baseTransactionCode = string.Empty;
 	private DateTime _transactionDate;
 	private TimeSpan _transactionTime;
 	private int _transactionType;
 	private int _groupCode;
 	private int _iOType;
 	private string _iOTypeName = string.Empty;
-	private int _itemReferenceId;
-	private string _itemCode = string.Empty;
-	private string _itemName = string.Empty;
+	private int _productReferenceId;
+	private string _productCode = string.Empty;
+	private string _productName = string.Empty;
 	private int _unitsetReferenceId;
 	private string _unitsetCode = string.Empty;
 	private string _unitsetName = string.Empty;
@@ -52,25 +52,25 @@ public class BaseTransaction : INotifyPropertyChanged, IDisposable
 	}
 
 	[Browsable(false)]
-	public int TransactionReferenceId
+	public int BaseTransactionReferenceId
 	{
-		get => _transactionReferenceId;
+		get => _baseTransactionReferenceId;
 		set
 		{
-			if (_transactionReferenceId == value) return;
-			_transactionReferenceId = value;
-			NotifyPropertyChanged(nameof(TransactionReferenceId));
+			if (_baseTransactionReferenceId == value) return;
+			_baseTransactionReferenceId = value;
+			NotifyPropertyChanged(nameof(BaseTransactionReferenceId));
 		}
 	}
 
-	public string TransactionNumber
+	public string BaseTransactionCode
 	{
-		get => _transactionNumber;
+		get => _baseTransactionCode;
 		set
 		{
-			if (_transactionNumber == value) return;
-			_transactionNumber = value;
-			NotifyPropertyChanged(nameof(TransactionNumber));
+			if (_baseTransactionCode == value) return;
+			_baseTransactionCode = value;
+			NotifyPropertyChanged(nameof(BaseTransactionCode));
 		}
 	}
 
@@ -220,36 +220,36 @@ public class BaseTransaction : INotifyPropertyChanged, IDisposable
 	}
 
 	[Browsable(false)]
-	public int ItemReferenceId
+	public int ProductReferenceId
 	{
-		get => _itemReferenceId;
+		get => _productReferenceId;
 		set
 		{
-			if (_itemReferenceId == value) return;
-			_itemReferenceId = value;
-			NotifyPropertyChanged(nameof(ItemReferenceId));
+			if (_productReferenceId == value) return;
+			_productReferenceId = value;
+			NotifyPropertyChanged(nameof(ProductReferenceId));
 		}
 	}
 
-	public string ItemCode
+	public string ProductCode
 	{
-		get => _itemCode;
+		get => _productCode;
 		set
 		{
-			if (_itemCode == value) return;
-			_itemCode = value;
-			NotifyPropertyChanged(nameof(ItemCode));
+			if (_productCode == value) return;
+			_productCode = value;
+			NotifyPropertyChanged(nameof(ProductCode));
 		}
 	}
 
-	public string ItemName
+	public string ProductName
 	{
-		get => _itemName;
+		get => _productName;
 		set
 		{
-			if (_itemName == value) return;
-			_itemName = value;
-			NotifyPropertyChanged(nameof(ItemName));
+			if (_productName == value) return;
+			_productName = value;
+			NotifyPropertyChanged(nameof(ProductName));
 		}
 	}
 

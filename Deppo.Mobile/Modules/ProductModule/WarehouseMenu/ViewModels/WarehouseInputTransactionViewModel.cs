@@ -16,7 +16,6 @@ public partial class WarehouseInputTransactionViewModel : BaseViewModel
 	private readonly IUserDialogs _userDialogs;
 	public WarehouseInputTransactionViewModel(IHttpClientService httpClientService, IWarehouseTransactionService warehouseTransactionService, IUserDialogs userDialogs)
 	{
-		Title = "Ambar Giriş Hareketleri";
 		_httpClientService = httpClientService;
 		_warehouseTransactionService = warehouseTransactionService;
 		_userDialogs = userDialogs;
