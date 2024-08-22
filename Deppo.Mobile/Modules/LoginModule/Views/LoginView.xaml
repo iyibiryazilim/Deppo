@@ -97,7 +97,7 @@
 
 
                 </VerticalStackLayout>
-                <Button Command="{Binding SaveParameterCommand}" Text="Kaydet" VerticalOptions="End" />
+                <Button Command="{Binding SaveCommand}" Text="Kaydet" VerticalOptions="End" />
             </VerticalStackLayout>
 
             <!--#endregion-->

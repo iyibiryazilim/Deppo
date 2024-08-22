@@ -64,7 +64,8 @@ public partial class LoginViewModel : BaseViewModel
                 await SecureStorage.SetAsync("token", token);
                 _userDialogs.Loading("Loading...");
                 await Task.Delay(1000);
-                Application.Current.MainPage = new AppShell();
+				var companyListViewModel = IPlatformApplication.Current.Services.GetRequiredService<CompanyListViewModel>();
+				Application.Current.MainPage = new CompanyListView(companyListViewModel);
 
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();
