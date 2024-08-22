@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage
-    x:Class="Deppo.Mobile.Modules.ProductModule.ProductProcess.Views.ProductProcessView"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:dx="http://schemas.devexpress.com/maui"
-    xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
-    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-    xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.ViewModels"
-    Title="{Binding Title}"
-    x:DataType="viewModel:ProductProcessViewModel"
-    Shell.NavBarIsVisible="False">
+<ContentPage x:Class="Deppo.Mobile.Modules.ProductModule.ProductProcess.Views.ProductProcessView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:ProductProcessViewModel"
+             Shell.NavBarIsVisible="False">
 
     <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -23,34 +23,35 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android" Value="artboard.png" />
+            <On Platform="Android"
+                Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
     <Grid RowDefinitions=".30*,.70*">
 
-        <Grid
-            Grid.Row="1"
-            RowDefinitions="Auto,Auto,Auto"
-            RowSpacing="20">
-            <VerticalStackLayout
-                Grid.Row="0"
-                Padding="5"
-                Spacing="5">
-                <Label
-                    FontAttributes="Bold"
-                    FontSize="Subtitle"
-                    Text="Giriş İşlemleri"
-                    TextColor="{StaticResource OffBlack}" />
+        <Grid Grid.Row="1"
+              RowDefinitions="Auto,Auto,Auto"
+              RowSpacing="20">
+            <VerticalStackLayout Grid.Row="0"
+                                 Padding="5"
+                                 Spacing="5">
+                <Label FontAttributes="Bold"
+                       FontSize="Subtitle"
+                       Text="Giriş İşlemleri"
+                       TextColor="{StaticResource OffBlack}" />
 
-                <Grid RowDefinitions="Auto,Auto" RowSpacing="5">
-                    <Border
-                        Grid.Row="0"
-                        Padding="5"
-                        StrokeShape="RoundRectangle 5"
-                        StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
-                            <Grid Grid.Column="0" ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                <Grid RowDefinitions="Auto,Auto"
+                      RowSpacing="5">
+                    <Border Grid.Row="0"
+                            Padding="5"
+                            StrokeShape="RoundRectangle 5"
+                            StrokeThickness="0.2">
+                        <Grid ColumnDefinitions=".85*,.15*"
+                              ColumnSpacing="0">
+                            <Grid Grid.Column="0"
+                                  ColumnDefinitions="Auto,*"
+                                  ColumnSpacing="10">
                                 <Border Padding="5"
                                         BackgroundColor="{StaticResource Primary}"
                                         StrokeShape="RoundRectangle 5">
@@ -70,9 +71,9 @@
                                        VerticalOptions="Center" />
                             </Grid>
 
-                            <Border Grid.Column="1" StrokeThickness="0">
-                                <toolkit:AvatarView 
-                                                    Padding="2"
+                            <Border Grid.Column="1"
+                                    StrokeThickness="0">
+                                <toolkit:AvatarView Padding="2"
                                                     BorderColor="{StaticResource Primary}"
                                                     CornerRadius="15"
                                                     FontFamily="FAS"
@@ -83,7 +84,7 @@
                                                     TextColor="{StaticResource Primary}"
                                                     WidthRequest="30" />
                             </Border>
-                           
+
 
 
                         </Grid>
@@ -137,17 +138,16 @@
                 </Grid>
 
             </VerticalStackLayout>
-            <VerticalStackLayout
-                Grid.Row="1"
-                Padding="5"
-                Spacing="5">
-                <Label
-                    FontAttributes="Bold"
-                    FontSize="Subtitle"
-                    Text="Çıkış İşlemleri"
-                    TextColor="{StaticResource OffBlack}" />
+            <VerticalStackLayout Grid.Row="1"
+                                 Padding="5"
+                                 Spacing="5">
+                <Label FontAttributes="Bold"
+                       FontSize="Subtitle"
+                       Text="Çıkış İşlemleri"
+                       TextColor="{StaticResource OffBlack}" />
 
-                <Grid RowDefinitions="Auto,Auto" RowSpacing="0">
+                <Grid RowDefinitions="Auto,Auto"
+                      RowSpacing="0">
                     <Border Grid.Row="0"
                             Padding="5"
                             StrokeShape="RoundRectangle 5"
@@ -244,17 +244,16 @@
 
             </VerticalStackLayout>
 
-            <VerticalStackLayout
-                Grid.Row="2"
-                Padding="5"
-                Spacing="5">
-                <Label
-                    FontAttributes="Bold"
-                    FontSize="Subtitle"
-                    Text="Transfer İşlemleri"
-                    TextColor="{StaticResource OffBlack}" />
+            <VerticalStackLayout Grid.Row="2"
+                                 Padding="5"
+                                 Spacing="5">
+                <Label FontAttributes="Bold"
+                       FontSize="Subtitle"
+                       Text="Transfer İşlemleri"
+                       TextColor="{StaticResource OffBlack}" />
 
-                <Grid RowDefinitions="Auto,Auto" RowSpacing="0">
+                <Grid RowDefinitions="Auto,Auto"
+                      RowSpacing="0">
                     <Border Grid.Row="0"
                             Padding="5"
                             StrokeShape="RoundRectangle 5"

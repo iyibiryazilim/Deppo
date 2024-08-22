@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
 {
+   
     [QueryProperty(name: nameof(Supplier), queryId: nameof(Supplier))]
     public partial class SupplierInputTransactionViewModel : BaseViewModel
     {
@@ -18,10 +19,10 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
         private readonly ICustomQueryService _customQueryService;
         private readonly IUserDialogs _userDialogs;
 
-        
-
         [ObservableProperty]
         private Supplier supplier = null!;
+
+       
 
         public SupplierInputTransactionViewModel(IHttpClientService httpClientService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
         {
@@ -29,7 +30,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
             _customQueryService = customQueryService;
             _userDialogs = userDialogs;
 
-            Title = "Tedarikçi Giriş Hareketleri";
+        
 
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
             GoToBackCommand = new Command(async () => await GoToBackAsync());
