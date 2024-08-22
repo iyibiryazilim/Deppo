@@ -4,10 +4,11 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:dx="http://schemas.devexpress.com/maui"
+    xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.LoginModule.ViewModels"
-    x:DataType="viewModel:LoginViewModel"
-    Title="LoginView">
+    Title="LoginView"
+    x:DataType="viewModel:LoginViewModel">
 
 
     <ContentPage.BackgroundImageSource>
@@ -15,47 +16,94 @@
             <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
-    <ScrollView>
-        <Grid RowDefinitions="Auto,Auto">
-            <Image
-                Grid.Row="0"
-                Aspect="AspectFit"
-                HeightRequest="400"
-                HorizontalOptions="Center"
-                Source="iyibir_dikey"
-                VerticalOptions="Start" />
 
-            <VerticalStackLayout
-                Grid.Row="1"
-                Padding="20"
-                Spacing="10"
-                VerticalOptions="Start">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <Grid RowDefinitions="Auto,Auto,Auto">
 
-                <dx:TextEdit
-                    BackgroundColor="{StaticResource White}"
-                    Keyboard="Default"
-                    LabelText="Kullanıcı Adı"
-                    Text="{Binding UserName}" />
-                
-                <dx:TextEdit
-                    BackgroundColor="{StaticResource White}"
-                    Keyboard="Default"
-                    LabelText="Şifre"                  
-                    Text="{Binding Password}"/>
+                <ImageButton
+                    Grid.Row="0"
+                    Margin="0,10,10,0"
+                    BackgroundColor="Transparent"
+                    Command="{Binding ShowParameterCommand}"
+                    CommandParameter="{x:Reference bottomSheet}"
+                    HeightRequest="35"
+                    HorizontalOptions="End"
+                    VerticalOptions="Start">
+                    <ImageButton.Source>
+                        <FontImageSource
+                            FontFamily="FAS"
+                            Glyph="{x:Static fontAwesome:FontAwesomeIcons.Gear}"
+                            Color="{StaticResource WhiteSmoke}" />
+                    </ImageButton.Source>
+                </ImageButton>
+
+                <Image
+                    Grid.Row="1"
+                    Aspect="AspectFit"
+                    HeightRequest="400"
+                    HorizontalOptions="Center"
+                    Source="iyibir_dikey"
+                    VerticalOptions="Start" />
+
+                <VerticalStackLayout
+                    Grid.Row="2"
+                    Padding="20"
+                    Spacing="10"
+                    VerticalOptions="Start">
+
+                    <dx:TextEdit
+                        BackgroundColor="{StaticResource White}"
+                        Keyboard="Default"
+                        LabelText="Kullanıcı Adı"
+                        Text="{Binding UserName}" />
+
+                    <dx:TextEdit
+                        BackgroundColor="{StaticResource White}"
+                        Keyboard="Default"
+                        LabelText="Şifre"
+                        Text="{Binding Password}" />
 
 
-                <Button
-                    Margin="0,30,0,0"
-                    Padding="15"
-                    BackgroundColor="{StaticResource Primary}"
-                    Command="{Binding LoginCommand}"
-                    CornerRadius="10"
-                    FontSize="Subtitle"
-                    Text="Oturum Açma" />
+                    <Button
+                        Margin="0,30,0,0"
+                        Padding="15"
+                        BackgroundColor="{StaticResource Primary}"
+                        Command="{Binding LoginCommand}"
+                        CornerRadius="10"
+                        FontSize="Subtitle"
+                        Text="Oturum Açma" />
+                </VerticalStackLayout>
+
+
+            </Grid>
+
+        </ScrollView>
+
+        <dx:BottomSheet
+            x:Name="bottomSheet"
+            Grid.Row="1"
+            AllowDismiss="True"
+            BackgroundColor="White"
+            CornerRadius="15"
+            HalfExpandedRatio="0.3"
+            IsModal="True"
+            ShowGrabber="True">
+            <!--#region BottomSheetContent-->
+            <VerticalStackLayout Spacing="10" VerticalOptions="Center" Padding="10">
+                <VerticalStackLayout Spacing="5">
+                    <Label FontSize="Title" Text="Ayarlar" />
+                    <Entry Placeholder="http://172.16.1.25:52789" Text="{Binding BaseUri}" FontSize="Subtitle" />
+
+
+                </VerticalStackLayout>
+                <Button Command="{Binding SaveParameterCommand}" Text="Kaydet" VerticalOptions="End" />
             </VerticalStackLayout>
 
+            <!--#endregion-->
+        </dx:BottomSheet>
+    </Grid>
 
-        </Grid>
-    </ScrollView>
+
 
 </ContentPage>
