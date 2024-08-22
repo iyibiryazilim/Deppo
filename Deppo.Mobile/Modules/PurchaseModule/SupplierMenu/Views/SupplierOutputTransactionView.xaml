@@ -12,11 +12,13 @@
              Shell.PresentationMode="ModalAnimated"
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                        EventName="Loaded" />
     </ContentPage.Behaviors>
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android" Value="artboard.png" />
+            <On Platform="Android"
+                Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
     <Grid RowDefinitions="Auto, *,Auto">
@@ -28,7 +30,7 @@
               VerticalOptions="Center">
 
             <VerticalStackLayout>
-                <Label Text="Tedarikçi Giriş Hareketleri"
+                <Label Text="Tedarikçi Çıkış Hareketleri"
                        FontSize="Title"
                        TextColor="{StaticResource White}" />
                 <Label Grid.Column="0"
@@ -39,8 +41,6 @@
                        Text="{Binding Supplier.Name}"
                        ToolTipProperties.Text="{Binding Supplier.Name, StringFormat='{0} - Giriş Hareketleri'}" />
             </VerticalStackLayout>
-
-           
         </Grid>
         <!--#endregion-->
 
@@ -68,7 +68,8 @@
                             Margin="5,0,5,0"
                             ItemsSource="{Binding Items}">
                 <CollectionView.ItemsLayout>
-                    <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+                    <LinearItemsLayout ItemSpacing="0"
+                                       Orientation="Vertical" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:SupplierTransaction">
@@ -76,9 +77,13 @@
                                 BackgroundColor="Transparent"
                                 StrokeShape="RoundRectangle 5"
                                 StrokeThickness="0.1">
-                            <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
-                                <VerticalStackLayout Grid.Column="0" Spacing="3">
+                            <Grid ColumnDefinitions="Auto, *"
+                                  ColumnSpacing="10">
+                                <VerticalStackLayout Grid.Column="0"
+                                                     Spacing="1"
+                                                     VerticalOptions="Center">
                                     <Label FontSize="Large"
+                                           FontAttributes="Bold"
                                            HorizontalOptions="Center"
                                            Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
                                            TextColor="{StaticResource OffBlack}" />
@@ -92,7 +97,7 @@
                                 </VerticalStackLayout>
 
                                 <VerticalStackLayout Grid.Column="1"
-                                                     Spacing="2"
+                                                     Spacing="1"
                                                      VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
                                            FontSize="Medium"
@@ -113,9 +118,11 @@
                                         <Label>
                                             <Label.FormattedText>
                                                 <FormattedString>
-                                                    <Span FontAttributes="None" Text="{Binding Quantity}" />
+                                                    <Span FontAttributes="None"
+                                                          Text="{Binding Quantity}" />
                                                     <Span Text=" " />
-                                                    <Span FontAttributes="None" Text="{Binding SubUnitsetCode}" />
+                                                    <Span FontAttributes="None"
+                                                          Text="{Binding SubUnitsetCode}" />
                                                 </FormattedString>
                                             </Label.FormattedText>
                                         </Label>
@@ -127,7 +134,8 @@
                                                                  Color="{StaticResource Primary}" />
                                             </Image.Source>
                                         </Image>
-                                        <Label FontAttributes="None" Text="{Binding IOTypeName}" />
+                                        <Label FontAttributes="None"
+                                               Text="{Binding IOTypeName}" />
                                     </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Grid>
@@ -140,7 +148,6 @@
                 Margin="10,10,10,20"
                 Text="Geri"
                 Command="{Binding GoToBackCommand}">
-            
         </Button>
     </Grid>
 </ContentPage>

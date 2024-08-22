@@ -41,25 +41,6 @@
                        Text="{Binding Supplier.Name}"
                        ToolTipProperties.Text="{Binding Supplier.Name, StringFormat='{0} - Giriş Hareketleri'}" />
             </VerticalStackLayout>
-
-            <!--<Border Grid.Column="1"
-                    Padding="0,0,0,0"
-                    BackgroundColor="Transparent"
-                    StrokeThickness="0">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding GoToBackCommand}" />
-                </Border.GestureRecognizers>
-                <Image Aspect="AspectFit"
-                       BackgroundColor="Transparent"
-                       HeightRequest="30"
-                       WidthRequest="30">
-                    <Image.Source>
-                        <FontImageSource FontFamily="FAS"
-                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
-                                         Color="{StaticResource White}" />
-                    </Image.Source>
-                </Image>
-            </Border>-->
         </Grid>
         <!--#endregion-->
 
@@ -127,7 +108,7 @@
                                     <Label FontSize="13"
                                            LineBreakMode="TailTruncation"
                                            Text="{Binding TransactionTypeName}" />
-                                   
+
                                     <HorizontalStackLayout Spacing="5">
                                         <Label FontFamily="FAS"
                                                FontSize="Small"
