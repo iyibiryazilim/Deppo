@@ -75,8 +75,8 @@ public partial class WarehouseDetailViewModel : BaseViewModel
         try
         {
             var query = @$"SELECT 
-                [InputQuantity] = COUNT(CASE WHEN STLINE.IOCODE IN (1, 2) THEN STLINE.LOGICALREF END),
-                [OutputQuantity] = COUNT(CASE WHEN STLINE.IOCODE IN (3, 4) THEN STLINE.LOGICALREF END)
+                [InputQuantity] = COUNT(DISTINCT CASE WHEN STLINE.IOCODE IN (1, 2) THEN STLINE.STOCKREF END),
+                [OutputQuantity] = COUNT(DISTINCT CASE WHEN STLINE.IOCODE IN (3, 4) THEN STLINE.STOCKREF END)
             FROM LG_001_02_STLINE AS STLINE
             LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE 
             ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = 1

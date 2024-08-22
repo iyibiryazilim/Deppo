@@ -72,8 +72,8 @@ public partial class ProductDetailViewModel : BaseViewModel
 		try
 		{
 			var query = @$"SELECT 
-                    [InputQuantity] = (SELECT ISNULL(COUNT(LOGICALREF), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(1, 2) AND STOCKREF = {ProductDetailModel.Product.ReferenceId}),
-                    [OutputQuantity] = (SELECT ISNULL(COUNT(LOGICALREF), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(3, 4) AND STOCKREF = {ProductDetailModel.Product.ReferenceId})";
+                    [InputQuantity] = (SELECT ISNULL(COUNT(DISTINCT STOCKREF), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(1, 2) AND STOCKREF = {ProductDetailModel.Product.ReferenceId}),
+                    [OutputQuantity] = (SELECT ISNULL(COUNT(DISTINCT STOCKREF), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(3, 4) AND STOCKREF = {ProductDetailModel.Product.ReferenceId})";
 
 			var result = await _customQueryService.GetObjectAsync(httpClient, query);
 
