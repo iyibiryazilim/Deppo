@@ -2,6 +2,7 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Helpers.CompanyHelper;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using System.Collections.ObjectModel;
@@ -54,7 +55,7 @@ public partial class WarehouseInputTransactionViewModel : BaseViewModel
 			_userDialogs.Loading("Loading Items...");
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			await Task.Delay(1000);
-			var result = await _warehouseTransactionService.GetInputTransactionByWarehouseNumberAsync(httpClient, Warehouse.Number, SearchText, null, 0, 20, 1);
+			var result = await _warehouseTransactionService.GetInputTransactionByWarehouseNumberAsync(httpClient, Warehouse.Number, SearchText, null, 0, 20, await CompanyHelper.GetCompanyNumberAsync());
 			
 			if(result.IsSuccess)
 			{
@@ -98,7 +99,7 @@ public partial class WarehouseInputTransactionViewModel : BaseViewModel
 			_userDialogs.Loading("Load Items");
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			var result = await _warehouseTransactionService.GetInputTransactionByWarehouseNumberAsync(httpClient, Warehouse.Number, SearchText, null, Items.Count, 20, 1);
+			var result = await _warehouseTransactionService.GetInputTransactionByWarehouseNumberAsync(httpClient, Warehouse.Number, SearchText, null, Items.Count, 20, await CompanyHelper.GetCompanyNumberAsync());
 
 			if(result.IsSuccess)
 			{

@@ -47,13 +47,6 @@
         </Grid>
         <!--#endregion-->
 
-        <!--#region Loading-->
-        <ActivityIndicator Grid.Row="1"
-                           HorizontalOptions="Center"
-                           IsRunning="{Binding IsBusy}"
-                           VerticalOptions="Center" />
-        <!--#endregion-->
-
         <!--#region Warehouse List-->
         <Grid Grid.Row="1"
               RowDefinitions="Auto, *"

@@ -82,7 +82,7 @@ public class Company : INotifyPropertyChanged,IDisposable
         }
     }
 
-    private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+    protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

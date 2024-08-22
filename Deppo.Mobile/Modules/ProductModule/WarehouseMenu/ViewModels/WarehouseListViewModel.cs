@@ -5,6 +5,7 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.ProductModels;
+using Deppo.Mobile.Helpers.CompanyHelper;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
@@ -59,9 +60,11 @@ public partial class WarehouseListViewModel : BaseViewModel
 			IsBusy = true;
 
 			Items.Clear();
-
+			_userDialogs.Loading("Loading Items...");
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _warehouseService.GetObjects(httpClient,search: SearchText, orderBy: null, page: 0, pageSize: 20, firmNumber: 1);
+			await Task.Delay(1000);
+
+			var result = await _warehouseService.GetObjects(httpClient,search: SearchText, orderBy: null, page: 0, pageSize: 20, firmNumber: await CompanyHelper.GetCompanyNumberAsync());
 			if (result.IsSuccess)
 			{
 				if (result.Data == null)
@@ -69,15 +72,23 @@ public partial class WarehouseListViewModel : BaseViewModel
 
 				foreach (var item in result.Data)
 					Items.Add(item);
+
+				_userDialogs.Loading().Hide();
 			}
 			else
 			{
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.Loading().Hide();
+
 				_userDialogs.Alert(message: result.Message, title: "Load Items");
 			}
 		}
 		catch (Exception ex)
 		{
-			_userDialogs.Alert(message: ex.Message, title: "Load Items");
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			_userDialogs.Alert(message: ex.Message, title: "Load Items Error");
 		}
 		finally
 		{
@@ -89,13 +100,15 @@ public partial class WarehouseListViewModel : BaseViewModel
 	{
 		if (IsBusy)
 			return;
+		if (Items.Count < 18)  // 18 equals to PageSize (20) - RemainingItemsThreshold (2)
+			return;
 
 		try
 		{
 			IsBusy = true;
-			_userDialogs.Loading("Refreshing Items...");
+			_userDialogs.Loading("Load more Items...");
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, Items.Count, 20, 1);
+			var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, Items.Count, 20, await CompanyHelper.GetCompanyNumberAsync());
 			if (result.IsSuccess)
 			{
 				if (result.Data == null)
@@ -141,7 +154,7 @@ public partial class WarehouseListViewModel : BaseViewModel
 
 			Items.Clear();
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _warehouseService.GetObjects(httpClient, search: SearchText, null, 0, 20, 1);
+			var result = await _warehouseService.GetObjects(httpClient, search: SearchText, null, 0, 20, await CompanyHelper.GetCompanyNumberAsync());
 
 			if (result.IsSuccess)
 			{
@@ -189,7 +202,7 @@ public partial class WarehouseListViewModel : BaseViewModel
 					
 					var httpClient = _httpClientService.GetOrCreateHttpClient();
 					SearchText = searchBar.Text;
-					var result = await _warehouseService.GetObjects(httpClient, SearchText, null, 0, 20, 1);
+					var result = await _warehouseService.GetObjects(httpClient, SearchText, null, 0, 20, await CompanyHelper.GetCompanyNumberAsync());
 					if (!result.IsSuccess)
 					{
 						_userDialogs.Alert(result.Message, "Hata");
