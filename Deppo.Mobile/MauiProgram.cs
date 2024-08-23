@@ -22,6 +22,8 @@ using Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductPanel.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductPanel.Views;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.ProductionInput.ViewModels;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.ProductionInput.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels;
@@ -190,6 +192,10 @@ public static class MauiProgram
         builder.Services.AddTransientWithShellRoute<WarehouseInputTransactionView, WarehouseInputTransactionViewModel>(nameof(WarehouseInputTransactionView));
         builder.Services.AddTransientWithShellRoute<WarehouseOutputTransactionView, WarehouseOutputTransactionViewModel>(nameof(WarehouseOutputTransactionView));
         builder.Services.AddSingletonWithShellRoute<ProductProcessView, ProductProcessViewModel>(nameof(ProductProcessView));
+
+        #region ProductionInput Modules
+            builder.Services.AddScopedWithShellRoute<ProductionInputWarehouseListView, ProductionInputWarehouseListViewModel>(nameof(ProductionInputWarehouseListView));
+        #endregion
 
         #endregion Product Modules
 
