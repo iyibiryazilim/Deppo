@@ -9,6 +9,7 @@ public class WarehouseTransaction : BaseTransaction
 	private string _warehouseName = string.Empty;
 	private int _currentReferenceId;
 	private string _currentCode = string.Empty;
+	private string _currentName = string.Empty;
 
 	public WarehouseTransaction()
 	{
@@ -59,6 +60,18 @@ public class WarehouseTransaction : BaseTransaction
 			if (_currentCode == value)
 				return;
 			_currentCode = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	public string CurrentName
+	{
+		get => _currentName;
+		set
+		{
+			if (_currentName == value)
+				return;
+			_currentName = value;
 			NotifyPropertyChanged();
 		}
 	}

@@ -64,7 +64,7 @@ public partial class WarehouseListViewModel : BaseViewModel
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			await Task.Delay(1000);
 
-			var result = await _warehouseService.GetObjects(httpClient,search: SearchText, orderBy: null, page: 0, pageSize: 20, firmNumber: await CompanyHelper.GetCompanyNumberAsync());
+			var result = await _warehouseService.GetObjects(httpClient,search: SearchText, orderBy: null, page: 0, pageSize: 20, firmNumber: _httpClientService.FirmNumber);
 			if (result.IsSuccess)
 			{
 				if (result.Data == null)
@@ -108,7 +108,7 @@ public partial class WarehouseListViewModel : BaseViewModel
 			IsBusy = true;
 			_userDialogs.Loading("Load more Items...");
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, Items.Count, 20, await CompanyHelper.GetCompanyNumberAsync());
+			var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, Items.Count, 20, _httpClientService.FirmNumber);
 			if (result.IsSuccess)
 			{
 				if (result.Data == null)
@@ -154,7 +154,7 @@ public partial class WarehouseListViewModel : BaseViewModel
 
 			Items.Clear();
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _warehouseService.GetObjects(httpClient, search: SearchText, null, 0, 20, await CompanyHelper.GetCompanyNumberAsync());
+			var result = await _warehouseService.GetObjects(httpClient, search: SearchText, null, 0, 20, _httpClientService.FirmNumber);
 
 			if (result.IsSuccess)
 			{
@@ -202,7 +202,7 @@ public partial class WarehouseListViewModel : BaseViewModel
 					
 					var httpClient = _httpClientService.GetOrCreateHttpClient();
 					SearchText = searchBar.Text;
-					var result = await _warehouseService.GetObjects(httpClient, SearchText, null, 0, 20, await CompanyHelper.GetCompanyNumberAsync());
+					var result = await _warehouseService.GetObjects(httpClient, SearchText, null, 0, 20, _httpClientService.FirmNumber);
 					if (!result.IsSuccess)
 					{
 						_userDialogs.Alert(result.Message, "Hata");

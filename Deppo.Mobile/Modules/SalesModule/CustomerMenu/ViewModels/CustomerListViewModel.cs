@@ -57,7 +57,7 @@ public partial class CustomerListViewModel : BaseViewModel
             _userDialogs.Loading("Loading Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             await Task.Delay(1000);
-            var result = await _customerService.GetObjects(httpClient, string.Empty, string.Empty, null, 1, 20, 1);
+            var result = await _customerService.GetObjects(httpClient, string.Empty, string.Empty, null, 0, 20, _httpClientService.FirmNumber);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
@@ -99,7 +99,7 @@ public partial class CustomerListViewModel : BaseViewModel
             IsBusy = true;
             _userDialogs.Loading("Refreshing Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _customerService.GetObjects(httpClient, string.Empty, string.Empty, null, Items.Count, 20, 1);
+            var result = await _customerService.GetObjects(httpClient, string.Empty, string.Empty, null, Items.Count, 20, _httpClientService.FirmNumber);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
@@ -154,7 +154,7 @@ public partial class CustomerListViewModel : BaseViewModel
                     {
                         var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-                        var result = await _customerService.GetObjects(httpClient, searchBar.Text, string.Empty, null, 1, 999999, 1);
+                        var result = await _customerService.GetObjects(httpClient, searchBar.Text, string.Empty, null, 0, 999999, _httpClientService.FirmNumber);
                         if (!result.IsSuccess)
                         {
                             _userDialogs.Alert(result.Message, "Hata");

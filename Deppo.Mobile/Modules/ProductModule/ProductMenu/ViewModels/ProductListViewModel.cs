@@ -50,7 +50,7 @@ public class ProductListViewModel : BaseViewModel
             _userDialogs.Loading("Loading Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             await Task.Delay(1000);
-            var result = await _productService.GetObjects(httpClient, string.Empty, string.Empty, null, 0, 20, 1);
+            var result = await _productService.GetObjects(httpClient, string.Empty, string.Empty, null, 0, 20, _httpClientService.FirmNumber);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
@@ -93,7 +93,7 @@ public class ProductListViewModel : BaseViewModel
             IsBusy = true;
             _userDialogs.Loading("Refreshing Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _productService.GetObjects(httpClient, string.Empty, string.Empty, null, Items.Count, 20, 1);
+            var result = await _productService.GetObjects(httpClient, string.Empty, string.Empty, null, Items.Count, 20, _httpClientService.FirmNumber);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
@@ -145,22 +145,19 @@ public class ProductListViewModel : BaseViewModel
                 if (searchBar.Text.Length >= 3)
                 {
                     IsBusy = true;
-                    using (_userDialogs.Loading("Searching.."))
+                    
+                    var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+                    var result = await _productService.GetObjects(httpClient, searchBar.Text, string.Empty, null, 0, 999999, _httpClientService.FirmNumber);
+                    if (!result.IsSuccess)
                     {
-                        var httpClient = _httpClientService.GetOrCreateHttpClient();
-
-                        var result = await _productService.GetObjects(httpClient, searchBar.Text, string.Empty, null, 1, 999999, 1);
-                        if (!result.IsSuccess)
-                        {
-                            _userDialogs.Alert(result.Message, "Hata");
-                            return;
-                        }
-
-                        Items.Clear();
-                        foreach (var item in result.Data)
-                            Items.Add(item);
-
+                        _userDialogs.Alert(result.Message, "Hata");
+                        return;
                     }
+
+                    Items.Clear();
+                    foreach (var item in result.Data)
+                        Items.Add(item);
                 }
             }
 

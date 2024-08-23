@@ -25,15 +25,15 @@ public class WarehouseQuery
         [BaseTransactionCode] = STFICHE.FICHENO,
         [TransactionType] = STLINE.TRCODE,
         [SubUnitsetCode] = ISNULL(SUBUNITSET.CODE,''),
-        [SubUnitsetReferenceId] = ISNULL(SUBUNITSET.LOGICALREF,0),
-        [UnitsetCode] = UNITSET.CODE,
-        [UnitsetReferenceId] = UNITSET.LOGICALREF,
+        [SubUnitsetReferenceId] = ISNULL(SUBUNITSET.LOGICALREF, 0),
+        [UnitsetCode] = ISNULL(UNITSET.CODE, ''),
+        [UnitsetReferenceId] = ISNULL(UNITSET.LOGICALREF, 0),
         [Quantity] = STLINE.AMOUNT,
         [IOType] = STLINE.IOCODE,
         [WarehouseName] = CAPIWHOUSE.NAME,
-		[SupplierReferenceId] = CLCARD.LOGICALREF,
-		[SupplierCode] = CLCARD.CODE,
-		[SupplierName] = CLCARD.DEFINITION_,
+		[CurrentReferenceId] = ISNULL(CLCARD.LOGICALREF, 0),
+		[CurrentCode] = CLCARD.CODE,
+		[CurrentName] = CLCARD.DEFINITION_,
         [ProductName]=ITEMS.NAME,
         [ProductCode]=ITEMS.CODE
         FROM LG_{FirmNumber.ToString().PadLeft(3, '0')}_{PeriodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
@@ -46,7 +46,7 @@ public class WarehouseQuery
 		WHERE STLINE.IOCODE IN (1,2) AND CAPIWHOUSE.NR = {WarehouseNumber}";
 
         if (!string.IsNullOrEmpty(Sorting))
-            baseQuery += $" ORDER BY {Sorting}";
+            baseQuery += $" ORDER BY STLINE.DATE_ {Sorting}";
 
         return baseQuery += $"\nOFFSET {Skip} ROWS FETCH NEXT {Take} ROWS ONLY";
 
@@ -73,14 +73,14 @@ public class WarehouseQuery
         [TransactionType] = STLINE.TRCODE,
         [SubUnitsetCode] = ISNULL(SUBUNITSET.CODE,''),
         [SubUnitsetReferenceId] = ISNULL(SUBUNITSET.LOGICALREF,0),
-        [UnitsetCode] = UNITSET.CODE,
-        [UnitsetReferenceId] = UNITSET.LOGICALREF,
+        [UnitsetCode] = ISNULL(UNITSET.CODE, ''),
+        [UnitsetReferenceId] = ISNULL(UNITSET.LOGICALREF, 0),
         [Quantity] = STLINE.AMOUNT,
         [IOType] = STLINE.IOCODE,
         [WarehouseName] = CAPIWHOUSE.NAME,
-		[SupplierReferenceId] = CLCARD.LOGICALREF,
-		[SupplierCode] = CLCARD.CODE,
-		[SupplierName] = CLCARD.DEFINITION_,
+		[CurrentReferenceId] = ISNULL(CLCARD.LOGICALREF, 0),
+		[CurrentCode] = CLCARD.CODE,
+		[CurrentName] = CLCARD.DEFINITION_,
         [ProductName]=ITEMS.NAME,
         [ProductCode]=ITEMS.CODE
         FROM LG_{FirmNumber.ToString().PadLeft(3, '0')}_{PeriodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
@@ -93,7 +93,7 @@ public class WarehouseQuery
 		WHERE STLINE.IOCODE IN (3,4) AND CAPIWHOUSE.NR = {WarehouseNumber}";
 
         if (!string.IsNullOrEmpty(Sorting))
-            baseQuery += $" ORDER BY {Sorting}";
+            baseQuery += $" ORDER BY STLINE.DATE_ {Sorting}";
 
         return baseQuery += $"\nOFFSET {Skip} ROWS FETCH NEXT {Take} ROWS ONLY";
 
