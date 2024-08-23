@@ -2,9 +2,10 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
-using Deppo.Mobile.Helpers.CompanyHelper;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Helpers.QueryHelper;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels;
@@ -13,12 +14,12 @@ namespace Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels;
 public partial class WarehouseInputTransactionViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
-	private readonly IWarehouseTransactionService _warehouseTransactionService;
+	private readonly ICustomQueryService _customQueryService;
 	private readonly IUserDialogs _userDialogs;
-	public WarehouseInputTransactionViewModel(IHttpClientService httpClientService, IWarehouseTransactionService warehouseTransactionService, IUserDialogs userDialogs)
+	public WarehouseInputTransactionViewModel(IHttpClientService httpClientService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
 	{
 		_httpClientService = httpClientService;
-		_warehouseTransactionService = warehouseTransactionService;
+		_customQueryService = customQueryService;
 		_userDialogs = userDialogs;
 
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
@@ -52,21 +53,27 @@ public partial class WarehouseInputTransactionViewModel : BaseViewModel
 			IsBusy = true;
 			Items.Clear();
 
+			var query = WarehouseQuery.InputTransactionListQuery(
+				FirmNumber: _httpClientService.FirmNumber,
+				PeriodNumber: _httpClientService.PeriodNumber,
+				WarehouseNumber: Warehouse.Number
+			);
+
 			_userDialogs.Loading("Loading Items...");
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			await Task.Delay(1000);
-			var result = await _warehouseTransactionService.GetInputTransactionByWarehouseNumberAsync(httpClient, Warehouse.Number, SearchText, null, 0, 20, await CompanyHelper.GetCompanyNumberAsync());
-			
-			if(result.IsSuccess)
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _customQueryService.GetObjectsAsync(httpClient, query);
+
+			if (result.IsSuccess)
 			{
 				if (result.Data is null)
 					return;
 
-                foreach (var item in result.Data)
-					Items.Add(item);
+				foreach (var item in result.Data)
+					Items.Add(Mapping.Mapper.Map<WarehouseTransaction>(item));
 
 				_userDialogs.Loading().Hide();
-            }
+			}
 			else
 			{
 				if (_userDialogs.IsHudShowing)
@@ -75,7 +82,7 @@ public partial class WarehouseInputTransactionViewModel : BaseViewModel
 				_userDialogs.Alert(message: result.Message, title: "Hata");
 			}
 		}
-		catch(Exception ex)
+		catch (Exception ex)
 		{
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.Loading().Hide();
@@ -84,7 +91,7 @@ public partial class WarehouseInputTransactionViewModel : BaseViewModel
 		}
 		finally
 		{
-			IsBusy = false; 
+			IsBusy = false;
 		}
 	}
 
@@ -96,18 +103,27 @@ public partial class WarehouseInputTransactionViewModel : BaseViewModel
 		try
 		{
 			IsBusy = true;
-			_userDialogs.Loading("Load Items");
+
+			var query = WarehouseQuery.InputTransactionListQuery(
+				FirmNumber: _httpClientService.FirmNumber,
+				PeriodNumber: _httpClientService.PeriodNumber,
+				WarehouseNumber: Warehouse.Number,
+				Sorting: "DESC",
+				Skip: Items.Count,
+				Take: 20
+			);
+
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			var result = await _warehouseTransactionService.GetInputTransactionByWarehouseNumberAsync(httpClient, Warehouse.Number, SearchText, null, Items.Count, 20, await CompanyHelper.GetCompanyNumberAsync());
+			var result = await _customQueryService.GetObjectsAsync(httpClient, query);
 
-			if(result.IsSuccess)
+			if (result.IsSuccess)
 			{
 				if (result.Data is null)
 					return;
 
-                foreach (var item in result.Data)
-					Items.Add(item);
+				foreach (var item in result.Data)
+					Items.Add(Mapping.Mapper.Map<WarehouseTransaction>(item));
 
 				if (_userDialogs.IsHudShowing)
 					_userDialogs.Loading().Hide();
@@ -125,7 +141,7 @@ public partial class WarehouseInputTransactionViewModel : BaseViewModel
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.Loading().Hide();
 
-			_userDialogs.Alert(message: ex.Message, title: "Load Items Error");
+			_userDialogs.Alert(message: ex.Message, title: "Hata");
 		}
 		finally
 		{

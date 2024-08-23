@@ -5,7 +5,9 @@ using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Helpers.CompanyHelper;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Helpers.QueryHelper;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels;
@@ -14,13 +16,13 @@ namespace Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels;
 public partial class WarehouseOutputTransactionViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
-	private readonly IWarehouseTransactionService _warehouseTransactionService;
+	private readonly ICustomQueryService _customQueryService;
 	private readonly IUserDialogs _userDialogs;
-	public WarehouseOutputTransactionViewModel(IHttpClientService httpClientService, IWarehouseTransactionService warehouseTransactionService, IUserDialogs userDialogs)
+	public WarehouseOutputTransactionViewModel(IHttpClientService httpClientService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
 	{
 		Title = "Ambar Çıkış Hareketleri";
 		_httpClientService = httpClientService;
-		_warehouseTransactionService = warehouseTransactionService;
+        _customQueryService = customQueryService;
 		_userDialogs = userDialogs;
 
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
@@ -54,17 +56,28 @@ public partial class WarehouseOutputTransactionViewModel : BaseViewModel
 			IsBusy = true;
 			Items.Clear();
 
+			var query = WarehouseQuery.OutputTransactionListQuery(
+				FirmNumber: _httpClientService.FirmNumber,
+				PeriodNumber: _httpClientService.PeriodNumber,
+				WarehouseNumber: Warehouse.Number,
+				Sorting: "DESC",
+				Skip: 0,
+				Take: 20
+			);
+
 			_userDialogs.Loading("Loading Items...");
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			await Task.Delay(1000);
-			var result = await _warehouseTransactionService.GetOutputTransactionByWarehouseNumberAsync(httpClient, Warehouse.Number, SearchText, null, 0, 20, await CompanyHelper.GetCompanyNumberAsync());
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _customQueryService.GetObjectsAsync(httpClient, query);
+			
 
 			if(result.IsSuccess)
 			{
 				if (result.Data is null)
 					return;
 				foreach (var item in result.Data)
-					Items.Add(item);
+					Items.Add(Mapping.Mapper.Map<WarehouseTransaction>(item));
 
 				_userDialogs.Loading().Hide();
 			}
@@ -96,9 +109,18 @@ public partial class WarehouseOutputTransactionViewModel : BaseViewModel
 		try
 		{
 			IsBusy = true;
-			_userDialogs.Loading("Load Items...");
+
+			var query = WarehouseQuery.OutputTransactionListQuery(
+				FirmNumber: _httpClientService.FirmNumber,
+				PeriodNumber: _httpClientService.PeriodNumber,
+				WarehouseNumber: Warehouse.Number,
+				Sorting: "DESC",
+				Skip: Items.Count,
+				Take: 20
+			);
+
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _warehouseTransactionService.GetOutputTransactionByWarehouseNumberAsync(httpClient, Warehouse.Number, SearchText, null, Items.Count, 20, await CompanyHelper.GetCompanyNumberAsync());
+			var result = await _customQueryService.GetObjectsAsync(httpClient, query);
 
 			if(result.IsSuccess)
 			{
@@ -106,7 +128,7 @@ public partial class WarehouseOutputTransactionViewModel : BaseViewModel
 					return;
 
 				foreach (var item in result.Data)
-					Items.Add(item);
+					Items.Add(Mapping.Mapper.Map<WarehouseTransaction>(item));
 
 				if(_userDialogs.IsHudShowing)
 					_userDialogs.Loading().Hide();
@@ -125,7 +147,7 @@ public partial class WarehouseOutputTransactionViewModel : BaseViewModel
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.Loading().Hide();
 
-			_userDialogs.Alert(message: ex.Message, title: "Load Items Error");
+			_userDialogs.Alert(message: ex.Message, title: "Hata");
 		}
 		finally
 		{

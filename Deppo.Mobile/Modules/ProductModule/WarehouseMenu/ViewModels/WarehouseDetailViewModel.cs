@@ -77,9 +77,9 @@ public partial class WarehouseDetailViewModel : BaseViewModel
             var query = @$"SELECT 
                 [InputQuantity] = COUNT(DISTINCT CASE WHEN STLINE.IOCODE IN (1, 2) THEN STLINE.STOCKREF END),
                 [OutputQuantity] = COUNT(DISTINCT CASE WHEN STLINE.IOCODE IN (3, 4) THEN STLINE.STOCKREF END)
-            FROM LG_001_02_STLINE AS STLINE
+            FROM LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
             LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE 
-            ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = 1
+            ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {_httpClientService.FirmNumber}
             WHERE STLINE.SOURCEINDEX = {WarehouseDetailModel.Warehouse.Number};
             ";
 
@@ -117,17 +117,17 @@ public partial class WarehouseDetailViewModel : BaseViewModel
                 [ProductCode] = ITEMS.CODE,
                 [ProductName] = ITEMS.NAME, 
                 [IOType] = STLINE.IOCODE,
-				[SubUnitsetCode] = SUBUNITSET.CODE,
+				[SubUnitsetCode] = ISNULL(SUBUNITSET.CODE, ''),
 				[Quantity] = STLINE.AMOUNT,
 				[WarehouseName] = CAPIWHOUSE.NAME,
                 [CurrentCode] = CLCARD.CODE
-				FROM LG_001_02_STLINE AS STLINE
-				LEFT JOIN LG_001_02_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
-				LEFT JOIN LG_001_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF
-                LEFT JOIN LG_001_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
-				LEFT JOIN LG_001_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
-				LEFT JOIN LG_001_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
-				LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = 1
+				FROM LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
+				LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+				LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF
+                LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
+				LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
+				LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
+				LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {_httpClientService.FirmNumber}
 				WHERE CAPIWHOUSE.LOGICALREF= {WarehouseDetailModel.Warehouse.ReferenceId} AND STLINE.STFICHEREF <> 0 AND STLINE.USREF <> 0 AND STLINE.UOMREF <> 0 ORDER BY STLINE.DATE_ DESC";
 
             var result = await _customQueryService.GetObjectsAsync(httpclient, query);
