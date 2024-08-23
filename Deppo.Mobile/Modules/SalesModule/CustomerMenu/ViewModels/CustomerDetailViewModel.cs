@@ -114,25 +114,25 @@ public partial class CustomerDetailViewModel : BaseViewModel
 		[BaseTransactionReferenceId] = STFICHE.LOGICALREF,
         [BaseTransactionCode] = STFICHE.FICHENO,
         [TransactionType] = STLINE.TRCODE,
-        [SubUnitsetCode] = SUBUNITSET.CODE,
-        [SubUnitsetReferenceId] = SUBUNITSET.LOGICALREF,
-        [UnitsetCode] = UNITSET.CODE,
-        [UnitsetReferenceId] = UNITSET.LOGICALREF,
+        [SubUnitsetCode] = ISNULL(SUBUNITSET.CODE, ''),
+        [SubUnitsetReferenceId] = ISNULL(SUBUNITSET.LOGICALREF, 0),
+        [UnitsetCode] = ISNULL(UNITSET.CODE,''),
+        [UnitsetReferenceId] = ISNULL(UNITSET.LOGICALREF, ''),
         [Quantity] = STLINE.AMOUNT,
         [IOType] = STLINE.IOCODE,
         [WarehouseName] = CAPIWHOUSE.NAME,
-		[CustomerReferenceId] = CLCARD.LOGICALREF,
+		[CustomerReferenceId] = ISNULL(CLCARD.LOGICALREF, ''),
 		[CustomerCode] = CLCARD.CODE,
 		[CustomerName] = CLCARD.DEFINITION_,
         [ProductCode]=ITEMS.CODE,
         [ProductName]=ITEMS.NAME
-        FROM LG_001_02_STLINE AS STLINE
-        LEFT JOIN LG_001_02_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
-        LEFT JOIN LG_001_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF
-		LEFT JOIN LG_001_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
-        LEFT JOIN LG_001_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
-        LEFT JOIN LG_001_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
-		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = 1
+        FROM LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
+        LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+        LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF
+		LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
+        LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
+        LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
+		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {_httpClientService.FirmNumber}
 		WHERE STLINE.IOCODE IN (1,2,3,4) AND STFICHE.TRCODE IN (1,2,3,7,6,8)  AND STLINE.STFICHEREF <> 0 AND STLINE.USREF <> 0 AND STLINE.UOMREF <> 0 AND  CLCARD.LOGICALREF = {CustomerDetailModel.Customer.ReferenceId}  ORDER BY STLINE.DATE_ DESC";
 
             var result = await _customQueryService.GetObjectsAsync(httpclient, query);
