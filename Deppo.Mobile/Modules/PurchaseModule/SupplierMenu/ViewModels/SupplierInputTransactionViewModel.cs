@@ -29,6 +29,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
             _userDialogs = userDialogs;
 
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+            LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
             GoToBackCommand = new Command(async () => await GoToBackAsync());
         }
 
@@ -109,9 +110,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
 
                     );
 
-
-                _userDialogs.Loading("Loading More Items...");
-                await Task.Delay(1000);
+                
 
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
                 var result = await _customQueryService.GetObjectsAsync(httpClient, query);

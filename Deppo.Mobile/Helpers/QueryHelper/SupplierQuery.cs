@@ -45,10 +45,9 @@ public static class SupplierQuery
 		WHERE STLINE.IOCODE IN (1,2) AND CLCARD.LOGICALREF = {SupplierReferenceId}";
 
         if (!string.IsNullOrEmpty(Sorting))
-            baseQuery += $" ORDER BY {Sorting}";
+            baseQuery += $" ORDER BY STLINE.DATE_ {Sorting}";
 
         return baseQuery += $"\nOFFSET {Skip} ROWS FETCH NEXT {Take} ROWS ONLY";
-
     }
 
     /// <summary>
@@ -92,9 +91,8 @@ public static class SupplierQuery
 		WHERE STLINE.IOCODE IN (3,4) AND CLCARD.LOGICALREF = {SupplierReferenceId}";
 
         if (!string.IsNullOrEmpty(Sorting))
-            baseQuery += $" ORDER BY {Sorting}";
+            baseQuery += $" ORDER BY STLINE.DATE_ {Sorting}";
 
         return baseQuery += $"\nOFFSET {Skip} ROWS FETCH NEXT {Take} ROWS ONLY";
-
     }
 }

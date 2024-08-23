@@ -14,7 +14,7 @@ public static class CustomerQuery
     /// <param name="CurrentIndex">Sayfa Başlangıcı</param>
     /// <param name="PageSize">Sayfa Sayısı</param>
     /// <returns></returns>
-    public static string InputTransactionListQuery(string FirmNumber, string PeriodNumber, int CustomerReferenceId, string Sorting = "DESC", int CurrentIndex = 0, int PageSize = 20)
+    public static string InputTransactionListQuery(int FirmNumber, int PeriodNumber, int CustomerReferenceId, string Sorting = "DESC", int CurrentIndex = 0, int PageSize = 20)
     {
         string baseQuery = @$"SELECT
         [ReferenceId] = STLINE.LOGICALREF,
@@ -30,9 +30,9 @@ public static class CustomerQuery
         [Quantity] = STLINE.AMOUNT,
         [IOType] = STLINE.IOCODE,
         [WarehouseName] = CAPIWHOUSE.NAME,
-		[SupplierReferenceId] = CLCARD.LOGICALREF,
-		[SupplierCode] = CLCARD.CODE,
-		[SupplierName] = CLCARD.DEFINITION_,
+		[CustomerReferenceId] = CLCARD.LOGICALREF,
+		[CustomerCode] = CLCARD.CODE,
+		[CustomerName] = CLCARD.DEFINITION_,
         [ProductName]=ITEMS.NAME,
         [ProductCode]=ITEMS.CODE
         FROM LG_{FirmNumber.ToString().PadLeft(3, '0')}_{PeriodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
@@ -45,10 +45,9 @@ public static class CustomerQuery
 		WHERE STLINE.IOCODE IN (1,2) AND CLCARD.LOGICALREF = {CustomerReferenceId}";
 
         if (!string.IsNullOrEmpty(Sorting))
-            baseQuery += $" ORDER BY {Sorting}";
+            baseQuery += $" ORDER BY STLINE.DATE_ {Sorting}";
 
         return baseQuery += $"\nOFFSET {CurrentIndex} ROWS FETCH NEXT {PageSize} ROWS ONLY";
-
     }
 
     /// <summary>
@@ -77,9 +76,9 @@ public static class CustomerQuery
         [Quantity] = STLINE.AMOUNT,
         [IOType] = STLINE.IOCODE,
         [WarehouseName] = CAPIWHOUSE.NAME,
-		[SupplierReferenceId] = CLCARD.LOGICALREF,
-		[SupplierCode] = CLCARD.CODE,
-		[SupplierName] = CLCARD.DEFINITION_,
+		[CustomerReferenceId] = CLCARD.LOGICALREF,
+		[CustomerCode] = CLCARD.CODE,
+		[CustomerName] = CLCARD.DEFINITION_,
         [ProductName]=ITEMS.NAME,
         [ProductCode]=ITEMS.CODE
         FROM LG_{FirmNumber.ToString().PadLeft(3, '0')}_{PeriodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
@@ -92,9 +91,8 @@ public static class CustomerQuery
 		WHERE STLINE.IOCODE IN (3,4) AND CLCARD.LOGICALREF = {CustomerReferenceId}";
 
         if (!string.IsNullOrEmpty(Sorting))
-            baseQuery += $" ORDER BY {Sorting}";
+            baseQuery += $" ORDER BY STLINE.DATE_ {Sorting}";
 
         return baseQuery += $"\nOFFSET {Skip} ROWS FETCH NEXT {Take} ROWS ONLY";
-
     }
 }

@@ -6,6 +6,7 @@ using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Helpers.QueryHelper;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -42,6 +43,8 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
         public ObservableCollection<SupplierTransaction> Items { get; } = new();
 
         public Command LoadItemsCommand { get; }
+
+        public Command LoadMoreItemsCommand { get; }
         public Command GoToBackCommand { get; }
 
         private async Task LoadItemsAsync()
@@ -52,30 +55,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
             {
                 IsBusy = true;
 
-                var query = @$"SELECT
-        [TransactionDate] = STLINE.DATE_,
-        [TransactionTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
-		[TransactionReferenceId] = STFICHE.LOGICALREF,
-        [BaseTransactionCode] = STFICHE.FICHENO,
-        [TransactionType] = STLINE.TRCODE,
-        [SubUnitsetCode] = ISNULL(SUBUNITSET.CODE,''),
-        [SubUnitsetReferenceId] = ISNULL(SUBUNITSET.LOGICALREF,0),
-        [UnitsetCode] = UNITSET.CODE,
-        [UnitsetReferenceId] = UNITSET.LOGICALREF,
-        [Quantity] = STLINE.AMOUNT,
-        [IOType] = STLINE.IOCODE,
-        [WarehouseName] = CAPIWHOUSE.NAME,
-		[SupplierReferenceId] = CLCARD.LOGICALREF,
-		[SupplierCode] = CLCARD.CODE,
-		[SupplierName] = CLCARD.DEFINITION_
-        FROM LG_001_02_STLINE AS STLINE
-        LEFT JOIN LG_001_02_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
-        LEFT JOIN LG_001_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF
-		LEFT JOIN LG_001_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
-        LEFT JOIN LG_001_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF AND MAINUNIT = 1
-        LEFT JOIN LG_001_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
-		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = 1
-		WHERE STLINE.IOCODE IN (3,4) AND STFICHE.TRCODE IN (1,2,3,7,6,8) AND  CLCARD.LOGICALREF = {Supplier.ReferenceId}  ORDER BY STLINE.DATE_ DESC"; ;
+                var query = SupplierQuery.OutputTransactionListQuery(FirmNumber: _httpClientService.FirmNumber, PeriodNumber: _httpClientService.FirmNumber, SupplierReferenceId: Supplier.ReferenceId);
 
                 Items.Clear();
 
@@ -109,6 +89,61 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
                     _userDialogs.Loading().Hide();
 
                 _userDialogs.Alert(message: ex.Message, title: "Load Items Error");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task LoadMoreItemsAsync()
+        {
+            if (IsBusy)
+                return;
+            try
+            {
+                IsBusy = true;
+
+                var query = SupplierQuery.OutputTransactionListQuery(
+                    FirmNumber: _httpClientService.FirmNumber,
+                    PeriodNumber: _httpClientService.PeriodNumber,
+                    SupplierReferenceId: Supplier.ReferenceId,
+                    Sorting: "DESC",
+                    Skip: Items.Count,
+                    Take: 20
+
+                    );
+
+                _userDialogs.Loading("Loading More Items...");
+                await Task.Delay(1000);
+
+                var httpClient = _httpClientService.GetOrCreateHttpClient();
+                var result = await _customQueryService.GetObjectsAsync(httpClient, query);
+
+                if (result.IsSuccess)
+                {
+                    if (result.Data is null)
+                        return;
+                    foreach (var item in result.Data)
+                    {
+                        Items.Add(Mapping.Mapper.Map<SupplierTransaction>(item));
+                    }
+                    _userDialogs.Loading().Hide();
+                }
+                else
+                {
+                    if (_userDialogs.IsHudShowing)
+                        _userDialogs.Loading().Hide();
+
+                    _userDialogs.Alert(message: result.Message, title: "Load More Items");
+                }
+            }
+            catch (Exception ex)
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.Loading().Hide();
+
+                _userDialogs.Alert(message: ex.Message, title: "Load More Items Error");
             }
             finally
             {
