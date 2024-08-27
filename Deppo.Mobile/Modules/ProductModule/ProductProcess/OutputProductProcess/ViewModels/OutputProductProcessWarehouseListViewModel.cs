@@ -4,6 +4,7 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Views;
 using System.Collections.ObjectModel;
 using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
@@ -27,6 +28,7 @@ public partial class OutputProductProcessWarehouseListViewModel : BaseViewModel
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
 		ItemTappedCommand = new Command<WarehouseModel>(ItemTappedAsync);
+		NextViewCommand = new Command(async () => await NextViewAsync());
 	}
 
 	#region Commands
@@ -41,9 +43,11 @@ public partial class OutputProductProcessWarehouseListViewModel : BaseViewModel
 	#endregion
 
 	#region Properties
+	[ObservableProperty]
+	OutputProductProcessType outputProductProcessType;
 
 	[ObservableProperty]
-	WarehouseModel selectedWarehouseModel;
+	WarehouseModel selectedWarehouseModel = null!;
 	#endregion
 
 	private async Task LoadItemsAsync()
@@ -160,6 +164,33 @@ public partial class OutputProductProcessWarehouseListViewModel : BaseViewModel
 		}
 		catch (Exception ex)
 		{
+			_userDialogs.Alert(ex.Message);
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task NextViewAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			await Shell.Current.GoToAsync($"{nameof(OutputProductProcessBasketListView)}", new Dictionary<string, object>
+			{
+				[nameof(WarehouseModel)] = SelectedWarehouseModel,
+				[nameof(OutputProductProcessType)] = OutputProductProcessType
+			});
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
 			_userDialogs.Alert(ex.Message);
 		}
 		finally

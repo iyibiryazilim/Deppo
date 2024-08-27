@@ -20,8 +20,9 @@ public class WarehouseTotal : INotifyPropertyChanged, IDisposable
     private int _warehouseNumber;
     private string _warehouseName = string.Empty;
     private double _stockQuantity;
+	private string? _image;
 
-    public WarehouseTotal()
+	public WarehouseTotal()
     {
 
     }
@@ -180,7 +181,18 @@ public class WarehouseTotal : INotifyPropertyChanged, IDisposable
         }
     }
 
-    public event PropertyChangedEventHandler? PropertyChanged;
+	public string? Image
+	{
+		get => _image;
+		set
+		{
+			if (_image == value) return;
+			_image = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	public event PropertyChangedEventHandler? PropertyChanged;
 
     protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
     {

@@ -22,5 +22,6 @@ public class MappingProfile : Profile
         CreateMap<CustomerTransaction, dynamic>();
         CreateMap<CompanyModel, dynamic>();
         CreateMap<Product, dynamic>();
+        CreateMap<WarehouseTotal, dynamic>();
     }
 }
