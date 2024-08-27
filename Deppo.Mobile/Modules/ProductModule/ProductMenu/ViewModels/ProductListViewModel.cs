@@ -1,10 +1,12 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.BaseModels;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
 
@@ -50,14 +52,14 @@ public class ProductListViewModel : BaseViewModel
             _userDialogs.Loading("Loading Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             await Task.Delay(1000);
-            var result = await _productService.GetObjects(httpClient, string.Empty, string.Empty, null, 0, 20, _httpClientService.FirmNumber);
+            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
                     return;
 
                 foreach (var item in result.Data)
-                    Items.Add(item);
+                    Items.Add(Mapping.Mapper.Map<Product>(item));
 
                 _userDialogs.Loading().Hide();
             }
@@ -66,6 +68,7 @@ public class ProductListViewModel : BaseViewModel
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.Loading().Hide();
 
+                Debug.WriteLine(result.Message);
                 _userDialogs.Alert(message: result.Message, title: "Load Items");
 
             }
@@ -93,14 +96,14 @@ public class ProductListViewModel : BaseViewModel
             IsBusy = true;
             _userDialogs.Loading("Refreshing Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _productService.GetObjects(httpClient, string.Empty, string.Empty, null, Items.Count, 20, _httpClientService.FirmNumber);
+            var result = await _productService.GetObjects(httpClient,_httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, Items.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
                     return;
 
                 foreach (var item in result.Data)
-                    Items.Add(item);
+                    Items.Add(Mapping.Mapper.Map<Product>(item));
 
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.Loading().Hide();
@@ -148,7 +151,7 @@ public class ProductListViewModel : BaseViewModel
                     
                     var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-                    var result = await _productService.GetObjects(httpClient, searchBar.Text, string.Empty, null, 0, 999999, _httpClientService.FirmNumber);
+                    var result = await _productService.GetObjects(httpClient,_httpClientService.FirmNumber, _httpClientService.PeriodNumber, searchBar.Text, 0, 20);
                     if (!result.IsSuccess)
                     {
                         _userDialogs.Alert(result.Message, "Hata");

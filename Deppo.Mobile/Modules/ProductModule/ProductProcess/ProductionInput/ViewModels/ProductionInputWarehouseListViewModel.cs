@@ -7,6 +7,7 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.ProductionInput.Views;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.ProductionInput.ViewModels;
 
@@ -97,6 +98,9 @@ public partial class ProductionInputWarehouseListViewModel : BaseViewModel
 
     public async Task NextAsync()
     {
-        await Shell.Current.GoToAsync($"ProductionInputPage?WarehouseId={SelectedWarehouseModel.ReferenceId}");
+        await Shell.Current.GoToAsync($"{nameof(ProductionInputProductListView)}", new Dictionary<string, object>
+        {
+            [nameof(WarehouseModel)] = SelectedWarehouseModel
+        });
     }
 }

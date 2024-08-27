@@ -54,7 +54,13 @@ public partial class LoginViewModel : BaseViewModel
             else
                 _httpClientService.BaseUri = baseUri;
 
-
+            if (string.IsNullOrEmpty(UserName))
+            {
+                _userDialogs.Alert("Please enter username", "Error", "OK");
+                return;
+            }
+            _userDialogs.Loading("Loading...");
+            await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
             var token = await _authenticationService.Authenticate(httpClient, UserName, Password);
@@ -62,21 +68,25 @@ public partial class LoginViewModel : BaseViewModel
             {
                 _httpClientService.Token = token;
                 await SecureStorage.SetAsync("token", token);
-                _userDialogs.Loading("Loading...");
-                await Task.Delay(1000);
-				var companyListViewModel = IPlatformApplication.Current.Services.GetRequiredService<CompanyListViewModel>();
-				Application.Current.MainPage = new CompanyListView(companyListViewModel);
+                var companyListViewModel = IPlatformApplication.Current.Services.GetRequiredService<CompanyListViewModel>();
+                Application.Current.MainPage = new CompanyListView(companyListViewModel);
 
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();
             }
             else
             {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
                 await _userDialogs.AlertAsync("Invalid username or password", "Error", "Ok");
             }
         }
         catch (System.Exception ex)
         {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
             await _userDialogs.AlertAsync(ex.Message, "Error", "Ok");
         }
         finally
@@ -93,7 +103,7 @@ public partial class LoginViewModel : BaseViewModel
 
     private async Task SaveAsync()
     {
-         if (IsBusy)
+        if (IsBusy)
             return;
 
         try

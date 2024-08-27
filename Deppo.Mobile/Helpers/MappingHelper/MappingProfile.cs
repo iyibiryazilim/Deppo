@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Mobile.Core.Models.LoginModels;
 using Deppo.Mobile.Core.Models.ProductModels;
@@ -20,5 +21,6 @@ public class MappingProfile : Profile
         CreateMap<CustomerDetailModel, dynamic>();
         CreateMap<CustomerTransaction, dynamic>();
         CreateMap<CompanyModel, dynamic>();
+        CreateMap<Product, dynamic>();
     }
 }

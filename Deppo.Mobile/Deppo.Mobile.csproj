@@ -123,4 +123,9 @@
 	  </MauiXaml>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Modules/ProductModule/ProductProcess/OutputProductProcess/" />
+	  <Folder Include="Modules/ProductModule/ProductProcess/TransferProductProcess/" />
+	</ItemGroup>
+
 </Project>
