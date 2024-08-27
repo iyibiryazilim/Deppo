@@ -12,13 +12,23 @@ public class Product : INotifyPropertyChanged, IDisposable
     private int _referenceId;
     private string _code = string.Empty;
     private string _name = string.Empty;
-    private int _vatRate;
-    private int? _unitsetReferenceId = default;
+    private double _vatRate;
+    private int _subUnitsetReferenceId = default;
+    private string _subUnitsetCode = string.Empty;
+    private string _subUnitsetName = string.Empty;
+    private int _unitsetReferenceId = default;
+    private string _unitsetCode = string.Empty;
+    private string _unitsetName = string.Empty;
     private Unitset? _unitset;
     private bool _isVariant;
     private int _trackingType;
+    private int _locTracking;
     private double _stockQuantity;
     private string? _image;
+    private int _brandReferenceId = default;
+    private string _brandCode = string.Empty;
+    private string _brandName = string.Empty;
+    private string _groupCode = string.Empty;
 
     public Product()
     {
@@ -59,7 +69,7 @@ public class Product : INotifyPropertyChanged, IDisposable
         }
     }
 
-    public int VatRate
+    public double VatRate
     {
         get => _vatRate;
         set
@@ -71,13 +81,69 @@ public class Product : INotifyPropertyChanged, IDisposable
     }
 
     [Browsable(false)]
-    public int? UnitsetReferenceId
+    public int SubUnitsetReferenceId
+    {
+        get => _subUnitsetReferenceId;
+        set
+        {
+            if (_subUnitsetReferenceId == value) return;
+            _subUnitsetReferenceId = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public string SubUnitsetCode
+    {
+        get => _subUnitsetCode;
+        set
+        {
+            if (_subUnitsetCode == value) return;
+            _subUnitsetCode = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public string SubUnitsetName
+    {
+        get => _subUnitsetName;
+        set
+        {
+            if (_subUnitsetName == value) return;
+            _subUnitsetName = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    [Browsable(false)]
+    public int UnitsetReferenceId
     {
         get => _unitsetReferenceId;
         set
         {
             if (_unitsetReferenceId == value) return;
             _unitsetReferenceId = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public string UnitsetCode
+    {
+        get => _unitsetCode;
+        set
+        {
+            if (_unitsetCode == value) return;
+            _unitsetCode = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public string UnitsetName
+    {
+        get => _unitsetName;
+        set
+        {
+            if (_unitsetName == value) return;
+            _unitsetName = value;
             NotifyPropertyChanged();
         }
     }
@@ -115,6 +181,17 @@ public class Product : INotifyPropertyChanged, IDisposable
         }
     }
 
+    public int LocTracking
+    {
+        get => _locTracking;
+        set
+        {
+            if (_locTracking == value) return;
+            _locTracking = value;
+            NotifyPropertyChanged();
+        }
+    }
+
     public double StockQuantity
     {
         get => _stockQuantity;
@@ -133,6 +210,51 @@ public class Product : INotifyPropertyChanged, IDisposable
         {
             if (_image == value) return;
             _image = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    [Browsable(false)]
+    public int BrandReferenceId
+    {
+        get => _brandReferenceId;
+        set
+        {
+            if (_brandReferenceId == value) return;
+            _brandReferenceId = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public string BrandCode
+    {
+        get => _brandCode;
+        set
+        {
+            if (_brandCode == value) return;
+            _brandCode = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public string BrandName
+    {
+        get => _brandName;
+        set
+        {
+            if (_brandName == value) return;
+            _brandName = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public string GroupCode
+    {
+        get => _groupCode;
+        set
+        {
+            if (_groupCode == value) return;
+            _groupCode = value;
             NotifyPropertyChanged();
         }
     }

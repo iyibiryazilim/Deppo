@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Deppo.Mobile.Modules.ProductModule.ProductProcess.ProductionInput.Views.ProductionInputProductListView"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.ProductionInput.ViewModels"
+    Title="{Binding Title}"
+    Padding="10"
+    Shell.TabBarIsVisible="False"
+    x:DataType="viewModel:ProductionInputProductListViewModel">
+
+    <ContentPage.ToolbarItems>
+    
+        <ToolbarItem>
+        
+            <ToolbarItem.IconImageSource>
+                <FontImageSource
+                    FontFamily="FAS"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.MagnifyingGlass}"
+                    Size="Large" />
+            </ToolbarItem.IconImageSource>
+            
+            <!-- <ToolbarItem.Command>
+                <Binding Source="{x:Reference Name=viewModel}" Path="AddProductCommand" />
+            </ToolbarItem.Command> -->
+
+        </ToolbarItem>
+
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+
+    <Grid
+        Padding="10"
+        RowDefinitions="Auto,*,Auto"
+        RowSpacing="10">
+        <Grid
+            Grid.Row="0"
+            ColumnDefinitions="*,Auto"
+            RowDefinitions="Auto">
+            <Entry
+                Grid.Column="0"
+                Placeholder="Search"
+                Text="Barcode" />
+            <Button Grid.Column="1" Text="Search" />
+        </Grid>
+
+        <CollectionView Grid.Row="1">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Label Text="Ürün" />
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Grid.Row="2" Text="İleri" />
+    </Grid>
+</ContentPage>

@@ -4,10 +4,11 @@ using Deppo.Core.BaseModels;
 using Deppo.Core.DataResultModel;
 using Deppo.Core.Services;
 using Deppo.Core.SortModels;
+using Newtonsoft.Json;
 
 namespace Deppo.Core.DataStores;
 
-public class ProductDataStore : IProductService
+public class ProductDataStore 
 {
     public string postUrl = $"/gateway/product/" + typeof(Product).Name;
 
@@ -22,10 +23,7 @@ public class ProductDataStore : IProductService
             {
                 if (!string.IsNullOrEmpty(data))
                 {
-                    var result = JsonSerializer.Deserialize<DataResult<IEnumerable<Product>>>(data, new JsonSerializerOptions
-                    {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                    });
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Product>>>(data);
 
                     dataResult.Data = result?.Data;
                     dataResult.IsSuccess = true;
@@ -35,10 +33,7 @@ public class ProductDataStore : IProductService
                 }
                 else
                 {
-                    var result = JsonSerializer.Deserialize<DataResult<IEnumerable<Product>>>(data, new JsonSerializerOptions
-                    {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                    });
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Product>>>(data);
 
                     dataResult.Data = result?.Data;
                     dataResult.IsSuccess = true;
@@ -49,10 +44,7 @@ public class ProductDataStore : IProductService
             }
             else
             {
-                var result = JsonSerializer.Deserialize<DataResult<IEnumerable<Product>>>(data, new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                });
+                var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Product>>>(data);
 
                 dataResult.Data = Enumerable.Empty<Product>();
                 dataResult.IsSuccess = false;
@@ -82,10 +74,7 @@ public class ProductDataStore : IProductService
             {
                 if (!string.IsNullOrEmpty(data))
                 {
-                    var result = JsonSerializer.Deserialize<DataResult<Product>>(data, new JsonSerializerOptions
-                    {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                    });
+                    var result = JsonConvert.DeserializeObject<DataResult<Product>>(data);
 
                     dataResult.Data = result?.Data;
                     dataResult.IsSuccess = true;
@@ -95,10 +84,7 @@ public class ProductDataStore : IProductService
                 }
                 else
                 {
-                    var result = JsonSerializer.Deserialize<DataResult<Product>>(data, new JsonSerializerOptions
-                    {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                    });
+                    var result = JsonConvert.DeserializeObject<DataResult<Product>>(data);
 
                     dataResult.Data = result?.Data;
                     dataResult.IsSuccess = true;
@@ -109,10 +95,7 @@ public class ProductDataStore : IProductService
             }
             else
             {
-                var result = JsonSerializer.Deserialize<DataResult<Product>>(data, new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                });
+                var result = JsonConvert.DeserializeObject<DataResult<Product>>(data);
 
                 dataResult.Data = null;
                 dataResult.IsSuccess = false;
@@ -142,10 +125,7 @@ public class ProductDataStore : IProductService
             {
                 if (!string.IsNullOrEmpty(data))
                 {
-                    var result = JsonSerializer.Deserialize<DataResult<Product>>(data, new JsonSerializerOptions
-                    {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                    });
+                    var result = JsonConvert.DeserializeObject<DataResult<Product>>(data);
 
                     dataResult.Data = result?.Data;
                     dataResult.IsSuccess = true;
@@ -155,10 +135,7 @@ public class ProductDataStore : IProductService
                 }
                 else
                 {
-                    var result = JsonSerializer.Deserialize<DataResult<Product>>(data, new JsonSerializerOptions
-                    {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                    });
+                    var result = JsonConvert.DeserializeObject<DataResult<Product>>(data);
 
                     dataResult.Data = result?.Data;
                     dataResult.IsSuccess = true;
@@ -169,10 +146,7 @@ public class ProductDataStore : IProductService
             }
             else
             {
-                var result = JsonSerializer.Deserialize<DataResult<Product>>(data, new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                });
+                var result = JsonConvert.DeserializeObject<DataResult<Product>>(data);
 
                 dataResult.Data = null;
                 dataResult.IsSuccess = false;

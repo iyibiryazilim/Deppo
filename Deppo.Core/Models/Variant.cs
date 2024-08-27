@@ -15,6 +15,19 @@ public class Variant : INotifyPropertyChanged, IDisposable
     private string _code = string.Empty;
     private string _name = string.Empty;
     private int _productReferenceId;
+    private string _productCode = string.Empty;
+    private string _productName = string.Empty;
+    private int _vatRate;
+    private int _subUnitsetReferenceId = default;
+    private string _subUnitsetCode = string.Empty;
+    private string _subUnitsetName = string.Empty;
+    private int _unitsetReferenceId = default;
+    private string _unitsetCode = string.Empty;
+    private string _unitsetName = string.Empty;
+    private int _trackingType;
+    private int _locTracking;
+    private double _stockQuantity;
+    private string? _image;
     private Product? _product;
 
     public Variant()
@@ -68,6 +81,157 @@ public class Variant : INotifyPropertyChanged, IDisposable
         }
     }
 
+    [Browsable(false)]
+    public string ProductCode
+    {
+        get => _productCode;
+        set
+        {
+            if (_productCode == value) return;
+            _productCode = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    [Browsable(false)]
+    public string ProductName
+    {
+        get => _productName;
+        set
+        {
+            if (_productName == value) return;
+            _productName = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public int VatRate
+    {
+        get => _vatRate;
+        set
+        {
+            if (_vatRate == value) return;
+            _vatRate = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    [Browsable(false)]
+    public int SubUnitsetReferenceId
+    {
+        get => _subUnitsetReferenceId;
+        set
+        {
+            if (_subUnitsetReferenceId == value) return;
+            _subUnitsetReferenceId = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    [Browsable(false)]
+    public string SubUnitsetCode
+    {
+        get => _subUnitsetCode;
+        set
+        {
+            if (_subUnitsetCode == value) return;
+            _subUnitsetCode = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    [Browsable(false)]
+    public string SubUnitsetName
+    {
+        get => _subUnitsetName;
+        set
+        {
+            if (_subUnitsetName == value) return;
+            _subUnitsetName = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    [Browsable(false)]
+    public int UnitsetReferenceId
+    {
+        get => _unitsetReferenceId;
+        set
+        {
+            if (_unitsetReferenceId == value) return;
+            _unitsetReferenceId = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    [Browsable(false)]
+    public string UnitsetCode
+    {
+        get => _unitsetCode;
+        set
+        {
+            if (_unitsetCode == value) return;
+            _unitsetCode = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    [Browsable(false)]
+    public string UnitsetName
+    {
+        get => _unitsetName;
+        set
+        {
+            if (_unitsetName == value) return;
+            _unitsetName = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public int TrackingType
+    {
+        get => _trackingType;
+        set
+        {
+            if (_trackingType == value) return;
+            _trackingType = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public int LocTracking
+    {
+        get => _locTracking;
+        set
+        {
+            if (_locTracking == value) return;
+            _locTracking = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public double StockQuantity
+    {
+        get => _stockQuantity;
+        set
+        {
+            if (_stockQuantity == value) return;
+            _stockQuantity = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public string? Image
+    {
+        get => _image;
+        set
+        {
+            if (_image == value) return;
+            _image = value;
+            NotifyPropertyChanged();
+        }
+    }
+
     public Product? Product
     {
         get => _product;
@@ -81,7 +245,7 @@ public class Variant : INotifyPropertyChanged, IDisposable
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+    protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
