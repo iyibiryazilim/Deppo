@@ -94,6 +94,9 @@
 	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ProductOutputTransactionView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\OutputProductProcess\Views\OutputProductProcessWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\ProductModule\WarehouseMenu\Views\WarehouseDetailView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -124,7 +127,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Modules/ProductModule/ProductProcess/OutputProductProcess/" />
 	  <Folder Include="Modules/ProductModule/ProductProcess/TransferProductProcess/" />
 	</ItemGroup>
 

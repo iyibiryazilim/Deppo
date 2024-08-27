@@ -3,6 +3,7 @@ using Controls.UserDialogs.Maui;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Views;
 using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.ViewModels;
@@ -21,10 +22,12 @@ public partial class ProductProcessViewModel : BaseViewModel
 
         ProductionInputCommand = new Command(async () => await ProductionInputAsync());
         OverCountCommand = new Command(async () => await OverCountAsync());
+        ConsumableProcessCommand = new Command(async () => await ConsumableProcessAsync());
     }
 
     public Command ProductionInputCommand { get; }
     public Command OverCountCommand { get; }
+    public Command ConsumableProcessCommand { get; }
 
     private async Task ProductionInputAsync()
     {
@@ -43,6 +46,14 @@ public partial class ProductProcessViewModel : BaseViewModel
             {nameof(InputProductProcessType), InputProductProcessType.OverCountProcess}
         });
     }
+
+    private async Task ConsumableProcessAsync()
+    {
+		await Shell.Current.GoToAsync($"{nameof(OutputProductProcessWarehouseListView)}", new Dictionary<string, object>
+		{
+			{nameof(OutputProductProcessType), OutputProductProcessType.ConsumableProcess}
+		});
+	}
 
 
 }
