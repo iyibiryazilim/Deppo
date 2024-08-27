@@ -24,6 +24,8 @@ using Deppo.Mobile.Modules.ProductModule.ProductPanel.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductPanel.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.ViewModels;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.ProductionInput.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.ProductionInput.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.ViewModels;
@@ -201,6 +203,10 @@ public static class MauiProgram
         builder.Services.AddTransientWithShellRoute<InputProductProcessWarehouseListView, InputProductProcessWarehouseListViewModel>(nameof(InputProductProcessWarehouseListView));
         builder.Services.AddScopedWithShellRoute<InputProductProcessBasketListView, InputProductProcessBasketListViewModel>(nameof(InputProductProcessBasketListView));
         builder.Services.AddTransientWithShellRoute<InputProductProcessProductListView, InputProductProcessProductListViewModel>(nameof(InputProductProcessProductListView));
+        #endregion
+
+        #region OutputProductProcess Modules
+        builder.Services.AddTransientWithShellRoute<OutputProductProcessWarehouseListView, OutputProductProcessWarehouseListViewModel>(nameof(OutputProductProcessWarehouseListView));
         #endregion
 
         #endregion Product Modules
