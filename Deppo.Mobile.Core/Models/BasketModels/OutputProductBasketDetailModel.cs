@@ -4,9 +4,11 @@ using System.Runtime.CompilerServices;
 
 namespace Deppo.Mobile.Core.Models.BasketModels;
 
-public class InputProductBasketDetailModel : INotifyPropertyChanged, IDisposable
+public class OutputProductBasketDetailModel : INotifyPropertyChanged, IDisposable
 {
     private int _referenceId;
+    private int _transactionReferenceId;
+    private int _transactionFicheReferenceId;
     private int _seriLotReferenceId;
     private string _seriLotCode = string.Empty;
     private string _seriLotName = string.Empty;
@@ -15,7 +17,7 @@ public class InputProductBasketDetailModel : INotifyPropertyChanged, IDisposable
     private string _locationName = string.Empty;
     private double _quantity;
 
-    public InputProductBasketDetailModel()
+    public OutputProductBasketDetailModel()
     {
 
     }
@@ -30,7 +32,31 @@ public class InputProductBasketDetailModel : INotifyPropertyChanged, IDisposable
             _referenceId = value;
             NotifyPropertyChanged();
         }
-    }    
+    }
+
+    [Browsable(false)]
+    public int TransactionReferenceId
+    {
+        get => _transactionReferenceId;
+        set
+        {
+            if (_transactionReferenceId == value) return;
+            _transactionReferenceId = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    [Browsable(false)]
+    public int TransactionFicheReferenceId
+    {
+        get => _transactionFicheReferenceId;
+        set
+        {
+            if (_transactionFicheReferenceId == value) return;
+            _transactionFicheReferenceId = value;
+            NotifyPropertyChanged();
+        }
+    }
 
     [Browsable(false)]
     public int SeriLotReferenceId
@@ -137,5 +163,4 @@ public class InputProductBasketDetailModel : INotifyPropertyChanged, IDisposable
             PropertyChanged = null;
         }
     }
-
 }
