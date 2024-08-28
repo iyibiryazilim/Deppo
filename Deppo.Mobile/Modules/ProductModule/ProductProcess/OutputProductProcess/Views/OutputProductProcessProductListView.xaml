@@ -4,6 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:selectConverter="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Converters"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.ViewModels"
              xmlns:warehouseModel="clr-namespace:Deppo.Mobile.Core.Models.WarehouseModels;assembly=Deppo.Mobile.Core"
@@ -20,6 +21,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+            <selectConverter:SelectProductConverter x:Key="selectProductConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -66,14 +68,14 @@
             <CollectionView Grid.Row="2"
                             ItemsSource="{Binding Items}"
                             RemainingItemsThreshold="2"
-                            >
+                            RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="warehouseModel:WarehouseTotalModel">
                         <Border Padding="10"
                                 BackgroundColor="Transparent"
                                 StrokeShape="RoundRectangle 10"
                                 StrokeThickness="0.1">
-                            <!--<Border.GestureRecognizers>
+                            <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductProcessProductListViewModel}}, Path=ItemTappedCommand}">
                                     <TapGestureRecognizer.CommandParameter>
                                         <MultiBinding Converter="{StaticResource selectProductConverter}">
@@ -83,7 +85,7 @@
 
                                     </TapGestureRecognizer.CommandParameter>
                                 </TapGestureRecognizer>
-                            </Border.GestureRecognizers>-->
+                            </Border.GestureRecognizers>
                             <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
                                 <Border BackgroundColor="{StaticResource Secondary}"
                                         StrokeShape="RoundRectangle 5"
@@ -97,7 +99,7 @@
                                 <VerticalStackLayout Grid.Column="1" Spacing="2">
                                     <Label x:Name="itemReferenceId"
                                            IsVisible="Hidden"
-                                           Text="{Binding ReferenceId}" />
+                                           Text="{Binding ProductReferenceId}" />
                                     <Label FontAttributes="Bold"
                                            LineBreakMode="TailTruncation"
                                            Text="{Binding ProductCode}" />
@@ -141,8 +143,36 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <Button Grid.Row="3" Text="Sepete Ekle" />
+            <Button Grid.Row="3" Text="Sepete Ekle" Command="{Binding ConfirmCommand}" />
         </Grid>
+
+        <dx:BottomSheet x:Name="variantBottomSheet"
+                        Grid.Row="1"
+                        AllowDismiss="True"
+                        BackgroundColor="White"
+                        CornerRadius="15"
+                        HalfExpandedRatio="0.3"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <!--#region BottomSheetContent-->
+            <Grid RowDefinitions="Auto, *, Auto" RowSpacing="10">
+                <CollectionView Grid.Row="1"
+                                ItemsSource="{Binding ItemVariants}"
+                                RemainingItemsThreshold="2"
+                                RemainingItemsThresholdReachedCommand="{Binding LoadMoreVariantItemsCommand}">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Label Text="asd" />
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+
+            <!--#endregion-->
+        </dx:BottomSheet>
 
 
     </Grid>

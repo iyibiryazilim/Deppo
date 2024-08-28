@@ -10,7 +10,6 @@ using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.ViewModels;
 
-
 [QueryProperty(name: nameof(OutputProductProcessType), queryId: nameof(OutputProductProcessType))]
 public partial class OutputProductProcessWarehouseListViewModel : BaseViewModel
 {

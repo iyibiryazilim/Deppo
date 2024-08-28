@@ -16,7 +16,10 @@ public class WarehouseTotal : INotifyPropertyChanged, IDisposable
     private int _subUnitsetReferenceId;
     private string _subUnitsetCode = string.Empty;
     private string _subUnitsetName = string.Empty;
-    private int _warehouseReferenceId;
+	private bool _isVariant;
+	private int _trackingType;
+	private int _locTracking;
+	private int _warehouseReferenceId;
     private int _warehouseNumber;
     private string _warehouseName = string.Empty;
     private double _stockQuantity;
@@ -37,6 +40,7 @@ public class WarehouseTotal : INotifyPropertyChanged, IDisposable
             NotifyPropertyChanged(nameof(ReferenceId));
         }
     }
+
 
     public int ProductReferenceId
     {
@@ -71,6 +75,7 @@ public class WarehouseTotal : INotifyPropertyChanged, IDisposable
         }
     }
 
+    [Browsable(false)]
     public int UnitsetReferenceId
     {
         get => _unitsetReferenceId;
@@ -104,7 +109,8 @@ public class WarehouseTotal : INotifyPropertyChanged, IDisposable
         }
     }
 
-    public int SubUnitsetReferenceId
+	[Browsable(false)]
+	public int SubUnitsetReferenceId
     {
         get => _subUnitsetReferenceId;
         set
@@ -137,7 +143,41 @@ public class WarehouseTotal : INotifyPropertyChanged, IDisposable
         }
     }
 
-    public int WarehouseReferenceId
+    public bool IsVariant
+    {
+        get => _isVariant;
+        set
+        {
+            if (_isVariant == value) return;
+            _isVariant = value;
+            NotifyPropertyChanged(nameof(IsVariant));
+        }
+    }
+
+	public int TrackingType
+	{
+		get => _trackingType;
+		set
+		{
+			if (_trackingType == value) return;
+			_trackingType = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	public int LocTracking
+	{
+		get => _locTracking;
+		set
+		{
+			if (_locTracking == value) return;
+			_locTracking = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	[Browsable(false)]
+	public int WarehouseReferenceId
     {
         get => _warehouseReferenceId;
         set

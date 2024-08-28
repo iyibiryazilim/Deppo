@@ -85,7 +85,7 @@ public class OutputProductBasketModel : INotifyPropertyChanged, IDisposable
 
 
     [Browsable(false)]
-    [Description("Ürün Varyantlı ise Varyant Reference Id, Vatyantlı değilse Ürün Reference Id")]
+    [Description("Ürün Varyantlı ise Varyant Reference Id, Varyantlı değilse Ürün Reference Id")]
     public int MainItemReferenceId
     {
         get => _mainItemReferenceId;
@@ -97,7 +97,7 @@ public class OutputProductBasketModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-    [DisplayName("Ürün Kodu"), Description("Ürün Varyantlı ise Varyant Kodu, Vatyantlı değilse Ürün Kodu")]
+    [DisplayName("Ürün Kodu"), Description("Ürün Varyantlı ise Varyant Kodu, Varyantlı değilse Ürün Kodu")]
     [Browsable(false)]
     public string MainItemCode
     {
@@ -110,7 +110,7 @@ public class OutputProductBasketModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-    [DisplayName("Ürün Adı"), Description("Ürün Varyantlı ise Varyant Adı, Vatyantlı değilse Ürün Adı")]
+    [DisplayName("Ürün Adı"), Description("Ürün Varyantlı ise Varyant Adı, Varyantlı değilse Ürün Adı")]
     [Browsable(false)]
     public string MainItemName
     {

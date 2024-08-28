@@ -23,5 +23,6 @@ public class MappingProfile : Profile
         CreateMap<CompanyModel, dynamic>();
         CreateMap<Product, dynamic>();
         CreateMap<WarehouseTotal, dynamic>();
+        CreateMap<Variant, dynamic>();
     }
 }

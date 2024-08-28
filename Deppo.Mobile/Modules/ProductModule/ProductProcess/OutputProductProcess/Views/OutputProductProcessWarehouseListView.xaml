@@ -7,7 +7,7 @@
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.ViewModels"
              xmlns:warehouseModel="clr-namespace:Deppo.Mobile.Core.Models.WarehouseModels;assembly=Deppo.Mobile.Core"
              Title="{Binding Title}"
-             Padding="10"
+             Padding="0"
              x:DataType="viewModel:OutputProductProcessWarehouseListViewModel"
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
@@ -27,7 +27,7 @@
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
-    <Grid Padding="10"
+    <Grid Padding="0"
           RowDefinitions="*,Auto"
           RowSpacing="10">
         <CollectionView ItemsSource="{Binding Items}"
@@ -37,7 +37,7 @@
                 <DataTemplate x:DataType="warehouseModel:WarehouseModel">
                     <Border Padding="10"
                             BackgroundColor="Transparent"
-                            StrokeShape="RoundRectangle 10"
+                            StrokeShape="RoundRectangle 0"
                             StrokeThickness="0.1">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductProcessWarehouseListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
@@ -48,7 +48,7 @@
                                     BackgroundColor="Transparent"
                                     StrokeThickness="0">
                                 <toolkit:AvatarView BackgroundColor="{StaticResource Primary}"
-                                                    BorderWidth="0.1"
+                                                    BorderWidth="0"
                                                     CornerRadius="50"
                                                     FontAttributes="Bold"
                                                     HorizontalOptions="Start"
@@ -63,12 +63,28 @@
                                 <Label FontAttributes="Bold"
                                        LineBreakMode="TailTruncation"
                                        MaxLines="1"
-                                       Text="{Binding Name}" />
+                                       Text="{Binding Name}">
+                                    <Label.Triggers>
+                                        <DataTrigger Binding="{Binding IsSelected}"
+                                                     TargetType="Label"
+                                                     Value="True">
+                                            <Setter Property="TextColor" Value="{StaticResource White}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
                                 <Label FontAttributes="None"
                                        LineBreakMode="TailTruncation"
                                        MaxLines="1"
                                        Text="{Binding City, FallbackValue='-', TargetNullValue='-'}"
-                                       TextColor="{StaticResource Gray600}" />
+                                       TextColor="{StaticResource Gray600}">
+                                    <Label.Triggers>
+                                        <DataTrigger Binding="{Binding IsSelected}"
+                                                     TargetType="Label"
+                                                     Value="True">
+                                            <Setter Property="TextColor" Value="{StaticResource WhiteSmoke}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
                             </VerticalStackLayout>
                         </Grid>
                         <Border.Triggers>
@@ -83,6 +99,7 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
         <Button Grid.Row="1"
+                Margin="10,10,10,20"
                 Command="{Binding NextViewCommand}"
                 IsEnabled="{Binding SelectedWarehouseModel, Converter={StaticResource IsNotNullConverter}}"
                 Text="İleri" />
