@@ -6,6 +6,7 @@
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:selectConverter="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Converters"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:variantModel="clr-namespace:Deppo.Mobile.Core.Models.VariantModels;assembly=Deppo.Mobile.Core"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.ViewModels"
              xmlns:warehouseModel="clr-namespace:Deppo.Mobile.Core.Models.WarehouseModels;assembly=Deppo.Mobile.Core"
              Title="{Binding Title}"
@@ -143,7 +144,9 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <Button Grid.Row="3" Text="Sepete Ekle" Command="{Binding ConfirmCommand}" />
+            <Button Grid.Row="3"
+                    Command="{Binding ConfirmCommand}"
+                    Text="Sepete Ekle" />
         </Grid>
 
         <dx:BottomSheet x:Name="variantBottomSheet"
@@ -164,7 +167,7 @@
                         <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
                     </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
-                        <DataTemplate>
+                        <DataTemplate x:DataType="variantModel:VariantModel">
                             <Label Text="asd" />
                         </DataTemplate>
                     </CollectionView.ItemTemplate>

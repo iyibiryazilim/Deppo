@@ -2,10 +2,10 @@
 <ContentPage x:Class="Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Views.OutputProductProcessBasketListView"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:basketModel="clr-namespace:Deppo.Mobile.Core.Models.BasketModels;assembly=Deppo.Mobile.Core"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModels="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.ViewModels"
-             xmlns:basketModel="clr-namespace:Deppo.Mobile.Core.Models.BasketModels;assembly=Deppo.Mobile.Core"
              Title="{Binding Title}"
              Padding="10"
              x:DataType="viewModels:OutputProductProcessBasketListViewModel"
@@ -130,6 +130,7 @@
         </CollectionView>
 
         <Button Grid.Row="2"
+                Command="{Binding NextViewCommand}"
                 Text="İleri" />
     </Grid>
 

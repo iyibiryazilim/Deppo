@@ -97,6 +97,9 @@
 	  <MauiXaml Update="Modules\ProductModule\ProductProcess\OutputProductProcess\Views\OutputProductProcessBasketListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\OutputProductProcess\Views\OutputProductProcessFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\ProductModule\ProductProcess\OutputProductProcess\Views\OutputProductProcessProductListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

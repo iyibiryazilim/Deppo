@@ -23,15 +23,17 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		IncreaseCommand = new Command<OutputProductBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<OutputProductBasketModel>(async (item) => await DecreaseAsync(item));
 		DeleteItemCommand = new Command<OutputProductBasketModel>(async (item) => await DeleteItemAsync(item));
+		NextViewCommand = new Command(async () => await NextViewAsync());
 		BackCommand = new Command(async () => await BackAsync());
 	}
 
 	#region Commands
 	public Command ShowProductViewCommand { get; }
-	public Command BackCommand { get; }
 	public Command IncreaseCommand { get; }
 	public Command DecreaseCommand { get; }
 	public Command DeleteItemCommand { get; }
+	public Command NextViewCommand { get; }
+	public Command BackCommand { get; }
 	#endregion
 
 	#region Properties
@@ -155,6 +157,31 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				await Shell.Current.GoToAsync("..");
 			}
 		}
+		catch (Exception ex)
+		{
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task NextViewAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+            if(Items.Count == 0)
+            {
+				await _userDialogs.AlertAsync("Sepetinizde ürün bulunmamaktadır.", "Hata", "Tamam");
+				return;
+            }
+			await Shell.Current.GoToAsync($"{nameof(OutputProductProcessFormView)}");
+        }
 		catch (Exception ex)
 		{
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
