@@ -27,6 +27,8 @@ public class Current : INotifyPropertyChanged, IDisposable
     //
     private string _name = string.Empty;
 
+    private bool _isSelected;
+
     public string TitleName => Name?.Length > 2 ? Name.Substring(0, 2) : Name;
 
     public Current()
@@ -221,9 +223,19 @@ public class Current : INotifyPropertyChanged, IDisposable
         }
     }
 
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set
+        {
+            _isSelected = value;
+            NotifyPropertyChanged();
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+    protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

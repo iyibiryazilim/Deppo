@@ -59,7 +59,6 @@
                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
                                            TextColor="{StaticResource White}"
                                            VerticalOptions="Center" />
-
                                 </Border>
                                 <Label Grid.Column="1"
                                        FontAttributes="Bold"
@@ -67,6 +66,9 @@
                                        Text="Mal Kabul İşlemleri"
                                        TextColor="{StaticResource Gray500}"
                                        VerticalOptions="Center" />
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ProductionInputCommand}" />
+                                </Grid.GestureRecognizers>
                             </Grid>
 
                             <Border Grid.Column="1"
@@ -82,9 +84,6 @@
                                                     TextColor="{StaticResource Primary}"
                                                     WidthRequest="30" />
                             </Border>
-
-
-
                         </Grid>
                     </Border>
                     <Border Grid.Row="1"
@@ -105,7 +104,6 @@
                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
                                            TextColor="{StaticResource White}"
                                            VerticalOptions="Center" />
-
                                 </Border>
                                 <Label Grid.Column="1"
                                        FontAttributes="Bold"
@@ -128,15 +126,9 @@
                                                     TextColor="{StaticResource Primary}"
                                                     WidthRequest="30" />
                             </Border>
-
-
-
                         </Grid>
                     </Border>
-                   
-                    
                 </Grid>
-
             </VerticalStackLayout>
             <VerticalStackLayout Grid.Row="1"
                                  Padding="5"
@@ -166,7 +158,6 @@
                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
                                            TextColor="{StaticResource White}"
                                            VerticalOptions="Center" />
-
                                 </Border>
                                 <Label Grid.Column="1"
                                        FontAttributes="Bold"
@@ -189,9 +180,6 @@
                                                     TextColor="{StaticResource Primary}"
                                                     WidthRequest="30" />
                             </Border>
-
-
-
                         </Grid>
                     </Border>
                     <Border Grid.Row="1"
@@ -212,7 +200,6 @@
                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
                                            TextColor="{StaticResource White}"
                                            VerticalOptions="Center" />
-
                                 </Border>
                                 <Label Grid.Column="1"
                                        FontAttributes="Bold"
@@ -236,21 +223,10 @@
                                                     TextColor="{StaticResource Primary}"
                                                     WidthRequest="30" />
                             </Border>
-
-
-
                         </Grid>
                     </Border>
-                    
                 </Grid>
-
             </VerticalStackLayout>
-
-
-
-
         </Grid>
-
-
     </Grid>
 </ContentPage>
