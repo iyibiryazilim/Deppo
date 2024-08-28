@@ -9,6 +9,7 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Converters;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Views;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
 
@@ -35,7 +36,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-		ItemTappedCommand = new Command<object>(ItemTappedAsync);
+		ItemTappedCommand = new Command<WarehouseTotalModel>(async (parameter) => await ItemTappedAsync(parameter));
 		LoadVariantItemsCommand = new Command(async () => await LoadVariantItemsAsync());
 		LoadMoreVariantItemsCommand = new Command(async () => await LoadMoreVariantItemsAsync());
 		VariantTappedCommand = new Command<VariantModel>(async (parameter) => await VariantTappedAsync(parameter));
@@ -72,6 +73,8 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 
 	[ObservableProperty]
 	WarehouseTotalModel? selectedProduct;
+
+	public ContentPage CurrentPage { get; set; } = null!;
 
 	#endregion
 
@@ -186,7 +189,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 		}
 	}
 
-	private async void ItemTappedAsync(object obj)
+	private async Task ItemTappedAsync(WarehouseTotalModel item)
 	{
 		if (IsBusy)
 			return;
@@ -195,16 +198,13 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
-			SelectProductModel selectProductModel = (SelectProductModel)obj;
-			WarehouseTotalModel item = Items.FirstOrDefault(x => x.ProductReferenceId == selectProductModel.ItemReferenceId);
-			BottomSheet variantBottomSheet = selectProductModel.BottomSheet;
-
 			if (item is not null)
 			{
 				#region Varyantlı olma durumu
 				if (item.IsVariant)
 				{
-					variantBottomSheet.State = BottomSheetState.HalfExpanded;
+					OutputProductProcessProductListView currentPage = CurrentPage as OutputProductProcessProductListView;
+					currentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.HalfExpanded;
 				}
 				#endregion
 				else
@@ -213,7 +213,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 					{
 						Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
 						SelectedProduct = item;
-
+						
 						var basketItem = new OutputProductBasketModel
 						{
 							ItemReferenceId = item.ProductReferenceId,

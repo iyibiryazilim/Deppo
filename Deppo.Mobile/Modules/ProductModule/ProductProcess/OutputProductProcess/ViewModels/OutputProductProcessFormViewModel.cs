@@ -1,9 +1,14 @@
-﻿using Controls.UserDialogs.Maui;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Controls.UserDialogs.Maui;
+using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.ViewModels;
 
+[QueryProperty(name: nameof(OutputProductProcessType), queryId: nameof(OutputProductProcessType))]
+[QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 public partial class OutputProductProcessFormViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
@@ -15,4 +20,12 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 
 		Title = "Form";
 	}
+
+	#region Properties
+	[ObservableProperty]
+	OutputProductProcessType outputProductProcessType;
+
+	[ObservableProperty]
+	WarehouseModel warehouseModel = null!;
+	#endregion
 }

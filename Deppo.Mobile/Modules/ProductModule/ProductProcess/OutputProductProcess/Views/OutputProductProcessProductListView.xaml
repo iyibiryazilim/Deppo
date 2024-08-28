@@ -77,15 +77,7 @@
                                 StrokeShape="RoundRectangle 10"
                                 StrokeThickness="0.1">
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductProcessProductListViewModel}}, Path=ItemTappedCommand}">
-                                    <TapGestureRecognizer.CommandParameter>
-                                        <MultiBinding Converter="{StaticResource selectProductConverter}">
-                                            <Binding Path="Text" Source="{x:Reference itemReferenceId}" />
-                                            <Binding Path="." Source="{x:Reference variantBottomSheet}" />
-                                        </MultiBinding>
-
-                                    </TapGestureRecognizer.CommandParameter>
-                                </TapGestureRecognizer>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductProcessProductListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
                             </Border.GestureRecognizers>
                             <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
                                 <Border BackgroundColor="{StaticResource Secondary}"

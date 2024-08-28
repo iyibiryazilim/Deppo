@@ -2,8 +2,10 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
+using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Views;
+using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
 using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
@@ -13,10 +15,13 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 {
+	private readonly IHttpClientService _httpClientService;
 	private readonly IUserDialogs _userDialogs;
-	public OutputProductProcessBasketListViewModel(IUserDialogs userDialogs)
+	public OutputProductProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs)
 	{
+		_httpClientService = httpClientService;
 		_userDialogs = userDialogs;
+
 		Title = "Sepet Listesi";
 
 		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
@@ -37,6 +42,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	#endregion
 
 	#region Properties
+	public ContentPage CurrentPage { get; set; } = null!;
+
 	[ObservableProperty]
 	OutputProductProcessType outputProductProcessType;
 	[ObservableProperty]
@@ -79,7 +86,18 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
-			item.Quantity++;
+			if (item is not null)
+			{
+				if (item.LocTracking == 1)
+				{
+					OutputProductProcessBasketListView currentPage = CurrentPage as OutputProductProcessBasketListView;
+					currentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.HalfExpanded;
+				}
+				else
+				{
+					item.Quantity++;
+				}
+			}
 		}
 		catch (Exception ex)
 		{
@@ -175,13 +193,17 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
-            if(Items.Count == 0)
-            {
+			if (Items.Count == 0)
+			{
 				await _userDialogs.AlertAsync("Sepetinizde ürün bulunmamaktadır.", "Hata", "Tamam");
 				return;
-            }
-			await Shell.Current.GoToAsync($"{nameof(OutputProductProcessFormView)}");
-        }
+			}
+			await Shell.Current.GoToAsync($"{nameof(OutputProductProcessFormView)}", new Dictionary<string, object>
+			{
+				[nameof(WarehouseModel)] = WarehouseModel,
+				[nameof(OutputProductProcessType)] = OutputProductProcessType
+			});
+		}
 		catch (Exception ex)
 		{
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
