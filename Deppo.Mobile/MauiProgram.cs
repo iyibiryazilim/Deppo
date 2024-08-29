@@ -172,6 +172,9 @@ public static class MauiProgram
         builder.Services.AddSingleton<ICustomerTransactionLineService, CustomerTransactionLineDataStore>();
         builder.Services.AddSingleton<IProductTransactionLineService, ProductTransactionLineDataStore>();
         builder.Services.AddSingleton<IVariantService, VariantDataStore>();
+        builder.Services.AddSingleton<IWarehouseTotalService, WarehouseTotalDataStore>();
+        builder.Services.AddSingleton<ISerilotTransactionService, SerilotTransactionDataStore>();
+        builder.Services.AddSingleton<ILocationTransactionService, LocationTransactionDataStore>();
 
         builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
         builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
@@ -207,6 +210,9 @@ public static class MauiProgram
 
         #region OutputProductProcess Modules
         builder.Services.AddTransientWithShellRoute<OutputProductProcessWarehouseListView, OutputProductProcessWarehouseListViewModel>(nameof(OutputProductProcessWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<OutputProductProcessBasketListView, OutputProductProcessBasketListViewModel>(nameof(OutputProductProcessBasketListView));
+        builder.Services.AddTransientWithShellRoute<OutputProductProcessProductListView, OutputProductProcessProductListViewModel>(nameof(OutputProductProcessProductListView));
+        builder.Services.AddTransientWithShellRoute<OutputProductProcessFormView, OutputProductProcessFormViewModel>(nameof(OutputProductProcessFormView));
         #endregion
 
         #endregion Product Modules
