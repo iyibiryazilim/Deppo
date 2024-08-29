@@ -36,16 +36,17 @@
     <Grid RowDefinitions="*,Auto">
 
         <Grid Grid.Row="0"
+              Margin="0,0,0,35"
               RowDefinitions="Auto,Auto,*,Auto"
               RowSpacing="10">
 
             <ImageButton Grid.Row="0"
                          Command="{Binding BackCommand}"
+                         HeightRequest="25"
                          HorizontalOptions="End">
                 <ImageButton.Source>
                     <FontImageSource FontFamily="FAS"
                                      Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
-                                     Size="Medium"
                                      Color="{StaticResource WhiteSmoke}" />
                 </ImageButton.Source>
             </ImageButton>
@@ -93,7 +94,7 @@
                             </Border.GestureRecognizers>
                             <Grid ColumnDefinitions="Auto,*"
                                   ColumnSpacing="10">
-                                <Border BackgroundColor="{StaticResource Secondary}"
+                                <Border BackgroundColor="{StaticResource Primary}"
                                         StrokeShape="RoundRectangle 5"
                                         StrokeThickness="0.5">
                                     <Image Grid.Column="0"
@@ -109,12 +110,13 @@
                                            Text="{Binding ReferenceId}" />
                                     <Label FontAttributes="Bold"
                                            LineBreakMode="TailTruncation"
-                                           Text="{Binding Code}" />
+                                           Text="{Binding Code}"
+                                           TextColor="{StaticResource OffBlack}" />
                                     <Label LineBreakMode="TailTruncation"
                                            Text="{Binding Name}"
                                            TextColor="{StaticResource Gray600}" />
 
-                                    <Label TextColor="{StaticResource Gray600}"
+                                    <Label TextColor="{StaticResource Gray500}"
                                            VerticalOptions="Center">
                                         <Label.FormattedText>
                                             <FormattedString>
@@ -151,6 +153,7 @@
 
             <Button Grid.Row="3"
                     Command="{Binding ConfirmCommand}"
+                    Margin="10,10,10,20"
                     Text="Sepete Ekle" />
         </Grid>
 

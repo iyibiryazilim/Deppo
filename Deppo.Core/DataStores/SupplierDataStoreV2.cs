@@ -66,31 +66,38 @@ namespace Deppo.Core.DataStores
         private string SupplierQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
         {
             string baseQuery = $@"SELECT
-[ReferenceId]=SUPPLIER.LOGICALREF,
-[Code]=SUPPLIER.CODE,
-[Title]=SUPPLIER.DEFINITION_,
-[IsPersonal] =
-        CASE
-            WHEN SUPPLIER.ISPERSCOMP= 0 THEN 0
-            ELSE 1
-        END,
-[Name]=SUPPLIER.DEFINITION_,
-[Email]=SUPPLIER.EMAILADDR,
-[Telephone]=SUPPLIER.TELNRS1+' '+ SUPPLIER.TELNRS2,
-[Address]=SUPPLIER.ADDR1,
-[City]=SUPPLIER.CITY,
-[Country]=SUPPLIER.COUNTRY,
-[PostalCode]=SUPPLIER.POSTCODE,
-[TaxOffice]=SUPPLIER.TAXOFFICE,
-[TaxNumber]=SUPPLIER.TAXNR,
-[IsActive]=
-       CASE
-	      WHEN SUPPLIER.ACTIVE=0 THEN 0
-		  ELSE 1
-END
-FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS SUPPLIER
-WHERE SUPPLIER.CODE LIKE '32%' AND SUPPLIER.CODE <> 'ÿ' AND SUPPLIER.ACTIVE = 0
-";
+    SUPPLIER.LOGICALREF AS [ReferenceId],
+    SUPPLIER.CODE AS [Code],
+    SUPPLIER.DEFINITION_ AS [Title],
+    CASE
+        WHEN SUPPLIER.ISPERSCOMP = 0 THEN 0
+        ELSE 1
+    END AS [IsPersonal],
+    SUPPLIER.DEFINITION_ AS [Name],
+    SUPPLIER.EMAILADDR AS [Email],
+    SUPPLIER.TELNRS1 + ' ' + SUPPLIER.TELNRS2 AS [Telephone],
+    SUPPLIER.ADDR1 AS [Address],
+    SUPPLIER.CITY AS [City],
+    SUPPLIER.COUNTRY AS [Country],
+    SUPPLIER.POSTCODE AS [PostalCode],
+    SUPPLIER.TAXOFFICE AS [TaxOffice],
+    SUPPLIER.TAXNR AS [TaxNumber],
+    CASE
+        WHEN SUPPLIER.ACTIVE = 0 THEN 0
+        ELSE 1
+    END AS [IsActive],
+	[OrderReferenceCount] = ISNULL( (SELECT COUNT(DISTINCT ORFLINE.STOCKREF)
+        FROM LG_001_02_ORFLINE AS ORFLINE
+        WHERE ORFLINE.CLIENTREF = SUPPLIER.LOGICALREF
+        AND ORFLINE.TRCODE = 2
+        AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0
+        AND ORFLINE.CLOSED = 0),0)
+
+FROM
+    LG_001_CLCARD AS SUPPLIER
+WHERE
+    SUPPLIER.CODE LIKE '32%'
+    AND SUPPLIER.CODE <> 'ÿ'";
 
             if (!string.IsNullOrEmpty(search))
                 baseQuery += $@" AND (SUPPLIER.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";
