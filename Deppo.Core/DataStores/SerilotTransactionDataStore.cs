@@ -67,7 +67,7 @@ public class SerilotTransactionDataStore : ISerilotTransactionService
         [ReferenceId] = LGMAIN.LOGICALREF,
         [TransactionReferenceId] = LGMAIN.STTRANSREF,
         [TransactionFicheReferenceId] = LGMAIN.STFICHEREF,
-		[SerilotReferenceId] = 0,
+		[SerilotReferenceId] = LGMAIN.SERILOTN,
         [InTransactionReferenceId] = LGMAIN.INTRANSREF,
         [InSerilotTransactionReferenceId] = LGMAIN.INSLTRANSREF,
         [SerilotCode] = ISNULL(SERILOT.CODE, ''),
