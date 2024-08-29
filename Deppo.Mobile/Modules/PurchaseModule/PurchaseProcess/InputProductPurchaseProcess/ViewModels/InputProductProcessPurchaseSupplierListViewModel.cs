@@ -5,6 +5,7 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views;
@@ -89,7 +90,7 @@ public partial class InputProductProcessPurchaseSupplierListViewModel : BaseView
                     return;
 
                 foreach (var item in result.Data)
-                    Items.Add(item);
+                    Items.Add(Mapping.Mapper.Map<Supplier>(item));
 
                 _userDialogs.Loading().Hide();
             }
@@ -131,7 +132,7 @@ public partial class InputProductProcessPurchaseSupplierListViewModel : BaseView
                     return;
 
                 foreach (var item in result.Data)
-                    Items.Add(item);
+                    Items.Add(Mapping.Mapper.Map<Supplier>(item));
 
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.Loading().Hide();
@@ -212,13 +213,22 @@ public partial class InputProductProcessPurchaseSupplierListViewModel : BaseView
         {
             IsBusy = true;
 
-            Items.ToList().ForEach(x => x.IsSelected = false);
+            if (supplier.IsSelected)
+            {
+                supplier.IsSelected = false;
+                SelectedSupplier = null;
+            }
+            else
+            {
+                // Tüm öğelerin seçimini kaldır
+                Items.ToList().ForEach(x => x.IsSelected = false);
 
-            var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == supplier.ReferenceId);
-            if (selectedItem != null)
-                selectedItem.IsSelected = true;
+                var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == supplier.ReferenceId);
+                if (selectedItem != null)
+                    selectedItem.IsSelected = true;
 
-            SelectedSupplier = supplier;
+                SelectedSupplier = supplier;
+            }
         }
         catch (Exception ex)
         {

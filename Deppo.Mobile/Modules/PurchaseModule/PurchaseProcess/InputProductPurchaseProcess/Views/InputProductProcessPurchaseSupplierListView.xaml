@@ -19,6 +19,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -139,6 +140,13 @@
                                                  Value="True">
                                         <Setter Property="BackgroundColor"
                                                 Value="{StaticResource PrimaryLight}" />
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding IsSelected}"
+                                                 TargetType="Border"
+                                                 Value="False">
+                                        <Setter Property="BackgroundColor"
+                                                Value="Transparent" />
                                     </DataTrigger>
                                 </Border.Triggers>
                                 <Border.GestureRecognizers>
