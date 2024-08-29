@@ -35,7 +35,7 @@ public class MainActivity : MauiAppCompatActivity
                var windowInsetsController = Window.DecorView.WindowInsetsController;
                if (windowInsetsController != null)
                {
-                    windowInsetsController.Hide(WindowInsetsCompat.Type.NavigationBars());
+                    windowInsetsController.Hide(WindowInsetsCompat.Type.NavigationBars() | WindowInsetsCompat.Type.StatusBars());
                }
           }
           else

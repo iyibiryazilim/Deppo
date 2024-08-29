@@ -36,7 +36,7 @@
 
         <Grid Grid.Row="0"
               RowDefinitions="Auto,Auto,*,Auto"
-              RowSpacing="10">
+              RowSpacing="0">
 
             <ImageButton Grid.Row="0" HorizontalOptions="End">
                 <ImageButton.Source>
@@ -90,9 +90,6 @@
                                 </Border>
 
                                 <VerticalStackLayout Grid.Column="1" Spacing="2">
-                                    <Label x:Name="itemReferenceId"
-                                           IsVisible="Hidden"
-                                           Text="{Binding ProductReferenceId}" />
                                     <Label FontAttributes="Bold"
                                            LineBreakMode="TailTruncation"
                                            Text="{Binding ProductCode}" />
@@ -138,7 +135,7 @@
 
             <Button Grid.Row="3"
                     Command="{Binding ConfirmCommand}"
-                    Text="Sepete Ekle" />
+                    Text="{Binding SelectedProducts.Count, StringFormat='Sepete Ekle : {0}'}" />
         </Grid>
 
         <dx:BottomSheet x:Name="variantBottomSheet"

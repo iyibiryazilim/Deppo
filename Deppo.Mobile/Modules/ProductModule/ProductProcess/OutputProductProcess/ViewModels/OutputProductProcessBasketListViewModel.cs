@@ -34,10 +34,10 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		IncreaseCommand = new Command<OutputProductBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<OutputProductBasketModel>(async (item) => await DecreaseAsync(item));
 		DeleteItemCommand = new Command<OutputProductBasketModel>(async (item) => await DeleteItemAsync(item));
-		LoadSerilotItemsCommand = new Command(async () => await LoadSerilotItemsAsync());
-		LoadMoreSerilotItemsCommand = new Command(async () => await LoadMoreSerilotItemsAsync());
-		LoadLocationItemsCommand = new Command(async () => await LoadLocationItemsAsync());
-		LoadMoreLocationItemsCommand = new Command(async () => await LoadMoreLocationItemsAsync());
+		LoadSerilotTransactionItemsCommand = new Command(async () => await LoadSerilotTransactionItemsAsync());
+		LoadMoreSerilotTransactionItemsCommand = new Command(async () => await LoadMoreSerilotTransactionItemsAsync());
+		LoadLocationTransactionItemsCommand = new Command(async () => await LoadLocationTransactionItemsAsync());
+		LoadMoreLocationTransactionItemsCommand = new Command(async () => await LoadMoreLocationTransactionItemsAsync());
 		NextViewCommand = new Command(async () => await NextViewAsync());
 		BackCommand = new Command(async () => await BackAsync());
 	}
@@ -48,16 +48,16 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	public Command DecreaseCommand { get; }
 	public Command DeleteItemCommand { get; }
 	#region Locations Command
-	public Command LoadLocationItemsCommand { get; }
-	public Command LoadMoreLocationItemsCommand { get; }
-	public Command LocationTappedCommand { get; }
-	public Command ConfirmLocationCommand { get; }
+	public Command LoadLocationTransactionItemsCommand { get; }
+	public Command LoadMoreLocationTransactionItemsCommand { get; }
+	public Command LocationTransactionTappedCommand { get; }
+	public Command ConfirmLocationTransactionCommand { get; }
 	#endregion
 
 	#region Serilot Command
-	public Command LoadSerilotItemsCommand { get; }
-	public Command LoadMoreSerilotItemsCommand { get; }
-	public Command ConfirmSerilotCommand { get; }
+	public Command LoadSerilotTransactionItemsCommand { get; }
+	public Command LoadMoreSerilotTransactionItemsCommand { get; }
+	public Command ConfirmSerilotTransactionCommand { get; }
 	#endregion
 	public Command NextViewCommand { get; }
 	public Command BackCommand { get; }
@@ -78,7 +78,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	#region Collections
 	public ObservableCollection<OutputProductBasketModel> Items { get; } = new();
 
-	public ObservableCollection<OutputProductBasketDetailModel> SerilotItems { get; } = new();
+	public ObservableCollection<OutputProductBasketDetailModel> SerilotTransactionItems { get; } = new();
+	public ObservableCollection<OutputProductBasketDetailModel> LocationTransactionItems { get; } = new();
 	#endregion
 
 	private async Task ShowProductViewAsync()
@@ -119,11 +120,11 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				if (item.LocTracking == 1)
 				{
 					OutputProductProcessBasketListView currentPage = CurrentPage as OutputProductProcessBasketListView;
-					currentPage.FindByName<BottomSheet>("serilotBottomSheet").State = BottomSheetState.HalfExpanded;
-					currentPage.FindByName<BottomSheet>("serilotBottomSheet").Loaded += async (s, e) =>
+					currentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.HalfExpanded;
+					currentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").Loaded += async (s, e) =>
 					{
-						SerilotItems.Clear();
-						await LoadSerilotItemsAsync();
+						LocationTransactionItems.Clear();
+						await LoadLocationTransactionItemsAsync();
 					};
 				}
 				else
@@ -173,6 +174,10 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		try
 		{
 			IsBusy = true;
+			var result = await _userDialogs.ConfirmAsync($"{item.ItemCode}\n{item.ItemName}\nİlgili ürün sepetinizden çıkarılacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+
+			if (!result)
+				return;
 
 			Items.Remove(item);
 		}
@@ -186,7 +191,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
-	private async Task LoadLocationItemsAsync()
+	private async Task LoadLocationTransactionItemsAsync()
 	{
 		//if (IsBusy)
 		//	return;
@@ -196,7 +201,11 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 			_userDialogs.ShowLoading("Load Location Items...");
 			await Task.Delay(1000);
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _locationTransactionService.GetObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number);
+			var result = await _locationTransactionService.GetInputObjectsAsync(httpClient: httpClient, 
+				firmNumber: _httpClientService.FirmNumber, 
+				periodNumber: _httpClientService.PeriodNumber, 
+				productReferenceId: SelectedItem.ItemReferenceId, 
+				warehouseNumber: WarehouseModel.Number);
 
 			if(result.IsSuccess)
 			{
@@ -205,7 +214,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 
                 foreach (var item in result.Data)
                 {
-                    
+                    var obj = Mapping.Mapper.Map(item);
+					LocationTransactionItems.Add(obj);
                 }
             }
 
@@ -221,7 +231,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
-	private async Task LoadMoreLocationItemsAsync()
+	private async Task LoadMoreLocationTransactionItemsAsync()
 	{
 		if (IsBusy)
 			return;
@@ -230,7 +240,13 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 			IsBusy = true;
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _locationTransactionService.GetObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, skip:20, take:20);
+			var result = await _locationTransactionService.GetInputObjectsAsync(httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				productReferenceId: SelectedItem.ItemReferenceId,
+				warehouseNumber: WarehouseModel.Number,
+				skip: LocationTransactionItems.Count,
+				take: 20);
 
 			if (result.IsSuccess)
 			{
@@ -239,7 +255,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 
 				foreach (var item in result.Data)
 				{
-
+					var obj = Mapping.Mapper.Map(item);
+					LocationTransactionItems.Add(obj);
 				}
 			}
 		}
@@ -254,7 +271,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	}
 
 
-	private async Task LoadSerilotItemsAsync()
+	private async Task LoadSerilotTransactionItemsAsync()
 	{
 		//if (IsBusy)
 		//	return;
@@ -276,7 +293,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				foreach (var item in result.Data)
 				{
 					var obj = Mapping.Mapper.Map<OutputProductBasketDetailModel>(item);
-					SerilotItems.Add(obj);
+					SerilotTransactionItems.Add(obj);
 				}
 			}
 
@@ -292,7 +309,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
-	private async Task LoadMoreSerilotItemsAsync()
+	private async Task LoadMoreSerilotTransactionItemsAsync()
 	{
 		if (IsBusy)
 			return;
@@ -302,7 +319,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 			IsBusy = true;
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _serilotTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: SelectedItem.ItemReferenceId, warehouseNumber: WarehouseModel.Number, skip: SerilotItems.Count, take: 20);
+			var result = await _serilotTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: SelectedItem.ItemReferenceId, warehouseNumber: WarehouseModel.Number, skip: SerilotTransactionItems.Count, take: 20);
 
 			if (result.IsSuccess)
 			{
@@ -312,7 +329,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				foreach (var item in result.Data)
 				{
 					var obj = Mapping.Mapper.Map<OutputProductBasketDetailModel>(item);
-					SerilotItems.Add(obj);
+					SerilotTransactionItems.Add(obj);
 				}
 			}
 		}
@@ -370,7 +387,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 					return;
 
 				Items.Clear();
-				SerilotItems.Clear();
+				SerilotTransactionItems.Clear();
+				LocationTransactionItems.Clear();
 				await Shell.Current.GoToAsync("..");
 			}
 			else
