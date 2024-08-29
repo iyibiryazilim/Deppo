@@ -57,10 +57,12 @@ public partial class InputProductProcessWarehouseListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-
-            _userDialogs.ShowLoading("Loading...");
             Items.Clear();
+
             await Task.Delay(1000);
+            _userDialogs.ShowLoading("Loading...");
+
+
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, 0, 20, _httpClientService.FirmNumber);
             if (result.IsSuccess)
@@ -157,9 +159,9 @@ public partial class InputProductProcessWarehouseListViewModel : BaseViewModel
             Items.ToList().ForEach(x => x.IsSelected = false);
 
             var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-            if (selectedItem != null)            
+            if (selectedItem != null)
                 selectedItem.IsSelected = true;
-            
+
             SelectedWarehouseModel = item;
 
         }

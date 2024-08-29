@@ -13,6 +13,7 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Converters;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using DevExpress.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
@@ -35,6 +36,26 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
     [ObservableProperty]
     private ObservableCollection<InputProductBasketModel> selectedProducts = new();
 
+    private bool IsSearchMode
+    {
+        get
+        {
+            if (CurrentPage is InputProductProcessProductListView)
+            {
+                SearchBar searchBar = (SearchBar)CurrentPage.FindByName("searchBar");
+                if (searchBar is not null)
+                    if (string.IsNullOrEmpty(searchBar.Text))
+                        return false;
+                    else
+                        return true;
+                else
+                    return false;
+            }
+            else
+                return false;
+        }
+    }
+
     public InputProductProcessProductListViewModel(
         IHttpClientService httpClientService,
         IProductService productService,
@@ -53,7 +74,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-        ItemTappedCommand = new Command<object>(ItemTappedAsync);
+        ItemTappedCommand = new Command<ProductModel>(async (parameter) => await ItemTappedAsync(parameter));
         ShowSelectedProductsCommand = new Command<BottomSheet>(async (parameter) => await ShowSelectedProductsAsync(parameter));
         LoadVariantItemsCommand = new Command<ProductModel>(async (parameter) => await LoadVariantItemsAsync(parameter));
         LoadMoreVariantItemsCommand = new Command(async () => await LoadMoreVariantItemsAsync());
@@ -61,11 +82,14 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
         ConfirmVariantCommand = new Command(async () => await ConfirmVariantAsync());
         ConfirmCommand = new Command(async () => await ConfirmAsync());
         BackCommand = new Command(async () => await BackAsync());
+        PerformSearchCommand = new Command<SearchBar>(async (parameter) => await PerformSearchAsync(parameter));
     }
+
+    public Page CurrentPage { get; set; } = null!;
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
-    public Command ItemTappedCommand { get; }
+    public Command<ProductModel> ItemTappedCommand { get; }
     public Command ShowSelectedProductsCommand { get; }
     public Command<ProductModel> LoadVariantItemsCommand { get; }
     public Command LoadMoreVariantItemsCommand { get; }
@@ -73,6 +97,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
     public Command ConfirmVariantCommand { get; }
     public Command ConfirmCommand { get; }
     public Command BackCommand { get; }
+    public Command<SearchBar> PerformSearchCommand { get; }
 
     public ObservableCollection<ProductModel> Items { get; } = new();
     public ObservableCollection<VariantModel> ItemVariants { get; } = new();
@@ -86,11 +111,14 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
         {
             IsBusy = true;
             Items.Clear();
-            SelectedProducts.Clear();
 
+            if (!IsSearchMode)
+                SelectedProducts.Clear();
+
+            await Task.Delay(1000);
             _userDialogs.Loading("Loading Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            await Task.Delay(1000);
+
             var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 20);
             if (result.IsSuccess)
             {
@@ -114,6 +142,13 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                         SubUnitsetName = item.SubUnitsetName,
                         StockQuantity = item.StockQuantity,
                         TrackingType = item.TrackingType,
+                        LocTracking = item.LocTracking,
+                        GroupCode = item.GroupCode,
+                        BrandReferenceId = item.BrandReferenceId,
+                        BrandCode = item.BrandCode,
+                        BrandName = item.BrandName,
+                        VatRate = item.VatRate,
+                        Image = item.Image,
                         IsVariant = item.IsVariant,
                         IsSelected = false
                     });
@@ -139,6 +174,14 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
 
     private async Task LoadMoreItemsAsync()
     {
+        if (IsSearchMode)
+        {
+            await PerformSearchMoreAsync(((SearchBar)CurrentPage.FindByName("searchBar")));
+            return;
+        }
+
+
+
         if (IsBusy)
             return;
 
@@ -194,7 +237,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
         }
     }
 
-    private async void ItemTappedAsync(object param)
+    private async Task ItemTappedAsync(ProductModel productModel)
     {
         if (IsBusy)
             return;
@@ -203,20 +246,22 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            SelectProductModel selectProductModel = (SelectProductModel)param;
-            ProductModel item = Items.FirstOrDefault(x => x.ReferenceId == selectProductModel.ItemReferenceId);
-            BottomSheet variantBottomSheet = selectProductModel.BottomSheet;
+            ProductModel item = Items.FirstOrDefault(x => x.ReferenceId == productModel.ReferenceId);
+            BottomSheet variantBottomSheet = (BottomSheet)CurrentPage.FindByName("variantBottomSheet");
 
             if (item is not null)
                 if (item.IsVariant)
                 {
-                    variantBottomSheet.State = BottomSheetState.HalfExpanded;
+                    if (variantBottomSheet is not null)
+                        variantBottomSheet.State = BottomSheetState.HalfExpanded;
                 }
                 else
                 {
                     if (!item.IsSelected)
                     {
-                        Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = true;
+                        var tappedItem = Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
+                        if (tappedItem != null)
+                            tappedItem.IsSelected = true;
 
                         SelectedProduct = item;
 
@@ -490,4 +535,143 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+    private async Task PerformSearchAsync(SearchBar searchBar)
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(searchBar.Text))
+            {
+                await LoadItemsAsync();
+                searchBar.Unfocus();
+                return;
+            }
+            else
+            {
+                if (searchBar.Text.Length > 5)
+                {
+                    IsBusy = true;
+                    Items.Clear();
+                    _userDialogs.Loading("Searching Items...");
+                    var httpClient = _httpClientService.GetOrCreateHttpClient();
+                    await Task.Delay(1000);
+                    var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, searchBar.Text, 0, 20);
+                    if (result.IsSuccess)
+                    {
+                        if (result.Data == null)
+                            return;
+
+                        foreach (var product in result.Data)
+                        {
+                            var item = Mapping.Mapper.Map<Product>(product);
+
+                            Items.Add(new ProductModel
+                            {
+                                ReferenceId = item.ReferenceId,
+                                Code = item.Code,
+                                Name = item.Name,
+                                UnitsetReferenceId = item.UnitsetReferenceId,
+                                UnitsetCode = item.UnitsetCode,
+                                UnitsetName = item.UnitsetName,
+                                SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                                SubUnitsetCode = item.SubUnitsetCode,
+                                SubUnitsetName = item.SubUnitsetName,
+                                StockQuantity = item.StockQuantity,
+                                TrackingType = item.TrackingType,
+                                LocTracking = item.LocTracking,
+                                GroupCode = item.GroupCode,
+                                BrandReferenceId = item.BrandReferenceId,
+                                BrandCode = item.BrandCode,
+                                BrandName = item.BrandName,
+                                VatRate = item.VatRate,
+                                Image = item.Image,
+                                IsVariant = item.IsVariant,
+                                IsSelected = false
+                            });
+                        }
+
+                    }
+
+                    _userDialogs.Loading().Hide();
+                    searchBar.Unfocus();
+                }
+            }
+
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task PerformSearchMoreAsync(SearchBar searchBar)
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            _userDialogs.Loading("Searching Items...");
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            await Task.Delay(1000);
+            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, searchBar.Text, Items.Count, 20);
+            if (result.IsSuccess)
+            {
+                if (result.Data == null)
+                    return;
+
+                foreach (var product in result.Data)
+                {
+                    var item = Mapping.Mapper.Map<Product>(product);
+
+                    Items.Add(new ProductModel
+                    {
+                        ReferenceId = item.ReferenceId,
+                        Code = item.Code,
+                        Name = item.Name,
+                        UnitsetReferenceId = item.UnitsetReferenceId,
+                        UnitsetCode = item.UnitsetCode,
+                        UnitsetName = item.UnitsetName,
+                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                        SubUnitsetCode = item.SubUnitsetCode,
+                        SubUnitsetName = item.SubUnitsetName,
+                        StockQuantity = item.StockQuantity,
+                        TrackingType = item.TrackingType,
+                        LocTracking = item.LocTracking,
+                        GroupCode = item.GroupCode,
+                        BrandReferenceId = item.BrandReferenceId,
+                        BrandCode = item.BrandCode,
+                        BrandName = item.BrandName,
+                        VatRate = item.VatRate,
+                        Image = item.Image,
+                        IsVariant = item.IsVariant,
+                        IsSelected = false
+                    });
+                }
+
+            }
+
+            _userDialogs.Loading().Hide();
+
+
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
 }
