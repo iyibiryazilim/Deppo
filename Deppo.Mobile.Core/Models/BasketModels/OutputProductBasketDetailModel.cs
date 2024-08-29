@@ -10,12 +10,17 @@ public class OutputProductBasketDetailModel : INotifyPropertyChanged, IDisposabl
     private int _transactionReferenceId;
     private int _transactionFicheReferenceId;
     private int _seriLotReferenceId;
+    private int _inTransactionReferenceId;
+    private int _inSerilotTransactionReferenceId;
     private string _seriLotCode = string.Empty;
     private string _seriLotName = string.Empty;
     private int _locationReferenceId;
     private string _locationCode = string.Empty;
     private string _locationName = string.Empty;
     private double _quantity;
+    private double _remainingQuantity;
+    private double _remainingUnitQuantity;
+
 
     public OutputProductBasketDetailModel()
     {
@@ -66,6 +71,30 @@ public class OutputProductBasketDetailModel : INotifyPropertyChanged, IDisposabl
         {
             if (_seriLotReferenceId == value) return;
             _seriLotReferenceId = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    [Browsable(false)]
+    public int InTransactionReferenceId
+	{
+		get => _inTransactionReferenceId;
+		set
+		{
+			if (_inTransactionReferenceId == value) return;
+			_inTransactionReferenceId = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+    [Browsable(false)]
+    public int InSerilotTransactionReferenceId
+    {
+        get => _inSerilotTransactionReferenceId;
+        set
+        {
+            if (_inSerilotTransactionReferenceId == value) return;
+            _inSerilotTransactionReferenceId = value;
             NotifyPropertyChanged();
         }
     }
@@ -141,6 +170,29 @@ public class OutputProductBasketDetailModel : INotifyPropertyChanged, IDisposabl
             NotifyPropertyChanged();
         }
     }
+
+	public double RemainingQuantity
+    {
+        get => _remainingQuantity;
+        set
+        {
+            if (_remainingQuantity == value) return;
+            _remainingQuantity = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public double RemainingUnitQuantity
+    {
+
+        get => _remainingUnitQuantity;
+		set
+		{
+			if (_remainingUnitQuantity == value) return;
+			_remainingUnitQuantity = value;
+			NotifyPropertyChanged();
+		}
+	}
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

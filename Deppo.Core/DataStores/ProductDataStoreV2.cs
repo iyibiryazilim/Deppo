@@ -143,7 +143,7 @@ WHERE ITEMS.ACTIVE = 0 AND ITEMS.MOLD = 0 AND TOOL = 0 AND ITEMS.CARDTYPE NOT IN
         if (!string.IsNullOrEmpty(search))
             baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";
 
-        baseQuery += $@" ORDER BY ITEMS.CODE DESC
+        baseQuery += $@" ORDER BY ITEMS.CODE ASC
 OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
         return baseQuery;
