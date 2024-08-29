@@ -18,14 +18,14 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess
 public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
-	private readonly ISerilotService _serilotService;
-	private readonly ILocationService _locationService;
+	private readonly ISerilotTransactionService _serilotTransactionService;
+	private readonly ILocationTransactionService _locationTransactionService;
 	private readonly IUserDialogs _userDialogs;
-	public OutputProductProcessBasketListViewModel(IHttpClientService httpClientService, ISerilotService serilotService, ILocationService locationService, IUserDialogs userDialogs)
+	public OutputProductProcessBasketListViewModel(IHttpClientService httpClientService, ISerilotTransactionService serilotTransactionService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs)
 	{
 		_httpClientService = httpClientService;
-		_serilotService = serilotService;
-		_locationService = locationService;
+		_serilotTransactionService = serilotTransactionService;
+		_locationTransactionService = locationTransactionService;
 		_userDialogs = userDialogs;
 
 		Title = "Sepet Listesi";
@@ -196,6 +196,20 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 			_userDialogs.ShowLoading("Load Location Items...");
 			await Task.Delay(1000);
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _locationTransactionService.GetObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number);
+
+			if(result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+                foreach (var item in result.Data)
+                {
+                    
+                }
+            }
+
+			_userDialogs.Loading().Hide();
 		}
 		catch (Exception ex)
 		{
@@ -216,6 +230,18 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 			IsBusy = true;
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _locationTransactionService.GetObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, skip:20, take:20);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+				{
+
+				}
+			}
 		}
 		catch (Exception ex)
 		{
@@ -240,7 +266,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 			_userDialogs.ShowLoading("Load Serilot Items...");
 			await Task.Delay(1000);
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _serilotService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: SelectedItem.ItemReferenceId, warehouseNumber: WarehouseModel.Number);
+			var result = await _serilotTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: SelectedItem.ItemReferenceId, warehouseNumber: WarehouseModel.Number);
 
 			if (result.IsSuccess)
 			{
@@ -276,7 +302,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 			IsBusy = true;
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _serilotService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: SelectedItem.ItemReferenceId, warehouseNumber: WarehouseModel.Number, skip: SerilotItems.Count, take: 20);
+			var result = await _serilotTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: SelectedItem.ItemReferenceId, warehouseNumber: WarehouseModel.Number, skip: SerilotItems.Count, take: 20);
 
 			if (result.IsSuccess)
 			{
@@ -344,6 +370,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 					return;
 
 				Items.Clear();
+				SerilotItems.Clear();
 				await Shell.Current.GoToAsync("..");
 			}
 			else

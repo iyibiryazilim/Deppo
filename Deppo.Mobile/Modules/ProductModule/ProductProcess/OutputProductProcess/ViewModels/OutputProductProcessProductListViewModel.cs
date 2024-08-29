@@ -72,7 +72,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 	WarehouseModel warehouseModel = null!;
 
 	[ObservableProperty]
-	WarehouseTotalModel? selectedProduct;
+	WarehouseTotalModel selectedProduct = null!;
 
 	public ContentPage CurrentPage { get; set; } = null!;
 
@@ -273,7 +273,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 			_userDialogs.Loading("Loading Variant Items");
 			ItemVariants.Clear();
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _variantService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, productReferenceId: SelectedProduct.ProductReferenceId, warehouseNumber: warehouseModel.Number, skip: 0, take: 20);
+			var result = await _variantService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, productReferenceId: SelectedProduct.ProductReferenceId, warehouseNumber: WarehouseModel.Number, skip: 0, take: 20);
 
 			if (result.IsSuccess)
 			{

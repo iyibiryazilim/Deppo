@@ -268,7 +268,7 @@
                                                            TextColor="{StaticResource White}" />
 
                                                     <!--<Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OutputProductProcessBasketListViewModel}}, Path=IncreaseCommand}" CommandParameter="{Binding .}" />
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OutputProductProcessBasketListViewModel}}, Path=}" CommandParameter="{Binding .}" />
                                                     </Border.GestureRecognizers>-->
                                                 </Border>
                                             </Grid>

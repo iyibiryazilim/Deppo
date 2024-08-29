@@ -21,11 +21,23 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 		Title = "Form";
 	}
 
+	#region Commands
+	public Command NextCommand { get; }
+	#endregion
+
 	#region Properties
 	[ObservableProperty]
 	OutputProductProcessType outputProductProcessType;
 
 	[ObservableProperty]
 	WarehouseModel warehouseModel = null!;
+
+	[ObservableProperty]
+	string documentNumber = string.Empty;
+
+	[ObservableProperty]
+	DateTime transactionDate = DateTime.Now;
 	#endregion
+
+	
 }

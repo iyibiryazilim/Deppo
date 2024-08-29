@@ -5,12 +5,12 @@ using System.Text;
 
 namespace Deppo.Core.DataStores;
 
-public class LocationDataStore : ILocationService
+public class LocationTransactionDataStore : ILocationTransactionService
 {
 	string postUrl = "/gateway/customQuery/CustomQuery";
 	public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsAsync(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int skip = 0, int take = 20, string search = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(LocationQuery(firmNumber, periodNumber, warehouseNumber, skip, take, search)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(LocationTransactionQuery(firmNumber, periodNumber, warehouseNumber, skip, take, search)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -60,7 +60,7 @@ public class LocationDataStore : ILocationService
 		}
 	}
 
-	private string LocationQuery(int firmNumber, int periodNumber, int warehouseNumber, int skip = 0, int take = 20, string search = "")
+	private string LocationTransactionQuery(int firmNumber, int periodNumber, int warehouseNumber, int skip = 0, int take = 20, string search = "")
 	{
 		var baseQuery = @$"SELECT 
 			  [ReferenceId] = LOCATION.LOGICALREF,

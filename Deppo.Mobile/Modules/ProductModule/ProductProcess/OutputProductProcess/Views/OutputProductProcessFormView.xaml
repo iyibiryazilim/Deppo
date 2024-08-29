@@ -18,4 +18,41 @@
             <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
+
+    <Grid RowDefinitions="*, Auto">
+        <ScrollView Grid.Row="0">
+            <dx:DataFormView BackgroundColor="Transparent">
+                <!--#region Fiş Türü -->
+                <dx:DataFormTextItem FieldName=""
+                                     InplaceLabelText="Fiş Türü"
+                                     IsInplaceLabelFloating="False"
+                                     IsLabelVisible="False"
+                                     IsReadOnly="True"
+                                     Placeholder="{Binding OutputProductProcessType}" />
+                <!--#endregion-->
+
+                <!--#region Ambar -->
+                <dx:DataFormTextItem FieldName=""
+                                     InplaceLabelText="Ambar"
+                                     IsInplaceLabelFloating="False"
+                                     IsLabelVisible="False"
+                                     IsReadOnly="True"
+                                     Placeholder="{Binding WarehouseModel.Name}" />
+                <!--#endregion-->
+
+                <!--#region Doküman İzleme Kodu-->
+                <dx:DataFormTextItem FieldName=""
+                                     InplaceLabelText="Doküman İzleme Kodu"
+                                     IsInplaceLabelFloating="False"
+                                     IsLabelVisible="False"
+                                     IsReadOnly="False"
+                                     Placeholder="{Binding DocumentNumber}" />
+                <!--#endregion-->
+
+                
+            </dx:DataFormView>
+        </ScrollView>
+        
+        <Button Text="Tamam" Grid.Row="1" Margin="10,10,10,20" />
+    </Grid>
 </ContentPage>
