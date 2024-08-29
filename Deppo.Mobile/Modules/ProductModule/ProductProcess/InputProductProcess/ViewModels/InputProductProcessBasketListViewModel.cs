@@ -7,6 +7,7 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
+using DevExpress.Maui.Controls;
 using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
@@ -46,6 +47,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
     public Command NextViewCommand { get; }
     public Command BackCommand { get; }
 
+    public Page CurrentPage { get; set; } = null!;
     public ObservableCollection<InputProductBasketModel> Items { get; } = new();
 
 
@@ -82,6 +84,10 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
         {
             IsBusy = true;
 
+            var result = await _userDialogs.ConfirmAsync($"{item.ItemCode}\n{item.ItemName}\nİlgili ürün sepetinizden çıkarılacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+            if (!result)
+                return;
+
             Items.Remove(item);
         }
         catch (Exception ex)
@@ -104,6 +110,13 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
             IsBusy = true;
 
             item.Quantity++;
+            InputProductProcessBasketListView? cp = CurrentPage as InputProductProcessBasketListView;
+
+            BottomSheet locationBottomSheet = cp.FindByName<BottomSheet>("locationBottomSheet");
+
+            if (locationBottomSheet != null)
+                locationBottomSheet.State = BottomSheetState.HalfExpanded;
+
         }
         catch (Exception ex)
         {
