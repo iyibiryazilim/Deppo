@@ -138,33 +138,155 @@
                     Text="İleri" />
         </Grid>
         <VerticalStackLayout Grid.Row="1" Spacing="5">
+            <!--#region Location bottom sheet -->
             <dx:BottomSheet x:Name="locationBottomSheet"
                             Grid.Row="1"
                             AllowDismiss="True"
-                            BackgroundColor="White"
+                            BackgroundColor="WhiteSmoke"
                             CornerRadius="15"
-                            HalfExpandedRatio="0.3"
+                            HalfExpandedRatio="0.6"
                             IsModal="True"
                             ShowGrabber="True">
                 <!--#region BottomSheetContent-->
-                <Grid RowDefinitions="Auto, *, Auto" RowSpacing="10" />
+                <Grid RowDefinitions="Auto, *, Auto" RowSpacing="10">
+                    <Label FontAttributes="Bold"
+                           FontSize="Header"
+                           HorizontalOptions="Center"
+                           Text="Konum Seçimi" />
+
+                    <CollectionView Grid.Row="1"
+                                    RemainingItemsThreshold="2"
+                                    RemainingItemsThresholdReachedCommand="{Binding LoadMoreLocationItemsCommand}">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+                        </CollectionView.ItemsLayout>
+
+
+                    </CollectionView>
+                    <Button Grid.Row="2"
+                            Margin="10,10,10,20"
+                            Text="Seç" />
+                </Grid>
 
                 <!--#endregion-->
             </dx:BottomSheet>
+            <!--#endregion-->
 
+            <!--#region Serilot bottom sheet -->
             <dx:BottomSheet x:Name="serilotBottomSheet"
                             Grid.Row="1"
                             AllowDismiss="True"
                             BackgroundColor="White"
                             CornerRadius="15"
-                            HalfExpandedRatio="0.3"
+                            HalfExpandedRatio="0.6"
                             IsModal="True"
                             ShowGrabber="True">
                 <!--#region BottomSheetContent-->
-                <Grid RowDefinitions="Auto, *, Auto" RowSpacing="10" />
+                <Grid RowDefinitions="Auto, *, Auto" RowSpacing="10">
+                    <Label FontAttributes="Bold"
+                           FontSize="Header"
+                           HorizontalOptions="Center"
+                           Text="Serilotlar" />
+
+                    <CollectionView Grid.Row="1"
+                                    ItemsSource="{Binding SerilotItems}"
+                                    RemainingItemsThreshold="2"
+                                    RemainingItemsThresholdReachedCommand="{Binding LoadMoreSerilotItemsCommand}">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="basketModel:OutputProductBasketDetailModel">
+                                <Border Padding="5"
+                                        BackgroundColor="White"
+                                        StrokeThickness="0.1">
+                                    <Grid ColumnDefinitions=".20*,.80*" ColumnSpacing="10">
+                                        <Border Grid.Column="0"
+                                                BackgroundColor="{StaticResource Secondary}"
+                                                StrokeShape="RoundRectangle 5"
+                                                StrokeThickness="0.5">
+                                            <Image Grid.Column="0"
+                                                   HeightRequest="50"
+                                                   Source="dotnet_bot.png"
+                                                   WidthRequest="50" />
+                                        </Border>
+
+                                        <VerticalStackLayout Grid.Column="1">
+                                            <Label FontAttributes="Bold"
+                                                   LineBreakMode="TailTruncation"
+                                                   Text="{Binding SeriLotCode}" />
+                                            <Label LineBreakMode="TailTruncation"
+                                                   Text="{Binding SeriLotName}"
+                                                   TextColor="{StaticResource Gray600}" />
+
+                                            <Label>
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span FontAttributes="Bold"
+                                                              FontFamily="FAS"
+                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding Quantity, StringFormat='{0:N2}'}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+
+                                            <Grid ColumnDefinitions="Auto,Auto,Auto"
+                                                  ColumnSpacing="10"
+                                                  HorizontalOptions="EndAndExpand">
+                                                <Border Grid.Column="0"
+                                                        Padding="5"
+                                                        BackgroundColor="Transparent"
+                                                        Stroke="{StaticResource Primary}"
+                                                        StrokeShape="RoundRectangle 2">
+                                                    <Label FontFamily="FAS"
+                                                           FontSize="Medium"
+                                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                                           TextColor="{StaticResource Primary}" />
+
+                                                    <!--<Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OutputProductProcessBasketListViewModel}}, Path=}" CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>-->
+                                                </Border>
+                                                <Label Grid.Column="1"
+                                                       FontAttributes="Bold"
+                                                       FontSize="Large"
+                                                       Text="{Binding Quantity}"
+                                                       TextColor="{StaticResource Primary}"
+                                                       VerticalOptions="Center" />
+                                                <Border Grid.Column="2"
+                                                        Padding="5"
+                                                        BackgroundColor="{StaticResource Primary}"
+                                                        Stroke="{StaticResource Primary}"
+                                                        StrokeShape="RoundRectangle 2">
+                                                    <Label FontFamily="FAS"
+                                                           FontSize="Medium"
+                                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                                           TextColor="{StaticResource White}" />
+
+                                                    <!--<Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OutputProductProcessBasketListViewModel}}, Path=IncreaseCommand}" CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>-->
+                                                </Border>
+                                            </Grid>
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+
+                    </CollectionView>
+                    <Button Grid.Row="2"
+                            Margin="10,10,10,20"
+                            Text="Tamam" />
+                </Grid>
 
                 <!--#endregion-->
             </dx:BottomSheet>
+            <!--#endregion-->
         </VerticalStackLayout>
 
     </Grid>
