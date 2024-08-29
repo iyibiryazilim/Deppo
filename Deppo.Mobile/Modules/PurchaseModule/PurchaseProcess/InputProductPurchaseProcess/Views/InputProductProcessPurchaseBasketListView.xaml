@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views.InputProductProcessPurchaseBasketListView"
+             xmlns:basketModel="clr-namespace:Deppo.Mobile.Core.Models.BasketModels;assembly=Deppo.Mobile.Core"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModels="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels"
+             Title="{Binding Title}"
+             Padding="10"
+             x:DataType="viewModels:InputProductProcessPurchaseBasketListViewModel"
+             Shell.TabBarIsVisible="False">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding BackCommand}" />
+    </Shell.BackButtonBehavior>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Command="{Binding ShowProductViewCommand}">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                 Size="Medium" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android"
+                Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid RowDefinitions="Auto,*,Auto"
+          RowSpacing="10">
+        <Entry Grid.Row="0"
+               Placeholder="Search" />
+
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Items}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="basketModel:InputProductBasketModel">
+
+                    <Border Padding="5"
+                            BackgroundColor="Transparent"
+                            StrokeThickness="0.1">
+                        <Grid ColumnDefinitions=".20*,.80*"
+                              ColumnSpacing="10">
+                            <Border Grid.Column="0"
+                                    BackgroundColor="{StaticResource Secondary}"
+                                    StrokeShape="RoundRectangle 5"
+                                    StrokeThickness="0.5">
+                                <Image Grid.Column="0"
+                                       HeightRequest="50"
+                                       Source="dotnet_bot.png"
+                                       WidthRequest="50" />
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1">
+                                <Label FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation"
+                                       Text="{Binding ItemCode}" />
+                                <Label LineBreakMode="TailTruncation"
+                                       Text="{Binding ItemName}"
+                                       TextColor="{StaticResource Gray600}" />
+
+                                <Label>
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span FontAttributes="Bold"
+                                                  FontFamily="FAS"
+                                                  Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                  TextColor="{StaticResource Primary}" />
+                                            <Span Text=" " />
+                                            <Span FontAttributes="Bold"
+                                                  Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                                  TextColor="{StaticResource Primary}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+
+                                <Grid ColumnDefinitions="Auto,Auto,Auto"
+                                      ColumnSpacing="10"
+                                      HorizontalOptions="EndAndExpand">
+                                    <Border Grid.Column="0"
+                                            Padding="5"
+                                            BackgroundColor="Transparent"
+                                            Stroke="{StaticResource Primary}"
+                                            StrokeShape="RoundRectangle 2">
+                                        <Label FontFamily="FAS"
+                                               FontSize="Medium"
+                                               Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                               TextColor="{StaticResource Primary}" />
+
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessPurchaseBasketListViewModel}}, Path=DecreaseCommand}"
+                                                                  CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                    </Border>
+                                    <Label Grid.Column="1"
+                                           FontAttributes="Bold"
+                                           FontSize="Large"
+                                           Text="{Binding Quantity}"
+                                           TextColor="{StaticResource Primary}"
+                                           VerticalOptions="Center" />
+                                    <Border Grid.Column="2"
+                                            Padding="5"
+                                            BackgroundColor="{StaticResource Primary}"
+                                            Stroke="{StaticResource Primary}"
+                                            StrokeShape="RoundRectangle 2">
+                                        <Label FontFamily="FAS"
+                                               FontSize="Medium"
+                                               Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                               TextColor="{StaticResource White}" />
+
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessPurchaseBasketListViewModel}}, Path=IncreaseCommand}"
+                                                                  CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                    </Border>
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Grid.Row="2"
+                Command="{Binding NextViewCommand}"
+                Text="İleri" />
+    </Grid>
+</ContentPage>

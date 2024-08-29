@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views.InputProductProcessPurchaseSupplierListView"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:model="clr-namespace:Deppo.Core.BaseModels;assembly=Deppo.Core"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             Title="{Binding Title}"
+             x:DataType="viewModel:InputProductProcessPurchaseSupplierListViewModel"
+             Shell.TabBarIsVisible="False">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                        EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android"
+                Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+    <Grid RowDefinitions="*,Auto">
+
+        <Grid Grid.Row="0"
+              Padding="10"
+              RowDefinitions="Auto,*">
+            <Border Grid.Row="0"
+                    Margin="5,5,5,0"
+                    Padding="0"
+                    BackgroundColor="{StaticResource PrimaryLight}"
+                    HeightRequest="35"
+                    Stroke="{StaticResource Primary}"
+                    StrokeShape="RoundRectangle 5"
+                    StrokeThickness="0.5">
+                <SearchBar x:Name="searchBar"
+                           Placeholder="Ara..."
+                           PlaceholderColor="{StaticResource OffBlack}"
+                           TextColor="{StaticResource OffBlack}">
+                    <SearchBar.Behaviors>
+                        <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                        CommandParameter="{Binding ., Source={x:Reference searchBar}}"
+                                                        EventName="TextChanged" />
+                    </SearchBar.Behaviors>
+                </SearchBar>
+            </Border>
+            <RefreshView Grid.Row="1"
+                         Command="{Binding LoadItemsCommand}"
+                         IsRefreshing="{Binding IsBusy, Mode=OneWay}"
+                         RefreshColor="Transparent">
+                <CollectionView ItemsSource="{Binding Items}"
+                                RemainingItemsThreshold="2"
+                                RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:Current">
+                            <Border StrokeShape="RoundRectangle 6"
+                                    StrokeThickness="0.2">
+                                <Grid Padding="10"
+                                      ColumnDefinitions="Auto,Auto,*"
+                                      ColumnSpacing="10">
+                                    <toolkit:AvatarView CornerRadius="200"
+                                                        Margin="5"
+                                                        BorderColor="{StaticResource Primary}"
+                                                        Background="{StaticResource PrimaryLight}"
+                                                        Text="{Binding TitleName}"
+                                                        TextColor="{StaticResource OffBlack}"
+                                                        FontSize="16"
+                                                        FontAttributes="Bold"
+                                                        WidthRequest="50"
+                                                        HeightRequest="50"
+                                                        VerticalOptions="Start" />
+
+                                    <VerticalStackLayout Grid.Column="1"
+                                                         Spacing="2">
+                                        <Label FontAttributes="Bold"
+                                               LineBreakMode="TailTruncation"
+                                               Text="{Binding Title}" />
+
+                                        <VerticalStackLayout Spacing="5"
+                                                             VerticalOptions="Center">
+                                            <HorizontalStackLayout Spacing="5">
+                                                <Image Aspect="AspectFit"
+                                                       HeightRequest="16"
+                                                       VerticalOptions="Center"
+                                                       WidthRequest="16">
+                                                    <Image.Source>
+                                                        <FontImageSource FontFamily="FAS"
+                                                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.UserClock}"
+                                                                         Size="16"
+                                                                         Color="{StaticResource PrimaryDarkText}" />
+                                                    </Image.Source>
+                                                </Image>
+                                                <Label Text="{Binding Name}"
+                                                       LineBreakMode="TailTruncation"
+                                                       HorizontalOptions="Start"
+                                                       WidthRequest="200"
+                                                       TextColor="{StaticResource Gray600}"
+                                                       VerticalOptions="Center" />
+                                            </HorizontalStackLayout>
+                                            <HorizontalStackLayout Spacing="5">
+                                                <Image Aspect="AspectFit"
+                                                       HeightRequest="16"
+                                                       VerticalOptions="Center"
+                                                       WidthRequest="16">
+                                                    <Image.Source>
+                                                        <FontImageSource FontFamily="FAS"
+                                                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.MapLocationDot}"
+                                                                         Size="16"
+                                                                         Color="{StaticResource PrimaryDarkText}" />
+                                                    </Image.Source>
+                                                </Image>
+                                                <Label TextColor="{StaticResource Gray600}"
+                                                       LineBreakMode="TailTruncation"
+                                                       HorizontalOptions="Start"
+                                                       WidthRequest="200"
+                                                       VerticalOptions="Center">
+                                                    <Label.Text>
+                                                        <MultiBinding StringFormat="{}{0} / {1}">
+                                                            <Binding Path="Country" />
+                                                            <Binding Path="City" />
+                                                        </MultiBinding>
+                                                    </Label.Text>
+                                                </Label>
+                                            </HorizontalStackLayout>
+                                        </VerticalStackLayout>
+                                    </VerticalStackLayout>
+                                </Grid>
+                                <Border.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected}"
+                                                 TargetType="Border"
+                                                 Value="True">
+                                        <Setter Property="BackgroundColor"
+                                                Value="{StaticResource PrimaryLight}" />
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding IsSelected}"
+                                                 TargetType="Border"
+                                                 Value="False">
+                                        <Setter Property="BackgroundColor"
+                                                Value="Transparent" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputProductProcessPurchaseSupplierListViewModel}}, Path=ItemTappedCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+        </Grid>
+        <Button Grid.Row="1"
+                Text="İleri"
+                Command="{Binding NextViewCommand}"
+                IsEnabled="{Binding SelectedSupplier, Converter={StaticResource IsNotNullConverter}}"
+                Margin="10,10,10,20"></Button>
+    </Grid>
+</ContentPage>

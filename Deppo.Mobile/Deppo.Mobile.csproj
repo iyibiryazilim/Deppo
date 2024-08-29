@@ -115,6 +115,15 @@
 	  <MauiXaml Update="Modules\ProductModule\WarehouseMenu\Views\WarehouseOutputTransactionView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseProcess\Views\InputProductProcessPurchaseBasketListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseProcess\Views\InputProductProcessPurchaseProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseProcess\Views\InputProductProcessPurchaseSupplierListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\PurchaseModule\SupplierMenu\Views\SupplierDetailView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

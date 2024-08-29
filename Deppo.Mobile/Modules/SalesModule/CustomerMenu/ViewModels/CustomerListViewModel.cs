@@ -8,6 +8,7 @@ using Deppo.Mobile.Core.Models;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views;
 using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views;
@@ -57,14 +58,14 @@ public partial class CustomerListViewModel : BaseViewModel
             _userDialogs.Loading("Loading Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             await Task.Delay(1000);
-            var result = await _customerService.GetObjects(httpClient, string.Empty, string.Empty, null, 0, 20, _httpClientService.FirmNumber);
+            var result = await _customerService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, Items.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
                     return;
 
                 foreach (var item in result.Data)
-                    Items.Add(item);
+                    Items.Add(Mapping.Mapper.Map<Customer>(item));
 
                 _userDialogs.Loading().Hide();
             }
@@ -99,14 +100,14 @@ public partial class CustomerListViewModel : BaseViewModel
             IsBusy = true;
             _userDialogs.Loading("Refreshing Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _customerService.GetObjects(httpClient, string.Empty, string.Empty, null, Items.Count, 20, _httpClientService.FirmNumber);
+            var result = await _customerService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, Items.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
                     return;
 
                 foreach (var item in result.Data)
-                    Items.Add(item);
+                    Items.Add(Mapping.Mapper.Map<Customer>(item));
 
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.Loading().Hide();
@@ -154,7 +155,7 @@ public partial class CustomerListViewModel : BaseViewModel
                     {
                         var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-                        var result = await _customerService.GetObjects(httpClient, searchBar.Text, string.Empty, null, 0, 999999, _httpClientService.FirmNumber);
+                        var result = await _customerService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, Items.Count, 20);
                         if (!result.IsSuccess)
                         {
                             _userDialogs.Alert(result.Message, "Hata");
