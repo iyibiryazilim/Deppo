@@ -27,8 +27,6 @@ public class Current : INotifyPropertyChanged, IDisposable
     //
     private string _name = string.Empty;
 
-    private bool _isSelected;
-
     public string TitleName => Name?.Length > 2 ? Name.Substring(0, 2) : Name;
 
     public Current()
@@ -219,16 +217,6 @@ public class Current : INotifyPropertyChanged, IDisposable
         {
             if (_name == value) return;
             _name = value;
-            NotifyPropertyChanged();
-        }
-    }
-
-    public bool IsSelected
-    {
-        get => _isSelected;
-        set
-        {
-            _isSelected = value;
             NotifyPropertyChanged();
         }
     }

@@ -32,6 +32,9 @@ public partial class InputProductProcessPurchaseSupplierListViewModel : BaseView
     private WarehouseModel warehouseModel = null!;
 
     [ObservableProperty]
+    private SupplierModel supplierModel = null!;
+
+    [ObservableProperty]
     private WarehouseModel selectedWarehouseModel = null!;
 
     [ObservableProperty]
@@ -54,11 +57,11 @@ public partial class InputProductProcessPurchaseSupplierListViewModel : BaseView
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         PerformSearchCommand = new Command<SearchBar>(async (searchBar) => await PerformSearchAsync(searchBar));
 
-        ItemTappedCommand = new Command<Supplier>(async (supplier) => await ItemTappedAsync(supplier));
+        ItemTappedCommand = new Command<SupplierModel>(async (supplier) => await ItemTappedAsync(supplier));
         NextViewCommand = new Command(async () => await NextViewAsync());
     }
 
-    public ObservableCollection<Supplier> Items { get; } = new();
+    public ObservableCollection<SupplierModel> Items { get; } = new();
 
     // public ObservableCollection<SupplierModel> SelectedItems { get; } = new();
     public Command LoadItemsCommand { get; }
@@ -66,7 +69,7 @@ public partial class InputProductProcessPurchaseSupplierListViewModel : BaseView
     public Command LoadMoreItemsCommand { get; }
     public Command<SearchBar> PerformSearchCommand { get; }
 
-    public Command<Supplier> ItemTappedCommand { get; }
+    public Command<SupplierModel> ItemTappedCommand { get; }
 
     public Command NextViewCommand { get; }
 
@@ -90,7 +93,7 @@ public partial class InputProductProcessPurchaseSupplierListViewModel : BaseView
                     return;
 
                 foreach (var item in result.Data)
-                    Items.Add(Mapping.Mapper.Map<Supplier>(item));
+                    Items.Add(Mapping.Mapper.Map<SupplierModel>(item));
 
                 _userDialogs.Loading().Hide();
             }
@@ -132,7 +135,7 @@ public partial class InputProductProcessPurchaseSupplierListViewModel : BaseView
                     return;
 
                 foreach (var item in result.Data)
-                    Items.Add(Mapping.Mapper.Map<Supplier>(item));
+                    Items.Add(Mapping.Mapper.Map<SupplierModel>(item));
 
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.Loading().Hide();
@@ -204,7 +207,7 @@ public partial class InputProductProcessPurchaseSupplierListViewModel : BaseView
         }
     }
 
-    private async Task ItemTappedAsync(Supplier supplier)
+    private async Task ItemTappedAsync(SupplierModel supplier)
     {
         if (IsBusy)
             return;

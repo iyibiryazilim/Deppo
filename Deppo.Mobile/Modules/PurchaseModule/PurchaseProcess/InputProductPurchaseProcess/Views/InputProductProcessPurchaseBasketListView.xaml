@@ -44,8 +44,25 @@
 
     <Grid RowDefinitions="Auto,*,Auto"
           RowSpacing="10">
-        <Entry Grid.Row="0"
-               Placeholder="Search" />
+        <Border Grid.Row="0"
+                Margin="5,0,5,0"
+                Padding="0"
+                BackgroundColor="{StaticResource PrimaryLight}"
+                HeightRequest="35"
+                Stroke="{StaticResource Primary}"
+                StrokeShape="RoundRectangle 5"
+                StrokeThickness="0.5">
+            <SearchBar x:Name="searchBar"
+                       Placeholder="Ara ..."
+                       PlaceholderColor="{StaticResource OffBlack}"
+                       TextColor="{StaticResource OffBlack}">
+                <!-- <SearchBar.Behaviors>
+           <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                           CommandParameter="{Binding ., Source={x:Reference searchBar}}"
+                                           EventName="TextChanged" />
+       </SearchBar.Behaviors>-->
+            </SearchBar>
+        </Border>
 
         <CollectionView Grid.Row="1"
                         ItemsSource="{Binding Items}">
@@ -58,7 +75,7 @@
                         <Grid ColumnDefinitions=".20*,.80*"
                               ColumnSpacing="10">
                             <Border Grid.Column="0"
-                                    BackgroundColor="{StaticResource Secondary}"
+                                    BackgroundColor="{StaticResource Primary}"
                                     StrokeShape="RoundRectangle 5"
                                     StrokeThickness="0.5">
                                 <Image Grid.Column="0"
@@ -96,12 +113,12 @@
                                     <Border Grid.Column="0"
                                             Padding="5"
                                             BackgroundColor="Transparent"
-                                            Stroke="{StaticResource Primary}"
+                                            Stroke="{StaticResource Secondary}"
                                             StrokeShape="RoundRectangle 2">
                                         <Label FontFamily="FAS"
                                                FontSize="Medium"
                                                Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
-                                               TextColor="{StaticResource Primary}" />
+                                               TextColor="{StaticResource Secondary}" />
 
                                         <Border.GestureRecognizers>
                                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessPurchaseBasketListViewModel}}, Path=DecreaseCommand}"
@@ -112,12 +129,12 @@
                                            FontAttributes="Bold"
                                            FontSize="Large"
                                            Text="{Binding Quantity}"
-                                           TextColor="{StaticResource Primary}"
+                                           TextColor="{StaticResource OffBlack}"
                                            VerticalOptions="Center" />
                                     <Border Grid.Column="2"
                                             Padding="5"
-                                            BackgroundColor="{StaticResource Primary}"
-                                            Stroke="{StaticResource Primary}"
+                                            BackgroundColor="{StaticResource Secondary}"
+                                            Stroke="{StaticResource Secondary}"
                                             StrokeShape="RoundRectangle 2">
                                         <Label FontFamily="FAS"
                                                FontSize="Medium"

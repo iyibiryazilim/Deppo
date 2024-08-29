@@ -10,6 +10,7 @@ namespace Deppo.Mobile.Core.Models.PurchaseModels
     public class SupplierModel : Supplier
     {
         private bool _isSelected;
+        private int _orderReferenceCount;
 
         public SupplierModel()
         {
@@ -21,6 +22,16 @@ namespace Deppo.Mobile.Core.Models.PurchaseModels
             set
             {
                 _isSelected = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int OrderReferenceCount
+        {
+            get => _orderReferenceCount;
+            set
+            {
+                _orderReferenceCount = value;
                 NotifyPropertyChanged();
             }
         }
