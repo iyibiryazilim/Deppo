@@ -116,7 +116,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 			if (item is not null)
 			{
 				SelectedItem = item;
-				if (item.LocTracking == 1 || item.LocTracking == 0)
+				if (item.LocTracking == 1)
 				{
 					OutputProductProcessBasketListView currentPage = CurrentPage as OutputProductProcessBasketListView;
 					currentPage.FindByName<BottomSheet>("serilotBottomSheet").State = BottomSheetState.HalfExpanded;
