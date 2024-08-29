@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
+using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LoginModels;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
@@ -24,5 +25,6 @@ public class MappingProfile : Profile
         CreateMap<Product, dynamic>();
         CreateMap<WarehouseTotal, dynamic>();
         CreateMap<Variant, dynamic>();
+        CreateMap<OutputProductBasketDetailModel, dynamic>();
     }
 }

@@ -70,17 +70,18 @@ public class SerilotDataStore : ISerilotService
 		[SerilotReferenceId] = 0,
         [InTransactionReferenceId] = LGMAIN.INTRANSREF,
         [InSerilotTransactionReferenceId] = LGMAIN.INSLTRANSREF,
-        [SerilotCode] = '',
-        [SerilotName] = '',
+        [SerilotCode] = ISNULL(SERILOT.CODE, ''),
+        [SerilotName] = ISNULL(SERILOT.NAME, ''),
         [LocationReferenceId] = LGMAIN.LOCREF,
         [LocationCode] = INVLOC.CODE,
         [LocationName] = INVLOC.NAME,
         [Quantity] = LGMAIN.AMOUNT,
         [RemainingQuantity] = LGMAIN.REMAMOUNT,
-        [RemainingUnitQuantity] = LGMAIN.REMLUNITAMNT
+        [RemainingUnitQuantity] = LGMAIN.REMLNUNITAMNT
         FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_SLTRANS LGMAIN WITH(NOLOCK)    
 		LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS ITEMS WITH(NOLOCK) ON (LGMAIN.ITEMREF  =  ITEMS.LOGICALREF) 
-		LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_LOCATION INVLOC WITH(NOLOCK) ON (LGMAIN.LOCREF  =  INVLOC.LOGICALREF) 
+		LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_LOCATION INVLOC WITH(NOLOCK) ON (LGMAIN.LOCREF  =  INVLOC.LOGICALREF)
+        LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_SERILOTN SERILOT WITH(NOLOCK) ON (LGMAIN.SLREF = SERILOT.LOGICALREF)
 		LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE STFIC WITH(NOLOCK) ON (LGMAIN.STFICHEREF  =  STFIC.LOGICALREF) 
 		LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL USLINE WITH(NOLOCK) ON (LGMAIN.UOMREF  =  USLINE.LOGICALREF) 
 		LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF UNITSET WITH(NOLOCK) ON (USLINE.UNITSETREF  =  UNITSET.LOGICALREF)
@@ -94,12 +95,12 @@ public class SerilotDataStore : ISerilotService
               (LGMAIN.REMAMOUNT > 0) 	  
 		";
 
-		//if (!string.IsNullOrEmpty(search))
-		//{
-		//	baseQuery += $" AND ( LIKE '%{search}%')";
-		//}
+		if (!string.IsNullOrEmpty(search))
+		{
+			baseQuery += $" AND ( SERILOT.CODE LIKE '{search}% OR SERILOT.NAME LIKE '%{search}%')";
+		}
 
-		baseQuery += $" ORDER BY LGMAIN.LOGICALREF OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+		baseQuery += $" ORDER BY SERILOT.CODE ASC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
 		return baseQuery;
 	}
