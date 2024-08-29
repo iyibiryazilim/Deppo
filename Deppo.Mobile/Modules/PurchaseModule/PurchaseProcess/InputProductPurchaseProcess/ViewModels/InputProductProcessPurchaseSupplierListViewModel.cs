@@ -220,7 +220,6 @@ public partial class InputProductProcessPurchaseSupplierListViewModel : BaseView
             }
             else
             {
-                // Tüm öğelerin seçimini kaldır
                 Items.ToList().ForEach(x => x.IsSelected = false);
 
                 var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == supplier.ReferenceId);
