@@ -202,8 +202,7 @@
                            HorizontalOptions="Center"
                            Text="Konum Seçimi" />
 
-                    <CollectionView Grid.Row="1"
-                                    ItemsSource="{Binding LocationTransactionItems}">
+                    <CollectionView Grid.Row="1" ItemsSource="{Binding LocationTransactionItems}">
                         <CollectionView.ItemsLayout>
                             <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
                         </CollectionView.ItemsLayout>
@@ -249,9 +248,9 @@
                                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
                                                            TextColor="{StaticResource Secondary}" />
 
-                                                    <!--<Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OutputProductProcessBasketListViewModel}}, Path=DecreaseCommand}" CommandParameter="{Binding .}" />
-                                                    </Border.GestureRecognizers>-->
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OutputProductProcessBasketListViewModel}}, Path=LocationTransactionDecreaseCommand}" CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
                                                 </Border>
                                                 <Label Grid.Column="1"
                                                        FontAttributes="Bold"
@@ -269,9 +268,9 @@
                                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
                                                            TextColor="{StaticResource White}" />
 
-                                                    <!--<Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OutputProductProcessBasketListViewModel}}, Path=IncreaseCommand}" CommandParameter="{Binding .}" />
-                                                    </Border.GestureRecognizers>-->
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OutputProductProcessBasketListViewModel}}, Path=LocationTransactionIncreaseCommand}" CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
                                                 </Border>
                                             </Grid>
                                         </VerticalStackLayout>
@@ -284,6 +283,7 @@
                     </CollectionView>
                     <Button Grid.Row="2"
                             Margin="10,10,10,20"
+                            Command="{Binding ConfirmLocationTransactionCommand}"
                             Text="Seç" />
                 </Grid>
 

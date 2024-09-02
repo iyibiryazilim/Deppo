@@ -39,6 +39,9 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		LoadMoreSerilotTransactionItemsCommand = new Command(async () => await LoadMoreSerilotTransactionItemsAsync());
 		LoadLocationTransactionItemsCommand = new Command(async () => await LoadLocationTransactionItemsAsync());
 		LoadMoreLocationTransactionItemsCommand = new Command(async () => await LoadMoreLocationTransactionItemsAsync());
+		LocationTransactionIncreaseCommand = new Command<LocationTransaction>(item => LocationTransactionIncreaseAsync(item));
+		LocationTransactionDecreaseCommand = new Command<LocationTransaction>(item => LocationTransactionDecreaseAsync(item));
+		ConfirmLocationTransactionCommand = new Command(ConfirmLocationTransactionAsync);
 		NextViewCommand = new Command(async () => await NextViewAsync());
 		BackCommand = new Command(async () => await BackAsync());
 	}
@@ -51,7 +54,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	#region Locations Command
 	public Command LoadLocationTransactionItemsCommand { get; }
 	public Command LoadMoreLocationTransactionItemsCommand { get; }
-	public Command LocationTransactionTappedCommand { get; }
+	public Command LocationTransactionIncreaseCommand { get; }
+	public Command LocationTransactionDecreaseCommand { get; }
 	public Command ConfirmLocationTransactionCommand { get; }
 	#endregion
 
@@ -213,17 +217,17 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				warehouseNumber: WarehouseModel.Number
 			);
 
-			if(result.IsSuccess)
+			if (result.IsSuccess)
 			{
 				if (result.Data is null)
 					return;
 				LocationTransactionItems.Clear();
 				foreach (var item in result.Data)
-                {
-                    var obj = Mapping.Mapper.Map<LocationTransaction>(item);
+				{
+					var obj = Mapping.Mapper.Map<LocationTransaction>(item);
 					LocationTransactionItems.Add(obj);
-                }
-            }
+				}
+			}
 
 			_userDialogs.Loading().Hide();
 		}
@@ -242,7 +246,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		if (IsBusy)
 			return;
 		if (LocationTransactionItems.Count < (18))  // 18 = Take (20) - Remaining ItemsThreshold (2)
-			return; 
+			return;
 		try
 		{
 			IsBusy = true;
@@ -271,6 +275,54 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		catch (Exception ex)
 		{
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private void LocationTransactionIncreaseAsync(LocationTransaction item)
+	{
+		if (item is not null)
+		{
+			if (item.TempQuantity < item.Quantity)
+			{
+				item.TempQuantity++;
+			}
+		}
+	}
+
+	private void LocationTransactionDecreaseAsync(LocationTransaction item)
+	{
+		if (item is not null)
+		{
+			if (item.TempQuantity > 0)
+			{
+				item.TempQuantity--;
+			}
+		}
+	}
+
+	private void ConfirmLocationTransactionAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			if (LocationTransactionItems.Count > 0)
+			{
+				var totalTempQuantity = LocationTransactionItems.Where(x => x.TempQuantity > 0).Sum(x => (double)x.TempQuantity);
+				
+				SelectedItem.Quantity = totalTempQuantity;
+				CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.Hidden;
+			}
+		}
+		catch (Exception ex)
+		{
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{
