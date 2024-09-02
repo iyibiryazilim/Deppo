@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
@@ -78,8 +79,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	#region Collections
 	public ObservableCollection<OutputProductBasketModel> Items { get; } = new();
 
-	public ObservableCollection<OutputProductBasketDetailModel> SerilotTransactionItems { get; } = new();
-	public ObservableCollection<OutputProductBasketDetailModel> LocationTransactionItems { get; } = new();
+	public ObservableCollection<SerilotTransaction> SerilotTransactionItems { get; } = new();
+	public ObservableCollection<LocationTransaction> LocationTransactionItems { get; } = new();
 	#endregion
 
 	private async Task ShowProductViewAsync()
@@ -198,23 +199,28 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		try
 		{
 			IsBusy = true;
+
 			_userDialogs.ShowLoading("Load Location Items...");
 			await Task.Delay(1000);
+			LocationTransactionItems.Clear();
+
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _locationTransactionService.GetInputObjectsAsync(httpClient: httpClient, 
-				firmNumber: _httpClientService.FirmNumber, 
-				periodNumber: _httpClientService.PeriodNumber, 
-				productReferenceId: SelectedItem.ItemReferenceId, 
-				warehouseNumber: WarehouseModel.Number);
+			var result = await _locationTransactionService.GetInputObjectsAsync(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				productReferenceId: SelectedItem.ItemReferenceId,
+				warehouseNumber: WarehouseModel.Number
+			);
 
 			if(result.IsSuccess)
 			{
 				if (result.Data is null)
 					return;
-
-                foreach (var item in result.Data)
+				LocationTransactionItems.Clear();
+				foreach (var item in result.Data)
                 {
-                    var obj = Mapping.Mapper.Map(item);
+                    var obj = Mapping.Mapper.Map<LocationTransaction>(item);
 					LocationTransactionItems.Add(obj);
                 }
             }
@@ -235,6 +241,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	{
 		if (IsBusy)
 			return;
+		if (LocationTransactionItems.Count < (18))  // 18 = Take (20) - Remaining ItemsThreshold (2)
+			return; 
 		try
 		{
 			IsBusy = true;
@@ -255,7 +263,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 
 				foreach (var item in result.Data)
 				{
-					var obj = Mapping.Mapper.Map(item);
+					var obj = Mapping.Mapper.Map<LocationTransaction>(item);
 					LocationTransactionItems.Add(obj);
 				}
 			}
