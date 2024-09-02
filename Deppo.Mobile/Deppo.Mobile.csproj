@@ -146,6 +146,8 @@
 
 	<ItemGroup>
 	  <Folder Include="Modules/ProductModule/ProductProcess/TransferProductProcess/" />
+	  <Folder Include="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\ViewModels\" />
+	  <Folder Include="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\" />
 	</ItemGroup>
 
 </Project>
