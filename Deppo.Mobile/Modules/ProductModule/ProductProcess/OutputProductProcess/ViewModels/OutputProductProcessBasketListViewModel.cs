@@ -42,6 +42,9 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		LocationTransactionIncreaseCommand = new Command<LocationTransaction>(item => LocationTransactionIncreaseAsync(item));
 		LocationTransactionDecreaseCommand = new Command<LocationTransaction>(item => LocationTransactionDecreaseAsync(item));
 		ConfirmLocationTransactionCommand = new Command(ConfirmLocationTransactionAsync);
+		SerilotTransactionIncreaseCommand = new Command<SerilotTransaction>(item => SerilotTransactionIncreaseAsync(item));
+		SerilotTransactionDecreaseCommand = new Command<SerilotTransaction>(item => SerilotTransactionDecreaseAsync(item));
+		ConfirmSerilotTransactionCommand = new Command(ConfirmSerilotTransactionAsync);
 		NextViewCommand = new Command(async () => await NextViewAsync());
 		BackCommand = new Command(async () => await BackAsync());
 	}
@@ -62,6 +65,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	#region Serilot Command
 	public Command LoadSerilotTransactionItemsCommand { get; }
 	public Command LoadMoreSerilotTransactionItemsCommand { get; }
+	public Command SerilotTransactionIncreaseCommand { get; }
+	public Command SerilotTransactionDecreaseCommand { get; }
 	public Command ConfirmSerilotTransactionCommand { get; }
 	#endregion
 	public Command NextViewCommand { get; }
@@ -130,6 +135,16 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 					{
 						LocationTransactionItems.Clear();
 						await LoadLocationTransactionItemsAsync();
+					};
+				}
+				else if(item.LocTracking == 0 && (item.TrackingType == 1 ||item.TrackingType == 2))
+				{
+					OutputProductProcessBasketListView currentPage = CurrentPage as OutputProductProcessBasketListView;
+					currentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.HalfExpanded;
+					currentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").Loaded += async (s, e) =>
+					{
+						SerilotTransactionItems.Clear();
+						await LoadSerilotTransactionItemsAsync();
 					};
 				}
 				else
@@ -342,6 +357,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 
 			_userDialogs.ShowLoading("Load Serilot Items...");
 			await Task.Delay(1000);
+			SerilotTransactionItems.Clear();
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			var result = await _serilotTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: SelectedItem.ItemReferenceId, warehouseNumber: WarehouseModel.Number);
 
@@ -350,9 +366,10 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				if (result.Data is null)
 					return;
 
+				SerilotTransactionItems.Clear();
 				foreach (var item in result.Data)
 				{
-					var obj = Mapping.Mapper.Map<OutputProductBasketDetailModel>(item);
+					var obj = Mapping.Mapper.Map<SerilotTransaction>(item);
 					SerilotTransactionItems.Add(obj);
 				}
 			}
@@ -373,6 +390,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	{
 		if (IsBusy)
 			return;
+		if (SerilotTransactionItems.Count < (18))  // 18 = Take (20) - Remaining ItemsThreshold (2)
+			return;
 
 		try
 		{
@@ -388,7 +407,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 
 				foreach (var item in result.Data)
 				{
-					var obj = Mapping.Mapper.Map<OutputProductBasketDetailModel>(item);
+					var obj = Mapping.Mapper.Map<SerilotTransaction>(item);
 					SerilotTransactionItems.Add(obj);
 				}
 			}
@@ -396,6 +415,54 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		catch (Exception ex)
 		{
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private void SerilotTransactionIncreaseAsync(SerilotTransaction item)
+	{
+		if (item is not null)
+		{
+			if (item.TempQuantity < item.Quantity)
+			{
+				item.TempQuantity++;
+			}
+		}
+	}
+
+	private void SerilotTransactionDecreaseAsync(SerilotTransaction item)
+	{
+		if (item is not null)
+		{
+			if (item.TempQuantity > 0)
+			{
+				item.TempQuantity--;
+			}
+		}
+	}
+
+	private void ConfirmSerilotTransactionAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			if (SerilotTransactionItems.Count > 0)
+			{
+				var totalTempQuantity = SerilotTransactionItems.Where(x => x.TempQuantity > 0).Sum(x => (double)x.TempQuantity);
+
+				SelectedItem.Quantity = totalTempQuantity;
+				CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.Hidden;
+			}
+		}
+		catch (Exception ex)
+		{
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{

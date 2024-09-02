@@ -202,7 +202,10 @@
                            HorizontalOptions="Center"
                            Text="Konum Seçimi" />
 
-                    <CollectionView Grid.Row="1" ItemsSource="{Binding LocationTransactionItems}">
+                    <CollectionView Grid.Row="1"
+                                    ItemsSource="{Binding LocationTransactionItems}"
+                                    RemainingItemsThreshold="2"
+                                    RemainingItemsThresholdReachedCommand="{Binding LoadMoreLocationTransactionItemsCommand}">
                         <CollectionView.ItemsLayout>
                             <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
                         </CollectionView.ItemsLayout>
@@ -292,7 +295,7 @@
             <!--#endregion-->
 
             <!--#region Serilot bottom sheet-->
-            <dx:BottomSheet x:Name="serilotBottomSheet"
+            <dx:BottomSheet x:Name="serilotTransactionBottomSheet"
                             Grid.Row="1"
                             AllowDismiss="True"
                             BackgroundColor="White"
@@ -305,7 +308,7 @@
                     <Label FontAttributes="Bold"
                            FontSize="Header"
                            HorizontalOptions="Center"
-                           Text="Serilotlar" />
+                           Text="Serilot Listesi" />
 
                     <CollectionView Grid.Row="1"
                                     ItemsSource="{Binding SerilotTransactionItems}"
@@ -315,27 +318,17 @@
                             <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="basketModel:OutputProductBasketDetailModel">
+                            <DataTemplate x:DataType="models:SerilotTransaction">
                                 <Border Padding="5"
                                         BackgroundColor="White"
                                         StrokeThickness="0.1">
-                                    <Grid ColumnDefinitions=".20*,.80*" ColumnSpacing="10">
-                                        <Border Grid.Column="0"
-                                                BackgroundColor="{StaticResource Secondary}"
-                                                StrokeShape="RoundRectangle 5"
-                                                StrokeThickness="0.5">
-                                            <Image Grid.Column="0"
-                                                   HeightRequest="50"
-                                                   Source="dotnet_bot.png"
-                                                   WidthRequest="50" />
-                                        </Border>
-
-                                        <VerticalStackLayout Grid.Column="1">
+                                    <Grid>
+                                        <VerticalStackLayout>
                                             <Label FontAttributes="Bold"
                                                    LineBreakMode="TailTruncation"
-                                                   Text="{Binding SeriLotCode}" />
+                                                   Text="{Binding ItemCode}" />
                                             <Label LineBreakMode="TailTruncation"
-                                                   Text="{Binding SeriLotName}"
+                                                   Text="{Binding ItemName}"
                                                    TextColor="{StaticResource Gray600}" />
 
                                             <Label>
@@ -366,14 +359,14 @@
                                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
                                                            TextColor="{StaticResource Primary}" />
 
-                                                    <!--<Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OutputProductProcessBasketListViewModel}}, Path=}" CommandParameter="{Binding .}" />
-                                                    </Border.GestureRecognizers>-->
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OutputProductProcessBasketListViewModel}}, Path=SerilotTransactionDecreaseCommand}" CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
                                                 </Border>
                                                 <Label Grid.Column="1"
                                                        FontAttributes="Bold"
                                                        FontSize="Large"
-                                                       Text="{Binding Quantity}"
+                                                       Text="{Binding TempQuantity}"
                                                        TextColor="{StaticResource Primary}"
                                                        VerticalOptions="Center" />
                                                 <Border Grid.Column="2"
@@ -386,9 +379,9 @@
                                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
                                                            TextColor="{StaticResource White}" />
 
-                                                    <!--<Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OutputProductProcessBasketListViewModel}}, Path=}" CommandParameter="{Binding .}" />
-                                                    </Border.GestureRecognizers>-->
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OutputProductProcessBasketListViewModel}}, Path=SerilotTransactionIncreaseCommand}" CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
                                                 </Border>
                                             </Grid>
                                         </VerticalStackLayout>
@@ -400,6 +393,7 @@
                     </CollectionView>
                     <Button Grid.Row="2"
                             Margin="10,10,10,20"
+                            Command="{Binding ConfirmSerilotTransactionCommand}"
                             Text="Tamam" />
                 </Grid>
 

@@ -27,6 +27,8 @@ public class SerilotTransaction : INotifyPropertyChanged, IDisposable
 	private double _remainingQuantity;
 	private double _remainingUnitQuantity;
 
+	private double tempQuantity = 0;
+
     public SerilotTransaction()
     {
     }
@@ -255,6 +257,17 @@ public class SerilotTransaction : INotifyPropertyChanged, IDisposable
 		{
 			if (_remainingUnitQuantity == value) return;
 			_remainingUnitQuantity = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	public double TempQuantity
+	{
+		get => tempQuantity;
+		set
+		{
+			if (tempQuantity == value) return;
+			tempQuantity = value;
 			NotifyPropertyChanged();
 		}
 	}
