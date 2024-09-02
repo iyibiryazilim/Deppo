@@ -88,6 +88,9 @@
 	  <Compile Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessCustomerListView.xaml.cs">
 	    <DependentUpon>OutputProductSalesOrderProcessCustomerListView.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessProductListView.xaml.cs">
+	    <DependentUpon>OutputProductSalesOrderProcessProductListView.xaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -148,10 +151,16 @@
 	  <MauiXaml Update="Modules\SalesModule\CustomerMenu\Views\CustomerOutputTransactionView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessBasketListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessCustomerListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessProductListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
