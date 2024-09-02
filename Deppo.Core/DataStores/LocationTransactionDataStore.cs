@@ -118,14 +118,23 @@ public class LocationTransactionDataStore : ILocationTransactionService
         [ReferenceId] = LGMAIN.LOGICALREF,
         [TransactionReferenceId] = LGMAIN.STTRANSREF,
         [TransactionFicheReferenceId] = LGMAIN.STFICHEREF,
-		[SerilotReferenceId] = LGMAIN.SERILOTN,
+		[SerilotReferenceId] = LGMAIN.SLREF,
         [InTransactionReferenceId] = LGMAIN.INTRANSREF,
         [InSerilotTransactionReferenceId] = LGMAIN.INSLTRANSREF,
         [SerilotCode] = ISNULL(SERILOT.CODE, ''),
         [SerilotName] = ISNULL(SERILOT.NAME, ''),
-        [LocationReferenceId] = LGMAIN.LOCREF,
-        [LocationCode] = INVLOC.CODE,
-        [LocationName] = INVLOC.NAME,
+        [LocationReferenceId] = ISNULL(LGMAIN.LOCREF, 0),
+        [LocationCode] = ISNULL(INVLOC.CODE, ''),
+        [LocationName] = ISNULL(INVLOC.NAME, ''),
+        [SubUnitsetReferenceId] = USLINE.LOGICALREF,
+        [SubUnitsetCode] = USLINE.CODE,
+        [SubUnitsetName] = USLINE.NAME,
+        [UnitsetReferenceId] = UNITSET.LOGICALREF,
+		[UnitsetCode] = UNITSET.CODE,
+		[UnitsetName] = UNITSET.NAME,
+        [ItemReferenceId] = ITEMS.LOGICALREF,
+		[ItemCode] = ITEMS.CODE,
+		[ItemName] = ITEMS.NAME,
         [Quantity] = LGMAIN.AMOUNT,
         [RemainingQuantity] = LGMAIN.REMAMOUNT,
         [RemainingUnitQuantity] = LGMAIN.REMLNUNITAMNT
@@ -141,8 +150,6 @@ public class LocationTransactionDataStore : ILocationTransactionService
               (LGMAIN.LPRODSTAT = 0) AND 
               (LGMAIN.ITEMREF = {productReferenceId}) AND
               (LGMAIN.INVENNO = {warehouseNumber}) AND
-              (LGMAIN.LOCREF = {locationRef}) AND
-              (LGMAIN.SERILOTN = {serilotRef})
 		      (LGMAIN.EXIMFCTYPE IN ( 0 , 4 , 5 , 3 , 2 , 7 )) AND 
               (LGMAIN.STATUS = 0) AND 
               (LGMAIN.REMAMOUNT > 0) AND
@@ -151,10 +158,10 @@ public class LocationTransactionDataStore : ILocationTransactionService
 
 		if (!string.IsNullOrEmpty(search))
 		{
-			baseQuery += $@" AND (LOCATION.CODE LIKE '{search}%' OR LOCATION.NAME LIKE '%{search}%')";
+			baseQuery += $@" AND (INVLOC.CODE LIKE '{search}%' OR INVLOC.NAME LIKE '%{search}%')";
 		}
 
-		baseQuery += $@" ORDER BY LOCATION.CODE OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+		baseQuery += $@" ORDER BY INVLOC.CODE OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
 		return baseQuery;
 	}
@@ -165,14 +172,23 @@ public class LocationTransactionDataStore : ILocationTransactionService
         [ReferenceId] = LGMAIN.LOGICALREF,
         [TransactionReferenceId] = LGMAIN.STTRANSREF,
         [TransactionFicheReferenceId] = LGMAIN.STFICHEREF,
-		[SerilotReferenceId] = LGMAIN.SERILOTN,
+		[SerilotReferenceId] = LGMAIN.SLREF,
         [InTransactionReferenceId] = LGMAIN.INTRANSREF,
         [InSerilotTransactionReferenceId] = LGMAIN.INSLTRANSREF,
         [SerilotCode] = ISNULL(SERILOT.CODE, ''),
         [SerilotName] = ISNULL(SERILOT.NAME, ''),
-        [LocationReferenceId] = LGMAIN.LOCREF,
-        [LocationCode] = INVLOC.CODE,
-        [LocationName] = INVLOC.NAME,
+        [LocationReferenceId] = ISNULL(LGMAIN.LOCREF, 0),
+        [LocationCode] = ISNULL(INVLOC.CODE, ''),
+        [LocationName] = ISNULL(INVLOC.NAME, ''),
+        [SubUnitsetReferenceId] = USLINE.LOGICALREF,
+        [SubUnitsetCode] = USLINE.CODE,
+        [SubUnitsetName] = USLINE.NAME,
+        [UnitsetReferenceId] = UNITSET.LOGICALREF,
+		[UnitsetCode] = UNITSET.CODE,
+		[UnitsetName] = UNITSET.NAME,
+        [ItemReferenceId] = ITEMS.LOGICALREF,
+		[ItemCode] = ITEMS.CODE,
+		[ItemName] = ITEMS.NAME,
         [Quantity] = LGMAIN.AMOUNT,
         [RemainingQuantity] = LGMAIN.REMAMOUNT,
         [RemainingUnitQuantity] = LGMAIN.REMLNUNITAMNT
@@ -188,8 +204,6 @@ public class LocationTransactionDataStore : ILocationTransactionService
               (LGMAIN.LPRODSTAT = 0) AND 
               (LGMAIN.ITEMREF = {productReferenceId}) AND
               (LGMAIN.INVENNO = {warehouseNumber}) AND
-              (LGMAIN.LOCREF = {locationRef}) AND
-              (LGMAIN.SERILOTN = {serilotRef})
 		      (LGMAIN.EXIMFCTYPE IN ( 0 , 4 , 5 , 3 , 2 , 7 )) AND 
               (LGMAIN.STATUS = 0) AND 
               (LGMAIN.REMAMOUNT > 0) AND
@@ -198,10 +212,10 @@ public class LocationTransactionDataStore : ILocationTransactionService
 
 		if (!string.IsNullOrEmpty(search))
 		{
-			baseQuery += $@" AND (LOCATION.CODE LIKE '{search}%' OR LOCATION.NAME LIKE '%{search}%')";
+			baseQuery += $@" AND (INVLOC.CODE LIKE '{search}%' OR INVLOC.NAME LIKE '%{search}%')";
 		}
 
-		baseQuery += $@" ORDER BY LOCATION.CODE OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+		baseQuery += $@" ORDER BY INVLOC.CODE OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
 		return baseQuery;
 	}
