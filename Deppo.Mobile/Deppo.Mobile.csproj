@@ -82,6 +82,12 @@
 	  <Compile Update="Modules\PurchaseModule\SupplierMenu\Views\SupplierDetailView.xaml.cs">
 	    <DependentUpon>SupplierDetailView.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessWarehouseListView.xaml.cs">
+	    <DependentUpon>OutputProductSalesOrderProcessWarehouseListView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessCustomerListView.xaml.cs">
+	    <DependentUpon>OutputProductSalesOrderProcessCustomerListView.xaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -142,12 +148,16 @@
 	  <MauiXaml Update="Modules\SalesModule\CustomerMenu\Views\CustomerOutputTransactionView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessCustomerListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 
 	<ItemGroup>
 	  <Folder Include="Modules/ProductModule/ProductProcess/TransferProductProcess/" />
-	  <Folder Include="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\ViewModels\" />
-	  <Folder Include="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\" />
 	</ItemGroup>
 
 </Project>
