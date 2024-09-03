@@ -1,42 +1,31 @@
 ﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
 
-namespace Deppo.Core.Models;
+namespace Deppo.Mobile.Core.Models.SalesModels.BasketModels;
 
-public class LocationTransaction :INotifyPropertyChanged, IDisposable
+public class OutputSalesBasketOrderDetailModel : INotifyPropertyChanged, IDisposable
 {
 	private int _referenceId;
 	private int _transactionReferenceId;
 	private int _transactionFicheReferenceId;
-	private int _serilotReferenceId;
+	private int _seriLotReferenceId;
 	private int _inTransactionReferenceId;
 	private int _inSerilotTransactionReferenceId;
-	private string _serilotCode = string.Empty;
-	private string _serilotName = string.Empty;
+	private string _seriLotCode = string.Empty;
+	private string _seriLotName = string.Empty;
 	private int _locationReferenceId;
 	private string _locationCode = string.Empty;
 	private string _locationName = string.Empty;
-	private int _subUnitsetReferenceId;
-	private string _subUnitsetCode = string.Empty;
-	private string _subUnitsetName = string.Empty;
-	private int _unitsetReferenceId;
-	private string _unitsetCode = string.Empty;
-	private string _unitsetName = string.Empty;
-	private int itemReferenceId;
-	private string _itemCode = string.Empty;
-	private string _itemName = string.Empty;
 	private double _quantity;
 	private double _remainingQuantity;
 	private double _remainingUnitQuantity;
 
-	private double tempQuantity = 0;
-
-	public LocationTransaction()
+	public OutputSalesBasketOrderDetailModel()
 	{
+
 	}
 
-	[Key]
+	[Browsable(false)]
 	public int ReferenceId
 	{
 		get => _referenceId;
@@ -73,13 +62,13 @@ public class LocationTransaction :INotifyPropertyChanged, IDisposable
 	}
 
 	[Browsable(false)]
-	public int SerilotReferenceId
+	public int SeriLotReferenceId
 	{
-		get => _serilotReferenceId;
+		get => _seriLotReferenceId;
 		set
 		{
-			if (_serilotReferenceId == value) return;
-			_serilotReferenceId = value;
+			if (_seriLotReferenceId == value) return;
+			_seriLotReferenceId = value;
 			NotifyPropertyChanged();
 		}
 	}
@@ -108,24 +97,26 @@ public class LocationTransaction :INotifyPropertyChanged, IDisposable
 		}
 	}
 
-	public string SerilotCode
+	[DisplayName("Seri / Lot Kodu")]
+	public string SeriLotCode
 	{
-		get => _serilotCode;
+		get => _seriLotCode;
 		set
 		{
-			if (_serilotCode == value) return;
-			_serilotCode = value;
+			if (_seriLotCode == value) return;
+			_seriLotCode = value;
 			NotifyPropertyChanged();
 		}
 	}
 
-	public string SerilotName
+	[DisplayName("Seri / Lot Adı")]
+	public string SeriLotName
 	{
-		get => _serilotName;
+		get => _seriLotName;
 		set
 		{
-			if (_serilotName == value) return;
-			_serilotName = value;
+			if (_seriLotName == value) return;
+			_seriLotName = value;
 			NotifyPropertyChanged();
 		}
 	}
@@ -142,6 +133,7 @@ public class LocationTransaction :INotifyPropertyChanged, IDisposable
 		}
 	}
 
+	[DisplayName("Stok Yeri Kodu")]
 	public string LocationCode
 	{
 		get => _locationCode;
@@ -153,6 +145,7 @@ public class LocationTransaction :INotifyPropertyChanged, IDisposable
 		}
 	}
 
+	[DisplayName("Stok Yeri Adı")]
 	public string LocationName
 	{
 		get => _locationName;
@@ -164,107 +157,7 @@ public class LocationTransaction :INotifyPropertyChanged, IDisposable
 		}
 	}
 
-	[Browsable(false)]
-	public int SubUnitsetReferenceId
-	{
-		get => _subUnitsetReferenceId;
-		set
-		{
-			if (_subUnitsetReferenceId == value) return;
-			_subUnitsetReferenceId = value;
-			NotifyPropertyChanged();
-		}
-	}
-
-	public string SubUnitsetCode
-	{
-		get => _subUnitsetCode;
-		set
-		{
-			if (_subUnitsetCode == value) return;
-			_subUnitsetCode = value;
-			NotifyPropertyChanged();
-		}
-	}
-
-	public string SubUnitsetName
-	{
-		get => _subUnitsetName;
-		set
-		{
-			if (_subUnitsetName == value) return;
-			_subUnitsetName = value;
-			NotifyPropertyChanged();
-		}
-	}
-
-	[Browsable(false)]
-	public int UnitsetReferenceId
-	{
-		get => _unitsetReferenceId;
-		set
-		{
-			if (_unitsetReferenceId == value) return;
-			_unitsetReferenceId = value;
-			NotifyPropertyChanged();
-		}
-	}
-
-	public string UnitsetCode
-	{
-		get => _unitsetCode;
-		set
-		{
-			if (_unitsetCode == value) return;
-			_unitsetCode = value;
-			NotifyPropertyChanged();
-		}
-	}
-
-	public string UnitsetName
-	{
-		get => _unitsetName;
-		set
-		{
-			if (_unitsetName == value) return;
-			_unitsetName = value;
-			NotifyPropertyChanged();
-		}
-	}
-
-	[Browsable(false)]
-	public int ItemReferenceId
-	{
-		get => itemReferenceId;
-		set
-		{
-			if (itemReferenceId == value) return;
-			itemReferenceId = value;
-			NotifyPropertyChanged();
-		}
-	}
-
-	public string ItemCode
-	{
-		get => _itemCode;
-		set
-		{
-			if (_itemCode == value) return;
-			_itemCode = value;
-			NotifyPropertyChanged();
-		}
-	}
-
-	public string ItemName
-	{
-		get => _itemName;
-		set
-		{
-			if (_itemName == value) return;
-			_itemName = value;
-			NotifyPropertyChanged();
-		}
-	}
+	[DisplayName("Miktar")]
 	public double Quantity
 	{
 		get => _quantity;
@@ -289,6 +182,7 @@ public class LocationTransaction :INotifyPropertyChanged, IDisposable
 
 	public double RemainingUnitQuantity
 	{
+
 		get => _remainingUnitQuantity;
 		set
 		{
@@ -298,18 +192,13 @@ public class LocationTransaction :INotifyPropertyChanged, IDisposable
 		}
 	}
 
-	public double TempQuantity
-	{
-		get => tempQuantity;
-		set
-		{
-			if (tempQuantity == value) return;
-			tempQuantity = value;
-			NotifyPropertyChanged();
-		}
-	}
 
 	public event PropertyChangedEventHandler? PropertyChanged;
+
+	protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+	{
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+	}
 
 	public void Dispose()
 	{
@@ -324,10 +213,5 @@ public class LocationTransaction :INotifyPropertyChanged, IDisposable
 		{
 			PropertyChanged = null;
 		}
-	}
-
-	protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-	{
-		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 }

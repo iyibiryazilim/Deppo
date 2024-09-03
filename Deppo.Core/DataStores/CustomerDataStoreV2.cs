@@ -15,7 +15,7 @@ namespace Deppo.Core.DataStores
 
         public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
         {
-            var content = new StringContent(JsonConvert.SerializeObject(ProductQuery(firmNumber, periodNumber, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(CustomerQuery(firmNumber, periodNumber, search, skip, take)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -63,7 +63,7 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        private string ProductQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+        private string CustomerQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
         {
             string baseQuery = $@"SELECT
 [ReferenceId]=CUSTOMER.LOGICALREF,
@@ -83,19 +83,19 @@ namespace Deppo.Core.DataStores
 [PostalCode]=CUSTOMER.POSTCODE,
 [TaxOffice]=CUSTOMER.TAXOFFICE,
 [TaxNumber]=CUSTOMER.TAXNR,
+[OrderReferenceCount] = ISNULL((SELECT COUNT(DISTINCT STOCKREF) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE WHERE CLIENTREF = CUSTOMER.LOGICALREF AND (AMOUNT-SHIPPEDAMOUNT) > 0 AND CLOSED = 0  AND LINETYPE = 0 AND TRCODE = 1 ),0),
 [IsActive]=
        CASE
 	      WHEN CUSTOMER.ACTIVE=0 THEN 0
 		  ELSE 1
 END
-FROM LG_001_CLCARD AS CUSTOMER
+FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CUSTOMER
 WHERE CUSTOMER.CODE LIKE '12%' AND CUSTOMER.CODE <> 'ÿ' AND CUSTOMER.ACTIVE = 0";
 
             if (!string.IsNullOrEmpty(search))
                 baseQuery += $@" AND (CUSTOMER.CODE LIKE '{search}%' OR CUSTOMER.NAME LIKE '%{search}%')";
 
-            baseQuery += $@" ORDER BY CUSTOMER.CODE DESC
-OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+            baseQuery += $@" ORDER BY CUSTOMER.CODE DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
             return baseQuery;
         }

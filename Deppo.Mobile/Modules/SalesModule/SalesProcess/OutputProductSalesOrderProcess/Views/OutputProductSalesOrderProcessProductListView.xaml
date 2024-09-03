@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views.OutputProductSalesOrderProcessProductListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:OutputProductSalesOrderProcessProductListViewModel"
+             Shell.TabBarIsVisible="False">
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid RowDefinitions="Auto, *, Auto" RowSpacing="10">
+        <Border Grid.Row="0"
+                Margin="5,0,5,0"
+                BackgroundColor="{StaticResource PrimaryLight}"
+                HeightRequest="35"
+                Stroke="{StaticResource Primary}"
+                StrokeShape="RoundRectangle 5"
+                StrokeThickness="0.5">
+            <SearchBar x:Name="searchBar"
+                       Placeholder="Ara..."
+                       PlaceholderColor="{StaticResource OffBlack}"
+                       TextColor="{StaticResource OffBlack}">
+                <!--<SearchBar.Behaviors>
+            <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                        CommandParameter="{Binding ., Source={x:Reference searchBar}}"
+                        EventName="TextChanged" />
+        </SearchBar.Behaviors>-->
+            </SearchBar>
+        </Border>
+        <CollectionView Grid.Row="1">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border>
+                        <Grid>
+                            
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <Button Grid.Row="2"
+                Margin="10,10,10,20"
+                Command="{Binding NextViewCommand}"
+                Text="İleri" />
+    </Grid>
+</ContentPage>

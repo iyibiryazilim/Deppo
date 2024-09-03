@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views.OutputProductSalesOrderProcessCustomerListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:customerModel="clr-namespace:Deppo.Mobile.Core.Models.SalesModels;assembly=Deppo.Mobile.Core"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:OutputProductSalesOrderProcessCustomerListViewModel"
+             Shell.TabBarIsVisible="False">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid RowDefinitions="*, Auto">
+        <Grid Grid.Row="0"
+              Padding="10"
+              RowDefinitions="Auto, *"
+              RowSpacing="10">
+            <!--#region Search-->
+            <Border Grid.Row="0"
+                    BackgroundColor="{StaticResource PrimaryLight}"
+                    HeightRequest="35"
+                    Stroke="{StaticResource Primary}"
+                    StrokeShape="RoundRectangle 5"
+                    StrokeThickness="0.5">
+                <SearchBar x:Name="searchBar"
+                           Placeholder="Ara..."
+                           PlaceholderColor="{StaticResource OffBlack}"
+                           TextColor="{StaticResource OffBlack}">
+                    <SearchBar.Behaviors>
+                        <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                    CommandParameter="{Binding ., Source={x:Reference searchBar}}"
+                                    EventName="TextChanged" />
+                    </SearchBar.Behaviors>
+                </SearchBar>
+            </Border>
+            <!--#endregion-->
+
+            <!--#region Main list-->
+            <CollectionView Grid.Row="1"
+                            
+                            ItemsSource="{Binding Items}"
+                            RemainingItemsThreshold="2"
+                            RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="customerModel:CustomerModel">
+                        <Border BackgroundColor="Transparent"
+                                StrokeShape="RoundRectangle 6"
+                                StrokeThickness="0.2">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessCustomerListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                            <Border.Triggers>
+                                <DataTrigger Binding="{Binding IsSelected}"
+                                             TargetType="Border"
+                                             Value="True">
+                                    <Setter Property="BackgroundColor" Value="{StaticResource PrimaryLight}" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Grid Padding="10"
+                                  ColumnDefinitions="Auto, Auto, *"
+                                  ColumnSpacing="10">
+                                <toolkit:AvatarView Grid.Column="0"
+                                                    Margin="5"
+                                                    Background="{StaticResource PrimaryLight}"
+                                                    BorderColor="{StaticResource Primary}"
+                                                    CornerRadius="200"
+                                                    FontAttributes="Bold"
+                                                    FontSize="16"
+                                                    HeightRequest="50"
+                                                    Text="{Binding TitleName}"
+                                                    TextColor="{StaticResource OffBlack}"
+                                                    VerticalOptions="Start"
+                                                    WidthRequest="50">
+                                    <toolkit:AvatarView.Triggers>
+                                        <DataTrigger Binding="{Binding IsSelected}"
+                                                     TargetType="toolkit:AvatarView"
+                                                     Value="True">
+                                            <Setter Property="Background" Value="{StaticResource Primary}" />
+                                            <Setter Property="TextColor" Value="{StaticResource White}" />
+                                        </DataTrigger>
+                                    </toolkit:AvatarView.Triggers>
+                                </toolkit:AvatarView>
+
+                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                    <Label FontAttributes="Bold"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="1"
+                                           Text="{Binding Title}">
+                                        <Label.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected}"
+                                                         TargetType="Label"
+                                                         Value="True">
+                                                <Setter Property="TextColor" Value="{StaticResource White}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+
+                                    <Label HorizontalOptions="Start"
+                                           LineBreakMode="TailTruncation"
+                                           TextColor="{StaticResource Gray600}"
+                                           VerticalOptions="Center"
+                                           WidthRequest="200">
+                                        <Label.Text>
+                                            <MultiBinding StringFormat="{}{0} / {1}">
+                                                <Binding Path="Country" />
+                                                <Binding Path="City" />
+                                            </MultiBinding>
+                                        </Label.Text>
+                                        <Label.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected}"
+                                                         TargetType="Label"
+                                                         Value="True">
+                                                <Setter Property="TextColor" Value="{StaticResource WhiteSmoke}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Image Aspect="AspectFit"
+                                               HeightRequest="16"
+                                               VerticalOptions="Center"
+                                               WidthRequest="16">
+                                            <Image.Source>
+                                                <FontImageSource FontFamily="FAS"
+                                                                 x:Name="FontImageBox"
+                                                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                                 Size="16"
+                                                                 Color="{StaticResource Primary}">
+                                                </FontImageSource>
+                                            </Image.Source>
+                                            <!--<Image.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected}"
+                                                             TargetType="Image"
+                                                             Value="True">
+                                                    <Setter TargetName="FontImageBox" Property="FontImageSource.Color" Value="{StaticResource Secondary}" />
+                                                </DataTrigger>
+                                            </Image.Triggers>-->
+                                        </Image>
+                                        <Label HorizontalOptions="Start"
+                                               LineBreakMode="TailTruncation"
+                                               Text="{Binding OrderReferenceCount}"
+                                               TextColor="{StaticResource Gray600}"
+                                               VerticalOptions="Center">
+                                            <Label.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected}"
+                                                             TargetType="Label"
+                                                             Value="True">
+                                                    <Setter Property="TextColor" Value="{StaticResource Secondary}" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            <!--#endregion-->
+        </Grid>
+        <Button Grid.Row="1"
+                Margin="10,10,10,20"
+                Command="{Binding NextViewCommand}"
+                IsEnabled="{Binding SelectedCustomerModel, Converter={StaticResource IsNotNullConverter}}"
+                Text="İleri" />
+    </Grid>
+</ContentPage>

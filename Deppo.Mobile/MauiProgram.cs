@@ -46,6 +46,8 @@ using Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels;
 using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesPanel.ViewModels;
 using Deppo.Mobile.Modules.SalesModule.SalesPanel.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.ViewModels;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ViewModels;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.WaitingOrderMenu.ViewModels;
@@ -233,6 +235,13 @@ public static class MauiProgram
         builder.Services.AddSingletonWithShellRoute<CustomerOutputTransactionView, CustomerOutputTransactionViewModel>(nameof(CustomerOutputTransactionView));
         builder.Services.AddSingletonWithShellRoute<WaitingSalesOrderListView, WaitingSalesOrderListViewModel>(nameof(WaitingSalesOrderListView));
         builder.Services.AddSingletonWithShellRoute<SalesProcessView, SalesProcessViewModel>(nameof(SalesProcessView));
+
+        #region OutputProductSalesOrderProcess Modules
+        builder.Services.AddTransientWithShellRoute<OutputProductSalesOrderProcessWarehouseListView, OutputProductSalesOrderProcessWarehouseListViewModel>(nameof(OutputProductSalesOrderProcessWarehouseListView));
+        builder.Services.AddTransientWithShellRoute<OutputProductSalesOrderProcessCustomerListView, OutputProductSalesOrderProcessCustomerListViewModel>(nameof(OutputProductSalesOrderProcessCustomerListView));
+        builder.Services.AddTransientWithShellRoute<OutputProductSalesOrderProcessProductListView, OutputProductSalesOrderProcessProductListViewModel>(nameof(OutputProductSalesOrderProcessProductListView));
+        builder.Services.AddScopedWithShellRoute<OutputProductSalesOrderProcessBasketListView, OutputProductSalesOrderProcessBasketListViewModel>(nameof(OutputProductSalesOrderProcessBasketListView));
+        #endregion
 
         #endregion Sales Modules
 

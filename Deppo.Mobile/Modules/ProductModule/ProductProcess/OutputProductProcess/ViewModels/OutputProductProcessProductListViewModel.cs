@@ -8,7 +8,6 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
-using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Converters;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Views;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
@@ -24,6 +23,29 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 	private readonly IServiceProvider _serviceProvider;
 	private readonly IVariantService _variantService;
 	private readonly IUserDialogs _userDialogs;
+
+	private bool IsSearchMode
+	{
+		get
+		{
+			if(CurrentPage is OutputProductProcessProductListView)
+			{
+				SearchBar searchBar = (SearchBar)CurrentPage.FindByName("searchBar");
+				if(searchBar is not null)
+				{
+					if (string.IsNullOrEmpty(searchBar.Text))
+						return false;
+					else
+						return true;
+				}
+				else 
+					return false;
+			}
+			else
+				return false;
+		}
+	}
+
 	public OutputProductProcessProductListViewModel(IHttpClientService httpClientService, IWarehouseTotalService warehouseTotalService, IServiceProvider serviceProvider, IVariantService variantService, IUserDialogs userDialogs)
 	{
 		_httpClientService = httpClientService;
@@ -42,6 +64,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 		VariantTappedCommand = new Command<VariantModel>(async (parameter) => await VariantTappedAsync(parameter));
 		ConfirmVariantCommand = new Command(async () => await ConfirmVariantAsync());
 		ConfirmCommand = new Command(async () => await ConfirmAsync());
+		PerformSearchCommand = new Command<SearchBar>(async (parameter) => await PerformSearchAsync(parameter));
 		BackCommand = new Command(async () => await BackAsync());
 	}
 
@@ -54,6 +77,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 	public Command VariantTappedCommand { get; }
 	public Command ConfirmVariantCommand { get; }
 	public Command ConfirmCommand { get; }
+	public Command<SearchBar> PerformSearchCommand { get; }
 	public Command BackCommand { get; }
 	#endregion
 
@@ -61,10 +85,8 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 	public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
 	public ObservableCollection<VariantModel> ItemVariants { get; } = new();
 
-
 	[ObservableProperty]
 	public ObservableCollection<OutputProductBasketModel> selectedProducts = new();
-
 	#endregion
 
 	#region Properties
@@ -99,8 +121,8 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 
 				foreach (var product in result.Data)
 				{
+					
 					var item = Mapping.Mapper.Map<WarehouseTotal>(product);
-
 					Items.Add(new WarehouseTotalModel
 					{
 						ProductReferenceId = item.ProductReferenceId,
@@ -111,10 +133,14 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 						UnitsetName = item.UnitsetName,
 						SubUnitsetReferenceId = item.SubUnitsetReferenceId,
 						SubUnitsetCode = item.SubUnitsetCode,
+						SubUnitsetName = item.SubUnitsetName,
 						StockQuantity = item.StockQuantity,
 						WarehouseReferenceId = item.WarehouseReferenceId,
 						WarehouseName = item.WarehouseName,
 						WarehouseNumber = item.WarehouseNumber,
+						LocTracking = item.LocTracking,
+						IsVariant = item.IsVariant,
+						TrackingType = item.TrackingType,
 						IsSelected = false,
 					});
 				}
@@ -165,10 +191,14 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 						UnitsetName = item.UnitsetName,
 						SubUnitsetReferenceId = item.SubUnitsetReferenceId,
 						SubUnitsetCode = item.SubUnitsetCode,
+						SubUnitsetName = item.SubUnitsetName,
 						StockQuantity = item.StockQuantity,
 						WarehouseReferenceId = item.WarehouseReferenceId,
 						WarehouseName = item.WarehouseName,
 						WarehouseNumber = item.WarehouseNumber,
+						LocTracking = item.LocTracking,
+						IsVariant = item.IsVariant,
+						TrackingType = item.TrackingType,
 						IsSelected = false,
 					});
 				}
@@ -213,7 +243,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 					{
 						Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
 						SelectedProduct = item;
-						
+
 						var basketItem = new OutputProductBasketModel
 						{
 							ItemReferenceId = item.ProductReferenceId,
@@ -435,6 +465,75 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 				}
 
 				await Shell.Current.GoToAsync($"..");
+			}
+		}
+		catch (Exception ex)
+		{
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task PerformSearchAsync(SearchBar searchBar)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			if(string.IsNullOrWhiteSpace(searchBar.Text))
+			{
+				await LoadItemsAsync();
+				searchBar.Unfocus();
+				return;
+			}
+			else
+			{
+				if(searchBar.Text.Length > 5)
+				{
+					IsBusy = true;
+					Items.Clear();
+					_userDialogs.Loading("Searching Items...");
+					var httpClient = _httpClientService.GetOrCreateHttpClient();
+					await Task.Delay(1000);
+					var result = await _warehouseTotalService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, searchBar.Text, 0, 20);
+					if(result.IsSuccess)
+					{
+						if (result.Data is null)
+							return;
+
+						foreach (var product in result.Data)
+						{
+							var item = Mapping.Mapper.Map<WarehouseTotal>(product);
+
+							Items.Add(new WarehouseTotalModel
+							{
+								ProductReferenceId = item.ProductReferenceId,
+								ProductCode = item.ProductCode,
+								ProductName = item.ProductName,
+								UnitsetReferenceId = item.UnitsetReferenceId,
+								UnitsetCode = item.UnitsetCode,
+								UnitsetName = item.UnitsetName,
+								SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+								SubUnitsetCode = item.SubUnitsetCode,
+								SubUnitsetName = item.SubUnitsetName,
+								StockQuantity = item.StockQuantity,
+								WarehouseReferenceId = item.WarehouseReferenceId,
+								WarehouseName = item.WarehouseName,
+								WarehouseNumber = item.WarehouseNumber,
+								IsVariant = item.IsVariant,
+								LocTracking = item.LocTracking,
+								TrackingType = item.TrackingType,
+								IsSelected = false,
+							});
+						}
+					}
+
+					_userDialogs.Loading().Hide();
+					searchBar.Unfocus();
+				}
 			}
 		}
 		catch (Exception ex)

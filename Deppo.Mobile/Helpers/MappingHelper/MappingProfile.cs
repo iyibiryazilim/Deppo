@@ -27,6 +27,9 @@ public class MappingProfile : Profile
         CreateMap<Variant, dynamic>();
         CreateMap<Supplier, dynamic>();
         CreateMap<SupplierModel, dynamic>();
+        CreateMap<CustomerModel, dynamic>();
         CreateMap<OutputProductBasketDetailModel, dynamic>();
+        CreateMap<LocationTransaction, dynamic>();
+        CreateMap<SerilotTransaction, dynamic>();
     }
 }

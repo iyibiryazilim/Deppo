@@ -98,6 +98,9 @@
                             <Grid Grid.Column="0"
                                   ColumnDefinitions="Auto,*"
                                   ColumnSpacing="10">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OutputProductSalesOrderProcessCommand}" />
+                                </Grid.GestureRecognizers>
                                 <Border Padding="5"
                                         BackgroundColor="{StaticResource Primary}"
                                         StrokeShape="RoundRectangle 5">
