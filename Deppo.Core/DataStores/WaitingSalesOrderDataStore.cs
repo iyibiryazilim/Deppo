@@ -79,8 +79,8 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
             [IsVariant] = ITEMS.CANCONFIGURE,
             [Quantity] = ORFLINE.AMOUNT,
             [ShippedQuantity] = ORFLINE.SHIPPEDAMOUNT,
-            [WaitingQuantity] = (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT)
-            
+            [WaitingQuantity] = (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT),
+            [OrderDate] = ORFLINE.DATE_
         FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFICHE AS ORFICHE ON ORFLINE.ORDFICHEREF = ORFICHE.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON ORFICHE.CLIENTREF = CLCARD.LOGICALREF

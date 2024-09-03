@@ -1,5 +1,4 @@
-﻿using Android.OS;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
@@ -10,7 +9,6 @@ using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views;
 using System.Collections.ObjectModel;
-using System.Runtime.CompilerServices;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.ViewModels;
 
@@ -79,7 +77,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 		{
 			_userDialogs.Alert(ex.Message);
 		}
-		
+
 	}
 
 	private async Task LoadItemsAsync()
@@ -95,7 +93,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 			await Task.Delay(1000);
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			await GetSalesOrders(skip: 0, take: 20);
-			if(SalesOrders.Count > 0)
+			if (SalesOrders.Count > 0)
 			{
 				var groupByCustomer = SalesOrders.GroupBy(x => x.CustomerReferenceId);
 				foreach (var item in groupByCustomer)
@@ -129,7 +127,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 					Items.Add(salesCustomer);
 				}
 			}
-			
+
 
 			Console.WriteLine(Items);
 
@@ -219,22 +217,22 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 		{
 			IsBusy = true;
 
-			if(SelectedSalesCustomer == item)
+			if (SelectedSalesCustomer == item)
 			{
 				SelectedSalesCustomer.IsSelected = false;
 				SelectedSalesCustomer = null;
 			}
-            else
-            {
-				if(SelectedSalesCustomer is not null)
+			else
+			{
+				if (SelectedSalesCustomer is not null)
 				{
 					SelectedSalesCustomer.IsSelected = false;
 				}
 				SelectedSalesCustomer = item;
 				SelectedSalesCustomer.IsSelected = true;
-            }
-        }
-		catch(Exception ex)
+			}
+		}
+		catch (Exception ex)
 		{
 			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
@@ -252,20 +250,21 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 		{
 			IsBusy = true;
 
-			if(SelectedSalesCustomer is not null)
+			if (SelectedSalesCustomer is not null)
 			{
 				await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessProductListView)}", new Dictionary<string, object>
 				{
 					[nameof(SalesCustomer)] = SelectedSalesCustomer,
 					[nameof(WarehouseModel)] = WarehouseModel,
 				});
-			} else
+			}
+			else
 			{
 				_userDialogs.Alert("Lütfen bir müşteri seçiniz.", "Hata", "Tamam");
 			}
-			
-			
-			
+
+
+
 		}
 		catch (Exception ex)
 		{
