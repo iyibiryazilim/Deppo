@@ -20,11 +20,12 @@ public class WaitingSalesOrder : INotifyPropertyChanged, IDisposable
 	private int _subUnitsetReferenceId;
 	private string _subUnitsetCode = string.Empty;
 	private string _subUnitsetName = string.Empty;
+	private bool _isVariant;
 	private double _quantity;
 	private double _shippedQuantity;
 	private double _waitingQuantity;
-	private DateTime _orderDate;
-	private DateTime _dueDate;
+	//private DateTime _orderDate;
+	//private DateTime _dueDate;
 
     public WaitingSalesOrder()
     {
@@ -189,6 +190,17 @@ public class WaitingSalesOrder : INotifyPropertyChanged, IDisposable
 			NotifyPropertyChanged();
 		}
 	}
+
+	public bool IsVariant
+	{
+		get => _isVariant;
+		set
+		{
+			if (_isVariant == value) return;
+			_isVariant = value;
+			NotifyPropertyChanged();
+		}
+	}
 	
 	public double Quantity
 	{
@@ -223,27 +235,27 @@ public class WaitingSalesOrder : INotifyPropertyChanged, IDisposable
 		}
 	}
 
-	public DateTime OrderDate
-	{
-		get => _orderDate;
-		set
-		{
-			if (_orderDate == value) return;
-			_orderDate = value;
-			NotifyPropertyChanged();
-		}
-	}
+	//public DateTime OrderDate
+	//{
+	//	get => _orderDate;
+	//	set
+	//	{
+	//		if (_orderDate == value) return;
+	//		_orderDate = value;
+	//		NotifyPropertyChanged();
+	//	}
+	//}
 
-	public DateTime DueDate
-	{
-		get => _dueDate;
-		set
-		{
-			if (_dueDate == value) return;
-			_dueDate = value;
-			NotifyPropertyChanged();
-		}
-	}
+	//public DateTime DueDate
+	//{
+	//	get => _dueDate;
+	//	set
+	//	{
+	//		if (_dueDate == value) return;
+	//		_dueDate = value;
+	//		NotifyPropertyChanged();
+	//	}
+	//}
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 

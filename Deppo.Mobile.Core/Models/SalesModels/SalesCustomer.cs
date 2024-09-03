@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Deppo.Mobile.Core.Models.SalesModels;
 
-public class SalesCustomer : ObservableObject
+public partial class SalesCustomer : ObservableObject
 {
     [ObservableProperty]
     private int _referenceId;

@@ -1,6 +1,7 @@
 ﻿using Android.OS;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
@@ -9,6 +10,7 @@ using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views;
 using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.ViewModels;
 
@@ -17,20 +19,18 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderP
 public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
-	private readonly ICustomerService _customerService;
+	private readonly IWaitingSalesOrderService _waitingSalesOrderService;
 	private readonly IUserDialogs _userDialogs;
-	public OutputProductSalesOrderProcessCustomerListViewModel(IHttpClientService httpClientService, ICustomerService customerService, IUserDialogs userDialogs)
+	public OutputProductSalesOrderProcessCustomerListViewModel(IHttpClientService httpClientService, IWaitingSalesOrderService waitingSalesOrderService, IUserDialogs userDialogs)
 	{
 		_httpClientService = httpClientService;
-		_customerService = customerService;
+		_waitingSalesOrderService = waitingSalesOrderService;
 		_userDialogs = userDialogs;
 
 		Title = "Müşteri seçimi";
 
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-		ItemTappedCommand = new Command<CustomerModel>(ItemTappedAsync);
-		PerformSearchCommand = new Command<SearchBar>(async (searchBar) => await PerformSearchAsync(searchBar));
 		NextViewCommand = new Command(async () => await NextViewAsync());
 	}
 
@@ -43,17 +43,40 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 	#endregion
 
 	#region Collections
-	public ObservableCollection<CustomerModel> Items { get; } = new();
+	public ObservableCollection<SalesCustomer> Items { get; } = new();
+	public ObservableCollection<WaitingSalesOrder> SalesOrders { get; } = new();
 
 	#endregion
 
 	#region Properties
 	[ObservableProperty]
 	WarehouseModel warehouseModel = null!;
-
-	[ObservableProperty]
-	CustomerModel? selectedCustomerModel;
 	#endregion
+
+	private async Task GetSalesOrders(int skip = 0, int take = 20)
+	{
+		try
+		{
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _waitingSalesOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, skip: skip, take: take);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+				foreach (var item in result.Data)
+				{
+					var obj = Mapping.Mapper.Map<WaitingSalesOrder>(item);
+					SalesOrders.Add(obj);
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			_userDialogs.Alert(ex.Message);
+		}
+		
+	}
 
 	private async Task LoadItemsAsync()
 	{
@@ -67,20 +90,44 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 			Items.Clear();
 			await Task.Delay(1000);
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-
-			var result = await _customerService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber);
-
-			if (result.IsSuccess)
+			await GetSalesOrders(skip: 0, take: 20);
+			if(SalesOrders.Count > 0)
 			{
-				if (result.Data is null)
-					return;
-
-				foreach (var item in result.Data)
+				var groupByCustomer = SalesOrders.GroupBy(x => x.CustomerReferenceId);
+				foreach (var item in groupByCustomer)
 				{
-					var obj = Mapping.Mapper.Map<CustomerModel>(item);
-					Items.Add(obj);
+					SalesCustomer salesCustomer = new();
+					salesCustomer.ReferenceId = item.Key;
+					salesCustomer.Code = item.FirstOrDefault().CustomerCode;
+					salesCustomer.Name = item.FirstOrDefault().CustomerName;
+					salesCustomer.ProductReferenceCount = item.GroupBy(x => x.ProductReferenceId).Count();
+
+					var groupByProduct = item.ToList().GroupBy(x => x.ProductReferenceId);
+					salesCustomer.Products = new();
+
+					foreach (var product in groupByProduct)
+					{
+						SalesCustomerProduct salesCustomerProduct = new();
+						salesCustomerProduct.ReferenceId = product.Key;
+						salesCustomerProduct.ItemReferenceId = product.FirstOrDefault().ProductReferenceId;
+						salesCustomerProduct.ItemCode = product.FirstOrDefault().ProductCode;
+						salesCustomerProduct.ItemName = product.FirstOrDefault().ProductName;
+						salesCustomerProduct.IsVariant = product.FirstOrDefault().IsVariant;
+						salesCustomerProduct.ShippedQuantity = product.Sum(x => x.ShippedQuantity);
+						salesCustomerProduct.WaitingQuantity = product.Sum(x => x.WaitingQuantity);
+						salesCustomerProduct.Quantity = product.Sum(x => x.Quantity);
+
+						salesCustomer.Products.Add(salesCustomerProduct);
+
+						salesCustomerProduct.Orders.AddRange(product.ToList());
+					}
+
+					Items.Add(salesCustomer);
 				}
 			}
+			
+
+			Console.WriteLine(Items);
 
 			_userDialogs.Loading().Hide();
 
@@ -107,121 +154,62 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 			IsBusy = true;
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-
-			var result = await _customerService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, skip: Items.Count, take: 20);
-
-			if (result.IsSuccess)
+			await GetSalesOrders(skip: SalesOrders.Count, take: 20);
+			if (SalesOrders.Count > 0)
 			{
-				if (result.Data is null)
-					return;
-
-				foreach (var item in result.Data)
+				var groupByCustomer = SalesOrders.GroupBy(x => x.CustomerReferenceId);
+				foreach (var item in groupByCustomer)
 				{
-					var obj = Mapping.Mapper.Map<CustomerModel>(item);
-					Items.Add(obj);
-				}
-			}
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+					SalesCustomer salesCustomer = new();
+					salesCustomer.ReferenceId = item.Key;
+					salesCustomer.Code = item.FirstOrDefault().CustomerCode;
+					salesCustomer.Name = item.FirstOrDefault().CustomerName;
+					salesCustomer.ProductReferenceCount = item.GroupBy(x => x.ProductReferenceId).Count();
 
-			_userDialogs.Alert(ex.Message);
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+					var groupByProduct = item.ToList().GroupBy(x => x.ProductReferenceId);
+					salesCustomer.Products = new();
 
-	private void ItemTappedAsync(CustomerModel item)
-	{
-		try
-		{
-			IsBusy = true;
-
-			if (SelectedCustomerModel == item)
-			{
-				SelectedCustomerModel.IsSelected = false;
-				SelectedCustomerModel = null;
-			}
-			else
-			{
-				if (SelectedCustomerModel is not null)
-				{
-					SelectedCustomerModel.IsSelected = false;
-				}
-				SelectedCustomerModel = item;
-				SelectedCustomerModel.IsSelected = true;
-			}
-
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
-
-			_userDialogs.Alert(ex.Message);
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
-
-	private async Task PerformSearchAsync(SearchBar searchBar)
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			if (string.IsNullOrWhiteSpace(searchBar.Text))
-			{
-				await LoadItemsAsync();
-				searchBar.Unfocus();
-				return;
-			}
-			else
-			{
-				if(searchBar.Text.Length > 5)
-				{
-					IsBusy = true;
-					Items.Clear();
-					_userDialogs.Loading("Searching Items...");
-					var httpClient = _httpClientService.GetOrCreateHttpClient();
-					await Task.Delay(1000);
-					var result = await _customerService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber,search: searchBar.Text, skip: 0, take: 20);
-
-					if(result.IsSuccess)
+					foreach (var product in groupByProduct)
 					{
-						if (result.Data is null)
-							return;
+						SalesCustomerProduct salesCustomerProduct = new();
+						salesCustomerProduct.ReferenceId = product.Key;
+						salesCustomerProduct.ItemReferenceId = product.FirstOrDefault().ProductReferenceId;
+						salesCustomerProduct.ItemCode = product.FirstOrDefault().ProductCode;
+						salesCustomerProduct.ItemName = product.FirstOrDefault().ProductName;
+						salesCustomerProduct.IsVariant = product.FirstOrDefault().IsVariant;
+						salesCustomerProduct.ShippedQuantity = product.Sum(x => x.ShippedQuantity);
+						salesCustomerProduct.WaitingQuantity = product.Sum(x => x.WaitingQuantity);
+						salesCustomerProduct.Quantity = product.Sum(x => x.Quantity);
 
-						foreach (var item in result.Data)
-						{
-							var obj = Mapping.Mapper.Map<CustomerModel>(item);
-							Items.Add(obj);
-						}
+						salesCustomer.Products.Add(salesCustomerProduct);
+
+						salesCustomerProduct.Orders.AddRange(product.ToList());
 					}
 
-					_userDialogs.Loading().Hide();
-					searchBar.Unfocus();
+					Items.Add(salesCustomer);
 				}
 			}
+
+
+			Console.WriteLine(Items);
+
+			_userDialogs.Loading().Hide();
+
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+			_userDialogs.Alert(ex.Message);
 		}
 		finally
 		{
 			IsBusy = false;
 		}
 	}
+
+
 
 	private async Task NextViewAsync()
 	{
@@ -231,14 +219,12 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 		{
 			IsBusy = true;
 
-			if (SelectedCustomerModel is not null)
+			
+			await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessProductListView)}", new Dictionary<string, object>
 			{
-				await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessProductListView)}", new Dictionary<string, object>
-				{
-					[nameof(WarehouseModel)] = WarehouseModel,
-					[nameof(CustomerModel)] = SelectedCustomerModel
-				});
-			}
+				[nameof(WarehouseModel)] = WarehouseModel,
+			});
+			
 		}
 		catch (Exception ex)
 		{

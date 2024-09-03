@@ -31,7 +31,7 @@ public partial class SalesCustomerProduct : ObservableObject
     private bool _isVariant;
 
     [ObservableProperty]
-    private double _orderQuantity;
+    private double _quantity;
 
     [ObservableProperty]
     private double _shippedQuantity;

@@ -31,5 +31,7 @@ public class MappingProfile : Profile
         CreateMap<OutputProductBasketDetailModel, dynamic>();
         CreateMap<LocationTransaction, dynamic>();
         CreateMap<SerilotTransaction, dynamic>();
-    }
+        CreateMap<SalesCustomer, dynamic>();
+		CreateMap<WaitingSalesOrder, dynamic>();
+	}
 }
