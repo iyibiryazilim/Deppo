@@ -34,6 +34,8 @@ using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchasePanel.ViewModels;
 using Deppo.Mobile.Modules.PurchaseModule.PurchasePanel.Views;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.ViewModels;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ViewModels;
@@ -181,6 +183,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<ILocationTransactionService, LocationTransactionDataStore>();
         builder.Services.AddSingleton<ISeriLotService, SeriLotDataStore>();
         builder.Services.AddSingleton<ILocationService, LocationDataStore>();
+        builder.Services.AddSingleton<IWaitingPurchaseOrderService, WaitingPurchaseOrderDataStore>();
 
         builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
         builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
@@ -222,6 +225,7 @@ public static class MauiProgram
         builder.Services.AddScopedWithShellRoute<OutputProductProcessBasketListView, OutputProductProcessBasketListViewModel>(nameof(OutputProductProcessBasketListView));
         builder.Services.AddTransientWithShellRoute<OutputProductProcessProductListView, OutputProductProcessProductListViewModel>(nameof(OutputProductProcessProductListView));
         builder.Services.AddTransientWithShellRoute<OutputProductProcessFormView, OutputProductProcessFormViewModel>(nameof(OutputProductProcessFormView));
+
         #endregion OutputProductProcess Modules
 
         #endregion Product Modules
@@ -254,11 +258,18 @@ public static class MauiProgram
         builder.Services.AddSingletonWithShellRoute<SupplierOutputTransactionView, SupplierOutputTransactionViewModel>(nameof(SupplierOutputTransactionView));
         builder.Services.AddSingletonWithShellRoute<WaitingPurchaseOrderListView, WaitingPurchaseOrderListViewModel>(nameof(WaitingPurchaseOrderListView));
         builder.Services.AddSingletonWithShellRoute<PurchaseProcessView, PurchaseProcessViewModel>(nameof(PurchaseProcessView));
-        builder.Services.AddSingletonWithShellRoute<InputProductProcessPurchaseWarehouseListView, InputProductProcessPurchaseWarehouseListViewModel>(nameof(InputProductProcessPurchaseWarehouseListView));
-        builder.Services.AddSingletonWithShellRoute<InputProductProcessPurchaseSupplierListView, InputProductProcessPurchaseSupplierListViewModel>(nameof(InputProductProcessPurchaseSupplierListView));
-        builder.Services.AddSingletonWithShellRoute<InputProductProcessPurchaseBasketListView, InputProductProcessPurchaseBasketListViewModel>(nameof(InputProductProcessPurchaseBasketListView));
-        builder.Services.AddSingletonWithShellRoute<InputProductProcessPurchaseProductListView, InputProductProcessPurchaseProductListViewModel>
-            (nameof(InputProductProcessPurchaseProductListView));
+        builder.Services.AddSingletonWithShellRoute<InputProductPurchaseProcessWarehouseListView, InputProductPurchaseProcessWarehouseListViewModel>(nameof(InputProductPurchaseProcessWarehouseListView));
+        builder.Services.AddSingletonWithShellRoute<InputProductPurchaseProcessSupplierListView, InputProductPurchaseProcessSupplierListViewModel>(nameof(InputProductPurchaseProcessSupplierListView));
+        builder.Services.AddSingletonWithShellRoute<InputProductPurchaseProcessBasketListView, InputProductPurchaseProcessBasketListViewModel>(nameof(InputProductPurchaseProcessBasketListView));
+        builder.Services.AddSingletonWithShellRoute<InputProductPurchaseProcessProductListView, InputProductPurchaseProcessProductListViewModel>
+            (nameof(InputProductPurchaseProcessProductListView));
+        builder.Services.AddSingletonWithShellRoute<InputProductPurchaseOrderProcessProductListView, InputProductPurchaseOrderProcessProductListViewModel>
+           (nameof(InputProductPurchaseOrderProcessProductListView));
+        builder.Services.AddSingletonWithShellRoute<InputProductPurchaseOrderProcessWarehouseListView, InputProductPurchaseOrderProcessWarehouseListViewModel>
+          (nameof(InputProductPurchaseOrderProcessWarehouseListView));
+        builder.Services.AddSingletonWithShellRoute<InputProductPurchaseOrderProcessBasketListView, InputProductPurchaseOrderProcessBasketListViewModel>
+        (nameof(InputProductPurchaseOrderProcessBasketListView));
+        builder.Services.AddSingletonWithShellRoute<InputProductPurchaseOrderProcessSupplierListView, InputProductPurchaseOrderProcessSupplierListViewModel>(nameof(InputProductPurchaseOrderProcessSupplierListView));
 
         #endregion Purchase Modules
 

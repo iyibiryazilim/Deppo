@@ -3,11 +3,11 @@ using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchasePr
 
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views;
 
-public partial class InputProductProcessPurchaseBasketListView : ContentPage
+public partial class InputProductPurchaseProcessBasketListView : ContentPage
 {
-    private readonly InputProductProcessPurchaseBasketListViewModel _viewModel;
+    private readonly InputProductPurchaseProcessBasketListViewModel _viewModel;
 
-    public InputProductProcessPurchaseBasketListView(InputProductProcessPurchaseBasketListViewModel viewModel)
+    public InputProductPurchaseProcessBasketListView(InputProductPurchaseProcessBasketListViewModel viewModel)
     {
         InitializeComponent();
         _viewModel = viewModel;

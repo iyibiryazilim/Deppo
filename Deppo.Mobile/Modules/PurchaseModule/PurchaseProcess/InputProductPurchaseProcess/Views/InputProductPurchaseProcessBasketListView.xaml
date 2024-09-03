@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views.InputProductProcessPurchaseBasketListView"
+             x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views.InputProductPurchaseProcessBasketListView"
              xmlns:basketModel="clr-namespace:Deppo.Mobile.Core.Models.BasketModels;assembly=Deppo.Mobile.Core"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModels="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels"
              Title="{Binding Title}"
              Padding="10"
-             x:DataType="viewModels:InputProductProcessPurchaseBasketListViewModel"
+             x:DataType="viewModels:InputProductPurchaseProcessBasketListViewModel"
              Shell.TabBarIsVisible="False">
     <Shell.BackButtonBehavior>
         <BackButtonBehavior Command="{Binding BackCommand}" />
@@ -121,7 +121,7 @@
                                                TextColor="{StaticResource Secondary}" />
 
                                         <Border.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessPurchaseBasketListViewModel}}, Path=DecreaseCommand}"
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductPurchaseProcessBasketListViewModel}}, Path=DecreaseCommand}"
                                                                   CommandParameter="{Binding .}" />
                                         </Border.GestureRecognizers>
                                     </Border>
@@ -142,7 +142,7 @@
                                                TextColor="{StaticResource White}" />
 
                                         <Border.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessPurchaseBasketListViewModel}}, Path=IncreaseCommand}"
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductPurchaseProcessBasketListViewModel}}, Path=IncreaseCommand}"
                                                                   CommandParameter="{Binding .}" />
                                         </Border.GestureRecognizers>
                                     </Border>

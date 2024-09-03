@@ -2,11 +2,11 @@ using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchasePr
 
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views;
 
-public partial class InputProductProcessPurchaseSupplierListView : ContentPage
+public partial class InputProductPurchaseProcessWarehouseListView : ContentPage
 {
-    private readonly InputProductProcessPurchaseSupplierListViewModel _viewModel;
+    private readonly InputProductPurchaseProcessWarehouseListViewModel _viewModel;
 
-    public InputProductProcessPurchaseSupplierListView(InputProductProcessPurchaseSupplierListViewModel viewModel)
+    public InputProductPurchaseProcessWarehouseListView(InputProductPurchaseProcessWarehouseListViewModel viewModel)
     {
         InitializeComponent();
         _viewModel = viewModel;

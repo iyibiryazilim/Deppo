@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views.InputProductPurchaseOrderProcessProductListView"
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:productModel="clr-namespace:Deppo.Mobile.Core.Models.ProductModels;assembly=Deppo.Mobile.Core"
              xmlns:selectConverter="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Converters"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views.InputProductProcessPurchaseProductListView"
-             xmlns:viewModels="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels"
+             xmlns:viewModels="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.ViewModels"
              Title="{Binding Title}"
-             x:DataType="viewModels:InputProductProcessPurchaseProductListViewModel"
-             Shell.PresentationMode="Modal"
+             x:DataType="viewModels:InputProductPurchaseOrderProcessProductListViewModel"
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
@@ -36,7 +35,7 @@
     <Grid RowDefinitions="*,Auto">
 
         <Grid Grid.Row="0"
-              Margin="0,0,0,35"
+              Margin="0,0,0,0"
               RowDefinitions="Auto,Auto,*,Auto"
               RowSpacing="10">
 
@@ -81,7 +80,7 @@
                                 StrokeShape="RoundRectangle 10"
                                 StrokeThickness="0.1">
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessPurchaseProductListViewModel}}, Path=ItemTappedCommand}">
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductPurchaseOrderProcessProductListViewModel}}, Path=ItemTappedCommand}">
                                     <TapGestureRecognizer.CommandParameter>
                                         <MultiBinding Converter="{StaticResource selectProductConverter}">
                                             <Binding Path="Text"
