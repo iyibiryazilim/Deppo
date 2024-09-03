@@ -52,7 +52,7 @@
             <!--#endregion-->
 
             <!--#region Main list-->
-            <CollectionView Grid.Row="0"
+            <CollectionView Grid.Row="1"
                             ItemsSource="{Binding Items}"
                             RemainingItemsThreshold="2"
                             RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
@@ -77,7 +77,8 @@
                             <Grid Padding="10"
                                   ColumnDefinitions="Auto, Auto, *"
                                   ColumnSpacing="10">
-                                <toolkit:AvatarView Margin="5"
+                                <toolkit:AvatarView Grid.Column="0"
+                                                    Margin="5"
                                                     Background="{StaticResource PrimaryLight}"
                                                     BorderColor="{StaticResource Primary}"
                                                     CornerRadius="200"
@@ -87,7 +88,51 @@
                                                     Text="{Binding TitleName}"
                                                     TextColor="{StaticResource OffBlack}"
                                                     VerticalOptions="Start"
-                                                    WidthRequest="50" />
+                                                    WidthRequest="50">
+                                    <toolkit:AvatarView.Triggers>
+                                        <DataTrigger Binding="{Binding IsSelected}"
+                                                     TargetType="toolkit:AvatarView"
+                                                     Value="True">
+                                            <Setter Property="Background" Value="{StaticResource Primary}" />
+                                            <Setter Property="TextColor" Value="{StaticResource White}" />
+                                        </DataTrigger>
+                                    </toolkit:AvatarView.Triggers>
+                                </toolkit:AvatarView>
+
+                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                    <Label FontAttributes="Bold"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="1"
+                                           Text="{Binding Title}">
+                                        <Label.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected}"
+                                                         TargetType="Label"
+                                                         Value="True">
+                                                <Setter Property="TextColor" Value="{StaticResource White}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+
+                                    <Label HorizontalOptions="Start"
+                                           LineBreakMode="TailTruncation"
+                                           TextColor="{StaticResource Gray600}"
+                                           VerticalOptions="Center"
+                                           WidthRequest="200">
+                                        <Label.Text>
+                                            <MultiBinding StringFormat="{}{0} / {1}">
+                                                <Binding Path="Country" />
+                                                <Binding Path="City" />
+                                            </MultiBinding>
+                                        </Label.Text>
+                                        <Label.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected}"
+                                                         TargetType="Label"
+                                                         Value="True">
+                                                <Setter Property="TextColor" Value="{StaticResource WhiteSmoke}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </VerticalStackLayout>
 
                             </Grid>
                         </Border>
