@@ -119,7 +119,7 @@ public partial class OutputProductSalesOrderProcessWarehouseListViewModel : Base
 				}
 			}
 
-			_userDialogs.HideHud();
+			_userDialogs.Loading().Hide();
 
 		}
 		catch (Exception ex)

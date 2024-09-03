@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Android.OS;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.SalesModels;
@@ -29,6 +30,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
 		ItemTappedCommand = new Command<CustomerModel>(ItemTappedAsync);
+		PerformSearchCommand = new Command<SearchBar>(async (searchBar) => await PerformSearchAsync(searchBar));
 		NextViewCommand = new Command(async () => await NextViewAsync());
 	}
 
@@ -36,6 +38,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 	public Command LoadItemsCommand { get; }
 	public Command LoadMoreItemsCommand { get; }
 	public Command ItemTappedCommand { get; }
+	public Command PerformSearchCommand { get; }
 	public Command NextViewCommand { get; }
 	#endregion
 
@@ -160,6 +163,59 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 				_userDialogs.HideHud();
 
 			_userDialogs.Alert(ex.Message);
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task PerformSearchAsync(SearchBar searchBar)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			if (string.IsNullOrWhiteSpace(searchBar.Text))
+			{
+				await LoadItemsAsync();
+				searchBar.Unfocus();
+				return;
+			}
+			else
+			{
+				if(searchBar.Text.Length > 5)
+				{
+					IsBusy = true;
+					Items.Clear();
+					_userDialogs.Loading("Searching Items...");
+					var httpClient = _httpClientService.GetOrCreateHttpClient();
+					await Task.Delay(1000);
+					var result = await _customerService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber,search: searchBar.Text, skip: 0, take: 20);
+
+					if(result.IsSuccess)
+					{
+						if (result.Data is null)
+							return;
+
+						foreach (var item in result.Data)
+						{
+							var obj = Mapping.Mapper.Map<CustomerModel>(item);
+							Items.Add(obj);
+						}
+					}
+
+					_userDialogs.Loading().Hide();
+					searchBar.Unfocus();
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{

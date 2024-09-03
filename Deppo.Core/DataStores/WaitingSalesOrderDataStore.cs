@@ -79,13 +79,13 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
             [Quantity] = ORFLINE.AMOUNT,
             [ShippedQuantity] = ORFLINE.SHIPPEDAMOUNT,
             [WaitingQuantity] = (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT),
-            [OrderDate] = ORFICHE.DATE_,
-            [DueDate] = ORFICHE.DUEDATE
+            [OrderDate] = ORFLINE.DATE_,
+            [DueDate] = ORFLINE.DUEDATE
         FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{firmNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{firmNumber.ToString().PadLeft(2, '0')}_ORFICHE AS ORFICHE ON ORFLINE.ORDFICHEREF = ORFICHE.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON ORFICHE.CLIENTREF = CLCARD.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON ORFLINE.STOCKREF = ITEMS.LOGICALREF
-		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON ORFLINE.UOMREF = SUBUNITSET.LOGICALREF
+		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON ORFLINE.UOMREF = SUBUNITSET.LOGICALREF AND MAINUNIT = 1
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON ORFLINE.USREF = UNITSET.LOGICALREF
 		";
 

@@ -10,5 +10,6 @@ public partial class OutputProductSalesOrderProcessBasketListView : ContentPage
 		InitializeComponent();
 		_viewModel = viewModel;
 		BindingContext = _viewModel;
+		_viewModel.CurrentPage = this;
 	}
 }

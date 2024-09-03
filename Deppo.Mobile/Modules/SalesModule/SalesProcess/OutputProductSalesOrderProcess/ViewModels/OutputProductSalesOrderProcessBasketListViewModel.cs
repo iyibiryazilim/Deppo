@@ -10,4 +10,12 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 	{
 		_userDialogs = userDialogs;
 	}
+
+	#region Commands
+
+	#endregion
+
+	#region Properties
+	public ContentPage CurrentPage { get; set; } = null!;
+	#endregion
 }

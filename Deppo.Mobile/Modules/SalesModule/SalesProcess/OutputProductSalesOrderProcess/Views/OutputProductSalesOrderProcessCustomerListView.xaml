@@ -42,17 +42,18 @@
                            Placeholder="Ara..."
                            PlaceholderColor="{StaticResource OffBlack}"
                            TextColor="{StaticResource OffBlack}">
-                    <!--<SearchBar.Behaviors>
+                    <SearchBar.Behaviors>
                         <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
                                     CommandParameter="{Binding ., Source={x:Reference searchBar}}"
                                     EventName="TextChanged" />
-                    </SearchBar.Behaviors>-->
+                    </SearchBar.Behaviors>
                 </SearchBar>
             </Border>
             <!--#endregion-->
 
             <!--#region Main list-->
             <CollectionView Grid.Row="1"
+                            
                             ItemsSource="{Binding Items}"
                             RemainingItemsThreshold="2"
                             RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
@@ -132,6 +133,42 @@
                                             </DataTrigger>
                                         </Label.Triggers>
                                     </Label>
+
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Image Aspect="AspectFit"
+                                               HeightRequest="16"
+                                               VerticalOptions="Center"
+                                               WidthRequest="16">
+                                            <Image.Source>
+                                                <FontImageSource FontFamily="FAS"
+                                                                 x:Name="FontImageBox"
+                                                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                                 Size="16"
+                                                                 Color="{StaticResource Primary}">
+                                                </FontImageSource>
+                                            </Image.Source>
+                                            <!--<Image.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected}"
+                                                             TargetType="Image"
+                                                             Value="True">
+                                                    <Setter TargetName="FontImageBox" Property="FontImageSource.Color" Value="{StaticResource Secondary}" />
+                                                </DataTrigger>
+                                            </Image.Triggers>-->
+                                        </Image>
+                                        <Label HorizontalOptions="Start"
+                                               LineBreakMode="TailTruncation"
+                                               Text="{Binding OrderReferenceCount}"
+                                               TextColor="{StaticResource Gray600}"
+                                               VerticalOptions="Center">
+                                            <Label.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected}"
+                                                             TargetType="Label"
+                                                             Value="True">
+                                                    <Setter Property="TextColor" Value="{StaticResource Secondary}" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </HorizontalStackLayout>
                                 </VerticalStackLayout>
 
                             </Grid>
