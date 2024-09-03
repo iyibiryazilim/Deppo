@@ -19,7 +19,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(Supplier), queryId: nameof(Supplier))]
 [QueryProperty(name: nameof(InputProductProcessType), queryId: nameof(InputProductProcessType))]
-public partial class InputProductProcessPurchaseBasketListViewModel : BaseViewModel
+public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewModel
 {
     private readonly IUserDialogs _userDialogs;
 
@@ -32,7 +32,7 @@ public partial class InputProductProcessPurchaseBasketListViewModel : BaseViewMo
     [ObservableProperty]
     private InputProductProcessType inputProductProcessType;
 
-    public InputProductProcessPurchaseBasketListViewModel(IUserDialogs userDialogs)
+    public InputProductPurchaseProcessBasketListViewModel(IUserDialogs userDialogs)
     {
         _userDialogs = userDialogs;
         Title = "Sepet Listesi";
@@ -65,7 +65,7 @@ public partial class InputProductProcessPurchaseBasketListViewModel : BaseViewMo
         {
             IsBusy = true;
 
-            await Shell.Current.GoToAsync($"{nameof(InputProductProcessPurchaseProductListView)}", new Dictionary<string, object>
+            await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseProcessProductListView)}", new Dictionary<string, object>
             {
                 {nameof(WarehouseModel), WarehouseModel}
             });

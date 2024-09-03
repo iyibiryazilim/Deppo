@@ -111,6 +111,9 @@
                                        Text="Siparişe bağlı Mal kabul İşlemleri"
                                        TextColor="{StaticResource Gray500}"
                                        VerticalOptions="Center" />
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding InputPurchaseOrderProcessCommand}" />
+                                </Grid.GestureRecognizers>
                             </Grid>
 
                             <Border Grid.Column="1"

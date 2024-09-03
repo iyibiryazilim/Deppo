@@ -17,7 +17,7 @@ using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels;
 
 [QueryProperty(name: nameof(InputProductProcessType), queryId: nameof(InputProductProcessType))]
-public partial class InputProductProcessPurchaseWarehouseListViewModel : BaseViewModel
+public partial class InputProductPurchaseProcessWarehouseListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
     private readonly IWarehouseService _warehouseService;
@@ -29,7 +29,7 @@ public partial class InputProductProcessPurchaseWarehouseListViewModel : BaseVie
     [ObservableProperty]
     private InputProductProcessType inputProductProcessType;
 
-    public InputProductProcessPurchaseWarehouseListViewModel(IHttpClientService httpClientService,
+    public InputProductPurchaseProcessWarehouseListViewModel(IHttpClientService httpClientService,
         IWarehouseService warehouseService,
         IUserDialogs userDialogs)
     {
@@ -180,7 +180,7 @@ public partial class InputProductProcessPurchaseWarehouseListViewModel : BaseVie
 
             if (SelectedWarehouseModel is not null)
             {
-                await Shell.Current.GoToAsync($"{nameof(InputProductProcessPurchaseSupplierListView)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseProcessSupplierListView)}", new Dictionary<string, object>
                 {
                     [nameof(WarehouseModel)] = SelectedWarehouseModel,
                     [nameof(InputProductProcessType)] = InputProductProcessType

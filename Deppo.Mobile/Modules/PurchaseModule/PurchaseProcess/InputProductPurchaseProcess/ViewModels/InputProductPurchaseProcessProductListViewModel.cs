@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels;
 
-public partial class InputProductProcessPurchaseProductListViewModel : BaseViewModel
+public partial class InputProductPurchaseProcessProductListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
     private readonly IProductService _productService;
@@ -38,7 +38,7 @@ public partial class InputProductProcessPurchaseProductListViewModel : BaseViewM
     [ObservableProperty]
     private ObservableCollection<InputProductBasketModel> selectedProducts = new();
 
-    public InputProductProcessPurchaseProductListViewModel(IHttpClientService httpClientService,
+    public InputProductPurchaseProcessProductListViewModel(IHttpClientService httpClientService,
         IProductService productService,
         IVariantService variantService,
         IUserDialogs userDialogs,
@@ -443,7 +443,7 @@ public partial class InputProductProcessPurchaseProductListViewModel : BaseViewM
         {
             IsBusy = true;
 
-            var previouseViewModel = _serviceProvider.GetRequiredService<InputProductProcessPurchaseBasketListViewModel>();
+            var previouseViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseProcessBasketListViewModel>();
             if (previouseViewModel is not null)
             {
                 foreach (var item in SelectedProducts)
