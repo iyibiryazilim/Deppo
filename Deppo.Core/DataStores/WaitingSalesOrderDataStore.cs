@@ -76,25 +76,27 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
             [SubUnitsetReferenceId] = SUBUNITSET.LOGICALREF,
             [SubUnitsetCode] = SUBUNITSET.CODE,
             [SubUnitsetName] = SUBUNITSET.NAME,
+            [IsVariant] = ITEMS.CANCONFIGURE,
             [Quantity] = ORFLINE.AMOUNT,
             [ShippedQuantity] = ORFLINE.SHIPPEDAMOUNT,
-            [WaitingQuantity] = (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT),
-            [OrderDate] = ORFLINE.DATE_,
-            [DueDate] = ORFLINE.DUEDATE
-        FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{firmNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
-        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{firmNumber.ToString().PadLeft(2, '0')}_ORFICHE AS ORFICHE ON ORFLINE.ORDFICHEREF = ORFICHE.LOGICALREF
+            [WaitingQuantity] = (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT)
+            
+        FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFICHE AS ORFICHE ON ORFLINE.ORDFICHEREF = ORFICHE.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON ORFICHE.CLIENTREF = CLCARD.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON ORFLINE.STOCKREF = ITEMS.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON ORFLINE.UOMREF = SUBUNITSET.LOGICALREF AND MAINUNIT = 1
-		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON ORFLINE.USREF = UNITSET.LOGICALREF
+		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON ORFLINE.USREF = UNITSET.LOGICALREF 
+		WHERE ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 1
+		AND ITEMS.UNITSETREF <> 0
 		";
 
 		if (!string.IsNullOrEmpty(search))
 		{
-			baseQuery += $@" WHERE ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";
+			baseQuery += $@" AND ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";
 		}
 
-		baseQuery += $@" ORDER BY ORFICHE.DATE_ DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+		baseQuery += $@" ORDER BY ORFLINE.DATE_ DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
 		return baseQuery;
 	}

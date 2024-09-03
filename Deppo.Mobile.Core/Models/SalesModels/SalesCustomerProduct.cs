@@ -31,7 +31,7 @@ public partial class SalesCustomerProduct : ObservableObject
     private bool _isVariant;
 
     [ObservableProperty]
-    private double _orderQuantity;
+    private double _quantity;
 
     [ObservableProperty]
     private double _shippedQuantity;
@@ -40,6 +40,6 @@ public partial class SalesCustomerProduct : ObservableObject
     private double _waitingQuantity;
 
     [ObservableProperty]
-    private List<WaitingSalesOrder> _orders = new();
+    public List<WaitingSalesOrder> orders = new();
 
 }

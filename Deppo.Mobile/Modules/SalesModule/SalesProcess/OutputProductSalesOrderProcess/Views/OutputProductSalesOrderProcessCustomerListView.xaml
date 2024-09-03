@@ -44,8 +44,8 @@
                            TextColor="{StaticResource OffBlack}">
                     <SearchBar.Behaviors>
                         <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
-                                    CommandParameter="{Binding ., Source={x:Reference searchBar}}"
-                                    EventName="TextChanged" />
+                                                        CommandParameter="{Binding ., Source={x:Reference searchBar}}"
+                                                        EventName="TextChanged" />
                     </SearchBar.Behaviors>
                 </SearchBar>
             </Border>
@@ -53,7 +53,6 @@
 
             <!--#region Main list-->
             <CollectionView Grid.Row="1"
-                            
                             ItemsSource="{Binding Items}"
                             RemainingItemsThreshold="2"
                             RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
@@ -61,7 +60,7 @@
                     <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="customerModel:CustomerModel">
+                    <DataTemplate x:DataType="customerModel:SalesCustomer">
                         <Border BackgroundColor="Transparent"
                                 StrokeShape="RoundRectangle 6"
                                 StrokeThickness="0.2">
@@ -78,7 +77,7 @@
                             <Grid Padding="10"
                                   ColumnDefinitions="Auto, Auto, *"
                                   ColumnSpacing="10">
-                                <toolkit:AvatarView Grid.Column="0"
+                                <!--<toolkit:AvatarView Grid.Column="0"
                                                     Margin="5"
                                                     Background="{StaticResource PrimaryLight}"
                                                     BorderColor="{StaticResource Primary}"
@@ -86,7 +85,7 @@
                                                     FontAttributes="Bold"
                                                     FontSize="16"
                                                     HeightRequest="50"
-                                                    Text="{Binding TitleName}"
+                                                    Text="{Binding }"
                                                     TextColor="{StaticResource OffBlack}"
                                                     VerticalOptions="Start"
                                                     WidthRequest="50">
@@ -98,13 +97,14 @@
                                             <Setter Property="TextColor" Value="{StaticResource White}" />
                                         </DataTrigger>
                                     </toolkit:AvatarView.Triggers>
-                                </toolkit:AvatarView>
+                                </toolkit:AvatarView>-->
 
                                 <VerticalStackLayout Grid.Column="1" Spacing="2">
                                     <Label FontAttributes="Bold"
                                            LineBreakMode="TailTruncation"
                                            MaxLines="1"
-                                           Text="{Binding Title}">
+                                           TextColor="{StaticResource OffBlack}"
+                                           Text="{Binding Code}">
                                         <Label.Triggers>
                                             <DataTrigger Binding="{Binding IsSelected}"
                                                          TargetType="Label"
@@ -114,7 +114,21 @@
                                         </Label.Triggers>
                                     </Label>
 
-                                    <Label HorizontalOptions="Start"
+                                    <Label FontAttributes="Bold"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="1"
+                                           TextColor="{StaticResource Gray600}"
+                                           Text="{Binding Name}">
+                                        <Label.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected}"
+                                                         TargetType="Label"
+                                                         Value="True">
+                                                <Setter Property="TextColor" Value="{StaticResource WhiteSmoke}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+
+                                    <!--<Label HorizontalOptions="Start"
                                            LineBreakMode="TailTruncation"
                                            TextColor="{StaticResource Gray600}"
                                            VerticalOptions="Center"
@@ -132,7 +146,7 @@
                                                 <Setter Property="TextColor" Value="{StaticResource WhiteSmoke}" />
                                             </DataTrigger>
                                         </Label.Triggers>
-                                    </Label>
+                                    </Label>-->
 
                                     <HorizontalStackLayout Spacing="5">
                                         <Image Aspect="AspectFit"
@@ -140,12 +154,11 @@
                                                VerticalOptions="Center"
                                                WidthRequest="16">
                                             <Image.Source>
-                                                <FontImageSource FontFamily="FAS"
-                                                                 x:Name="FontImageBox"
+                                                <FontImageSource x:Name="FontImageBox"
+                                                                 FontFamily="FAS"
                                                                  Glyph="{x:Static fontAwesome:FontAwesomeIcons.Box}"
                                                                  Size="16"
-                                                                 Color="{StaticResource Primary}">
-                                                </FontImageSource>
+                                                                 Color="{StaticResource Primary}" />
                                             </Image.Source>
                                             <!--<Image.Triggers>
                                                 <DataTrigger Binding="{Binding IsSelected}"
@@ -157,7 +170,7 @@
                                         </Image>
                                         <Label HorizontalOptions="Start"
                                                LineBreakMode="TailTruncation"
-                                               Text="{Binding OrderReferenceCount}"
+                                               Text="{Binding ProductReferenceCount}"
                                                TextColor="{StaticResource Gray600}"
                                                VerticalOptions="Center">
                                             <Label.Triggers>
@@ -181,7 +194,7 @@
         <Button Grid.Row="1"
                 Margin="10,10,10,20"
                 Command="{Binding NextViewCommand}"
-                IsEnabled="{Binding SelectedCustomerModel, Converter={StaticResource IsNotNullConverter}}"
+                IsEnabled="{Binding SelectedSalesCustomer, Converter={StaticResource IsNotNullConverter}}"
                 Text="İleri" />
     </Grid>
 </ContentPage>

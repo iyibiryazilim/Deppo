@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Deppo.Mobile.Core.Models.SalesModels;
 
-public class SalesCustomer : ObservableObject
+public partial class SalesCustomer : ObservableObject
 {
     [ObservableProperty]
     private int _referenceId;
@@ -18,7 +18,10 @@ public class SalesCustomer : ObservableObject
     private int _productReferenceCount;
 
     [ObservableProperty]
-    private List<SalesCustomerProduct> _products;
+    public List<SalesCustomerProduct> products;
+
+    [ObservableProperty]
+    bool isSelected;
 
     public SalesCustomer()
     {
