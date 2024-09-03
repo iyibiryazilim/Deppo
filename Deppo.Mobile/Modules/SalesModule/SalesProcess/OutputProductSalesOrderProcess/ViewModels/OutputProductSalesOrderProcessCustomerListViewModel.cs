@@ -31,6 +31,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+		ItemTappedCommand = new Command<SalesCustomer>(async (customer) => await ItemTappedAsync(customer));
 		NextViewCommand = new Command(async () => await NextViewAsync());
 	}
 
@@ -51,6 +52,9 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 	#region Properties
 	[ObservableProperty]
 	WarehouseModel warehouseModel = null!;
+
+	[ObservableProperty]
+	SalesCustomer? selectedSalesCustomer;
 	#endregion
 
 	private async Task GetSalesOrders(int skip = 0, int take = 20)
@@ -157,6 +161,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 			await GetSalesOrders(skip: SalesOrders.Count, take: 20);
 			if (SalesOrders.Count > 0)
 			{
+
 				var groupByCustomer = SalesOrders.GroupBy(x => x.CustomerReferenceId);
 				foreach (var item in groupByCustomer)
 				{
@@ -190,7 +195,6 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 				}
 			}
 
-
 			Console.WriteLine(Items);
 
 			_userDialogs.Loading().Hide();
@@ -209,7 +213,36 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 		}
 	}
 
+	private async Task ItemTappedAsync(SalesCustomer item)
+	{
+		try
+		{
+			IsBusy = true;
 
+			if(SelectedSalesCustomer == item)
+			{
+				SelectedSalesCustomer.IsSelected = false;
+				SelectedSalesCustomer = null;
+			}
+            else
+            {
+				if(SelectedSalesCustomer is not null)
+				{
+					SelectedSalesCustomer.IsSelected = false;
+				}
+				SelectedSalesCustomer = item;
+				SelectedSalesCustomer.IsSelected = true;
+            }
+        }
+		catch(Exception ex)
+		{
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 
 	private async Task NextViewAsync()
 	{
@@ -219,11 +252,19 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 		{
 			IsBusy = true;
 
-			
-			await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessProductListView)}", new Dictionary<string, object>
+			if(SelectedSalesCustomer is not null)
 			{
-				[nameof(WarehouseModel)] = WarehouseModel,
-			});
+				await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessProductListView)}", new Dictionary<string, object>
+				{
+					[nameof(SalesCustomer)] = SelectedSalesCustomer,
+					[nameof(WarehouseModel)] = WarehouseModel,
+				});
+			} else
+			{
+				_userDialogs.Alert("Lütfen bir müşteri seçiniz.", "Hata", "Tamam");
+			}
+			
+			
 			
 		}
 		catch (Exception ex)

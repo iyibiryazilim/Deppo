@@ -40,6 +40,6 @@ public partial class SalesCustomerProduct : ObservableObject
     private double _waitingQuantity;
 
     [ObservableProperty]
-    private List<WaitingSalesOrder> _orders = new();
+    public List<WaitingSalesOrder> orders = new();
 
 }

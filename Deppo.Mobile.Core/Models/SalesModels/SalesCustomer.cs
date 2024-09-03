@@ -18,7 +18,10 @@ public partial class SalesCustomer : ObservableObject
     private int _productReferenceCount;
 
     [ObservableProperty]
-    private List<SalesCustomerProduct> _products;
+    public List<SalesCustomerProduct> products;
+
+    [ObservableProperty]
+    bool isSelected;
 
     public SalesCustomer()
     {

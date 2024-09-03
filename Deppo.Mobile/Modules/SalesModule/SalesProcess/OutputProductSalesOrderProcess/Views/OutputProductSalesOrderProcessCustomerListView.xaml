@@ -64,9 +64,9 @@
                         <Border BackgroundColor="Transparent"
                                 StrokeShape="RoundRectangle 6"
                                 StrokeThickness="0.2">
-                            <!--<Border.GestureRecognizers>
+                            <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessCustomerListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
-                            </Border.GestureRecognizers>-->
+                            </Border.GestureRecognizers>
                             <Border.Triggers>
                                 <DataTrigger Binding="{Binding IsSelected}"
                                              TargetType="Border"
@@ -194,6 +194,7 @@
         <Button Grid.Row="1"
                 Margin="10,10,10,20"
                 Command="{Binding NextViewCommand}"
+                IsEnabled="{Binding SelectedSalesCustomer, Converter={StaticResource IsNotNullConverter}}"
                 Text="İleri" />
     </Grid>
 </ContentPage>
