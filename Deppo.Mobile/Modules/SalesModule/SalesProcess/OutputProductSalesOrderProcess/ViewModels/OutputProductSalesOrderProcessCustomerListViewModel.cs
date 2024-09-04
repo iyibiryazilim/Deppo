@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
@@ -12,10 +12,10 @@ using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.ViewModels;
 
-
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseViewModel
 {
+
 	private readonly IHttpClientService _httpClientService;
 	private readonly IWaitingSalesOrderService _waitingSalesOrderService;
 	private readonly IUserDialogs _userDialogs;
