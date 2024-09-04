@@ -24,7 +24,7 @@ public class WaitingSalesOrder : INotifyPropertyChanged, IDisposable
 	private double _quantity;
 	private double _shippedQuantity;
 	private double _waitingQuantity;
-	//private DateTime _orderDate;
+	private DateTime? _orderDate;
 	//private DateTime _dueDate;
 
     public WaitingSalesOrder()
@@ -235,16 +235,16 @@ public class WaitingSalesOrder : INotifyPropertyChanged, IDisposable
 		}
 	}
 
-	//public DateTime OrderDate
-	//{
-	//	get => _orderDate;
-	//	set
-	//	{
-	//		if (_orderDate == value) return;
-	//		_orderDate = value;
-	//		NotifyPropertyChanged();
-	//	}
-	//}
+	public DateTime? OrderDate
+	{
+		get => _orderDate;
+		set
+		{
+			if (_orderDate == value) return;
+			_orderDate = value;
+			NotifyPropertyChanged();
+		}
+	}
 
 	//public DateTime DueDate
 	//{

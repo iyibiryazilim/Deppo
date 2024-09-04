@@ -27,12 +27,16 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 		_userDialogs = userDialogs;
 
 		Title = "Sipariş ve Ürünler";
+		IsProductListVisible = false;
+		IsOrderListVisible = true;
 
-		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+		SwitchToProductListViewCommand = new Command(SwitchToProductListViewAsync);
+		SwitchToOrderListViewCommand = new Command(SwitchToOrderListViewAsync);
 	}
 
 	#region Commands
-	public Command LoadItemsCommand { get; }
+	public Command SwitchToProductListViewCommand { get; }
+	public Command SwitchToOrderListViewCommand { get; }
 	public Command ItemTappedCommand { get; }
 	public Command NextViewCommand { get; }
 	#endregion
@@ -48,18 +52,42 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 
 	[ObservableProperty]
 	SalesCustomer salesCustomer = null!;
+
+	[ObservableProperty]
+	bool isProductListVisible = false;
+
+	[ObservableProperty]
+	bool isOrderListVisible = true;
 	#endregion
 
-	async Task LoadItemsAsync()
+	async void SwitchToProductListViewAsync()
 	{
-		
+		IsProductListVisible = true;
+		IsOrderListVisible = false;
+
+		// Ürünler verilerini yükle
+		await LoadItemsAsync();
+	}
+
+	async void SwitchToOrderListViewAsync()
+	{
+		IsProductListVisible = false;
+		IsOrderListVisible = true;
+
+		// Sipariş verilerini yükle
+		await LoadOrdersAsync();
+	}
+
+	async Task LoadItemsAsync()
+	{		
 		try
 		{
 			IsBusy = true;
 
+			Products.Clear();
 			_userDialogs.Loading("Loading Items...");
 			await Task.Delay(1000);
-			Products.Clear();
+			
 
             foreach (var item in SalesCustomer.Products)
             {
@@ -87,16 +115,31 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 		{
 			IsBusy = true;
 
+			Orders.Clear();
 			_userDialogs.Loading("Loading Items...");
 			await Task.Delay(1000);
-			Orders.Clear();
+			
+            foreach (var item in SalesCustomer.Products)
+            {
+                if(item.Orders is not null)
+				{
+                    foreach (var order in item.Orders)
+                    {
+						Orders.Add(order);
+                    }
+                }
+            }
 
-			_userDialogs.Loading().Hide();
+            _userDialogs.Loading().Hide();
 		}
 		catch (Exception)
 		{
 
 			throw;
+		}
+		finally
+		{
+			IsBusy = false;
 		}
 	}
 }
