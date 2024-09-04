@@ -5,6 +5,7 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
+using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -28,6 +29,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
         private readonly ISupplierService _supplierService;
         private readonly IUserDialogs _userDialogs;
         private readonly IWaitingPurchaseOrderService _waitingPurchaseOrderService;
+        private readonly IPurchaseSupplierService _purchaseSupplierService;
 
         [ObservableProperty]
         private SupplierModel supplierModel = null!;
@@ -44,11 +46,13 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
         public InputProductPurchaseOrderProcessSupplierListViewModel(IHttpClientService httpClientService,
         ISupplierService supplierService,
         IUserDialogs userDialogs,
-        IWaitingPurchaseOrderService waitingPurchaseOrderService)
+        IWaitingPurchaseOrderService waitingPurchaseOrderService, IPurchaseSupplierService purchaseSupplierService)
         {
             _httpClientService = httpClientService;
             _supplierService = supplierService;
             _userDialogs = userDialogs;
+            _waitingPurchaseOrderService = waitingPurchaseOrderService;
+            _purchaseSupplierService = purchaseSupplierService;
 
             Title = "Tedarikçiler";
 
@@ -58,7 +62,6 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
 
             ItemTappedCommand = new Command<PurchaseSupplier>(async (supplier) => await ItemTappedAsync(supplier));
             NextViewCommand = new Command(async () => await NextViewAsync());
-            _waitingPurchaseOrderService = waitingPurchaseOrderService;
         }
 
         //Collections
@@ -91,7 +94,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
             try
             {
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _waitingPurchaseOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, skip: skip, take: take);
+                var result = await _purchaseSupplierService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber);
 
                 if (result.IsSuccess)
                 {
@@ -310,7 +313,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
                     {
                         [nameof(PurchaseSupplier)] = SelectedPurchaseSupplier,
                         [nameof(WarehouseModel)] = SelectedWarehouseModel,
-                        [nameof(SelectedWarehouseModel)] = SelectedWarehouseModel,
+
                         [nameof(SelectedSupplier)] = SelectedSupplier,
                         [nameof(InputProductProcessType)] = InputProductProcessType
                     });

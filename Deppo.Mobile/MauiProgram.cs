@@ -3,6 +3,8 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.BaseModels;
 using Deppo.Core.DataStores;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.DataStores;
+using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.ViewModels;
 using Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.Views;
@@ -184,6 +186,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<ISeriLotService, SeriLotDataStore>();
         builder.Services.AddSingleton<ILocationService, LocationDataStore>();
         builder.Services.AddSingleton<IWaitingPurchaseOrderService, WaitingPurchaseOrderDataStore>();
+        builder.Services.AddSingleton<IPurchaseSupplierService, PurchaseSupplierDataStore>();
+        builder.Services.AddSingleton<IPurchaseSupplierProductService, PurchaseSupplierProductDataStore>();
 
         builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
         builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
@@ -241,11 +245,13 @@ public static class MauiProgram
         builder.Services.AddSingletonWithShellRoute<SalesProcessView, SalesProcessViewModel>(nameof(SalesProcessView));
 
         #region OutputProductSalesOrderProcess Modules
+
         builder.Services.AddTransientWithShellRoute<OutputProductSalesOrderProcessWarehouseListView, OutputProductSalesOrderProcessWarehouseListViewModel>(nameof(OutputProductSalesOrderProcessWarehouseListView));
         builder.Services.AddTransientWithShellRoute<OutputProductSalesOrderProcessCustomerListView, OutputProductSalesOrderProcessCustomerListViewModel>(nameof(OutputProductSalesOrderProcessCustomerListView));
         builder.Services.AddTransientWithShellRoute<OutputProductSalesOrderProcessProductListView, OutputProductSalesOrderProcessProductListViewModel>(nameof(OutputProductSalesOrderProcessProductListView));
         builder.Services.AddScopedWithShellRoute<OutputProductSalesOrderProcessBasketListView, OutputProductSalesOrderProcessBasketListViewModel>(nameof(OutputProductSalesOrderProcessBasketListView));
-        #endregion
+
+        #endregion OutputProductSalesOrderProcess Modules
 
         #endregion Sales Modules
 

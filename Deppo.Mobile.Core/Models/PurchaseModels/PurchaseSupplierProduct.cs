@@ -31,6 +31,24 @@ public partial class PurchaseSupplierProduct : ObservableObject
     private bool _isVariant;
 
     [ObservableProperty]
+    private int _unitsetReferenceId;
+
+    [ObservableProperty]
+    private string _unitsetName = string.Empty;
+
+    [ObservableProperty]
+    private string _unitsetCode = string.Empty;
+
+    [ObservableProperty]
+    private int _SubunitsetReferenceId;
+
+    [ObservableProperty]
+    private string _SubunitsetName = string.Empty;
+
+    [ObservableProperty]
+    private string _SubunitsetCode = string.Empty;
+
+    [ObservableProperty]
     private double _quantity;
 
     [ObservableProperty]
