@@ -25,6 +25,7 @@ public class WaitingPurchaseOrder : INotifyPropertyChanged, IDisposable
     private int _supplierReferenceId;
     private string _supplierName = string.Empty;
     private string _supplierCode = string.Empty;
+    private bool _isVariant;
 
     public WaitingPurchaseOrder()
     {
@@ -239,6 +240,17 @@ public class WaitingPurchaseOrder : INotifyPropertyChanged, IDisposable
             if (_supplierName == value) return;
             _supplierName = value;
             NotifyPropertyChanged(nameof(SupplierName));
+        }
+    }
+
+    public bool IsVariant
+    {
+        get => _isVariant;
+        set
+        {
+            if (_isVariant == value) return;
+            _isVariant = value;
+            NotifyPropertyChanged();
         }
     }
 

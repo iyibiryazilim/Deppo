@@ -1,25 +1,44 @@
 using System;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Deppo.Core.Models;
 
 namespace Deppo.Mobile.Core.Models.PurchaseModels;
 
-public class PurchaseSupplierProduct
+public partial class PurchaseSupplierProduct : ObservableObject
 {
+    [ObservableProperty]
     private int _referenceId;
-    private int _itemReferenceId;
-    private string _itemCode = string.Empty;
-    private string _itemName = string.Empty;
-    private int _mainItemReferenceId;
-    private string _mainItemCode = string.Empty;
-    private string _mainItemName = string.Empty;
-    private bool _isVariant;
-    private double _orderQuantity;
-    private double _shippedQuantity;
-    private double _waitingQuantity;
-    private List<WaitingPurchaseOrder> _orders;
 
-    public PurchaseSupplierProduct()
-    {
-        //Orders = new List<PurchaseSupplierProductOrder>();
-    }
+    [ObservableProperty]
+    private int _itemReferenceId;
+
+    [ObservableProperty]
+    private string _itemCode = string.Empty;
+
+    [ObservableProperty]
+    private string _itemName = string.Empty;
+
+    [ObservableProperty]
+    private int _mainItemReferenceId;
+
+    [ObservableProperty]
+    private string _mainItemCode = string.Empty;
+
+    [ObservableProperty]
+    private string _mainItemName = string.Empty;
+
+    [ObservableProperty]
+    private bool _isVariant;
+
+    [ObservableProperty]
+    private double _quantity;
+
+    [ObservableProperty]
+    private double _shippedQuantity;
+
+    [ObservableProperty]
+    private double _waitingQuantity;
+
+    [ObservableProperty]
+    public List<WaitingPurchaseOrder> orders = new();
 }
