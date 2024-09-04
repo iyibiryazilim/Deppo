@@ -13,9 +13,9 @@ public class PurchaseSupplierDataStore : IPurchaseSupplierService
 {
     private string postUrl = "/gateway/customQuery/CustomQuery";
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber,string search = "", int skip = 0, int take = 20)
     {
-        var content = new StringContent(JsonConvert.SerializeObject(PurchaseSupplierQuery(firmNumber, periodNumber, search, skip, take)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(PurchaseSupplierQuery(firmNumber, periodNumber, warehouseNumber,search, skip, take)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -63,24 +63,26 @@ public class PurchaseSupplierDataStore : IPurchaseSupplierService
         }
     }
 
-    private string PurchaseSupplierQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+    private string PurchaseSupplierQuery(int firmNumber, int periodNumber, int warehouseNumber,string search = "", int skip = 0, int take = 20)
     {
         string baseQuery = $@"SELECT
     [ReferenceId] = CLCARD.LOGICALREF,
     [Code] = CLCARD.CODE,
     [Name] = CLCARD.DEFINITION_,
-    [ProductReferenceCount] = COUNT(DISTINCT ORFLINE.STOCKREF)
-FROM LG_001_02_ORFLINE AS ORFLINE
-LEFT JOIN LG_001_CLCARD AS CLCARD
+    [ProductReferenceCount] = COUNT(DISTINCT ORFLINE.STOCKREF),
+    [Country] = CLCARD.COUNTRY,
+    [City] = CLCARD.CITY
+FROM LG_{firmNumber.ToString().PadLeft(3,'0')}_{periodNumber.ToString().PadLeft(2,'0')}_ORFLINE AS ORFLINE
+LEFT JOIN LG_{firmNumber.ToString().PadLeft(3,'0')}_CLCARD AS CLCARD
     ON ORFLINE.CLIENTREF = CLCARD.LOGICALREF
 WHERE ORFLINE.CLOSED = 0
     AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0
-    AND ORFLINE.TRCODE = 1";
+    AND ORFLINE.TRCODE = 2 AND ORFLINE.SOURCEINDEX = {warehouseNumber}";
 
         if (!string.IsNullOrEmpty(search))
             baseQuery += $@" AND (CLCARD.CODE LIKE '{search}%' OR CLCARD.DEFINITION_ LIKE '%{search}%')";
 
-        baseQuery += $@" GROUP BY CLCARD.LOGICALREF, CLCARD.CODE, CLCARD.DEFINITION_
+        baseQuery += $@" GROUP BY CLCARD.LOGICALREF, CLCARD.CODE, CLCARD.DEFINITION_, CLCARD.COUNTRY, CLCARD.CITY
 ORDER BY CLCARD.DEFINITION_ ASC
 OFFSET {skip} ROWS
 FETCH NEXT {take} ROWS ONLY";

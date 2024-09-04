@@ -26,6 +26,11 @@ public class WaitingPurchaseOrder : INotifyPropertyChanged, IDisposable
     private string _supplierName = string.Empty;
     private string _supplierCode = string.Empty;
     private bool _isVariant;
+    private int _variantReferenceId;
+    private string _variantCode = string.Empty;
+    private string _variantName = string.Empty;
+    private int _locTracking;
+    private int _trackingType;
 
     public WaitingPurchaseOrder()
     {
@@ -250,6 +255,61 @@ public class WaitingPurchaseOrder : INotifyPropertyChanged, IDisposable
         {
             if (_isVariant == value) return;
             _isVariant = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public int VariantReferenceId
+    {
+        get => _variantReferenceId;
+        set
+        {
+            if (_variantReferenceId == value) return;
+            _variantReferenceId = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public string VariantCode
+    {
+        get => _variantCode;
+        set
+        {
+            if (_variantCode == value) return;
+            _variantCode = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public string VariantName
+    {
+        get => _variantName;
+        set
+        {
+            if (_variantName == value) return;
+            _variantName = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public int LocTracking
+    {
+        get => _locTracking;
+        set
+        {
+            if (_locTracking == value) return;
+            _locTracking = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public int TrackingType
+    {
+        get => _trackingType;
+        set
+        {
+            if (_trackingType == value) return;
+            _trackingType = value;
             NotifyPropertyChanged();
         }
     }

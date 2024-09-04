@@ -30,6 +30,7 @@ public class InputPurchaseBasketModel : INotifyPropertyChanged, IDisposable
     private int _locTracking;
     private bool _isSelected;
     private string _image;
+    private double _inputQuantity;
 
     private List<InputPurchaseBasketOrderModel> _details = new();
 
@@ -275,6 +276,17 @@ public class InputPurchaseBasketModel : INotifyPropertyChanged, IDisposable
         {
             if (_image == value) return;
             _image = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public double InputQuantity
+    {
+        get => _inputQuantity;
+        set
+        {
+            if (_inputQuantity == value) return;
+            _inputQuantity = value;
             NotifyPropertyChanged();
         }
     }

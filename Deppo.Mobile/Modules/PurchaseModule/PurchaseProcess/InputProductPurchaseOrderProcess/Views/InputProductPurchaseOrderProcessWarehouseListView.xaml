@@ -78,7 +78,7 @@
                                          TargetType="Border"
                                          Value="True">
                                 <Setter Property="BackgroundColor"
-                                        Value="{StaticResource PrimaryLight}" />
+                                        Value="{StaticResource SecondaryLight}" />
                             </DataTrigger>
                         </Border.Triggers>
                     </Border>

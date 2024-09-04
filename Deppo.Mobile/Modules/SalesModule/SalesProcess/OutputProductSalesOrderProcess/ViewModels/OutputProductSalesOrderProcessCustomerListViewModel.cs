@@ -110,7 +110,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 					foreach (var product in groupByProduct)
 					{
 						SalesCustomerProduct salesCustomerProduct = new();
-						salesCustomerProduct.ReferenceId = product.Key;
+						//salesCustomerProduct.ReferenceId = product.Key;
 						salesCustomerProduct.ItemReferenceId = product.FirstOrDefault().ProductReferenceId;
 						salesCustomerProduct.ItemCode = product.FirstOrDefault().ProductCode;
 						salesCustomerProduct.ItemName = product.FirstOrDefault().ProductName;
@@ -175,7 +175,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 					foreach (var product in groupByProduct)
 					{
 						SalesCustomerProduct salesCustomerProduct = new();
-						salesCustomerProduct.ReferenceId = product.Key;
+						//salesCustomerProduct.ReferenceId = product.Key;
 						salesCustomerProduct.ItemReferenceId = product.FirstOrDefault().ProductReferenceId;
 						salesCustomerProduct.ItemCode = product.FirstOrDefault().ProductCode;
 						salesCustomerProduct.ItemName = product.FirstOrDefault().ProductName;
