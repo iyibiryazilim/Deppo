@@ -8,6 +8,8 @@ public partial class OutputProductSalesOrderProcessProductListView : ContentPage
 	public OutputProductSalesOrderProcessProductListView(OutputProductSalesOrderProcessProductListViewModel viewModel)
 	{
 		InitializeComponent();
-		BindingContext = _viewModel = viewModel;
+		_viewModel = viewModel;
+		BindingContext = _viewModel;
+		_viewModel.CurrentPage = this;
 	}
 }

@@ -8,9 +8,6 @@ public class WaitingSalesOrder : INotifyPropertyChanged, IDisposable
 {
 	private int _referenceId;
 	private int _orderReferenceId; 
-	private int _customerReferenceId;
-	private string _customerCode = string.Empty;
-	private string _customerName = string.Empty;
 	private int _productReferenceId;
 	private string _productCode = string.Empty;
 	private string _productName = string.Empty;
@@ -20,12 +17,20 @@ public class WaitingSalesOrder : INotifyPropertyChanged, IDisposable
 	private int _subUnitsetReferenceId;
 	private string _subUnitsetCode = string.Empty;
 	private string _subUnitsetName = string.Empty;
-	private bool _isVariant;
 	private double _quantity;
 	private double _shippedQuantity;
 	private double _waitingQuantity;
-	private DateTime? _orderDate;
-	//private DateTime _dueDate;
+	private int _customerReferenceId;
+	private string _customerCode = string.Empty;
+	private string _customerName = string.Empty;
+	private bool _isVariant;
+	private int _variantReferenceId;
+	private string _variantCode = string.Empty;
+	private string _variantName = string.Empty;
+	private int _locTracking;
+	private int _trackingType;
+	private DateTime _orderDate;
+	private DateTime _dueDate;
 
     public WaitingSalesOrder()
     {
@@ -57,40 +62,6 @@ public class WaitingSalesOrder : INotifyPropertyChanged, IDisposable
 	}
 
 	[Browsable(false)]
-	public int CustomerReferenceId
-	{
-		get => _customerReferenceId;
-		set
-		{
-			if (_customerReferenceId == value) return;
-			_customerReferenceId = value;
-			NotifyPropertyChanged();
-		}
-	}
-
-	public string CustomerCode
-	{
-		get => _customerCode;
-		set
-		{
-			if (_customerCode == value) return;
-			_customerCode = value;
-			NotifyPropertyChanged();
-		}
-	}
-
-	public string CustomerName
-	{
-		get => _customerName;
-		set
-		{
-			if (_customerName == value) return;
-			_customerName = value;
-			NotifyPropertyChanged();
-		}
-	}
-
-	[Browsable(false)]
 	public int ProductReferenceId
 	{
 		get => _productReferenceId;
@@ -101,7 +72,7 @@ public class WaitingSalesOrder : INotifyPropertyChanged, IDisposable
 			NotifyPropertyChanged();
 		}
 	}
-	
+
 	public string ProductCode
 	{
 		get => _productCode;
@@ -122,7 +93,7 @@ public class WaitingSalesOrder : INotifyPropertyChanged, IDisposable
 			NotifyPropertyChanged();
 		}
 	}
-	
+
 	[Browsable(false)]
 	public int UnitsetReferenceId
 	{
@@ -191,17 +162,6 @@ public class WaitingSalesOrder : INotifyPropertyChanged, IDisposable
 		}
 	}
 
-	public bool IsVariant
-	{
-		get => _isVariant;
-		set
-		{
-			if (_isVariant == value) return;
-			_isVariant = value;
-			NotifyPropertyChanged();
-		}
-	}
-	
 	public double Quantity
 	{
 		get => _quantity;
@@ -235,7 +195,107 @@ public class WaitingSalesOrder : INotifyPropertyChanged, IDisposable
 		}
 	}
 
-	public DateTime? OrderDate
+	[Browsable(false)]
+	public int CustomerReferenceId
+	{
+		get => _customerReferenceId;
+		set
+		{
+			if (_customerReferenceId == value) return;
+			_customerReferenceId = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	public string CustomerCode
+	{
+		get => _customerCode;
+		set
+		{
+			if (_customerCode == value) return;
+			_customerCode = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	public string CustomerName
+	{
+		get => _customerName;
+		set
+		{
+			if (_customerName == value) return;
+			_customerName = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	public bool IsVariant
+	{
+		get => _isVariant;
+		set
+		{
+			if (_isVariant == value) return;
+			_isVariant = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	public int VariantReferenceId
+	{
+		get => _variantReferenceId;
+		set
+		{
+			if (_variantReferenceId == value) return;
+			_variantReferenceId = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	public string VariantCode
+	{
+		get => _variantCode;
+		set
+		{
+			if (_variantCode == value) return;
+			_variantCode = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	public string VariantName
+	{
+		get => _variantName;
+		set
+		{
+			if (_variantName == value) return;
+			_variantName = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	public int LocTracking
+	{
+		get => _locTracking;
+		set
+		{
+			if (_locTracking == value) return;
+			_locTracking = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	public int TrackingType
+	{
+		get => _trackingType;
+		set
+		{
+			if (_trackingType == value) return;
+			_trackingType = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	public DateTime OrderDate
 	{
 		get => _orderDate;
 		set
@@ -246,16 +306,16 @@ public class WaitingSalesOrder : INotifyPropertyChanged, IDisposable
 		}
 	}
 
-	//public DateTime DueDate
-	//{
-	//	get => _dueDate;
-	//	set
-	//	{
-	//		if (_dueDate == value) return;
-	//		_dueDate = value;
-	//		NotifyPropertyChanged();
-	//	}
-	//}
+	public DateTime DueDate
+	{
+		get => _dueDate;
+		set
+		{
+			if (_dueDate == value) return;
+			_dueDate = value;
+			NotifyPropertyChanged();
+		}
+	}
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 

@@ -1,11 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
-using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.SalesModels;
+using Deppo.Mobile.Core.Models.SalesModels.BasketModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
+using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using JetBrains.Annotations;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.ViewModels;
@@ -16,37 +20,10 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 {
 	private readonly IHttpClientService _httpClientService;
 	private readonly IWaitingSalesOrderService _waitingSalesOrderService;
+	private readonly ISalesCustomerProductService _salesCustomerProductService;
 	private readonly IServiceProvider _serviceProvider;
 	private readonly IUserDialogs _userDialogs;
 
-	public OutputProductSalesOrderProcessProductListViewModel(IHttpClientService httpClientService, IWaitingSalesOrderService waitingSalesOrderService, IServiceProvider serviceProvider, IUserDialogs userDialogs)
-	{
-		_httpClientService = httpClientService;
-		_waitingSalesOrderService = waitingSalesOrderService;
-		_serviceProvider = serviceProvider;
-		_userDialogs = userDialogs;
-
-		Title = "Sipariş ve Ürünler";
-		IsProductListVisible = false;
-		IsOrderListVisible = true;
-
-		SwitchToProductListViewCommand = new Command(SwitchToProductListViewAsync);
-		SwitchToOrderListViewCommand = new Command(SwitchToOrderListViewAsync);
-	}
-
-	#region Commands
-	public Command SwitchToProductListViewCommand { get; }
-	public Command SwitchToOrderListViewCommand { get; }
-	public Command ItemTappedCommand { get; }
-	public Command NextViewCommand { get; }
-	#endregion
-
-	#region Collections
-	public ObservableCollection<WaitingSalesOrder> Orders { get; } = new();
-	public ObservableCollection<SalesCustomerProduct> Products { get; } = new();
-	#endregion
-
-	#region Properties
 	[ObservableProperty]
 	WarehouseModel warehouseModel = null!;
 
@@ -54,53 +31,162 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 	SalesCustomer salesCustomer = null!;
 
 	[ObservableProperty]
-	bool isProductListVisible = false;
+	ObservableCollection<OutputSalesBasketModel> selectedProducts = new();
 
 	[ObservableProperty]
-	bool isOrderListVisible = true;
+	int targetViewType = default;
+
+	[ObservableProperty]
+	bool isProductVisible = true;
+
+	[ObservableProperty]
+	bool isOrderVisible = false;
+
+	public Page CurrentPage { get; set; }
+
+	public OutputProductSalesOrderProcessProductListViewModel(IHttpClientService httpClientService, IWaitingSalesOrderService waitingSalesOrderService, ISalesCustomerProductService salesCustomerProductService, IServiceProvider serviceProvider, IUserDialogs userDialogs)
+	{
+		_httpClientService = httpClientService;
+		_waitingSalesOrderService = waitingSalesOrderService;
+		_salesCustomerProductService = salesCustomerProductService;
+		_serviceProvider = serviceProvider;
+		_userDialogs = userDialogs;
+
+		Title = "Ürün Listesi";
+
+		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+		ItemTappedCommand = new Command<SalesCustomerProduct>(async (item) => await ItemTappedAsync(item));
+
+		LoadOrdersCommand = new Command(async () => await LoadOrdersAsync());
+		LoadMoreOrdersCommand = new Command(async () => await LoadMoreOrdersAsync());
+		OrderTappedCommand = new Command<WaitingSalesOrderModel>(async (item) => await OrderTappedAsync(item));
+
+		SwitchViewCommand = new Command(async () => await SwitchViewAsync());
+	}
+
+	#region Commands
+	public Command SwitchViewCommand { get; }
+	public Command LoadItemsCommand { get; }
+	public Command LoadMoreItemsCommand { get; }
+	public Command<SalesCustomerProduct> ItemTappedCommand { get; }
+
+	public Command LoadOrdersCommand { get; }
+	public Command LoadMoreOrdersCommand { get; }
+	public Command<WaitingSalesOrderModel> OrderTappedCommand { get; }
+
+	public Command NextViewCommand { get; }
 	#endregion
 
-	async void SwitchToProductListViewAsync()
-	{
-		IsProductListVisible = true;
-		IsOrderListVisible = false;
+	#region Collections
+	public ObservableCollection<WaitingSalesOrderModel> Orders { get; } = new();
+	public ObservableCollection<SalesCustomerProduct> Items { get; } = new();
+	#endregion
 
-		// Ürünler verilerini yükle
-		await LoadItemsAsync();
+	private async Task SwitchViewAsync()
+	{
+		if (IsBusy)
+			return;
+
+		try
+		{
+			switch (TargetViewType)
+			{
+				case 0:
+					await SwitchToOrderListViewAsync();
+					break;
+				case 1:
+					await SwitchToProductListViewAsync();
+					break;
+				default:
+					await SwitchToProductListViewAsync();
+					break;
+			}
+		}
+		catch (Exception ex)
+		{
+			_userDialogs.Alert(ex.Message,"Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+
 	}
 
-	async void SwitchToOrderListViewAsync()
+	//TargetViewType = 0
+	private async Task SwitchToProductListViewAsync()
 	{
-		IsProductListVisible = false;
-		IsOrderListVisible = true;
+		try
+		{
+			Orders.Clear();
+			TargetViewType = 0;
+			IsProductVisible = true;
+			IsOrderVisible = false;
+			SelectedProducts.Clear();
+			CurrentPage.FindByName<Border>("productView").IsVisible = true;
+			CurrentPage.FindByName<Border>("orderView").IsVisible = false;
+			await LoadItemsAsync();
 
-		// Sipariş verilerini yükle
-		await LoadOrdersAsync();
+		}
+		catch (Exception ex)
+		{
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
 	}
 
-	async Task LoadItemsAsync()
-	{		
+	//TargetViewType = 1
+	private async Task SwitchToOrderListViewAsync()
+	{
+		try
+		{
+			Items.Clear();
+			TargetViewType = 1;
+			IsProductVisible = false;
+			IsOrderVisible = true;
+			SelectedProducts.Clear();
+			CurrentPage.FindByName<Border>("productView").IsVisible = false;
+			CurrentPage.FindByName<Border>("orderView").IsVisible = true;
+			await LoadOrdersAsync();
+
+		}
+		catch (Exception ex)
+		{
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+	}
+
+	private async Task LoadItemsAsync()
+	{
+		if (IsBusy)
+			return;
 		try
 		{
 			IsBusy = true;
 
-			Products.Clear();
-			_userDialogs.Loading("Loading Items...");
+			_userDialogs.ShowLoading("Loading Items...");
+			Items.Clear();
 			await Task.Delay(1000);
-			
 
-            foreach (var item in SalesCustomer.Products)
-            {
-				Products.Add(item);
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _salesCustomerProductService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SalesCustomer.ReferenceId, WarehouseModel.Number, string.Empty, 0, 20);
+
+			if(result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+					Items.Add(Mapping.Mapper.Map<SalesCustomerProduct>(item));
             }
 
-			_userDialogs.Loading().Hide();
-        }
+			_userDialogs.HideHud();
+		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
-			
+
 			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
 		finally
@@ -109,33 +195,244 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 		}
 	}
 
-	async Task LoadOrdersAsync()
+	private async Task LoadMoreItemsAsync()
 	{
+		if (IsBusy)
+			return;
 		try
 		{
 			IsBusy = true;
 
-			Orders.Clear();
-			_userDialogs.Loading("Loading Items...");
-			await Task.Delay(1000);
-			
-            foreach (var item in SalesCustomer.Products)
-            {
-                if(item.Orders is not null)
-				{
-                    foreach (var order in item.Orders)
-                    {
-						Orders.Add(order);
-                    }
-                }
-            }
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _salesCustomerProductService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SalesCustomer.ReferenceId, WarehouseModel.Number, string.Empty, Items.Count, 20);
 
-            _userDialogs.Loading().Hide();
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+					Items.Add(Mapping.Mapper.Map<SalesCustomerProduct>(item));
+			}
 		}
-		catch (Exception)
+		catch (Exception ex)
 		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 
-			throw;
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task ItemTappedAsync(SalesCustomerProduct salesCustomerProduct)
+	{
+		if (IsBusy)
+			return;
+
+		try
+		{
+			IsBusy = true;
+
+			var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == salesCustomerProduct.ReferenceId);
+
+			if(selectedItem is not null)
+			{
+				if(selectedItem.IsSelected)
+				{
+					Items.FirstOrDefault(x => x.ReferenceId == salesCustomerProduct.ReferenceId).IsSelected = false;
+					SelectedProducts.Remove(SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == selectedItem.ItemReferenceId));
+				}
+				else
+				{
+					Items.FirstOrDefault(x => x.ReferenceId == salesCustomerProduct.ReferenceId).IsSelected = true;
+
+					var basketItem = new OutputSalesBasketModel
+					{
+						ItemReferenceId = selectedItem.ItemReferenceId,
+						ItemCode = selectedItem.ItemCode,
+						ItemName = selectedItem.ItemName,
+						IsVariant = selectedItem.IsVariant,
+						UnitsetReferenceId = selectedItem.UnitsetReferenceId,
+						UnitsetCode = selectedItem.UnitsetCode,
+						UnitsetName = selectedItem.UnitsetName,
+						SubUnitsetReferenceId = selectedItem.SubUnitsetReferenceId,
+						SubUnitsetCode = selectedItem.SubUnitsetCode,
+						SubUnitsetName = selectedItem.SubUnitsetName,
+						MainItemReferenceId = selectedItem.MainItemReferenceId,
+						MainItemCode = selectedItem.MainItemCode,
+						MainItemName = selectedItem.MainItemName,
+						StockQuantity = default,
+						IsSelected = false,
+						TrackingType = selectedItem.TrackingType,
+						LocTracking = selectedItem.LocTracking,
+						Image = string.Empty,
+						Quantity = selectedItem.WaitingQuantity,
+					};
+
+					if (selectedItem.LocTracking == 1 || selectedItem.TrackingType == 1)
+						basketItem.OutputQuantity = 0;
+					else
+						basketItem.OutputQuantity = 1;
+
+					SelectedProducts.Add(basketItem);
+				}
+			}
+		}
+		catch(Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task LoadOrdersAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			_userDialogs.ShowLoading("Loading Orders...");
+			Orders.Clear();
+			await Task.Delay(1000);
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _waitingSalesOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, customerReferenceId: SalesCustomer.ReferenceId, string.Empty, 0, 20);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+					Orders.Add(Mapping.Mapper.Map<WaitingSalesOrderModel>(item));
+			}
+
+			_userDialogs.HideHud();
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task LoadMoreOrdersAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _waitingSalesOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, customerReferenceId: SalesCustomer.ReferenceId, string.Empty, Orders.Count, 20);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+					Orders.Add(Mapping.Mapper.Map<WaitingSalesOrderModel>(item));
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task OrderTappedAsync(WaitingSalesOrderModel waitingSalesOrderModel)
+	{
+		if (IsBusy)
+			return;
+
+		try
+		{
+			IsBusy = true;
+
+			var selectedItem = Orders.FirstOrDefault(x => x.ReferenceId == waitingSalesOrderModel.ReferenceId);
+			if(selectedItem is not null)
+			{
+				if(selectedItem.IsSelected)
+				{
+					Orders.FirstOrDefault(x => x.ReferenceId == waitingSalesOrderModel.ReferenceId).IsSelected = false;
+					SelectedProducts.Remove(SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == selectedItem.ProductReferenceId));
+				}
+				else
+				{
+					Orders.FirstOrDefault(x => x.ReferenceId == waitingSalesOrderModel.ReferenceId).IsSelected = true;
+
+					if (SelectedProducts.ToList().Exists(x => x.ItemReferenceId == selectedItem.ProductReferenceId))
+					{
+						SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == selectedItem.ProductReferenceId).Quantity += selectedItem.WaitingQuantity;
+					}
+					else
+					{
+						var basketItem = new OutputSalesBasketModel
+						{
+							ItemReferenceId = selectedItem.IsVariant ? selectedItem.VariantReferenceId : selectedItem.ProductReferenceId,
+							ItemCode = selectedItem.IsVariant ? selectedItem.VariantCode : selectedItem.ProductCode,
+							ItemName = selectedItem.IsVariant ? selectedItem.VariantName : selectedItem.VariantName,
+							IsVariant = selectedItem.IsVariant,
+							UnitsetReferenceId = selectedItem.UnitsetReferenceId,
+							UnitsetCode = selectedItem.UnitsetCode,
+							UnitsetName = selectedItem.UnitsetName,
+							SubUnitsetReferenceId = selectedItem.SubUnitsetReferenceId,
+							SubUnitsetCode = selectedItem.SubUnitsetCode,
+							SubUnitsetName = selectedItem.SubUnitsetName,
+							MainItemReferenceId = selectedItem.ProductReferenceId,
+							MainItemCode = selectedItem.ProductCode,
+							MainItemName = selectedItem.VariantName,
+							StockQuantity = default,
+							IsSelected = false,
+							TrackingType = selectedItem.TrackingType,
+							LocTracking = selectedItem.LocTracking,
+							Image = string.Empty,
+							Quantity = selectedItem.WaitingQuantity,
+						};
+
+						if (selectedItem.LocTracking == 1 || selectedItem.TrackingType == 1)
+							basketItem.OutputQuantity = 0;
+						else
+							basketItem.OutputQuantity = 1;
+
+						SelectedProducts.Add(basketItem);
+					}
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{

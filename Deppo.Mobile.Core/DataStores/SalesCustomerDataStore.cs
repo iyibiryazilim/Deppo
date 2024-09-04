@@ -8,9 +8,9 @@ namespace Deppo.Mobile.Core.DataStores;
 public class SalesCustomerDataStore : ISalesCustomerService
 {
 	private string postUrl = "/gateway/customQuery/CustomQuery";
-	public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsAsync(HttpClient httpClient, int firmNumber, int periodNumber, int customerReferenceId, int skip = 0, int take = 20, string search = "")
+	public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsAsync(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int skip = 0, int take = 20, string search = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(SalesCustomerQuery(firmNumber, periodNumber, skip, take, search)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(SalesCustomerQuery(firmNumber, periodNumber, warehouseNumber, search, skip, take)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -58,22 +58,24 @@ public class SalesCustomerDataStore : ISalesCustomerService
 		}
 	}
 
-	private string SalesCustomerQuery(int firmNumber, int periodNumber, int skip = 0, int take = 20, string search = "")
+	private string SalesCustomerQuery(int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20)
 	{
 		string baseQuery = $@"SELECT
             [ReferenceId] = CLCARD.LOGICALREF,
 			[Code] = CLCARD.CODE,
-			[Name] = CLCARD.NAME,
-			[ProductReferenceCount] = COUNT(DISTINCT ORFLINE.STOCKREF)
+			[Name] = CLCARD.DEFINITION_,
+			[ProductReferenceCount] = COUNT(DISTINCT ORFLINE.STOCKREF),
+            [Country] = CLCARD.COUNTRY,
+            [City] = CLCARD.CITY
         FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2,'0')}_ORFLINE AS ORFLINE
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = ORFLINE.CLIENTREF
-        WHERE ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUN - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 1
+        WHERE ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 1 AND ORFLINE.SOURCEINDEX = {warehouseNumber}
 		";
 
 		if(!string.IsNullOrEmpty(search))
-			baseQuery += $@" AND (CUSTOMER.CODE LIKE '{search}%' OR CUSTOMER.NAME LIKE '%{search}%')";
+			baseQuery += $@" AND (CLCARD.CODE LIKE '{search}%' OR CLCARD.DEFINITION_ LIKE '%{search}%')";
 
-		baseQuery += $@" GROUP BY CLCARD.LOGICALREF, CLCARD.CODE, CLCARD.NAME ORDER BY CUSTOMER.CODE OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+		baseQuery += $@" GROUP BY CLCARD.LOGICALREF, CLCARD.CODE, CLCARD.DEFINITION_, CLCARD.COUNTRY, CLCARD.CITY ORDER BY CLCARD.DEFINITION_ ASC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
 		return baseQuery;
 	}

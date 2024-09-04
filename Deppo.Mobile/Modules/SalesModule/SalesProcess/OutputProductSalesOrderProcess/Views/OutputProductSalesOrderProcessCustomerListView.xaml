@@ -26,13 +26,14 @@
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
-    <Grid RowDefinitions="*, Auto">
+    <Grid RowDefinitions="*,Auto">
+
         <Grid Grid.Row="0"
               Padding="10"
-              RowDefinitions="Auto, *"
-              RowSpacing="10">
-            <!--#region Search-->
+              RowDefinitions="Auto,*">
             <Border Grid.Row="0"
+                    Margin="5,5,5,0"
+                    Padding="0"
                     BackgroundColor="{StaticResource PrimaryLight}"
                     HeightRequest="35"
                     Stroke="{StaticResource Primary}"
@@ -42,159 +43,89 @@
                            Placeholder="Ara..."
                            PlaceholderColor="{StaticResource OffBlack}"
                            TextColor="{StaticResource OffBlack}">
-                    <SearchBar.Behaviors>
-                        <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
-                                                        CommandParameter="{Binding ., Source={x:Reference searchBar}}"
-                                                        EventName="TextChanged" />
-                    </SearchBar.Behaviors>
+                    <!-- <SearchBar.Behaviors>
+                    <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                    CommandParameter="{Binding ., Source={x:Reference searchBar}}"
+                                                    EventName="TextChanged" />
+                </SearchBar.Behaviors>-->
                 </SearchBar>
             </Border>
-            <!--#endregion-->
 
-            <!--#region Main list-->
             <CollectionView Grid.Row="1"
                             ItemsSource="{Binding Items}"
                             RemainingItemsThreshold="2"
                             RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
-                <CollectionView.ItemsLayout>
-                    <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
-                </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="customerModel:SalesCustomer">
-                        <Border BackgroundColor="Transparent"
-                                StrokeShape="RoundRectangle 6"
-                                StrokeThickness="0.2">
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessCustomerListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
-                            </Border.GestureRecognizers>
-                            <Border.Triggers>
-                                <DataTrigger Binding="{Binding IsSelected}"
-                                             TargetType="Border"
-                                             Value="True">
-                                    <Setter Property="BackgroundColor" Value="{StaticResource PrimaryLight}" />
-                                </DataTrigger>
-                            </Border.Triggers>
+                        <Border StrokeShape="RoundRectangle 10" StrokeThickness="0.1">
                             <Grid Padding="10"
-                                  ColumnDefinitions="Auto, Auto, *"
+                                  ColumnDefinitions="Auto,*"
                                   ColumnSpacing="10">
-                                <!--<toolkit:AvatarView Grid.Column="0"
-                                                    Margin="5"
-                                                    Background="{StaticResource PrimaryLight}"
+                                <toolkit:AvatarView Background="{StaticResource PrimaryLight}"
                                                     BorderColor="{StaticResource Primary}"
                                                     CornerRadius="200"
                                                     FontAttributes="Bold"
                                                     FontSize="16"
                                                     HeightRequest="50"
-                                                    Text="{Binding }"
+                                                    Text="{Binding TitleName}"
                                                     TextColor="{StaticResource OffBlack}"
                                                     VerticalOptions="Start"
-                                                    WidthRequest="50">
-                                    <toolkit:AvatarView.Triggers>
-                                        <DataTrigger Binding="{Binding IsSelected}"
-                                                     TargetType="toolkit:AvatarView"
-                                                     Value="True">
-                                            <Setter Property="Background" Value="{StaticResource Primary}" />
-                                            <Setter Property="TextColor" Value="{StaticResource White}" />
-                                        </DataTrigger>
-                                    </toolkit:AvatarView.Triggers>
-                                </toolkit:AvatarView>-->
+                                                    WidthRequest="50" />
 
                                 <VerticalStackLayout Grid.Column="1" Spacing="2">
                                     <Label FontAttributes="Bold"
                                            LineBreakMode="TailTruncation"
                                            MaxLines="1"
-                                           TextColor="{StaticResource OffBlack}"
-                                           Text="{Binding Code}">
-                                        <Label.Triggers>
-                                            <DataTrigger Binding="{Binding IsSelected}"
-                                                         TargetType="Label"
-                                                         Value="True">
-                                                <Setter Property="TextColor" Value="{StaticResource White}" />
-                                            </DataTrigger>
-                                        </Label.Triggers>
+                                           Text="{Binding Name}" />
+
+                                    <Label>
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{Binding City}" />
+                                                <Span Text=" / " />
+                                                <Span Text="{Binding Country}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
                                     </Label>
 
-                                    <Label FontAttributes="Bold"
-                                           LineBreakMode="TailTruncation"
-                                           MaxLines="1"
-                                           TextColor="{StaticResource Gray600}"
-                                           Text="{Binding Name}">
-                                        <Label.Triggers>
-                                            <DataTrigger Binding="{Binding IsSelected}"
-                                                         TargetType="Label"
-                                                         Value="True">
-                                                <Setter Property="TextColor" Value="{StaticResource WhiteSmoke}" />
-                                            </DataTrigger>
-                                        </Label.Triggers>
+                                    <Label>
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span FontFamily="FAS" Text="{x:Static fontAwesome:FontAwesomeIcons.Box}" />
+                                                <Span Text=" " />
+                                                <Span Text="{Binding ProductReferenceCount}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
                                     </Label>
 
-                                    <!--<Label HorizontalOptions="Start"
-                                           LineBreakMode="TailTruncation"
-                                           TextColor="{StaticResource Gray600}"
-                                           VerticalOptions="Center"
-                                           WidthRequest="200">
-                                        <Label.Text>
-                                            <MultiBinding StringFormat="{}{0} / {1}">
-                                                <Binding Path="Country" />
-                                                <Binding Path="City" />
-                                            </MultiBinding>
-                                        </Label.Text>
-                                        <Label.Triggers>
-                                            <DataTrigger Binding="{Binding IsSelected}"
-                                                         TargetType="Label"
-                                                         Value="True">
-                                                <Setter Property="TextColor" Value="{StaticResource WhiteSmoke}" />
-                                            </DataTrigger>
-                                        </Label.Triggers>
-                                    </Label>-->
 
-                                    <HorizontalStackLayout Spacing="5">
-                                        <Image Aspect="AspectFit"
-                                               HeightRequest="16"
-                                               VerticalOptions="Center"
-                                               WidthRequest="16">
-                                            <Image.Source>
-                                                <FontImageSource x:Name="FontImageBox"
-                                                                 FontFamily="FAS"
-                                                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                                                                 Size="16"
-                                                                 Color="{StaticResource Primary}" />
-                                            </Image.Source>
-                                            <!--<Image.Triggers>
-                                                <DataTrigger Binding="{Binding IsSelected}"
-                                                             TargetType="Image"
-                                                             Value="True">
-                                                    <Setter TargetName="FontImageBox" Property="FontImageSource.Color" Value="{StaticResource Secondary}" />
-                                                </DataTrigger>
-                                            </Image.Triggers>-->
-                                        </Image>
-                                        <Label HorizontalOptions="Start"
-                                               LineBreakMode="TailTruncation"
-                                               Text="{Binding ProductReferenceCount}"
-                                               TextColor="{StaticResource Gray600}"
-                                               VerticalOptions="Center">
-                                            <Label.Triggers>
-                                                <DataTrigger Binding="{Binding IsSelected}"
-                                                             TargetType="Label"
-                                                             Value="True">
-                                                    <Setter Property="TextColor" Value="{StaticResource Secondary}" />
-                                                </DataTrigger>
-                                            </Label.Triggers>
-                                        </Label>
-                                    </HorizontalStackLayout>
                                 </VerticalStackLayout>
-
                             </Grid>
+                            <Border.Triggers>
+                                <DataTrigger Binding="{Binding IsSelected}"
+                                             TargetType="Border"
+                                             Value="True">
+                                    <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding IsSelected}"
+                                             TargetType="Border"
+                                             Value="False">
+                                    <Setter Property="BackgroundColor" Value="Transparent" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessCustomerListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-            <!--#endregion-->
         </Grid>
         <Button Grid.Row="1"
                 Margin="10,10,10,20"
                 Command="{Binding NextViewCommand}"
-                IsEnabled="{Binding SelectedSalesCustomer, Converter={StaticResource IsNotNullConverter}}"
+                IsEnabled="{Binding SalesCustomer, Converter={StaticResource IsNotNullConverter}}"
                 Text="İleri" />
     </Grid>
 </ContentPage>

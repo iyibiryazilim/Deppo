@@ -5,8 +5,8 @@ namespace Deppo.Mobile.Core.Models.SalesModels;
 
 public partial class SalesCustomerProduct : ObservableObject
 {
-	//[ObservableProperty]
-	//int _referenceId;
+	[ObservableProperty]
+	int _referenceId;
 
 	[ObservableProperty]
 	int _itemReferenceId;
@@ -55,6 +55,21 @@ public partial class SalesCustomerProduct : ObservableObject
 
 	[ObservableProperty]
 	double waitingQuantity;
+
+	[ObservableProperty]
+	bool isSelected;
+
+	[ObservableProperty]
+	int locTracking;
+
+	[ObservableProperty]
+	int trackingType;
+
+	[ObservableProperty]
+	string image = string.Empty;
+
+	[ObservableProperty]
+	double stockQuantity;
 
 	[ObservableProperty]
 	public List<WaitingSalesOrder> orders = new();

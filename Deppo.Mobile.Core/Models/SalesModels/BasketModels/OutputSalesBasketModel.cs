@@ -25,6 +25,7 @@ public class OutputSalesBasketModel : INotifyPropertyChanged, IDisposable
 	private int _locTracking;
 	private bool _isSelected;
 	private string _image;
+	private double _outputQuantity;
 	private List<OutputSalesBasketOrderModel> _details = new();
 
 	public OutputSalesBasketModel()
@@ -274,6 +275,17 @@ public class OutputSalesBasketModel : INotifyPropertyChanged, IDisposable
 		{
 			if (_image == value) return;
 			_image = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	public double OutputQuantity
+	{
+		get => _outputQuantity;
+		set
+		{
+			if (_outputQuantity == value) return;
+			_outputQuantity = value;
 			NotifyPropertyChanged();
 		}
 	}
