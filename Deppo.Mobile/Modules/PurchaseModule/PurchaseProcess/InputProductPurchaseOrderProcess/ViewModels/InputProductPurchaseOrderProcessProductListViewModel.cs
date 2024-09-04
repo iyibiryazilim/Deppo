@@ -9,6 +9,7 @@ using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.VariantModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
+using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -34,6 +35,8 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
         private readonly IUserDialogs _userDialogs;
         private readonly IServiceProvider _serviceProvider;
         private readonly IWaitingPurchaseOrderService _waitingPurchaseOrderService;
+        private readonly IPurchaseSupplierService _purchaseSupplierService;
+        private readonly IPurchaseSupplierProductService _purchaseSupplierProductService;
 
         [ObservableProperty]
         private ObservableCollection<InputProductBasketModel> selectedProducts = new();
@@ -43,7 +46,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
 
         IUserDialogs userDialogs,
         IServiceProvider serviceProvider,
-        IWaitingPurchaseOrderService waitingPurchaseOrderService)
+        IWaitingPurchaseOrderService waitingPurchaseOrderService, IPurchaseSupplierService purchaseSupplierService, IPurchaseSupplierProductService purchaseSupplierProductService)
         {
             _httpClientService = httpClientService;
             _productService = productService;
@@ -51,11 +54,17 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
             _userDialogs = userDialogs;
             _serviceProvider = serviceProvider;
             _waitingPurchaseOrderService = waitingPurchaseOrderService;
+            _purchaseSupplierService = purchaseSupplierService;
+            _purchaseSupplierProductService = purchaseSupplierProductService;
 
             Title = "Sipariş ve Ürün Listesi";
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+            SwitchToProductListViewCommand = new Command(SwitchToProductListViewAsync);
+            SwitchToOrderListViewCommand = new Command(SwitchToOrderListViewAsync);
         }
 
+        public Command SwitchToProductListViewCommand { get; }
+        public Command SwitchToOrderListViewCommand { get; }
         public Command LoadItemsCommand { get; }
         public Command ItemTappedCommand { get; }
         public Command NextViewCommand { get; }
@@ -71,17 +80,69 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
         [ObservableProperty]
         private PurchaseSupplier purchaseSupplier = null!;
 
+        [ObservableProperty]
+        private bool isProductListVisible = false;
+
+        [ObservableProperty]
+        private bool isOrderListVisible = true;
+
         #endregion Properties
+
+        private async void SwitchToProductListViewAsync()
+        {
+            IsProductListVisible = true;
+            IsOrderListVisible = false;
+
+            // Ürünler verilerini yükle
+            await LoadItemsAsync();
+        }
+
+        private async void SwitchToOrderListViewAsync()
+        {
+            IsProductListVisible = false;
+            IsOrderListVisible = true;
+
+            // Sipariş verilerini yükle
+            await LoadOrdersAsync();
+        }
 
         private async Task LoadItemsAsync()
         {
+            //try
+            //{
+            //    IsBusy = true;
+            //    Products.Clear();
+            //    _userDialogs.Loading("Loading Items...");
+            //    var httpClient = _httpClientService.GetOrCreateHttpClient();
+            //    var result = await _purchaseSupplierProductService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseSupplier.ReferenceId);
+
+            //    if (result.Data is not null)
+            //    {
+            //        foreach (var item in result.Data)
+            //        {
+            //            var obj = Mapping.Mapper.Map<PurchaseSupplierProduct>(item);
+            //            Products.Add(obj);
+            //        }
+            //    }
+            //}
+            //catch (Exception ex
+            //)
+            //{
+            //    if (_userDialogs.IsHudShowing)
+            //        _userDialogs.HideHud();
+
+            //    _userDialogs.Alert(ex.Message);
+            //}
+            //finally
+            //{
+            //    IsBusy = false;
+            //}
             try
             {
                 IsBusy = true;
-
+                Products.Clear();
                 _userDialogs.Loading("Loading Items...");
                 await Task.Delay(1000);
-                Products.Clear();
 
                 foreach (var item in PurchaseSupplier.Products)
                 {
@@ -109,15 +170,30 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
             {
                 IsBusy = true;
 
+                Orders.Clear();
                 _userDialogs.Loading("Loading Items...");
                 await Task.Delay(1000);
-                Orders.Clear();
+
+                foreach (var item in PurchaseSupplier.Products)
+                {
+                    if (item.Orders is not null)
+                    {
+                        foreach (var order in item.Orders)
+                        {
+                            Orders.Add(order);
+                        }
+                    }
+                }
 
                 _userDialogs.Loading().Hide();
             }
             catch (Exception)
             {
                 throw;
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
     }

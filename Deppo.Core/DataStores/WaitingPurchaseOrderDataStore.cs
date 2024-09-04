@@ -74,12 +74,14 @@ public class WaitingPurchaseOrderDataStore : IWaitingPurchaseOrderService
     [UnitsetReferenceId] = UNITSET.LOGICALREF,
     [UnitsetCode] = UNITSET.CODE,
     [UnitsetName] = UNITSET.NAME,
+
     [SubUnitsetReferenceId] = SUBUNITSET.LOGICALREF,
     [SubUnitsetCode] = SUBUNITSET.CODE,
     [SubUnitsetName] = SUBUNITSET.NAME,
     [Quantity] = ORFLINE.AMOUNT,
     [ShippedQuantity] = ORFLINE.SHIPPEDAMOUNT,
     [WaitingQuantity] = (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT),
+    [IsVariant]=ITEMS.CANCONFIGURE,
     [OrderDate] = ORFLINE.DATE_,
     [DueDate] = ORFLINE.DUEDATE
 

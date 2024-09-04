@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Deppo.Core.DataResultModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,4 +9,5 @@ namespace Deppo.Mobile.Core.Services;
 
 public interface IPurchaseSupplierProductService
 {
+    Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int supplierReferenceId, string search = "", int skip = 0, int take = 20);
 }
