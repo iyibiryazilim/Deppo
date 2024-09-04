@@ -33,6 +33,8 @@ public class MappingProfile : Profile
         CreateMap<SerilotTransaction, dynamic>();
         CreateMap<SalesCustomer, dynamic>();
         CreateMap<WaitingSalesOrder, dynamic>();
+        CreateMap<PurchaseSupplier, dynamic>();
         CreateMap<PurchaseSupplierProduct, dynamic>();
+        CreateMap<WaitingPurchaseOrderModel, dynamic>();
     }
 }

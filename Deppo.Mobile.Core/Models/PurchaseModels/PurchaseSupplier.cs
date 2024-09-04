@@ -8,22 +8,28 @@ namespace Deppo.Mobile.Core.Models.PurchaseModels;
 public partial class PurchaseSupplier : ObservableObject
 {
     [ObservableProperty]
-    public int _referenceId;
+    int _referenceId;
 
     [ObservableProperty]
-    public string _code = string.Empty;
+    string _code = string.Empty;
 
     [ObservableProperty]
-    public string _name = string.Empty;
+    string _name = string.Empty;
 
     [ObservableProperty]
-    public int _productReferenceCount;
+    int _productReferenceCount;
+
+    [ObservableProperty]
+    string country = string.Empty;
+
+    [ObservableProperty]
+    string city = string.Empty;
 
     public string TitleName => Name?.Length > 2 ? Name.Substring(0, 2) : Name;
 
     [ObservableProperty]
-    public List<PurchaseSupplierProduct> products;
+    List<PurchaseSupplierProduct> products = new();
 
     [ObservableProperty]
-    public bool isSelected;
+    bool isSelected;
 }

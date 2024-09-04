@@ -7,55 +7,70 @@ namespace Deppo.Mobile.Core.Models.PurchaseModels;
 public partial class PurchaseSupplierProduct : ObservableObject
 {
     [ObservableProperty]
-    private int _referenceId;
+    int _referenceId;
 
     [ObservableProperty]
-    private int _itemReferenceId;
+    int _itemReferenceId;
 
     [ObservableProperty]
-    private string _itemCode = string.Empty;
+    string _itemCode = string.Empty;
 
     [ObservableProperty]
-    private string _itemName = string.Empty;
+    string _itemName = string.Empty;
 
     [ObservableProperty]
-    private int _mainItemReferenceId;
+    int _mainItemReferenceId;
 
     [ObservableProperty]
-    private string _mainItemCode = string.Empty;
+    string _mainItemCode = string.Empty;
 
     [ObservableProperty]
-    private string _mainItemName = string.Empty;
+    string _mainItemName = string.Empty;
 
     [ObservableProperty]
-    private bool _isVariant;
+    bool _isVariant;
 
     [ObservableProperty]
-    private int _unitsetReferenceId;
+    int _unitsetReferenceId;
 
     [ObservableProperty]
-    private string _unitsetName = string.Empty;
+    string _unitsetName = string.Empty;
 
     [ObservableProperty]
-    private string _unitsetCode = string.Empty;
+    string _unitsetCode = string.Empty;
 
     [ObservableProperty]
-    private int _SubunitsetReferenceId;
+    int _subUnitsetReferenceId;
 
     [ObservableProperty]
-    private string _SubunitsetName = string.Empty;
+    string _subUnitsetName = string.Empty;
 
     [ObservableProperty]
-    private string _SubunitsetCode = string.Empty;
+    string _subUnitsetCode = string.Empty;
 
     [ObservableProperty]
-    private double _quantity;
+    double _quantity;
 
     [ObservableProperty]
-    private double _shippedQuantity;
+    double _shippedQuantity;
 
     [ObservableProperty]
-    private double _waitingQuantity;
+    double _waitingQuantity;
+
+    [ObservableProperty]
+    bool isSelected;
+
+    [ObservableProperty]
+    int locTracking;
+
+    [ObservableProperty]
+    int trackingType;
+
+    [ObservableProperty]
+    string image = string.Empty;
+
+    [ObservableProperty]
+    double stockQuantity;
 
     [ObservableProperty]
     public List<WaitingPurchaseOrder> orders = new();

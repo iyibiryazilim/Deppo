@@ -9,5 +9,5 @@ namespace Deppo.Mobile.Core.Services;
 
 public interface IPurchaseSupplierProductService
 {
-    Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int supplierReferenceId, string search = "", int skip = 0, int take = 20);
+    Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int supplierReferenceId, int warehouseNumber,string search = "", int skip = 0, int take = 20);
 }
