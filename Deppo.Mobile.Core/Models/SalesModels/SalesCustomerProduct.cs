@@ -1,4 +1,3 @@
-using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Deppo.Core.Models;
 
@@ -6,40 +5,58 @@ namespace Deppo.Mobile.Core.Models.SalesModels;
 
 public partial class SalesCustomerProduct : ObservableObject
 {
-    [ObservableProperty]
-    private int _referenceId;
+	//[ObservableProperty]
+	//int _referenceId;
 
-    [ObservableProperty]
-    private int _itemReferenceId;
+	[ObservableProperty]
+	int _itemReferenceId;
 
-    [ObservableProperty]
-    private string _itemCode = string.Empty;
+	[ObservableProperty]
+	string _itemCode = string.Empty;
 
-    [ObservableProperty]
-    private string _itemName = string.Empty;
+	[ObservableProperty]
+	string _itemName = string.Empty;
 
-    [ObservableProperty]
-    private int _mainItemReferenceId;
+	[ObservableProperty]
+	int _mainItemReferenceId;
 
-    [ObservableProperty]
-    private string _mainItemCode = string.Empty;
+	[ObservableProperty]
+	string _mainItemCode = string.Empty;
 
-    [ObservableProperty]
-    private string _mainItemName = string.Empty;
+	[ObservableProperty]
+	string _mainItemName = string.Empty;
 
-    [ObservableProperty]
-    private bool _isVariant;
+	[ObservableProperty]
+	bool _isVariant;
 
-    [ObservableProperty]
-    private double _quantity;
+	[ObservableProperty]
+	int unitsetReferenceId;
 
-    [ObservableProperty]
-    private double _shippedQuantity;
+	[ObservableProperty]
+	string unitsetCode = string.Empty;
 
-    [ObservableProperty]
-    private double _waitingQuantity;
+	[ObservableProperty]
+	string unitsetName = string.Empty;
 
-    [ObservableProperty]
-    public List<WaitingSalesOrder> orders = new();
+	[ObservableProperty]
+	int subUnitsetReferenceId;
+
+	[ObservableProperty]
+	string subUnitsetCode = string.Empty;
+
+	[ObservableProperty]
+	string subUnitsetName = string.Empty;
+
+	[ObservableProperty]
+	double quantity;
+
+	[ObservableProperty]
+	double shippedQuantity;
+
+	[ObservableProperty]
+	double waitingQuantity;
+
+	[ObservableProperty]
+	public List<WaitingSalesOrder> orders = new();
 
 }
