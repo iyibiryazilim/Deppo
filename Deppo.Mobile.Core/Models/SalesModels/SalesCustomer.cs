@@ -6,16 +6,16 @@ namespace Deppo.Mobile.Core.Models.SalesModels;
 public partial class SalesCustomer : ObservableObject
 {
     [ObservableProperty]
-    private int _referenceId;
+    int referenceId;
 
     [ObservableProperty]
-    private string _code = string.Empty;
+    string code = string.Empty;
 
     [ObservableProperty]
-    private string _name = string.Empty;
+    string name = string.Empty;
 
     [ObservableProperty]
-    private int _productReferenceCount;
+    int productReferenceCount;
 
     [ObservableProperty]
     public List<SalesCustomerProduct> products;
