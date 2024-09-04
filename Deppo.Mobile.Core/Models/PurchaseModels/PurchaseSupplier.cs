@@ -19,6 +19,8 @@ public partial class PurchaseSupplier : ObservableObject
     [ObservableProperty]
     private int _productReferenceCount;
 
+    public string TitleName => Name?.Length > 2 ? Name.Substring(0, 2) : Name;
+
     [ObservableProperty]
     public List<PurchaseSupplierProduct> products;
 
