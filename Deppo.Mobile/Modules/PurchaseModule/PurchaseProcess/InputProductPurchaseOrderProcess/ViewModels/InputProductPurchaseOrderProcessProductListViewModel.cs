@@ -38,7 +38,11 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
     private readonly IPurchaseSupplierProductService _purchaseSupplierProductService;
 
     [ObservableProperty]
-    ObservableCollection<InputPurchaseBasketModel> selectedProducts = new();
+    ObservableCollection<PurchaseSupplierProduct> selectedProducts = new();
+
+    [ObservableProperty]
+    ObservableCollection<WaitingPurchaseOrderModel> selectedOrders = new();
+
 
     [ObservableProperty]
     WarehouseModel warehouseModel = null!;
@@ -81,6 +85,7 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
         OrderTappedCommand = new Command<WaitingPurchaseOrderModel>(async (x) => await OrderTappedAsync(x));
 
         SwitchViewCommand = new Command(async () => await SwitchViewAsync());
+        NextViewCommand = new Command(async () => await NextViewAsync());
     }
 
     public Command SwitchViewCommand { get; }
@@ -136,10 +141,11 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
             TargetViewType = 0;
             IsProductVisible = true;
             IsOrderVisible = false;
-            SelectedProducts.Clear();
             CurrentPage.FindByName<Border>("productView").IsVisible = true;
             CurrentPage.FindByName<Border>("orderView").IsVisible = false;
             Orders.Clear();
+            Title = "Ürün Listesi";
+            SelectedOrders.Clear();
             await LoadItemsAsync();
 
         }
@@ -161,6 +167,8 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
             CurrentPage.FindByName<Border>("productView").IsVisible = false;
             CurrentPage.FindByName<Border>("orderView").IsVisible = true;
             Items.Clear();
+            Title = "Sipariş Listesi";
+            SelectedProducts.Clear();
             await LoadOrdersAsync();
 
         }
@@ -181,7 +189,7 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
             _userDialogs.ShowLoading("Yükleniyor...");
             Items.Clear();
             await Task.Delay(1000);
-            
+
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _purchaseSupplierProductService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseSupplier.ReferenceId, WarehouseModel.Number, string.Empty, 0, 20);
@@ -252,7 +260,7 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
         }
     }
 
-    private async Task LoadOrdersAsync()
+    async Task LoadOrdersAsync()
     {
         if (IsBusy)
             return;
@@ -263,7 +271,7 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
             _userDialogs.ShowLoading("Yükleniyor...");
             Orders.Clear();
             await Task.Delay(1000);
-            
+
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _waitingPurchaseOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, PurchaseSupplier.ReferenceId, string.Empty, Orders.Count, 20);
@@ -344,50 +352,50 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
         {
             IsBusy = true;
 
-            var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == purchaseSupplierProduct.ReferenceId);
+            var selectedItem = Items.FirstOrDefault(x => x.ItemReferenceId == purchaseSupplierProduct.ItemReferenceId);
             if (selectedItem is not null)
             {
 
                 if (selectedItem.IsSelected)
                 {
-                    Items.FirstOrDefault(x => x.ReferenceId == purchaseSupplierProduct.ReferenceId).IsSelected = false;
+                    Items.FirstOrDefault(x => x.ItemReferenceId == purchaseSupplierProduct.ItemReferenceId).IsSelected = false;
                     SelectedProducts.Remove(SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == selectedItem.ItemReferenceId));
                 }
                 else
                 {
-                    Items.FirstOrDefault(x => x.ReferenceId == purchaseSupplierProduct.ReferenceId).IsSelected = true;
+                    Items.FirstOrDefault(x => x.ItemReferenceId == purchaseSupplierProduct.ItemReferenceId).IsSelected = true;
 
-                    var basketItem = new InputPurchaseBasketModel
-                    {
-                        ItemReferenceId = selectedItem.ItemReferenceId,
-                        ItemCode = selectedItem.ItemCode,
-                        ItemName = selectedItem.ItemName,
-                        IsVariant = selectedItem.IsVariant,
-                        UnitsetReferenceId = selectedItem.UnitsetReferenceId,
-                        UnitsetCode = selectedItem.UnitsetCode,
-                        UnitsetName = selectedItem.UnitsetName,
-                        SubUnitsetReferenceId = selectedItem.SubUnitsetReferenceId,
-                        SubUnitsetCode = selectedItem.SubUnitsetCode,
-                        SubUnitsetName = selectedItem.SubUnitsetName,
-                        MainItemReferenceId = selectedItem.MainItemReferenceId,
-                        MainItemCode = selectedItem.MainItemCode,
-                        MainItemName = selectedItem.MainItemName,
-                        StockQuantity = default,
-                        IsSelected = false,
-                        TrackingType = selectedItem.TrackingType,
-                        LocTracking = selectedItem.LocTracking,
-                        Image = string.Empty,
-                        Quantity = selectedItem.WaitingQuantity,
+                    // var basketItem = new InputPurchaseBasketModel
+                    // {
+                    //     ItemReferenceId = selectedItem.ItemReferenceId,
+                    //     ItemCode = selectedItem.ItemCode,
+                    //     ItemName = selectedItem.ItemName,
+                    //     IsVariant = selectedItem.IsVariant,
+                    //     UnitsetReferenceId = selectedItem.UnitsetReferenceId,
+                    //     UnitsetCode = selectedItem.UnitsetCode,
+                    //     UnitsetName = selectedItem.UnitsetName,
+                    //     SubUnitsetReferenceId = selectedItem.SubUnitsetReferenceId,
+                    //     SubUnitsetCode = selectedItem.SubUnitsetCode,
+                    //     SubUnitsetName = selectedItem.SubUnitsetName,
+                    //     MainItemReferenceId = selectedItem.MainItemReferenceId,
+                    //     MainItemCode = selectedItem.MainItemCode,
+                    //     MainItemName = selectedItem.MainItemName,
+                    //     StockQuantity = default,
+                    //     IsSelected = false,
+                    //     TrackingType = selectedItem.TrackingType,
+                    //     LocTracking = selectedItem.LocTracking,
+                    //     Image = string.Empty,
+                    //     Quantity = selectedItem.WaitingQuantity,
 
-                    };
+                    // };
 
-                    if (selectedItem.LocTracking == 1 || selectedItem.TrackingType == 1)
-                        basketItem.InputQuantity = 0;
-                    else
-                        basketItem.InputQuantity = 1;
+                    // if (selectedItem.LocTracking == 1 || selectedItem.TrackingType == 1)
+                    //     basketItem.InputQuantity = 0;
+                    // else
+                    //     basketItem.InputQuantity = 1;
 
 
-                    SelectedProducts.Add(basketItem);
+                    SelectedProducts.Add(selectedItem);
                 }
 
 
@@ -425,50 +433,51 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
                 if (selectedItem.IsSelected)
                 {
                     Orders.FirstOrDefault(x => x.ReferenceId == waitingPurchaseOrderModel.ReferenceId).IsSelected = false;
-                    SelectedProducts.Remove(SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == selectedItem.ProductReferenceId));
+                    SelectedOrders.Remove(SelectedOrders.FirstOrDefault(x => x.ReferenceId == selectedItem.ReferenceId));
                 }
                 else
                 {
                     Orders.FirstOrDefault(x => x.ReferenceId == waitingPurchaseOrderModel.ReferenceId).IsSelected = true;
-
-                    if (SelectedProducts.ToList().Exists(x => x.ItemReferenceId == selectedItem.ProductReferenceId))
-                    {
-                        SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == selectedItem.ProductReferenceId).Quantity += selectedItem.WaitingQuantity;
-                    }
-                    else
-                    {
-                        var basketItem = new InputPurchaseBasketModel
-                        {
-                            ItemReferenceId = selectedItem.IsVariant ? selectedItem.VariantReferenceId : selectedItem.ProductReferenceId,
-                            ItemCode = selectedItem.IsVariant ? selectedItem.VariantCode : selectedItem.ProductCode,
-                            ItemName = selectedItem.IsVariant ? selectedItem.VariantName : selectedItem.VariantName,
-                            IsVariant = selectedItem.IsVariant,
-                            UnitsetReferenceId = selectedItem.UnitsetReferenceId,
-                            UnitsetCode = selectedItem.UnitsetCode,
-                            UnitsetName = selectedItem.UnitsetName,
-                            SubUnitsetReferenceId = selectedItem.SubUnitsetReferenceId,
-                            SubUnitsetCode = selectedItem.SubUnitsetCode,
-                            SubUnitsetName = selectedItem.SubUnitsetName,
-                            MainItemReferenceId = selectedItem.ProductReferenceId,
-                            MainItemCode = selectedItem.ProductCode,
-                            MainItemName = selectedItem.VariantName,
-                            StockQuantity = default,
-                            IsSelected = false,
-                            TrackingType = selectedItem.TrackingType,
-                            LocTracking = selectedItem.LocTracking,
-                            Image = string.Empty,
-                            Quantity = selectedItem.WaitingQuantity,
-
-                        };
-
-                        if (selectedItem.LocTracking == 1 || selectedItem.TrackingType == 1)
-                            basketItem.InputQuantity = 0;
-                        else
-                            basketItem.InputQuantity = 1;
+                    SelectedOrders.Add(selectedItem);
 
 
-                        SelectedProducts.Add(basketItem);
-                    }
+                    // if (SelectedProducts.ToList().Exists(x => x.ItemReferenceId == selectedItem.ProductReferenceId))
+                    // {
+                    //     SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == selectedItem.ProductReferenceId).Quantity += selectedItem.WaitingQuantity;
+                    // }
+                    // else
+                    // {
+                    // var basketItem = new InputPurchaseBasketModel
+                    // {
+                    //     ItemReferenceId = selectedItem.IsVariant ? selectedItem.VariantReferenceId : selectedItem.ProductReferenceId,
+                    //     ItemCode = selectedItem.IsVariant ? selectedItem.VariantCode : selectedItem.ProductCode,
+                    //     ItemName = selectedItem.IsVariant ? selectedItem.VariantName : selectedItem.VariantName,
+                    //     IsVariant = selectedItem.IsVariant,
+                    //     UnitsetReferenceId = selectedItem.UnitsetReferenceId,
+                    //     UnitsetCode = selectedItem.UnitsetCode,
+                    //     UnitsetName = selectedItem.UnitsetName,
+                    //     SubUnitsetReferenceId = selectedItem.SubUnitsetReferenceId,
+                    //     SubUnitsetCode = selectedItem.SubUnitsetCode,
+                    //     SubUnitsetName = selectedItem.SubUnitsetName,
+                    //     MainItemReferenceId = selectedItem.ProductReferenceId,
+                    //     MainItemCode = selectedItem.ProductCode,
+                    //     MainItemName = selectedItem.VariantName,
+                    //     StockQuantity = default,
+                    //     IsSelected = false,
+                    //     TrackingType = selectedItem.TrackingType,
+                    //     LocTracking = selectedItem.LocTracking,
+                    //     Image = string.Empty,
+                    //     Quantity = selectedItem.WaitingQuantity,
+
+                    // };
+
+                    // if (selectedItem.LocTracking == 1 || selectedItem.TrackingType == 1)
+                    //     basketItem.InputQuantity = 0;
+                    // else
+                    //     basketItem.InputQuantity = 1;
+
+
+                    //}
 
 
                 }
@@ -490,6 +499,143 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
         {
             IsBusy = false;
         }
+    }
+
+    private async Task NextViewAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+            if (SelectedOrders.Count == 0 && SelectedProducts.Count == 0)
+            {
+                await _userDialogs.AlertAsync("Lütfen işlem yapılabilecek bir ürün veya sipariş seçiniz.", "Uyarı", "Tamam");
+                return;
+            }
+            CancellationTokenSource cts = new();
+            ObservableCollection<InputPurchaseBasketModel> basketItems = new();
+            switch (TargetViewType)
+            {
+                case 0:
+                    basketItems = await ConvertProductItems().WaitAsync(cts.Token);
+                    break;
+                case 1:
+                    basketItems = await ConvertOrderItems().WaitAsync(cts.Token);
+                    break;
+                default:
+                    break;
+            }
+
+            await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessBasketListView)}", new Dictionary<string, object>
+            {
+                [nameof(WarehouseModel)] = WarehouseModel,
+                [nameof(PurchaseSupplier)] = PurchaseSupplier,
+                ["Items"] = basketItems
+            });
+
+
+        }
+        catch (System.Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task<ObservableCollection<InputPurchaseBasketModel>> ConvertOrderItems()
+    {
+        return await Task.Run(() =>
+        {
+
+            ObservableCollection<InputPurchaseBasketModel> basketItems = new();
+            foreach (var item in SelectedOrders)
+            {
+                var basketItem = new InputPurchaseBasketModel
+                {
+                    ItemReferenceId = item.ProductReferenceId,
+                    ItemCode = item.ProductCode,
+                    ItemName = item.ProductName,
+                    IsVariant = item.IsVariant,
+                    UnitsetReferenceId = item.UnitsetReferenceId,
+                    UnitsetCode = item.UnitsetCode,
+                    UnitsetName = item.UnitsetName,
+                    SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                    SubUnitsetCode = item.SubUnitsetCode,
+                    SubUnitsetName = item.SubUnitsetName,
+                    MainItemReferenceId = item.ProductReferenceId,
+                    MainItemCode = item.ProductCode,
+                    MainItemName = item.ProductName,
+                    StockQuantity = default,
+                    IsSelected = false,
+                    TrackingType = item.TrackingType,
+                    LocTracking = item.LocTracking,
+                    Image = string.Empty,
+                    Quantity = item.WaitingQuantity,
+
+                };
+
+                if (item.LocTracking == 1 || item.TrackingType == 1)
+                    basketItem.InputQuantity = 0;
+                else
+                    basketItem.InputQuantity = 1;
+
+                basketItems.Add(basketItem);
+            }
+
+            return basketItems;
+        });
+
+    }
+
+    private async Task<ObservableCollection<InputPurchaseBasketModel>> ConvertProductItems()
+    {
+        return await Task.Run(() =>
+        {
+
+            ObservableCollection<InputPurchaseBasketModel> basketItems = new();
+            foreach (var item in SelectedProducts)
+            {
+                var basketItem = new InputPurchaseBasketModel
+                {
+                    ItemReferenceId = item.ItemReferenceId,
+                    ItemCode = item.ItemCode,
+                    ItemName = item.ItemName,
+                    IsVariant = item.IsVariant,
+                    UnitsetReferenceId = item.UnitsetReferenceId,
+                    UnitsetCode = item.UnitsetCode,
+                    UnitsetName = item.UnitsetName,
+                    SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                    SubUnitsetCode = item.SubUnitsetCode,
+                    SubUnitsetName = item.SubUnitsetName,
+                    MainItemReferenceId = item.MainItemReferenceId,
+                    MainItemCode = item.MainItemCode,
+                    MainItemName = item.MainItemName,
+                    StockQuantity = default,
+                    IsSelected = false,
+                    TrackingType = item.TrackingType,
+                    LocTracking = item.LocTracking,
+                    Image = string.Empty,
+                    Quantity = item.WaitingQuantity,
+
+                };
+
+                if (item.LocTracking == 1 || item.TrackingType == 1)
+                    basketItem.InputQuantity = 0;
+                else
+                    basketItem.InputQuantity = 1;
+
+                basketItems.Add(basketItem);
+            }
+
+            return basketItems;
+
+        });
+
     }
 
 }

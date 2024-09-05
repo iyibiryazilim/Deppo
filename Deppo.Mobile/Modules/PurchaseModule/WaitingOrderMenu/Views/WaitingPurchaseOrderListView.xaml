@@ -8,8 +8,7 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              Title="{Binding Title}"
-             x:DataType="viewModel:WaitingPurchaseOrderListViewModel"
-             Shell.TabBarIsVisible="False">
+             x:DataType="viewModel:WaitingPurchaseOrderListViewModel">
 
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding LoadSupplierCommand}"
