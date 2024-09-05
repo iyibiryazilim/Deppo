@@ -103,7 +103,7 @@ public partial class WaitingSalesOrderListViewModel : BaseViewModel
 		{
 			IsBusy = true;
 			Items.Clear();
-			var result = await _waitingSalesOrderService.GetObjectsByCustomer(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, 1489, "", 0, 20);
+			var result = await _waitingSalesOrderService.GetObjectsByCustomer(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, customerReferenceId: customer.ReferenceId, "", 0, 20);
 
 			if (result.IsSuccess)
 			{

@@ -22,10 +22,7 @@ public partial class WaitingPurchaseOrderListViewModel : BaseViewModel
     public ObservableCollection<WaitingPurchaseOrder> Items { get; } = new();
 
     [ObservableProperty]
-    private PurchaseSupplier purchaseSupplier = null!;
-
-    [ObservableProperty]
-    private Supplier? selectedSupplier;
+    Supplier? selectedSupplier;
 
 
     public WaitingPurchaseOrderListViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, IWaitingPurchaseOrderService waitingPurchaseOrderService, ISupplierService supplierService)
@@ -39,27 +36,21 @@ public partial class WaitingPurchaseOrderListViewModel : BaseViewModel
 
         LoadItemsCommand = new Command<Supplier>(async (x) => await LoadItemsAsync(x));
         LoadSupplierCommand = new Command(async () => await LoadSupplierAsync());
-        OnSelectedSupplierChangeCommand = new Command<Supplier>(async (x) => await OnSelectedSupplierChangedAsync(x));
+       
     }
 
     public Command LoadItemsCommand { get; }
 
     public Command LoadSupplierCommand { get; }
 
-    public Command<Supplier?> OnSelectedSupplierChangeCommand { get; }
 
+	partial void OnSelectedSupplierChanged(Supplier? value)
+	{
+		if(value is not null)
+            LoadItemsCommand.Execute(value);
+	}
 
-
-
-    private async Task OnSelectedSupplierChangedAsync(Supplier? value)
-    {
-        if (value is not null)
-        {
-            await LoadItemsAsync(value);
-        }
-    }
-
-    public async Task LoadSupplierAsync()
+	public async Task LoadSupplierAsync()
     {
         if (IsBusy)
             return;
@@ -68,9 +59,10 @@ public partial class WaitingPurchaseOrderListViewModel : BaseViewModel
             IsBusy = true;
 
             _userDialogs.Loading("Yükleniyor");
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
             await Task.Delay(1000);
-            var result = await _supplierService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, Suppliers.Count, 20);
+            Suppliers.Clear();
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _supplierService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 999999);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
@@ -104,15 +96,15 @@ public partial class WaitingPurchaseOrderListViewModel : BaseViewModel
 
     public async Task LoadItemsAsync(Supplier supplier)
     {
+        if (supplier is null)
+            return;
         if (IsBusy)
             return;
 
         try
         {
             IsBusy = true;
-            _userDialogs.ShowLoading("Yükleniyor..");
             Items.Clear();
-            await Task.Delay(10000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _waitingPurchaseOrderService.GetObjectsBySupplier(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, supplier.ReferenceId, string.Empty, Items.Count, 20);
@@ -125,7 +117,6 @@ public partial class WaitingPurchaseOrderListViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
