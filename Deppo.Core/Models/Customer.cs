@@ -1,7 +1,7 @@
 using System;
 using Deppo.Core.BaseModels;
 
-namespace Deppo.Mobile.Core.Models;
+namespace Deppo.Core.Models;
 
 /// <summary>
 /// Müşteri - LG_CLCARD

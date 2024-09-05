@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage
-    x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views.InputProductPurchaseOrderProcessProductListView"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:dx="http://schemas.devexpress.com/maui"
-    xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
-    xmlns:model="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels;assembly=Deppo.Mobile.Core"
-    xmlns:purchaseModels="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels;assembly=Deppo.Mobile.Core"
-    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-    xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.ViewModels"
-    Title="{Binding Title}"
-    x:DataType="viewModel:InputProductPurchaseOrderProcessProductListViewModel"
-    Shell.TabBarIsVisible="False">
+<ContentPage x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views.InputProductPurchaseOrderProcessProductListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:model="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels;assembly=Deppo.Mobile.Core"
+             xmlns:purchaseModels="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels;assembly=Deppo.Mobile.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:InputProductPurchaseOrderProcessProductListViewModel"
+             Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
@@ -32,36 +31,32 @@
     <ContentPage.ToolbarItems>
         <ToolbarItem Command="{Binding SwitchViewCommand}">
             <ToolbarItem.IconImageSource>
-                <FontImageSource
-                    FontFamily="FAS"
-                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.Rotate}"
-                    Size="Large" />
+                <FontImageSource FontFamily="FAS"
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Rotate}"
+                                 Size="Large" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </ContentPage.ToolbarItems>
 
     <Grid RowDefinitions="*, Auto" RowSpacing="10">
 
-        <Border
-            x:Name="productView"
-            Grid.Row="0"
-            StrokeThickness="0">
+        <Border x:Name="productView"
+                Grid.Row="0"
+                StrokeThickness="0">
 
             <Grid RowDefinitions="Auto,*" RowSpacing="10">
-                <Border
-                    Grid.Row="0"
-                    Margin="5,0,5,0"
-                    Padding="0"
-                    BackgroundColor="{StaticResource PrimaryLight}"
-                    HeightRequest="35"
-                    Stroke="{StaticResource Primary}"
-                    StrokeShape="RoundRectangle 5"
-                    StrokeThickness="0.5">
-                    <SearchBar
-                        x:Name="searchBar"
-                        Placeholder="Ara..."
-                        PlaceholderColor="{StaticResource OffBlack}"
-                        TextColor="{StaticResource OffBlack}">
+                <Border Grid.Row="0"
+                        Margin="5,0,5,0"
+                        Padding="0"
+                        BackgroundColor="{StaticResource PrimaryLight}"
+                        HeightRequest="35"
+                        Stroke="{StaticResource Primary}"
+                        StrokeShape="RoundRectangle 5"
+                        StrokeThickness="0.5">
+                    <SearchBar x:Name="searchBar"
+                               Placeholder="Ara..."
+                               PlaceholderColor="{StaticResource OffBlack}"
+                               TextColor="{StaticResource OffBlack}">
                         <!-- <SearchBar.Behaviors>
                         <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
                                                         CommandParameter="{Binding ., Source={x:Reference searchBar}}"
@@ -70,64 +65,55 @@
                     </SearchBar>
                 </Border>
 
-                <CollectionView
-                    Grid.Row="1"
-                    ItemsSource="{Binding Items}"
-                    IsVisible="{Binding IsProductVisible}"
-                    RemainingItemsThreshold="2"
-                    RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+                <CollectionView Grid.Row="1"
+                                IsVisible="{Binding IsProductVisible}"
+                                ItemsSource="{Binding Items}"
+                                RemainingItemsThreshold="2"
+                                RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
                     </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="model:PurchaseSupplierProduct">
-                            <Border
-                                Padding="10"
-                                BackgroundColor="Transparent"
-                                StrokeThickness="0.1">
+                            <Border Padding="10"
+                                    BackgroundColor="Transparent"
+                                    StrokeThickness="0.1">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputProductPurchaseOrderProcessProductListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
                                 </Border.GestureRecognizers>
                                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-                                    <Border
-                                        BackgroundColor="{StaticResource Secondary}"
-                                        StrokeShape="RoundRectangle 5"
-                                        StrokeThickness="0.5">
-                                        <Image
-                                            Grid.Column="0"
-                                            HeightRequest="50"
-                                            Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
-                                            WidthRequest="50" />
+                                    <Border BackgroundColor="{StaticResource Secondary}"
+                                            StrokeShape="RoundRectangle 5"
+                                            StrokeThickness="0.5">
+                                        <Image Grid.Column="0"
+                                               HeightRequest="50"
+                                               Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                               WidthRequest="50" />
                                     </Border>
 
                                     <VerticalStackLayout Grid.Column="1" Spacing="2">
-                                        <Label
-                                            FontAttributes="Bold"
-                                            LineBreakMode="TailTruncation"
-                                            Text="{Binding ItemCode}" />
-                                        <Label
-                                            LineBreakMode="TailTruncation"
-                                            Text="{Binding ItemName}"
-                                            TextColor="{StaticResource Gray600}" />
+                                        <Label FontAttributes="Bold"
+                                               LineBreakMode="TailTruncation"
+                                               Text="{Binding ItemCode}" />
+                                        <Label LineBreakMode="TailTruncation"
+                                               Text="{Binding ItemName}"
+                                               TextColor="{StaticResource Gray600}" />
 
                                         <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
-                                            <Image
-                                                Aspect="AspectFit"
-                                                HeightRequest="16"
-                                                VerticalOptions="Center"
-                                                WidthRequest="16">
+                                            <Image Aspect="AspectFit"
+                                                   HeightRequest="16"
+                                                   VerticalOptions="Center"
+                                                   WidthRequest="16">
                                                 <Image.Source>
-                                                    <FontImageSource
-                                                        FontFamily="FAS"
-                                                        Glyph="{x:Static fontAwesome:FontAwesomeIcons.BusinessTime}"
-                                                        Size="16"
-                                                        Color="{StaticResource Primary}" />
+                                                    <FontImageSource FontFamily="FAS"
+                                                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.BusinessTime}"
+                                                                     Size="16"
+                                                                     Color="{StaticResource Primary}" />
                                                 </Image.Source>
                                             </Image>
-                                            <Label
-                                                Text="{Binding WaitingQuantity, StringFormat='{0:N2}'}"
-                                                TextColor="{StaticResource Gray600}"
-                                                VerticalOptions="Center" />
+                                            <Label Text="{Binding WaitingQuantity, StringFormat='{0:N2}'}"
+                                                   TextColor="{StaticResource Gray600}"
+                                                   VerticalOptions="Center" />
                                         </HorizontalStackLayout>
                                     </VerticalStackLayout>
 
@@ -143,117 +129,105 @@
 
         </Border>
 
-        <Border
-            x:Name="orderView"
-            Grid.Row="0"
-            IsVisible="False"
-            StrokeThickness="0" />
-        <Grid RowDefinitions="Auto,*" RowSpacing="10">
-
-            <Border
+        <Border x:Name="orderView"
                 Grid.Row="0"
-                Margin="5,0,5,0"
-                Padding="0"
-                BackgroundColor="{StaticResource PrimaryLight}"
-                HeightRequest="35"
-                Stroke="{StaticResource Primary}"
-                StrokeShape="RoundRectangle 5"
-                StrokeThickness="0.5">
-                <SearchBar
-                    x:Name="searchBarOrder"
-                    Placeholder="Ara..."
-                    PlaceholderColor="{StaticResource OffBlack}"
-                    TextColor="{StaticResource OffBlack}">
-                    <!-- <SearchBar.Behaviors>
-                        <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
-                                                        CommandParameter="{Binding ., Source={x:Reference searchBar}}"
-                                                        EventName="TextChanged" />
-                    </SearchBar.Behaviors>-->
-                </SearchBar>
-            </Border>
+                IsVisible="False"
+                StrokeThickness="0">
+            <Grid RowDefinitions="Auto,*" RowSpacing="10">
 
-            <CollectionView
-                Grid.Row="1"
-                ItemsSource="{Binding Orders}"
-                IsVisible="{Binding IsOrderVisible}"
-                RemainingItemsThreshold="2"
-                RemainingItemsThresholdReachedCommand="{Binding LoadMoreOrdersCommand}">
-                <CollectionView.ItemsLayout>
-                    <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
-                </CollectionView.ItemsLayout>
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="model:WaitingPurchaseOrderModel">
-                        <Border
-                            Padding="10"
-                            BackgroundColor="Transparent"
-                            StrokeThickness="0.1">
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputProductPurchaseOrderProcessProductListViewModel}}, Path=OrderTappedCommand}" CommandParameter="{Binding .}" />
-                            </Border.GestureRecognizers>
-                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-                                <Border
-                                    Padding="5"
-                                    BackgroundColor="{StaticResource Secondary}"
-                                    StrokeShape="RoundRectangle 5"
-                                    StrokeThickness="0.5">
-                                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
-                                        <Label
-                                            FontAttributes="Bold"
-                                            FontSize="Subtitle"
-                                            HorizontalOptions="Center"
-                                            Text="{Binding OrderDate, StringFormat='{0:dd}'}" />
-                                        <Label
-                                            FontSize="Caption"
-                                            HorizontalOptions="Center"
-                                            Text="{Binding OrderDate, StringFormat='{0:MM/yyyy}'}" />
+                <Border Grid.Row="0"
+                        Margin="5,0,5,0"
+                        Padding="0"
+                        BackgroundColor="{StaticResource PrimaryLight}"
+                        HeightRequest="35"
+                        Stroke="{StaticResource Primary}"
+                        StrokeShape="RoundRectangle 5"
+                        StrokeThickness="0.5">
+                    <SearchBar x:Name="searchBarOrder"
+                               Placeholder="Ara..."
+                               PlaceholderColor="{StaticResource OffBlack}"
+                               TextColor="{StaticResource OffBlack}">
+                        <!-- <SearchBar.Behaviors>
+                <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                CommandParameter="{Binding ., Source={x:Reference searchBar}}"
+                                                EventName="TextChanged" />
+            </SearchBar.Behaviors>-->
+                    </SearchBar>
+                </Border>
+
+                <CollectionView Grid.Row="1"
+                                IsVisible="{Binding IsOrderVisible}"
+                                ItemsSource="{Binding Orders}"
+                                RemainingItemsThreshold="2"
+                                RemainingItemsThresholdReachedCommand="{Binding LoadMoreOrdersCommand}">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:WaitingPurchaseOrderModel">
+                            <Border Padding="10"
+                                    BackgroundColor="Transparent"
+                                    StrokeThickness="0.1">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputProductPurchaseOrderProcessProductListViewModel}}, Path=OrderTappedCommand}" CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                    <Border Padding="5"
+                                            BackgroundColor="{StaticResource Secondary}"
+                                            StrokeShape="RoundRectangle 5"
+                                            StrokeThickness="0.5">
+                                        <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                                            <Label FontAttributes="Bold"
+                                                   FontSize="Subtitle"
+                                                   HorizontalOptions="Center"
+                                                   Text="{Binding OrderDate, StringFormat='{0:dd}'}" />
+                                            <Label FontSize="Caption"
+                                                   HorizontalOptions="Center"
+                                                   Text="{Binding OrderDate, StringFormat='{0:MM/yyyy}'}" />
+                                        </VerticalStackLayout>
+                                    </Border>
+
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                        <Label FontAttributes="Bold"
+                                               LineBreakMode="TailTruncation"
+                                               Text="{Binding ProductCode}" />
+                                        <Label LineBreakMode="TailTruncation"
+                                               Text="{Binding ProductName}"
+                                               TextColor="{StaticResource Gray600}" />
+
+                                        <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                                            <Image Aspect="AspectFit"
+                                                   HeightRequest="16"
+                                                   VerticalOptions="Center"
+                                                   WidthRequest="16">
+                                                <Image.Source>
+                                                    <FontImageSource FontFamily="FAS"
+                                                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.BusinessTime}"
+                                                                     Size="16"
+                                                                     Color="{StaticResource Primary}" />
+                                                </Image.Source>
+                                            </Image>
+                                            <Label Text="{Binding WaitingQuantity, StringFormat='{0:N2}'}"
+                                                   TextColor="{StaticResource Gray600}"
+                                                   VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
                                     </VerticalStackLayout>
-                                </Border>
 
-                                <VerticalStackLayout Grid.Column="1" Spacing="2">
-                                    <Label
-                                        FontAttributes="Bold"
-                                        LineBreakMode="TailTruncation"
-                                        Text="{Binding ProductCode}" />
-                                    <Label
-                                        LineBreakMode="TailTruncation"
-                                        Text="{Binding ProductName}"
-                                        TextColor="{StaticResource Gray600}" />
+                                </Grid>
 
-                                    <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
-                                        <Image
-                                            Aspect="AspectFit"
-                                            HeightRequest="16"
-                                            VerticalOptions="Center"
-                                            WidthRequest="16">
-                                            <Image.Source>
-                                                <FontImageSource
-                                                    FontFamily="FAS"
-                                                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.BusinessTime}"
-                                                    Size="16"
-                                                    Color="{StaticResource Primary}" />
-                                            </Image.Source>
-                                        </Image>
-                                        <Label
-                                            Text="{Binding WaitingQuantity, StringFormat='{0:N2}'}"
-                                            TextColor="{StaticResource Gray600}"
-                                            VerticalOptions="Center" />
-                                    </HorizontalStackLayout>
-                                </VerticalStackLayout>
+                            </Border>
 
-                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
 
-                        </Border>
+            </Grid>
+        </Border>
 
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
 
-        </Grid>
-
-        <Button
-            Grid.Row="1"
-            Margin="10,10,10,20"
-            Command="{Binding NextViewCommand}"
-            Text="İleri" />
+        <Button Grid.Row="1"
+                Margin="10,10,10,20"
+                Command="{Binding NextViewCommand}"
+                Text="İleri" />
     </Grid>
 </ContentPage>
