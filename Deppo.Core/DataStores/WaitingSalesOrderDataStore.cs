@@ -234,7 +234,7 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
             [VariantCode] = ISNULL(VARIANT.CODE, ''),
 			[VariantName] = ISNULL(VARIANT.NAME, ''),
             [LocTracking] = ITEMS.LOCTRACKING,
-			[TrackingType] = ITEMS.TRACKTYPE
+			[TrackingType] = ITEMS.TRACKTYPE,
             [OrderDate] = ORFLINE.DATE_,
             [DueDate] = ORFLINE.DUEDATE
         FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
@@ -386,8 +386,8 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
             [LocTracking] = ITEMS.LOCTRACKING,
 			[TrackingType] = ITEMS.TRACKTYPE,
             [OrderDate] = ORFLINE.DATE_,
-            [DueDate] = ORFLINE.DUEDATE
-        FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
+            [DueDate] = ORFLINE.DUEDATE 
+		FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFICHE AS ORFICHE ON ORFLINE.ORDFICHEREF = ORFICHE.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON ORFLINE.STOCKREF = ITEMS.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON ORFICHE.CLIENTREF = CLCARD.LOGICALREF
