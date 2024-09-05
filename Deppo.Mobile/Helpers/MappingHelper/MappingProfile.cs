@@ -27,14 +27,17 @@ public class MappingProfile : Profile
         CreateMap<Variant, dynamic>();
         CreateMap<Supplier, dynamic>();
         CreateMap<SupplierModel, dynamic>();
+        CreateMap<Customer, dynamic>();
         CreateMap<CustomerModel, dynamic>();
         CreateMap<OutputProductBasketDetailModel, dynamic>();
         CreateMap<LocationTransaction, dynamic>();
         CreateMap<SerilotTransaction, dynamic>();
         CreateMap<SalesCustomer, dynamic>();
-        CreateMap<WaitingSalesOrder, dynamic>();
+		CreateMap<SalesCustomerProduct, dynamic>();
+		CreateMap<WaitingSalesOrder, dynamic>();
         CreateMap<PurchaseSupplier, dynamic>();
         CreateMap<PurchaseSupplierProduct, dynamic>();
         CreateMap<WaitingPurchaseOrderModel, dynamic>();
-    }
+		CreateMap<WaitingSalesOrderModel, dynamic>();
+	}
 }

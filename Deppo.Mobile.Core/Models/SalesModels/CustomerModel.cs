@@ -1,4 +1,6 @@
-﻿namespace Deppo.Mobile.Core.Models.SalesModels;
+﻿using Deppo.Core.Models;
+
+namespace Deppo.Mobile.Core.Models.SalesModels;
 
 public class CustomerModel : Customer
 {

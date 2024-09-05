@@ -1,12 +1,112 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentPage x:Class="Deppo.Mobile.Modules.SalesModule.WaitingOrderMenu.Views.WaitingSalesOrderListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Deppo.Mobile.Modules.SalesModule.WaitingOrderMenu.Views.WaitingSalesOrderListView"
-             Title="WaitingSalesOrderListView">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.WaitingOrderMenu.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:WaitingSalesOrderListViewModel">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadCustomersCommand}" EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid RowDefinitions="Auto, *" RowSpacing="10">
+        <dx:FormListPickerItem Grid.Row="0"
+                               InlineContent="{x:Null}"
+                               ItemsSource="{Binding Customers}"
+                               PickerShowMode="BottomSheet"
+                               PickerTitle="Müşteri Seçiniz"
+                               ShowSeparator="False"
+                               SelectedItem="{Binding SelectedCustomer}"
+                               ShowSearchPanel="True"
+                               ShowArrow="True"
+                               Text="{Binding SelectedCustomer.Title}">
+            <dx:FormListPickerItem.ImageSource>
+                <FontImageSource FontFamily="FAS"
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.User}"
+                                 Size="15"
+                                 Color="{StaticResource Primary}" />
+            </dx:FormListPickerItem.ImageSource>
+            <dx:FormListPickerItem.ItemTemplate>
+                <DataTemplate x:DataType="model:Customer">
+                    <Border Padding="15" StrokeShape="RoundRectangle 5" StrokeThickness="0">
+                        <Label FontAttributes="Bold"
+                               LineBreakMode="TailTruncation"
+                               Text="{Binding Title}"
+                               TextColor="{StaticResource OffBlack}"
+                               VerticalOptions="Center" />
+                    </Border>
+                </DataTemplate>
+            </dx:FormListPickerItem.ItemTemplate>
+        </dx:FormListPickerItem>
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Items}">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:WaitingSalesOrder">
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeThickness="0.1">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                            <Border Padding="5"
+                                    BackgroundColor="{StaticResource Secondary}"
+                                    StrokeShape="RoundRectangle 5"
+                                    StrokeThickness="0.5">
+                                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Label FontAttributes="Bold"
+                                           FontSize="Subtitle"
+                                           HorizontalOptions="Center"
+                                           Text="{Binding OrderDate, StringFormat='{0:dd}'}" />
+                                    <Label FontSize="Caption"
+                                           HorizontalOptions="Center"
+                                           Text="{Binding OrderDate, StringFormat='{0:MM/yyyy}'}" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation"
+                                       Text="{Binding ProductCode}" />
+                                <Label LineBreakMode="TailTruncation"
+                                       Text="{Binding ProductName}"
+                                       TextColor="{StaticResource Gray600}" />
+
+                                <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                                    <Image Aspect="AspectFit"
+                                           HeightRequest="16"
+                                           VerticalOptions="Center"
+                                           WidthRequest="16">
+                                        <Image.Source>
+                                            <FontImageSource FontFamily="FAS"
+                                                             Glyph="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                             Size="16"
+                                                             Color="{StaticResource Primary}" />
+                                        </Image.Source>
+                                    </Image>
+                                    <Label Text="{Binding WaitingQuantity, StringFormat='{0:N2}'}"
+                                           TextColor="{StaticResource Gray600}"
+                                           VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+
+                        </Grid>
+
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+    </Grid>
 </ContentPage>

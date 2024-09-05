@@ -18,15 +18,16 @@ public partial class SalesCustomer : ObservableObject
     int productReferenceCount;
 
     [ObservableProperty]
-    public List<SalesCustomerProduct> products;
+    string country = string.Empty;
+
+    [ObservableProperty]
+    string city = string.Empty;
+
+	public string TitleName => Name?.Length > 2 ? Name.Substring(0, 2) : Name;
+
+	[ObservableProperty]
+    public List<SalesCustomerProduct> products = new();
 
     [ObservableProperty]
     bool isSelected;
-
-    public SalesCustomer()
-    {
-        //Products = new List<PurchaseSupplierProduct>();
-    }
-
-
 }

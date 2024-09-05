@@ -4,5 +4,5 @@ namespace Deppo.Mobile.Core.Services;
 
 public interface ISalesCustomerProductService
 {
-	public Task<DataResult<IEnumerable<dynamic>>> GetObjectsByCustomer(HttpClient httpClient, int firmNumber, int periodNumber, int customerReferenceId, int skip, int take);
+	Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int customerReferenceId, int warehouseNumber, string search = "", int skip = 0, int take = 20);
 }
