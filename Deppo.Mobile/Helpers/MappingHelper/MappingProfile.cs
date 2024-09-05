@@ -2,6 +2,7 @@
 using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Mobile.Core.Models.BasketModels;
+using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.LoginModels;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
@@ -39,5 +40,6 @@ public class MappingProfile : Profile
         CreateMap<PurchaseSupplierProduct, dynamic>();
         CreateMap<WaitingPurchaseOrderModel, dynamic>();
 		CreateMap<WaitingSalesOrderModel, dynamic>();
+        CreateMap<LocationModel, dynamic>();
 	}
 }
