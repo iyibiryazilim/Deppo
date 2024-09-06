@@ -3,10 +3,12 @@ using System.Collections.ObjectModel;
 using Android.Net.Wifi.Rtt;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
+using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
@@ -67,14 +69,20 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
     public Command<LocationModel> LocationConfirmCommand { get; }
     public Command LocationCloseCommand { get; }
 
-    public Command LoadMoreSerilotsCommand { get; }
+    public Command LoadMoreSeriLotsCommand { get; }
+    public Command<SeriLotModel> SeriLotIncreaseCommand { get; }
+    public Command<SeriLotModel> SeriLotDecreaseCommand { get; }
+    public Command SeriLotConfirmCommand { get; }
+    public Command SeriLotCloseCommand { get; }
 
     public Command NextViewCommand { get; }
     public Command BackCommand { get; }
 
     public Page CurrentPage { get; set; } = null!;
+
     public ObservableCollection<InputProductBasketModel> Items { get; } = new();
     public ObservableCollection<LocationModel> Locations { get; } = new();
+    public ObservableCollection<SeriLotModel> SeriLots { get; } = new();
 
     private async Task ShowProductViewAsync()
     {
@@ -160,6 +168,31 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
         //{
         //    IsBusy = false;
         //}
+    }
+
+    private async Task DeleteItemAsync(InputProductBasketModel item)
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            var result = await _userDialogs.ConfirmAsync($"{item.ItemCode}\n{item.ItemName}\nİlgili ürün sepetinizden çıkarılacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+            if (!result)
+                return;
+
+            Items.Remove(item);
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     private async Task LoadWarehouseLocationsAsync(InputProductBasketModel inputProductBasketModel)
@@ -275,7 +308,98 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
         }
     }
 
-    private async Task DeleteItemAsync(InputProductBasketModel item)
+    private async Task LoadSeriLotAsync(InputProductBasketModel inputProductBasketModel)
+    {
+        try
+        {
+            _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(1000);
+            SeriLots.Clear();
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _seriLotService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, search: string.Empty, skip: 0, take: 20);
+            if (result.IsSuccess)
+            {
+                if (result.Data is not null)
+                {
+                    foreach (var item in result.Data)
+                        SeriLots.Add(Mapping.Mapper.Map<SeriLotModel>(item));
+                }
+            }
+
+            _userDialogs.HideHud();
+        }
+        catch (System.Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message);
+        }
+    }
+
+    private async Task LoadMoreSeriLotAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _seriLotService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, search: string.Empty, skip: SeriLots.Count, take: 20);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                    SeriLots.Add(Mapping.Mapper.Map<SeriLotModel>(item));
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task SeriLotCloseAsync()
+    {
+        await MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            CurrentPage.FindByName<BottomSheet>("serilotBottomSheet").State = BottomSheetState.Hidden;
+        });
+    }
+
+    private void SeriLotIncrease(SeriLotModel item)
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            item.InputQuantity += 1;
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private void SeriLotDecrease(SeriLotModel item)
     {
         if (IsBusy)
             return;
@@ -284,15 +408,57 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            var result = await _userDialogs.ConfirmAsync($"{item.ItemCode}\n{item.ItemName}\nİlgili ürün sepetinizden çıkarılacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
-            if (!result)
-                return;
-
-            Items.Remove(item);
+            if (item.InputQuantity > 0)
+            {
+                item.InputQuantity -= 1;
+            }
         }
         catch (Exception ex)
         {
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private void SeriLotConfirm()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            if (SeriLots.Count > 0)
+            {
+                double totalInputQuantity = 0;
+                foreach (var seriLot in SeriLots)
+                {
+                    if (seriLot.InputQuantity > 0)
+                        totalInputQuantity += seriLot.InputQuantity;
+                }
+
+                SelectedInputProductBasketModel.Quantity = totalInputQuantity;
+
+                CurrentPage.FindByName<BottomSheet>("serilotBottomSheet").State = BottomSheetState.Hidden;
+            }
+            else
+            {
+                CurrentPage.FindByName<BottomSheet>("serilotBottomSheet").State = BottomSheetState.Hidden;
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
         finally
         {
