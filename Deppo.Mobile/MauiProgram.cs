@@ -181,7 +181,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IProductTransactionLineService, ProductTransactionLineDataStore>();
         builder.Services.AddSingleton<IVariantService, VariantDataStore>();
         builder.Services.AddSingleton<IWarehouseTotalService, WarehouseTotalDataStore>();
-        builder.Services.AddSingleton<ISerilotTransactionService, SerilotTransactionDataStore>();
+        builder.Services.AddSingleton<ISeriLotTransactionService, SeriLotTransactionDataStore>();
         builder.Services.AddSingleton<ILocationTransactionService, LocationTransactionDataStore>();
         builder.Services.AddSingleton<ISeriLotService, SeriLotDataStore>();
         builder.Services.AddSingleton<ILocationService, LocationDataStore>();

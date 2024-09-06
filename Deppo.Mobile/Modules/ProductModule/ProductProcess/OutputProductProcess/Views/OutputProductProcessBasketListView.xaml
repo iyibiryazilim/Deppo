@@ -5,6 +5,7 @@
              xmlns:basketModel="clr-namespace:Deppo.Mobile.Core.Models.BasketModels;assembly=Deppo.Mobile.Core"
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:locationModel="clr-namespace:Deppo.Mobile.Core.Models.LocationModels;assembly=Deppo.Mobile.Core"
              xmlns:models="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModels="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.ViewModels"
@@ -210,7 +211,7 @@
                             <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="models:LocationTransaction">
+                            <DataTemplate x:DataType="locationModel:LocationTransactionModel">
                                 <Border Padding="5"
                                         BackgroundColor="Transparent"
                                         StrokeThickness="0.1">
@@ -258,7 +259,7 @@
                                                 <Label Grid.Column="1"
                                                        FontAttributes="Bold"
                                                        FontSize="Large"
-                                                       Text="{Binding TempQuantity}"
+                                                       Text="{Binding OutputQuantity}"
                                                        TextColor="{StaticResource OffBlack}"
                                                        VerticalOptions="Center" />
                                                 <Border Grid.Column="2"
@@ -318,7 +319,7 @@
                             <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="models:SerilotTransaction">
+                            <DataTemplate x:DataType="models:SeriLotTransaction">
                                 <Border Padding="5"
                                         BackgroundColor="White"
                                         StrokeThickness="0.1">

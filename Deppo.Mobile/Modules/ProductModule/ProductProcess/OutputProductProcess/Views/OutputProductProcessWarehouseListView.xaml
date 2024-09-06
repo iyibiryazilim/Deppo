@@ -64,26 +64,12 @@
                                        LineBreakMode="TailTruncation"
                                        MaxLines="1"
                                        Text="{Binding Name}">
-                                    <Label.Triggers>
-                                        <DataTrigger Binding="{Binding IsSelected}"
-                                                     TargetType="Label"
-                                                     Value="True">
-                                            <Setter Property="TextColor" Value="{StaticResource White}" />
-                                        </DataTrigger>
-                                    </Label.Triggers>
                                 </Label>
                                 <Label FontAttributes="None"
                                        LineBreakMode="TailTruncation"
                                        MaxLines="1"
                                        Text="{Binding City, FallbackValue='-', TargetNullValue='-'}"
                                        TextColor="{StaticResource Gray600}">
-                                    <Label.Triggers>
-                                        <DataTrigger Binding="{Binding IsSelected}"
-                                                     TargetType="Label"
-                                                     Value="True">
-                                            <Setter Property="TextColor" Value="{StaticResource WhiteSmoke}" />
-                                        </DataTrigger>
-                                    </Label.Triggers>
                                 </Label>
                             </VerticalStackLayout>
                         </Grid>
@@ -91,7 +77,7 @@
                             <DataTrigger Binding="{Binding IsSelected}"
                                          TargetType="Border"
                                          Value="True">
-                                <Setter Property="BackgroundColor" Value="{StaticResource PrimaryLight}" />
+                                <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
                             </DataTrigger>
                         </Border.Triggers>
                     </Border>

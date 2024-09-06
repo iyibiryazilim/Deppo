@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace Deppo.Core.Models;
 
-public class SerilotTransaction : INotifyPropertyChanged, IDisposable
+public class SeriLotTransaction : INotifyPropertyChanged, IDisposable
 {
 	private int _referenceId;
 	private int _transactionReferenceId;
@@ -29,7 +29,7 @@ public class SerilotTransaction : INotifyPropertyChanged, IDisposable
 
 	private double tempQuantity = 0;
 
-    public SerilotTransaction()
+    public SeriLotTransaction()
     {
     }
 

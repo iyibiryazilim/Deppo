@@ -37,15 +37,19 @@
         <Grid Grid.Row="0"
               RowDefinitions="Auto,Auto,*,Auto"
               RowSpacing="10">
+            <Grid Grid.Row="0" ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                <Label Grid.Column="0" Text="{Binding WarehouseModel.Name, StringFormat='{0} Ambarı Ürünleri'}" VerticalOptions="Center" FontSize="Medium" TextColor="{StaticResource WhiteSmoke}" FontAttributes="Bold" />
 
-            <ImageButton Grid.Row="0" HorizontalOptions="End">
-                <ImageButton.Source>
-                    <FontImageSource FontFamily="FAS"
-                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
-                                     Size="Medium"
-                                     Color="{StaticResource WhiteSmoke}" />
-                </ImageButton.Source>
-            </ImageButton>
+                <ImageButton Grid.Column="1" HorizontalOptions="End">
+                    <ImageButton.Source>
+                        <FontImageSource FontFamily="FAS"
+                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                         Size="Medium"
+                         Color="{StaticResource WhiteSmoke}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </Grid>
+            
             <Border Grid.Row="1"
                     Margin="5,0,5,0"
                     Padding="0"
@@ -123,7 +127,7 @@
                                 <DataTrigger Binding="{Binding IsSelected}"
                                              TargetType="Border"
                                              Value="True">
-                                    <Setter Property="BackgroundColor" Value="{StaticResource PrimaryLight}" />
+                                    <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
                                 </DataTrigger>
                             </Border.Triggers>
 

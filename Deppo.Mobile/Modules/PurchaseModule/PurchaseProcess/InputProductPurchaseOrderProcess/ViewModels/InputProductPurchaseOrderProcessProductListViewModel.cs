@@ -274,7 +274,7 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
 
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _waitingPurchaseOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, PurchaseSupplier.ReferenceId, string.Empty, Orders.Count, 20);
+            var result = await _waitingPurchaseOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, PurchaseSupplier.ReferenceId, string.Empty, 0, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -313,7 +313,7 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _waitingPurchaseOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, PurchaseSupplier.ReferenceId, string.Empty, 0, 20);
+            var result = await _waitingPurchaseOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, PurchaseSupplier.ReferenceId, string.Empty, Orders.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
