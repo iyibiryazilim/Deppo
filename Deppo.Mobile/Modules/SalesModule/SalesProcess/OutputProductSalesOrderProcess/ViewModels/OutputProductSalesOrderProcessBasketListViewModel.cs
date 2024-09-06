@@ -23,7 +23,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 	private readonly IHttpClientService _httpClientService;
 	private readonly IUserDialogs _userDialogs;
 	private readonly ILocationTransactionService _locationTransactionService;
-	private readonly ISerilotTransactionService _serilotTransactionService;
+	private readonly ISeriLotTransactionService _seriLotTransactionService;
 
 	[ObservableProperty]
 	WarehouseModel warehouseModel = null!;
@@ -34,12 +34,12 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 	[ObservableProperty]
 	ObservableCollection<OutputSalesBasketModel> items = null!;
 
-	public OutputProductSalesOrderProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ILocationTransactionService locationTransactionService, ISerilotTransactionService serilotTransactionService)
+	public OutputProductSalesOrderProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ILocationTransactionService locationTransactionService, ISeriLotTransactionService seriLotTransactionService)
 	{
 		_httpClientService = httpClientService;
 		_userDialogs = userDialogs;
 		_locationTransactionService = locationTransactionService;
-		_serilotTransactionService = serilotTransactionService;
+		_seriLotTransactionService = seriLotTransactionService;
 
 		Title = "Satış Sepeti";
 

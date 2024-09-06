@@ -3,6 +3,7 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
+using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
@@ -19,10 +20,10 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess
 public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
-	private readonly ISerilotTransactionService _serilotTransactionService;
+	private readonly ISeriLotTransactionService _serilotTransactionService;
 	private readonly ILocationTransactionService _locationTransactionService;
 	private readonly IUserDialogs _userDialogs;
-	public OutputProductProcessBasketListViewModel(IHttpClientService httpClientService, ISerilotTransactionService serilotTransactionService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs)
+	public OutputProductProcessBasketListViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs)
 	{
 		_httpClientService = httpClientService;
 		_serilotTransactionService = serilotTransactionService;
@@ -39,11 +40,11 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		LoadMoreSerilotTransactionItemsCommand = new Command(async () => await LoadMoreSerilotTransactionItemsAsync());
 		LoadLocationTransactionItemsCommand = new Command(async () => await LoadLocationTransactionItemsAsync());
 		LoadMoreLocationTransactionItemsCommand = new Command(async () => await LoadMoreLocationTransactionItemsAsync());
-		LocationTransactionIncreaseCommand = new Command<LocationTransaction>(item => LocationTransactionIncreaseAsync(item));
-		LocationTransactionDecreaseCommand = new Command<LocationTransaction>(item => LocationTransactionDecreaseAsync(item));
+		LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(item => LocationTransactionIncreaseAsync(item));
+		LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(item => LocationTransactionDecreaseAsync(item));
 		ConfirmLocationTransactionCommand = new Command(ConfirmLocationTransactionAsync);
-		SerilotTransactionIncreaseCommand = new Command<SerilotTransaction>(item => SerilotTransactionIncreaseAsync(item));
-		SerilotTransactionDecreaseCommand = new Command<SerilotTransaction>(item => SerilotTransactionDecreaseAsync(item));
+		SerilotTransactionIncreaseCommand = new Command<SeriLotTransaction>(item => SerilotTransactionIncreaseAsync(item));
+		SerilotTransactionDecreaseCommand = new Command<SeriLotTransaction>(item => SerilotTransactionDecreaseAsync(item));
 		ConfirmSerilotTransactionCommand = new Command(ConfirmSerilotTransactionAsync);
 		NextViewCommand = new Command(async () => await NextViewAsync());
 		BackCommand = new Command(async () => await BackAsync());
@@ -88,7 +89,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	#region Collections
 	public ObservableCollection<OutputProductBasketModel> Items { get; } = new();
 
-	public ObservableCollection<SerilotTransaction> SerilotTransactionItems { get; } = new();
+	public ObservableCollection<SeriLotTransaction> SerilotTransactionItems { get; } = new();
 	public ObservableCollection<LocationTransaction> LocationTransactionItems { get; } = new();
 	#endregion
 
@@ -129,23 +130,13 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				SelectedItem = item;
 				if (item.LocTracking == 1)
 				{
-					OutputProductProcessBasketListView currentPage = CurrentPage as OutputProductProcessBasketListView;
-					currentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.HalfExpanded;
-					currentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").Loaded += async (s, e) =>
-					{
-						LocationTransactionItems.Clear();
-						await LoadLocationTransactionItemsAsync();
-					};
+					await LoadLocationTransactionItemsAsync();
+					CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.FullExpanded;
 				}
 				else if(item.LocTracking == 0 && (item.TrackingType == 1 ||item.TrackingType == 2))
 				{
-					OutputProductProcessBasketListView currentPage = CurrentPage as OutputProductProcessBasketListView;
-					currentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.HalfExpanded;
-					currentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").Loaded += async (s, e) =>
-					{
-						SerilotTransactionItems.Clear();
-						await LoadSerilotTransactionItemsAsync();
-					};
+					await LoadSerilotTransactionItemsAsync();
+					CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.FullExpanded;
 				}
 				else
 				{
@@ -297,25 +288,25 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
-	private void LocationTransactionIncreaseAsync(LocationTransaction item)
+	private void LocationTransactionIncreaseAsync(LocationTransactionModel item)
 	{
 		if (item is not null)
 		{
-			//if (item.TempQuantity < item.Quantity)
-			//{
-			//	item.TempQuantity++;
-			//}
+			if(item.OutputQuantity < item.Quantity)
+			{
+				item.OutputQuantity++;
+			}
 		}
 	}
 
-	private void LocationTransactionDecreaseAsync(LocationTransaction item)
+	private void LocationTransactionDecreaseAsync(LocationTransactionModel item)
 	{
 		if (item is not null)
 		{
-			//if (item.TempQuantity > 0)
-			//{
-			//	item.TempQuantity--;
-			//}
+			if (item.OutputQuantity > 0)
+			{
+				item.OutputQuantity--;
+			}
 		}
 	}
 
@@ -369,7 +360,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				SerilotTransactionItems.Clear();
 				foreach (var item in result.Data)
 				{
-					var obj = Mapping.Mapper.Map<SerilotTransaction>(item);
+					var obj = Mapping.Mapper.Map<SeriLotTransaction>(item);
 					SerilotTransactionItems.Add(obj);
 				}
 			}
@@ -407,7 +398,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 
 				foreach (var item in result.Data)
 				{
-					var obj = Mapping.Mapper.Map<SerilotTransaction>(item);
+					var obj = Mapping.Mapper.Map<SeriLotTransaction>(item);
 					SerilotTransactionItems.Add(obj);
 				}
 			}
@@ -422,7 +413,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
-	private void SerilotTransactionIncreaseAsync(SerilotTransaction item)
+	private void SerilotTransactionIncreaseAsync(SeriLotTransaction item)
 	{
 		if (item is not null)
 		{
@@ -433,7 +424,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
-	private void SerilotTransactionDecreaseAsync(SerilotTransaction item)
+	private void SerilotTransactionDecreaseAsync(SeriLotTransaction item)
 	{
 		if (item is not null)
 		{

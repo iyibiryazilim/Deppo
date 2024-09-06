@@ -319,7 +319,7 @@
                             <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="models:SerilotTransaction">
+                            <DataTemplate x:DataType="models:SeriLotTransaction">
                                 <Border Padding="5"
                                         BackgroundColor="White"
                                         StrokeThickness="0.1">

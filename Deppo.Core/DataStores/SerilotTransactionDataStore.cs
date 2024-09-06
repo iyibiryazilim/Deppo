@@ -5,13 +5,13 @@ using System.Text;
 
 namespace Deppo.Core.DataStores;
 
-public class SerilotTransactionDataStore : ISerilotTransactionService
+public class SeriLotTransactionDataStore : ISeriLotTransactionService
 {
 	string postUrl = "/gateway/customQuery/CustomQuery";
 
 	public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(SerilotTransactionQuery(firmNumber, periodNumber, productReferenceId, warehouseNumber, skip, take, search)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(SeriLotTransactionQuery(firmNumber, periodNumber, productReferenceId, warehouseNumber, skip, take, search)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -61,7 +61,7 @@ public class SerilotTransactionDataStore : ISerilotTransactionService
 		}
 	}
 
-	private string SerilotTransactionQuery(int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "")
+	private string SeriLotTransactionQuery(int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "")
 	{
 		var baseQuery = $@"SELECT
         [ReferenceId] = LGMAIN.LOGICALREF,

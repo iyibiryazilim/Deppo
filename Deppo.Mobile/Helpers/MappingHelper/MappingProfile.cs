@@ -7,6 +7,7 @@ using Deppo.Mobile.Core.Models.LoginModels;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.SalesModels;
+using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.VariantModels;
 using Google.Android.Material.Color.Utilities;
 
@@ -34,8 +35,6 @@ public class MappingProfile : Profile
         CreateMap<Customer, dynamic>();
         CreateMap<CustomerModel, dynamic>();
         CreateMap<OutputProductBasketDetailModel, dynamic>();
-        CreateMap<LocationTransaction, dynamic>();
-        CreateMap<SerilotTransaction, dynamic>();
         CreateMap<SalesCustomer, dynamic>();
 		CreateMap<SalesCustomerProduct, dynamic>();
 		CreateMap<WaitingSalesOrder, dynamic>();
@@ -43,7 +42,11 @@ public class MappingProfile : Profile
         CreateMap<PurchaseSupplierProduct, dynamic>();
         CreateMap<WaitingPurchaseOrderModel, dynamic>();
 		CreateMap<WaitingSalesOrderModel, dynamic>();
-        CreateMap<LocationModel, dynamic>();
+		CreateMap<LocationTransaction, dynamic>();
+		CreateMap<LocationModel, dynamic>();
         CreateMap<LocationTransactionModel, dynamic>();
+		CreateMap<SeriLotModel, dynamic>();
+		CreateMap<SeriLotTransaction, dynamic>();
+		CreateMap<SeriLotTransactionModel, dynamic>();
 	}
 }
