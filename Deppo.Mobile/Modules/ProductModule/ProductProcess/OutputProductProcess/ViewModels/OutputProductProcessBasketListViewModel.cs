@@ -53,12 +53,14 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		SeriLotTransactionIncreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionIncreaseAsync(item));
 		SeriLotTransactionDecreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionDecreaseAsync(item));
 		ConfirmSeriLotTransactionCommand = new Command(ConfirmSeriLotTransactionAsync);
+		SeriLotTransactionCloseCommand = new Command(async () => await SeriLotTransactionCloseAsync());
 
 		
 		LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
 		LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(item => LocationTransactionIncreaseAsync(item));
 		LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(item => LocationTransactionDecreaseAsync(item));
 		ConfirmLocationTransactionCommand = new Command(ConfirmLocationTransactionAsync);
+		LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
 
 		NextViewCommand = new Command(async () => await NextViewAsync());
 		BackCommand = new Command(async () => await BackAsync());
@@ -75,6 +77,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	public Command LocationTransactionIncreaseCommand { get; }
 	public Command LocationTransactionDecreaseCommand { get; }
 	public Command ConfirmLocationTransactionCommand { get; }
+	public Command LocationTransactionCloseCommand { get; }
 	#endregion
 
 	#region SeriLotTransaction Command
@@ -82,6 +85,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	public Command SeriLotTransactionIncreaseCommand { get; }
 	public Command SeriLotTransactionDecreaseCommand { get; }
 	public Command ConfirmSeriLotTransactionCommand { get; }
+	public Command SeriLotTransactionCloseCommand { get; }
 	#endregion
 	public Command NextViewCommand { get; }
 	public Command BackCommand { get; }
@@ -378,6 +382,14 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
+	private async Task LocationTransactionCloseAsync()
+	{
+		await MainThread.InvokeOnMainThreadAsync(() =>
+		{
+			CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.Hidden;
+		});
+	}
+
 
 	private async Task LoadSeriLotTransactionsAsync()
 	{
@@ -527,6 +539,14 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		{
 			IsBusy = false;
 		}
+	}
+
+	private async Task SeriLotTransactionCloseAsync()
+	{
+		await MainThread.InvokeOnMainThreadAsync(() =>
+		{
+			CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.Hidden;
+		});
 	}
 
 	private async Task NextViewAsync()

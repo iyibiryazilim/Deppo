@@ -206,7 +206,7 @@
                             <ImageButton Grid.Column="1"
           HeightRequest="25"
           VerticalOptions="Center"
-          Command="{Binding }"
+          Command="{Binding LocationTransactionCloseCommand}"
           HorizontalOptions="End">
                                 <ImageButton.Source>
                                     <FontImageSource FontFamily="FAS"
@@ -319,7 +319,7 @@
             <!--#region SerilotTransaction bottom sheet-->
             <dx:BottomSheet x:Name="serilotTransactionBottomSheet"
                             Grid.Row="1"
-                            AllowDismiss="True"
+                            AllowDismiss="False"
                             BackgroundColor="White"
                             CornerRadius="15"
                             HalfExpandedRatio="0.6"
