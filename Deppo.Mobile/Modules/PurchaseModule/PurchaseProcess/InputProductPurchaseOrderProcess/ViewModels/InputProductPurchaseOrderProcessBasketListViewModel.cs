@@ -9,7 +9,6 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
-using DevExpress.DirectX.Common.Direct2D;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
 
@@ -73,7 +72,7 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
 	public Command<InputPurchaseBasketModel> DeleteItemCommand { get; }
 	public Command<InputPurchaseBasketModel> IncreaseCommand { get; }
 	public Command<InputPurchaseBasketModel> DecreaseCommand { get; }
-	
+
 	public Command LoadMoreWarehouseLocationsCommand { get; }
 	public Command<LocationModel> LocationIncreaseCommand { get; }
 	public Command<LocationModel> LocationDecreaseCommand { get; }
@@ -172,7 +171,7 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, SelectedItem.ItemReferenceId, string.Empty, Locations.Count, 20);
 
-			if(result.IsSuccess)
+			if (result.IsSuccess)
 			{
 				if (result.Data is null)
 					return;
@@ -396,7 +395,7 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
 		{
 			IsBusy = true;
 
-			if(item.InputQuantity > 0)
+			if (item.InputQuantity > 0)
 			{
 				item.InputQuantity -= 1;
 			}

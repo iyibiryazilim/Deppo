@@ -5,6 +5,7 @@ namespace Deppo.Mobile.Core.Models.SeriLotModels;
 public class SeriLotTransactionModel : SeriLotTransaction
 {
 	private bool _isSelected;
+    private double _outputQuantity;
 
     public SeriLotTransactionModel()
     {
@@ -21,4 +22,15 @@ public class SeriLotTransactionModel : SeriLotTransaction
             NotifyPropertyChanged();
         }
     }
+
+    public double OutputQuantity
+	{
+		get => _outputQuantity;
+		set
+		{
+			if (_outputQuantity == value) return;
+			_outputQuantity = value;
+			NotifyPropertyChanged();
+		}
+	}
 }

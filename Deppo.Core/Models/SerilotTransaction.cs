@@ -27,7 +27,6 @@ public class SeriLotTransaction : INotifyPropertyChanged, IDisposable
 	private double _remainingQuantity;
 	private double _remainingUnitQuantity;
 
-	private double tempQuantity = 0;
 
     public SeriLotTransaction()
     {
@@ -260,18 +259,6 @@ public class SeriLotTransaction : INotifyPropertyChanged, IDisposable
 			NotifyPropertyChanged();
 		}
 	}
-
-	public double TempQuantity
-	{
-		get => tempQuantity;
-		set
-		{
-			if (tempQuantity == value) return;
-			tempQuantity = value;
-			NotifyPropertyChanged();
-		}
-	}
-
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
