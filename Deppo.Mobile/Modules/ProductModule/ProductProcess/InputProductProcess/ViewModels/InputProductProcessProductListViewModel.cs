@@ -28,10 +28,10 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
     private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty]
-    WarehouseModel warehouseModel = null!;
+    private WarehouseModel warehouseModel = null!;
 
     [ObservableProperty]
-    ProductModel? selectedProduct;
+    private ProductModel? selectedProduct;
 
     [ObservableProperty]
     private ObservableCollection<InputProductBasketModel> selectedProducts = new();
@@ -70,7 +70,6 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
         _serviceProvider = serviceProvider;
 
         Title = "Ürün Listesi";
-
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
@@ -153,7 +152,6 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                         IsSelected = false
                     });
                 }
-
             }
 
             _userDialogs.Loading().Hide();
@@ -179,8 +177,6 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
             await PerformSearchMoreAsync(((SearchBar)CurrentPage.FindByName("searchBar")));
             return;
         }
-
-
 
         if (IsBusy)
             return;
@@ -218,7 +214,6 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                         IsSelected = false
                     });
                 }
-
             }
 
             _userDialogs.Loading().Hide();
@@ -297,12 +292,9 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                         {
                             SelectedProducts.Remove(selectedItem);
                             Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = false;
-
                         }
-
                     }
                 }
-
         }
         catch (Exception ex)
         {
@@ -499,11 +491,8 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                     if (!previouseViewModel.Items.Any(x => x.ItemCode == item.ItemCode))
                         previouseViewModel.Items.Add(item);
 
-
                 await Shell.Current.GoToAsync($"..");
-
             }
-
         }
         catch (Exception ex)
         {
@@ -592,14 +581,12 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                                 IsSelected = false
                             });
                         }
-
                     }
 
                     _userDialogs.Loading().Hide();
                     searchBar.Unfocus();
                 }
             }
-
         }
         catch (Exception ex)
         {
@@ -657,12 +644,9 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                         IsSelected = false
                     });
                 }
-
             }
 
             _userDialogs.Loading().Hide();
-
-
         }
         catch (Exception ex)
         {
@@ -673,5 +657,4 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
 }
