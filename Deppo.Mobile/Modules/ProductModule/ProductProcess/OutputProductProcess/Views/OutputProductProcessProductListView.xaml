@@ -40,7 +40,7 @@
             <Grid Grid.Row="0" ColumnDefinitions="*, Auto" ColumnSpacing="10">
                 <Label Grid.Column="0" Text="{Binding WarehouseModel.Name, StringFormat='{0} Ambarı Ürünleri'}" VerticalOptions="Center" FontSize="Medium" TextColor="{StaticResource WhiteSmoke}" FontAttributes="Bold" />
 
-                <ImageButton Grid.Column="1" HorizontalOptions="End">
+                <ImageButton Grid.Column="1" HorizontalOptions="End" Command="{Binding BackCommand}">
                     <ImageButton.Source>
                         <FontImageSource FontFamily="FAS"
                          Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"

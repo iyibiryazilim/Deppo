@@ -24,6 +24,14 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 	private readonly IVariantService _variantService;
 	private readonly IUserDialogs _userDialogs;
 
+	public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
+	public ObservableCollection<VariantModel> ItemVariants { get; } = new();
+
+	[ObservableProperty]
+	public ObservableCollection<OutputProductBasketModel> selectedProducts = new();
+	
+
+
 	private bool IsSearchMode
 	{
 		get
@@ -81,15 +89,9 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 	public Command BackCommand { get; }
 	#endregion
 
-	#region Collections
-	public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
-	public ObservableCollection<VariantModel> ItemVariants { get; } = new();
+	
 
-	[ObservableProperty]
-	public ObservableCollection<OutputProductBasketModel> selectedProducts = new();
-	#endregion
-
-	#region Properties
+	
 	[ObservableProperty]
 	WarehouseModel warehouseModel = null!;
 
@@ -98,7 +100,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 
 	public ContentPage CurrentPage { get; set; } = null!;
 
-	#endregion
+	
 
 	private async Task LoadItemsAsync()
 	{
@@ -554,6 +556,10 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 		try
 		{
 			IsBusy = true;
+			if(SelectedProducts.Count > 0)
+			{
+				SelectedProducts.Clear();
+			}
 
 			await Shell.Current.GoToAsync($"..");
 		}
