@@ -68,7 +68,6 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
     public Command LocationCloseCommand { get; }
 
     public Command LoadMoreSerilotsCommand { get; }
-    public Command
 
     public Command NextViewCommand { get; }
     public Command BackCommand { get; }
