@@ -2,12 +2,17 @@ using System;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
+using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using DevExpress.Maui.Controls;
+using static Android.Provider.CallLog;
 using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
@@ -17,39 +22,46 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.
 public partial class InputProductProcessBasketListViewModel : BaseViewModel
 {
     private readonly IUserDialogs _userDialogs;
+    private readonly IHttpClientService _httpClientService;
+    private readonly ILocationService _locationService;
 
     [ObservableProperty]
-    WarehouseModel warehouseModel = null!;
+    private WarehouseModel warehouseModel = null!;
 
     [ObservableProperty]
-    InputProductProcessType inputProductProcessType;
+    private InputProductProcessType inputProductProcessType;
 
-    public InputProductProcessBasketListViewModel(IUserDialogs userDialogs)
+    public InputProductProcessBasketListViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, ILocationService locationService)
     {
         _userDialogs = userDialogs;
+        _httpClientService = httpClientService;
+        _locationService = locationService;
         Title = "Sepet Listesi";
 
         ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
         DeleteItemCommand = new Command<InputProductBasketModel>(async (item) => await DeleteItemAsync(item));
         IncreaseCommand = new Command<InputProductBasketModel>(async (item) => await IncreaseAsync(item));
+        LocationCloseCommand = new Command(async () => await LocationCloseAsync());
         DecreaseCommand = new Command<InputProductBasketModel>(async (item) => await DecreaseAsync(item));
         NextViewCommand = new Command(async () => await NextViewAsync());
         BackCommand = new Command(async () => await BackAsync());
 
         Items.Clear();
-
     }
 
     public Command ShowProductViewCommand { get; }
     public Command<InputProductBasketModel> DeleteItemCommand { get; }
     public Command<InputProductBasketModel> IncreaseCommand { get; }
     public Command<InputProductBasketModel> DecreaseCommand { get; }
+    public Command LocationConfirmCommand { get; }
+    public Command LocationCloseCommand { get; }
+
     public Command NextViewCommand { get; }
     public Command BackCommand { get; }
 
     public Page CurrentPage { get; set; } = null!;
     public ObservableCollection<InputProductBasketModel> Items { get; } = new();
-
+    public ObservableCollection<LocationModel> Locations { get; } = new();
 
     private async Task ShowProductViewAsync()
     {
@@ -100,7 +112,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
         }
     }
 
-    private async Task IncreaseAsync(InputProductBasketModel item)
+    private async Task IncreaseAsync(InputProductBasketModel inputProductBasketModel)
     {
         if (IsBusy)
             return;
@@ -108,24 +120,93 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-
-            item.Quantity++;
-            InputProductProcessBasketListView? cp = CurrentPage as InputProductProcessBasketListView;
-
-            BottomSheet locationBottomSheet = cp.FindByName<BottomSheet>("locationBottomSheet");
-
-            if (locationBottomSheet != null)
-                locationBottomSheet.State = BottomSheetState.HalfExpanded;
-
+            if (inputProductBasketModel.LocTracking == 1)
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await LoadWarehouseLocationsAsync(inputProductBasketModel);
+                    CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.FullExpanded;
+                });
+            }
+            else if (inputProductBasketModel.TrackingType == 1)
+            {
+                await LoadWarehouseLocationsAsync(inputProductBasketModel);
+                CurrentPage.FindByName<BottomSheet>("serilotBottomSheet").State = BottomSheetState.FullExpanded;
+            }
+            else
+            {
+                inputProductBasketModel.Quantity += 1;
+            }
         }
         catch (Exception ex)
         {
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            await _userDialogs.AlertAsync(ex.Message);
         }
         finally
         {
             IsBusy = false;
         }
+
+        //eski bottomsheet kodları
+        //if (IsBusy)
+        //    return;
+
+        //try
+        //{
+        //    IsBusy = true;
+
+        //    item.Quantity++;
+        //    InputProductProcessBasketListView? cp = CurrentPage as InputProductProcessBasketListView;
+
+        //    BottomSheet locationBottomSheet = cp.FindByName<BottomSheet>("locationBottomSheet");
+
+        //    if (locationBottomSheet != null)
+        //        locationBottomSheet.State = BottomSheetState.HalfExpanded;
+
+        //}
+        //catch (Exception ex)
+        //{
+        //    await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        //}
+        //finally
+        //{
+        //    IsBusy = false;
+        //}
+    }
+
+    private async Task LoadWarehouseLocationsAsync(InputProductBasketModel inputProductBasketModel)
+    {
+        try
+        {
+            _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(1000);
+            Locations.Clear();
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, inputProductBasketModel.ItemReferenceId, string.Empty, 0, 20);
+            if (result.IsSuccess)
+            {
+                if (result.Data is not null)
+                {
+                    foreach (var item in result.Data)
+                        Locations.Add(Mapping.Mapper.Map<LocationModel>(item));
+                }
+            }
+
+            _userDialogs.HideHud();
+        }
+        catch (System.Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message);
+        }
+    }
+
+    private async Task LocationCloseAsync()
+    {
+        await MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
+        });
     }
 
     private async Task DecreaseAsync(InputProductBasketModel item)
@@ -164,7 +245,6 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
                 await _userDialogs.AlertAsync("Sepetinizde ürün bulunmamaktadır.", "Hata", "Tamam");
                 return;
             }
-
         }
         catch (Exception ex)
         {
@@ -192,11 +272,9 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 
                 Items.Clear();
                 await Shell.Current.GoToAsync("..");
-
             }
             else
                 await Shell.Current.GoToAsync("..");
-
         }
         catch (Exception ex)
         {

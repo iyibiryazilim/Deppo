@@ -128,6 +128,10 @@
                                     Text="Sayım Fazlası İşlemleri"
                                     TextColor="{StaticResource Gray500}"
                                     VerticalOptions="Center" />
+
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OverCountCommand }" />
+                                </Grid.GestureRecognizers>
                             </Grid>
 
                             <Border Grid.Column="1" StrokeThickness="0">
