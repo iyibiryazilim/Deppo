@@ -202,17 +202,21 @@
                 <Grid RowDefinitions="Auto, *" RowSpacing="20">
                     <VerticalStackLayout Grid.Row="0" Spacing="5">
                         <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
-                            <Label Grid.Column="0" FontAttributes="Bold" FontSize="Medium" HorizontalOptions="Start" Text="{Binding WarehouseModel.Name, StringFormat='{0} Stok Yerleri Hareketleri'}" />
+                            <Label Grid.Column="0"
+                                   FontAttributes="Bold"
+                                   FontSize="Medium"
+                                   HorizontalOptions="Start"
+                                   Text="{Binding WarehouseModel.Name, StringFormat='{0} Stok Yerleri Hareketleri'}" />
                             <ImageButton Grid.Column="1"
-          HeightRequest="25"
-          VerticalOptions="Center"
-          Command="{Binding LocationTransactionCloseCommand}"
-          HorizontalOptions="End">
+                                         Command="{Binding LocationTransactionCloseCommand}"
+                                         HeightRequest="25"
+                                         HorizontalOptions="End"
+                                         VerticalOptions="Center">
                                 <ImageButton.Source>
                                     <FontImageSource FontFamily="FAS"
-                      Color="{StaticResource OffBlack}"
-                      Glyph="{x:Static fontAwesome:FontAwesomeIcons.ChevronDown}"
-                      Size="Medium" />
+                                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.ChevronDown}"
+                                                     Size="Medium"
+                                                     Color="{StaticResource OffBlack}" />
                                 </ImageButton.Source>
                             </ImageButton>
                         </Grid>
@@ -221,7 +225,25 @@
                     <Grid Grid.Row="1"
                           RowDefinitions="Auto, *, Auto"
                           RowSpacing="10">
-
+                        <Border Grid.Row="0"
+                                Padding="0"
+                                BackgroundColor="{StaticResource PrimaryLight}"
+                                HeightRequest="35"
+                                Stroke="{StaticResource Primary}"
+                                StrokeShape="RoundRectangle 5"
+                                StrokeThickness="0.5">
+                            <SearchBar x:Name="locationTransactionSearchBar"
+                                       Placeholder="Ara..."
+                                       PlaceholderColor="{StaticResource OffBlack}"
+                                       TextColor="{StaticResource OffBlack}">
+                                <!-- <SearchBar.Behaviors>
+    <toolkit:EventToCommandBehavior
+        Command="{Binding PerformSearchCommand}"
+        CommandParameter="{Binding Text, Source={x:Reference searchBar}}"
+        EventName="SearchButtonPressed" />
+</SearchBar.Behaviors>-->
+                            </SearchBar>
+                        </Border>
                         <CollectionView Grid.Row="1"
                                         ItemsSource="{Binding LocationTransactions}"
                                         RemainingItemsThreshold="2"
