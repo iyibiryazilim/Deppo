@@ -6,28 +6,28 @@ namespace Deppo.Mobile.Core.Models.SalesModels;
 public partial class SalesCustomerProduct : ObservableObject
 {
 	[ObservableProperty]
-	int _referenceId;
+	int referenceId;
 
 	[ObservableProperty]
-	int _itemReferenceId;
+	int itemReferenceId;
 
 	[ObservableProperty]
-	string _itemCode = string.Empty;
+	string itemCode = string.Empty;
 
 	[ObservableProperty]
-	string _itemName = string.Empty;
+	string itemName = string.Empty;
 
 	[ObservableProperty]
-	int _mainItemReferenceId;
+	int mainItemReferenceId;
 
 	[ObservableProperty]
-	string _mainItemCode = string.Empty;
+	string mainItemCode = string.Empty;
 
 	[ObservableProperty]
-	string _mainItemName = string.Empty;
+	string mainItemName = string.Empty;
 
 	[ObservableProperty]
-	bool _isVariant;
+	bool isVariant;
 
 	[ObservableProperty]
 	int unitsetReferenceId;

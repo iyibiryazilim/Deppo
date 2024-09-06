@@ -7,6 +7,8 @@ using Deppo.Mobile.Core.Models.LoginModels;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.SalesModels;
+using Deppo.Mobile.Core.Models.VariantModels;
+using Google.Android.Material.Color.Utilities;
 
 namespace Deppo.Mobile.Helpers.MappingHelper;
 
@@ -25,7 +27,8 @@ public class MappingProfile : Profile
         CreateMap<CompanyModel, dynamic>();
         CreateMap<Product, dynamic>();
         CreateMap<WarehouseTotal, dynamic>();
-        CreateMap<Variant, dynamic>();
+        CreateMap<Deppo.Core.Models.Variant, dynamic>();
+        CreateMap<VariantModel, dynamic>();
         CreateMap<Supplier, dynamic>();
         CreateMap<SupplierModel, dynamic>();
         CreateMap<Customer, dynamic>();
@@ -41,5 +44,6 @@ public class MappingProfile : Profile
         CreateMap<WaitingPurchaseOrderModel, dynamic>();
 		CreateMap<WaitingSalesOrderModel, dynamic>();
         CreateMap<LocationModel, dynamic>();
+        CreateMap<LocationTransactionModel, dynamic>();
 	}
 }

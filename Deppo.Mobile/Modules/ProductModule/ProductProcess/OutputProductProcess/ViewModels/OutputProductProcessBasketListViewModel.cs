@@ -301,10 +301,10 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	{
 		if (item is not null)
 		{
-			if (item.TempQuantity < item.Quantity)
-			{
-				item.TempQuantity++;
-			}
+			//if (item.TempQuantity < item.Quantity)
+			//{
+			//	item.TempQuantity++;
+			//}
 		}
 	}
 
@@ -312,10 +312,10 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	{
 		if (item is not null)
 		{
-			if (item.TempQuantity > 0)
-			{
-				item.TempQuantity--;
-			}
+			//if (item.TempQuantity > 0)
+			//{
+			//	item.TempQuantity--;
+			//}
 		}
 	}
 
@@ -327,13 +327,13 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
-			if (LocationTransactionItems.Count > 0)
-			{
-				var totalTempQuantity = LocationTransactionItems.Where(x => x.TempQuantity > 0).Sum(x => (double)x.TempQuantity);
+			//if (LocationTransactionItems.Count > 0)
+			//{
+			//	var totalTempQuantity = LocationTransactionItems.Where(x => x.TempQuantity > 0).Sum(x => (double)x.TempQuantity);
 				
-				SelectedItem.Quantity = totalTempQuantity;
-				CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.Hidden;
-			}
+			//	SelectedItem.Quantity = totalTempQuantity;
+			//	CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.Hidden;
+			//}
 		}
 		catch (Exception ex)
 		{
