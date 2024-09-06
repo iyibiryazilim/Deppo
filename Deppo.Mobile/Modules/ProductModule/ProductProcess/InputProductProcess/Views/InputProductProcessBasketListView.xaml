@@ -310,6 +310,10 @@
                                                            FontSize="Medium"
                                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
                                                            TextColor="{StaticResource Secondary}" />
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessBasketListViewModel}}, Path=LocationDecreaseCommand}"
+                                                                              CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
                                                 </Border>
                                                 <Label Grid.Column="1"
                                                        FontAttributes="Bold"
@@ -326,6 +330,10 @@
                                                            FontSize="Medium"
                                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
                                                            TextColor="{StaticResource White}" />
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessBasketListViewModel}}, Path=LocationIncreaseCommand}"
+                                                                              CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
                                                 </Border>
                                             </Grid>
                                         </Grid>
