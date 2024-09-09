@@ -395,6 +395,9 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				{
 					if(item.OutputQuantity > 0)
 						item.OutputQuantity--;
+
+					if(item.OutputQuantity == 0)
+						item.IsSelected = false;
 				}
 			}
 		}

@@ -269,6 +269,9 @@
                                                         BackgroundColor="Transparent"
                                                         Stroke="{StaticResource Secondary}"
                                                         StrokeShape="RoundRectangle 2">
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessBasketListViewModel}}, Path=LocationTransactionDecreaseCommand}" CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
                                                     <Label FontFamily="FAS"
                                                            FontSize="Medium"
                                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
@@ -285,6 +288,9 @@
                                                         BackgroundColor="{StaticResource Secondary}"
                                                         Stroke="{StaticResource Secondary}"
                                                         StrokeShape="RoundRectangle 2">
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessBasketListViewModel}}, Path=LocationTransactionIncreaseCommand}" CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
                                                     <Label FontFamily="FAS"
                                                            FontSize="Medium"
                                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
@@ -297,7 +303,9 @@
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>
-                        <Button Grid.Row="2" Text="Tamam" />
+                        <Button Grid.Row="2"
+                                Command="{Binding LocationTransactionConfirmCommand}"
+                                Text="Tamam" />
                     </Grid>
                 </Grid>
                 <!--#endregion-->
