@@ -24,12 +24,14 @@ public partial class ProductProcessViewModel : BaseViewModel
         OverCountCommand = new Command(async () => await OverCountAsync());
         ConsumableProcessCommand = new Command(async () => await ConsumableProcessAsync());
         UnderCountProcessCommand = new Command(async () => await UnderCountProcessAsync());
+        WasteProcessCommand = new Command(async () => await WasteProcessAsync());
     }
 
     public Command ProductionInputCommand { get; }
     public Command OverCountCommand { get; }
     public Command ConsumableProcessCommand { get; }
     public Command UnderCountProcessCommand { get; }
+    public Command WasteProcessCommand { get; }
 
     private async Task ProductionInputAsync()
     {
@@ -65,5 +67,13 @@ public partial class ProductProcessViewModel : BaseViewModel
         });
         
     }
+
+    private async Task WasteProcessAsync()
+	{
+		await Shell.Current.GoToAsync($"{nameof(OutputProductProcessWarehouseListView)}", new Dictionary<string, object>
+		{
+			{ nameof(OutputProductProcessType), OutputProductProcessType.WasteProcess }
+		});
+	}
 
 }

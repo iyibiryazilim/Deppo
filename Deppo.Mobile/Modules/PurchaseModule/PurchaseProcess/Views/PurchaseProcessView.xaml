@@ -7,8 +7,7 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ViewModels"
              Title="{Binding Title}"
-             x:DataType="viewModel:PurchaseProcessViewModel"
-             Shell.NavBarIsVisible="False">
+             x:DataType="viewModel:PurchaseProcessViewModel">
     <ContentPage.Behaviors>
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
                                    StatusBarStyle="Default" />
