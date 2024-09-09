@@ -6,6 +6,7 @@
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:locationModel="clr-namespace:Deppo.Mobile.Core.Models.LocationModels;assembly=Deppo.Mobile.Core"
+             xmlns:seriLotModel="clr-namespace:Deppo.Mobile.Core.Models.SeriLotModels;assembly=Deppo.Mobile.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModels="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.ViewModels"
              Title="{Binding Title}"
@@ -321,39 +322,154 @@
                         <Button Grid.Row="2"
                                 Command="{Binding LocationConfirmCommand}"
                                 Text="Tamam" />
-
                     </Grid>
-
                 </Grid>
-
-
-
-
                 <!--#endregion-->
             </dx:BottomSheet>
         </Grid>
+
         <dx:BottomSheet x:Name="serilotBottomSheet"
                         Grid.Row="1"
-                        AllowDismiss="True"
-                        BackgroundColor="White"
-                        CornerRadius="15"
-                        HalfExpandedRatio="0.3"
+                        Padding="10,30,10,10"
+                        AllowDismiss="False"
+                        BackgroundColor="{StaticResource Gray100}"
+                        CornerRadius="10"
+                        HalfExpandedRatio="0.5"
                         IsModal="True"
                         ShowGrabber="True">
             <!--#region BottomSheetContent-->
-            <VerticalStackLayout Padding="10"
-                                 Spacing="10"
-                                 VerticalOptions="Center">
-                <VerticalStackLayout Spacing="5">
-                    <Label FontSize="Title" Text="Ayarlar" />
-                    <Entry FontSize="Subtitle"
-                           Placeholder="http://172.16.1.25:52789"
-                           Text="test" />
+            <Grid RowDefinitions="Auto, *" RowSpacing="20">
+                <VerticalStackLayout Grid.Row="0" Spacing="5">
+                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               FontAttributes="Bold"
+                               FontSize="Medium"
+                               HorizontalOptions="Start"
+                               Text="Seri Lot Listesi" />
+                        <ImageButton Grid.Column="1"
+                                     Command="{Binding SeriLotCloseCommand}"
+                                     HeightRequest="25"
+                                     HorizontalOptions="End"
+                                     VerticalOptions="Center">
+                            <ImageButton.Source>
+                                <FontImageSource FontFamily="FAS"
+                                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.ChevronDown}"
+                                                 Size="Medium"
+                                                 Color="{StaticResource OffBlack}" />
+                            </ImageButton.Source>
+                        </ImageButton>
+                    </Grid>
 
-
+                    <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
                 </VerticalStackLayout>
-                <Button Text="Kaydet" VerticalOptions="End" />
-            </VerticalStackLayout>
+
+                <Grid Grid.Row="1"
+                      RowDefinitions="Auto, *, Auto"
+                      RowSpacing="10">
+                    <!--#region Search-->
+                    <Border Grid.Row="0"
+                            Padding="0"
+                            BackgroundColor="{StaticResource PrimaryLight}"
+                            HeightRequest="35"
+                            Stroke="{StaticResource Primary}"
+                            StrokeShape="RoundRectangle 5"
+                            StrokeThickness="0.5">
+                        <SearchBar x:Name="serilotSearchBar"
+                                   Placeholder="Ara..."
+                                   PlaceholderColor="{StaticResource OffBlack}"
+                                   TextColor="{StaticResource OffBlack}" />
+                    </Border>
+                    <!--#endregion-->
+                    <CollectionView Grid.Row="1"
+                                    ItemsSource="{Binding SeriLots}"
+                                    RemainingItemsThreshold="2"
+                                    RemainingItemsThresholdReachedCommand="{Binding LoadMoreSeriLotsCommand}">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="seriLotModel:SeriLotModel">
+                                <Border Padding="10"
+                                        BackgroundColor="{StaticResource WhiteSmoke}"
+                                        StrokeShape="RoundRectangle 10"
+                                        StrokeThickness="0.1">
+                                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                                        <VerticalStackLayout Grid.Column="0">
+                                            <Label FontAttributes="Bold"
+                                                   LineBreakMode="TailTruncation"
+                                                   Text="{Binding Code}" />
+                                            <Label LineBreakMode="TailTruncation"
+                                                   Text="{Binding Name}"
+                                                   TextColor="{StaticResource Gray600}" />
+
+                                            <Label>
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span FontAttributes="Bold"
+                                                              FontFamily="FAS"
+                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+
+                                        </VerticalStackLayout>
+
+                                        <Grid Grid.Column="1"
+                                              ColumnDefinitions="Auto,Auto,Auto"
+                                              ColumnSpacing="10"
+                                              HorizontalOptions="EndAndExpand"
+                                              VerticalOptions="Center">
+                                            <Border Grid.Column="0"
+                                                    Padding="5"
+                                                    BackgroundColor="Transparent"
+                                                    Stroke="{StaticResource Secondary}"
+                                                    StrokeShape="RoundRectangle 2">
+                                                <Label FontFamily="FAS"
+                                                       FontSize="Medium"
+                                                       Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                                       TextColor="{StaticResource Primary}" />
+
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductPurchaseOrderProcessBasketListViewModel}}, Path=SeriLotDecreaseCommand}" CommandParameter="{Binding .}" />
+                                                </Border.GestureRecognizers>
+                                            </Border>
+                                            <Label Grid.Column="1"
+                                                   FontAttributes="Bold"
+                                                   FontSize="Large"
+                                                   Text="{Binding InputQuantity}"
+                                                   TextColor="{StaticResource OffBlack}"
+                                                   VerticalOptions="Center" />
+                                            <Border Grid.Column="2"
+                                                    Padding="5"
+                                                    BackgroundColor="{StaticResource Secondary}"
+                                                    Stroke="{StaticResource Secondary}"
+                                                    StrokeShape="RoundRectangle 2">
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductPurchaseOrderProcessBasketListViewModel}}, Path=SeriLotIncreaseCommand}" CommandParameter="{Binding .}" />
+                                                </Border.GestureRecognizers>
+                                                <Label FontFamily="FAS"
+                                                       FontSize="Medium"
+                                                       Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                                       TextColor="{StaticResource White}" />
+                                            </Border>
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Button Grid.Row="2"
+                            Command="{Binding SeriLotConfirmCommand}"
+                            Text="Tamam" />
+                </Grid>
+
+            </Grid>
 
             <!--#endregion-->
         </dx:BottomSheet>

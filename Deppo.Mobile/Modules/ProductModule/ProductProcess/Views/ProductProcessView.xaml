@@ -229,6 +229,9 @@
                                 Grid.Column="0"
                                 ColumnDefinitions="Auto,*"
                                 ColumnSpacing="10">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding UnderCountProcessCommand}" />
+                                </Grid.GestureRecognizers>
                                 <Border
                                     Padding="5"
                                     BackgroundColor="{StaticResource Primary}"

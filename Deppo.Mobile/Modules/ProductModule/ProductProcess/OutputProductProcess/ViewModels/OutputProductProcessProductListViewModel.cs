@@ -24,13 +24,19 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 	private readonly IVariantService _variantService;
 	private readonly IUserDialogs _userDialogs;
 
+	[ObservableProperty]
+	WarehouseModel warehouseModel = null!;
+
 	public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
 	public ObservableCollection<VariantModel> ItemVariants { get; } = new();
 
 	[ObservableProperty]
 	public ObservableCollection<OutputProductBasketModel> selectedProducts = new();
-	
 
+	[ObservableProperty]
+	WarehouseTotalModel selectedProduct = null!;
+
+	public ContentPage CurrentPage { get; set; } = null!;
 
 	private bool IsSearchMode
 	{
@@ -88,19 +94,6 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 	public Command<SearchBar> PerformSearchCommand { get; }
 	public Command BackCommand { get; }
 	#endregion
-
-	
-
-	
-	[ObservableProperty]
-	WarehouseModel warehouseModel = null!;
-
-	[ObservableProperty]
-	WarehouseTotalModel selectedProduct = null!;
-
-	public ContentPage CurrentPage { get; set; } = null!;
-
-	
 
 	private async Task LoadItemsAsync()
 	{
@@ -350,7 +343,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 			IsBusy = true;
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _variantService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, productReferenceId: SelectedProduct.ProductReferenceId, warehouseNumber: warehouseModel.Number, skip: ItemVariants.Count(), take: 20);
+			var result = await _variantService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, productReferenceId: SelectedProduct.ProductReferenceId, warehouseNumber: WarehouseModel.Number, skip: ItemVariants.Count(), take: 20);
 
 			if (result.IsSuccess)
 			{

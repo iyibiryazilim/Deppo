@@ -29,7 +29,9 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
         [ObservableProperty]
         private InputProductProcessType inputProductProcessType;
 
-        public InputProductPurchaseOrderProcessWarehouseListViewModel(IHttpClientService httpClientService,
+		public ObservableCollection<WarehouseModel> Items { get; } = new();
+
+		public InputProductPurchaseOrderProcessWarehouseListViewModel(IHttpClientService httpClientService,
         IWarehouseService warehouseService,
         IUserDialogs userDialogs)
         {
@@ -49,8 +51,6 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
         public Command LoadMoreItemsCommand { get; }
         public Command ItemTappedCommand { get; }
         public Command NextViewCommand { get; }
-
-        public ObservableCollection<WarehouseModel> Items { get; } = new();
 
         private async Task LoadItemsAsync()
         {
