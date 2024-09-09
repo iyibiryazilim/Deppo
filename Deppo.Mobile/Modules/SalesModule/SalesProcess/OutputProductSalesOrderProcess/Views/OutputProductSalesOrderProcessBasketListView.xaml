@@ -367,7 +367,7 @@
                                     RemainingItemsThreshold="2"
                                     RemainingItemsThresholdReachedCommand="{Binding LoadMoreSeriLotTransactionsCommand}">
                         <CollectionView.ItemsLayout>
-                            <LinearItemsLayout ItemSpacing="5" />
+                            <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="seriLotModels:SeriLotTransactionModel">
