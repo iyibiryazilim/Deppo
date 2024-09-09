@@ -6,6 +6,8 @@ namespace Deppo.Mobile.Core.Models.ProductModels;
 public class ProductModel : Product
 {
     private bool _isSelected;
+    private string _locTrackingIcon;
+    private string _locTrackingIconColor;
 
     public ProductModel()
     {
@@ -22,4 +24,17 @@ public class ProductModel : Product
             NotifyPropertyChanged();
         }
     }
+
+    public string LocTrackingIcon
+    {
+        get => _locTrackingIcon = _locTrackingIcon ?? "ic_location";
+        set
+        {
+            if (_locTrackingIcon == value) return;
+            _locTrackingIcon = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public string LocTrackingIconColor => LocTracking == 1 ? "Green" : "Gray200";
 }
