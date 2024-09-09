@@ -9,7 +9,6 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModels="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels"
              Title="{Binding Title}"
-             Padding="10"
              x:DataType="viewModels:InputProductProcessBasketListViewModel"
              Shell.TabBarIsVisible="False">
 
@@ -192,6 +191,7 @@
                 </CollectionView>
 
                 <Button Grid.Row="2"
+                Margin="5,10,5,10"
                         Command="{Binding NextViewCommand}"
                         Text="İleri" />
             </Grid>
