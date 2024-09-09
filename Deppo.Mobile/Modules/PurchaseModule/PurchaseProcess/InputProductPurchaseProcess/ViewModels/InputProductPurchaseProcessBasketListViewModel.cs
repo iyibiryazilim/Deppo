@@ -1,11 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
+using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
+using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
+using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views;
+using DevExpress.Maui.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,6 +26,8 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
 public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewModel
 {
     private readonly IUserDialogs _userDialogs;
+    private readonly ILocationService _locationService;
+    private readonly ISeriLotService _seriLotService;
 
     [ObservableProperty]
     private WarehouseModel warehouseModel = null!;
@@ -30,31 +36,52 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
     private Supplier supplier = null!;
 
     [ObservableProperty]
+    private InputProductBasketModel? selectedInputProductBasketModel;
+
+    [ObservableProperty]
     private InputProductProcessType inputProductProcessType;
 
-    public InputProductPurchaseProcessBasketListViewModel(IUserDialogs userDialogs)
+    public InputProductPurchaseProcessBasketListViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, ILocationService locationService, ISeriLotService seriLotService)
     {
         _userDialogs = userDialogs;
+        _locationService = locationService;
+        _seriLotService = seriLotService;
         Title = "Sepet Listesi";
 
         ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
+
         DeleteItemCommand = new Command<InputProductBasketModel>(async (item) => await DeleteItemAsync(item));
         IncreaseCommand = new Command<InputProductBasketModel>(async (item) => await IncreaseAsync(item));
         DecreaseCommand = new Command<InputProductBasketModel>(async (item) => await DecreaseAsync(item));
+
+        LocationCloseCommand = new Command(async () => await LocationCloseAsync());
+        LocationConfirmCommand = new Command<LocationModel>(async (locationModel) => await LocationConfirmAsync(locationModel));
+        LocationIncreaseCommand = new Command<LocationModel>(async (locationModel) => await LocationIncreaseAsync(locationModel));
+        LocationDecreaseCommand = new Command<LocationModel>(async (LocationModel) => await LocationDecreaseAsync(LocationModel));
+
         NextViewCommand = new Command(async () => await NextViewAsync());
         BackCommand = new Command(async () => await BackAsync());
 
         Items.Clear();
     }
 
+    public Page CurrentPage { get; set; } = null!;
+
     public Command ShowProductViewCommand { get; }
     public Command<InputProductBasketModel> DeleteItemCommand { get; }
     public Command<InputProductBasketModel> IncreaseCommand { get; }
     public Command<InputProductBasketModel> DecreaseCommand { get; }
+
+    public Command<LocationModel> LocationDecreaseCommand { get; }
+    public Command<LocationModel> LocationIncreaseCommand { get; }
+    public Command<LocationModel> LocationConfirmCommand { get; }
+    public Command LocationCloseCommand { get; }
+
     public Command NextViewCommand { get; }
     public Command BackCommand { get; }
 
     public ObservableCollection<InputProductBasketModel> Items { get; } = new();
+    public ObservableCollection<LocationModel> Locations { get; }
 
     private async Task ShowProductViewAsync()
     {
@@ -133,6 +160,92 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
 
             if (item.Quantity > 1)
                 item.Quantity--;
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task LocationCloseAsync()
+    {
+        await MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
+        });
+    }
+
+    private async Task LocationIncreaseAsync(LocationModel locationModel)
+    {
+        if (IsBusy) return;
+
+        try
+        {
+            IsBusy = true;
+            locationModel.InputQuantity++;
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync($"{ex.Message}");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task LocationConfirmAsync(LocationModel locationModel)
+    {
+        if (IsBusy) return;
+        try
+        {
+            IsBusy = true;
+            if (Locations.Count > 0)
+            {
+                double totalInputQuantity = 0;
+                foreach (var location in Locations)
+                {
+                    if (location.InputQuantity > 0)
+                    {
+                        totalInputQuantity += location.InputQuantity;
+                    }
+                }
+                SelectedInputProductBasketModel.Quantity = totalInputQuantity;
+
+                CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
+            }
+            else
+            {
+                CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
+            }
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task LocationDecreaseAsync(LocationModel locationModel)
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            if (locationModel.InputQuantity > 0)
+            {
+                locationModel.InputQuantity -= 1;
+            }
         }
         catch (Exception ex)
         {

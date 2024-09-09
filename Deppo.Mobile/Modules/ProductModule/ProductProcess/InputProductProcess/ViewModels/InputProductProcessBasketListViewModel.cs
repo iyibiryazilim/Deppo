@@ -38,6 +38,9 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
     [ObservableProperty]
     private InputProductProcessType inputProductProcessType;
 
+    [ObservableProperty]
+    private SeriLotTransactionModel? selectedSeriLotTransaction;
+
     public InputProductProcessBasketListViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, ILocationService locationService, ISeriLotService seriLotService)
     {
         _userDialogs = userDialogs;
@@ -48,6 +51,8 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 
         ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
         IncreaseCommand = new Command<InputProductBasketModel>(async (item) => await IncreaseAsync(item));
+        DecreaseCommand = new Command<InputProductBasketModel>(async (item) => await DecreaseAsync(item));
+
         LocationCloseCommand = new Command(async () => await LocationCloseAsync());
         LocationConfirmCommand = new Command<LocationModel>(async (locationModel) => await LocationConfirmAsync(locationModel));
         LocationIncreaseCommand = new Command<LocationModel>(async (locationModel) => await LocationIncreaseAsync(locationModel));
@@ -61,8 +66,10 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
     }
 
     public Command ShowProductViewCommand { get; }
+
     public Command<InputProductBasketModel> DeleteItemCommand { get; }
     public Command<InputProductBasketModel> IncreaseCommand { get; }
+    public Command<InputProductBasketModel> DecreaseCommand { get; }
 
     public Command<LocationModel> LocationDecreaseCommand { get; }
     public Command<LocationModel> LocationIncreaseCommand { get; }
@@ -125,13 +132,18 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
                     CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.FullExpanded;
                 });
             }
-            else if (inputProductBasketModel.TrackingType == 1)
+
+            // Sadece SeriLot takipli ise serilotTransactionBottomSheet aç
+            else if (inputProductBasketModel.LocTracking == 0 && (inputProductBasketModel.TrackingType == 1 || inputProductBasketModel.TrackingType == 2))
             {
-                await LoadWarehouseLocationsAsync(inputProductBasketModel);
-                CurrentPage.FindByName<BottomSheet>("serilotBottomSheet").State = BottomSheetState.FullExpanded;
+                await LoadSeriLotAsync(inputProductBasketModel);
+                CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.FullExpanded;
             }
+            //stok yeri ve serilot takipli değilse
             else
             {
+                if (inputProductBasketModel.Quantity < inputProductBasketModel.StockQuantity)
+                    inputProductBasketModel.Quantity++;
             }
         }
         catch (Exception ex)
@@ -168,6 +180,42 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
         //{
         //    IsBusy = false;
         //}
+    }
+
+    private async Task DecreaseAsync(InputProductBasketModel inputProductBasketModel)
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            if (inputProductBasketModel is not null)
+            {
+                if (inputProductBasketModel.Quantity > 1)
+                {
+                    // Stok Yeri takipli ise locationTransactionBottomSheet aç
+                    if (inputProductBasketModel.LocTracking == 1)
+                    {
+                        await LoadWarehouseLocationsAsync(inputProductBasketModel);
+                        CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.FullExpanded;
+                    }
+                    // Sadece SeriLot takipli ise serilotTransactionBottomSheet aç
+                    else if (inputProductBasketModel.LocTracking == 0 && (inputProductBasketModel.TrackingType == 1 || inputProductBasketModel.TrackingType == 2))
+                    {
+                        await LoadSeriLotAsync(inputProductBasketModel);
+                        CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.FullExpanded;
+                    }
+                    // Stok yeri ve SeriLot takipli değilse
+                    else
+                    {
+                        inputProductBasketModel.Quantity--;
+                    }
+                }
+            }
+        }
+        catch (Exception ex) { }
+        finally { IsBusy = false; }
     }
 
     private async Task DeleteItemAsync(InputProductBasketModel item)
