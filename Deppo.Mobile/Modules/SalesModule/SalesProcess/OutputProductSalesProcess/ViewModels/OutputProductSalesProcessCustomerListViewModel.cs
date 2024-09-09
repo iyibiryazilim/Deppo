@@ -6,6 +6,7 @@ using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.Views;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.ViewModels;
@@ -163,11 +164,11 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 
 			if (SalesCustomer is not null)
 			{
-				//await Shell.Current.GoToAsync($"{nameof(OutputProductSalesProcessProductListView)}", new Dictionary<string, object>
-				//{
-				//	[nameof(SalesCustomer)] = SalesCustomer,
-				//	[nameof(WarehouseModel)] = WarehouseModel,
-				//});
+				await Shell.Current.GoToAsync($"{nameof(OutputProductSalesProcessBasketListView)}", new Dictionary<string, object>
+				{
+					[nameof(SalesCustomer)] = SalesCustomer,
+					[nameof(WarehouseModel)] = WarehouseModel,
+				});
 			}
 			else
 			{

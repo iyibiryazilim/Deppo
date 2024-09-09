@@ -7,10 +7,5 @@
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.ViewModels"
              x:DataType="viewModel:OutputProductSalesProcessBasketListViewModel"
              Title="OutputProductSalesProcessBasketListView">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+    
 </ContentPage>

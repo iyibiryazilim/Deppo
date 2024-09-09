@@ -472,7 +472,11 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
 					await Shell.Current.GoToAsync("..");
 				}
 			}
-			await Shell.Current.GoToAsync("..");
+			else
+			{
+				await Shell.Current.GoToAsync("..");
+			}
+			
 		}
 		catch (Exception ex)
 		{
