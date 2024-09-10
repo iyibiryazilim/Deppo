@@ -153,8 +153,8 @@
 
             <Button Grid.Row="3"
                     Command="{Binding ConfirmCommand}"
-                    Margin="10,10,10,20"
-                    Text="Sepete Ekle" />
+                    Margin="5,10,5,20"
+                    Text="{Binding SelectedProducts.Count,StringFormat='Sepete Ekle : {0} '}" />
         </Grid>
 
         <dx:BottomSheet x:Name="variantBottomSheet"

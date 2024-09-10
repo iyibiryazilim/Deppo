@@ -33,8 +33,8 @@
     <Grid RowDefinitions="*,Auto">
 
         <Grid Grid.Row="0"
-              Padding="10"
-              RowDefinitions="Auto,*">
+             
+              RowDefinitions="Auto,*,Auto" RowSpacing="5">
             <Border Grid.Row="0"
                     Margin="5,5,5,0"
                     Padding="0"
@@ -54,13 +54,10 @@
                     </SearchBar.Behaviors>
                 </SearchBar>
             </Border>
-            <RefreshView Grid.Row="1"
-                         Command="{Binding LoadItemsCommand}"
-                         IsRefreshing="{Binding IsBusy, Mode=OneWay}"
-                         RefreshColor="Transparent">
-                <CollectionView ItemsSource="{Binding Items}"
-                                RemainingItemsThreshold="2"
-                                RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+
+            <CollectionView  Grid.Row="1"
+                             ItemsSource="{Binding Items}"
+                                >
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="supplierModel:SupplierModel">
                             <Border StrokeShape="RoundRectangle 6"
@@ -149,12 +146,12 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-            </RefreshView>
+           
         </Grid>
-        <Button Grid.Row="1"
+        <Button Grid.Row="2"
                 Text="İleri"
                 Command="{Binding NextViewCommand}"
                 IsEnabled="{Binding SelectedSupplier, Converter={StaticResource IsNotNullConverter}}"
-                Margin="10,10,10,20"></Button>
+                Margin="5,10,5,20"></Button>
     </Grid>
 </ContentPage>
