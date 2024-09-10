@@ -108,7 +108,7 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 						LocTracking = product.LocTracking,
 						IsVariant = product.IsVariant,
 						TrackingType = product.TrackingType,
-						IsSelected = false
+						IsSelected = false,
 					};
 
 					Items.Add(item);

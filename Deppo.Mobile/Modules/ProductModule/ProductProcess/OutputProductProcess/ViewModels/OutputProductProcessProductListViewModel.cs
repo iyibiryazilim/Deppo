@@ -137,6 +137,9 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 						IsVariant = item.IsVariant,
 						TrackingType = item.TrackingType,
 						IsSelected = false,
+						LocTrackingIcon = product.LocTrackingIcon,
+						VariantIcon = product.VariantIcon,
+						TrackingTypeIcon = product.TrackingTypeIcon,
 					});
 				}
 			}
@@ -195,6 +198,9 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 						IsVariant = item.IsVariant,
 						TrackingType = item.TrackingType,
 						IsSelected = false,
+						LocTrackingIcon = product.LocTrackingIcon,
+						VariantIcon = product.VariantIcon,
+						TrackingTypeIcon = product.TrackingTypeIcon,
 					});
 				}
 			}
@@ -259,6 +265,9 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 							LocTracking = item.LocTracking,
 							TrackingType = item.TrackingType,
 							Quantity = item.LocTracking == 0 ? 1 : 0,
+							LocTrackingIcon = item.LocTrackingIcon,
+							VariantIcon = item.VariantIcon,
+							TrackingTypeIcon = item.TrackingTypeIcon,
 						};
 
 						SelectedProducts.Add(basketItem);
@@ -453,14 +462,17 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 			var previousViewModel = _serviceProvider.GetRequiredService<OutputProductProcessBasketListViewModel>();
 			if (previousViewModel is not null)
 			{
-				foreach (var item in SelectedProducts)
+				if(SelectedProducts.Any())
 				{
-					if (!previousViewModel.Items.Any(x => x.ItemCode == item.ItemCode))
-						previousViewModel.Items.Add(item);
+					foreach (var item in SelectedProducts)
+					{
+						if (!previousViewModel.Items.Any(x => x.ItemCode == item.ItemCode))
+							previousViewModel.Items.Add(item);
+					}
 				}
-
-				await Shell.Current.GoToAsync($"..");
 			}
+			await Shell.Current.GoToAsync($"..");
+			SelectedProducts.Clear();
 		}
 		catch (Exception ex)
 		{
@@ -522,6 +534,9 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 								LocTracking = item.LocTracking,
 								TrackingType = item.TrackingType,
 								IsSelected = false,
+								LocTrackingIcon = product.LocTrackingIcon,
+								VariantIcon = product.VariantIcon,
+								TrackingTypeIcon = product.TrackingTypeIcon
 							});
 						}
 					}
