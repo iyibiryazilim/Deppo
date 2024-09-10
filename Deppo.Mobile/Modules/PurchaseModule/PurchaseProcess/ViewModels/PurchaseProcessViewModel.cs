@@ -19,7 +19,7 @@ public partial class PurchaseProcessViewModel : BaseViewModel
         _userDialogs = userDialogs;
         _httpClientService = httpClientService;
 
-        Title = "İşlemler";
+        Title = "SatınAlma İşlemleri";
 
         ProductionInputCommand = new Command(async () => await ProductionInputAsync());
         InputPurchaseOrderProcessCommand = new Command(async () => await InputPurchaseOrderProcessAsync());

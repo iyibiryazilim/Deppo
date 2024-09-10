@@ -9,7 +9,7 @@
     xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.ProductionInput.ViewModels"
     Title="{Binding Title}"
     Shell.TabBarIsVisible="False"
-    Padding="10"
+   
     x:DataType="viewModel:ProductionInputWarehouseListViewModel">
 
     <ContentPage.Behaviors>
@@ -30,7 +30,7 @@
     </ContentPage.BackgroundImageSource>
 
     <Grid
-        Padding="10"
+       
         RowDefinitions="*,Auto"
         RowSpacing="10">
         <CollectionView ItemsSource="{Binding Items}">

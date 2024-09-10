@@ -18,7 +18,7 @@ public partial class ProductProcessViewModel : BaseViewModel
         _userDialogs = userDialogs;
         _httpClientService = httpClientService;
 
-        Title = "İşlemler";
+        Title = "Malzeme İşlemleri";
 
         ProductionInputCommand = new Command(async () => await ProductionInputAsync());
         OverCountCommand = new Command(async () => await OverCountAsync());

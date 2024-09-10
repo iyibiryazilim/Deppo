@@ -146,7 +146,7 @@
                        Text="Çıkış İşlemleri"
                        TextColor="{StaticResource OffBlack}" />
 
-                <Grid RowDefinitions="Auto,Auto" RowSpacing="0">
+                <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="0">
                     <!--#region Sarf Fişi-->
                     <Border Grid.Row="0"
                             Padding="5"
@@ -247,11 +247,12 @@
                     <!--#endregion-->
 
                     <!--#region Fire Fişi-->
-                    <Border Grid.Row="1"
+                    <Border Grid.Row="2"
                             Padding="5"
                             StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
+                        <Grid ColumnDefinitions=".85*,.15*"
+                              ColumnSpacing="0">
                             <Grid Grid.Column="0"
                                   ColumnDefinitions="Auto,*"
                                   ColumnSpacing="10">
@@ -277,7 +278,8 @@
                                        VerticalOptions="Center" />
                             </Grid>
 
-                            <Border Grid.Column="1" StrokeThickness="0">
+                            <Border Grid.Column="1"
+                                    StrokeThickness="0">
                                 <toolkit:AvatarView Padding="2"
                                                     BorderColor="{StaticResource Primary}"
                                                     CornerRadius="15"

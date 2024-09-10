@@ -64,11 +64,13 @@
                                                  VerticalOptions="Start">
                                 <Label FontAttributes="Bold"
                                        LineBreakMode="TailTruncation"
+                                       VerticalOptions="Center"
                                        MaxLines="1"
                                        Text="{Binding Name}" />
                                 <Label FontAttributes="None"
                                        LineBreakMode="TailTruncation"
                                        MaxLines="1"
+                                       
                                        Text="{Binding City, FallbackValue='-', TargetNullValue='-'}"
                                        TextColor="{StaticResource Gray600}" />
                             </VerticalStackLayout>
