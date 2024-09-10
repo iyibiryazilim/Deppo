@@ -56,6 +56,8 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 		_locationTransactionService = locationTransactionService;
 		_seriLotTransactionService = seriLotTransactionService;
 		_userDialogs = userDialogs;
+		Title = "Sepet Listesi";
+		Items.Clear();
 
 		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
 		IncreaseCommand = new Command<OutputProductBasketModel>(async (item) => await IncreaseAsync(item));
@@ -76,7 +78,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 
 		BackCommand = new Command(async () => await BackAsync());
 
-		Items.Clear();
+		
 	}
 
 	public Page CurrentPage { get; set; } = null!;

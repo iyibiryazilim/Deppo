@@ -280,9 +280,15 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 
 			if(previousViewModel is not null)
 			{
-				foreach(var item in SelectedProducts)
-					if (!previousViewModel.Items.Any(x => x.ItemCode == item.ItemName))
-						previousViewModel.Items.Add(item);
+				if(SelectedProducts.Any())
+				{
+					foreach (var item in SelectedProducts)
+						if (!previousViewModel.Items.Any(x => x.ItemCode == item.ItemName))
+							previousViewModel.Items.Add(item);
+
+					SelectedProducts.Clear();
+				} 
+				
 
 				await Shell.Current.GoToAsync("..");
 			}

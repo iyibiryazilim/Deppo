@@ -124,7 +124,7 @@
             <Button Grid.Row="3"
                     Margin="10,10,10,20"
                     Command="{Binding ConfirmCommand}"
-                    Text="Sepete Ekle" />
+                    Text="{Binding SelectedProducts.Count, StringFormat='Sepete Ekle : {0}'}" />
 
         </Grid>
         <!--#endregion-->

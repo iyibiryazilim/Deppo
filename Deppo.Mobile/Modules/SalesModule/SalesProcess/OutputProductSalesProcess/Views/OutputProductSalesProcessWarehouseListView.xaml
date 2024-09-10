@@ -26,7 +26,7 @@
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
-    <Grid Padding="10"
+    <Grid
           RowDefinitions="*,Auto"
           RowSpacing="10">
         <CollectionView ItemsSource="{Binding Items}">
@@ -80,7 +80,7 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
         <Button Grid.Row="1"
-                Margin="5,10,5,10"
+                Margin="5,10,5,20"
                 Command="{Binding NextViewCommand}"
                 IsEnabled="{Binding SelectedWarehouseModel, Converter={StaticResource IsNotNullConverter}}"
                 Text="İleri" />
