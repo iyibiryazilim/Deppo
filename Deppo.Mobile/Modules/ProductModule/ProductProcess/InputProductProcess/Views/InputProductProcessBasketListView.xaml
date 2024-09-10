@@ -258,7 +258,7 @@
                             </SearchBar>
                         </Border>
 
-                        <CollectionView Grid.Row="1" ItemsSource="{Binding Locations}">
+                        <CollectionView Grid.Row="1" ItemsSource="{Binding Locations}" RemainingItemsThreshold="2" RemainingItemsThresholdReachedCommand="{Binding LoadMoreLocationsCommand}">
                             <CollectionView.ItemsLayout>
                                 <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
                             </CollectionView.ItemsLayout>
