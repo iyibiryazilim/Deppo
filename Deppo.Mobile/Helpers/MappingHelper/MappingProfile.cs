@@ -9,6 +9,7 @@ using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.VariantModels;
+using Deppo.Mobile.Core.Models.WarehouseModels;
 using Google.Android.Material.Color.Utilities;
 
 namespace Deppo.Mobile.Helpers.MappingHelper;
@@ -28,6 +29,7 @@ public class MappingProfile : Profile
         CreateMap<CompanyModel, dynamic>();
         CreateMap<Product, dynamic>();
         CreateMap<WarehouseTotal, dynamic>();
+        CreateMap<WarehouseTotalModel, dynamic>();
         CreateMap<Deppo.Core.Models.Variant, dynamic>();
         CreateMap<VariantModel, dynamic>();
         CreateMap<Supplier, dynamic>();

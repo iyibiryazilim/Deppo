@@ -36,7 +36,7 @@
                        Text="Giriş İşlemleri"
                        TextColor="{StaticResource OffBlack}" />
 
-                <Grid RowDefinitions="Auto,Auto" RowSpacing="5">
+                <Grid RowDefinitions="Auto,Auto" RowSpacing="0">
 
                     <Border Grid.Row="0"
                             Padding="5"
@@ -46,6 +46,9 @@
                             <Grid Grid.Column="0"
                                   ColumnDefinitions="Auto,*"
                                   ColumnSpacing="10">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OutputProductSalesProcessCommand}" />
+                                </Grid.GestureRecognizers>
                                 <Border Padding="5"
                                         BackgroundColor="{StaticResource Primary}"
                                         StrokeShape="RoundRectangle 5">
