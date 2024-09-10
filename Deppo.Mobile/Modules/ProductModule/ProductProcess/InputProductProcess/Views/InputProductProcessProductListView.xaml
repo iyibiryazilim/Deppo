@@ -81,7 +81,7 @@
                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessProductListViewModel}}, Path=ItemTappedCommand}"
                                                   CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>
-                        <Grid ColumnDefinitions="Auto,*"
+                        <Grid ColumnDefinitions="Auto,*, Auto"
                               ColumnSpacing="10">
                             <Border BackgroundColor="{StaticResource Secondary}"
                                     StrokeShape="RoundRectangle 5"
@@ -124,6 +124,12 @@
                                     </Label.FormattedText>
                                 </Label>
                             </VerticalStackLayout>
+
+                            <Grid ColumnDefinitions="Auto, Auto, Auto" ColumnSpacing="3" HorizontalOptions="End" VerticalOptions="Start" Grid.Column="2"> 
+                                <Label Grid.Column="0" FontFamily="FAS" Text="{Binding VariantIcon}" TextColor="{Binding VariantIconColor}" FontSize="10" />
+                                <Label Grid.Column="1" FontFamily="FAS" Text="{Binding LocTrackingIcon}" TextColor="{Binding LocTrackingIconColor}" FontSize="10" />
+                                <Label Grid.Column="2" FontFamily="FAS" Text="{Binding TrackingTypeIcon}" TextColor="{Binding TrackingTypeIconColor}" FontSize="10" />
+                            </Grid>
                         </Grid>
 
                         <Border.Triggers>
