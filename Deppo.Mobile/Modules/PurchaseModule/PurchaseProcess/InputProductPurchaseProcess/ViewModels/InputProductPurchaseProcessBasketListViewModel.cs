@@ -6,6 +6,7 @@ using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views;
@@ -25,6 +26,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
 [QueryProperty(name: nameof(InputProductProcessType), queryId: nameof(InputProductProcessType))]
 public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewModel
 {
+    private readonly IHttpClientService _httpClientService;
     private readonly IUserDialogs _userDialogs;
     private readonly ILocationService _locationService;
     private readonly ISeriLotService _seriLotService;
@@ -41,8 +43,9 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
     [ObservableProperty]
     private InputProductProcessType inputProductProcessType;
 
-    public InputProductPurchaseProcessBasketListViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, ILocationService locationService, ISeriLotService seriLotService)
+    public InputProductPurchaseProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IHttpClientService httpClientService2, ILocationService locationService, ISeriLotService seriLotService)
     {
+        _httpClientService = httpClientService;
         _userDialogs = userDialogs;
         _locationService = locationService;
         _seriLotService = seriLotService;
@@ -137,7 +140,12 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
         {
             IsBusy = true;
 
-            item.Quantity++;
+            if(item.LocTracking == 1){
+               await LoadLocationItemsAsync(item);
+                CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.FullExpanded;
+            }
+            else
+                item.Quantity++;
         }
         catch (Exception ex)
         {
@@ -168,6 +176,29 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    private async Task LoadLocationItemsAsync(InputProductBasketModel item) {
+        try
+        {
+            _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(1000);
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, item.ItemReferenceId, string.Empty, 0, 20);
+            if(result.IsSuccess) {
+                if(result.Data is null)
+                    return;
+
+                foreach(var location in result.Data) {
+                    Locations.Add(Mapping.Mapper.Map<LocationModel>(location));
+                }
+            }
+            _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
     }
 

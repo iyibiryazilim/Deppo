@@ -53,6 +53,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
         IncreaseCommand = new Command<InputProductBasketModel>(async (item) => await IncreaseAsync(item));
         DecreaseCommand = new Command<InputProductBasketModel>(async (item) => await DecreaseAsync(item));
 
+        LoadMoreLocationsCommand = new Command(async () => await LoadMoreWarehouseLocationsAsync());
         LocationCloseCommand = new Command(async () => await LocationCloseAsync());
         LocationConfirmCommand = new Command<LocationModel>(async (locationModel) => await LocationConfirmAsync(locationModel));
         LocationIncreaseCommand = new Command<LocationModel>(async (locationModel) => await LocationIncreaseAsync(locationModel));
@@ -71,6 +72,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
     public Command<InputProductBasketModel> IncreaseCommand { get; }
     public Command<InputProductBasketModel> DecreaseCommand { get; }
 
+    public Command LoadMoreLocationsCommand { get; }
     public Command<LocationModel> LocationDecreaseCommand { get; }
     public Command<LocationModel> LocationIncreaseCommand { get; }
     public Command<LocationModel> LocationConfirmCommand { get; }
@@ -126,10 +128,10 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
             SelectedInputProductBasketModel = inputProductBasketModel;
             if (inputProductBasketModel.LocTracking == 1)
             {
-                MainThread.BeginInvokeOnMainThread(async () =>
+                await Shell.Current.GoToAsync($"{nameof(InputProductProcessBasketLocationListView)}", new Dictionary<string, object>
                 {
-                    await LoadWarehouseLocationsAsync(inputProductBasketModel);
-                    CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.FullExpanded;
+                    {nameof(WarehouseModel), WarehouseModel},
+                    {nameof(InputProductBasketModel), inputProductBasketModel}
                 });
             }
 
@@ -154,32 +156,6 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
         {
             IsBusy = false;
         }
-
-        //eski bottomsheet kodları
-        //if (IsBusy)
-        //    return;
-
-        //try
-        //{
-        //    IsBusy = true;
-
-        //    item.Quantity++;
-        //    InputProductProcessBasketListView? cp = CurrentPage as InputProductProcessBasketListView;
-
-        //    BottomSheet locationBottomSheet = cp.FindByName<BottomSheet>("locationBottomSheet");
-
-        //    if (locationBottomSheet != null)
-        //        locationBottomSheet.State = BottomSheetState.HalfExpanded;
-
-        //}
-        //catch (Exception ex)
-        //{
-        //    await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        //}
-        //finally
-        //{
-        //    IsBusy = false;
-        //}
     }
 
     private async Task DecreaseAsync(InputProductBasketModel inputProductBasketModel)
@@ -267,6 +243,39 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
         catch (System.Exception ex)
         {
             await _userDialogs.AlertAsync(ex.Message);
+        }
+    }
+
+    private async Task LoadMoreWarehouseLocationsAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number,SelectedInputProductBasketModel.ItemReferenceId, search: string.Empty, skip: Locations.Count, take: 20);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                    Locations.Add(Mapping.Mapper.Map<LocationModel>(item));
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 

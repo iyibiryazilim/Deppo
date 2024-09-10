@@ -115,6 +115,7 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
                         SubUnitsetName = item.SubUnitsetName,
                         StockQuantity = item.StockQuantity,
                         TrackingType = item.TrackingType,
+                        LocTracking = item.LocTracking,
                         IsVariant = item.IsVariant,
                         IsSelected = false
                     });
@@ -171,6 +172,7 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
                         SubUnitsetName = item.SubUnitsetName,
                         StockQuantity = item.StockQuantity,
                         TrackingType = item.TrackingType,
+                        LocTracking = item.LocTracking,
                         IsVariant = item.IsVariant,
                         IsSelected = false
                     });
