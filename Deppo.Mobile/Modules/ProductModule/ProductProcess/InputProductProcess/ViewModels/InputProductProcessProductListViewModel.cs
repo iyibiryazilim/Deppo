@@ -279,7 +279,13 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                             Quantity = item.LocTracking == 0 ? 1 : 0,
                             LocTracking = item.LocTracking,
                             TrackingType = item.TrackingType,
-                            IsVariant = item.IsVariant
+                            IsVariant = item.IsVariant,
+                            VariantIcon = item.VariantIcon,
+                            LocTrackingIcon = item.LocTrackingIcon,
+                            TrackingTypeIcon = item.TrackingTypeIcon
+                            
+
+                           
                         };
 
                         SelectedProducts.Add(basketItem);
