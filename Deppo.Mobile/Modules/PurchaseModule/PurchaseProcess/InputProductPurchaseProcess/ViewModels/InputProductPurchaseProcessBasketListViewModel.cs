@@ -140,9 +140,13 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
         {
             IsBusy = true;
 
-            if(item.LocTracking == 1){
-               await LoadLocationItemsAsync(item);
-                CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.FullExpanded;
+            if (item.LocTracking == 1)
+            {
+                await Shell.Current.GoToAsync($"{nameof(InputProductProcessBasketLocationListView)}", new Dictionary<string, object>
+                {
+                    {nameof(WarehouseModel), WarehouseModel},
+                    {nameof(InputProductBasketModel), item}
+                });
             }
             else
                 item.Quantity++;
@@ -179,18 +183,21 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
         }
     }
 
-    private async Task LoadLocationItemsAsync(InputProductBasketModel item) {
+    private async Task LoadLocationItemsAsync(InputProductBasketModel item)
+    {
         try
         {
             _userDialogs.ShowLoading("Yükleniyor...");
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, item.ItemReferenceId, string.Empty, 0, 20);
-            if(result.IsSuccess) {
-                if(result.Data is null)
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
                     return;
 
-                foreach(var location in result.Data) {
+                foreach (var location in result.Data)
+                {
                     Locations.Add(Mapping.Mapper.Map<LocationModel>(location));
                 }
             }
