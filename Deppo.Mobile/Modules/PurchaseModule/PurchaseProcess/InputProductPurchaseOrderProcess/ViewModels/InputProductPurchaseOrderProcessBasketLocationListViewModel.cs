@@ -59,7 +59,7 @@ public partial class InputProductPurchaseOrderProcessBasketLocationListViewModel
     private InputProductBasketModel inputProductBasketModel = null!;
 
     public ObservableCollection<LocationModel> Items { get; } = new();
-    //public ObservableCollection<LocationModel> SelectedItems { get; } = new();
+    public ObservableCollection<LocationModel> SelectedItems { get; } = new();
 
     [ObservableProperty]
     private LocationModel selectedItem;
@@ -252,12 +252,10 @@ public partial class InputProductPurchaseOrderProcessBasketLocationListViewModel
 
             _userDialogs.ShowLoading("Loading...");
             await Task.Delay(500);
-            foreach (var item in Items)
+            foreach (var item in Items.Where(x => x.IsSelected))
             {
-                if (!InputProductBasketModel.SelectedLocations.Any(x => x.Code == item.Code) && item.IsSelected)
-                {
-                    InputProductBasketModel.SelectedLocations.Add(item);
-                }
+                if (!SelectedItems.Any(x => x.Code == item.Code))
+                    SelectedItems.Add(item);
             }
 
             CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
@@ -376,7 +374,7 @@ public partial class InputProductPurchaseOrderProcessBasketLocationListViewModel
                 if (result.Data is not null)
                 {
                     foreach (var item in result.Data)
-                        InputProductBasketModel.SelectedLocations.Add(Mapping.Mapper.Map<LocationModel>(item));
+                        SelectedItems.Add(Mapping.Mapper.Map<LocationModel>(item));
 
                     barcodeEntry.Text = string.Empty;
                     barcodeEntry.Focus();
@@ -406,11 +404,28 @@ public partial class InputProductPurchaseOrderProcessBasketLocationListViewModel
 
             _userDialogs.ShowLoading("Loading...");
 
-            var previousViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketListViewModel>();
-            if (InputProductBasketModel.SelectedLocations.Count > 0)
+            var previousViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseOrderProcessBasketListViewModel>();
+
+            if (previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputProductBasketModel.ItemReferenceId) is not null)
             {
-                var totalQuantity = InputProductBasketModel.SelectedLocations.Where(x => x.InputQuantity > 0).Sum(x => (double)x.InputQuantity);
-                previousViewModel.SelectedInputProductBasketModel.Quantity = totalQuantity;
+                foreach (var item in SelectedItems.Where(x => x.InputQuantity > 0)) //Locations
+                {
+                    var location = previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputProductBasketModel.ItemReferenceId).Details.FirstOrDefault(x => x.LocationCode == item.Code);
+                    if (location is not null)
+                    {
+                        location.Quantity = item.InputQuantity;
+                    }
+                    else
+                    {
+                        previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputProductBasketModel.ItemReferenceId).Details.Add(new InputPurchaseBasketDetailModel
+                        {
+                            LocationReferenceId = item.ReferenceId,
+                            LocationCode = item.Code,
+                            LocationName = item.Name,
+                            Quantity = item.InputQuantity
+                        });
+                    }
+                }
             }
 
             await Shell.Current.GoToAsync("..");

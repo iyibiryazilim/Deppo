@@ -18,6 +18,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 {
 	private readonly IHttpClientService _httpClientService;
 	private readonly ISalesCustomerService _salesCustomerService;
+	private readonly ISalesCustomerProductService _salesCustomerProductService;
 	private readonly IUserDialogs _userDialogs;
 
 	[ObservableProperty]
@@ -30,11 +31,15 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 	public ObservableCollection<SalesCustomer> Items { get; } = new();
 	#endregion
 
-	public OutputProductSalesOrderProcessCustomerListViewModel(IHttpClientService httpClientService, ISalesCustomerService salesCustomerService, IUserDialogs userDialogs)
+	public OutputProductSalesOrderProcessCustomerListViewModel(IHttpClientService httpClientService,
+	ISalesCustomerService salesCustomerService,
+	IUserDialogs userDialogs,
+	ISalesCustomerProductService salesCustomerProductService)
 	{
 		_httpClientService = httpClientService;
 		_salesCustomerService = salesCustomerService;
 		_userDialogs = userDialogs;
+		_salesCustomerProductService = salesCustomerProductService;
 
 		Title = "Müşteriler";
 
@@ -42,15 +47,17 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
 		ItemTappedCommand = new Command<SalesCustomer>(async (customer) => await ItemTappedAsync(customer));
 		NextViewCommand = new Command(async () => await NextViewAsync());
+		ShowOrdersCommand = new Command<SalesCustomer>(async (customer) => await ShowOrdersAsync(customer));
 	}
 
 	#region Commands
 	public Command LoadItemsCommand { get; }
 	public Command LoadMoreItemsCommand { get; }
 	public Command ItemTappedCommand { get; }
+	public Command ShowOrdersCommand { get; }
 	public Command NextViewCommand { get; }
 	#endregion
-	
+
 	private async Task LoadItemsAsync()
 	{
 		if (IsBusy)
@@ -64,8 +71,8 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 			await Task.Delay(1000);
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _salesCustomerService.GetObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip:0, take:20, search: "");
-			if(result.IsSuccess)
+			var result = await _salesCustomerService.GetObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: 0, take: 20, search: "");
+			if (result.IsSuccess)
 			{
 				if (result.Data is null)
 					return;
@@ -116,6 +123,48 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 				_userDialogs.HideHud();
 
 			_userDialogs.Alert(ex.Message);
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task ShowOrdersAsync(SalesCustomer selectedItem)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var customerOrders = await _salesCustomerProductService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				customerReferenceId: selectedItem.ReferenceId,
+				warehouseNumber: WarehouseModel.Number,
+				skip: 0,
+				take: 20
+			);
+
+			if (customerOrders.IsSuccess)
+			{
+				if (customerOrders.Data is null)
+					return;
+
+				foreach (var item in customerOrders.Data)
+				{
+					Items.FirstOrDefault(x => x.ReferenceId == selectedItem.ReferenceId)?
+					.Products.Add(Mapping.Mapper.Map<SalesCustomerProduct>(item));
+
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{

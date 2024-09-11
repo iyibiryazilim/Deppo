@@ -41,6 +41,7 @@ public class InputPurchaseBasketModel : INotifyPropertyChanged, IDisposable
 	private string _trackingTypeIcon;
 	private string _trackingTypeIconColor;
 
+
 	public InputPurchaseBasketModel()
     {
         ReferenceId = Guid.NewGuid();

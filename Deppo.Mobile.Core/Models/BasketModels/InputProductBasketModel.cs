@@ -38,8 +38,6 @@ public class InputProductBasketModel : INotifyPropertyChanged, IDisposable
 	private string _trackingTypeIcon;
 	private string _trackingTypeIconColor;
 
-    public ObservableCollection<LocationModel> SelectedLocations { get; } = new();
-
 	public InputProductBasketModel()
     {
         ReferenceId = Guid.NewGuid();
