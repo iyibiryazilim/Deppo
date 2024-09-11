@@ -12,7 +12,6 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
-using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Converters;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using DevExpress.Maui.Controls;
 
@@ -36,7 +35,10 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
     [ObservableProperty]
     private ObservableCollection<InputProductBasketModel> selectedProducts = new();
 
-    private bool IsSearchMode
+	public ObservableCollection<ProductModel> Items { get; } = new();
+	public ObservableCollection<VariantModel> ItemVariants { get; } = new();
+
+	private bool IsSearchMode
     {
         get
         {
@@ -98,8 +100,6 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
     public Command BackCommand { get; }
     public Command<SearchBar> PerformSearchCommand { get; }
 
-    public ObservableCollection<ProductModel> Items { get; } = new();
-    public ObservableCollection<VariantModel> ItemVariants { get; } = new();
 
     private async Task LoadItemsAsync()
     {
@@ -114,8 +114,8 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
             if (!IsSearchMode)
                 SelectedProducts.Clear();
 
-            await Task.Delay(1000);
             _userDialogs.Loading("Loading Items...");
+            await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
             var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 20);
@@ -199,20 +199,27 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
 
                     Items.Add(new ProductModel
                     {
-                        ReferenceId = item.ReferenceId,
-                        Code = item.Code,
-                        Name = item.Name,
-                        UnitsetReferenceId = item.UnitsetReferenceId,
-                        UnitsetCode = item.UnitsetCode,
-                        UnitsetName = item.UnitsetName,
-                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                        SubUnitsetCode = item.SubUnitsetCode,
-                        SubUnitsetName = item.SubUnitsetName,
-                        StockQuantity = item.StockQuantity,
-                        TrackingType = item.TrackingType,
-                        IsVariant = item.IsVariant,
-                        IsSelected = false
-                    });
+						ReferenceId = item.ReferenceId,
+						Code = item.Code,
+						Name = item.Name,
+						UnitsetReferenceId = item.UnitsetReferenceId,
+						UnitsetCode = item.UnitsetCode,
+						UnitsetName = item.UnitsetName,
+						SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+						SubUnitsetCode = item.SubUnitsetCode,
+						SubUnitsetName = item.SubUnitsetName,
+						StockQuantity = item.StockQuantity,
+						TrackingType = item.TrackingType,
+						LocTracking = item.LocTracking,
+						GroupCode = item.GroupCode,
+						BrandReferenceId = item.BrandReferenceId,
+						BrandCode = item.BrandCode,
+						BrandName = item.BrandName,
+						VatRate = item.VatRate,
+						Image = item.Image,
+						IsVariant = item.IsVariant,
+						IsSelected = false
+					});
                 }
             }
 
@@ -283,9 +290,6 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                             VariantIcon = item.VariantIcon,
                             LocTrackingIcon = item.LocTrackingIcon,
                             TrackingTypeIcon = item.TrackingTypeIcon
-                            
-
-                           
                         };
 
                         SelectedProducts.Add(basketItem);

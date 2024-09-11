@@ -26,7 +26,6 @@ public class OutputSalesBasketOrderModel : INotifyPropertyChanged, IDisposable
 	private DateTime _orderDate;
 	private DateTime _dueDate;
 
-	private List<OutputSalesBasketOrderDetailModel> _details = new();
 	public OutputSalesBasketOrderModel()
 	{
 
@@ -242,17 +241,6 @@ public class OutputSalesBasketOrderModel : INotifyPropertyChanged, IDisposable
 		{
 			if (_dueDate == value) return;
 			_dueDate = value;
-			NotifyPropertyChanged();
-		}
-	}
-
-	public List<OutputSalesBasketOrderDetailModel> Details
-	{
-		get => _details;
-		set
-		{
-			if (_details == value) return;
-			_details = value;
 			NotifyPropertyChanged();
 		}
 	}

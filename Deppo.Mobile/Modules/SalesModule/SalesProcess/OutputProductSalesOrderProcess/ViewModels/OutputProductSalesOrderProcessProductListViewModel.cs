@@ -574,17 +574,19 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 					basketItem.OutputQuantity = 0;
 				else
 					basketItem.OutputQuantity = 1;
+
 				var httpClient = _httpClientService.GetOrCreateHttpClient();
-				var productOrders = await _waitingSalesOrderService.GetObjects(
+				var productOrders = await _waitingSalesOrderService.GetObjectsByProduct(
 									httpClient: httpClient,
 									firmNumber: _httpClientService.FirmNumber,
 									periodNumber: _httpClientService.PeriodNumber,
 									warehouseNumber: WarehouseModel.Number,
+									customerReferenceId: SalesCustomer.ReferenceId,
 									productReferenceId: basketItem.ItemReferenceId,
 									skip: 0,
-									take: 9999999999
+									take: 99999999
+				);
 
-								);
 				if (productOrders.IsSuccess)
 				{
 					if (productOrders.Data is not null)
@@ -594,14 +596,28 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 							basketItem.Orders.Add(new OutputSalesBasketOrderModel{
 
 									ReferenceId = productOrder.ReferenceId,
+									OrderReferenceId = productOrder.OrderReferenceId,
+									CustomerReferenceId = productOrder.CustomerReferenceId,
+									CustomerCode = productOrder.CustomerCode,
+									CustomerName = productOrder.CustomerName,
+									ProductReferenceId = productOrder.ProductReferenceId,
+									ProductCode = productOrder.ProductCode,
+									ProductName = productOrder.ProductName,
+									UnitsetReferenceId = productOrder.UnitsetReferenceId,
+									UnitsetCode = productOrder.UnitsetCode,
+									UnitsetName = productOrder.UnitsetName,
+									SubUnitsetReferenceId = productOrder.SubUnitsetReferenceId,
+									SubUnitsetCode = productOrder.SubUnitsetCode,
+									SubUnitsetName = productOrder.SubUnitsetName,
+									Quantity = productOrder.Quantity,
+									ShippedQuantity = productOrder.ShippedQuantity,
+									WaitingQuantity = productOrder.WaitingQuantity,
 									OrderDate = productOrder.OrderDate,
-									//todo: add other properties
-
+									DueDate = productOrder.DueDate,
 							});
 						}
 					}
 				}
-
 
 				basketItems.Add(basketItem);
 			}

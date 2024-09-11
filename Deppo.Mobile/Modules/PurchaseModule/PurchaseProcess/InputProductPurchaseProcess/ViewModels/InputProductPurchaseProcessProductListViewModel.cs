@@ -9,7 +9,6 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
-using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Converters;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
 using DevExpress.Maui.Controls;
 using System;
@@ -54,7 +53,7 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-        ItemTappedCommand = new Command<object>(ItemTappedAsync);
+        ItemTappedCommand = new Command<ProductModel>(async (parameter) => await ItemTappedAsync(parameter));
         ShowSelectedProductsCommand = new Command<BottomSheet>(async (parameter) => await ShowSelectedProductsAsync(parameter));
         LoadVariantItemsCommand = new Command<ProductModel>(async (parameter) => await LoadVariantItemsAsync(parameter));
         LoadMoreVariantItemsCommand = new Command(async () => await LoadMoreVariantItemsAsync());
@@ -63,6 +62,8 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
         ConfirmCommand = new Command(async () => await ConfirmAsync());
         BackCommand = new Command(async () => await BackAsync());
     }
+
+    Page CurrentPage { get; set; } = null!;
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
@@ -195,7 +196,7 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
         }
     }
 
-    private async void ItemTappedAsync(object param)
+    private async Task ItemTappedAsync(ProductModel item)
     {
         if (IsBusy)
             return;
@@ -204,14 +205,10 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
         {
             IsBusy = true;
 
-            SelectProductModel selectProductModel = (SelectProductModel)param;
-            ProductModel item = Items.FirstOrDefault(x => x.ReferenceId == selectProductModel.ItemReferenceId);
-            BottomSheet variantBottomSheet = selectProductModel.BottomSheet;
-
             if (item is not null)
                 if (item.IsVariant)
                 {
-                    variantBottomSheet.State = BottomSheetState.HalfExpanded;
+                    CurrentPage.FindByName<BottomSheet>("").State = BottomSheetState.HalfExpanded;
                 }
                 else
                 {
