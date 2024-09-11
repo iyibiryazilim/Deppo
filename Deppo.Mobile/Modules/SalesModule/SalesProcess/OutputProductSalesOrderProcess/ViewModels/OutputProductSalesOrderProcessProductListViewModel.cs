@@ -110,7 +110,7 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 		}
 		catch (Exception ex)
 		{
-			_userDialogs.Alert(ex.Message,"Hata", "Tamam");
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{
@@ -177,14 +177,14 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			var result = await _salesCustomerProductService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SalesCustomer.ReferenceId, WarehouseModel.Number, string.Empty, 0, 20);
 
-			if(result.IsSuccess)
+			if (result.IsSuccess)
 			{
 				if (result.Data is null)
 					return;
 
 				foreach (var item in result.Data)
 					Items.Add(Mapping.Mapper.Map<SalesCustomerProduct>(item));
-            }
+			}
 
 			_userDialogs.HideHud();
 		}
@@ -245,9 +245,9 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 
 			var selectedItem = Items.FirstOrDefault(x => x.ItemReferenceId == salesCustomerProduct.ItemReferenceId);
 
-			if(selectedItem is not null)
+			if (selectedItem is not null)
 			{
-				if(selectedItem.IsSelected)
+				if (selectedItem.IsSelected)
 				{
 					Items.FirstOrDefault(x => x.ItemReferenceId == salesCustomerProduct.ItemReferenceId).IsSelected = false;
 					SelectedProducts.Remove(SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == selectedItem.ItemReferenceId));
@@ -288,7 +288,7 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 				}
 			}
 		}
-		catch(Exception ex)
+		catch (Exception ex)
 		{
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
@@ -383,9 +383,9 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 			IsBusy = true;
 
 			var selectedItem = Orders.FirstOrDefault(x => x.ReferenceId == waitingSalesOrderModel.ReferenceId);
-			if(selectedItem is not null)
+			if (selectedItem is not null)
 			{
-				if(selectedItem.IsSelected)
+				if (selectedItem.IsSelected)
 				{
 					Orders.FirstOrDefault(x => x.ReferenceId == waitingSalesOrderModel.ReferenceId).IsSelected = false;
 					SelectedOrders.Remove(SelectedOrders.FirstOrDefault(x => x.ReferenceId == selectedItem.ReferenceId));
@@ -429,7 +429,7 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 					//	else
 					//		basketItem.OutputQuantity = 1;
 
-						
+
 					//}
 				}
 			}
@@ -455,7 +455,7 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 		{
 			IsBusy = true;
 
-			if(SelectedOrders.Count == 0 && SelectedProducts.Count == 0)
+			if (SelectedOrders.Count == 0 && SelectedProducts.Count == 0)
 			{
 				await _userDialogs.AlertAsync("Lütfen işlem yapılabilecek bir ürün veya sipariş seçiniz.", "Uyarı", "Tamam");
 				return;
@@ -463,17 +463,17 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 
 			CancellationTokenSource cts = new();
 			ObservableCollection<OutputSalesBasketModel> basketItems = new();
-			switch(TargetViewType)
+			switch (TargetViewType)
 			{
 				case 0:
 					basketItems = await ConvertProductItems().WaitAsync(cts.Token);
 					break;
-                case 1:
+				case 1:
 					basketItems = await ConvertOrderItems().WaitAsync(cts.Token);
 					break;
 				default:
 					break;
-					
+
 			}
 
 			await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessBasketListView)}", new Dictionary<string, object>
@@ -485,7 +485,7 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
@@ -502,7 +502,7 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 		return await Task.Run(() =>
 		{
 			ObservableCollection<OutputSalesBasketModel> basketItems = new();
-			foreach(var item in SelectedOrders)
+			foreach (var item in SelectedOrders)
 			{
 				var basketItem = new OutputSalesBasketModel
 				{
@@ -527,9 +527,9 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 					Quantity = item.WaitingQuantity,
 				};
 
-				if(item.LocTracking == 1 ||item.TrackingType == 1) 
+				if (item.LocTracking == 1 || item.TrackingType == 1)
 					basketItem.OutputQuantity = 0;
-				else 
+				else
 					basketItem.OutputQuantity = 1;
 
 				basketItems.Add(basketItem);
@@ -542,11 +542,11 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 
 	private async Task<ObservableCollection<OutputSalesBasketModel>> ConvertProductItems()
 	{
-		return await Task.Run(() =>
+		return await Task.Run(async () =>
 		{
 			ObservableCollection<OutputSalesBasketModel> basketItems = new();
-            foreach (var item in SelectedProducts)
-            {
+			foreach (var item in SelectedProducts)
+			{
 				var basketItem = new OutputSalesBasketModel
 				{
 					ItemReferenceId = item.ItemReferenceId,
@@ -574,11 +574,39 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 					basketItem.OutputQuantity = 0;
 				else
 					basketItem.OutputQuantity = 1;
+				var httpClient = _httpClientService.GetOrCreateHttpClient();
+				var productOrders = await _waitingSalesOrderService.GetObjects(
+									httpClient: httpClient,
+									firmNumber: _httpClientService.FirmNumber,
+									periodNumber: _httpClientService.PeriodNumber,
+									warehouseNumber: WarehouseModel.Number,
+									productReferenceId: basketItem.ItemReferenceId,
+									skip: 0,
+									take: 9999999999
+
+								);
+				if (productOrders.IsSuccess)
+				{
+					if (productOrders.Data is not null)
+					{
+						foreach (var productOrder in productOrders.Data)
+						{
+							basketItem.Orders.Add(new OutputSalesBasketOrderModel{
+
+									ReferenceId = productOrder.ReferenceId,
+									OrderDate = productOrder.OrderDate,
+									//todo: add other properties
+
+							});
+						}
+					}
+				}
+
 
 				basketItems.Add(basketItem);
-            }
+			}
 
-            return basketItems;
+			return basketItems;
 		});
 	}
 }

@@ -26,7 +26,8 @@ public class OutputSalesBasketModel : INotifyPropertyChanged, IDisposable
 	private bool _isSelected;
 	private string _image;
 	private double _outputQuantity;
-	private List<OutputSalesBasketOrderModel> _details = new();
+	private List<OutputSalesBasketOrderModel> _orders = new();
+	private List<OutputSalesBasketDetailModel> _details = new();
 
 	private string _locTrackingIcon;
 	private string _locTrackingIconColor;
@@ -298,7 +299,18 @@ public class OutputSalesBasketModel : INotifyPropertyChanged, IDisposable
 	}
 
 
-	public List<OutputSalesBasketOrderModel> Details
+	public List<OutputSalesBasketOrderModel> Orders
+	{
+		get => _orders;
+		set
+		{
+			if (_orders == value) return;
+			_orders = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	public List<OutputSalesBasketDetailModel> Details
 	{
 		get => _details;
 		set

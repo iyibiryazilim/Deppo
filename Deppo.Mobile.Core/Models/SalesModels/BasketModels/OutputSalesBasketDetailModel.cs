@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Deppo.Mobile.Core.Models.SalesModels.BasketModels;
 
-public class OutputSalesBasketOrderDetailModel : INotifyPropertyChanged, IDisposable
+public class OutputSalesBasketDetailModel : INotifyPropertyChanged, IDisposable
 {
 	private int _referenceId;
 	private int _transactionReferenceId;
@@ -20,7 +20,7 @@ public class OutputSalesBasketOrderDetailModel : INotifyPropertyChanged, IDispos
 	private double _remainingQuantity;
 	private double _remainingUnitQuantity;
 
-	public OutputSalesBasketOrderDetailModel()
+	public OutputSalesBasketDetailModel()
 	{
 
 	}
