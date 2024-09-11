@@ -105,7 +105,7 @@
                 
             </Border>
 
-            <CollectionView Grid.Row="1" ItemsSource="{Binding SelectedItems}">
+            <CollectionView Grid.Row="1" ItemsSource="{Binding InputProductBasketModel.SelectedLocations}">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
                 </CollectionView.ItemsLayout>

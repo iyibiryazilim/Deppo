@@ -1,6 +1,8 @@
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Deppo.Mobile.Core.Models.LocationModels;
 using Java.Lang.Ref;
 
 namespace Deppo.Mobile.Core.Models.BasketModels;
@@ -35,6 +37,8 @@ public class InputProductBasketModel : INotifyPropertyChanged, IDisposable
 	private string _variantIconColor;
 	private string _trackingTypeIcon;
 	private string _trackingTypeIconColor;
+
+    public ObservableCollection<LocationModel> SelectedLocations { get; } = new();
 
 	public InputProductBasketModel()
     {
