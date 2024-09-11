@@ -139,6 +139,9 @@
 	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseOrderProcess\Views\InputProductPurchaseOrderProcessBasketListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseOrderProcess\Views\InputProductPurchaseOrderProcessBasketLocationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseOrderProcess\Views\InputProductPurchaseOrderProcessProductListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -152,6 +155,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseProcess\Views\InputProductPurchaseProcessBasketLocationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseProcess\Views\InputProductPurchaseProcessBasketSeriLotListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseProcess\Views\InputProductPurchaseProcessProductListView.xaml">
