@@ -34,9 +34,6 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 	[ObservableProperty]
 	private InputProductProcessType inputProductProcessType;
 
-	[ObservableProperty]
-	private SeriLotTransactionModel? selectedSeriLotTransaction;
-
 	public InputProductProcessBasketListViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider)
 	{
 		_userDialogs = userDialogs;
@@ -235,6 +232,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
+	[Obsolete("Not used")]
 	private async Task LoadWarehouseLocationsAsync(InputProductBasketModel inputProductBasketModel)
 	{
 		try
@@ -262,6 +260,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
+	[Obsolete("Not used")]
 	private async Task LoadMoreWarehouseLocationsAsync()
 	{
 		if (IsBusy)
@@ -295,6 +294,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
+	[Obsolete("Not used")]
 	private async Task LocationCloseAsync()
 	{
 		await MainThread.InvokeOnMainThreadAsync(() =>
@@ -303,6 +303,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		});
 	}
 
+	[Obsolete("Not used")]
 	private async Task LocationIncreaseAsync(LocationModel locationModel)
 	{
 		if (IsBusy) return;
@@ -322,6 +323,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
+	[Obsolete("Not used")]
 	private async Task LocationConfirmAsync(LocationModel locationModel)
 	{
 		if (IsBusy) return;
@@ -357,6 +359,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
+	[Obsolete("Not used")]
 	private async Task LocationDecreaseAsync(LocationModel locationModel)
 	{
 		if (IsBusy)
@@ -381,6 +384,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
+	[Obsolete("Not used")]
 	private async Task LoadSeriLotAsync(InputProductBasketModel inputProductBasketModel)
 	{
 		try
@@ -408,6 +412,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
+	[Obsolete("Not used")]
 	private async Task LoadMoreSeriLotAsync()
 	{
 		if (IsBusy)
@@ -441,6 +446,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
+	[Obsolete("Not used")]
 	private async Task SeriLotCloseAsync()
 	{
 		await MainThread.InvokeOnMainThreadAsync(() =>
@@ -449,6 +455,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		});
 	}
 
+	[Obsolete("Not used")]
 	private void SeriLotIncrease(SeriLotModel item)
 	{
 		if (IsBusy)
@@ -472,6 +479,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
+	[Obsolete("Not used")]
 	private void SeriLotDecrease(SeriLotModel item)
 	{
 		if (IsBusy)
@@ -499,6 +507,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
+	[Obsolete("Not used")]
 	private void SeriLotConfirm()
 	{
 		if (IsBusy)

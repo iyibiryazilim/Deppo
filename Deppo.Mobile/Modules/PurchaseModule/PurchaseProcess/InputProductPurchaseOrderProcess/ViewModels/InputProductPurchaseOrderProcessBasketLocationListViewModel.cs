@@ -405,7 +405,7 @@ public partial class InputProductPurchaseOrderProcessBasketLocationListViewModel
             _userDialogs.ShowLoading("Loading...");
 
             var previousViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseOrderProcessBasketListViewModel>();
-
+			/* ToDo
             if (previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputProductBasketModel.ItemReferenceId) is not null)
             {
                 foreach (var item in SelectedItems.Where(x => x.InputQuantity > 0)) //Locations
@@ -427,8 +427,9 @@ public partial class InputProductPurchaseOrderProcessBasketLocationListViewModel
                     }
                 }
             }
+            */
 
-            await Shell.Current.GoToAsync("..");
+			await Shell.Current.GoToAsync("..");
             _userDialogs.HideHud();
         }
         catch (Exception ex)
