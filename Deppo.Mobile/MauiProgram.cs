@@ -289,6 +289,7 @@ public static class MauiProgram
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseProcessProductListView, InputProductPurchaseProcessProductListViewModel>(nameof(InputProductPurchaseProcessProductListView));
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseProcessBasketListView, InputProductPurchaseProcessBasketListViewModel>(nameof(InputProductPurchaseProcessBasketListView));
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseProcessBasketLocationListView, InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurchaseProcessBasketLocationListView));
+        builder.Services.AddScopedWithShellRoute<InputProductPurchaseProcessBasketSeriLotListView, InputProductPurchaseProcessBasketSeriLotListViewModel>(nameof(InputProductPurchaseProcessBasketSeriLotListView));
 
         #endregion Satınalma İşlemleri
 
@@ -298,6 +299,8 @@ public static class MauiProgram
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessSupplierListView, InputProductPurchaseOrderProcessSupplierListViewModel>(nameof(InputProductPurchaseOrderProcessSupplierListView));
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessProductListView, InputProductPurchaseOrderProcessProductListViewModel>(nameof(InputProductPurchaseOrderProcessProductListView));
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessBasketListView, InputProductPurchaseOrderProcessBasketListViewModel>(nameof(InputProductPurchaseOrderProcessBasketListView));
+
+        builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessBasketLocationListView, InputProductPurchaseOrderProcessBasketLocationListView>(nameof(InputProductPurchaseOrderProcessBasketLocationListView));
 
         #endregion Siparişe Bağlı Satınalma İşlemleri
 
