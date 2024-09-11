@@ -9,6 +9,7 @@ using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
+using Deppo.Mobile.Helpers.MessageHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using DevExpress.Android.CollectionView;
@@ -81,6 +82,7 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
     public Command ShowLocationsCommand { get; }
     public Command CloseLocationsCommand { get; }
     public Command<LocationModel> ItemTappedCommand { get; }
+    public Command<SearchBar> LocationsPerformSearchCommand  { get; }
     public Command ConfirmLocationsCommand { get; }
     #endregion
 
@@ -186,6 +188,43 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
         catch (Exception ex)
         {
             _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task LocationsPerformSearchAsync(SearchBar searchText)
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(searchText.Text))
+                return;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _locationService.GetObjects(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                warehouseNumber: WarehouseModel.Number,
+                productReferenceId: InputProductBasketModel.ItemReferenceId,
+                search: searchText.Text,
+                skip: 0,
+                take: 20
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
         }
         finally
         {
@@ -382,14 +421,18 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
 
             if (result.IsSuccess)
             {
-                if (result.Data is not null)
+                if (!(result.Data.Count() > 0))
                 {
-                    foreach (var item in result.Data)
-                        InputProductBasketModel.SelectedLocations.Add(Mapping.Mapper.Map<LocationModel>(item));
-
-                    barcodeEntry.Text = string.Empty;
-                    barcodeEntry.Focus();
+                    new MessageHelper().GetToastMessage(message: $"{barcodeEntry.Text} kodlu raf bulunamadý.");
+                    return;
                 }
+
+                foreach (var item in result.Data)
+                    InputProductBasketModel.SelectedLocations.Add(Mapping.Mapper.Map<LocationModel>(item));
+
+                barcodeEntry.Text = string.Empty;
+                barcodeEntry.Focus();
+                
             }
 
             _userDialogs.HideHud();
