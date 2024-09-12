@@ -303,7 +303,9 @@ public static class MauiProgram
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessProductListView, InputProductPurchaseOrderProcessProductListViewModel>(nameof(InputProductPurchaseOrderProcessProductListView));
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessBasketListView, InputProductPurchaseOrderProcessBasketListViewModel>(nameof(InputProductPurchaseOrderProcessBasketListView));
 
-        builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessBasketLocationListView, InputProductPurchaseOrderProcessBasketLocationListView>(nameof(InputProductPurchaseOrderProcessBasketLocationListView));
+        builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessBasketLocationListView, InputProductPurchaseOrderProcessBasketLocationListViewModel>(nameof(InputProductPurchaseOrderProcessBasketLocationListView));
+
+        builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessBasketSeriLotListView, InputProductPurchaseOrderProcessBasketSeriLotListViewModel>(nameof(InputProductPurchaseOrderProcessBasketSeriLotListView));
 
         #endregion Siparişe Bağlı Satınalma İşlemleri
 

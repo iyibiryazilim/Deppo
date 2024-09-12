@@ -10,15 +10,20 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
+using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.ViewModels;
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(PurchaseSupplier), queryId: nameof(PurchaseSupplier))]
+[QueryProperty(name: nameof(InputProductProcessType), queryId: nameof(InputProductProcessType))]
 [QueryProperty(name: nameof(Items), queryId: nameof(Items))]
 public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseViewModel
 {
@@ -26,34 +31,39 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
     private readonly IUserDialogs _userDialogs;
     private readonly ILocationService _locationService;
     private readonly ISeriLotService _seriLotService;
+    private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty]
-    private WarehouseModel warehouseModel;
+    private WarehouseModel warehouseModel = null!;
 
     [ObservableProperty]
     private PurchaseSupplier purchaseSupplier;
 
     [ObservableProperty]
+    private InputPurchaseBasketModel? selectedInputPurchaseBasketModel;
+
+    [ObservableProperty]
     private ObservableCollection<InputPurchaseBasketModel> items;
 
     [ObservableProperty]
-    private InputPurchaseBasketModel? selectedItem;
+    private InputProductProcessType inputProductProcessType;
 
-    public InputProductPurchaseOrderProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ILocationService locationService, ISeriLotService seriLotService)
+    public InputProductPurchaseOrderProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider)
     {
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
         _locationService = locationService;
         _seriLotService = seriLotService;
+        _serviceProvider = serviceProvider;
 
         Title = "Satınalma Sepeti";
 
         IncreaseCommand = new Command<InputPurchaseBasketModel>(async (x) => await IncreaseAsync(x));
 
         LoadMoreWarehouseLocationsCommand = new Command(async () => await LoadMoreWarehouseLocationsAsync());
-        LocationIncreaseCommand = new Command<LocationModel>(LocationIncrease);
-        LocationDecreaseCommand = new Command<LocationModel>(LocationDecrease);
-        LocationConfirmCommand = new Command(LocationConfirm);
+        //LocationIncreaseCommand = new Command<LocationModel>(LocationIncrease);
+        //LocationDecreaseCommand = new Command<LocationModel>(LocationDecrease);
+        //LocationConfirmCommand = new Command(LocationConfirm);
         LocationCloseCommand = new Command(async () => await LocationCloseAsync());
 
         LoadMoreSeriLotsCommand = new Command(async () => await LoadMoreSeriLotAsync());
@@ -93,35 +103,68 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
 
     #endregion Commands
 
-    private async Task IncreaseAsync(InputPurchaseBasketModel inputPurchaseBasketModel)
+    private async Task ShowProductViewAsync()
     {
         if (IsBusy)
             return;
+
         try
         {
             IsBusy = true;
 
-            SelectedItem = inputPurchaseBasketModel;
+            await Shell.Current.GoToAsync($"{nameof(InputProductProcessProductListView)}", new Dictionary<string, object>
+            {
+                {nameof(WarehouseModel), WarehouseModel}
+            });
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
+    private async Task IncreaseAsync(InputPurchaseBasketModel inputPurchaseBasketModel)
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            SelectedInputPurchaseBasketModel = inputPurchaseBasketModel;
             if (inputPurchaseBasketModel.LocTracking == 1)
             {
-                await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessBasketLocationListView)}", new Dictionary<string, object>
+                var nextViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseProcessBasketLocationListViewModel>();
+
+                await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseProcessBasketLocationListView)}", new Dictionary<string, object>
                 {
                     {nameof(WarehouseModel), WarehouseModel},
+                    {nameof(InputPurchaseBasketModel), inputPurchaseBasketModel}
+                });
+                await nextViewModel.LoadSelectedItemsAsync();
+            }
+
+            // Sadece SeriLot takipli ise
+            else if (inputPurchaseBasketModel.LocTracking == 0 && (inputPurchaseBasketModel.TrackingType == 1 || inputPurchaseBasketModel.TrackingType == 2))
+            {
+                await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseProcessBasketSeriLotListView)}", new Dictionary<string, object>
+                {
+                     {nameof(WarehouseModel), WarehouseModel},
                     {nameof(InputProductBasketModel), inputPurchaseBasketModel}
                 });
             }
-            else if (inputPurchaseBasketModel.TrackingType == 1)
-            {
-                await LoadSeriLotAsync(inputPurchaseBasketModel);
-                CurrentPage.FindByName<BottomSheet>("serilotBottomSheet").State = BottomSheetState.FullExpanded;
-            }
+            //stok yeri ve serilot takipli değilse
             else
             {
-                inputPurchaseBasketModel.InputQuantity += 1;
+                inputPurchaseBasketModel.Quantity++;
             }
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             await _userDialogs.AlertAsync(ex.Message);
         }
@@ -131,6 +174,83 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
         }
     }
 
+    private async Task DecreaseAsync(InputPurchaseBasketModel inputPurchaseBasketModel)
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            if (inputPurchaseBasketModel is not null)
+            {
+                if (inputPurchaseBasketModel.Quantity > 1)
+                {
+                    // Stok Yeri takipli ise locationTransactionBottomSheet aç
+                    if (inputPurchaseBasketModel.LocTracking == 1)
+                    {
+                        await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseProcessBasketLocationListView)}", new Dictionary<string, object>
+                        {
+                            {nameof(WarehouseModel), WarehouseModel},
+                            {nameof(InputPurchaseBasketModel), inputPurchaseBasketModel}
+                        });
+                    }
+                    // Sadece SeriLot takipli ise serilotTransactionBottomSheet aç
+                    else if (inputPurchaseBasketModel.LocTracking == 0 && (inputPurchaseBasketModel.TrackingType == 1 || inputPurchaseBasketModel.TrackingType == 2))
+                    {
+                        await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseProcessBasketSeriLotListView)}", new Dictionary<string, object>
+                        {
+                            {nameof(WarehouseModel), WarehouseModel},
+                            {nameof(InputPurchaseBasketModel), inputPurchaseBasketModel}
+                        });
+                    }
+                    // Stok yeri ve SeriLot takipli değilse
+                    else
+                    {
+                        inputPurchaseBasketModel.Quantity--;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task DeleteItemAsync(InputPurchaseBasketModel item)
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            var result = await _userDialogs.ConfirmAsync($"{item.ItemCode}\n{item.ItemName}\nİlgili ürün sepetinizden çıkarılacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+            if (!result)
+                return;
+
+            Items.Remove(item);
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [Obsolete("Not used")]
     private async Task LoadWarehouseLocationsAsync(InputPurchaseBasketModel inputPurchaseBasketModel)
     {
         try
@@ -158,6 +278,7 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
         }
     }
 
+    [Obsolete("Not used")]
     private async Task LoadMoreWarehouseLocationsAsync()
     {
         if (IsBusy)
@@ -167,7 +288,7 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, SelectedItem.ItemReferenceId, string.Empty, Locations.Count, 20);
+            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, SelectedInputPurchaseBasketModel.ItemReferenceId, search: string.Empty, skip: Locations.Count, take: 20);
 
             if (result.IsSuccess)
             {
@@ -191,95 +312,7 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
         }
     }
 
-    private void LocationIncrease(LocationModel item)
-    {
-        if (IsBusy)
-            return;
-        try
-        {
-            IsBusy = true;
-
-            item.InputQuantity += 1;
-        }
-        catch (Exception ex)
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
-            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
-    private void LocationDecrease(LocationModel item)
-    {
-        if (IsBusy)
-            return;
-        try
-        {
-            IsBusy = true;
-
-            if (item.InputQuantity > 0)
-            {
-                item.InputQuantity -= 1;
-            }
-        }
-        catch (Exception ex)
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
-            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
-    private void LocationConfirm()
-    {
-        if (IsBusy)
-            return;
-
-        try
-        {
-            IsBusy = true;
-
-            if (Locations.Count > 0)
-            {
-                double totalInputQuantity = 0;
-                foreach (var location in Locations)
-                {
-                    if (location.InputQuantity > 0)
-                        totalInputQuantity += location.InputQuantity;
-                }
-
-                SelectedItem.InputQuantity = totalInputQuantity;
-
-                CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
-            }
-            else
-            {
-                CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
-            }
-        }
-        catch (Exception ex)
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
-            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
+    [Obsolete("Not used")]
     private async Task LocationCloseAsync()
     {
         await MainThread.InvokeOnMainThreadAsync(() =>
@@ -288,6 +321,88 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
         });
     }
 
+    [Obsolete("Not used")]
+    private async Task LocationIncreaseAsync(LocationModel locationModel)
+    {
+        if (IsBusy) return;
+
+        try
+        {
+            IsBusy = true;
+            locationModel.InputQuantity++;
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync($"{ex.Message}");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [Obsolete("Not used")]
+    private async Task LocationConfirmAsync(LocationModel locationModel)
+    {
+        if (IsBusy) return;
+        try
+        {
+            IsBusy = true;
+            if (Locations.Count > 0)
+            {
+                double totalInputQuantity = 0;
+                foreach (var location in Locations)
+                {
+                    if (location.InputQuantity > 0)
+                    {
+                        totalInputQuantity += location.InputQuantity;
+                    }
+                }
+                SelectedInputPurchaseBasketModel.Quantity = totalInputQuantity;
+
+                CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
+            }
+            else
+            {
+                CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
+            }
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [Obsolete("Not used")]
+    private async Task LocationDecreaseAsync(LocationModel locationModel)
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            if (locationModel.InputQuantity > 0)
+            {
+                locationModel.InputQuantity -= 1;
+            }
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [Obsolete("Not used")]
     private async Task LoadSeriLotAsync(InputPurchaseBasketModel inputPurchaseBasketModel)
     {
         try
@@ -315,6 +430,7 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
         }
     }
 
+    [Obsolete("Not used")]
     private async Task LoadMoreSeriLotAsync()
     {
         if (IsBusy)
@@ -348,6 +464,7 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
         }
     }
 
+    [Obsolete("Not used")]
     private async Task SeriLotCloseAsync()
     {
         await MainThread.InvokeOnMainThreadAsync(() =>
@@ -356,6 +473,7 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
         });
     }
 
+    [Obsolete("Not used")]
     private void SeriLotIncrease(SeriLotModel item)
     {
         if (IsBusy)
@@ -379,6 +497,7 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
         }
     }
 
+    [Obsolete("Not used")]
     private void SeriLotDecrease(SeriLotModel item)
     {
         if (IsBusy)
@@ -406,6 +525,7 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
         }
     }
 
+    [Obsolete("Not used")]
     private void SeriLotConfirm()
     {
         if (IsBusy)
@@ -424,7 +544,7 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
                         totalInputQuantity += seriLot.InputQuantity;
                 }
 
-                SelectedItem.InputQuantity = totalInputQuantity;
+                SelectedInputPurchaseBasketModel.Quantity = totalInputQuantity;
 
                 CurrentPage.FindByName<BottomSheet>("serilotBottomSheet").State = BottomSheetState.Hidden;
             }
@@ -446,33 +566,54 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
         }
     }
 
-    private async Task BackAsync()
+    private async Task NextViewAsync()
     {
+        if (IsBusy)
+            return;
+
         try
         {
             IsBusy = true;
 
-            if (Items.Count > 0)
+            if (Items.Count == 0)
             {
-                var result = await _userDialogs.ConfirmAsync(message: "Sepetinizdeki ürünler silinecektir. Devam etmek istiyor musunuz?", title: "Uyarı", okText: "Evet", cancelText: "Hayır");
-                if (result)
-                {
-                    SelectedItem = null;
-                    Items.Clear();
-                    await Shell.Current.GoToAsync("..");
-                }
-            }
-            else
-            {
-                await Shell.Current.GoToAsync("..");
+                await _userDialogs.AlertAsync("Sepetinizde ürün bulunmamaktadır.", "Hata", "Tamam");
+                return;
             }
         }
         catch (Exception ex)
         {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+            if (Items.Count > 0)
+            {
+                var result = await _userDialogs.ConfirmAsync("Sepetinizdeki ürünler silinecektir. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+                if (!result)
+                    return;
+
+                Items.Clear();
+                await Shell.Current.GoToAsync("..");
+            }
+            else
+                await Shell.Current.GoToAsync("..");
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {

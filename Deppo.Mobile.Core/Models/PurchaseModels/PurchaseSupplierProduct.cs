@@ -7,70 +7,70 @@ namespace Deppo.Mobile.Core.Models.PurchaseModels;
 public partial class PurchaseSupplierProduct : ObservableObject
 {
     [ObservableProperty]
-    int _referenceId;
+    private int _referenceId;
 
     [ObservableProperty]
-    int _itemReferenceId;
+    private int _itemReferenceId;
 
     [ObservableProperty]
-    string _itemCode = string.Empty;
+    private string _itemCode = string.Empty;
 
     [ObservableProperty]
-    string _itemName = string.Empty;
+    private string _itemName = string.Empty;
 
     [ObservableProperty]
-    int _mainItemReferenceId;
+    private int _mainItemReferenceId;
 
     [ObservableProperty]
-    string _mainItemCode = string.Empty;
+    private string _mainItemCode = string.Empty;
 
     [ObservableProperty]
-    string _mainItemName = string.Empty;
+    private string _mainItemName = string.Empty;
 
     [ObservableProperty]
-    bool _isVariant;
+    private bool _isVariant;
 
     [ObservableProperty]
-    int _unitsetReferenceId;
+    private int _unitsetReferenceId;
 
     [ObservableProperty]
-    string _unitsetName = string.Empty;
+    private string _unitsetName = string.Empty;
 
     [ObservableProperty]
-    string _unitsetCode = string.Empty;
+    private string _unitsetCode = string.Empty;
 
     [ObservableProperty]
-    int _subUnitsetReferenceId;
+    private int _subUnitsetReferenceId;
 
     [ObservableProperty]
-    string _subUnitsetName = string.Empty;
+    private string _subUnitsetName = string.Empty;
 
     [ObservableProperty]
-    string _subUnitsetCode = string.Empty;
+    private string _subUnitsetCode = string.Empty;
 
     [ObservableProperty]
-    double _quantity;
+    private double _quantity;
 
     [ObservableProperty]
-    double _shippedQuantity;
+    private double _shippedQuantity;
 
     [ObservableProperty]
-    double _waitingQuantity;
+    private double _waitingQuantity;
 
     [ObservableProperty]
-    bool isSelected;
+    private bool isSelected;
 
     [ObservableProperty]
-    int locTracking;
+    private int locTracking;
 
     [ObservableProperty]
-    int trackingType;
+    private int trackingType;
 
     [ObservableProperty]
-    string image = string.Empty;
+    private string image = string.Empty;
 
     [ObservableProperty]
-    double stockQuantity;
+    private double stockQuantity;
 
     [ObservableProperty]
     public List<WaitingPurchaseOrder> orders = new();

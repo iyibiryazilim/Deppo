@@ -12,8 +12,10 @@
              x:DataType="viewModel:InputProductPurchaseOrderProcessProductListViewModel"
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                        EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -24,7 +26,8 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android" Value="artboard.png" />
+            <On Platform="Android"
+                Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
@@ -38,26 +41,30 @@
         </ToolbarItem>
     </ContentPage.ToolbarItems>
 
-    <Grid RowDefinitions="*, Auto" RowSpacing="10">
+    <Grid RowDefinitions="*, Auto"
+          RowSpacing="10">
 
         <Border x:Name="productView"
                 Grid.Row="0"
                 StrokeThickness="0">
 
-            <Grid RowDefinitions="Auto,Auto,*" RowSpacing="10">
+            <Grid RowDefinitions="Auto,Auto,*"
+                  RowSpacing="10">
                 <Border Grid.Row="0"
                         Padding="20,10,20,10"
                         BackgroundColor="Transparent"
                         StrokeShape="RoundRectangle 10"
                         StrokeThickness="0">
-                    <Label FontSize="Medium" LineBreakMode="TailTruncation">
+                    <Label FontSize="Medium"
+                           LineBreakMode="TailTruncation">
                         <Label.FormattedText>
                             <FormattedString>
                                 <Span FontFamily="FAS"
                                       Text="{x:Static fontAwesome:FontAwesomeIcons.User}"
                                       TextColor="{StaticResource WhiteSmoke}" />
                                 <Span Text="  " />
-                                <Span Text="{Binding PurchaseSupplier.Name}" TextColor="{StaticResource WhiteSmoke}" />
+                                <Span Text="{Binding PurchaseSupplier.Name}"
+                                      TextColor="{StaticResource WhiteSmoke}" />
                             </FormattedString>
                         </Label.FormattedText>
                     </Label>
@@ -88,7 +95,8 @@
                                 RemainingItemsThreshold="2"
                                 RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
                     <CollectionView.ItemsLayout>
-                        <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+                        <LinearItemsLayout ItemSpacing="0"
+                                           Orientation="Vertical" />
                     </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="model:PurchaseSupplierProduct">
@@ -96,17 +104,19 @@
                                     BackgroundColor="Transparent"
                                     StrokeThickness="0.1">
                                 <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputProductPurchaseOrderProcessProductListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputProductPurchaseOrderProcessProductListViewModel}}, Path=ItemTappedCommand}"
+                                                          CommandParameter="{Binding .}" />
                                 </Border.GestureRecognizers>
                                 <Border.Triggers>
                                     <DataTrigger Binding="{Binding IsSelected}"
                                                  TargetType="Border"
                                                  Value="True">
-                                        <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
+                                        <Setter Property="BackgroundColor"
+                                                Value="{StaticResource SecondaryLight}" />
                                     </DataTrigger>
-
                                 </Border.Triggers>
-                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                <Grid ColumnDefinitions="Auto,*,Auto"
+                                      ColumnSpacing="10">
                                     <Border BackgroundColor="{StaticResource Secondary}"
                                             StrokeShape="RoundRectangle 5"
                                             StrokeThickness="0.5">
@@ -116,7 +126,8 @@
                                                WidthRequest="50" />
                                     </Border>
 
-                                    <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                    <VerticalStackLayout Grid.Column="1"
+                                                         Spacing="2">
                                         <Label FontAttributes="Bold"
                                                LineBreakMode="TailTruncation"
                                                Text="{Binding ItemCode}" />
@@ -124,7 +135,8 @@
                                                Text="{Binding ItemName}"
                                                TextColor="{StaticResource Gray600}" />
 
-                                        <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                                        <HorizontalStackLayout Spacing="5"
+                                                               VerticalOptions="Center">
                                             <Image Aspect="AspectFit"
                                                    HeightRequest="16"
                                                    VerticalOptions="Center"
@@ -141,38 +153,57 @@
                                                    VerticalOptions="Center" />
                                         </HorizontalStackLayout>
                                     </VerticalStackLayout>
-
+                                    <!--<Grid Grid.Column="2"
+                                          ColumnDefinitions="Auto, Auto, Auto"
+                                          ColumnSpacing="3"
+                                          HorizontalOptions="End"
+                                          VerticalOptions="Start">
+                                        <Label Grid.Column="0"
+                                               FontFamily="FAS"
+                                               FontSize="10"
+                                               Text="{Binding VariantIcon}"
+                                               TextColor="{Binding VariantIconColor}" />
+                                        <Label Grid.Column="1"
+                                               FontFamily="FAS"
+                                               FontSize="10"
+                                               Text="{Binding LocTrackingIcon}"
+                                               TextColor="{Binding LocTrackingIconColor}" />
+                                        <Label Grid.Column="2"
+                                               FontFamily="FAS"
+                                               FontSize="10"
+                                               Text="{Binding TrackingTypeIcon}"
+                                               TextColor="{Binding TrackingTypeIconColor}" />
+                                    </Grid>-->
                                 </Grid>
-
                             </Border>
-
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-
             </Grid>
-
         </Border>
 
         <Border x:Name="orderView"
                 Grid.Row="0"
                 IsVisible="False"
                 StrokeThickness="0">
-            <Grid RowDefinitions="Auto,Auto,*" RowSpacing="10">
+            <Grid RowDefinitions="Auto,Auto,*"
+                  RowSpacing="10">
 
                 <Border Grid.Row="0"
                         Padding="20,10,20,10"
                         BackgroundColor="Transparent"
                         StrokeShape="RoundRectangle 10"
                         StrokeThickness="0">
-                    <Label FontSize="Medium" LineBreakMode="TailTruncation">
+                    <Label FontSize="Medium"
+                           LineBreakMode="TailTruncation">
                         <Label.FormattedText>
                             <FormattedString>
                                 <Span FontFamily="FAS"
                                       Text="{x:Static fontAwesome:FontAwesomeIcons.User}"
                                       TextColor="{StaticResource WhiteSmoke}" />
                                 <Span Text="  " />
-                                <Span Text="{Binding PurchaseSupplier.Name}" TextColor="{StaticResource WhiteSmoke}" />
+                                <Span Text="{Binding PurchaseSupplier.Name}"
+                                      TextColor="{StaticResource WhiteSmoke}" />
                             </FormattedString>
                         </Label.FormattedText>
                     </Label>
@@ -204,7 +235,8 @@
                                 RemainingItemsThreshold="2"
                                 RemainingItemsThresholdReachedCommand="{Binding LoadMoreOrdersCommand}">
                     <CollectionView.ItemsLayout>
-                        <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+                        <LinearItemsLayout ItemSpacing="0"
+                                           Orientation="Vertical" />
                     </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="model:WaitingPurchaseOrderModel">
@@ -212,22 +244,25 @@
                                     BackgroundColor="Transparent"
                                     StrokeThickness="0.1">
                                 <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputProductPurchaseOrderProcessProductListViewModel}}, Path=OrderTappedCommand}" CommandParameter="{Binding .}" />
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputProductPurchaseOrderProcessProductListViewModel}}, Path=OrderTappedCommand}"
+                                                          CommandParameter="{Binding .}" />
                                 </Border.GestureRecognizers>
                                 <Border.Triggers>
                                     <DataTrigger Binding="{Binding IsSelected}"
                                                  TargetType="Border"
                                                  Value="True">
-                                        <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
+                                        <Setter Property="BackgroundColor"
+                                                Value="{StaticResource SecondaryLight}" />
                                     </DataTrigger>
-
                                 </Border.Triggers>
-                                <Grid ColumnDefinitions="Auto,*, Auto" ColumnSpacing="10">
+                                <Grid ColumnDefinitions="Auto,*, Auto"
+                                      ColumnSpacing="10">
                                     <Border Padding="5"
                                             BackgroundColor="{StaticResource Secondary}"
                                             StrokeShape="RoundRectangle 5"
                                             StrokeThickness="0.5">
-                                        <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                                        <VerticalStackLayout HorizontalOptions="Center"
+                                                             VerticalOptions="Center">
                                             <Label FontAttributes="Bold"
                                                    FontSize="Subtitle"
                                                    HorizontalOptions="Center"
@@ -238,7 +273,8 @@
                                         </VerticalStackLayout>
                                     </Border>
 
-                                    <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                    <VerticalStackLayout Grid.Column="1"
+                                                         Spacing="2">
                                         <Label FontAttributes="Bold"
                                                LineBreakMode="TailTruncation"
                                                Text="{Binding ProductCode}" />
@@ -246,7 +282,8 @@
                                                Text="{Binding ProductName}"
                                                TextColor="{StaticResource Gray600}" />
 
-                                        <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                                        <HorizontalStackLayout Spacing="5"
+                                                               VerticalOptions="Center">
                                             <Image Aspect="AspectFit"
                                                    HeightRequest="16"
                                                    VerticalOptions="Center"
@@ -285,18 +322,13 @@
                                                Text="{Binding TrackingTypeIcon}"
                                                TextColor="{Binding TrackingTypeIconColor}" />
                                     </Grid>
-
                                 </Grid>
-
                             </Border>
-
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-
             </Grid>
         </Border>
-
 
         <Button Grid.Row="1"
                 Margin="10,10,10,20"

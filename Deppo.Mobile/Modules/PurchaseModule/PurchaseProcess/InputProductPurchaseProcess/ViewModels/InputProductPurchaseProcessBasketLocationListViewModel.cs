@@ -3,11 +3,15 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.Models.PurchaseModels;
+using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
+using Deppo.Mobile.Helpers.MessageHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using DevExpress.Maui.Controls;
 using Microsoft.VisualBasic;
 using System;
@@ -21,7 +25,7 @@ using System.Threading.Tasks;
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels;
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
-[QueryProperty(name: nameof(InputProductBasketModel), queryId: nameof(InputProductBasketModel))]
+[QueryProperty(name: nameof(InputPurchaseBasketModel), queryId: nameof(InputPurchaseBasketModel))]
 public partial class InputProductPurchaseProcessBasketLocationListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -36,30 +40,36 @@ public partial class InputProductPurchaseProcessBasketLocationListViewModel : Ba
         _locationService = locationService;
         _serviceProvider = serviceProvider;
 
+        LoadSelectedItemsCommand = new Command(async () => await LoadSelectedItemsAsync());
         ShowLocationsCommand = new Command(async () => await ShowLocationsAsync());
-        CloseLocationsCommand = new Command(async () => await CloseLocationsAsync());
-        ItemTappedCommand = new Command<LocationModel>(async (locationModel) => await ItemTappedAsync(locationModel));
-        ConfirmLocationsCommand = new Command(async () => await ConfirmLocationsAsync());
-        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
-        LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         PerformSearchCommand = new Command<Entry>(async (searchBar) => await PerformSearchAsync(searchBar));
         IncreaseCommand = new Command<LocationModel>(async (locationModel) => await IncreaseAsync(locationModel));
         DecreaseCommand = new Command<LocationModel>(async (locationModel) => await DecreaseAsync(locationModel));
         ConfirmCommand = new Command(async () => await ConfirmAsync());
         CancelCommand = new Command(async () => await CancelAsync());
+
+        CloseLocationsCommand = new Command(async () => await CloseLocationsAsync());
+        ItemTappedCommand = new Command<LocationModel>(async (locationModel) => await ItemTappedAsync(locationModel));
+        ConfirmLocationsCommand = new Command(async () => await ConfirmLocationsAsync());
+        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+        LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
     }
 
     [ObservableProperty]
     private WarehouseModel warehouseModel = null!;
 
     [ObservableProperty]
-    private InputProductBasketModel inputProductBasketModel = null!;
+    private InputPurchaseBasketModel inputPurchaseBasketModel = null!;
 
     public ObservableCollection<LocationModel> Items { get; } = new();
     public ObservableCollection<LocationModel> SelectedItems { get; } = new();
 
-    public Page CurrentPage { get; set; } = null!;
+    [ObservableProperty]
+    private LocationModel selectedItem;
 
+    public Page CurrentPage { get; set; }
+
+    public Command LoadSelectedItemsCommand { get; }
     public Command<LocationModel> IncreaseCommand { get; }
     public Command<LocationModel> DecreaseCommand { get; }
     public Command<Entry> PerformSearchCommand { get; }
@@ -73,9 +83,47 @@ public partial class InputProductPurchaseProcessBasketLocationListViewModel : Ba
     public Command ShowLocationsCommand { get; }
     public Command CloseLocationsCommand { get; }
     public Command<LocationModel> ItemTappedCommand { get; }
+    public Command<SearchBar> LocationsPerformSearchCommand { get; }
     public Command ConfirmLocationsCommand { get; }
 
     #endregion Location BottomSheet Commands
+
+    public async Task LoadSelectedItemsAsync()
+    {
+        //if (IsBusy)
+        //    return;
+
+        try
+        {
+            IsBusy = true;
+
+            _userDialogs.ShowLoading("Loading...");
+            await Task.Delay(500);
+
+            SelectedItems.Clear();
+            if (InputPurchaseBasketModel.Details.Count > 0)
+            {
+                foreach (var item in InputPurchaseBasketModel.Details)
+                    SelectedItems.Add(new LocationModel
+                    {
+                        Code = item.LocationCode,
+                        Name = item.LocationName,
+                        StockQuantity = default,
+                        InputQuantity = item.Quantity
+                    });
+            }
+
+            _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
     private async Task ShowLocationsAsync()
     {
@@ -111,7 +159,7 @@ public partial class InputProductPurchaseProcessBasketLocationListViewModel : Ba
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _locationService.GetObjects(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, productReferenceId: InputProductBasketModel.ItemReferenceId, skip: 0, take: 20);
+            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, InputPurchaseBasketModel.ItemReferenceId, string.Empty, 0, 20);
 
             if (result.IsSuccess)
             {
@@ -143,10 +191,17 @@ public partial class InputProductPurchaseProcessBasketLocationListViewModel : Ba
         {
             IsBusy = true;
 
-            _userDialogs.ShowLoading("Loadig...");
+            _userDialogs.ShowLoading("Loading...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _locationService.GetObjects(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: warehouseModel.Number, productReferenceId: InputProductBasketModel.ItemReferenceId, skip: Items.Count, take: 20);
+            var result = await _locationService.GetObjects(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                warehouseNumber: WarehouseModel.Number,
+                productReferenceId: InputPurchaseBasketModel.ItemReferenceId,
+                skip: Items.Count,
+                take: 20);
 
             if (result.IsSuccess)
             {
@@ -162,6 +217,41 @@ public partial class InputProductPurchaseProcessBasketLocationListViewModel : Ba
         catch (Exception ex)
         {
             _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task LocationsPerformSearchAsync(SearchBar searchText)
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(searchText.Text))
+                return;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _locationService.GetObjects(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                warehouseNumber: WarehouseModel.Number,
+                productReferenceId: InputPurchaseBasketModel.ItemReferenceId,
+                search: searchText.Text,
+                skip: 0,
+                take: 20
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+            }
+        }
+        catch (Exception)
+        {
+            throw;
         }
         finally
         {
@@ -232,9 +322,9 @@ public partial class InputProductPurchaseProcessBasketLocationListViewModel : Ba
 
             _userDialogs.ShowLoading("Loading...");
             await Task.Delay(500);
-            foreach (var item in Items)
+            foreach (var item in Items.Where(x => x.IsSelected))
             {
-                if (item.IsSelected)
+                if (!SelectedItems.Any(x => x.Code == item.Code))
                     SelectedItems.Add(item);
             }
 
@@ -260,10 +350,20 @@ public partial class InputProductPurchaseProcessBasketLocationListViewModel : Ba
         {
             IsBusy = true;
 
-            _userDialogs.ShowLoading("Loading...");
-            await Task.Delay(500);
+            SelectedItem = locationModel;
 
-            _userDialogs.HideHud();
+            if (InputPurchaseBasketModel.TrackingType != 0)
+            {
+                await Shell.Current.GoToAsync($"{nameof(InputProductProcessBasketSeriLotListView)}", new Dictionary<string, object>
+                {
+                    [nameof(WarehouseModel)] = WarehouseModel,
+                    [nameof(InputPurchaseBasketModel)] = InputPurchaseBasketModel
+                });
+            }
+            else
+            {
+                locationModel.InputQuantity++;
+            }
         }
         catch (Exception ex)
         {
@@ -284,10 +384,23 @@ public partial class InputProductPurchaseProcessBasketLocationListViewModel : Ba
         {
             IsBusy = true;
 
-            _userDialogs.ShowLoading("Loading...");
-            await Task.Delay(500);
+            if (locationModel.InputQuantity > 0)
+            {
+                SelectedItem = locationModel;
 
-            _userDialogs.HideHud();
+                if (InputPurchaseBasketModel.TrackingType != 0)
+                {
+                    await Shell.Current.GoToAsync($"{nameof(InputProductProcessBasketSeriLotListView)}", new Dictionary<string, object>
+                    {
+                        [nameof(WarehouseModel)] = WarehouseModel,
+                        [nameof(InputPurchaseBasketModel)] = InputPurchaseBasketModel
+                    });
+                }
+                else
+                {
+                    locationModel.InputQuantity--;
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -321,21 +434,24 @@ public partial class InputProductPurchaseProcessBasketLocationListViewModel : Ba
                         firmNumber: _httpClientService.FirmNumber,
                         periodNumber: _httpClientService.PeriodNumber,
                         warehouseNumber: WarehouseModel.Number,
-                        productReferenceId: InputProductBasketModel.ItemReferenceId,
+                        productReferenceId: InputPurchaseBasketModel.ItemReferenceId,
                         search: barcodeEntry.Text,
                         skip: 0,
                         take: 1);
 
             if (result.IsSuccess)
             {
-                if (result.Data is not null)
+                if (!(result.Data.Count() > 0))
                 {
-                    foreach (var item in result.Data)
-                        SelectedItems.Add(Mapping.Mapper.Map<LocationModel>(item));
-
-                    barcodeEntry.Text = string.Empty;
-                    barcodeEntry.Focus();
+                    new MessageHelper().GetToastMessage(message: $"{barcodeEntry.Text} kodlu raf bulunamad�.");
+                    return;
                 }
+
+                foreach (var item in result.Data)
+                    SelectedItems.Add(Mapping.Mapper.Map<LocationModel>(item));
+
+                barcodeEntry.Text = string.Empty;
+                barcodeEntry.Focus();
             }
 
             _userDialogs.HideHud();
@@ -350,6 +466,10 @@ public partial class InputProductPurchaseProcessBasketLocationListViewModel : Ba
         }
     }
 
+    /// <summary>
+    /// Confirm the selected locations and go back to the previous page.
+    /// </summary>
+    /// <returns></returns>
     private async Task ConfirmAsync()
     {
         if (IsBusy)
@@ -361,11 +481,31 @@ public partial class InputProductPurchaseProcessBasketLocationListViewModel : Ba
 
             _userDialogs.ShowLoading("Loading...");
 
-            var previousViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketListViewModel>();
-            if (SelectedItems.Count > 0)
+            var previousViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseProcessBasketListViewModel>();
+
+            if (previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputPurchaseBasketModel.ItemReferenceId) is not null)
             {
-                var totalQuantity = SelectedItems.Where(x => x.InputQuantity > 0).Sum(x => (double)x.InputQuantity);
-                previousViewModel.SelectedInputProductBasketModel.Quantity = totalQuantity;
+                foreach (var item in SelectedItems.Where(x => x.InputQuantity > 0)) //Locations
+                {
+                    var location = previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputPurchaseBasketModel.ItemReferenceId).Details.FirstOrDefault(x => x.LocationCode == item.Code);
+                    if (location is not null)
+                    {
+                        location.Quantity = item.InputQuantity;
+                    }
+                    else
+                    {
+                        previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputPurchaseBasketModel.ItemReferenceId).Details.Add(new InputPurchaseBasketDetailModel
+                        {
+                            LocationReferenceId = item.ReferenceId,
+                            LocationCode = item.Code,
+                            LocationName = item.Name,
+                            Quantity = item.InputQuantity
+                        });
+                    }
+                }
+
+                var totalInputQuantity = SelectedItems.Where(x => x.InputQuantity > 0).Sum(x => x.InputQuantity);
+                previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputPurchaseBasketModel.ItemReferenceId).InputQuantity = totalInputQuantity;
             }
 
             await Shell.Current.GoToAsync("..");
