@@ -567,6 +567,13 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 				await _userDialogs.AlertAsync("Sepetinizde ürün bulunmamaktadır.", "Hata", "Tamam");
 				return;
 			}
+
+			await Shell.Current.GoToAsync($"{nameof(InputProductProcessFormView)}", new Dictionary<string, object>
+                {
+                    [nameof(WarehouseModel)] = WarehouseModel,
+                    [nameof(InputProductProcessType)] = InputProductProcessType,
+					[nameof(Items)] = Items
+                });
 		}
 		catch (Exception ex)
 		{
