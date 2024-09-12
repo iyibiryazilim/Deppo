@@ -87,10 +87,10 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
     public Command ConfirmLocationsCommand { get; }
     #endregion
 
-    private async Task LoadSelectedItemsAsync()
+    public async Task LoadSelectedItemsAsync()
     {
-        if (IsBusy)
-            return;
+        //if (IsBusy)
+        //    return;
 
         try
         {
@@ -99,6 +99,7 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
             _userDialogs.ShowLoading("Loading...");
             await Task.Delay(500);
 
+            SelectedItems.Clear();
             if (InputProductBasketModel.Details.Count > 0)
             {
                 foreach (var item in InputProductBasketModel.Details)
