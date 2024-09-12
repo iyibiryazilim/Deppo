@@ -204,10 +204,14 @@ public static class MauiProgram
         builder.Services.AddSingleton<IOverviewAnalysisService,OverviewAnalysisDataStore>();
         builder.Services.AddSingleton<IProductAnalysisService, ProductAnalysisDataStore>();
 
+        builder.Services.AddSingleton<IProductionTransactionService ,  ProductionTransactionDataStore>();
 
         builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
         builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
         builder.Services.AddTransientWithShellRoute<CompanyListView, CompanyListViewModel>(nameof(CompanyListView));
+
+        
+
 
         #region Analysis Modules
 
