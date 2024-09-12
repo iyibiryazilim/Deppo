@@ -96,11 +96,12 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
         {
             IsBusy = true;
 
-            _userDialogs.ShowLoading("Loading...");
-            await Task.Delay(500);
+			
+			_userDialogs.ShowLoading("Loading...");
+			SelectedItems.Clear();
+            await Task.Delay(1000);
 
-            SelectedItems.Clear();
-            if (InputProductBasketModel.Details.Count > 0)
+			if (InputProductBasketModel.Details.Count > 0)
             {
                 foreach (var item in InputProductBasketModel.Details)
                     SelectedItems.Add(new LocationModel
@@ -381,7 +382,7 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
             }
             else
             {
-                locationModel.InputQuantity++;
+                locationModel.InputQuantity += 1;
             }
         }
         catch (Exception ex)
@@ -417,7 +418,7 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
                 }
                 else
                 {
-                    locationModel.InputQuantity--;
+                    locationModel.InputQuantity -= 1;
                 }
             }
         }
@@ -525,9 +526,14 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
                         });
                     }
                 }
-            }
 
-            await Shell.Current.GoToAsync("..");
+				#region İlgili ürünün Quantity'sine seçilen stok yerlerinin toplam InputQuantitysi kadar set et
+				var inputTotalQuantity = SelectedItems.Sum(x => x.InputQuantity);
+				previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputProductBasketModel.ItemReferenceId).Quantity = inputTotalQuantity;
+				#endregion
+			}
+
+			await Shell.Current.GoToAsync("..");
             _userDialogs.HideHud();
 
         }

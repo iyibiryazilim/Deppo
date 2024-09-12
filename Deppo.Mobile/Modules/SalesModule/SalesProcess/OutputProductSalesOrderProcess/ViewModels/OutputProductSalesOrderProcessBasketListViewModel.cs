@@ -352,7 +352,30 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 				SelectedLocationTransactions.Clear();
 				SelectedLocationTransactions.ToList().AddRange(LocationTransactions.Where(x => x.OutputQuantity > 0));
 
-				var totalOutputQuantity = SelectedLocationTransactions.Sum(x => (double)x.OutputQuantity);
+                foreach (var item in SelectedLocationTransactions)
+                {
+					var selectedLocationTransactionItem = SelectedItem.Details.FirstOrDefault(x => x.TransactionReferenceId == item.TransactionReferenceId);
+					if (selectedLocationTransactionItem is not null)
+					{
+						selectedLocationTransactionItem.Quantity = item.OutputQuantity;
+					}
+
+					SelectedItem.Details.Add(new OutputSalesBasketDetailModel
+					{
+						LocationReferenceId = item.LocationReferenceId,
+						LocationCode = item.LocationCode,
+						LocationName = item.LocationName,
+						Quantity = item.OutputQuantity,
+						TransactionReferenceId = item.TransactionReferenceId,
+						TransactionFicheReferenceId = item.TransactionFicheReferenceId,
+						InTransactionReferenceId = item.InTransactionReferenceId,
+						RemainingQuantity = item.RemainingQuantity,
+						RemainingUnitQuantity = item.RemainingUnitQuantity,
+					});
+                }
+
+
+                var totalOutputQuantity = SelectedLocationTransactions.Sum(x => (double)x.OutputQuantity);
 				SelectedItem.OutputQuantity = totalOutputQuantity;
 
 				CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.Hidden;

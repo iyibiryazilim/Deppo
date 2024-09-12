@@ -3,6 +3,7 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.SalesModels;
+using Deppo.Mobile.Core.Models.SalesModels.BasketModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
@@ -32,7 +33,7 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 	public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
 
 	[ObservableProperty]
-	public ObservableCollection<OutputProductBasketModel> selectedProducts = new();
+	public ObservableCollection<OutputSalesBasketModel> selectedProducts = new();
 
 	public OutputProductSalesProcessProductListViewModel(IHttpClientService httpClientService, IWarehouseTotalService warehouseTotalService, IVariantService variantService, IServiceProvider serviceProvider, IUserDialogs userDialogs)
 	{
@@ -217,7 +218,7 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 						Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
 						SelectedProduct = item;
 
-						var basketItem = new OutputProductBasketModel
+						var basketItem = new OutputSalesBasketModel
 						{
 							ItemReferenceId = item.ProductReferenceId,
 							ItemCode = item.ProductCode,
@@ -237,6 +238,7 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 							LocTracking = item.LocTracking,
 							TrackingType = item.TrackingType,
 							Quantity = item.LocTracking == 0 ? 1 : 0,
+							OutputQuantity = item.LocTracking == 0 ? 1 : 0,
 						};
 
 						SelectedProducts.Add(basketItem);
