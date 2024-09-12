@@ -318,7 +318,7 @@ namespace Deppo.Core.DataStores
         private string DueDatePassedCustomersCount(int firmNumber, int periodNumber)
         {
             string baseQuery = $@"select COUNT(DISTINCT CLIENTREF) 
-            AS UniqueCustomerRef from LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE as ORFLINE
+            AS DueDatePassedCustomersCount from LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE as ORFLINE
             WHERE ORFLINE.DUEDATE < CAST(GETDATE() AS DATE) and  ORFLINE.TRCODE = 1;";
 
             return baseQuery;
@@ -326,14 +326,14 @@ namespace Deppo.Core.DataStores
         private string DueDatePassedProductsCount(int firmNumber, int periodNumber)
         {
             string baseQuery = $@"select  COUNT(DISTINCT STOCKREF) 
-            AS UniqueCustomerRef from LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE as ORFLINE
+            AS DueDatePassedProductsCount from LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE as ORFLINE
             WHERE ORFLINE.DUEDATE < CAST(GETDATE() AS DATE) and  ORFLINE.TRCODE = 1;";
 
             return baseQuery;
         }
         private string ReturnProductReferenceCount(int firmNumber, int periodNumber)
         {
-            string baseQuery = $@"SELECT COUNT(DISTINCT STOCKREF) AS UniqueStockRefCount
+            string baseQuery = $@"SELECT COUNT(DISTINCT STOCKREF) AS ReturnProductReferenceCount
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE
 WHERE TRCODE in (2,3);";
 
@@ -341,7 +341,7 @@ WHERE TRCODE in (2,3);";
         }
         private string SoldProductReferenceCount(int firmNumber, int periodNumber)
         {
-            string baseQuery = $@"SELECT COUNT(DISTINCT STOCKREF) AS UniqueStockRefCount
+            string baseQuery = $@"SELECT COUNT(DISTINCT STOCKREF) AS SoldProductReferenceCount
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE
 WHERE TRCODE in (7 , 8);
 ";
