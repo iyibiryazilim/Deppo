@@ -18,22 +18,17 @@ public partial class ProductPanelViewModel : BaseViewModel
     private readonly IProductPanelService _productPanelService;
 
     [ObservableProperty]
-    private int? inputProductQuantity;
-
-    [ObservableProperty]
-    private int? outputProductQuantity;
-    public ObservableCollection<ProductModel> LastProducts { get; } = new();
-    public ObservableCollection<WarehouseModel> LastWarehouses { get; } = new();
-    public ObservableCollection<ProductTransaction> LastTransactions { get; } = new();
-
-
+    public ProductPanelModel productPanelModel = new();
 
     public ProductPanelViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, IProductPanelService productPanelService)
     {
         _userDialogs = userDialogs;
         _httpClientService = httpClientService;
         _productPanelService = productPanelService;
+        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
     }
+
+    public Command LoadItemsCommand { get; }
 
     public async Task LoadItemsAsync()
     {
@@ -78,7 +73,7 @@ public partial class ProductPanelViewModel : BaseViewModel
                     return;
 
                 foreach (var item in result.Data)
-                    LastProducts.Add(Mapping.Mapper.Map<ProductModel>(item));
+                    ProductPanelModel.LastProducts.Add(Mapping.Mapper.Map<ProductModel>(item));
             }
         }
         catch (Exception ex)
@@ -111,7 +106,7 @@ public partial class ProductPanelViewModel : BaseViewModel
                     return;
 
                 foreach (var item in result.Data)
-                    LastWarehouses.Add(Mapping.Mapper.Map<WarehouseModel>(item));
+                    ProductPanelModel.LastWarehouses.Add(Mapping.Mapper.Map<WarehouseModel>(item));
             }
         }
         catch (Exception ex)
@@ -144,7 +139,7 @@ public partial class ProductPanelViewModel : BaseViewModel
                     return;
 
                 foreach (var item in result.Data)
-                    LastTransactions.Add(Mapping.Mapper.Map<ProductTransaction>(item));
+                    ProductPanelModel.LastTransactions.Add(Mapping.Mapper.Map<ProductTransaction>(item));
             }
         }
         catch (Exception ex)
@@ -176,7 +171,8 @@ public partial class ProductPanelViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                InputProductQuantity = Mapping.Mapper.Map<int>(result.Data);
+
+                ProductPanelModel.InputProductQuantity = Convert.ToInt32(result.Data);
             }
         }
         catch (Exception ex)
@@ -208,7 +204,7 @@ public partial class ProductPanelViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                OutputProductQuantity = Mapping.Mapper.Map<int>(result.Data);
+                ProductPanelModel.OutputProductQuantity = Convert.ToInt32(result.Data);
             }
         }
         catch (Exception ex)

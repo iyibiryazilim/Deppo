@@ -197,6 +197,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<IProductPanelService, ProductPanelDataStore>();
         builder.Services.AddSingleton<ISalesPanelService, SalesPanelDataStore>();
         builder.Services.AddSingleton<IPurchasePanelService, PurchasePanelDataStore>();
+        builder.Services.AddSingleton<IOverviewAnalysisService,OverviewAnalysisDataStore>();
+        builder.Services.AddSingleton<IProductAnalysisService, ProductAnalysisDataStore>();
 
         builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
         builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
