@@ -197,6 +197,11 @@ public static class MauiProgram
         builder.Services.AddSingleton<IProductPanelService, ProductPanelDataStore>();
         builder.Services.AddSingleton<ISalesPanelService, SalesPanelDataStore>();
         builder.Services.AddSingleton<IPurchasePanelService, PurchasePanelDataStore>();
+        builder.Services.AddSingleton<IPurchaseAnalysisService, PurchaseAnalysisDataStore>();
+        builder.Services.AddSingleton<ISalesAnalysisService, SalesAnalysisDataStore>();
+        builder.Services.AddSingleton<IPurchasePanelService, PurchasePanelDataStore>();
+        builder.Services.AddSingleton<ISalesPanelService, SalesPanelDataStore>();
+
 
         builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
         builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
@@ -223,6 +228,7 @@ public static class MauiProgram
         builder.Services.AddTransientWithShellRoute<WarehouseInputTransactionView, WarehouseInputTransactionViewModel>(nameof(WarehouseInputTransactionView));
         builder.Services.AddTransientWithShellRoute<WarehouseOutputTransactionView, WarehouseOutputTransactionViewModel>(nameof(WarehouseOutputTransactionView));
         builder.Services.AddSingletonWithShellRoute<ProductProcessView, ProductProcessViewModel>(nameof(ProductProcessView));
+
 
         #region ProductionInput Modules
 
