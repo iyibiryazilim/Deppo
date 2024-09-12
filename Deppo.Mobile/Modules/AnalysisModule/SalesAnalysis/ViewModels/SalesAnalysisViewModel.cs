@@ -12,10 +12,12 @@ public partial class SalesAnalysisViewModel : BaseViewModel
     private readonly ISalesAnalysisService _salesAnalysisService;
     private readonly IUserDialogs _userDialogs;
 
-    public SalesAnalysisViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService , ISalesAnalysisService )
+    public SalesAnalysisViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService , ISalesAnalysisService salesAnalysisService)
     {
-        _userDialogs = userDialogs;
         _httpClientService = httpClientService;
+        _salesAnalysisService = salesAnalysisService;
+        _userDialogs = userDialogs;
+
 
         Title = "Satış Analizi";
     }
