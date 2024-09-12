@@ -350,19 +350,35 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
 
     private string GetLastWarehousesQuery(int firmNumber, int periodNumber)
     {
-        string baseQuery = $@"SELECT TOP 5
-        [ReferenceId] = CAPIWHOUSE.LOGICALREF,
-        [Number] = CAPIWHOUSE.NR,
-        [Name] = CAPIWHOUSE.NAME,
-		[City] = CAPIWHOUSE.CITY,
-		[Country] = CAPIWHOUSE.COUNTRY,
-        [Quantity] = STLINE.AMOUNT
-
-        FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
-        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
-		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
-		WHERE STFICHE.GRPCODE = 3
-		ORDER BY STLINE.DATE_ DESC";
+        string baseQuery = $@"WITH LastWarehouses AS (
+    SELECT
+        CAPIWHOUSE.LOGICALREF AS ReferenceId,
+        CAPIWHOUSE.NR AS Number,
+        CAPIWHOUSE.NAME AS Name,
+        CAPIWHOUSE.CITY AS City,
+        CAPIWHOUSE.COUNTRY AS Country,
+        0 AS Quantity,
+        STLINE.DATE_ AS Date_,
+        STLINE.FTIME AS Time,
+        ROW_NUMBER() OVER (PARTITION BY CAPIWHOUSE.LOGICALREF ORDER BY STLINE.DATE_ DESC, STLINE.FTIME DESC) AS RowNum
+    FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
+    LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+    LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR ={firmNumber}
+    WHERE STFICHE.GRPCODE = 3
+)
+SELECT TOP 5
+    ReferenceId,
+    Number,
+    Name,
+    City,
+    Country,
+    Quantity,
+    Date_,
+    Time
+FROM LastWarehouses
+WHERE RowNum = 1
+ORDER BY Date_ DESC, Time DESC;
+";
 
         return baseQuery;
     }
