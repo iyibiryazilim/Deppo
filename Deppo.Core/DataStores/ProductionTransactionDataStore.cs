@@ -15,17 +15,13 @@ namespace Deppo.Core.DataStores
     {
         private string postUrl = "/gateway/product/ProductionTransaction/Tiger";
 
-        public async Task<DataResult<ResponseModel>> InsertProductionTransaction(HttpClient httpClient, ProductionTransactionInsert dto, string? firmNumber)
+        public async Task<DataResult<ResponseModel>> InsertProductionTransaction(HttpClient httpClient, ProductionTransactionInsert dto, int firmNumber)
         {
-            if (firmNumber != null && firmNumber != string.Empty)
+            if (firmNumber != null)
             {
-                postUrl = $"/gateway/product/ProductionTransaction/Tiger?firmNumber={firmNumber}";
+                postUrl = $"/gateway/product/ProductionTransaction/Tiger?firmNumber={firmNumber.ToString()}";
             }
-            else
-            {
-                firmNumber = dto.FirmNumber.ToString();
-                postUrl = $"/gateway/product/ProductionTransaction/Tiger?firmNumber={firmNumber}";
-            }
+            
 
         var result = new DataResult<ResponseModel>();
             try

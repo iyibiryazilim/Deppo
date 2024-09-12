@@ -11,6 +11,6 @@ namespace Deppo.Core.Services
 {
     public interface IOutCountingTransactionService
     {
-        Task<DataResult<ResponseModel>> InsertOutCountingTransaction(HttpClient httpClient, OutCountingTransactionInsert dto, string? firmNumber);
+        Task<DataResult<ResponseModel>> InsertOutCountingTransaction(HttpClient httpClient, OutCountingTransactionInsert dto, int firmNumber);
     }
 }

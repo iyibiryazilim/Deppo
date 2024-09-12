@@ -11,6 +11,6 @@ namespace Deppo.Core.Services
 {
     public interface IWastageTransactionService
     {
-        Task<DataResult<ResponseModel>> InsertWastageTransaction(HttpClient httpClient, WastageTransactionInsert dto, string? firmNumber);
+        Task<DataResult<ResponseModel>> InsertWastageTransaction(HttpClient httpClient, WastageTransactionInsert dto, int firmNumber);
     }
 }

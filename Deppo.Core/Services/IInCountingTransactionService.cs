@@ -11,6 +11,6 @@ namespace Deppo.Core.Services
 {
     public interface IInCountingTransactionService
     {
-        Task<DataResult<ResponseModel>> InsertInCountingTransaction(HttpClient httpClient, InCountingTransactionInsert dto, string? firmNumber);
+        Task<DataResult<ResponseModel>> InsertInCountingTransaction(HttpClient httpClient, InCountingTransactionInsert dto, int firmNumber);
     }
 }

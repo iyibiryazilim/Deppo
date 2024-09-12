@@ -11,6 +11,6 @@ namespace Deppo.Core.Services
 {
     public interface IConsumableTransactionService
     {
-        Task<DataResult<ResponseModel>> InsertConsumableTransaction(HttpClient httpClient, ConsumableTransactionInsert dto, string? firmNumber);
+        Task<DataResult<ResponseModel>> InsertConsumableTransaction(HttpClient httpClient, ConsumableTransactionInsert dto, int firmNumber);
     }
 }
