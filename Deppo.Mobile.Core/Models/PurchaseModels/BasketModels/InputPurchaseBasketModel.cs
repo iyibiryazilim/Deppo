@@ -32,17 +32,17 @@ public class InputPurchaseBasketModel : INotifyPropertyChanged, IDisposable
     private string _image;
     private double _inputQuantity;
 
-    private List<InputPurchaseBasketOrderModel> _details = new();
+    private List<InputPurchaseBasketOrderModel> _orders = new();
+    private List<InputPurchaseBasketDetailModel> _details = new();
 
-	private string _locTrackingIcon;
-	private string _locTrackingIconColor;
-	private string _variantIcon;
-	private string _variantIconColor;
-	private string _trackingTypeIcon;
-	private string _trackingTypeIconColor;
+    private string _locTrackingIcon;
+    private string _locTrackingIconColor;
+    private string _variantIcon;
+    private string _variantIconColor;
+    private string _trackingTypeIcon;
+    private string _trackingTypeIconColor;
 
-
-	public InputPurchaseBasketModel()
+    public InputPurchaseBasketModel()
     {
         ReferenceId = Guid.NewGuid();
     }
@@ -310,46 +310,46 @@ public class InputPurchaseBasketModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-	public string LocTrackingIcon
-	{
-		get => _locTrackingIcon = _locTrackingIcon ?? "location-dot";
-		set
-		{
-			if (_locTrackingIcon == value) return;
-			_locTrackingIcon = value;
-			NotifyPropertyChanged();
-		}
-	}
+    public string LocTrackingIcon
+    {
+        get => _locTrackingIcon = _locTrackingIcon ?? "location-dot";
+        set
+        {
+            if (_locTrackingIcon == value) return;
+            _locTrackingIcon = value;
+            NotifyPropertyChanged();
+        }
+    }
 
-	public string LocTrackingIconColor => LocTracking == 1 ? "#F5004F" : "#C8C8C8";
+    public string LocTrackingIconColor => LocTracking == 1 ? "#F5004F" : "#C8C8C8";
 
-	public string VariantIcon
-	{
-		get => _variantIcon = _variantIcon ?? "bookmark";
-		set
-		{
-			if (_variantIcon == value) return;
-			_variantIcon = value;
-			NotifyPropertyChanged();
-		}
-	}
+    public string VariantIcon
+    {
+        get => _variantIcon = _variantIcon ?? "bookmark";
+        set
+        {
+            if (_variantIcon == value) return;
+            _variantIcon = value;
+            NotifyPropertyChanged();
+        }
+    }
 
-	public string VariantIconColor => IsVariant ? "#F5004F" : "#C8C8C8";
+    public string VariantIconColor => IsVariant ? "#F5004F" : "#C8C8C8";
 
-	public string TrackingTypeIcon
-	{
-		get => _trackingTypeIcon = _trackingTypeIcon ?? "box-archive";
-		set
-		{
-			if (_trackingTypeIcon == value) return;
-			_trackingTypeIcon = value;
-			NotifyPropertyChanged();
-		}
-	}
+    public string TrackingTypeIcon
+    {
+        get => _trackingTypeIcon = _trackingTypeIcon ?? "box-archive";
+        set
+        {
+            if (_trackingTypeIcon == value) return;
+            _trackingTypeIcon = value;
+            NotifyPropertyChanged();
+        }
+    }
 
-	public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
+    public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 
-	public event PropertyChangedEventHandler? PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
     {
