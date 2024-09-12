@@ -1,9 +1,11 @@
 using System;
 using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.ProductModels;
+using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
@@ -16,6 +18,9 @@ public partial class SalesPanelViewModel : BaseViewModel
     private readonly IHttpClientService _httpClientService;
     private readonly IUserDialogs _userDialogs;
     private readonly ISalesPanelService _salesPanelService;
+
+    [ObservableProperty]
+    SalesPanelModel salesPanelModel = new();
     public SalesPanelViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService , ISalesPanelService salesPanelService)
     {
         _salesPanelService = salesPanelService;
@@ -23,14 +28,30 @@ public partial class SalesPanelViewModel : BaseViewModel
         _httpClientService = httpClientService;
 
         Title = "Satış Paneli";
+        LoadItemsCommand = new Command(async () => await LoadItemAsync());
     }
-    private int WaitingOrderCount;
-    private int TotalOrderCount;
-    private int ShippedOrderCount;
-    private ObservableCollection<Customer> LastCustomer = new ObservableCollection<Customer>();
-    private ObservableCollection<CustomerTransaction> LastCustomerTransaction = new ObservableCollection<CustomerTransaction>();
+    public Command LoadItemsCommand { get; }
 
-    private async Task GetLastTransactionByCustomer()
+    private async Task LoadItemAsync()
+    {
+        try
+        {
+            await Task.WhenAll(GetLastTransactionByCustomerAsync(), GetLastTransactionAsync(), TotalOrderCountsAsync(), ShippedOrderCountsAsync());
+           
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+        }
+    }
+
+    private async Task GetLastTransactionByCustomerAsync()
     {
 
         if (IsBusy)
@@ -47,7 +68,7 @@ public partial class SalesPanelViewModel : BaseViewModel
                     return;
 
                 foreach (var item in result.Data)
-                    LastCustomer.Add(Mapping.Mapper.Map<Customer>(item));
+                    SalesPanelModel.LastCustomer.Add(Mapping.Mapper.Map<Customer>(item));
             }
         }
         catch (Exception ex)
@@ -62,7 +83,7 @@ public partial class SalesPanelViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-    private async Task GetLastTransaction()
+    private async Task GetLastTransactionAsync()
     {
 
         if (IsBusy)
@@ -79,7 +100,7 @@ public partial class SalesPanelViewModel : BaseViewModel
                     return;
 
                 foreach (var item in result.Data)
-                    LastCustomerTransaction.Add(Mapping.Mapper.Map<CustomerTransaction>(item));
+                    SalesPanelModel.LastCustomerTransaction.Add(Mapping.Mapper.Map<CustomerTransaction>(item));
             }
         }
         catch (Exception ex)
@@ -94,7 +115,7 @@ public partial class SalesPanelViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-    private async Task TotalOrderCounts()
+    private async Task TotalOrderCountsAsync()
     {
 
         if (IsBusy)
@@ -110,7 +131,8 @@ public partial class SalesPanelViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                result = Convert.ToInt32(result.Data);
+                var response = Convert.ToInt32(result.Data);
+                SalesPanelModel.AmountTotal = response;
             }
         }
         catch (Exception ex)
@@ -125,7 +147,7 @@ public partial class SalesPanelViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-    private async Task ShippedOrderCounts()
+    private async Task ShippedOrderCountsAsync()
     {
 
         if (IsBusy)
@@ -141,7 +163,9 @@ public partial class SalesPanelViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                result = Convert.ToInt32(result.Data);
+               var response = Convert.ToInt32(result.Data);
+                SalesPanelModel.ShippedQuantityTotal = response;
+                SalesPanelModel.WaitingOrderCount = SalesPanelModel.AmountTotal - SalesPanelModel.ShippedQuantityTotal;
             }
         }
         catch (Exception ex)
