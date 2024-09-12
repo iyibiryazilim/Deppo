@@ -124,11 +124,16 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 			SelectedInputProductBasketModel = inputProductBasketModel;
 			if (inputProductBasketModel.LocTracking == 1)
 			{
+				var nextViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketLocationListViewModel>();
+				
+
 				await Shell.Current.GoToAsync($"{nameof(InputProductProcessBasketLocationListView)}", new Dictionary<string, object>
 				{
 					{nameof(WarehouseModel), WarehouseModel},
 					{nameof(InputProductBasketModel), inputProductBasketModel}
 				});
+				await nextViewModel.LoadSelectedItemsAsync();
+
 			}
 
 			// Sadece SeriLot takipli ise
