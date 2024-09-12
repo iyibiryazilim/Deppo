@@ -69,7 +69,7 @@
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesProcessProductListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
                             </Border.GestureRecognizers>
-                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                            <Grid ColumnDefinitions="Auto,*, Auto" ColumnSpacing="10">
                                 <Border BackgroundColor="{StaticResource Primary}"
                                         StrokeShape="RoundRectangle 5"
                                         StrokeThickness="0.5">
@@ -107,6 +107,28 @@
                                         </Label.FormattedText>
                                     </Label>
                                 </VerticalStackLayout>
+
+                                <Grid Grid.Column="2"
+                                      ColumnDefinitions="Auto, Auto, Auto"
+                                      ColumnSpacing="3"
+                                      HorizontalOptions="End"
+                                      VerticalOptions="Start">
+                                    <Label Grid.Column="0"
+                                           FontFamily="FAS"
+                                           FontSize="10"
+                                           Text="{Binding VariantIcon}"
+                                           TextColor="{Binding VariantIconColor}" />
+                                    <Label Grid.Column="1"
+                                           FontFamily="FAS"
+                                           FontSize="10"
+                                           Text="{Binding LocTrackingIcon}"
+                                           TextColor="{Binding LocTrackingIconColor}" />
+                                    <Label Grid.Column="2"
+                                           FontFamily="FAS"
+                                           FontSize="10"
+                                           Text="{Binding TrackingTypeIcon}"
+                                           TextColor="{Binding TrackingTypeIconColor}" />
+                                </Grid>
                             </Grid>
 
                             <Border.Triggers>

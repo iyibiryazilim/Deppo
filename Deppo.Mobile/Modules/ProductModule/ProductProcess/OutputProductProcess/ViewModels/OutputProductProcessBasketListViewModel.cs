@@ -428,8 +428,17 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				SelectedLocationTransactions.Clear();
 				SelectedLocationTransactions.ToList().AddRange(LocationTransactions.Where(x => x.OutputQuantity > 0));
 
+
+
 				foreach (var item in SelectedLocationTransactions)
 				{
+					var selectedLocationTransactionItem = SelectedItem.Details.FirstOrDefault(x => x.TransactionReferenceId == item.TransactionReferenceId);
+					if (selectedLocationTransactionItem is not null)
+					{
+						selectedLocationTransactionItem.Quantity = item.OutputQuantity;
+					}
+
+
 					SelectedItem.Details.Add(new OutputProductBasketDetailModel
 					{
 						LocationReferenceId = item.ReferenceId,
