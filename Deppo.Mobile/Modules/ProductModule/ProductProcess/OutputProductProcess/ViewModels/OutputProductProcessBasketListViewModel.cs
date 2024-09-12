@@ -428,28 +428,26 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				SelectedLocationTransactions.Clear();
 				SelectedLocationTransactions.ToList().AddRange(LocationTransactions.Where(x => x.OutputQuantity > 0));
 
+				foreach (var item in SelectedLocationTransactions)
+				{
+					SelectedItem.Details.Add(new OutputProductBasketDetailModel
+					{
+						LocationReferenceId = item.ReferenceId,
+						LocationCode = item.LocationCode,
+						LocationName = item.LocationName,
+						TransactionReferenceId = item.TransactionReferenceId,
+						TransactionFicheReferenceId = item.TransactionFicheReferenceId,
+						InTransactionReferenceId = item.InTransactionReferenceId,
+						Quantity = item.OutputQuantity,
+						RemainingQuantity = item.Quantity - item.OutputQuantity,
+					});
+				}
+
+
+
 				var totalOutputQuantity = LocationTransactions.Where(x => x.OutputQuantity > 0).Sum(x => (double)x.OutputQuantity);
 				SelectedItem.Quantity = totalOutputQuantity;
 
-				/*
-				foreach (var selectedLocationTransaction in SelectedLocationTransactions)
-				{
-					OutputProductBasketDetailModel outputProductBasketDetailModel = new();
-					outputProductBasketDetailModel.LocationReferenceId = selectedLocationTransaction.LocationReferenceId;
-					outputProductBasketDetailModel.LocationCode = selectedLocationTransaction.LocationCode;
-					outputProductBasketDetailModel.LocationName = selectedLocationTransaction.LocationName;
-
-					if (SelectedSeriLotTransactions.Count > 0)
-					{
-						foreach (var selectedSeriLotTransaction in SelectedSeriLotTransactions)
-						{
-							outputProductBasketDetailModel.
-						}
-					}
-
-					SelectedItem.Details.Add(outputProductBasketDetailModel);
-				}
-				*/
 
 				CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.Hidden;
 			}
@@ -619,6 +617,23 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 
 				// Stok yeri takipli değilse
 				if (SelectedItem.LocTracking == 0) {
+
+					foreach(var item in SelectedSeriLotTransactions)
+					{
+						SelectedItem.Details.Add(new OutputProductBasketDetailModel
+						{
+							SeriLotReferenceId = item.ReferenceId,
+							SeriLotCode = item.SerilotCode,
+							SeriLotName = item.SerilotName,
+							TransactionFicheReferenceId = item.TransactionFicheReferenceId,
+							TransactionReferenceId = item.TransactionReferenceId,
+							InTransactionReferenceId = item.InTransactionReferenceId,
+							Quantity = item.OutputQuantity,
+							InSerilotTransactionReferenceId = item.InSerilotTransactionReferenceId,
+							RemainingQuantity = item.Quantity - item.OutputQuantity
+						});
+					}
+
 
 					var totalOutputQuantity = SeriLotTransactions.Where(x => x.OutputQuantity > 0).Sum(x => (double)x.OutputQuantity);
 					SelectedItem.Quantity = totalOutputQuantity;
