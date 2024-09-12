@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Deppo.Mobile.Core.Models.SalesModels.BasketModels;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -299,7 +300,18 @@ public class InputPurchaseBasketModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-    public List<InputPurchaseBasketOrderModel> Details
+    public List<InputPurchaseBasketOrderModel> Orders
+    {
+        get => _orders;
+        set
+        {
+            if (_orders == value) return;
+            _orders = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public List<InputPurchaseBasketDetailModel> Details
     {
         get => _details;
         set
