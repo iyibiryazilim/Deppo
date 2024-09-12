@@ -4,6 +4,7 @@ using Deppo.Core.BaseModels;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.ProductModels;
+using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.VariantModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
@@ -35,7 +36,7 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
     private ProductModel? selectedProduct;
 
     [ObservableProperty]
-    private ObservableCollection<InputProductBasketModel> selectedProducts = new();
+    private ObservableCollection<InputPurchaseBasketModel> selectedProducts = new();
 
     public InputProductPurchaseProcessProductListViewModel(IHttpClientService httpClientService,
         IProductService productService,
@@ -63,7 +64,7 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
         BackCommand = new Command(async () => await BackAsync());
     }
 
-    Page CurrentPage { get; set; } = null!;
+    private Page CurrentPage { get; set; } = null!;
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
@@ -218,7 +219,7 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
 
                         SelectedProduct = item;
 
-                        var basketItem = new InputProductBasketModel
+                        var basketItem = new InputPurchaseBasketModel
                         {
                             ItemReferenceId = item.ReferenceId,
                             ItemCode = item.Code,
@@ -235,6 +236,7 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
                             MainItemReferenceId = default,
                             StockQuantity = item.StockQuantity,
                             Quantity = item.LocTracking == 0 ? 1 : 0,
+                            InputQuantity = item.LocTracking == 0 ? 1 : 0,
                             LocTracking = item.LocTracking,
                             TrackingType = item.TrackingType,
                             IsVariant = item.IsVariant
@@ -400,7 +402,7 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
             IsBusy = true;
 
             var item = ItemVariants.FirstOrDefault(x => x.IsSelected);
-            var basketItem = new InputProductBasketModel
+            var basketItem = new InputPurchaseBasketModel
             {
                 ItemReferenceId = item.ReferenceId,
                 ItemCode = item.Code,

@@ -33,8 +33,6 @@ public partial class InputProductPurchaseProcessSupplierListViewModel : BaseView
     [ObservableProperty]
     private SupplierModel supplierModel = null!;
 
-    [ObservableProperty]
-    private WarehouseModel selectedWarehouseModel = null!;
 
     [ObservableProperty]
     private Supplier selectedSupplier = null!;
@@ -254,8 +252,8 @@ public partial class InputProductPurchaseProcessSupplierListViewModel : BaseView
             {
                 await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseProcessBasketListView)}", new Dictionary<string, object>
                 {
-                    [nameof(WarehouseModel)] = SelectedWarehouseModel,
-                    [nameof(SelectedWarehouseModel)] = SelectedWarehouseModel,
+                    [nameof(WarehouseModel)] = WarehouseModel,
+                   
                     [nameof(SelectedSupplier)] = SelectedSupplier,
                     [nameof(InputProductProcessType)] = InputProductProcessType
                 });

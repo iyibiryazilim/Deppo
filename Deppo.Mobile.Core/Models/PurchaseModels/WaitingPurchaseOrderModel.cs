@@ -5,17 +5,16 @@ namespace Deppo.Mobile.Core.Models.PurchaseModels;
 
 public class WaitingPurchaseOrderModel : WaitingPurchaseOrder
 {
-    bool _isSelected;
-	private string _locTrackingIcon;
-	private string _locTrackingIconColor;
-	private string _variantIcon;
-	private string _variantIconColor;
-	private string _trackingTypeIcon;
-	private string _trackingTypeIconColor;
+    private bool _isSelected;
+    private string _locTrackingIcon;
+    private string _locTrackingIconColor;
+    private string _variantIcon;
+    private string _variantIconColor;
+    private string _trackingTypeIcon;
+    private string _trackingTypeIconColor;
 
-	public WaitingPurchaseOrderModel()
+    public WaitingPurchaseOrderModel()
     {
-
     }
 
     public bool IsSelected
@@ -29,43 +28,42 @@ public class WaitingPurchaseOrderModel : WaitingPurchaseOrder
         }
     }
 
-	public string LocTrackingIcon
-	{
-		get => _locTrackingIcon = _locTrackingIcon ?? "location-dot";
-		set
-		{
-			if (_locTrackingIcon == value) return;
-			_locTrackingIcon = value;
-			NotifyPropertyChanged();
-		}
-	}
+    public string LocTrackingIcon
+    {
+        get => _locTrackingIcon = _locTrackingIcon ?? "location-dot";
+        set
+        {
+            if (_locTrackingIcon == value) return;
+            _locTrackingIcon = value;
+            NotifyPropertyChanged();
+        }
+    }
 
-	public string LocTrackingIconColor => LocTracking == 1 ? "#F5004F" : "#C8C8C8";
+    public string LocTrackingIconColor => LocTracking == 1 ? "#F5004F" : "#C8C8C8";
 
-	public string VariantIcon
-	{
-		get => _variantIcon = _variantIcon ?? "bookmark";
-		set
-		{
-			if (_variantIcon == value) return;
-			_variantIcon = value;
-			NotifyPropertyChanged();
-		}
-	}
+    public string VariantIcon
+    {
+        get => _variantIcon = _variantIcon ?? "bookmark";
+        set
+        {
+            if (_variantIcon == value) return;
+            _variantIcon = value;
+            NotifyPropertyChanged();
+        }
+    }
 
-	public string VariantIconColor => IsVariant ? "#F5004F" : "#C8C8C8";
+    public string VariantIconColor => IsVariant ? "#F5004F" : "#C8C8C8";
 
-	public string TrackingTypeIcon
-	{
-		get => _trackingTypeIcon = _trackingTypeIcon ?? "box-archive";
-		set
-		{
-			if (_trackingTypeIcon == value) return;
-			_trackingTypeIcon = value;
-			NotifyPropertyChanged();
-		}
-	}
+    public string TrackingTypeIcon
+    {
+        get => _trackingTypeIcon = _trackingTypeIcon ?? "box-archive";
+        set
+        {
+            if (_trackingTypeIcon == value) return;
+            _trackingTypeIcon = value;
+            NotifyPropertyChanged();
+        }
+    }
 
-	public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
-
+    public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 }

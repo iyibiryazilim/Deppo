@@ -3,6 +3,8 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
+using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
@@ -16,6 +18,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.ViewModels;
 
@@ -56,7 +59,7 @@ public partial class InputProductPurchaseOrderProcessBasketLocationListViewModel
     private WarehouseModel warehouseModel = null!;
 
     [ObservableProperty]
-    private InputProductBasketModel inputProductBasketModel = null!;
+    private InputPurchaseBasketModel inputPurchaseBasketModel = null!;
 
     public ObservableCollection<LocationModel> Items { get; } = new();
     public ObservableCollection<LocationModel> SelectedItems { get; } = new();
@@ -122,7 +125,7 @@ public partial class InputProductPurchaseOrderProcessBasketLocationListViewModel
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 warehouseNumber: WarehouseModel.Number,
-                productReferenceId: InputProductBasketModel.ItemReferenceId,
+                productReferenceId: InputPurchaseBasketModel.ItemReferenceId,
                 skip: 0,
                 take: 20);
 
@@ -164,7 +167,7 @@ public partial class InputProductPurchaseOrderProcessBasketLocationListViewModel
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 warehouseNumber: WarehouseModel.Number,
-                productReferenceId: InputProductBasketModel.ItemReferenceId,
+                productReferenceId: InputPurchaseBasketModel.ItemReferenceId,
                 skip: Items.Count,
                 take: 20);
 
@@ -282,12 +285,12 @@ public partial class InputProductPurchaseOrderProcessBasketLocationListViewModel
 
             SelectedItem = locationModel;
 
-            if (InputProductBasketModel.TrackingType != 0)
+            if (InputPurchaseBasketModel.TrackingType != 0)
             {
                 await Shell.Current.GoToAsync($"{nameof(InputProductProcessBasketSeriLotListView)}", new Dictionary<string, object>
                 {
                     [nameof(WarehouseModel)] = WarehouseModel,
-                    [nameof(InputProductBasketModel)] = InputProductBasketModel
+                    [nameof(InputPurchaseBasketModel)] = InputPurchaseBasketModel
                 });
             }
             else
@@ -318,12 +321,12 @@ public partial class InputProductPurchaseOrderProcessBasketLocationListViewModel
             {
                 SelectedItem = locationModel;
 
-                if (InputProductBasketModel.TrackingType != 0)
+                if (InputPurchaseBasketModel.TrackingType != 0)
                 {
-                    await Shell.Current.GoToAsync($"{nameof(InputProductProcessBasketSeriLotListView)}", new Dictionary<string, object>
+                    await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessBasketSeriLotListView)}", new Dictionary<string, object>
                     {
                         [nameof(WarehouseModel)] = WarehouseModel,
-                        [nameof(InputProductBasketModel)] = InputProductBasketModel
+                        [nameof(InputPurchaseBasketModel)] = InputPurchaseBasketModel
                     });
                 }
                 else
@@ -364,7 +367,7 @@ public partial class InputProductPurchaseOrderProcessBasketLocationListViewModel
                         firmNumber: _httpClientService.FirmNumber,
                         periodNumber: _httpClientService.PeriodNumber,
                         warehouseNumber: WarehouseModel.Number,
-                        productReferenceId: InputProductBasketModel.ItemReferenceId,
+                        productReferenceId: InputPurchaseBasketModel.ItemReferenceId,
                         search: barcodeEntry.Text,
                         skip: 0,
                         take: 1);
@@ -405,7 +408,32 @@ public partial class InputProductPurchaseOrderProcessBasketLocationListViewModel
             _userDialogs.ShowLoading("Loading...");
 
             var previousViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseOrderProcessBasketListViewModel>();
-			/* ToDo
+            if (previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputPurchaseBasketModel.ItemReferenceId) is not null)
+            {
+                foreach (var item in SelectedItems.Where(x => x.InputQuantity > 0)) //Locations
+                {
+                    var location = previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputPurchaseBasketModel.ItemReferenceId).Details.FirstOrDefault(x => x.LocationCode == item.Code);
+                    if (location is not null)
+                    {
+                        location.Quantity = item.InputQuantity;
+                    }
+                    else
+                    {
+                        previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputPurchaseBasketModel.ItemReferenceId).Details.Add(new InputPurchaseBasketDetailModel
+                        {
+                            LocationReferenceId = item.ReferenceId,
+                            LocationCode = item.Code,
+                            LocationName = item.Name,
+                            Quantity = item.InputQuantity
+                        });
+                    }
+                }
+
+                var totalInputQuantity = SelectedItems.Where(x => x.InputQuantity > 0).Sum(x => x.InputQuantity);
+                previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputPurchaseBasketModel.ItemReferenceId).Quantity = totalInputQuantity;
+            }
+
+            /* ToDo
             if (previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputProductBasketModel.ItemReferenceId) is not null)
             {
                 foreach (var item in SelectedItems.Where(x => x.InputQuantity > 0)) //Locations
@@ -429,7 +457,7 @@ public partial class InputProductPurchaseOrderProcessBasketLocationListViewModel
             }
             */
 
-			await Shell.Current.GoToAsync("..");
+            await Shell.Current.GoToAsync("..");
             _userDialogs.HideHud();
         }
         catch (Exception ex)

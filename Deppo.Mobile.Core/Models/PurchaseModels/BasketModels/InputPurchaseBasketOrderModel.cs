@@ -82,7 +82,7 @@ public class InputPurchaseBasketOrderModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-    public string CustomerName
+    public string SupplierName
     {
         get => _supplierName;
         set

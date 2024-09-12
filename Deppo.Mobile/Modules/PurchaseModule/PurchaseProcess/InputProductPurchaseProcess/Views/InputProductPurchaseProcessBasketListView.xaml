@@ -49,7 +49,6 @@
         <Grid RowDefinitions="Auto,*,Auto"
               RowSpacing="10">
             <Border Grid.Row="0"
-                   
                     Padding="0"
                     BackgroundColor="{StaticResource PrimaryLight}"
                     HeightRequest="35"

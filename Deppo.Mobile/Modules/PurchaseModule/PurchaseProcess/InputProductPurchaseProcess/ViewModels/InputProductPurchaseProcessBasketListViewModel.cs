@@ -4,13 +4,16 @@ using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views;
 using DevExpress.Maui.Controls;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -30,6 +33,7 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
     private readonly IUserDialogs _userDialogs;
     private readonly ILocationService _locationService;
     private readonly ISeriLotService _seriLotService;
+    private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty]
     private WarehouseModel warehouseModel = null!;
@@ -38,24 +42,25 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
     private Supplier supplier = null!;
 
     [ObservableProperty]
-    private InputProductBasketModel? selectedInputProductBasketModel;
+    private InputPurchaseBasketModel? selectedInputProductBasketModel;
 
     [ObservableProperty]
     private InputProductProcessType inputProductProcessType;
 
-    public InputProductPurchaseProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IHttpClientService httpClientService2, ILocationService locationService, ISeriLotService seriLotService)
+    public InputProductPurchaseProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IHttpClientService httpClientService2, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider)
     {
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
         _locationService = locationService;
         _seriLotService = seriLotService;
+        _serviceProvider = serviceProvider;
         Title = "Sepet Listesi";
 
         ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
 
-        DeleteItemCommand = new Command<InputProductBasketModel>(async (item) => await DeleteItemAsync(item));
-        IncreaseCommand = new Command<InputProductBasketModel>(async (item) => await IncreaseAsync(item));
-        DecreaseCommand = new Command<InputProductBasketModel>(async (item) => await DecreaseAsync(item));
+        DeleteItemCommand = new Command<InputPurchaseBasketModel>(async (item) => await DeleteItemAsync(item));
+        IncreaseCommand = new Command<InputPurchaseBasketModel>(async (item) => await IncreaseAsync(item));
+        DecreaseCommand = new Command<InputPurchaseBasketModel>(async (item) => await DecreaseAsync(item));
 
         LocationCloseCommand = new Command(async () => await LocationCloseAsync());
         LocationConfirmCommand = new Command<LocationModel>(async (locationModel) => await LocationConfirmAsync(locationModel));
@@ -71,9 +76,9 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
     public Page CurrentPage { get; set; } = null!;
 
     public Command ShowProductViewCommand { get; }
-    public Command<InputProductBasketModel> DeleteItemCommand { get; }
-    public Command<InputProductBasketModel> IncreaseCommand { get; }
-    public Command<InputProductBasketModel> DecreaseCommand { get; }
+    public Command<InputPurchaseBasketModel> DeleteItemCommand { get; }
+    public Command<InputPurchaseBasketModel> IncreaseCommand { get; }
+    public Command<InputPurchaseBasketModel> DecreaseCommand { get; }
 
     public Command<LocationModel> LocationDecreaseCommand { get; }
     public Command<LocationModel> LocationIncreaseCommand { get; }
@@ -83,7 +88,7 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
     public Command NextViewCommand { get; }
     public Command BackCommand { get; }
 
-    public ObservableCollection<InputProductBasketModel> Items { get; } = new();
+    public ObservableCollection<InputPurchaseBasketModel> Items { get; } = new();
     public ObservableCollection<LocationModel> Locations { get; }
 
     private async Task ShowProductViewAsync()
@@ -110,7 +115,7 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
         }
     }
 
-    private async Task DeleteItemAsync(InputProductBasketModel item)
+    private async Task DeleteItemAsync(InputPurchaseBasketModel item)
     {
         if (IsBusy)
             return;
@@ -131,22 +136,24 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
         }
     }
 
-    private async Task IncreaseAsync(InputProductBasketModel item)
+    private async Task IncreaseAsync(InputPurchaseBasketModel item)
     {
         if (IsBusy)
             return;
-
         try
         {
             IsBusy = true;
 
             if (item.LocTracking == 1)
             {
-                await Shell.Current.GoToAsync($"{nameof(InputProductProcessBasketLocationListView)}", new Dictionary<string, object>
+                var nextViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseProcessBasketLocationListViewModel>();
+
+                await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseProcessBasketLocationListView)}", new Dictionary<string, object>
                 {
                     {nameof(WarehouseModel), WarehouseModel},
-                    {nameof(InputProductBasketModel), item}
+                    {nameof(InputPurchaseBasketModel), item}
                 });
+                await nextViewModel.LoadSelectedItemsAsync();
             }
             else
                 item.Quantity++;
@@ -161,7 +168,7 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
         }
     }
 
-    private async Task DecreaseAsync(InputProductBasketModel item)
+    private async Task DecreaseAsync(InputPurchaseBasketModel item)
     {
         if (IsBusy)
             return;
@@ -183,7 +190,7 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
         }
     }
 
-    private async Task LoadLocationItemsAsync(InputProductBasketModel item)
+    private async Task LoadLocationItemsAsync(InputPurchaseBasketModel item)
     {
         try
         {

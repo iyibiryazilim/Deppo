@@ -38,20 +38,19 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
     private readonly IPurchaseSupplierProductService _purchaseSupplierProductService;
 
     [ObservableProperty]
-    ObservableCollection<PurchaseSupplierProduct> selectedProducts = new();
+    private ObservableCollection<PurchaseSupplierProduct> selectedProducts = new();
 
     [ObservableProperty]
-    ObservableCollection<WaitingPurchaseOrderModel> selectedOrders = new();
-
-
-    [ObservableProperty]
-    WarehouseModel warehouseModel = null!;
+    private ObservableCollection<WaitingPurchaseOrderModel> selectedOrders = new();
 
     [ObservableProperty]
-    PurchaseSupplier purchaseSupplier = null!;
+    private WarehouseModel warehouseModel = null!;
 
     [ObservableProperty]
-    int targetViewType = default;
+    private PurchaseSupplier purchaseSupplier = null!;
+
+    [ObservableProperty]
+    private int targetViewType = default;
 
     [ObservableProperty]
     private bool isProductVisible = true;
@@ -114,9 +113,11 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
                 case 0:
                     await SwitchToOrderListViewAsync();
                     break;
+
                 case 1:
                     await SwitchToProductListViewAsync();
                     break;
+
                 default:
                     await SwitchToProductListViewAsync();
                     break;
@@ -130,7 +131,6 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
         {
             IsBusy = false;
         }
-
     }
 
     //TargetViewType = 0
@@ -147,7 +147,6 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
             Title = "Ürün Listesi";
             SelectedOrders.Clear();
             await LoadItemsAsync();
-
         }
         catch (System.Exception ex)
         {
@@ -170,7 +169,6 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
             Title = "Sipariş Listesi";
             SelectedProducts.Clear();
             await LoadOrdersAsync();
-
         }
         catch (System.Exception ex)
         {
@@ -190,7 +188,6 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
             Items.Clear();
             await Task.Delay(1000);
 
-
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _purchaseSupplierProductService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseSupplier.ReferenceId, WarehouseModel.Number, string.Empty, 0, 20);
             if (result.IsSuccess)
@@ -199,13 +196,10 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
                 {
                     foreach (var item in result.Data)
                         Items.Add(Mapping.Mapper.Map<PurchaseSupplierProduct>(item));
-
                 }
-
             }
 
             _userDialogs.HideHud();
-
         }
         catch (System.Exception ex)
         {
@@ -240,12 +234,9 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
                     foreach (var item in result.Data)
                         Items.Add(Mapping.Mapper.Map<PurchaseSupplierProduct>(item));
 
-
                     _userDialogs.HideHud();
-
                 }
             }
-
         }
         catch (System.Exception ex)
         {
@@ -260,7 +251,7 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
         }
     }
 
-    async Task LoadOrdersAsync()
+    private async Task LoadOrdersAsync()
     {
         if (IsBusy)
             return;
@@ -272,7 +263,6 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
             Orders.Clear();
             await Task.Delay(1000);
 
-
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _waitingPurchaseOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, PurchaseSupplier.ReferenceId, string.Empty, 0, 20);
             if (result.IsSuccess)
@@ -281,12 +271,10 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
                 {
                     foreach (var item in result.Data)
                         Orders.Add(Mapping.Mapper.Map<WaitingPurchaseOrderModel>(item));
-
                 }
             }
 
             _userDialogs.HideHud();
-
         }
         catch (System.Exception ex)
         {
@@ -320,15 +308,10 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
                 {
                     foreach (var item in result.Data)
                         Orders.Add(Mapping.Mapper.Map<WaitingPurchaseOrderModel>(item));
-
-
-
                 }
             }
 
             _userDialogs.HideHud();
-
-
         }
         catch (System.Exception ex)
         {
@@ -355,7 +338,6 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
             var selectedItem = Items.FirstOrDefault(x => x.ItemReferenceId == purchaseSupplierProduct.ItemReferenceId);
             if (selectedItem is not null)
             {
-
                 if (selectedItem.IsSelected)
                 {
                     Items.FirstOrDefault(x => x.ItemReferenceId == purchaseSupplierProduct.ItemReferenceId).IsSelected = false;
@@ -394,15 +376,9 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
                     // else
                     //     basketItem.InputQuantity = 1;
 
-
                     SelectedProducts.Add(selectedItem);
                 }
-
-
-
             }
-
-
         }
         catch (System.Exception ex)
         {
@@ -429,7 +405,6 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
             var selectedItem = Orders.FirstOrDefault(x => x.ReferenceId == waitingPurchaseOrderModel.ReferenceId);
             if (selectedItem is not null)
             {
-
                 if (selectedItem.IsSelected)
                 {
                     Orders.FirstOrDefault(x => x.ReferenceId == waitingPurchaseOrderModel.ReferenceId).IsSelected = false;
@@ -439,7 +414,6 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
                 {
                     Orders.FirstOrDefault(x => x.ReferenceId == waitingPurchaseOrderModel.ReferenceId).IsSelected = true;
                     SelectedOrders.Add(selectedItem);
-
 
                     // if (SelectedProducts.ToList().Exists(x => x.ItemReferenceId == selectedItem.ProductReferenceId))
                     // {
@@ -476,17 +450,9 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
                     // else
                     //     basketItem.InputQuantity = 1;
 
-
                     //}
-
-
                 }
-
-
-
             }
-
-
         }
         catch (System.Exception ex)
         {
@@ -521,9 +487,11 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
                 case 0:
                     basketItems = await ConvertProductItems().WaitAsync(cts.Token);
                     break;
+
                 case 1:
                     basketItems = await ConvertOrderItems().WaitAsync(cts.Token);
                     break;
+
                 default:
                     break;
             }
@@ -534,8 +502,6 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
                 [nameof(PurchaseSupplier)] = PurchaseSupplier,
                 ["Items"] = basketItems
             });
-
-
         }
         catch (System.Exception ex)
         {
@@ -551,7 +517,6 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
     {
         return await Task.Run(() =>
         {
-
             ObservableCollection<InputPurchaseBasketModel> basketItems = new();
             foreach (var item in SelectedOrders)
             {
@@ -576,7 +541,6 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
                     LocTracking = item.LocTracking,
                     Image = string.Empty,
                     Quantity = item.WaitingQuantity,
-
                 };
 
                 if (item.LocTracking == 1 || item.TrackingType == 1)
@@ -589,14 +553,12 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
 
             return basketItems;
         });
-
     }
 
     private async Task<ObservableCollection<InputPurchaseBasketModel>> ConvertProductItems()
     {
-        return await Task.Run(() =>
+        return await Task.Run(async () =>
         {
-
             ObservableCollection<InputPurchaseBasketModel> basketItems = new();
             foreach (var item in SelectedProducts)
             {
@@ -621,7 +583,6 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
                     LocTracking = item.LocTracking,
                     Image = string.Empty,
                     Quantity = item.WaitingQuantity,
-
                 };
 
                 if (item.LocTracking == 1 || item.TrackingType == 1)
@@ -629,13 +590,43 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
                 else
                     basketItem.InputQuantity = 1;
 
+                var httpClient = _httpClientService.GetOrCreateHttpClient();
+                var result = await _waitingPurchaseOrderService.GetObjectsByProduct(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, supplierReferenceId: PurchaseSupplier.ReferenceId, productReferenceId: item.ItemReferenceId, string.Empty, 0, 999999999);
+                if (result.IsSuccess)
+                {
+                    if (result.Data is not null)
+                    {
+                        foreach (var purchaseOrder in result.Data)
+                        {
+                            basketItem.Orders.Add(new InputPurchaseBasketOrderModel
+                            {
+                                OrderReferenceId = purchaseOrder.ReferenceId,
+                                SupplierReferenceId = purchaseOrder.SupplierReferenceId,
+                                SupplierCode = purchaseOrder.SupplierCode,
+                                SupplierName = purchaseOrder.SupplierName,
+                                ProductReferenceId = purchaseOrder.ProductReferenceId,
+                                ProductCode = purchaseOrder.ProductCode,
+                                ProductName = purchaseOrder.ProductName,
+                                UnitsetReferenceId = purchaseOrder.UnitsetReferenceId,
+                                UnitsetCode = purchaseOrder.UnitsetCode,
+                                UnitsetName = purchaseOrder.UnitsetName,
+                                SubUnitsetName = purchaseOrder.SubUnitsetName,
+                                SubUnitsetCode = purchaseOrder.SubUnitsetCode,
+                                SubUnitsetReferenceId = purchaseOrder.UnitsetReferenceId,
+                                Quantity = purchaseOrder.Quantity,
+                                ShippedQuantity = purchaseOrder.ShippedQuantity,
+                                WaitingQuantity = purchaseOrder.WaitingQuantity,
+                                OrderDate = purchaseOrder.OrderDate,
+                                DueDate = purchaseOrder.DueDate,
+                            });
+                        }
+                    }
+                }
+
                 basketItems.Add(basketItem);
             }
 
             return basketItems;
-
         });
-
     }
-
 }
