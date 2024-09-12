@@ -7,13 +7,13 @@ public static class DeppoEnums
 {
     public enum InputProductProcessType
     {
-        [Description("Üretimden Giriş")]
+        [Description("Üretimden Giriş İşlemi")]
         ProductionInputProcess = 0,
 
-        [Description("Sayım Fazlası")]
+        [Description("Sayım Fazlası İşlemi")]
         OverCountProcess = 1,
 
-        [Description("Depo Transfer")]
+        [Description("Ambar Transfer İşlemi")]
         DevirProcess = 3
     }
 

@@ -24,7 +24,7 @@
                 Stroke="{StaticResource Primary}"
                 StrokeShape="RoundRectangle 10"
                 StrokeThickness="0.2">
-                <VerticalStackLayout>
+                <VerticalStackLayout VerticalOptions="End">
                     <Label FontSize="Subtitle" Text="762" />
                     <Label FontSize="20" Text="Total Product" />
                 </VerticalStackLayout>
@@ -37,7 +37,7 @@
                 Stroke="{StaticResource Primary}"
                 StrokeShape="RoundRectangle 10"
                 StrokeThickness="0.2">
-                <VerticalStackLayout>
+                <VerticalStackLayout VerticalOptions="End">
                     <Label FontSize="Subtitle" Text="762" />
                     <Label FontSize="20" Text="Input Product" />
                 </VerticalStackLayout>
@@ -50,7 +50,7 @@
                 Stroke="{StaticResource Primary}"
                 StrokeShape="RoundRectangle 10"
                 StrokeThickness="0.2">
-                <VerticalStackLayout>
+                <VerticalStackLayout VerticalOptions="End">
                     <Label FontSize="Subtitle" Text="762" />
                     <Label FontSize="20" Text="Input Product" />
                 </VerticalStackLayout>
