@@ -1,20 +1,21 @@
-﻿using System;
+﻿using Deppo.Core.DTOs.SeriLotTransactionDto;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Deppo.Core.DTOs;
+namespace Deppo.Core.DTOs.BaseTransaction;
 
 public class BaseTransactionLineDto
 {
-    
-        public BaseTransactionLineDto()
+
+    public BaseTransactionLineDto()
     {
-        SeriLotTransactions = new List<SeriLotTransactionDto>();
+        SeriLotTransactions = new List<Deppo.Core.DTOs.SeriLotTransactionDto.SeriLotTransactionDto>();
     }
 
-    public IList<SeriLotTransactionDto> SeriLotTransactions { get; set; }
+    public IList<Deppo.Core.DTOs.SeriLotTransactionDto.SeriLotTransactionDto> SeriLotTransactions { get; set; }
     public string? ProductCode { get; set; } = string.Empty;
     public double? Quantity { get; set; }
     public string? SubUnitsetCode { get; set; } = string.Empty;

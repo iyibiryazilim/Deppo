@@ -1,21 +1,23 @@
 ﻿using Deppo.Core.DataResultModel;
-using Deppo.Core.DTOs.ProductionTransaction;
+using Deppo.Core.DTOs;
+using Deppo.Core.DTOs.OutCountingTransaction;
 using Deppo.Core.ResponseResultModels;
 using Deppo.Core.Services;
-using Newtonsoft.Json;  // Ensure Newtonsoft.Json is used for serialization
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Net.Http;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Deppo.Core.DataStores
 {
-    public class ProductionTransactionDataStore : IProductionTransactionService
+    public class OutCountingTransactionDataStore : IOutCountingTransactionService
     {
         private string postUrl = "/gateway/product/ProductionTransaction/Tiger";
 
-        public async Task<DataResult<ResponseModel>> InsertProductionTransaction(HttpClient httpClient, ProductionTransactionInsert dto, string? firmNumber)
+        public async Task<DataResult<ResponseModel>> InsertOutCountingTransaction(HttpClient httpClient, OutCountingTransactionInsert dto, string? firmNumber)
         {
             if (firmNumber != null && firmNumber != string.Empty)
             {
@@ -27,7 +29,7 @@ namespace Deppo.Core.DataStores
                 postUrl = $"/gateway/product/ProductionTransaction/Tiger?firmNumber={firmNumber}";
             }
 
-        var result = new DataResult<ResponseModel>();
+            var result = new DataResult<ResponseModel>();
             try
             {
                 var content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json");

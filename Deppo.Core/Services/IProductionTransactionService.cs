@@ -1,6 +1,6 @@
 using System;
 using Deppo.Core.DataResultModel;
-using Deppo.Core.DTOs;
+using Deppo.Core.DTOs.ProductionTransaction;
 using Deppo.Core.ResponseResultModels;
 
 namespace Deppo.Core.Services;

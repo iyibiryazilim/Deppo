@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Deppo.Core.DTOs;
+namespace Deppo.Core.DTOs.BaseTransaction;
 
 public class BaseTransactionDto
 {
