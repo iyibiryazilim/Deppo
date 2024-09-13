@@ -522,7 +522,7 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
                             LocationReferenceId = item.ReferenceId,
                             LocationCode = item.Code,
                             LocationName = item.Name,
-                            Quantity = item.InputQuantity
+                            Quantity = item.InputQuantity,
                         });
                     }
                 }
