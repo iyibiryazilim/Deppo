@@ -12,6 +12,9 @@ public interface ISalesPanelService
 {
     Task<DataResult<IEnumerable<dynamic>>> GetLastTransactionByCustomer(HttpClient httpClient , int firmNumber, int periodNumber);
     Task<DataResult<IEnumerable<dynamic>>> GetLastTransaction(HttpClient httpClient , int firmNumber, int periodNumber);
+
+    Task<DataResult<IEnumerable<dynamic>>> GetLastFiche(HttpClient httpClient, int firmNumber, int periodNumber);
+
     Task<DataResult<dynamic>> TotalOrderCount(HttpClient httpClient, int firmNumber, int periodNumber);
     Task<DataResult<dynamic>> ShippedOrderCount(HttpClient httpClient , int firmNumber, int periodNumber);
 
