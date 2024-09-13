@@ -20,7 +20,7 @@ namespace Deppo.Core.DataStores
         public async Task<DataResult<ResponseModel>> InsertOutCountingTransaction(HttpClient httpClient, OutCountingTransactionInsert dto, int firmNumber)
         {
             
-                postUrl = $"/gateway/product/ProductionTransaction/Tiger?firmNumber={firmNumber.ToString()}";
+                postUrl = $"/gateway/product/ProductionTransaction/Tiger?firmNumber={firmNumber}";
             
            
 
@@ -44,8 +44,9 @@ namespace Deppo.Core.DataStores
                 }
                 else
                 {
+                     var message = await responseMessage.Content.ReadAsStringAsync();
                     Debug.WriteLine($"Received non-successful HTTP status code: {responseMessage.StatusCode}");
-                    result.Message = "Failed to insert sales order.";
+                    result.Message = message;
                     result.IsSuccess = false;
                     return result;
                 }

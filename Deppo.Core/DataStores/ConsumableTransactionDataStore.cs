@@ -20,15 +20,16 @@ namespace Deppo.Core.DataStores
         public async Task<DataResult<ResponseModel>> InsertConsumableTransaction(HttpClient httpClient, ConsumableTransactionInsert dto, int firmNumber)
         {
            
-                postUrl = $"/gateway/product/ConsumableTransaction/Tiger?firmNumber={firmNumber.ToString()}";
+                postUrl = $"/gateway/product/ConsumableTransaction/Tiger?firmNumber={firmNumber}";
             
            
             var result = new DataResult<ResponseModel>();
             try
             {
+                var json = JsonConvert.SerializeObject(dto);
                 var content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json");
 
-                var responseMessage = await httpClient.PostAsync($"{postUrl}/InsertProductionTransaction", content);
+                var responseMessage = await httpClient.PostAsync($"{postUrl}", content);
 
                 if (responseMessage.IsSuccessStatusCode)
                 {
@@ -43,8 +44,9 @@ namespace Deppo.Core.DataStores
                 }
                 else
                 {
+                    var message = await responseMessage.Content.ReadAsStringAsync();
                     Debug.WriteLine($"Received non-successful HTTP status code: {responseMessage.StatusCode}");
-                    result.Message = "Failed to insert sales order.";
+                    result.Message = message;
                     result.IsSuccess = false;
                     return result;
                 }

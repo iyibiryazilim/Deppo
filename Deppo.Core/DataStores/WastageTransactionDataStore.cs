@@ -20,7 +20,7 @@ namespace Deppo.Core.DataStores
         public async Task<DataResult<ResponseModel>> InsertWastageTransaction(HttpClient httpClient, WastageTransactionInsert dto, int firmNumber)
         {
             
-                postUrl = $"/gateway/product/WastageTransaction/Tiger?firmNumber={firmNumber.ToString()}";
+                postUrl = $"/gateway/product/WastageTransaction/Tiger?firmNumber={firmNumber}";
             
            
 
