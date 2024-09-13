@@ -154,7 +154,8 @@
 
                             <Label
                                 LineBreakMode="TailTruncation"
-                                MaxLines="12"
+                                MaximumWidthRequest="12"
+                                MaxLines="1"
                                 Text="{Binding Title}"
                                 TextColor="{StaticResource OffBlack}" />
                         </VerticalStackLayout>
