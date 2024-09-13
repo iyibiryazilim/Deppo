@@ -72,6 +72,7 @@
 		<PackageReference Include="DevExpress.Maui.Controls" Version="24.1.*" />
 		<PackageReference Include="DevExpress.Maui.CollectionView" Version="24.1.*" />
 		<PackageReference Include="AutoMapper" Version="12.0.1" />
+		<PackageReference Include="SkiaSharp.Extended.UI.Maui" Version="2.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -177,6 +178,12 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\PurchaseModule\SupplierMenu\Views\SupplierOutputTransactionView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ResultModule\Views\InsertFailurePageView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ResultModule\Views\InsertSuccessPageView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\SalesModule\CustomerMenu\Views\CustomerDetailView.xaml">

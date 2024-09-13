@@ -46,6 +46,8 @@ using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels;
 using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views;
 using Deppo.Mobile.Modules.PurchaseModule.WaitingOrderMenu.ViewModels;
 using Deppo.Mobile.Modules.PurchaseModule.WaitingOrderMenu.Views;
+using Deppo.Mobile.Modules.ResultModule.ViewModels;
+using Deppo.Mobile.Modules.ResultModule.Views;
 using Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels;
 using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesPanel.ViewModels;
@@ -62,6 +64,7 @@ using DevExpress.Maui;
 using DotNet.Meteor.HotReload.Plugin;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SkiaSharp.Views.Maui.Controls.Hosting;
 
 namespace Deppo.Mobile;
 
@@ -81,6 +84,7 @@ public static class MauiProgram
                 options.SetShouldSuppressExceptionsInBehaviors(true);
                 options.SetShouldSuppressExceptionsInAnimations(true);
             })
+            .UseSkiaSharp()
             .UseDevExpressCollectionView()
             .UseDevExpressControls()
             .UseDevExpressEditors()
@@ -342,6 +346,11 @@ public static class MauiProgram
 
         #endregion Fast Production Modules
 
-        return builder.Build();
+        #region Result Modules
+        builder.Services.AddTransientWithShellRoute<InsertSuccessPageView, InsertSuccessPageViewModel>(nameof(InsertSuccessPageView));
+		builder.Services.AddTransientWithShellRoute<InsertFailurePageView, InsertFailurePageViewModel>(nameof(InsertFailurePageView));
+		#endregion
+
+		return builder.Build();
     }
 }
