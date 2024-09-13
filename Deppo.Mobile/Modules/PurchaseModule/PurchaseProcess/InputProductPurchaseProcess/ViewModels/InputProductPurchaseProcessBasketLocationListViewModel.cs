@@ -501,11 +501,15 @@ public partial class InputProductPurchaseProcessBasketLocationListViewModel : Ba
                             LocationName = item.Name,
                             Quantity = item.InputQuantity
                         });
+                   
+                    
                     }
+
+                    var totalInputQuantity = SelectedItems.Where(x => x.InputQuantity > 0).Sum(x => x.InputQuantity);
+                    previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputPurchaseBasketModel.ItemReferenceId).Quantity= totalInputQuantity;
                 }
 
-                var totalInputQuantity = SelectedItems.Where(x => x.InputQuantity > 0).Sum(x => x.InputQuantity);
-                previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputPurchaseBasketModel.ItemReferenceId).InputQuantity = totalInputQuantity;
+               
             }
 
             await Shell.Current.GoToAsync("..");

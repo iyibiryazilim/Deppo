@@ -26,7 +26,6 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(Supplier), queryId: nameof(Supplier))]
-[QueryProperty(name: nameof(InputProductProcessType), queryId: nameof(InputProductProcessType))]
 public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -43,9 +42,6 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
 
     [ObservableProperty]
     private InputPurchaseBasketModel? selectedInputProductBasketModel;
-
-    [ObservableProperty]
-    private InputProductProcessType inputProductProcessType;
 
     public InputProductPurchaseProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IHttpClientService httpClientService2, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider)
     {
@@ -123,6 +119,10 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
         try
         {
             IsBusy = true;
+
+            var result = await _userDialogs.ConfirmAsync($"{item.ItemCode}\n{item.ItemName}\nİlgili ürün sepetinizden çıkarılacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+            if (!result)
+                return;
 
             Items.Remove(item);
         }
@@ -316,6 +316,12 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
                 await _userDialogs.AlertAsync("Sepetinizde ürün bulunmamaktadır.", "Hata", "Tamam");
                 return;
             }
+
+            await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseProcessFormView)}", new Dictionary<string, object>
+            {
+                [nameof(WarehouseModel)] = WarehouseModel,
+                [nameof(Items)] = Items
+            });
         }
         catch (Exception ex)
         {
