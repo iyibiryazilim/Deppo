@@ -198,9 +198,9 @@ public class BaseTransaction : INotifyPropertyChanged, IDisposable
 			switch (_iOTypeName)
 			{
 				case "Giriş":
-					return "\uf062";
+					return "arrow-up";
 				case "Çıkış":
-					return "\uf063";
+					return "arrow-down";
 				default:
 					return "";
 			}
