@@ -69,6 +69,7 @@ public partial class PurchasePanelViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
+                PurchasePanelModel.LastSuplier.Clear();
                 foreach (var item in result.Data)
                     PurchasePanelModel.LastSuplier.Add(Mapping.Mapper.Map<Supplier>(item));
             }
@@ -99,6 +100,7 @@ public partial class PurchasePanelViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
+                PurchasePanelModel.LastSupplierTransaction.Clear();
                 foreach (var item in result.Data)
                     PurchasePanelModel.LastSupplierTransaction.Add(Mapping.Mapper.Map<SupplierTransaction>(item));
             }
