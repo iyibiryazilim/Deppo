@@ -24,7 +24,7 @@ public class HttpClientService : IHttpClientService
     {
         var httpClient = _httpClient.Value;
         if (httpClient.BaseAddress == null)
-            httpClient.BaseAddress = new Uri(BaseUri);
+            httpClient.BaseAddress = new Uri(BaseUri,true);
 
         if (!string.IsNullOrEmpty(BaseUri))
         {

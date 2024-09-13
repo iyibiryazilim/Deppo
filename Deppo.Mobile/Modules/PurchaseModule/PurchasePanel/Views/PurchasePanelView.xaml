@@ -32,7 +32,7 @@
 
     <Grid
         Padding="10"
-        RowDefinitions="Auto,Auto,Auto"
+        RowDefinitions="Auto,Auto,*"
         RowSpacing="20">
 
         <VerticalStackLayout Grid.Row="0" Spacing="5">
