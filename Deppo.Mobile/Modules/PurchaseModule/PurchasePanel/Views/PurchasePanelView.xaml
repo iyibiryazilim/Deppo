@@ -33,7 +33,7 @@
     <Grid
         Padding="10"
         RowDefinitions="Auto,Auto,Auto"
-        RowSpacing="10">
+        RowSpacing="20">
 
         <VerticalStackLayout Grid.Row="0" Spacing="5">
             <Label
@@ -62,9 +62,9 @@
 
                         <Label
                             FontAttributes="Bold"
-                            FontSize="48"
+                            FontSize="45"
                             HorizontalOptions="Start"
-                            Text="{Binding PurchasePanelModel.AmountTotal}"
+                            Text="{Binding PurchasePanelModel.AmountTotal, StringFormat='{0:N0}'}"
                             TextColor="{StaticResource White}"
                             VerticalOptions="End" />
                         <Label
@@ -89,7 +89,7 @@
                         <Label
                             FontAttributes="Bold"
                             FontSize="Title"
-                            Text="{Binding PurchasePanelModel.WaitingOrderCount}"
+                            Text="{Binding PurchasePanelModel.WaitingOrderCount, StringFormat='{0:N0}'}"
                             TextColor="{StaticResource White}" />
                         <Label Text="Bekleyen Referans" TextColor="{StaticResource White}" />
 
@@ -112,7 +112,7 @@
                         <Label
                             FontAttributes="Bold"
                             FontSize="Title"
-                            Text="{Binding PurchasePanelModel.ShippedQuantityTotal}"
+                            Text="{Binding PurchasePanelModel.ShippedQuantityTotal, StringFormat='{0:N0}'}"
                             TextColor="{StaticResource White}" />
                         <Label Text="Kabul edilen Referans" TextColor="{StaticResource White}" />
 
@@ -128,14 +128,21 @@
 
         </VerticalStackLayout>
 
-        <StackLayout Grid.Row="1">
+        <StackLayout Grid.Row="1" Spacing="5">
             <Label
                 FontAttributes="Bold"
                 FontSize="Subtitle"
-                Text="Hareket Gören Son 5 Tedarikçiler"
+                Text="Hareket Gören Son 5 Tedarikçi"
                 TextColor="{StaticResource OffBlack}" />
 
-            <CollectionView ItemsLayout="HorizontalList" ItemsSource="{Binding PurchasePanelModel.LastSuplier}">
+            <CollectionView ItemsSource="{Binding PurchasePanelModel.LastSuplier}">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout
+                        ItemSpacing="10"
+                        Orientation="Horizontal"
+                        SnapPointsAlignment="Center"
+                        SnapPointsType="MandatorySingle" />
+                </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:Supplier">
                         <VerticalStackLayout>
@@ -147,15 +154,15 @@
                                 FontAttributes="Bold"
                                 FontSize="16"
                                 HeightRequest="50"
-                                Text="VS"
-                                TextColor="{StaticResource OffBlack}"
+                                Text="{Binding TitleName}"
+                                TextColor="{StaticResource White}"
                                 VerticalOptions="Start"
                                 WidthRequest="50" />
 
                             <Label
                                 LineBreakMode="TailTruncation"
-                                MaximumWidthRequest="12"
                                 MaxLines="1"
+                                MaximumWidthRequest="100"
                                 Text="{Binding Title}"
                                 TextColor="{StaticResource OffBlack}" />
                         </VerticalStackLayout>
@@ -179,26 +186,30 @@
                             BackgroundColor="Transparent"
                             StrokeThickness="0.1">
                             <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
-                                <VerticalStackLayout
+                                <Border
                                     Grid.Column="0"
-                                    Spacing="1"
-                                    VerticalOptions="Center">
-                                    <Label
-                                        FontAttributes="Bold"
-                                        FontSize="Large"
-                                        HorizontalOptions="Center"
-                                        Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
-                                        TextColor="{StaticResource OffBlack}" />
-                                    <Label
-                                        FontSize="Medium"
-                                        HorizontalOptions="Center"
-                                        Text="{Binding TransactionDate, StringFormat='{0:MM/yyyy}'}"
-                                        TextColor="{StaticResource OffBlack}" />
-                                    <Label
-                                        HorizontalOptions="Center"
-                                        Text="{Binding TransactionTime, StringFormat='{0:hh\\:mm}'}"
-                                        TextColor="{StaticResource Gray400}" />
-                                </VerticalStackLayout>
+                                    Padding="5"
+                                    BackgroundColor="{StaticResource Secondary}"
+                                    StrokeShape="RoundRectangle 10">
+                                    <VerticalStackLayout Spacing="1" VerticalOptions="Center">
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="Large"
+                                            HorizontalOptions="Center"
+                                            Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
+                                            TextColor="{StaticResource OffBlack}" />
+                                        <Label
+                                            FontSize="Medium"
+                                            HorizontalOptions="Center"
+                                            Text="{Binding TransactionDate, StringFormat='{0:MM/yyyy}'}"
+                                            TextColor="{StaticResource OffBlack}" />
+                                        <Label
+                                            HorizontalOptions="Center"
+                                            Text="{Binding TransactionTime, StringFormat='{0:hh\\:mm}'}"
+                                            TextColor="{StaticResource Black}" />
+                                    </VerticalStackLayout>
+                                </Border>
+
 
                                 <VerticalStackLayout
                                     Grid.Column="1"

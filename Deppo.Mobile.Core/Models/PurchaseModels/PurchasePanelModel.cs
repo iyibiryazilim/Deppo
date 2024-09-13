@@ -23,5 +23,6 @@ namespace Deppo.Mobile.Core.Models.PurchaseModels
         int shippedQuantityTotal;
         public ObservableCollection<Supplier> LastSuplier { get; } = new();
         public ObservableCollection<SupplierTransaction> LastSupplierTransaction { get; } = new();
+        public ObservableCollection<PurchaseFiche> LastPurchaseFiche { get; } = new();
     }
 }
