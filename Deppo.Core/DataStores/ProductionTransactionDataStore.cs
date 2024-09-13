@@ -19,16 +19,18 @@ namespace Deppo.Core.DataStores
         {
             if (firmNumber != null)
             {
-                postUrl = $"/gateway/product/ProductionTransaction/Tiger?firmNumber={firmNumber.ToString()}";
+                postUrl = $"/gateway/product/ProductionTransaction/Tiger?firmNumber={firmNumber}";
             }
             
 
         var result = new DataResult<ResponseModel>();
             try
             {
+                var json = JsonConvert.SerializeObject(dto);
                 var content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json");
 
-                var responseMessage = await httpClient.PostAsync($"{postUrl}/InsertProductionTransaction", content);
+
+                var responseMessage = await httpClient.PostAsync($"{postUrl}", content);
 
                 if (responseMessage.IsSuccessStatusCode)
                 {
@@ -41,14 +43,17 @@ namespace Deppo.Core.DataStores
                     return result;
 
                 }
-                else
-                {
-                    Debug.WriteLine($"Received non-successful HTTP status code: {responseMessage.StatusCode}");
-                    result.Message = "Failed to insert sales order.";
-                    result.IsSuccess = false;
-                    return result;
-                }
-            }
+				else
+				{
+				
+					var message = await responseMessage.Content.ReadAsStringAsync();
+                    Console.WriteLine(message);
+                    return null;
+					//var jsonObject = JObject.Parse(message);
+					//var errors = jsonObject["errors"];
+					//var nameErrors = errors["Name"];
+				}
+			}
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
