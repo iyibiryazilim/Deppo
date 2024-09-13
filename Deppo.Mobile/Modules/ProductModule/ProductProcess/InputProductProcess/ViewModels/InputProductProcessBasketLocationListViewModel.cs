@@ -500,43 +500,54 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
 
         try
         {
-            IsBusy = true;
+			IsBusy = true;
 
-            _userDialogs.ShowLoading("Loading...");
+			_userDialogs.ShowLoading("Loading...");
 
-            var previousViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketListViewModel>();
+			var previousViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketListViewModel>();
 
-            if (previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputProductBasketModel.ItemReferenceId) is not null)
-            {
-                foreach (var item in SelectedItems.Where(x => x.InputQuantity > 0)) //Locations
-                {
-                    var location = previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputProductBasketModel.ItemReferenceId).Details.FirstOrDefault(x => x.LocationCode == item.Code);
-                    if (location is not null)
-                    {
-                        location.Quantity = item.InputQuantity;
-                    }
-                    else
-                    {
-                        previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputProductBasketModel.ItemReferenceId).Details.Add(new InputProductBasketDetailModel
-                        {
-                            LocationReferenceId = item.ReferenceId,
-                            LocationCode = item.Code,
-                            LocationName = item.Name,
-                            Quantity = item.InputQuantity,
-                        });
-                    }
-                }
+			var basketItem = previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputProductBasketModel.ItemReferenceId);
+			if (basketItem is not null)
+			{
+				// InputQuantity <= 0 olanları mevcut Details'tan çıkarıyoruz
+				var itemsToRemove = SelectedItems.Where(x => x.InputQuantity <= 0).ToList();
+				foreach (var item in itemsToRemove)
+				{
+					var locationToRemove = basketItem.Details.FirstOrDefault(x => x.LocationCode == item.Code);
+					if (locationToRemove != null)
+					{
+						basketItem.Details.Remove(locationToRemove);
+					}
+				}
 
-				#region İlgili ürünün Quantity'sine seçilen stok yerlerinin toplam InputQuantitysi kadar set et
+				foreach (var item in SelectedItems.Where(x => x.InputQuantity > 0))
+				{
+					var location = basketItem.Details.FirstOrDefault(x => x.LocationCode == item.Code);
+					if (location is not null)
+					{
+						location.Quantity = item.InputQuantity;
+					}
+					else
+					{
+						basketItem.Details.Add(new InputProductBasketDetailModel
+						{
+							LocationReferenceId = item.ReferenceId,
+							LocationCode = item.Code,
+							LocationName = item.Name,
+							Quantity = item.InputQuantity,
+						});
+					}
+				}
+
+				// İlgili ürünün Quantity'sine seçilen stok yerlerinin toplam InputQuantity'sini set et
 				var inputTotalQuantity = SelectedItems.Sum(x => x.InputQuantity);
-				previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputProductBasketModel.ItemReferenceId).Quantity = inputTotalQuantity;
-				#endregion
+				basketItem.Quantity = inputTotalQuantity;
 			}
 
 			await Shell.Current.GoToAsync("..");
-            _userDialogs.HideHud();
+			_userDialogs.HideHud();
 
-        }
+		}
         catch (Exception ex)
         {
             _userDialogs.Alert(ex.Message);
