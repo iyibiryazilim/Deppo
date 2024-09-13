@@ -3,13 +3,251 @@
     x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchasePanel.Views.PurchasePanelView"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+    xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
+    xmlns:panelModel="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels;assembly=Deppo.Mobile.Core"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchasePanel.ViewModels"
     Title="{Binding Title}"
     x:DataType="viewModel:PurchasePanelViewModel">
-    <VerticalStackLayout>
-        <Label
-            HorizontalOptions="Center"
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" />
-    </VerticalStackLayout>
+
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+
+    <Grid
+        Padding="10"
+        RowDefinitions="Auto,Auto,Auto"
+        RowSpacing="10">
+
+        <VerticalStackLayout Grid.Row="0" Spacing="5">
+            <Label
+                FontAttributes="Bold"
+                FontSize="Subtitle"
+                HorizontalOptions="Start"
+                Text="Özet"
+                TextColor="{StaticResource White}" />
+            <Grid
+                Grid.Row="0"
+                ColumnDefinitions="*,*"
+                ColumnSpacing="10"
+                RowDefinitions="Auto,Auto"
+                RowSpacing="10">
+
+                <Border
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="0"
+                    Padding="10"
+                    BackgroundColor="{StaticResource Primary}"
+                    Stroke="{StaticResource Primary}"
+                    StrokeShape="RoundRectangle 10"
+                    StrokeThickness="0.2">
+                    <VerticalStackLayout Spacing="10" VerticalOptions="End">
+
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="48"
+                            HorizontalOptions="Start"
+                            Text="{Binding PurchasePanelModel.AmountTotal}"
+                            TextColor="{StaticResource White}"
+                            VerticalOptions="End" />
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            Text="Toplam Referans"
+                            TextColor="{StaticResource White}" />
+
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Padding="10"
+                    BackgroundColor="{StaticResource Primary}"
+                    Stroke="{StaticResource Primary}"
+                    StrokeShape="RoundRectangle 10"
+                    StrokeThickness="0.1">
+                    <VerticalStackLayout Spacing="5" VerticalOptions="End">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="Title"
+                            Text="{Binding PurchasePanelModel.WaitingOrderCount}"
+                            TextColor="{StaticResource White}" />
+                        <Label Text="Bekleyen Referans" TextColor="{StaticResource White}" />
+
+                        <ProgressBar
+                            HeightRequest="5"
+                            Progress="0.5"
+                            ProgressColor="{StaticResource Secondary}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Padding="10"
+                    BackgroundColor="{StaticResource Primary}"
+                    Stroke="{StaticResource Primary}"
+                    StrokeShape="RoundRectangle 10"
+                    StrokeThickness="0.2">
+                    <VerticalStackLayout Spacing="5" VerticalOptions="End">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="Title"
+                            Text="{Binding PurchasePanelModel.ShippedQuantityTotal}"
+                            TextColor="{StaticResource White}" />
+                        <Label Text="Kabul edilen Referans" TextColor="{StaticResource White}" />
+
+                        <ProgressBar
+                            HeightRequest="5"
+                            Progress="0.5"
+                            ProgressColor="{StaticResource Secondary}" />
+                    </VerticalStackLayout>
+                </Border>
+
+
+            </Grid>
+
+        </VerticalStackLayout>
+
+        <StackLayout Grid.Row="1">
+            <Label
+                FontAttributes="Bold"
+                FontSize="Subtitle"
+                Text="Hareket Gören Son 5 Tedarikçiler"
+                TextColor="{StaticResource OffBlack}" />
+
+            <CollectionView ItemsLayout="HorizontalList" ItemsSource="{Binding PurchasePanelModel.LastSuplier}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="model:Supplier">
+                        <VerticalStackLayout>
+                            <toolkit:AvatarView
+                                Margin="5"
+                                Background="{StaticResource PrimaryLight}"
+                                BorderColor="{StaticResource Primary}"
+                                CornerRadius="200"
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                HeightRequest="50"
+                                Text="VS"
+                                TextColor="{StaticResource OffBlack}"
+                                VerticalOptions="Start"
+                                WidthRequest="50" />
+
+                            <Label
+                                LineBreakMode="TailTruncation"
+                                MaxLines="12"
+                                Text="{Binding Title}"
+                                TextColor="{StaticResource OffBlack}" />
+                        </VerticalStackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </StackLayout>
+
+        <StackLayout Grid.Row="2">
+            <Label
+                FontAttributes="Bold"
+                FontSize="Subtitle"
+                Text="Son Hareketler"
+                TextColor="{StaticResource OffBlack}" />
+
+            <CollectionView ItemsSource="{Binding PurchasePanelModel.LastSupplierTransaction}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="model:SupplierTransaction">
+                        <Border
+                            Padding="5"
+                            BackgroundColor="Transparent"
+                            StrokeThickness="0.1">
+                            <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
+                                <VerticalStackLayout
+                                    Grid.Column="0"
+                                    Spacing="1"
+                                    VerticalOptions="Center">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="Large"
+                                        HorizontalOptions="Center"
+                                        Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
+                                        TextColor="{StaticResource OffBlack}" />
+                                    <Label
+                                        FontSize="Medium"
+                                        HorizontalOptions="Center"
+                                        Text="{Binding TransactionDate, StringFormat='{0:MM/yyyy}'}"
+                                        TextColor="{StaticResource OffBlack}" />
+                                    <Label
+                                        HorizontalOptions="Center"
+                                        Text="{Binding TransactionTime, StringFormat='{0:hh\\:mm}'}"
+                                        TextColor="{StaticResource Gray400}" />
+                                </VerticalStackLayout>
+
+                                <VerticalStackLayout
+                                    Grid.Column="1"
+                                    Spacing="1"
+                                    VerticalOptions="Center">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="Medium"
+                                        Text="{Binding BaseTransactionCode}" />
+                                    <Label
+                                        FontSize="13"
+                                        LineBreakMode="TailTruncation"
+                                        Text="{Binding ProductName}" />
+
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Label
+                                            FontFamily="FAS"
+                                            FontSize="Small"
+                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
+                                            TextColor="{StaticResource Primary}"
+                                            VerticalOptions="Center" />
+                                        <Label>
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span FontAttributes="Bold" Text="{Binding Quantity}" />
+                                                    <Span Text=" " />
+                                                    <Span FontAttributes="Bold" Text="{Binding SubUnitsetCode}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                        <Image>
+                                            <Image.Source>
+                                                <FontImageSource
+                                                    FontFamily="FAS"
+                                                    Glyph="{Binding IOTypeImageSource}"
+                                                    Size="16"
+                                                    Color="{StaticResource Primary}" />
+                                            </Image.Source>
+                                        </Image>
+                                        <Label Text="{Binding IOTypeName}" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </StackLayout>
+
+    </Grid>
+
+
 </ContentPage>
