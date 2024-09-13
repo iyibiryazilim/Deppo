@@ -262,16 +262,16 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
         private string ShippedOrderCount(int firmNumber, int periodNumber)
         {
             string baseQuery = $@"SELECT 
-	SUM(ORFLINE.SHIPPEDAMOUNT) AS ShippedQuantityTotal
+	ISNULL(COUNT(Distinct ORFLINE.STOCKREF),0) AS ShippedQuantityTotal
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
-WHERE ORFLINE.TRCODE = 1";
+WHERE ORFLINE.TRCODE = 1 AND ORFLINE.SHIPPEDAMOUNT > 0";
             return baseQuery;
         }
 
         private string TotalOrderCount(int firmNumber, int periodNumber)
         {
             string baseQuery = $@"SELECT 
-	SUM(ORFLINE.AMOUNT) AS AmountTotal
+	ISNULL(COUNT(Distinct ORFLINE.STOCKREF),0) AS AmountTotal
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
 WHERE ORFLINE.TRCODE = 1";
             return baseQuery;
@@ -287,24 +287,24 @@ WHERE ORFLINE.TRCODE = 1";
      [TransactionType] = STLINE.TRCODE,
 	 [GroupCode] = ISNULL(ITEMS.STGRPCODE,''),
 	 [IOType] = STLINE.IOCODE,
-	 [ProductReferenceId] =  ITEMS.LOGICALREF,
-	 [ProductCode] = ITEMS.CODE,
-	 [ProductName] = ITEMS.NAME,
-	 [UnitsetReferenceId] = unitset.LOGICALREF,
-	 [UnitsetCode] = unitset.CODE,
-	 [UnitsetName] = unitset.NAME,
-	 [SubUnitsetReferenceId] = subunitset.LOGICALREF,
-	 [SubUnitsetCode] = subunitset.CODE,
-	 [SubUnitsetName] = subunitset.NAME,
+	 [ProductReferenceId] =  ISNULL(ITEMS.LOGICALREF,0),
+	 [ProductCode] = ISNULL(ITEMS.CODE,''),
+	 [ProductName] = ISNULL(ITEMS.NAME,''),
+	 [UnitsetReferenceId] = ISNULL( unitset.LOGICALREF,0),
+	 [UnitsetCode] = ISNULL( unitset.CODE , ''),
+	 [UnitsetName] =  ISNULL (unitset.NAME , ''),
+	 [SubUnitsetReferenceId] = ISNULL ( subunitset.LOGICALREF, 0),
+	 [SubUnitsetCode] = ISNULL (subunitset.CODE,''),
+	 [SubUnitsetName] = ISNULL (subunitset.NAME , ''),
 	 [WarehouseName] = capiwhouse.NAME,
-	 [Quantity] = STLINE.AMOUNT,
-	 [Length] = ITMUNITA.LENGTH,
-	 [Width] = ITMUNITA.WIDTH,
-	 [Height] = ITMUNITA.HEIGHT,
-	 [Weight] = ITMUNITA.WEIGHT,
-	 [Volume] = ITMUNITA.VOLUME_,
-	  [Barcode] = (SELECT TOP 1 ISNULL(ITMUNITA.BARCODE,'') FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITBARCODE
-	  WHERE ITEMREF = ITMUNITA.ITEMREF AND ITMUNITAREF = ITMUNITA.LOGICALREF AND UNITLINEREF = ITMUNITA.UNITLINEREF)
+	 [Quantity] = ISNULL ( STLINE.AMOUNT,0),
+	 [Length] =  ISNULL ( ITMUNITA.LENGTH , 0),
+	 [Width] = ISNULL  (ITMUNITA.WIDTH,0),
+	 [Height] = ISNULL ( ITMUNITA.HEIGHT,0),
+	 [Weight] = ISNULL  ( ITMUNITA.WEIGHT , 0),
+	 [Volume] = ISNULL  (ITMUNITA.VOLUME_ , 0),
+	  [Barcode] = isnull ((SELECT TOP 1 ISNULL(ITMUNITA.BARCODE,'') FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITBARCODE
+	  WHERE ITEMREF = ITMUNITA.ITEMREF AND ITMUNITAREF = ITMUNITA.LOGICALREF AND UNITLINEREF = ITMUNITA.UNITLINEREF),0)
 from  LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE as STLINE
 Left Join LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE on STLINE.STFICHEREF = STFICHE.LOGICALREF
 left join LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS on STLINE.STOCKREF = ITEMS.LOGICALREF
