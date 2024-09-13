@@ -34,8 +34,11 @@ public partial class PurchasePanelViewModel : BaseViewModel
 
     private async Task LoadItemAsync()
     {
+        if (IsBusy)
+            return;
         try
         {
+            IsBusy = true;
             await Task.WhenAll(GetLastTransactionBySupplierAsync(), GetLastTransactionAsync(), TotalOrderCountsAsync(), ShippedOrderCountsAsync());
 
         }
@@ -48,13 +51,13 @@ public partial class PurchasePanelViewModel : BaseViewModel
         }
         finally
         {
+            IsBusy = false;
         }
     }
     private async Task GetLastTransactionBySupplierAsync()
     {
 
-        if (IsBusy)
-            return;
+     
         try
         {
 
@@ -79,14 +82,12 @@ public partial class PurchasePanelViewModel : BaseViewModel
         }
         finally
         {
-            IsBusy = false;
         }
     }
     private async Task GetLastTransactionAsync()
     {
 
-        if (IsBusy)
-            return;
+     
         try
         {
 
@@ -111,14 +112,11 @@ public partial class PurchasePanelViewModel : BaseViewModel
         }
         finally
         {
-            IsBusy = false;
         }
     }
     private async Task TotalOrderCountsAsync()
     {
 
-        if (IsBusy)
-            return;
         try
         {
 
@@ -130,8 +128,14 @@ public partial class PurchasePanelViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                var response = Convert.ToInt32(result.Data);
-                PurchasePanelModel.AmountTotal = response;
+                foreach (var item in result.Data)
+                {
+                    var value = (Mapping.Mapper.Map<PurchasePanelModel>(item));
+                    PurchasePanelModel.AmountTotal = value.AmountTotal;
+                }
+
+
+
             }
         }
         catch (Exception ex)
@@ -143,14 +147,12 @@ public partial class PurchasePanelViewModel : BaseViewModel
         }
         finally
         {
-            IsBusy = false;
         }
     }
     private async Task ShippedOrderCountsAsync()
     {
 
-        if (IsBusy)
-            return;
+   
         try
         {
 
@@ -162,9 +164,14 @@ public partial class PurchasePanelViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                var response = Convert.ToInt32(result.Data);
-                PurchasePanelModel.ShippedQuantityTotal = response;
+                foreach (var item in result.Data)
+                {
+                    var value = (Mapping.Mapper.Map<PurchasePanelModel>(item));
+                    PurchasePanelModel.ShippedQuantityTotal = value.ShippedQuantityTotal;
+                }
                 PurchasePanelModel.WaitingOrderCount = PurchasePanelModel.AmountTotal - PurchasePanelModel.ShippedQuantityTotal;
+
+
             }
         }
         catch (Exception ex)
@@ -176,7 +183,6 @@ public partial class PurchasePanelViewModel : BaseViewModel
         }
         finally
         {
-            IsBusy = false;
         }
     }
 

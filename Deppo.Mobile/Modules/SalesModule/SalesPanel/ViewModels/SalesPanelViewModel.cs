@@ -5,6 +5,7 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.ProductModels;
+using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
@@ -34,8 +35,11 @@ public partial class SalesPanelViewModel : BaseViewModel
 
     private async Task LoadItemAsync()
     {
+        if (IsBusy)
+            return;
         try
         {
+            IsBusy = true;
             await Task.WhenAll(GetLastTransactionByCustomerAsync(), GetLastTransactionAsync(), TotalOrderCountsAsync(), ShippedOrderCountsAsync());
            
         }
@@ -48,14 +52,15 @@ public partial class SalesPanelViewModel : BaseViewModel
         }
         finally
         {
+            Console.WriteLine(SalesPanelModel);
+            IsBusy = false;
         }
     }
 
     private async Task GetLastTransactionByCustomerAsync()
     {
 
-        if (IsBusy)
-            return;
+       
         try
         {
 
@@ -80,14 +85,13 @@ public partial class SalesPanelViewModel : BaseViewModel
         }
         finally
         {
-            IsBusy = false;
+            
         }
     }
     private async Task GetLastTransactionAsync()
     {
 
-        if (IsBusy)
-            return;
+       
         try
         {
 
@@ -112,14 +116,13 @@ public partial class SalesPanelViewModel : BaseViewModel
         }
         finally
         {
-            IsBusy = false;
+  
         }
     }
     private async Task TotalOrderCountsAsync()
     {
 
-        if (IsBusy)
-            return;
+       
         try
         {
 
@@ -131,8 +134,16 @@ public partial class SalesPanelViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                var response = Convert.ToInt32(result.Data);
-                SalesPanelModel.AmountTotal = response;
+
+                foreach (var item in result.Data)
+                {
+                    var value = (Mapping.Mapper.Map<SalesPanelModel>(item));
+                    SalesPanelModel.AmountTotal = value.AmountTotal;
+                }
+
+
+                var jsonData = result.Data.ToString();
+                var jsonObject = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(jsonData);
             }
         }
         catch (Exception ex)
@@ -142,16 +153,16 @@ public partial class SalesPanelViewModel : BaseViewModel
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
+
         finally
         {
-            IsBusy = false;
+      
         }
     }
     private async Task ShippedOrderCountsAsync()
     {
 
-        if (IsBusy)
-            return;
+       
         try
         {
 
@@ -163,9 +174,14 @@ public partial class SalesPanelViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-               var response = Convert.ToInt32(result.Data);
-                SalesPanelModel.ShippedQuantityTotal = response;
+                foreach (var item in result.Data)
+                {
+                    var value = (Mapping.Mapper.Map<SalesPanelModel>(item));
+                    SalesPanelModel.ShippedQuantityTotal = value.ShippedQuantityTotal;
+                }
+
                 SalesPanelModel.WaitingOrderCount = SalesPanelModel.AmountTotal - SalesPanelModel.ShippedQuantityTotal;
+
             }
         }
         catch (Exception ex)
@@ -177,9 +193,10 @@ public partial class SalesPanelViewModel : BaseViewModel
         }
         finally
         {
-            IsBusy = false;
+           
         }
     }
+  
     
 
 

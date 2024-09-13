@@ -33,8 +33,11 @@ public partial class SalesAnalysisViewModel : BaseViewModel
 
     private async Task LoadItemAsync()
     {
+        if (IsBusy)
+            return;
         try
         {
+            IsBusy = true;
             await Task.WhenAll(LastProduct(), LastCustomer(), DueDatePassedCustomersCount(), DueDatePassedProductsCount(), ReturnProductReferenceCount(), SoldProductReferenceCount());
 
         }
@@ -47,14 +50,14 @@ public partial class SalesAnalysisViewModel : BaseViewModel
         }
         finally
         {
+            IsBusy = false;
         }
     }
 
 
     private async Task DueDatePassedCustomersCount()
       {
-        if (IsBusy)
-            return;
+     
         try
         {
 
@@ -66,8 +69,13 @@ public partial class SalesAnalysisViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                var response = Convert.ToInt32(result.Data);
-                SalesAnalysisModel.DueDatePassedCustomersCount = response;
+                foreach (var item in result.Data)
+                {
+                    var value = (Mapping.Mapper.Map<SalesAnalysisModel>(item));
+                    SalesAnalysisModel.DueDatePassedCustomersCount = value.DueDatePassedCustomersCount;
+                }
+
+
             }
         }
         catch (Exception ex)
@@ -79,13 +87,12 @@ public partial class SalesAnalysisViewModel : BaseViewModel
         }
         finally
         {
-            IsBusy = false;
+           
         }
     }
     private async Task DueDatePassedProductsCount()
     {
-        if (IsBusy)
-            return;
+       
         try
         {
 
@@ -97,8 +104,11 @@ public partial class SalesAnalysisViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                var response = Convert.ToInt32(result.Data);
-                SalesAnalysisModel.DueDatePassedProductsCount = response;
+                foreach (var item in result.Data)
+                {
+                    var value = (Mapping.Mapper.Map<SalesAnalysisModel>(item));
+                    SalesAnalysisModel.DueDatePassedProductsCount = value.DueDatePassedProductsCount;
+                }
             }
         }
         catch (Exception ex)
@@ -110,13 +120,12 @@ public partial class SalesAnalysisViewModel : BaseViewModel
         }
         finally
         {
-            IsBusy = false;
+        
         }
     }
     private async Task ReturnProductReferenceCount()
     {
-        if (IsBusy)
-            return;
+   
         try
         {
 
@@ -128,8 +137,11 @@ public partial class SalesAnalysisViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                var response = Convert.ToInt32(result.Data);
-                SalesAnalysisModel.ReturnProductReferenceCount = response;
+                foreach (var item in result.Data)
+                {
+                    var value = (Mapping.Mapper.Map<SalesAnalysisModel>(item));
+                    SalesAnalysisModel.ReturnProductReferenceCount = value.ReturnProductReferenceCount;
+                }
             }
         }
         catch (Exception ex)
@@ -141,13 +153,12 @@ public partial class SalesAnalysisViewModel : BaseViewModel
         }
         finally
         {
-            IsBusy = false;
+           
         }
     }
     private async Task SoldProductReferenceCount()
     {
-        if (IsBusy)
-            return;
+      
         try
         {
 
@@ -159,8 +170,11 @@ public partial class SalesAnalysisViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                var response = Convert.ToInt32(result.Data);
-                SalesAnalysisModel.SoldProductReferenceCount = response;
+                foreach (var item in result.Data)
+                {
+                    var value = (Mapping.Mapper.Map<SalesAnalysisModel>(item));
+                    SalesAnalysisModel.SoldProductReferenceCount = value.SoldProductReferenceCount;
+                }
             }
         }
         catch (Exception ex)
@@ -172,14 +186,13 @@ public partial class SalesAnalysisViewModel : BaseViewModel
         }
         finally
         {
-            IsBusy = false;
+           
         }
     }
     private async Task LastCustomer()
     {
 
-        if (IsBusy)
-            return;
+  
         try
         {
 
@@ -204,14 +217,12 @@ public partial class SalesAnalysisViewModel : BaseViewModel
         }
         finally
         {
-            IsBusy = false;
+           
         }
     }
     private async Task LastProduct()
     {
 
-        if (IsBusy)
-            return;
         try
         {
 
@@ -236,7 +247,7 @@ public partial class SalesAnalysisViewModel : BaseViewModel
         }
         finally
         {
-            IsBusy = false;
+           
         }
     }
 

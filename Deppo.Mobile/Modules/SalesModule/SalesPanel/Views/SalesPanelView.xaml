@@ -3,9 +3,14 @@
     x:Class="Deppo.Mobile.Modules.SalesModule.SalesPanel.Views.SalesPanelView"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
     xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesPanel.ViewModels"
+    xmlns:toolkit ="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     Title="{Binding Title}"
     x:DataType="viewModel:SalesPanelViewModel">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Loaded" Command="{Binding LoadItemsCommand}" />
+    </ContentPage.Behaviors>
     <VerticalStackLayout>
         <Label
             HorizontalOptions="Center"
