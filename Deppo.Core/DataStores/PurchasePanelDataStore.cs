@@ -264,7 +264,7 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
             string baseQuery = $@"SELECT 
 	ISNULL(COUNT(Distinct ORFLINE.STOCKREF),0) AS ShippedQuantityTotal
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
-WHERE ORFLINE.TRCODE = 1 AND ORFLINE.SHIPPEDAMOUNT > 0";
+WHERE ORFLINE.TRCODE = 2 AND ORFLINE.SHIPPEDAMOUNT > 0";
             return baseQuery;
         }
 
@@ -273,7 +273,7 @@ WHERE ORFLINE.TRCODE = 1 AND ORFLINE.SHIPPEDAMOUNT > 0";
             string baseQuery = $@"SELECT 
 	ISNULL(COUNT(Distinct ORFLINE.STOCKREF),0) AS AmountTotal
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
-WHERE ORFLINE.TRCODE = 1";
+WHERE ORFLINE.TRCODE = 2";
             return baseQuery;
         }
         private string SupplierTransaction(int firmNumber, int periodNumber)

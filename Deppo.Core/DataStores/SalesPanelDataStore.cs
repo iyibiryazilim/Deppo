@@ -263,7 +263,7 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
             string baseQuery = $@"SELECT 
 	ISNULL(COUNT(Distinct ORFLINE.STOCKREF),0) AS ShippedQuantityTotal
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
-WHERE ORFLINE.TRCODE = 2 AND  ORFLINE.SHIPPEDAMOUNT > 0";
+WHERE ORFLINE.TRCODE = 1 AND  ORFLINE.SHIPPEDAMOUNT > 0";
             return baseQuery;
         }
 
@@ -272,22 +272,25 @@ WHERE ORFLINE.TRCODE = 2 AND  ORFLINE.SHIPPEDAMOUNT > 0";
             string baseQuery = $@"SELECT 
 	ISNULL(COUNT(Distinct ORFLINE.STOCKREF),0) AS AmountTotal
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
-WHERE ORFLINE.TRCODE = 2";
+WHERE ORFLINE.TRCODE = 1";
             return baseQuery;
         }
         
         private string CustomerTransaction(int firmNumber, int periodNumber)
         {
             string baseQuery = $@"Select TOP 5
+            [ReferenceId] = STLINE.LOGICALREF,
+            [TransactionDate] = STLINE.DATE_,
+            [TransactionTime] = dbo.LG_INTTOTIME(STLINE.FTIME),
      [SupplierReferenceId] = CLCARD.LOGICALREF,
 	 [SupplierCode] = CLCARD.CODE,
      [SupplierName] = CLCARD.DEFINITION_,
 	 [BaseTransactionReferenceId] = STFICHE.LOGICALREF,
 	 [BaseTransactionCode] = STFICHE.FICHENO,
      [TransactionType] = STLINE.TRCODE,
-	 [GroupCode] = ISNULL(ITEMS.STGRPCODE,''),
+	 [GroupCode] = STFICHE.GRPCODE,
 	 [IOType] = STLINE.IOCODE,
-	 [ProductReferenceId] =  ISNULL(ITEMS.LOGICALREF,0),
+	 [ProductReferenceId] =  ITEMS.LOGICALREF,
 	 [ProductCode] = ISNULL(ITEMS.CODE,''),
 	 [ProductName] = ISNULL(ITEMS.NAME,''),
 	 [UnitsetReferenceId] = ISNULL( unitset.LOGICALREF,0),
@@ -297,23 +300,22 @@ WHERE ORFLINE.TRCODE = 2";
 	 [SubUnitsetCode] = ISNULL (subunitset.CODE,''),
 	 [SubUnitsetName] = ISNULL (subunitset.NAME , ''),
 	 [WarehouseName] = capiwhouse.NAME,
+     [WarehouseNumber] = capiwhouse.NR,
 	 [Quantity] = ISNULL ( STLINE.AMOUNT,0),
-	 [Length] =  ISNULL ( ITMUNITA.LENGTH , 0),
-	 [Width] = ISNULL  (ITMUNITA.WIDTH,0),
-	 [Height] = ISNULL ( ITMUNITA.HEIGHT,0),
-	 [Weight] = ISNULL  ( ITMUNITA.WEIGHT , 0),
-	 [Volume] = ISNULL  (ITMUNITA.VOLUME_ , 0),
-	  [Barcode] = isnull ((SELECT TOP 1 ISNULL(ITMUNITA.BARCODE,'') FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITBARCODE
-	  WHERE ITEMREF = ITMUNITA.ITEMREF AND ITMUNITAREF = ITMUNITA.LOGICALREF AND UNITLINEREF = ITMUNITA.UNITLINEREF),0)
+	 [Length] =  ISNULL ( STLINE.UINFO4 , 0),
+	 [Width] = ISNULL  (STLINE.UINFO5,0),
+	 [Height] = ISNULL ( STLINE.UINFO6,0),
+	 [Weight] = ISNULL  ( STLINE.UINFO7 , 0),
+	 [Volume] = ISNULL  (STLINE.UINFO8 , 0),
+	 [Barcode] = ''
 from  LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE as STLINE
 Left Join LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE on STLINE.STFICHEREF = STFICHE.LOGICALREF
 left join LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS on STLINE.STOCKREF = ITEMS.LOGICALREF
 Left Join LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD as CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
 left join LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS subunitset ON STLINE.UOMREF = subunitset.LOGICALREF
-left join LG_{firmNumber.ToString().PadLeft(3, '0')}_ITMUNITA AS ITMUNITA on subunitset.LOGICALREF = ITMUNITA.UNITLINEREF
 left join LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS unitset ON STLINE.USREF = unitset.LOGICALREF
-LEFT JOIN L_CAPIWHOUSE AS capiwhouse ON STLINE.SOURCEINDEX = capiwhouse.NR
-where CLCARD.Code like  '12%' AND STFICHE.GRPCODE = 2
+LEFT JOIN L_CAPIWHOUSE AS capiwhouse ON STLINE.SOURCEINDEX = capiwhouse.NR AND capiwhouse.FIRMNR = {firmNumber}
+where CLCARD.Code like  '12%' AND STFICHE.TRCODE IN(7,8) AND STLINE.LINETYPE = 0
 order by STLINE.DATE_ desc;";
 
             return baseQuery;
