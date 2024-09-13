@@ -39,7 +39,7 @@ public partial class PurchasePanelViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            await Task.WhenAll(GetLastTransactionBySupplierAsync(), GetLastTransactionAsync(), TotalOrderCountsAsync(), ShippedOrderCountsAsync());
+            await Task.WhenAll(GetLastTransactionBySupplierAsync(), GetLastTransactionAsync(), TotalOrderCountsAsync(), ShippedOrderCountsAsync(), GetLastFicheAsync());
 
         }
         catch (Exception ex)
@@ -116,6 +116,39 @@ public partial class PurchasePanelViewModel : BaseViewModel
         {
         }
     }
+
+    private async Task GetLastFicheAsync()
+    {
+
+
+        try
+        {
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _purchasePanelService.GetLastFiche(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                PurchasePanelModel.LastPurchaseFiche.Clear();
+                foreach (var item in result.Data)
+                    PurchasePanelModel.LastPurchaseFiche.Add(Mapping.Mapper.Map<PurchaseFiche>(item));
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+        }
+    }
+
     private async Task TotalOrderCountsAsync()
     {
 

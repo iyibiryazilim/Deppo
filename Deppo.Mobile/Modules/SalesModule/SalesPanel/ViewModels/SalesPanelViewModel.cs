@@ -40,7 +40,7 @@ public partial class SalesPanelViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            await Task.WhenAll(GetLastTransactionByCustomerAsync(), GetLastTransactionAsync(), TotalOrderCountsAsync(), ShippedOrderCountsAsync());
+            await Task.WhenAll(GetLastTransactionByCustomerAsync(), GetLastTransactionAsync(), TotalOrderCountsAsync(), ShippedOrderCountsAsync(),GetLastFiche());
            
         }
         catch (Exception ex)
@@ -71,7 +71,7 @@ public partial class SalesPanelViewModel : BaseViewModel
             {
                 if (result.Data is null)
                     return;
-
+                SalesPanelModel.LastCustomer.Clear();
                 foreach (var item in result.Data)
                     SalesPanelModel.LastCustomer.Add(Mapping.Mapper.Map<Customer>(item));
             }
@@ -102,6 +102,7 @@ public partial class SalesPanelViewModel : BaseViewModel
             {
                 if (result.Data is null)
                     return;
+                SalesPanelModel.LastCustomerTransaction.Clear();
 
                 foreach (var item in result.Data)
                     SalesPanelModel.LastCustomerTransaction.Add(Mapping.Mapper.Map<CustomerTransaction>(item));
@@ -133,7 +134,6 @@ public partial class SalesPanelViewModel : BaseViewModel
             {
                 if (result.Data is null)
                     return;
-
 
                 foreach (var item in result.Data)
                 {
@@ -196,8 +196,41 @@ public partial class SalesPanelViewModel : BaseViewModel
            
         }
     }
-  
-    
+
+    private async Task GetLastFiche()
+    {
+
+
+        try
+        {
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _salesPanelService.GetLastFiche(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+                SalesPanelModel.LastSalesFiche.Clear();
+                foreach (var item in result.Data)
+                    SalesPanelModel.LastSalesFiche.Add(Mapping.Mapper.Map<SalesFiche>(item));
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+
+        }
+    }
+
+
+
 
 
 }

@@ -23,4 +23,7 @@ public partial class SalesPanelModel :ObservableObject
      int shippedQuantityTotal;
      public ObservableCollection<Customer> LastCustomer { get; } = new();
      public ObservableCollection<CustomerTransaction> LastCustomerTransaction { get; }  = new();
+
+    public ObservableCollection<SalesFiche> LastSalesFiche { get; } = new();
+
 }
