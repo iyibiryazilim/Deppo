@@ -15,12 +15,19 @@ namespace Deppo.Mobile.Core.Models.PurchaseModels
         {
 
         }
-        [ObservableProperty]
-        int waitingOrderCount;
+
+        double waitingOrderCount;
+
         [ObservableProperty]
         int amountTotal;
         [ObservableProperty]
         int shippedQuantityTotal;
+
+        public double WaitingOrderCount
+        {
+            get => waitingOrderCount = (AmountTotal - ShippedQuantityTotal) < 0 ? 0 : (AmountTotal - ShippedQuantityTotal);
+            set => SetProperty(ref waitingOrderCount, value);
+        }
         public ObservableCollection<Supplier> LastSuplier { get; } = new();
         public ObservableCollection<SupplierTransaction> LastSupplierTransaction { get; } = new();
         public ObservableCollection<PurchaseFiche> LastPurchaseFiche { get; } = new();

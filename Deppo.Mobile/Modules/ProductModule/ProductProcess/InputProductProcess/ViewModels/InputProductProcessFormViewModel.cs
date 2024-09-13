@@ -142,6 +142,8 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            _userDialogs.ShowLoading("Ä°ÅŸlem TamamlanÄ±yor...");
+            await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
@@ -193,10 +195,13 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
 
             if(result.IsSuccess)
             {
-                resultModel.Message = "Baþarýlý";
+                resultModel.Message = "BaÅŸarÄ±lÄ±";
                 resultModel.Code = result.Data.Code;
                 resultModel.PageTitle = Title;
                 resultModel.PageCountToBack = (int)InputProductProcessType.ProductionInputProcess + 1;
+
+                if(_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
 
                 await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
                 {
@@ -205,7 +210,11 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
             }
             else
             {
-				resultModel.Message = "Baþarýsýz";
+
+                if(_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+				resultModel.Message = "BaÅŸarÄ±sÄ±z";
                 resultModel.PageTitle = Title;
                 resultModel.PageCountToBack = (int)InputProductProcessType.ProductionInputProcess;
 				await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
