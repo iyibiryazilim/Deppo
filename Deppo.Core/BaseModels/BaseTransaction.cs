@@ -26,6 +26,7 @@ public class BaseTransaction : INotifyPropertyChanged, IDisposable
 	private string _subUnitsetCode = string.Empty;
 	private string _subUnitsetName = string.Empty;
 	private int _warehouseNumber;
+	private string _warehouseName = string.Empty;
 	private double _quantity;
 	private double _length;
 	private double _width;
@@ -329,6 +330,17 @@ public class BaseTransaction : INotifyPropertyChanged, IDisposable
 			if (_warehouseNumber == value) return;
 			_warehouseNumber = value;
 			NotifyPropertyChanged(nameof(WarehouseNumber));
+		}
+	}
+
+	public string WarehouseName
+	{
+		get => _warehouseName;
+		set
+		{
+			if (_warehouseName == value) return;
+			_warehouseName = value;
+			NotifyPropertyChanged(nameof(WarehouseName));
 		}
 	}
 
