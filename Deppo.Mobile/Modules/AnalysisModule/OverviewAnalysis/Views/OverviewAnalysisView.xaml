@@ -2,11 +2,17 @@
 <ContentPage
     x:Class="Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.Views.OverviewAnalysisView"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.ViewModels"
     Title="{Binding Title}"
     x:DataType="viewModel:OverviewAnalysisViewModel">
 
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Loaded"
+                                        Command="{Binding LoadItemsCommand}" />
+    </ContentPage.Behaviors>
 
     <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="10">
         <Grid

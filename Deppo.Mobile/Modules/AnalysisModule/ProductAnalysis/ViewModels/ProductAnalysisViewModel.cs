@@ -1,9 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
-using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.AnalysisModels;
-using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
@@ -75,7 +73,12 @@ public partial class ProductAnalysisViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                ProductAnalysisModel.InputTransactionCount = Convert.ToInt32(result.Data);
+                foreach (var item in result.Data)
+                {
+                    var obj = Mapping.Mapper.Map<ProductAnalysisModel>(item);
+                    ProductAnalysisModel.InputTransactionCount = obj.InputTransactionCount;
+                }
+
             }
         }
         catch (Exception ex)
@@ -107,7 +110,11 @@ public partial class ProductAnalysisViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                ProductAnalysisModel.OutputTransactionCount = Convert.ToInt32(result.Data);
+                foreach (var item in result.Data)
+                {
+                    var obj = Mapping.Mapper.Map<ProductAnalysisModel>(item);
+                    ProductAnalysisModel.OutputTransactionCount = obj.OutputTransactionCount;
+                }
             }
         }
         catch (Exception ex)
@@ -139,7 +146,11 @@ public partial class ProductAnalysisViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                ProductAnalysisModel.NegativeStockProductQuantity = Convert.ToInt32(result.Data);
+                foreach (var item in result.Data)
+                {
+                    var obj = Mapping.Mapper.Map<ProductAnalysisModel>(item);
+                    ProductAnalysisModel.NegativeStockProductQuantity = obj.NegativeStockProductQuantity;
+                }
             }
         }
         catch (Exception ex)
