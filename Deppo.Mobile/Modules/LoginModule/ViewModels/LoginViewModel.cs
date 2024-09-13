@@ -48,7 +48,7 @@ public partial class LoginViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            string baseUri = await SecureStorage.GetAsync("baseUri");
+            string baseUri = "http://172.16.1.25:52789";//await SecureStorage.GetAsync("baseUri");
             if (string.IsNullOrEmpty(baseUri))
                 _httpClientService.BaseUri = "http://172.16.1.25:52789";
             else
@@ -67,7 +67,7 @@ public partial class LoginViewModel : BaseViewModel
             if (!string.IsNullOrEmpty(token))
             {
                 _httpClientService.Token = token;
-                await SecureStorage.SetAsync("token", token);
+                //await SecureStorage.SetAsync("token", token);
                 var companyListViewModel = IPlatformApplication.Current.Services.GetRequiredService<CompanyListViewModel>();
                 Application.Current.MainPage = new CompanyListView(companyListViewModel);
 
