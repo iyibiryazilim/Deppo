@@ -26,7 +26,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.
 public partial class InputProductProcessFormViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
-    private readonly IProductionTransactionService _productionTransactionService;
+    IProductionTransactionService _productionTransactionService;
     private readonly IUserDialogs _userDialogs;
 
 
@@ -187,12 +187,16 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
 			}
 
            var result = await _productionTransactionService.InsertProductionTransaction(httpClient, productionTransactionDto, _httpClientService.FirmNumber);
+            // result.Data.Code = result.Code;
             Console.WriteLine(result);
             ResultModel resultModel = new();
 
             if(result.IsSuccess)
             {
                 resultModel.Message = "Baþarýlý";
+                resultModel.Code = result.Data.Code;
+                resultModel.PageTitle = Title;
+                resultModel.PageCountToBack = (int)InputProductProcessType.ProductionInputProcess + 1;
 
                 await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
                 {
@@ -202,7 +206,8 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
             else
             {
 				resultModel.Message = "Baþarýsýz";
-
+                resultModel.PageTitle = Title;
+                resultModel.PageCountToBack = (int)InputProductProcessType.ProductionInputProcess;
 				await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
                 {
 					[nameof(ResultModel)] = resultModel
