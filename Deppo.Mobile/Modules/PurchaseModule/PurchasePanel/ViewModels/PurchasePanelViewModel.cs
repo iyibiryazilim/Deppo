@@ -50,8 +50,6 @@ public partial class PurchasePanelViewModel : BaseViewModel
         {
         }
     }
-
-
     private async Task GetLastTransactionBySupplierAsync()
     {
 
