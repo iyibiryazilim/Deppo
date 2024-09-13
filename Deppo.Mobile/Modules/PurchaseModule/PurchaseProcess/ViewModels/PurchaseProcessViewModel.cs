@@ -42,10 +42,7 @@ public partial class PurchaseProcessViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessWarehouseListView)}", new Dictionary<string, object>
-        {
-            {nameof(InputProductProcessType), InputProductProcessType.ProductionInputProcess}
-        });
+            await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessWarehouseListView)}");
         }
         catch (Exception ex)
         {

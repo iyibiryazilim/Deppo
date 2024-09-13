@@ -207,23 +207,18 @@ public static class MauiProgram
         builder.Services.AddSingleton<ISalesAnalysisService, SalesAnalysisDataStore>();
         builder.Services.AddSingleton<IPurchasePanelService, PurchasePanelDataStore>();
         builder.Services.AddSingleton<ISalesPanelService, SalesPanelDataStore>();
-        builder.Services.AddSingleton<IOverviewAnalysisService,OverviewAnalysisDataStore>();
+        builder.Services.AddSingleton<IOverviewAnalysisService, OverviewAnalysisDataStore>();
         builder.Services.AddSingleton<IProductAnalysisService, ProductAnalysisDataStore>();
 
-        builder.Services.AddSingleton<IProductionTransactionService ,  ProductionTransactionDataStore>();
+        builder.Services.AddSingleton<IProductionTransactionService, ProductionTransactionDataStore>();
         builder.Services.AddSingleton<IConsumableTransactionService, ConsumableTransactionDataStore>();
         builder.Services.AddSingleton<IInCountingTransactionService, InCountingTransactionDataStore>();
         builder.Services.AddSingleton<IOutCountingTransactionService, OutCountingTransactionDataStore>();
         builder.Services.AddSingleton<IWastageTransactionService, WastageTransactionDataStore>();
 
-
-
         builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
         builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
         builder.Services.AddTransientWithShellRoute<CompanyListView, CompanyListViewModel>(nameof(CompanyListView));
-
-        
-
 
         #region Analysis Modules
 
@@ -246,7 +241,6 @@ public static class MauiProgram
         builder.Services.AddTransientWithShellRoute<WarehouseInputTransactionView, WarehouseInputTransactionViewModel>(nameof(WarehouseInputTransactionView));
         builder.Services.AddTransientWithShellRoute<WarehouseOutputTransactionView, WarehouseOutputTransactionViewModel>(nameof(WarehouseOutputTransactionView));
         builder.Services.AddSingletonWithShellRoute<ProductProcessView, ProductProcessViewModel>(nameof(ProductProcessView));
-
 
         #region ProductionInput Modules
 
@@ -316,8 +310,12 @@ public static class MauiProgram
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseProcessSupplierListView, InputProductPurchaseProcessSupplierListViewModel>(nameof(InputProductPurchaseProcessSupplierListView));
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseProcessProductListView, InputProductPurchaseProcessProductListViewModel>(nameof(InputProductPurchaseProcessProductListView));
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseProcessBasketListView, InputProductPurchaseProcessBasketListViewModel>(nameof(InputProductPurchaseProcessBasketListView));
-        builder.Services.AddScopedWithShellRoute<InputProductPurchaseProcessBasketLocationListView, InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurchaseProcessBasketLocationListView));
+        builder.Services.AddScopedWithShellRoute<InputProductPurchaseProcessBasketLocationListView,
+InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurchaseProcessBasketLocationListView));
+
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseProcessBasketSeriLotListView, InputProductPurchaseProcessBasketSeriLotListViewModel>(nameof(InputProductPurchaseProcessBasketSeriLotListView));
+
+        builder.Services.AddScopedWithShellRoute<InputProductPurchaseProcessFormView, InputProductPurchaseProcessFormViewModel>(nameof(InputProductPurchaseProcessFormView));
 
         #endregion Satınalma İşlemleri
 
@@ -331,6 +329,8 @@ public static class MauiProgram
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessBasketLocationListView, InputProductPurchaseOrderProcessBasketLocationListViewModel>(nameof(InputProductPurchaseOrderProcessBasketLocationListView));
 
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessBasketSeriLotListView, InputProductPurchaseOrderProcessBasketSeriLotListViewModel>(nameof(InputProductPurchaseOrderProcessBasketSeriLotListView));
+
+        builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessFormView, InputProductPurchaseOrderProcessFormViewModel>(nameof(InputProductPurchaseOrderProcessFormView));
 
         #endregion Siparişe Bağlı Satınalma İşlemleri
 

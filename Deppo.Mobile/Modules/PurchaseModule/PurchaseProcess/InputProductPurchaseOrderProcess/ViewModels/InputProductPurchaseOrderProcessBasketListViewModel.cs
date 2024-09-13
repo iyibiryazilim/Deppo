@@ -72,6 +72,8 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
         SeriLotConfirmCommand = new Command(SeriLotConfirm);
         SeriLotCloseCommand = new Command(async () => await SeriLotCloseAsync());
 
+        NextViewCommand = new Command(async () => await NextViewAsync());
+
         BackCommand = new Command(async () => await BackAsync());
     }
 
@@ -139,9 +141,9 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
             SelectedInputPurchaseBasketModel = inputPurchaseBasketModel;
             if (inputPurchaseBasketModel.LocTracking == 1)
             {
-                var nextViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseProcessBasketLocationListViewModel>();
+                var nextViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseOrderProcessBasketLocationListViewModel>();
 
-                await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseProcessBasketLocationListView)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessBasketLocationListView)}", new Dictionary<string, object>
                 {
                     {nameof(WarehouseModel), WarehouseModel},
                     {nameof(InputPurchaseBasketModel), inputPurchaseBasketModel}
@@ -152,10 +154,10 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
             // Sadece SeriLot takipli ise
             else if (inputPurchaseBasketModel.LocTracking == 0 && (inputPurchaseBasketModel.TrackingType == 1 || inputPurchaseBasketModel.TrackingType == 2))
             {
-                await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseProcessBasketSeriLotListView)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessBasketSeriLotListView)}", new Dictionary<string, object>
                 {
                      {nameof(WarehouseModel), WarehouseModel},
-                    {nameof(InputProductBasketModel), inputPurchaseBasketModel}
+                    {nameof(InputPurchaseBasketModel), inputPurchaseBasketModel}
                 });
             }
             //stok yeri ve serilot takipli değilse
@@ -580,6 +582,13 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
                 await _userDialogs.AlertAsync("Sepetinizde ürün bulunmamaktadır.", "Hata", "Tamam");
                 return;
             }
+
+            await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessFormView)}", new Dictionary<string, object>
+            {
+                [nameof(WarehouseModel)] = WarehouseModel,
+                [nameof(PurchaseSupplier)] = PurchaseSupplier,
+                [nameof(Items)] = Items
+            });
         }
         catch (Exception ex)
         {

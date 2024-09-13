@@ -23,7 +23,7 @@ using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOr
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.ViewModels;
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
-[QueryProperty(name: nameof(InputProductBasketModel), queryId: nameof(InputProductBasketModel))]
+[QueryProperty(name: nameof(InputPurchaseBasketModel), queryId: nameof(InputPurchaseBasketModel))]
 public partial class InputProductPurchaseOrderProcessBasketLocationListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -41,6 +41,7 @@ public partial class InputProductPurchaseOrderProcessBasketLocationListViewModel
         _locationService = locationService;
         _serviceProvider = serviceProvider;
 
+        LoadSelectedItemsCommand = new Command(async () => await LoadSelectedItemsAsync());
         ShowLocationsCommand = new Command(async () => await ShowLocationsAsync());
         PerformSearchCommand = new Command<Entry>(async (searchBar) => await PerformSearchAsync(searchBar));
         IncreaseCommand = new Command<LocationModel>(async (locationModel) => await IncreaseAsync(locationModel));
@@ -84,6 +85,8 @@ public partial class InputProductPurchaseOrderProcessBasketLocationListViewModel
     public Command<LocationModel> ItemTappedCommand { get; }
     public Command ConfirmLocationsCommand { get; }
 
+    public Command LoadSelectedItemsCommand { get; }
+
     #endregion Location BottomSheet Commands
 
     private async Task ShowLocationsAsync()
@@ -95,6 +98,43 @@ public partial class InputProductPurchaseOrderProcessBasketLocationListViewModel
         {
             await LoadItemsAsync();
             CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.HalfExpanded;
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    public async Task LoadSelectedItemsAsync()
+    {
+        //if (IsBusy)
+        //    return;
+
+        try
+        {
+            IsBusy = true;
+
+            _userDialogs.ShowLoading("Loading...");
+            await Task.Delay(500);
+
+            SelectedItems.Clear();
+            if (InputPurchaseBasketModel.Details.Count > 0)
+            {
+                foreach (var item in InputPurchaseBasketModel.Details)
+                    SelectedItems.Add(new LocationModel
+                    {
+                        Code = item.LocationCode,
+                        Name = item.LocationName,
+                        StockQuantity = default,
+                        InputQuantity = item.Quantity
+                    });
+            }
+
+            _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
@@ -430,7 +470,7 @@ public partial class InputProductPurchaseOrderProcessBasketLocationListViewModel
                 }
 
                 var totalInputQuantity = SelectedItems.Where(x => x.InputQuantity > 0).Sum(x => x.InputQuantity);
-                previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputPurchaseBasketModel.ItemReferenceId).Quantity = totalInputQuantity;
+                previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputPurchaseBasketModel.ItemReferenceId).InputQuantity = totalInputQuantity;
             }
 
             /* ToDo
