@@ -11,6 +11,7 @@ using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using DevExpress.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesPanel.ViewModels;
 
@@ -30,8 +31,11 @@ public partial class SalesPanelViewModel : BaseViewModel
 
         Title = "Satış Paneli";
         LoadItemsCommand = new Command(async () => await LoadItemAsync());
+        ItemTappedCommand = new Command<SalesFiche>(async (salesFiche) => await ItemTappedAsync(salesFiche));
     }
+    public Page CurrentPage { get; set; }
     public Command LoadItemsCommand { get; }
+    public Command ItemTappedCommand { get; }
 
     private async Task LoadItemAsync()
     {
@@ -40,7 +44,20 @@ public partial class SalesPanelViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            await Task.WhenAll(GetLastTransactionByCustomerAsync(), GetLastTransactionAsync(), TotalOrderCountsAsync(), ShippedOrderCountsAsync(),GetLastFiche());
+            CancellationTokenSource cancellationTokenSource = new();
+
+            _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(500);
+            
+            await Task.WhenAll(TotalOrderCountsAsync(), ShippedOrderCountsAsync()).ContinueWith((task) =>
+            {
+               SalesPanelModel.WaitingOrderCount = SalesPanelModel.AmountTotal - SalesPanelModel.ShippedQuantityTotal;
+            });            
+
+            await Task.WhenAll(GetLastTransactionByCustomerAsync(), GetLastFicheAsync());
+
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
            
         }
         catch (Exception ex)
@@ -53,6 +70,35 @@ public partial class SalesPanelViewModel : BaseViewModel
         finally
         {
             Console.WriteLine(SalesPanelModel);
+            IsBusy = false;
+        }
+    }
+
+    private async Task ItemTappedAsync(SalesFiche salesFiche)
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+            _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(500);
+            await GetLastTransactionAsync(salesFiche);
+            CurrentPage.FindByName<BottomSheet>("ficheTransactionBottomSheet").State = BottomSheetState.HalfExpanded;
+
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
             IsBusy = false;
         }
     }
@@ -88,7 +134,7 @@ public partial class SalesPanelViewModel : BaseViewModel
             
         }
     }
-    private async Task GetLastTransactionAsync()
+    private async Task GetLastTransactionAsync(SalesFiche salesFiche)
     {
 
        
@@ -96,7 +142,7 @@ public partial class SalesPanelViewModel : BaseViewModel
         {
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _salesPanelService.GetLastTransaction(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber);
+            var result = await _salesPanelService.GetLastTransaction(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber,salesFiche.ReferenceId);
 
             if (result.IsSuccess)
             {
@@ -197,7 +243,7 @@ public partial class SalesPanelViewModel : BaseViewModel
         }
     }
 
-    private async Task GetLastFiche()
+    private async Task GetLastFicheAsync()
     {
 
 

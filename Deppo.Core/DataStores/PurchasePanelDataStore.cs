@@ -14,9 +14,9 @@ namespace Deppo.Core.DataStores
         private string postUrl = "/gateway/customQuery/CustomQuery";
 
 
-        public async Task<DataResult<IEnumerable<dynamic>>> SupplierTransaction(HttpClient httpClient, int firmNumber, int periodNumber)
+        public async Task<DataResult<IEnumerable<dynamic>>> SupplierTransaction(HttpClient httpClient, int firmNumber, int periodNumber,int ficheReferenceId)
         {
-            var content = new StringContent(JsonConvert.SerializeObject(SupplierTransaction(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(SupplierTransaction(firmNumber, periodNumber,ficheReferenceId)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -280,14 +280,14 @@ namespace Deppo.Core.DataStores
 			[SpecialCode] = ISNULL  ( STFICHE.SPECODE , ''),
 			[CurrentReferenceID] = ISNULL ( CLCARD.LOGICALREF, 0),
 			[CurrentCode] = ISNULL (CLCARD.CODE , '' ),
-			[CurrentName] = ISNULL ( CLCARD.NAME ,''),
+			[CurrentName] = ISNULL ( CLCARD.DEFINITION_ ,''),
 			[WarehouseName] =  ISNULL (CAPIWHOUSE.NAME , ''),
 			[WarehouseNumber] = ISNULL( CAPIWHOUSE.NR, 0),
 			[Description] =  ISNULL (STFICHE.GENEXP1, '')
-			From LG{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
+			From LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
 			left join LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
-			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX
-			WHERE STFICHE.TRCODE in (1,5) and CLCARD.CODE like '32%'
+			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
+			WHERE STFICHE.TRCODE in (1,5)
 			ORDER BY STFICHE.DATE_ DESC;";
 
             return baseQuery;
@@ -354,9 +354,9 @@ FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft
 WHERE ORFLINE.TRCODE = 2";
             return baseQuery;
         }
-        private string SupplierTransaction(int firmNumber, int periodNumber)
+        private string SupplierTransaction(int firmNumber, int periodNumber,int ficheReferenceId)
         {
-            string baseQuery = $@"Select TOP 5
+            string baseQuery = $@"Select
             [ReferenceId] = STLINE.LOGICALREF,
             [TransactionDate] = STLINE.DATE_,
             [TransactionTime] = dbo.LG_INTTOTIME(STLINE.FTIME),
@@ -393,7 +393,7 @@ Left Join LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD as CLCARD ON STLINE.
 left join LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS subunitset ON STLINE.UOMREF = subunitset.LOGICALREF
 left join LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS unitset ON STLINE.USREF = unitset.LOGICALREF
 LEFT JOIN L_CAPIWHOUSE AS capiwhouse ON STLINE.SOURCEINDEX = capiwhouse.NR AND capiwhouse.FIRMNR = {firmNumber}
-where CLCARD.Code like  '32%' AND STFICHE.TRCODE IN(1,5) AND STLINE.LINETYPE = 0
+where STFICHE.TRCODE IN(1,5) AND STLINE.LINETYPE = 0 AND STLINE.STFICHEREF = {ficheReferenceId}
 order by STLINE.DATE_ desc;";
 
             return baseQuery;

@@ -11,7 +11,7 @@ namespace Deppo.Core.Services;
 public interface ISalesPanelService
 {
     Task<DataResult<IEnumerable<dynamic>>> GetLastTransactionByCustomer(HttpClient httpClient , int firmNumber, int periodNumber);
-    Task<DataResult<IEnumerable<dynamic>>> GetLastTransaction(HttpClient httpClient , int firmNumber, int periodNumber);
+    Task<DataResult<IEnumerable<dynamic>>> GetLastTransaction(HttpClient httpClient , int firmNumber, int periodNumber,int ficheReferenceId);
 
     Task<DataResult<IEnumerable<dynamic>>> GetLastFiche(HttpClient httpClient, int firmNumber, int periodNumber);
 

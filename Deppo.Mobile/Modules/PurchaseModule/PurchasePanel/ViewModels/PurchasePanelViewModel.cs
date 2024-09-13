@@ -9,6 +9,7 @@ using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using DevExpress.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchasePanel.ViewModels;
 
@@ -21,16 +22,20 @@ public partial class PurchasePanelViewModel : BaseViewModel
     [ObservableProperty]
     PurchasePanelModel purchasePanelModel = new();
 
-    public PurchasePanelViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService , IPurchasePanelService purchasePanelService)
+    public PurchasePanelViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, IPurchasePanelService purchasePanelService)
     {
-        
+
         _httpClientService = httpClientService;
         _purchasePanelService = purchasePanelService;
         _userDialogs = userDialogs;
-        Title = "Satınalma Paneli";       
+        Title = "Satınalma Paneli";
         LoadItemsCommand = new Command(async () => await LoadItemAsync());
+        ItemTappedCommand = new Command<PurchaseFiche>(async (purchaseFiche) => await ItemTappedAsync(purchaseFiche));
     }
-    public Command LoadItemsCommand { get;  }
+
+    public Page CurrentPage { get; set; }
+    public Command LoadItemsCommand { get; }
+    public Command ItemTappedCommand { get; }
 
     private async Task LoadItemAsync()
     {
@@ -39,7 +44,21 @@ public partial class PurchasePanelViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            await Task.WhenAll(GetLastTransactionBySupplierAsync(), GetLastTransactionAsync(), TotalOrderCountsAsync(), ShippedOrderCountsAsync(), GetLastFicheAsync());
+
+            CancellationTokenSource cancellationTokenSource = new();
+
+            _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(500);
+            
+            await Task.WhenAll(TotalOrderCountsAsync(), ShippedOrderCountsAsync()).ContinueWith((task) =>
+            {
+               PurchasePanelModel.WaitingOrderCount = PurchasePanelModel.AmountTotal - PurchasePanelModel.ShippedQuantityTotal;
+            });            
+
+            await Task.WhenAll(GetLastTransactionBySupplierAsync(), GetLastFicheAsync());
+
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
         }
         catch (Exception ex)
@@ -54,10 +73,40 @@ public partial class PurchasePanelViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+    private async Task ItemTappedAsync(PurchaseFiche purchaseFiche)
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+            _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(500);
+            await GetLastTransactionAsync(purchaseFiche);
+            CurrentPage.FindByName<BottomSheet>("ficheTransactionBottomSheet").State = BottomSheetState.HalfExpanded;
+
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
     private async Task GetLastTransactionBySupplierAsync()
     {
 
-     
+
         try
         {
 
@@ -85,15 +134,14 @@ public partial class PurchasePanelViewModel : BaseViewModel
         {
         }
     }
-    private async Task GetLastTransactionAsync()
+    private async Task GetLastTransactionAsync(PurchaseFiche purchaseFiche)
     {
 
-     
         try
         {
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _purchasePanelService.SupplierTransaction(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber);
+            var result = await _purchasePanelService.SupplierTransaction(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, purchaseFiche.ReferenceId);
 
             if (result.IsSuccess)
             {
@@ -187,7 +235,7 @@ public partial class PurchasePanelViewModel : BaseViewModel
     private async Task ShippedOrderCountsAsync()
     {
 
-   
+
         try
         {
 
@@ -204,7 +252,7 @@ public partial class PurchasePanelViewModel : BaseViewModel
                     var value = (Mapping.Mapper.Map<PurchasePanelModel>(item));
                     PurchasePanelModel.ShippedQuantityTotal = value.ShippedQuantityTotal;
                 }
-                PurchasePanelModel.WaitingOrderCount = PurchasePanelModel.AmountTotal - PurchasePanelModel.ShippedQuantityTotal;
+                //PurchasePanelModel.WaitingOrderCount = PurchasePanelModel.AmountTotal - PurchasePanelModel.ShippedQuantityTotal;
 
 
             }
