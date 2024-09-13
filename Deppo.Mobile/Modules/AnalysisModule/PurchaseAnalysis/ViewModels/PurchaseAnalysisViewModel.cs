@@ -35,8 +35,11 @@ public partial class PurchaseAnalysisViewModel : BaseViewModel
 
     private async Task LoadItemAsync()
     {
+        if (IsBusy)
+            return;
         try
         {
+            IsBusy = true;
             await Task.WhenAll(LastProduct(), LastSupplier(), DueDatePassedSupplierCount(), DueDatePassedProductsCount(), ReturnProductReferenceCount(), PurchaseProductReferenceCount());
 
         }
@@ -49,13 +52,14 @@ public partial class PurchaseAnalysisViewModel : BaseViewModel
         }
         finally
         {
+            IsBusy = false;
+
         }
     }
 
     private async Task DueDatePassedSupplierCount()
     {
-        if (IsBusy)
-            return;
+       
         try
         {
 
@@ -67,8 +71,14 @@ public partial class PurchaseAnalysisViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                var response = Convert.ToInt32(result.Data);
-                PurchaseAnalysisModel.DueDatePassedSuppliersCount = response;
+
+                foreach (var item in result.Data)
+                {
+                    var value = (Mapping.Mapper.Map<PurchaseAnalysisModel>(item));
+                    PurchaseAnalysisModel.DueDatePassedSuppliersCount = value.DueDatePassedSupplierCount;
+                }
+
+
             }
         }
         catch (Exception ex)
@@ -78,15 +88,11 @@ public partial class PurchaseAnalysisViewModel : BaseViewModel
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
-        finally
-        {
-            IsBusy = false;
-        }
+        
     }
     private async Task DueDatePassedProductsCount()
     {
-        if (IsBusy)
-            return;
+       
         try
         {
 
@@ -98,8 +104,11 @@ public partial class PurchaseAnalysisViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                var response = Convert.ToInt32(result.Data);
-                PurchaseAnalysisModel.DueDatePassedProductsCount = response;
+                foreach (var item in result.Data)
+                {
+                    var value = (Mapping.Mapper.Map<PurchaseAnalysisModel>(item));
+                    PurchaseAnalysisModel.DueDatePassedProductsCount = value.DueDatePassedProductsCount;
+                }
             }
         }
         catch (Exception ex)
@@ -109,15 +118,11 @@ public partial class PurchaseAnalysisViewModel : BaseViewModel
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
-        finally
-        {
-            IsBusy = false;
-        }
+       
     }
     private async Task ReturnProductReferenceCount()
     {
-        if (IsBusy)
-            return;
+     
         try
         {
 
@@ -129,8 +134,11 @@ public partial class PurchaseAnalysisViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                var response = Convert.ToInt32(result.Data);
-                PurchaseAnalysisModel.ReturnProductReferenceCount = response;
+                foreach (var item in result.Data)
+                {
+                    var value = (Mapping.Mapper.Map<PurchaseAnalysisModel>(item));
+                    PurchaseAnalysisModel.ReturnProductReferenceCount = value.ReturnProductReferenceCount;
+                }
             }
         }
         catch (Exception ex)
@@ -140,15 +148,11 @@ public partial class PurchaseAnalysisViewModel : BaseViewModel
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
-        finally
-        {
-            IsBusy = false;
-        }
+        
     }
     private async Task PurchaseProductReferenceCount()
     {
-        if (IsBusy)
-            return;
+        
         try
         {
 
@@ -160,8 +164,11 @@ public partial class PurchaseAnalysisViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                var response = Convert.ToInt32(result.Data);
-                PurchaseAnalysisModel.PurchaseProductReferenceCount = response;
+                foreach (var item in result.Data)
+                {
+                    var value = (Mapping.Mapper.Map<PurchaseAnalysisModel>(item));
+                    PurchaseAnalysisModel.PurchaseProductReferenceCount = value.PurchaseProductReferenceCount;
+                }
             }
         }
         catch (Exception ex)
@@ -171,16 +178,11 @@ public partial class PurchaseAnalysisViewModel : BaseViewModel
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
-        finally
-        {
-            IsBusy = false;
-        }
+       
     }
     private async Task LastSupplier()
     {
 
-        if (IsBusy)
-            return;
         try
         {
 
@@ -203,16 +205,12 @@ public partial class PurchaseAnalysisViewModel : BaseViewModel
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
-        finally
-        {
-            IsBusy = false;
-        }
+        
     }
     private async Task LastProduct()
     {
 
-        if (IsBusy)
-            return;
+        
         try
         {
 
@@ -235,9 +233,6 @@ public partial class PurchaseAnalysisViewModel : BaseViewModel
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
-        finally
-        {
-            IsBusy = false;
-        }
+       
     }
 }
