@@ -385,7 +385,7 @@ ORDER BY Date_ DESC, Time DESC;
 
     private string GetInputProductQuantityQuery(int firmNumber, int periodNumber)
     {
-        string baseQuery = $@"SELECT COUNT(DISTINCT STLINE.STOCKREF) AS InputProductCount 
+        string baseQuery = $@"SELECT COUNT(DISTINCT STLINE.STOCKREF) AS InputProductQuantity 
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE STLINE 
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STFICHE.LOGICALREF = STLINE.STFICHEREF
 WHERE STLINE.IOCODE IN (1,2) AND STFICHE.GRPCODE = 3";
@@ -395,7 +395,7 @@ WHERE STLINE.IOCODE IN (1,2) AND STFICHE.GRPCODE = 3";
 
     private string GetOutputProductQuantityQuery(int firmNumber, int periodNumber)
     {
-        string baseQuery = $@"SELECT COUNT(DISTINCT STLINE.STOCKREF) AS OutputProductCount 
+        string baseQuery = $@"SELECT COUNT(DISTINCT STLINE.STOCKREF) AS OutputProductQuantity 
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE STLINE 
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STFICHE.LOGICALREF = STLINE.STFICHEREF
 WHERE STLINE.IOCODE IN (3,4) AND STFICHE.GRPCODE = 3";

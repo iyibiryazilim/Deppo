@@ -4,6 +4,7 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.AnalysisModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 
 namespace Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.ViewModels;
@@ -72,7 +73,11 @@ public partial class OverviewAnalysisViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                OverviewAnalysisModel.TotalProductCount = Convert.ToInt32(result.Data);
+                foreach (var item in result.Data)
+                {
+                    var obj = Mapping.Mapper.Map<OverviewAnalysisModel>(item);
+                    OverviewAnalysisModel.TotalProductCount = obj.TotalProductCount;
+                }
             }
         }
         catch (Exception ex)
@@ -90,11 +95,9 @@ public partial class OverviewAnalysisViewModel : BaseViewModel
 
     private async Task GetTotalInputProductCountAsync()
     {
-        if (IsBusy)
-            return;
+
         try
         {
-            IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _overviewAnalysisService.GetTotalInputProductCountAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber);
@@ -104,7 +107,11 @@ public partial class OverviewAnalysisViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                OverviewAnalysisModel.TotalInputProductCount = Convert.ToInt32(result.Data);
+                foreach (var item in result.Data)
+                {
+                    var obj = Mapping.Mapper.Map<OverviewAnalysisModel>(item);
+                    OverviewAnalysisModel.TotalInputProductCount = obj.TotalInputProductCount;
+                }
             }
         }
         catch (Exception ex)
@@ -114,19 +121,14 @@ public partial class OverviewAnalysisViewModel : BaseViewModel
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
-        finally
-        {
-            IsBusy = false;
-        }
+
     }
 
     private async Task GetTotalOutputProductCountAsync()
     {
-        if (IsBusy)
-            return;
+
         try
         {
-            IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _overviewAnalysisService.GetTotalOutputProductCountAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber);
@@ -136,7 +138,11 @@ public partial class OverviewAnalysisViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                OverviewAnalysisModel.TotalOutputProductCount = Convert.ToInt32(result.Data);
+                foreach (var item in result.Data)
+                {
+                    var obj = Mapping.Mapper.Map<OverviewAnalysisModel>(item);
+                    OverviewAnalysisModel.TotalOutputProductCount = obj.TotalOutputProductCount;
+                }
             }
         }
         catch (Exception ex)
@@ -146,19 +152,14 @@ public partial class OverviewAnalysisViewModel : BaseViewModel
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
-        finally
-        {
-            IsBusy = false;
-        }
+
     }
 
     private async Task GetInputTransactionCountAsync()
     {
-        if (IsBusy)
-            return;
+
         try
         {
-            IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _overviewAnalysisService.GetInputTransactionCountAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber);
@@ -168,7 +169,11 @@ public partial class OverviewAnalysisViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                OverviewAnalysisModel.InputTransactionCount = Convert.ToInt32(result.Data);
+                foreach (var item in result.Data)
+                {
+                    var obj = Mapping.Mapper.Map<OverviewAnalysisModel>(item);
+                    OverviewAnalysisModel.InputTransactionCount = obj.InputTransactionCount;
+                }
             }
         }
         catch (Exception ex)
@@ -178,16 +183,12 @@ public partial class OverviewAnalysisViewModel : BaseViewModel
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
-        finally
-        {
-            IsBusy = false;
-        }
+
     }
 
     private async Task GetOutputTransactionCountAsync()
     {
-        if (IsBusy)
-            return;
+
         try
         {
             IsBusy = true;
@@ -200,7 +201,11 @@ public partial class OverviewAnalysisViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                OverviewAnalysisModel.TotalOutputProductCount = Convert.ToInt32(result.Data);
+                foreach (var item in result.Data)
+                {
+                    var obj = Mapping.Mapper.Map<OverviewAnalysisModel>(item);
+                    OverviewAnalysisModel.OutputTransactionCount = obj.OutputTransactionCount;
+                }
             }
         }
         catch (Exception ex)
@@ -210,10 +215,7 @@ public partial class OverviewAnalysisViewModel : BaseViewModel
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
-        finally
-        {
-            IsBusy = false;
-        }
+
     }
 
 }

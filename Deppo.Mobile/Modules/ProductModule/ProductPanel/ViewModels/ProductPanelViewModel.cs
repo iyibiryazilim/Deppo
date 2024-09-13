@@ -171,8 +171,12 @@ public partial class ProductPanelViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
+                foreach (var item in result.Data)
+                {
+                    var obj = Mapping.Mapper.Map<ProductPanelModel>(item);
+                    ProductPanelModel.InputProductQuantity = obj.InputProductQuantity;
+                }
 
-                ProductPanelModel.InputProductQuantity = Convert.ToInt32(result.Data);
             }
         }
         catch (Exception ex)
@@ -204,7 +208,11 @@ public partial class ProductPanelViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                ProductPanelModel.OutputProductQuantity = Convert.ToInt32(result.Data);
+                foreach (var item in result.Data)
+                {
+                    var obj = Mapping.Mapper.Map<ProductPanelModel>(item);
+                    ProductPanelModel.OutputProductQuantity = obj.OutputProductQuantity;
+                }
             }
         }
         catch (Exception ex)
