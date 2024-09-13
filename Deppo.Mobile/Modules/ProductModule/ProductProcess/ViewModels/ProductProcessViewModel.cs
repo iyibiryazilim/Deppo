@@ -27,9 +27,6 @@ public partial class ProductProcessViewModel : BaseViewModel
         ConsumableProcessCommand = new Command(async () => await ConsumableProcessAsync());
         UnderCountProcessCommand = new Command(async () => await UnderCountProcessAsync());
         WasteProcessCommand = new Command(async () => await WasteProcessAsync());
-
-        SuccessPageCommand = new Command(async () => await SuccessPageAsync());
-        FailurePageCommand = new Command(async () => await FailurePageAsync());
     }
 
     public Command ProductionInputCommand { get; }
@@ -85,34 +82,4 @@ public partial class ProductProcessViewModel : BaseViewModel
 			{ nameof(OutputProductProcessType), OutputProductProcessType.WasteProcess }
 		});
 	}
-
-
-    [Obsolete("Geçiçi olarak kullanılıyor")]
-    private async Task SuccessPageAsync()
-    {
-        var resultModel = new ResultModel
-        {
-            Message = "Başarılı"
-        };
-
-        await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
-        {
-            [nameof(ResultModel)] = resultModel
-        });
-    }
-
-	[Obsolete("Geçiçi olarak kullanılıyor")]
-	private async Task FailurePageAsync()
-	{
-		var resultModel = new ResultModel
-		{
-			Message = "Başarısız"
-		};
-
-		await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
-		{
-			[nameof(ResultModel)] = resultModel
-		});
-	}
-
 }

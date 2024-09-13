@@ -13,14 +13,13 @@ namespace Deppo.Core.DataStores
 {
     public class ProductionTransactionDataStore : IProductionTransactionService
     {
-        private string postUrl = "/gateway/product/ProductionTransaction/Tiger";
+       //private string postUrl = "/gateway/product/ProductionTransaction/Tiger";
 
         public async Task<DataResult<ResponseModel>> InsertProductionTransaction(HttpClient httpClient, ProductionTransactionInsert dto, int firmNumber)
         {
-            if (firmNumber != null)
-            {
-                postUrl = $"/gateway/product/ProductionTransaction/Tiger?firmNumber={firmNumber}";
-            }
+          
+        var  postUrl = $"/gateway/product/ProductionTransaction/Tiger?firmNumer={firmNumber}";
+            
             
 
         var result = new DataResult<ResponseModel>();
@@ -48,10 +47,10 @@ namespace Deppo.Core.DataStores
 				
 					var message = await responseMessage.Content.ReadAsStringAsync();
                     Console.WriteLine(message);
-                    return null;
-					//var jsonObject = JObject.Parse(message);
-					//var errors = jsonObject["errors"];
-					//var nameErrors = errors["Name"];
+                    //var jsonObject = JObject.Parse(message);
+                    //var errors = jsonObject["errors"];
+                    //var nameErrors = errors["Name"];
+                    return result;
 				}
 			}
             catch (Exception ex)

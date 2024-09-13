@@ -11,6 +11,9 @@ public partial class ResultModel : ObservableObject
 	string message = string.Empty;
 
 	[ObservableProperty]
-	int pageCountToBack;
+	string code = string.Empty;
+
+	[ObservableProperty]
+	int pageCountToBack = 0;
 
 }
