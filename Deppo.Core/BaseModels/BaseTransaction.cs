@@ -168,7 +168,6 @@ public class BaseTransaction : INotifyPropertyChanged, IDisposable
 			_iOType = value;
 			NotifyPropertyChanged(nameof(IOType));
 			NotifyPropertyChanged(nameof(IOTypeName));
-			NotifyPropertyChanged(nameof(IOTypeImageSource));
 		}
 	}
 
@@ -192,21 +191,20 @@ public class BaseTransaction : INotifyPropertyChanged, IDisposable
 		}
 	}
 
-	public string IOTypeImageSource
+	public string IOTypeImageSource => IOTypeName switch
 	{
-		get
-		{
-			switch (_iOTypeName)
-			{
-				case "Giriş":
-					return "arrow-up";
-				case "Çıkış":
-					return "arrow-down";
-				default:
-					return "";
-			}
-		}
-	}
+		"Giriş" => "arrow-up",
+		"Çıkış" => "arrow-down",
+		_ => ""
+	};
+
+	public string IOTypeColor => IOTypeName switch
+	{
+		"Giriş" => "#44B0C0",
+		"Çıkış" => "#F5004F",
+		_ => "#141414"
+	};
+
 
 	[Browsable(false)]
 	public int GroupCode

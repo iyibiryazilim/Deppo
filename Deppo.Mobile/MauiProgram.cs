@@ -182,6 +182,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<ICustomerService, CustomerDataStoreV2>();
         builder.Services.AddSingleton<IWaitingSalesOrderService, WaitingSalesOrderDataStore>();
         builder.Services.AddSingleton<ISupplierService, SupplierDataStoreV2>();
+        builder.Services.AddSingleton<IProductTransactionService, ProductTransactionDataStore>();
         builder.Services.AddSingleton<IWarehouseTransactionService, WarehouseTransactionDataStore>();
         builder.Services.AddSingleton<ICustomerTransactionService, CustomerTransactionDataStore>();
         builder.Services.AddSingleton<ISupplierTransactionService, SupplierTransactionDataStore>();
@@ -195,7 +196,6 @@ public static class MauiProgram
         builder.Services.AddSingleton<ISeriLotService, SeriLotDataStore>();
         builder.Services.AddSingleton<ILocationService, LocationDataStore>();
         builder.Services.AddSingleton<IWaitingPurchaseOrderService, WaitingPurchaseOrderDataStore>();
-        builder.Services.AddSingleton<IWaitingSalesOrderService, WaitingSalesOrderDataStore>();
         builder.Services.AddSingleton<IPurchaseSupplierService, PurchaseSupplierDataStore>();
         builder.Services.AddSingleton<IPurchaseSupplierProductService, PurchaseSupplierProductDataStore>();
         builder.Services.AddSingleton<ISalesCustomerService, SalesCustomerDataStore>();
