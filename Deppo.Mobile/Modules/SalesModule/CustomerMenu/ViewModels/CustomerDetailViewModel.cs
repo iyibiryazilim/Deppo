@@ -9,9 +9,11 @@ using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views;
 using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views;
+using DevExpress.Data.Async.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,6 +24,7 @@ public partial class CustomerDetailViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
     private readonly ICustomerService _customerService;
+    private readonly ICustomerTransactionService _customerTransactionService;
     private readonly IUserDialogs _userDialogs;
     private readonly ICustomQueryService _customQueryService;
 
@@ -30,11 +33,13 @@ public partial class CustomerDetailViewModel : BaseViewModel
 
     public CustomerDetailViewModel(IHttpClientService httpClientService,
     ICustomerService customerService,
-    IUserDialogs userDialogs,
+	ICustomerTransactionService customerTransactionService,
+	IUserDialogs userDialogs,
     ICustomQueryService customQueryService)
     {
         _httpClientService = httpClientService;
         _customerService = customerService;
+        _customerTransactionService = customerTransactionService;
         _userDialogs = userDialogs;
         _customQueryService = customQueryService;
 
@@ -55,11 +60,14 @@ public partial class CustomerDetailViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
+			_userDialogs.Loading("Loading Items...");
             await Task.Delay(1000);
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            // Querylerde yer alan firma numarasi dinamik olarak alinacak
             await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastTransactionsAsync(httpClient));
+
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
@@ -70,7 +78,6 @@ public partial class CustomerDetailViewModel : BaseViewModel
         }
         finally
         {
-            Console.WriteLine(CustomerDetailModel);
             IsBusy = false;
         }
     }
@@ -103,39 +110,20 @@ public partial class CustomerDetailViewModel : BaseViewModel
         }
     }
 
-    private async Task GetLastTransactionsAsync(HttpClient httpclient)
+    private async Task GetLastTransactionsAsync(HttpClient httpClient)
     {
         try
         {
-            var query = @$"SELECT Top 5
 
-        [TransactionDate] = STLINE.DATE_,
-        [TransactionTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
-		[BaseTransactionReferenceId] = STFICHE.LOGICALREF,
-        [BaseTransactionCode] = STFICHE.FICHENO,
-        [TransactionType] = STLINE.TRCODE,
-        [SubUnitsetCode] = ISNULL(SUBUNITSET.CODE, ''),
-        [SubUnitsetReferenceId] = ISNULL(SUBUNITSET.LOGICALREF, 0),
-        [UnitsetCode] = ISNULL(UNITSET.CODE,''),
-        [UnitsetReferenceId] = ISNULL(UNITSET.LOGICALREF, ''),
-        [Quantity] = STLINE.AMOUNT,
-        [IOType] = STLINE.IOCODE,
-        [WarehouseName] = CAPIWHOUSE.NAME,
-		[CustomerReferenceId] = ISNULL(CLCARD.LOGICALREF, ''),
-		[CustomerCode] = CLCARD.CODE,
-		[CustomerName] = CLCARD.DEFINITION_,
-        [ProductCode]=ITEMS.CODE,
-        [ProductName]=ITEMS.NAME
-        FROM LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
-        LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
-        LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF
-		LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
-        LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
-        LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
-		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {_httpClientService.FirmNumber}
-		WHERE STLINE.IOCODE IN (1,2,3,4) AND STFICHE.TRCODE IN (1,2,3,7,6,8)  AND STLINE.STFICHEREF <> 0 AND STLINE.USREF <> 0 AND STLINE.UOMREF <> 0 AND  CLCARD.LOGICALREF = {CustomerDetailModel.Customer.ReferenceId}  ORDER BY STLINE.DATE_ DESC";
-
-            var result = await _customQueryService.GetObjectsAsync(httpclient, query);
+            var result = await _customerTransactionService.GetObjects(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                customerReferenceId: CustomerDetailModel.Customer.ReferenceId,
+                search: "",
+                skip: 0,
+                take: 5
+            );
 
             if (result.IsSuccess)
             {

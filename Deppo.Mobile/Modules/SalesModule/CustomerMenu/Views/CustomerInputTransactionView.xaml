@@ -138,7 +138,7 @@
                                                 <FontImageSource FontFamily="FAS"
                                                                  Glyph="{Binding IOTypeImageSource}"
                                                                  Size="16"
-                                                                 Color="{StaticResource Primary}" />
+                                                                 Color="{Binding IOTypeColor}" />
                                             </Image.Source>
                                         </Image>
                                         <Label FontAttributes="None"
