@@ -2,204 +2,183 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
-using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
+namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels;
+
+[QueryProperty(name: nameof(SupplierDetailModel), queryId: nameof(SupplierDetailModel))]
+public partial class SupplierDetailViewModel : BaseViewModel
 {
-    [QueryProperty(name: nameof(SupplierDetailModel), queryId: nameof(SupplierDetailModel))]
-    public partial class SupplierDetailViewModel : BaseViewModel
-    {
-        private readonly IHttpClientService _httpClientService;
-        private readonly ICustomQueryService _customQueryService;
-        private readonly IUserDialogs _userDialogs;
+	private readonly IHttpClientService _httpClientService;
+	private readonly ISupplierTransactionService _supplierTransactionService;
+	private readonly ICustomQueryService _customQueryService;
+	private readonly IUserDialogs _userDialogs;
 
-        [ObservableProperty]
-        private SupplierDetailModel supplierDetailModel = null!;
+	[ObservableProperty]
+	private SupplierDetailModel supplierDetailModel = null!;
 
-        public SupplierDetailViewModel(IHttpClientService httpClientService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
-        {
-            Title = "Tedarikçi Detayı";
+	public SupplierDetailViewModel(IHttpClientService httpClientService, ISupplierTransactionService supplierTransactionService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
+	{
+		Title = "Tedarikçi Detayı";
 
-            _httpClientService = httpClientService;
-            _customQueryService = customQueryService;
-            _userDialogs = userDialogs;
+		_httpClientService = httpClientService;
+		_supplierTransactionService = supplierTransactionService;
+		_customQueryService = customQueryService;
+		_userDialogs = userDialogs;
 
-            LoadItemsCommand = new Command(async () => await LoadItemsAsync());
-            InputQuantityTappedCommand = new Command(async () => await InputQuantityTappedAsync());
-            OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
-        }
+		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+		InputQuantityTappedCommand = new Command(async () => await InputQuantityTappedAsync());
+		OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
+	}
 
-        public Command LoadItemsCommand { get; }
-        public Command InputQuantityTappedCommand { get; }
+	public Command LoadItemsCommand { get; }
+	public Command InputQuantityTappedCommand { get; }
 
-        public Command OutputQuantityTappedCommand { get; }
+	public Command OutputQuantityTappedCommand { get; }
 
-        private async Task LoadItemsAsync()
-        {
-            try
-            {
-                IsBusy = true;
+	private async Task LoadItemsAsync()
+	{
+		try
+		{
+			IsBusy = true;
 
-                var httpClient = _httpClientService.GetOrCreateHttpClient();
-                await Task.Delay(1000);
 
-                // Querylerde yer alan firma numarasi dinamik olarak alinacak
-                await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastTransactionsAsync(httpClient));
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
+			_userDialogs.Loading("Loading Items...");
+			await Task.Delay(1000);
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-                _userDialogs.Alert(message: ex.Message, title: "Hata...");
-            }
-            finally
-            {
-                Console.WriteLine(SupplierDetailModel);
-                IsBusy = false;
-            }
-        }
+			await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastTransactionsAsync(httpClient));
 
-        private async Task GetInputOutputQuantityAsync(HttpClient httpClient)
-        {
-            try
-            {
-                var query = @$"SELECT
-                    [InputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(1, 2) AND CLIENTREF = {SupplierDetailModel.Supplier.ReferenceId}),
-                    [OutputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_001_02_STLINE WHERE IOCODE IN(3, 4) AND CLIENTREF = {SupplierDetailModel.Supplier.ReferenceId})";
+			_userDialogs.HideHud();
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
 
-                var result = await _customQueryService.GetObjectAsync(httpClient, query);
+			_userDialogs.Alert(message: ex.Message, title: "Hata...");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 
-                if (result.IsSuccess)
-                {
-                    if (result.Data == null)
-                        return;
-                    var obj = Mapping.Mapper.Map<SupplierDetailModel>(result.Data);
-                    SupplierDetailModel.InputQuantity = obj.InputQuantity;
-                    SupplierDetailModel.OutputQuantity = obj.OutputQuantity;
-                }
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
+	private async Task GetInputOutputQuantityAsync(HttpClient httpClient)
+	{
+		try
+		{
+			var query = @$"SELECT
+                    [InputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STLINE WHERE IOCODE IN(1, 2) AND CLIENTREF = {SupplierDetailModel.Supplier.ReferenceId}),
+                    [OutputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STLINE WHERE IOCODE IN(3, 4) AND CLIENTREF = {SupplierDetailModel.Supplier.ReferenceId})";
 
-                _userDialogs.Alert(message: ex.Message, title: "Hata");
-            }
-        }
+			var result = await _customQueryService.GetObjectAsync(httpClient, query);
 
-        private async Task GetLastTransactionsAsync(HttpClient httpclient)
-        {
-            try
-            {
-                var query = @$"SELECT Top 5
+			if (result.IsSuccess)
+			{
+				if (result.Data == null)
+					return;
+				var obj = Mapping.Mapper.Map<SupplierDetailModel>(result.Data);
+				SupplierDetailModel.InputQuantity = obj.InputQuantity;
+				SupplierDetailModel.OutputQuantity = obj.OutputQuantity;
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
 
-        [TransactionDate] = STLINE.DATE_,
-        [TransactionTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
-		[BaseTransactionReferenceId] = STFICHE.LOGICALREF,
-        [BaseTransactionCode] = STFICHE.FICHENO,
-        [TransactionType] = STLINE.TRCODE,
-        [SubUnitsetCode] = SUBUNITSET.CODE,
-        [SubUnitsetReferenceId] = SUBUNITSET.LOGICALREF,
-        [UnitsetCode] = UNITSET.CODE,
-        [UnitsetReferenceId] = UNITSET.LOGICALREF,
-        [Quantity] = STLINE.AMOUNT,
-        [IOType] = STLINE.IOCODE,
-        [WarehouseName] = CAPIWHOUSE.NAME,
-		[SupplierReferenceId] = CLCARD.LOGICALREF,
-		[SupplierCode] = CLCARD.CODE,
-		[SupplierName] = CLCARD.DEFINITION_,
-        [ProductCode]=ITEMS.CODE,
-        [ProductName]=ITEMS.NAME
-        FROM LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
-        LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
-        LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF
-		LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
-        LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
-        LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
-		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {_httpClientService.FirmNumber}
-		WHERE STLINE.IOCODE IN (1,2,3,4) AND STFICHE.TRCODE IN (1,2,3,7,6,8) AND  CLCARD.LOGICALREF = {SupplierDetailModel.Supplier.ReferenceId} AND STLINE.STFICHEREF <> 0 AND STLINE.USREF <> 0 AND STLINE.UOMREF <> 0 ORDER BY STLINE.DATE_ DESC";
+			_userDialogs.Alert(message: ex.Message, title: "Hata");
+		}
+	}
 
-                var result = await _customQueryService.GetObjectsAsync(httpclient, query);
+	private async Task GetLastTransactionsAsync(HttpClient httpClient)
+	{
+		try
+		{
 
-                if (result.IsSuccess)
-                {
-                    if (result.Data == null)
-                        return;
+			SupplierDetailModel.LastTransactions.Clear();
 
-                    foreach (var item in result.Data)
-                    {
-                        SupplierDetailModel.LastTransactions.Add(Mapping.Mapper.Map<SupplierTransaction>(item));
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
+			var result = await _supplierTransactionService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				supplierReferenceId: SupplierDetailModel.Supplier.ReferenceId,
+				skip: 0,
+				take: 5
+			);
 
-                _userDialogs.Alert(message: ex.Message, title: "Hata");
-            }
-        }
+			if (result.IsSuccess)
+			{
+				if (result.Data == null)
+					return;
 
-        private async Task InputQuantityTappedAsync()
-        {
-            try
-            {
-                IsBusy = true;
+				foreach (var item in result.Data)
+				{
+					SupplierDetailModel.LastTransactions.Add(Mapping.Mapper.Map<SupplierTransaction>(item));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
 
-                await Task.Delay(300);
-                await Shell.Current.GoToAsync($"{nameof(SupplierInputTransactionView)}", new Dictionary<string, object>
-                {
-                    ["Supplier"] = SupplierDetailModel.Supplier
-                });
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
+			_userDialogs.Alert(message: ex.Message, title: "Hata");
+		}
+	}
 
-                _userDialogs.Alert(message: ex.Message, title: "Hata");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
+	private async Task InputQuantityTappedAsync()
+	{
+		try
+		{
+			IsBusy = true;
 
-        private async Task OutputQuantityTappedAsync()
-        {
-            try
-            {
-                IsBusy = true;
+			await Task.Delay(300);
+			await Shell.Current.GoToAsync($"{nameof(SupplierInputTransactionView)}", new Dictionary<string, object>
+			{
+				["Supplier"] = SupplierDetailModel.Supplier
+			});
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
 
-                await Task.Delay(300);
-                await Shell.Current.GoToAsync($"{nameof(SupplierOutputTransactionView)}", new Dictionary<string, object>
-                {
-                    ["Supplier"] = SupplierDetailModel.Supplier
-                });
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
+			_userDialogs.Alert(message: ex.Message, title: "Hata");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 
-                _userDialogs.Alert(message: ex.Message, title: "Hata");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
-    }
+	private async Task OutputQuantityTappedAsync()
+	{
+		try
+		{
+			IsBusy = true;
+
+			await Task.Delay(300);
+			await Shell.Current.GoToAsync($"{nameof(SupplierOutputTransactionView)}", new Dictionary<string, object>
+			{
+				["Supplier"] = SupplierDetailModel.Supplier
+			});
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			_userDialogs.Alert(message: ex.Message, title: "Hata");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 }
