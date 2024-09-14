@@ -15,5 +15,6 @@ namespace Deppo.Mobile.Core.Models.ProductModels
         public ObservableCollection<ProductModel> LastProducts { get; } = new();
         public ObservableCollection<WarehouseModel> LastWarehouses { get; } = new();
         public ObservableCollection<ProductTransaction> LastTransactions { get; } = new();
+        public ObservableCollection<ProductFiche> LastProductFiche { get; } = new();
     }
 }
