@@ -59,9 +59,9 @@ public class ProductPanelDataStore : IProductPanelService
         }
     }
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetLastTransactions(HttpClient httpClient, int firmNumber, int periodNumber)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetLastTransactions(HttpClient httpClient, int firmNumber, int periodNumber,int ficheReferenceId)
     {
-        var content = new StringContent(JsonConvert.SerializeObject(GetLastTransactionsQuery(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(GetLastTransactionsQuery(firmNumber, periodNumber,ficheReferenceId)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -259,6 +259,81 @@ public class ProductPanelDataStore : IProductPanelService
         }
     }
 
+    public async Task<DataResult<IEnumerable<dynamic>>> GetLastFiche(HttpClient httpClient, int firmNumber, int periodNumber)
+    {
+        var content = new StringContent(JsonConvert.SerializeObject(GetLastFiche(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
+
+        HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+        DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            var data = await responseMessage.Content.ReadAsStringAsync();
+            if (data != null)
+            {
+                if (!string.IsNullOrEmpty(data))
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "success";
+                    return dataResult;
+                }
+                else
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "empty";
+                    return dataResult;
+                }
+            }
+            else
+            {
+                var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                dataResult.Data = Enumerable.Empty<dynamic>();
+                dataResult.IsSuccess = false;
+                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+                return dataResult;
+            }
+        }
+        else
+        {
+            dataResult.Data = Enumerable.Empty<dynamic>();
+            dataResult.IsSuccess = false;
+            dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+            return dataResult;
+        }
+    }
+
+    private string GetLastFiche(int firmNumber, int periodNumber)
+    {
+        string baseQuery = $@"Select TOP 5
+            [ReferenceId] = STFICHE.LOGICALREF,
+			[FicheType] = STFICHE.TRCODE,
+			[FicheNumber] = STFICHE.FICHENO,
+            [FicheDate] = STFICHE.DATE_,
+            [FicheTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
+			[DocumentNumber] =ISNULL (STFICHE.DOCODE , ''),			
+			[SpecialCode] = ISNULL  ( STFICHE.SPECODE , ''),
+			[CurrentReferenceID] = ISNULL ( CLCARD.LOGICALREF, 0),
+			[CurrentCode] = ISNULL (CLCARD.CODE , '' ),
+			[CurrentName] = ISNULL ( CLCARD.DEFINITION_ ,''),
+			[WarehouseName] =  ISNULL (CAPIWHOUSE.NAME , ''),
+			[WarehouseNumber] = ISNULL( CAPIWHOUSE.NR, 0),
+			[Description] =  ISNULL (STFICHE.GENEXP1, '')
+			From LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
+			left join LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
+			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
+			WHERE STFICHE.TRCODE in (13,12,11,25,51,50)
+			ORDER BY STFICHE.DATE_ DESC;";
+
+        return baseQuery;
+    }
+
     private string GetLastProductsQuery(int firmNumber, int periodNumber)
     {
         string baseQuery = $@"SELECT TOP 5
@@ -311,7 +386,7 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
         return baseQuery;
     }
 
-    private string GetLastTransactionsQuery(int firmNumber, int periodNumber)
+    private string GetLastTransactionsQuery(int firmNumber, int periodNumber,int ficheReferenceId)
     {
         string baseQuery = $@"SELECT TOP 5
         [ReferenceId] = STLINE.LOGICALREF,
@@ -342,7 +417,7 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
 		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
-		WHERE STFICHE.GRPCODE = 3
+		WHERE STFICHE.GRPCODE = 3 AND STFICHE.LOGICALREF = {ficheReferenceId}
 		ORDER BY STLINE.DATE_ DESC";
 
         return baseQuery;

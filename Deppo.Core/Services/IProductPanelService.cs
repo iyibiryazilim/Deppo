@@ -8,13 +8,14 @@ namespace Deppo.Core.Services
     {
         public Task<DataResult<IEnumerable<dynamic>>> GetLastProducts(HttpClient httpClient, int firmNumber, int periodNumber);
 
-        public Task<DataResult<IEnumerable<dynamic>>> GetLastTransactions(HttpClient httpClient, int firmNumber, int periodNumber);
+        public Task<DataResult<IEnumerable<dynamic>>> GetLastTransactions(HttpClient httpClient, int firmNumber, int periodNumber,int ficheReferenceId);
 
 
         public Task<DataResult<IEnumerable<dynamic>>> GetLastWarehouses(HttpClient httpClient, int firmNumber, int periodNumber);
 
         public Task<DataResult<dynamic>> GetInputProductQuantity(HttpClient httpClient, int firmNumber, int periodNumber);
 
+        public Task<DataResult<IEnumerable<dynamic>>> GetLastFiche(HttpClient httpClient, int firmNumber, int periodNumber);
 
         public Task<DataResult<dynamic>> GetOutputProductQuantity(HttpClient httpClient, int firmNumber, int periodNumber);
 
