@@ -15,12 +15,11 @@ namespace Deppo.Core.DataStores
 {
     public class ConsumableTransactionDataStore : IConsumableTransactionService
     {
-        private string postUrl = "/gateway/product/ConsumableTransaction/Tiger";
 
         public async Task<DataResult<ResponseModel>> InsertConsumableTransaction(HttpClient httpClient, ConsumableTransactionInsert dto, int firmNumber)
         {
            
-                postUrl = $"/gateway/product/ConsumableTransaction/Tiger?firmNumber={firmNumber}";
+              var  postUrl = $"/gateway/product/ConsumableTransaction/Tiger?firmNumber={firmNumber}";
             
            
             var result = new DataResult<ResponseModel>();

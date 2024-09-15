@@ -46,10 +46,8 @@ namespace Deppo.Core.DataStores
 				{
 				
 					var message = await responseMessage.Content.ReadAsStringAsync();
-                    Console.WriteLine(message);
-                    //var jsonObject = JObject.Parse(message);
-                    //var errors = jsonObject["errors"];
-                    //var nameErrors = errors["Name"];
+                    result.Message = message;
+                    result.IsSuccess = false;
                     return result;
 				}
 			}
