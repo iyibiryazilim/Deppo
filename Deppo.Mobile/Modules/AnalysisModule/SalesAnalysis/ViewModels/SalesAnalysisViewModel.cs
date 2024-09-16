@@ -4,6 +4,7 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.AnalysisModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
@@ -20,7 +21,7 @@ public partial class SalesAnalysisViewModel : BaseViewModel
     [ObservableProperty]
     SalesAnalysisModel salesAnalysisModel = new();
 
-    public SalesAnalysisViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService , ISalesAnalysisService salesAnalysisService)
+    public SalesAnalysisViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, ISalesAnalysisService salesAnalysisService)
     {
         _httpClientService = httpClientService;
         _salesAnalysisService = salesAnalysisService;
@@ -38,8 +39,12 @@ public partial class SalesAnalysisViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            await Task.WhenAll(LastProduct(), LastCustomer(), DueDatePassedCustomersCount(), DueDatePassedProductsCount(), ReturnProductReferenceCount(), SoldProductReferenceCount());
+            _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(1000);
+            await Task.WhenAll(DueDatePassedCustomersCount(), DueDatePassedProductsCount(), ReturnProductReferenceCount(), SoldProductReferenceCount(), GetSalesProductReferenceAnalysisAsync());
 
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
@@ -54,10 +59,48 @@ public partial class SalesAnalysisViewModel : BaseViewModel
         }
     }
 
+    private async Task GetSalesProductReferenceAnalysisAsync()
+    {
+        try
+        {
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _salesAnalysisService.SalesProductReferenceAnalysis(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, DateTime.Now);
 
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+
+                List<SalesProductReferenceAnalysis> cacheItems = new();
+                foreach (var item in result.Data)
+                {
+                    var value = Mapping.Mapper.Map<SalesProductReferenceAnalysis>(item);
+                    cacheItems.Add(value);
+                }
+
+                SalesAnalysisModel.SalesProductReferenceAnalysis.Clear();
+                foreach (var item in cacheItems)
+                    SalesAnalysisModel.SalesProductReferenceAnalysis.Add(item);
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+    }
+
+
+    /// <summary>
+    /// Termin Tarihi Geçen Müşteri Sayısı
+    /// </summary>
+    /// <returns></returns>
     private async Task DueDatePassedCustomersCount()
-      {
-     
+    {
+
         try
         {
 
@@ -87,12 +130,17 @@ public partial class SalesAnalysisViewModel : BaseViewModel
         }
         finally
         {
-           
+
         }
     }
+
+    /// <summary>
+    /// Termin Tarihi Geçen Ürün Sayısı
+    /// </summary>
+    /// <returns></returns>
     private async Task DueDatePassedProductsCount()
     {
-       
+
         try
         {
 
@@ -120,12 +168,17 @@ public partial class SalesAnalysisViewModel : BaseViewModel
         }
         finally
         {
-        
+
         }
     }
+
+    /// <summary>
+    /// İade Ürün Referans Sayısı
+    /// </summary>
+    /// <returns></returns>
     private async Task ReturnProductReferenceCount()
     {
-   
+
         try
         {
 
@@ -153,12 +206,16 @@ public partial class SalesAnalysisViewModel : BaseViewModel
         }
         finally
         {
-           
+
         }
     }
+
+    /// <summary>
+    /// Satılan Ürün Referans Sayısı
+    /// </summary>
     private async Task SoldProductReferenceCount()
     {
-      
+
         try
         {
 
@@ -186,13 +243,13 @@ public partial class SalesAnalysisViewModel : BaseViewModel
         }
         finally
         {
-           
+
         }
     }
     private async Task LastCustomer()
     {
 
-  
+
         try
         {
 
@@ -217,7 +274,7 @@ public partial class SalesAnalysisViewModel : BaseViewModel
         }
         finally
         {
-           
+
         }
     }
     private async Task LastProduct()
@@ -247,7 +304,7 @@ public partial class SalesAnalysisViewModel : BaseViewModel
         }
         finally
         {
-           
+
         }
     }
 

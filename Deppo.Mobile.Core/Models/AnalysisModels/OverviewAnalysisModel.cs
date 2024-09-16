@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Deppo.Mobile.Core.Models.ProductModels;
+using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Core.Models.AnalysisModels
 {
@@ -22,5 +24,10 @@ namespace Deppo.Mobile.Core.Models.AnalysisModels
 
         [ObservableProperty]
         private int inputTransactionCount;
+
+        [ObservableProperty]
+        private int productsWithNoTransactionsCount;
+
+        public ObservableCollection<ProductModel> ProductsWithNoTransactions { get; } = new();
     }
 }

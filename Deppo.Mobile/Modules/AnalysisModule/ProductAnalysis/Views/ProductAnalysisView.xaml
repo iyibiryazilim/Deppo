@@ -2,21 +2,175 @@
 <ContentPage
     x:Class="Deppo.Mobile.Modules.AnalysisModule.ProductAnalysis.Views.ProductAnalysisView"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:dx="http://schemas.devexpress.com/maui"
+    xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+    xmlns:model="clr-namespace:Deppo.Mobile.Core.Models.AnalysisModels;assembly=Deppo.Mobile.Core"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.AnalysisModule.ProductAnalysis.ViewModels"
     Title="{Binding Title}"
-    x:DataType="viewModel:ProductAnalysisViewModel">
+    x:DataType="viewModel:ProductAnalysisViewModel"
+    BackgroundColor="{StaticResource White}">
 
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior EventName="Loaded"
-                                        Command="{Binding LoadItemsCommand}" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
-    
-    <VerticalStackLayout>
-        <Label
-            HorizontalOptions="Center"
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" />
-    </VerticalStackLayout>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <!-- <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>-->
+
+    <Grid
+        Padding="10"
+        RowDefinitions="200,Auto,Auto"
+        RowSpacing="20">
+
+        <dx:PieChartView
+            Grid.Row="0"
+            Background="Transparent"
+            BackgroundColor="Transparent">
+            <dx:PieChartView.Series>
+                <dx:DonutSeries>
+                    <dx:DonutSeries.Data>
+                        <dx:PieSeriesDataAdapter
+                            DataSource="{Binding ProductAnalysisModel.IORates}"
+                            LabelDataMember="Label"
+                            ValueDataMember="Value" />
+                    </dx:DonutSeries.Data>
+                    <dx:DonutSeries.Label>
+                        <dx:PieSeriesLabel Position="Inside" TextPattern="{}{VP}%">
+                            <dx:PieSeriesLabel.Style>
+                                <dx:PieSeriesLabelStyle>
+                                    <dx:PieSeriesLabelStyle.TextStyle>
+                                        <dx:TextStyle Size="14" Color="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" />
+                                    </dx:PieSeriesLabelStyle.TextStyle>
+                                </dx:PieSeriesLabelStyle>
+                            </dx:PieSeriesLabel.Style>
+                        </dx:PieSeriesLabel>
+                    </dx:DonutSeries.Label>
+                </dx:DonutSeries>
+            </dx:PieChartView.Series>
+
+            <dx:PieChartView.Legend>
+                <dx:Legend
+                    HorizontalPosition="RightOutside"
+                    Orientation="TopToBottom"
+                    VerticalPosition="Center">
+                    <dx:Legend.Style>
+                        <dx:LegendStyle
+                            BackgroundColor="{AppThemeBinding Light={StaticResource White},
+                                                              Dark=Black}"
+                            IndentFromDiagram="20"
+                            ItemsVerticalIndent="20">
+                            <dx:LegendStyle.TextStyle>
+                                <dx:TextStyle Size="14" Color="{AppThemeBinding Light={StaticResource Gray950}, Dark={StaticResource White}}" />
+                            </dx:LegendStyle.TextStyle>
+                        </dx:LegendStyle>
+                    </dx:Legend.Style>
+                </dx:Legend>
+            </dx:PieChartView.Legend>
+            <!-- <dx:PieChartView.ChartStyle>
+                <dx:PieChartStyle BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark=Black}" Palette="{Binding IOColors}" />
+            </dx:PieChartView.ChartStyle> -->
+        </dx:PieChartView>
+
+        <Grid
+            Grid.Row="1"
+            ColumnDefinitions="*,*"
+            ColumnSpacing="5">
+            <Border
+                Grid.Column="0"
+                Padding="15"
+                Stroke="{StaticResource Primary}"
+                BackgroundColor="{StaticResource PrimaryLight}"
+                StrokeShape="RoundRectangle 10"
+                StrokeThickness="0.2">
+                <Grid
+                    ColumnDefinitions="Auto,*"
+                    RowDefinitions="Auto,Auto"
+                    VerticalOptions="Center">
+                    <Label
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        FontSize="14"
+                        Text="Giriş İşlem Sayısı"
+                        TextColor="{StaticResource White}" />
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        FontSize="Large"
+                        Text="4753"
+                        TextColor="{StaticResource White}" />
+                    <Label
+                        Grid.Row="0"
+                        Grid.RowSpan="2"
+                        Grid.Column="1"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span
+                                    FontFamily="FAS"
+                                    FontSize="48"
+                                    Text="{x:Static fontAwesome:FontAwesomeIcons.ArrowUp}"
+                                    TextColor="{StaticResource White}" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </Grid>
+            </Border>
+                        <Border
+                Grid.Column="1"
+                Padding="15"
+                Stroke="{StaticResource Primary}"
+                BackgroundColor="{StaticResource PrimaryLight}"
+                StrokeShape="RoundRectangle 10"
+                StrokeThickness="0.2">
+                <Grid
+                    ColumnDefinitions="Auto,*"
+                    RowDefinitions="Auto,Auto"
+                    VerticalOptions="Center">
+                    <Label
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        FontSize="14"
+                        Text="Çıkış İşlem Sayısı"
+                        TextColor="{StaticResource White}" />
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        FontSize="Large"
+                        Text="5235"
+                        TextColor="{StaticResource White}" />
+                    <Label
+                        Grid.Row="0"
+                        Grid.RowSpan="2"
+                        Grid.Column="1"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span
+                                    FontFamily="FAS"
+                                    FontSize="48"
+                                    Text="{x:Static fontAwesome:FontAwesomeIcons.ArrowDown}"
+                                    TextColor="{StaticResource White}" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </Grid>
+            </Border>
+        </Grid>
+
+    </Grid>
+
 </ContentPage>

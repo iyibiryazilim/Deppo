@@ -24,10 +24,17 @@ public partial class ProductAnalysisViewModel : BaseViewModel
         _productAnalysisService = productAnalysisService;
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+
+
     }
 
     [ObservableProperty]
-    public ProductAnalysisModel productAnalysisModel = new();
+    ProductAnalysisModel productAnalysisModel = new();
+
+    // public Color[] IOColors {
+    //         get;
+    //         set;
+    //     }
 
     public Command LoadItemsCommand { get; }
 
@@ -40,7 +47,25 @@ public partial class ProductAnalysisViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            await Task.WhenAll(GetInputTransactionCountAsync(), GetOutputTransactionCountAsync(),GetNegativeStockProductsCountAsync(), GetLastWarehousesAsync());
+            // IOColors = new Color[] { 
+            //     Color.FromArgb("#44B0C0"),
+            //     Color.FromArgb("#E6BE0C")
+            // };
+            await Task.Delay(1000);
+            ProductAnalysisModel.IORates.Clear();
+            ProductAnalysisModel.IORates.Add(new IORateModel("Giriş İşlem Oranı", 52.5));
+            ProductAnalysisModel.IORates.Add(new IORateModel("Çıkış İşlem Oranı", 47.5));
+
+            //var tasks = new List<Task>
+            //{
+            //    GetInputTransactionCountAsync(),
+            //    GetOutputTransactionCountAsync(),
+            //    GetNegativeStockProductsCountAsync(),
+            //    GetLastWarehousesAsync()
+            //
+
+
+            //await Task.WhenAll(GetInputTransactionCountAsync(), GetOutputTransactionCountAsync(),GetNegativeStockProductsCountAsync(), GetLastWarehousesAsync());
 
         }
         catch (Exception ex)

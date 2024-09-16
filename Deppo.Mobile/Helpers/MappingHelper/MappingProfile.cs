@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
+using Deppo.Mobile.Core.Models.AnalysisModels;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.LoginModels;
@@ -52,5 +53,6 @@ public class MappingProfile : Profile
 		CreateMap<SeriLotTransaction, dynamic>();
 		CreateMap<SeriLotTransactionModel, dynamic>();
         CreateMap<ShipAddressModel, dynamic>();
+        CreateMap<SalesProductReferenceAnalysis, dynamic>();
 	}
 }

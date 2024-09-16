@@ -86,6 +86,7 @@ public static class MauiProgram
             })
             .UseSkiaSharp()
             .UseDevExpressCollectionView()
+            .UseDevExpressCharts()
             .UseDevExpressControls()
             .UseDevExpressEditors()
             .UseDevExpress()
