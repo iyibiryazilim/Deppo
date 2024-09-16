@@ -33,7 +33,7 @@ public partial class InputProductPurchaseProcessSupplierListViewModel : BaseView
     private SupplierModel supplierModel = null!;
 
     [ObservableProperty]
-    private Supplier selectedSupplier = null!;
+    private SupplierModel selectedSupplier = null!;
 
     public InputProductPurchaseProcessSupplierListViewModel(IHttpClientService httpClientService,
         ISupplierService supplierService,
@@ -249,7 +249,7 @@ public partial class InputProductPurchaseProcessSupplierListViewModel : BaseView
                 {
                     [nameof(WarehouseModel)] = WarehouseModel,
 
-                    [nameof(SelectedSupplier)] = SelectedSupplier,
+                    [nameof(SupplierModel)] = SelectedSupplier,
                 });
             }
         }

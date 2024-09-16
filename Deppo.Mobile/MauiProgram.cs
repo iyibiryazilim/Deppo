@@ -56,6 +56,10 @@ using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProce
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.ViewModels;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.ViewModels;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.ViewModels;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ViewModels;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.WaitingOrderMenu.ViewModels;
@@ -221,6 +225,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IRetailSalesDispatchTransactionService ,RetailSalesDispatchTransactionDataStore>();
         builder.Services.AddSingleton<IWholeSalesDispatchTransactionService, WholeSalesDispatchTransactionDataStore>();
 
+
         builder.Services.AddSingleton<IPurchaseReturnDispatchTransactionService, PurchaseReturnDispatchTransactionDataStore>();
         builder.Services.AddSingleton<IRetailSalesReturnDispatchTransactionService, RetailSalesReturnDispatchTransactionDataStore>();
         builder.Services.AddSingleton<IWholeSalesReturnDispatchTransactionService, WholeSalesReturnDispatchTransactionDataStore>();
@@ -302,6 +307,31 @@ public static class MauiProgram
 
         #endregion Siparise Bagli Sevk Islemleri
 
+        #region Satış İade İşlemleri
+
+        builder.Services.AddTransientWithShellRoute<ReturnSalesWarehouseListView, ReturnSalesWarehouseListViewModel>(nameof(ReturnSalesWarehouseListView));
+
+        builder.Services.AddScopedWithShellRoute<ReturnSalesBasketView, ReturnSalesBasketViewModel>(nameof(ReturnSalesBasketView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesProductListView, ReturnSalesProductListViewModel>(nameof(ReturnSalesProductListView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesBasketLocationListView, ReturnSalesBasketLocationListViewModel>(nameof(ReturnSalesBasketLocationListView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesBasketSeriLotListView, ReturnSalesBasketSeriLotListViewModel>(nameof(ReturnSalesBasketSeriLotListView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesFormView, ReturnSalesFormViewModel>(nameof(ReturnSalesFormView));
+
+        #endregion Satış İade İşlemleri
+
+        #region İrsaliyeye Bağlı Satış İade İşlemleri
+
+        builder.Services.AddTransientWithShellRoute<ReturnSalesDispatchWarehouseListView, ReturnSalesDispatchWarehouseListViewModel>(nameof(ReturnSalesDispatchWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesDispatchCustomerListView, ReturnSalesDispatchCustomerListViewModel>(nameof(ReturnSalesDispatchCustomerListView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesDispatchProductListView, ReturnSalesDispatchProductListViewModel>(nameof(ReturnSalesDispatchProductListView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesDispatchListView, ReturnSalesDispatchListViewModel>(nameof(ReturnSalesDispatchListView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesDispatchBasketView, ReturnSalesDispatchBasketViewModel>(nameof(ReturnSalesDispatchBasketView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesDispatchBasketLocationListView, ReturnSalesDispatchBasketLocationListViewModel>(nameof(ReturnSalesDispatchBasketLocationListView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesDispatchBasketSeriLotListView, ReturnSalesDispatchBasketSeriLotListViewModel>(nameof(ReturnSalesDispatchBasketSeriLotListView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesDispatchFormView, ReturnSalesDispatchFormViewModel>(nameof(ReturnSalesDispatchFormView));
+
+        #endregion İrsaliyeye Bağlı Satış İade İşlemleri
+
         #endregion Sales Modules
 
         #region Purchase Modules
@@ -342,6 +372,8 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
 
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessFormView, InputProductPurchaseOrderProcessFormViewModel>(nameof(InputProductPurchaseOrderProcessFormView));
 
+        builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessOtherProductListView, InputProductPurchaseOrderProcessOtherProductListViewModel>(nameof(InputProductPurchaseOrderProcessOtherProductListView));
+
         #endregion Siparişe Bağlı Satınalma İşlemleri
 
         #endregion Purchase Modules
@@ -359,10 +391,12 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         #endregion Fast Production Modules
 
         #region Result Modules
-        builder.Services.AddTransientWithShellRoute<InsertSuccessPageView, InsertSuccessPageViewModel>(nameof(InsertSuccessPageView));
-		builder.Services.AddTransientWithShellRoute<InsertFailurePageView, InsertFailurePageViewModel>(nameof(InsertFailurePageView));
-		#endregion
 
-		return builder.Build();
+        builder.Services.AddTransientWithShellRoute<InsertSuccessPageView, InsertSuccessPageViewModel>(nameof(InsertSuccessPageView));
+        builder.Services.AddTransientWithShellRoute<InsertFailurePageView, InsertFailurePageViewModel>(nameof(InsertFailurePageView));
+
+        #endregion Result Modules
+
+        return builder.Build();
     }
 }

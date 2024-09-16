@@ -187,7 +187,7 @@
                     Text="İleri" />
         </Grid>
 
-        <dx:BottomSheet x:Name="locationBottomSheet"
+        <!--<dx:BottomSheet x:Name="locationBottomSheet"
                         Grid.Row="1"
                         Padding="10,30,10,10"
                         AllowDismiss="False"
@@ -196,7 +196,9 @@
                         HalfExpandedRatio="0.5"
                         IsModal="True"
                         ShowGrabber="True">
-            <!--#region BottomSheetContent-->
+            -->
+        <!--#region BottomSheetContent-->
+        <!--
             <Grid RowDefinitions="Auto,*"
                   RowSpacing="20">
 
@@ -240,12 +242,14 @@
                                    Placeholder="Ara..."
                                    PlaceholderColor="{StaticResource OffBlack}"
                                    TextColor="{StaticResource OffBlack}">
-                            <!-- <SearchBar.Behaviors>
+                            -->
+        <!-- <SearchBar.Behaviors>
     <toolkit:EventToCommandBehavior
         Command="{Binding PerformSearchCommand}"
         CommandParameter="{Binding Text, Source={x:Reference searchBar}}"
         EventName="SearchButtonPressed" />
 </SearchBar.Behaviors>-->
+        <!--
                         </SearchBar>
                     </Border>
 
@@ -339,7 +343,9 @@
                 </Grid>
             </Grid>
 
-            <!--#endregion-->
-        </dx:BottomSheet>
+            -->
+        <!--#endregion-->
+        <!--
+        </dx:BottomSheet>-->
     </Grid>
 </ContentPage>

@@ -35,6 +35,15 @@
                 Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem>
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                 Size="Large" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
 
     <Grid RowDefinitions="*,Auto">
         <Grid RowDefinitions="*,Auto">

@@ -6,6 +6,7 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
@@ -46,26 +47,24 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
         ConfirmCommand = new Command(async () => await ConfirmAsync());
         CancelCommand = new Command(async () => await CancelAsync());
 
-
         CloseLocationsCommand = new Command(async () => await CloseLocationsAsync());
         ItemTappedCommand = new Command<LocationModel>(async (locationModel) => await ItemTappedAsync(locationModel));
         ConfirmLocationsCommand = new Command(async () => await ConfirmLocationsAsync());
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-
     }
 
     [ObservableProperty]
-    WarehouseModel warehouseModel = null!;
+    private WarehouseModel warehouseModel = null!;
 
     [ObservableProperty]
-    InputProductBasketModel inputProductBasketModel = null!;
+    private InputProductBasketModel inputProductBasketModel = null!;
 
     public ObservableCollection<LocationModel> Items { get; } = new();
     public ObservableCollection<LocationModel> SelectedItems { get; } = new();
 
     [ObservableProperty]
-    LocationModel selectedItem;
+    private LocationModel selectedItem;
 
     public Page CurrentPage { get; set; }
 
@@ -85,7 +84,8 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
     public Command<LocationModel> ItemTappedCommand { get; }
     public Command<SearchBar> LocationsPerformSearchCommand { get; }
     public Command ConfirmLocationsCommand { get; }
-    #endregion
+
+    #endregion Location BottomSheet Commands
 
     public async Task LoadSelectedItemsAsync()
     {
@@ -96,12 +96,11 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
         {
             IsBusy = true;
 
-			
-			_userDialogs.ShowLoading("Loading...");
-			SelectedItems.Clear();
+            _userDialogs.ShowLoading("Loading...");
+            SelectedItems.Clear();
             await Task.Delay(1000);
 
-			if (InputProductBasketModel.Details.Count > 0)
+            if (InputProductBasketModel.Details.Count > 0)
             {
                 foreach (var item in InputProductBasketModel.Details)
                     SelectedItems.Add(new LocationModel
@@ -111,12 +110,9 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
                         StockQuantity = default,
                         InputQuantity = item.Quantity
                     });
-
             }
 
-
             _userDialogs.HideHud();
-
         }
         catch (Exception ex)
         {
@@ -181,7 +177,6 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
             }
 
             _userDialogs.HideHud();
-
         }
         catch (Exception ex)
         {
@@ -224,7 +219,6 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
             }
 
             _userDialogs.HideHud();
-
         }
         catch (Exception ex)
         {
@@ -259,12 +253,10 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
             {
                 if (result.Data is null)
                     return;
-
             }
         }
         catch (Exception)
         {
-
             throw;
         }
         finally
@@ -286,7 +278,6 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
             await Task.Delay(500);
             CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
             _userDialogs.HideHud();
-
         }
         catch (Exception ex)
         {
@@ -310,14 +301,11 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
             if (locationModel.IsSelected)
             {
                 Items.FirstOrDefault(x => x.ReferenceId == locationModel.ReferenceId).IsSelected = false;
-
             }
             else
             {
                 Items.FirstOrDefault(x => x.ReferenceId == locationModel.ReferenceId).IsSelected = true;
-
             }
-
         }
         catch (Exception ex)
         {
@@ -348,7 +336,6 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
 
             CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
             _userDialogs.HideHud();
-
         }
         catch (Exception ex)
         {
@@ -359,7 +346,6 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
             IsBusy = false;
         }
     }
-
 
     private async Task IncreaseAsync(LocationModel locationModel)
     {
@@ -442,7 +428,6 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
             if (string.IsNullOrEmpty(barcodeEntry.Text))
                 return;
 
-
             IsBusy = true;
 
             _userDialogs.ShowLoading("Loading...");
@@ -473,11 +458,9 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
 
                 barcodeEntry.Text = string.Empty;
                 barcodeEntry.Focus();
-
             }
 
             _userDialogs.HideHud();
-
         }
         catch (Exception ex)
         {
@@ -500,54 +483,53 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
 
         try
         {
-			IsBusy = true;
+            IsBusy = true;
 
-			_userDialogs.ShowLoading("Loading...");
+            _userDialogs.ShowLoading("Loading...");
 
-			var previousViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketListViewModel>();
+            var previousViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketListViewModel>();
 
-			var basketItem = previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputProductBasketModel.ItemReferenceId);
-			if (basketItem is not null)
-			{
-				// InputQuantity <= 0 olanları mevcut Details'tan çıkarıyoruz
-				var itemsToRemove = SelectedItems.Where(x => x.InputQuantity <= 0).ToList();
-				foreach (var item in itemsToRemove)
-				{
-					var locationToRemove = basketItem.Details.FirstOrDefault(x => x.LocationCode == item.Code);
-					if (locationToRemove != null)
-					{
-						basketItem.Details.Remove(locationToRemove);
-					}
-				}
+            var basketItem = previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == InputProductBasketModel.ItemReferenceId);
+            if (basketItem is not null)
+            {
+                // InputQuantity <= 0 olanları mevcut Details'tan çıkarıyoruz
+                var itemsToRemove = SelectedItems.Where(x => x.InputQuantity <= 0).ToList();
+                foreach (var item in itemsToRemove)
+                {
+                    var locationToRemove = basketItem.Details.FirstOrDefault(x => x.LocationCode == item.Code);
+                    if (locationToRemove != null)
+                    {
+                        basketItem.Details.Remove(locationToRemove);
+                    }
+                }
 
-				foreach (var item in SelectedItems.Where(x => x.InputQuantity > 0))
-				{
-					var location = basketItem.Details.FirstOrDefault(x => x.LocationCode == item.Code);
-					if (location is not null)
-					{
-						location.Quantity = item.InputQuantity;
-					}
-					else
-					{
-						basketItem.Details.Add(new InputProductBasketDetailModel
-						{
-							LocationReferenceId = item.ReferenceId,
-							LocationCode = item.Code,
-							LocationName = item.Name,
-							Quantity = item.InputQuantity,
-						});
-					}
-				}
+                foreach (var item in SelectedItems.Where(x => x.InputQuantity > 0))
+                {
+                    var location = basketItem.Details.FirstOrDefault(x => x.LocationCode == item.Code);
+                    if (location is not null)
+                    {
+                        location.Quantity = item.InputQuantity;
+                    }
+                    else
+                    {
+                        basketItem.Details.Add(new InputProductBasketDetailModel
+                        {
+                            LocationReferenceId = item.ReferenceId,
+                            LocationCode = item.Code,
+                            LocationName = item.Name,
+                            Quantity = item.InputQuantity,
+                        });
+                    }
+                }
 
-				// İlgili ürünün Quantity'sine seçilen stok yerlerinin toplam InputQuantity'sini set et
-				var inputTotalQuantity = SelectedItems.Sum(x => x.InputQuantity);
-				basketItem.Quantity = inputTotalQuantity;
-			}
+                // İlgili ürünün Quantity'sine seçilen stok yerlerinin toplam InputQuantity'sini set et
+                var inputTotalQuantity = SelectedItems.Sum(x => x.InputQuantity);
+                basketItem.Quantity = inputTotalQuantity;
+            }
 
-			await Shell.Current.GoToAsync("..");
-			_userDialogs.HideHud();
-
-		}
+            await Shell.Current.GoToAsync("..");
+            _userDialogs.HideHud();
+        }
         catch (Exception ex)
         {
             _userDialogs.Alert(ex.Message);
@@ -571,7 +553,6 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
             await Task.Delay(500);
             await Shell.Current.GoToAsync("..");
             _userDialogs.HideHud();
-
         }
         catch (Exception ex)
         {
@@ -582,5 +563,4 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
             IsBusy = false;
         }
     }
-
 }
