@@ -1,11 +1,20 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Android.OS;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.DTOs.PurchaseDispatchTransaction;
+using Deppo.Core.DTOs.SeriLotTransactionDto;
+using Deppo.Core.Models;
+using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
+using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ResultModule;
+using Deppo.Mobile.Modules.ResultModule.Views;
 using DevExpress.Maui.Controls;
+using Microsoft.Maui.Controls.Compatibility.Platform.Android;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,13 +29,18 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(Items), queryId: nameof(Items))]
+[QueryProperty(name: nameof(SupplierModel), queryId: nameof(SupplierModel))]
 public partial class InputProductPurchaseProcessFormViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
     private readonly IUserDialogs _userDialogs;
+    private readonly IPurchaseDispatchTransactionService _purchaseDispatchTransactionService;
 
     [ObservableProperty]
     private WarehouseModel warehouseModel = null!;
+
+    [ObservableProperty]
+    private SupplierModel supplierModel = null!;
 
     [ObservableProperty]
     private DateTime ficheDate = DateTime.Now;
@@ -46,15 +60,17 @@ public partial class InputProductPurchaseProcessFormViewModel : BaseViewModel
     [ObservableProperty]
     private ObservableCollection<InputPurchaseBasketModel> items = null!;
 
-    public InputProductPurchaseProcessFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs)
+    public InputProductPurchaseProcessFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IPurchaseDispatchTransactionService purchaseDispatchTransactionService)
     {
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
+        _purchaseDispatchTransactionService = purchaseDispatchTransactionService;
         Items = new();
         Title = "Mal Kabul İşlemi";
 
         LoadPageCommand = new Command(async () => await LoadPageAsync());
         ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
+        SaveCommand = new Command(async () => await SaveAsync());
     }
 
     public Page CurrentPage { get; set; }
@@ -120,5 +136,104 @@ public partial class InputProductPurchaseProcessFormViewModel : BaseViewModel
         }
 
         return value.ToString();
+    }
+
+    private async Task SaveAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
+            await Task.Delay(1000);
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            var purchaseDispatchDto = new PurchaseDispatchTransactionInsert
+            {
+                SpeCode = SpecialCode,
+                CurrentCode = SupplierModel.Code,
+                Code = string.Empty,
+                DocTrackingNumber = DocumentTrackingNumber,
+                DoCode = DocumentNumber,
+                TransactionDate = FicheDate,
+                FirmNumber = _httpClientService.FirmNumber,
+                WarehouseNumber = WarehouseModel.Number,
+                Description = Description
+            };
+
+            foreach (var item in Items)
+            {
+                var purchaseDispatchTransactionLineDto = new PurchaseDispatchTransactionLineDto
+                {
+                    ProductCode = item.ItemCode,
+                    WarehouseNumber = (short)WarehouseModel.Number,
+                    Quantity = item.Quantity,
+                    ConversionFactor = 1,
+                    OtherConversionFactor = 1,
+                    SubUnitsetCode = item.SubUnitsetCode,
+                };
+
+                foreach (var detail in item.Details)
+                {
+                    var seriLotTransactionDto = new SeriLotTransactionDto
+                    {
+                        StockLocationCode = detail.LocationCode,
+                        SubUnitsetCode = item.SubUnitsetCode,
+                        Quantity = detail.Quantity,
+                        ConversionFactor = 1,
+                        OtherConversionFactor = 1,
+                        DestinationStockLocationCode = string.Empty,
+                    };
+                    purchaseDispatchTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
+                }
+
+                purchaseDispatchDto.Lines.Add(purchaseDispatchTransactionLineDto);
+            }
+
+            var result = await _purchaseDispatchTransactionService.InsertPurchaseDispatchTransaction(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, purchaseDispatchDto);
+
+            Console.WriteLine(result);
+            ResultModel resultModel = new();
+            if (result.IsSuccess)
+            {
+                resultModel.Message = "Başarılı";
+                resultModel.Code = result.Data.Code;
+                resultModel.PageTitle = Title;
+                resultModel.PageCountToBack = 5;
+
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
+                {
+                    [nameof(ResultModel)] = resultModel
+                });
+            }
+            else
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                resultModel.Message = "Başarısız";
+                resultModel.PageTitle = Title;
+                resultModel.PageCountToBack = 4;
+                await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+                {
+                    [nameof(ResultModel)] = resultModel
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 }
