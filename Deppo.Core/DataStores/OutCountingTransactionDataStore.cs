@@ -19,7 +19,7 @@ namespace Deppo.Core.DataStores
         public async Task<DataResult<ResponseModel>> InsertOutCountingTransaction(HttpClient httpClient, OutCountingTransactionInsert dto, int firmNumber)
         {
             
-          var  postUrl = $"/gateway/product/ProductionTransaction/Tiger?firmNumber={firmNumber}";
+          var  postUrl = $"/gateway/product/OutCountingTransaction/Tiger?firmNumber={firmNumber}";
             
            
 
@@ -28,7 +28,7 @@ namespace Deppo.Core.DataStores
             {
                 var content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json");
 
-                var responseMessage = await httpClient.PostAsync($"{postUrl}/InsertProductionTransaction", content);
+                var responseMessage = await httpClient.PostAsync($"{postUrl}", content);
 
                 if (responseMessage.IsSuccessStatusCode)
                 {

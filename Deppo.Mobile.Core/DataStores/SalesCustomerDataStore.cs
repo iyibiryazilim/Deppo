@@ -66,9 +66,12 @@ public class SalesCustomerDataStore : ISalesCustomerService
 			[Name] = CLCARD.DEFINITION_,
 			[ProductReferenceCount] = COUNT(DISTINCT ORFLINE.STOCKREF),
             [Country] = CLCARD.COUNTRY,
-            [City] = CLCARD.CITY
+            [City] = CLCARD.CITY,
+            [ShipAddressCount] = COUNT(SHIPADRESS.CLIENTREF)
+
         FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2,'0')}_ORFLINE AS ORFLINE
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = ORFLINE.CLIENTREF
+		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_SHIPINFO AS SHIPADRESS ON CLCARD.LOGICALREF = SHIPADRESS.CLIENTREF
         WHERE ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 1 AND ORFLINE.SOURCEINDEX = {warehouseNumber}
 		";
 

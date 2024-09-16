@@ -28,7 +28,7 @@ namespace Deppo.Core.DataStores
             {
                 var content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json");
 
-                var responseMessage = await httpClient.PostAsync($"{postUrl}/InsertProductionTransaction", content);
+                var responseMessage = await httpClient.PostAsync($"{postUrl}", content);
 
                 if (responseMessage.IsSuccessStatusCode)
                 {

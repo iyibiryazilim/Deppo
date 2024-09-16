@@ -204,6 +204,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<IPurchaseSupplierProductService, PurchaseSupplierProductDataStore>();
         builder.Services.AddSingleton<ISalesCustomerService, SalesCustomerDataStore>();
         builder.Services.AddSingleton<ISalesCustomerProductService, SalesCustomerProductDataStore>();
+        builder.Services.AddSingleton<IShipAddressService, ShipAddressDataStore>();
+
         builder.Services.AddSingleton<IProductPanelService, ProductPanelDataStore>();
         builder.Services.AddSingleton<ISalesPanelService, SalesPanelDataStore>();
         builder.Services.AddSingleton<IPurchasePanelService, PurchasePanelDataStore>();
@@ -220,6 +222,14 @@ public static class MauiProgram
         builder.Services.AddSingleton<IOutCountingTransactionService, OutCountingTransactionDataStore>();
         builder.Services.AddSingleton<IWastageTransactionService, WastageTransactionDataStore>();
         builder.Services.AddSingleton<IPurchaseDispatchTransactionService, PurchaseDispatchTransactionDataStore>();
+        builder.Services.AddSingleton<IRetailSalesDispatchTransactionService ,RetailSalesDispatchTransactionDataStore>();
+        builder.Services.AddSingleton<IWholeSalesDispatchTransactionService, WholeSalesDispatchTransactionDataStore>();
+
+
+        builder.Services.AddSingleton<IPurchaseReturnDispatchTransactionService, PurchaseReturnDispatchTransactionDataStore>();
+        builder.Services.AddSingleton<IRetailSalesReturnDispatchTransactionService, RetailSalesReturnDispatchTransactionDataStore>();
+        builder.Services.AddSingleton<IWholeSalesReturnDispatchTransactionService, WholeSalesReturnDispatchTransactionDataStore>();
+        builder.Services.AddSingleton<ITransferTransactionService, TransferTransactionDataStore>();
 
         builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
         builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));

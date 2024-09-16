@@ -344,7 +344,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 			{
 				//SelectedLocationTransaction = item;
 				// SeriLot takipli ise serilotTransactionBottomSheet aç
-				if (SelectedItem.TrackingType == 1 || SelectedItem.TrackingType == 2) {
+				if (SelectedItem.TrackingType != 0) {
 					await LoadSeriLotTransactionsAsync();
 					CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.FullExpanded;
 				}
