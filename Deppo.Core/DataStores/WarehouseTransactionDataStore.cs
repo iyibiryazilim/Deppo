@@ -8,6 +8,8 @@ namespace Deppo.Core.DataStores;
 
 public class WarehouseTransactionDataStore : IWarehouseTransactionService
 {
+	private string request = "/gateway/customQuery/CustomQuery";
+
 	string postUrl = $"/gateway/product/" + typeof(WarehouseTransaction).Name;
 	public async Task<DataResult<IEnumerable<WarehouseTransaction>>> GetInputTransactionByWarehouseNumberAsync(HttpClient httpClient,int number, string search, SortModel? orderBy, int page, int pageSize, int firmNumber)
 	{
@@ -129,5 +131,12 @@ public class WarehouseTransactionDataStore : IWarehouseTransactionService
 			dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
 			return dataResult;
 		}
+	}
+
+	private string GetInputTransactionByWarehouseNumberQuery(int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20)
+	{
+		var baseQuery = "";
+
+		return baseQuery;
 	}
 }

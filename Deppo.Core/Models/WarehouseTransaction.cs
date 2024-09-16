@@ -6,7 +6,6 @@ namespace Deppo.Core.Models;
 public class WarehouseTransaction : BaseTransaction
 {
 	private int _warehouseReferenceId;
-	private string _warehouseName = string.Empty;
 	private int _currentReferenceId;
 	private string _currentCode = string.Empty;
 	private string _currentName = string.Empty;
@@ -28,16 +27,6 @@ public class WarehouseTransaction : BaseTransaction
 		}
 	}
 
-	public string WarehouseName
-	{
-		get => _warehouseName;
-		set
-		{
-			if (_warehouseName == value) return;
-			_warehouseName = value;
-			NotifyPropertyChanged();
-		}
-	}
 
 	[Browsable(false)]
 	public int CurrentReferenceId
