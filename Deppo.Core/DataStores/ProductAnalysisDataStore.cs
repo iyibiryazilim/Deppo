@@ -210,7 +210,7 @@ namespace Deppo.Core.DataStores
 
         private string GetInputTransactionCountQuery(int firmNumber,int periodNumber)
         {
-            string baseQuery = $@"SELECT COUNT(STLINE.LOGICALREF) AS InputTransactionCount FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
+            string baseQuery = $@"SELECT ISNULL(COUNT(STLINE.LOGICALREF),0) AS InputTransactionCount FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
 WHERE STLINE.IOCODE IN (1,2) AND STFICHE.GRPCODE = 3";
 
@@ -219,7 +219,7 @@ WHERE STLINE.IOCODE IN (1,2) AND STFICHE.GRPCODE = 3";
 
         private string GetOutputTransactionCountQuery(int firmNumber, int periodNumber)
         {
-            string baseQuery = $@"SELECT COUNT(STLINE.LOGICALREF) AS OutputTransactionCount FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
+            string baseQuery = $@"SELECT ISNULL(COUNT(STLINE.LOGICALREF),0) AS OutputTransactionCount FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
 WHERE STLINE.IOCODE IN (3,4) AND STFICHE.GRPCODE = 3";
 
@@ -233,8 +233,8 @@ WHERE STLINE.IOCODE IN (3,4) AND STFICHE.GRPCODE = 3";
         CAPIWHOUSE.LOGICALREF AS ReferenceId,
         CAPIWHOUSE.NR AS Number,
         CAPIWHOUSE.NAME AS Name,
-        CAPIWHOUSE.CITY AS City,
-        CAPIWHOUSE.COUNTRY AS Country,
+        ISNULL(CAPIWHOUSE.CITY,'') AS City,
+        ISNULL(CAPIWHOUSE.COUNTRY,'') AS Country,
         0 AS Quantity,
         STLINE.DATE_ AS Date_,
         STLINE.FTIME AS Time,
@@ -242,7 +242,7 @@ WHERE STLINE.IOCODE IN (3,4) AND STFICHE.GRPCODE = 3";
     FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
     LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
     LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
-    WHERE STFICHE.GRPCODE = 3
+    WHERE STFICHE.GRPCODE = 3 AND STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0
 )
 SELECT TOP 5
     ReferenceId,
@@ -263,7 +263,7 @@ ORDER BY Date_ DESC, Time DESC;";
         private string GetNegativeStockProductsCountQuery(int firmNumber, int periodNumber)
         {
             string baseQuery = $@"SELECT
-    COUNT(*) AS NegativeStockProductQuantity
+    ISNULL(COUNT(*),0) AS NegativeStockProductQuantity
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS
 WHERE
     (SELECT ISNULL(SUM(ONHAND), 0) FROM LV_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STINVTOT WHERE STOCKREF = ITEMS.LOGICALREF AND INVENNO = -1) < 0";
