@@ -27,6 +27,9 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 	[ObservableProperty]
 	SalesCustomer salesCustomer = null!;
 
+	[ObservableProperty]
+	SalesCustomer? swipedSalesCustomer;  // Sipariş listesini göstermek için swipe edilen müşteriyi tutar.
+
 	#region Collections
 	public ObservableCollection<SalesCustomer> Items { get; } = new();
 	#endregion

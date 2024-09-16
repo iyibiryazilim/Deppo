@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Models;
+using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Core.Services;
@@ -7,6 +9,7 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.Views;
+using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.ViewModels;
@@ -16,6 +19,7 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 {
 	private readonly IHttpClientService _httpClientService;
 	private readonly ISalesCustomerService _salesCustomerService;
+	private readonly ISalesCustomerProductService _salesCustomerProductService;
 	private readonly IUserDialogs _userDialogs;
 
 	[ObservableProperty]
@@ -24,12 +28,18 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 	[ObservableProperty]
 	SalesCustomer salesCustomer = null!;
 
+	[ObservableProperty]
+	SalesCustomer? swipedSalesCustomer;  // Müşteriye ait ürün listesini göstermek için swipe edilen müşteriyi tutar.
+
 	public ObservableCollection<SalesCustomer> Items { get; } = new();
 
-	public OutputProductSalesProcessCustomerListViewModel(IHttpClientService httpClientService, ISalesCustomerService salesCustomerService, IUserDialogs userDialogs)
+	public ObservableCollection<SalesCustomerProduct> SalesCustomerProducts { get; } = new();
+
+	public OutputProductSalesProcessCustomerListViewModel(IHttpClientService httpClientService, ISalesCustomerService salesCustomerService, ISalesCustomerProductService salesCustomerProductService, IUserDialogs userDialogs)
 	{
 		_httpClientService = httpClientService;
 		_salesCustomerService = salesCustomerService;
+		_salesCustomerProductService = salesCustomerProductService;
 		_userDialogs = userDialogs;
 
 		Title = "Müşteriler";
@@ -38,13 +48,22 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
 		ItemTappedCommand = new Command<SalesCustomer>(async (customer) => await ItemTappedAsync(customer));
 		NextViewCommand = new Command(async () => await NextViewAsync());
+
+		ShowProductsCommand = new Command<SalesCustomer>(async (customer) => await ShowProductsAsync(customer));
+		LoadMoreProductsCommand = new Command(async () => await LoadMoreProductsAsync());
 	}
+
+	public Page CurrentPage { get; set; } = null!;
+
 
 	#region Commands
 	public Command LoadItemsCommand { get; }
 	public Command LoadMoreItemsCommand { get; }
 	public Command ItemTappedCommand { get; }
 	public Command NextViewCommand { get; }
+
+	public Command ShowProductsCommand { get; }
+	public Command LoadMoreProductsCommand { get; }
 	#endregion
 
 	private async Task LoadItemsAsync()
@@ -153,6 +172,127 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 			IsBusy = false;
 		}
 	}
+
+	private async Task ShowProductsAsync(SalesCustomer customer)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			await LoadProductsAsync(customer);
+			CurrentPage.FindByName<BottomSheet>("customerProductsBottomSheet").State = BottomSheetState.HalfExpanded;
+
+
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task LoadProductsAsync(SalesCustomer customer)
+	{
+		try
+		{
+			SwipedSalesCustomer = customer;
+			SalesCustomerProducts.Clear();
+			_userDialogs.Loading("Loading Products...");
+			await Task.Delay(1000);
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _salesCustomerProductService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				customerReferenceId: SwipedSalesCustomer.ReferenceId,
+				warehouseNumber: WarehouseModel.Number,
+				search:string.Empty,
+				skip: 0,
+				take: 20
+			);
+
+			if(result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+				{
+					SalesCustomerProducts.Add(Mapping.Mapper.Map<SalesCustomerProduct>(item));
+				}
+			}
+
+			_userDialogs.HideHud();
+
+
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task LoadMoreProductsAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _salesCustomerProductService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				customerReferenceId: SwipedSalesCustomer.ReferenceId,
+				warehouseNumber: WarehouseModel.Number,
+				search: string.Empty,
+				skip: SalesCustomerProducts.Count,
+				take: 20
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var order in result.Data)
+				{
+					SalesCustomerProducts.Add(Mapping.Mapper.Map<SalesCustomerProduct>(order));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
 
 	private async Task NextViewAsync()
 	{

@@ -79,5 +79,5 @@ public class ShipAddressDataStore : IShipAddressService
 
 		return baseQuery;
 
-	};
+	}
 }
