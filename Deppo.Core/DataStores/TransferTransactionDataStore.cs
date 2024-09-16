@@ -1,5 +1,6 @@
 ﻿using Deppo.Core.DataResultModel;
-using Deppo.Core.DTOs.PurchaseDispatchTransaction;
+using Deppo.Core.DTOs.ConsumableTransaction;
+using Deppo.Core.DTOs.TransferTransaction;
 using Deppo.Core.ResponseResultModels;
 using Deppo.Core.Services;
 using Newtonsoft.Json;
@@ -12,17 +13,19 @@ using System.Threading.Tasks;
 
 namespace Deppo.Core.DataStores
 {
-    public class PurchaseDispatchTransactionDataStore : IPurchaseDispatchTransactionService
+    public class TransferTransactionDataStore : ITransferTransactionService
     {
-        public async Task<DataResult<ResponseModel>> InsertPurchaseDispatchTransaction(HttpClient httpClient, int firmNumber, PurchaseDispatchTransactionInsert dto)
+        public async Task<DataResult<ResponseModel>> InsertTransferTransaction(HttpClient httpClient, TransferTransactionInsert dto, int firmNumber)
         {
-            var postUrl = $"/gateway/purchase/PurchaseDispatchTransaction/Tiger?firmNumber={firmNumber}";
+
+            var postUrl = $"/gateway/product/TransferTransaction/Tiger?firmNumber={firmNumber}";
+
+
             var result = new DataResult<ResponseModel>();
             try
             {
                 var json = JsonConvert.SerializeObject(dto);
                 var content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json");
-
 
                 var responseMessage = await httpClient.PostAsync($"{postUrl}", content);
 
@@ -39,8 +42,8 @@ namespace Deppo.Core.DataStores
                 }
                 else
                 {
-
                     var message = await responseMessage.Content.ReadAsStringAsync();
+                    Debug.WriteLine($"Received non-successful HTTP status code: {responseMessage.StatusCode}");
                     result.Message = message;
                     result.IsSuccess = false;
                     return result;
@@ -55,6 +58,7 @@ namespace Deppo.Core.DataStores
                     Message = $"An error occurred: {ex.Message}"
                 };
             }
+
         }
     }
 }

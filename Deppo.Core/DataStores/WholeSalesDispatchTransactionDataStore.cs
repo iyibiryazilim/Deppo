@@ -1,5 +1,6 @@
 ﻿using Deppo.Core.DataResultModel;
 using Deppo.Core.DTOs.PurchaseDispatchTransaction;
+using Deppo.Core.DTOs.SalesDispatchTransaction;
 using Deppo.Core.ResponseResultModels;
 using Deppo.Core.Services;
 using Newtonsoft.Json;
@@ -12,11 +13,11 @@ using System.Threading.Tasks;
 
 namespace Deppo.Core.DataStores
 {
-    public class PurchaseDispatchTransactionDataStore : IPurchaseDispatchTransactionService
+    public class WholeSalesDispatchTransactionDataStore :IWholeSalesDispatchTransactionService
     {
-        public async Task<DataResult<ResponseModel>> InsertPurchaseDispatchTransaction(HttpClient httpClient, int firmNumber, PurchaseDispatchTransactionInsert dto)
+        public async Task<DataResult<ResponseModel>> InsertWholeSalesDispatchTransaction(HttpClient httpClient, int firmNumber, WholeSalesDispatchTransactionInsert dto)
         {
-            var postUrl = $"/gateway/purchase/PurchaseDispatchTransaction/Tiger?firmNumber={firmNumber}";
+            var postUrl = $"/gateway/sales/WholeSalesDispatchTransaction/Tiger?firmNumber={firmNumber}";
             var result = new DataResult<ResponseModel>();
             try
             {
