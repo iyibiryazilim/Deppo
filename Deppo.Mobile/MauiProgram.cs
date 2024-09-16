@@ -215,6 +215,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<IInCountingTransactionService, InCountingTransactionDataStore>();
         builder.Services.AddSingleton<IOutCountingTransactionService, OutCountingTransactionDataStore>();
         builder.Services.AddSingleton<IWastageTransactionService, WastageTransactionDataStore>();
+        builder.Services.AddSingleton<IPurchaseDispatchTransactionService, PurchaseDispatchTransactionDataStore>();
+
 
         builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
         builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
