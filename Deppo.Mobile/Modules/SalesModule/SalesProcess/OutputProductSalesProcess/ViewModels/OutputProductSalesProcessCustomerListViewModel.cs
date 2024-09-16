@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
-using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.SalesModels;
+using Deppo.Mobile.Core.Models.ShipAddressModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
@@ -20,6 +20,7 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 	private readonly IHttpClientService _httpClientService;
 	private readonly ISalesCustomerService _salesCustomerService;
 	private readonly ISalesCustomerProductService _salesCustomerProductService;
+	private readonly IShipAddressService _shipAddressService;
 	private readonly IUserDialogs _userDialogs;
 
 	[ObservableProperty]
@@ -35,11 +36,14 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 
 	public ObservableCollection<SalesCustomerProduct> SalesCustomerProducts { get; } = new();
 
-	public OutputProductSalesProcessCustomerListViewModel(IHttpClientService httpClientService, ISalesCustomerService salesCustomerService, ISalesCustomerProductService salesCustomerProductService, IUserDialogs userDialogs)
+	public ObservableCollection<ShipAddressModel> ShipAddresses { get; } = new();
+
+	public OutputProductSalesProcessCustomerListViewModel(IHttpClientService httpClientService, ISalesCustomerService salesCustomerService, ISalesCustomerProductService salesCustomerProductService, IShipAddressService shipAddressService, IUserDialogs userDialogs)
 	{
 		_httpClientService = httpClientService;
 		_salesCustomerService = salesCustomerService;
 		_salesCustomerProductService = salesCustomerProductService;
+		_shipAddressService = shipAddressService;
 		_userDialogs = userDialogs;
 
 		Title = "Müşteriler";
@@ -157,6 +161,14 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 					SalesCustomer.IsSelected = false;
 				}
 				SalesCustomer = item;
+
+				// Müşterinin sevk adresi varsa sevk adres bottomSheet aç
+				if (SalesCustomer.ShipAddressCount > 0)
+				{
+					await LoadShipAddressesAsync(SalesCustomer);
+					CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
+				} 
+
 				SalesCustomer.IsSelected = true;
 			}
 		}
@@ -188,7 +200,7 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
@@ -216,12 +228,12 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 				periodNumber: _httpClientService.PeriodNumber,
 				customerReferenceId: SwipedSalesCustomer.ReferenceId,
 				warehouseNumber: WarehouseModel.Number,
-				search:string.Empty,
+				search: string.Empty,
 				skip: 0,
 				take: 20
 			);
 
-			if(result.IsSuccess)
+			if (result.IsSuccess)
 			{
 				if (result.Data is null)
 					return;
@@ -238,7 +250,7 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
@@ -282,7 +294,93 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task LoadShipAddressesAsync(SalesCustomer customer)
+	{
+		try
+		{
+			ShipAddresses.Clear();
+
+			_userDialogs.Loading("Loading Ship Addresses...");
+			await Task.Delay(1000);
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _shipAddressService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				currentReferenceId: SalesCustomer.ReferenceId,
+				search: string.Empty,
+				skip: 0,
+				take: 20
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+				{
+					ShipAddresses.Add(Mapping.Mapper.Map<ShipAddressModel>(item));
+				}
+			}
+
+
+			_userDialogs.HideHud();
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+	}
+
+	private async Task LoadMoreShipAddressesAsync(SalesCustomer customer)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _shipAddressService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				currentReferenceId: customer.ReferenceId,
+				search: string.Empty,
+				skip: ShipAddresses.Count,
+				take: 20
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+				{
+					ShipAddresses.Add(Mapping.Mapper.Map<ShipAddressModel>(item));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			_userDialogs.Alert(ex.Message, "Hata", "Tamam");

@@ -8,6 +8,7 @@ using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
+using Deppo.Mobile.Core.Models.ShipAddressModels;
 using Deppo.Mobile.Core.Models.VariantModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Google.Android.Material.Color.Utilities;
@@ -50,5 +51,6 @@ public class MappingProfile : Profile
 		CreateMap<SeriLotModel, dynamic>();
 		CreateMap<SeriLotTransaction, dynamic>();
 		CreateMap<SeriLotTransactionModel, dynamic>();
+        CreateMap<ShipAddressModel, dynamic>();
 	}
 }

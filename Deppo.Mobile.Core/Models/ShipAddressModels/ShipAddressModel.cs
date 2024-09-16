@@ -2,11 +2,11 @@
 
 namespace Deppo.Mobile.Core.Models.ShipAddressModels;
 
-public class ShipAdressModel : ShipAddress
+public class ShipAddressModel : ShipAddress
 {
 	private bool _isSelected;
 
-    public ShipAdressModel()
+    public ShipAddressModel()
     {
         
     }
