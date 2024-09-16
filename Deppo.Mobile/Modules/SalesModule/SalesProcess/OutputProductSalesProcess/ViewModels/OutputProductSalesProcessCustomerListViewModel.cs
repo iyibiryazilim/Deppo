@@ -57,6 +57,8 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 		LoadMoreProductsCommand = new Command(async () => await LoadMoreProductsAsync());
 
 		LoadMoreShipAddressesCommand = new Command(async () => await LoadMoreShipAddressesAsync());
+		ShipAddressTappedCommand = new Command<ShipAddressModel>(async (shipAddress) => await ShipAddressTappedAsync(shipAddress));
+		
 	}
 
 	public Page CurrentPage { get; set; } = null!;
@@ -72,6 +74,7 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 	public Command LoadMoreProductsCommand { get; }
 
 	public Command LoadMoreShipAddressesCommand { get; }
+	public Command ShipAddressTappedCommand { get; }
 	#endregion
 
 	private async Task LoadItemsAsync()
@@ -395,6 +398,30 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 		}
 	}
 
+	private async Task ShipAddressTappedAsync(ShipAddressModel shipAddressModel)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			ShipAddresses.ToList().ForEach(x => x.IsSelected = false);
+			ShipAddresses.FirstOrDefault(x => x.ReferenceId == shipAddressModel.ReferenceId).IsSelected = true;
+
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 	
 	private async Task NextViewAsync()
 	{
