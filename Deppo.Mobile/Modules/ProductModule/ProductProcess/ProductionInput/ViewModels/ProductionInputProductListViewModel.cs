@@ -49,11 +49,12 @@ public partial class ProductionInputProductListViewModel : BaseViewModel
             try
             {
                 IsBusy = true;
-                Items.Clear();
 
                 _userDialogs.Loading("Loading Items...");
-                var httpClient = _httpClientService.GetOrCreateHttpClient();
+                Items.Clear();
                 await Task.Delay(1000);
+
+                var httpClient = _httpClientService.GetOrCreateHttpClient();
                 var result = await _productService.GetObjects(httpClient,  _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 20);
                 if (result.IsSuccess)
                 {

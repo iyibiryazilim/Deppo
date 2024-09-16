@@ -66,7 +66,7 @@ public class CustomerTransactionDataStore : ICustomerTransactionService
             [BaseTransactionReferenceId] = STFICHE.LOGICALREF,
             [BaseTransactionCode] = STFICHE.FICHENO,
 			[TransactionDate] = STLINE.DATE_,
-            [TransactionTime] = dbo.LG_INTTOTIME(STFICHE.TIME_),
+            [TransactionTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
             [TransactionType] = STLINE.TRCODE,
             [IOType] = STLINE.IOCODE,
             [ProductReferenceId] = ITEMS.LOGICALREF,
@@ -82,15 +82,15 @@ public class CustomerTransactionDataStore : ICustomerTransactionService
             [CustomerCode] = CLCARD.CODE,
             [CustomerName] = CLCARD.DEFINITION_,
             [Quantity] = STLINE.AMOUNT,
-            [WarehouseNumber] = CAPIWOUSE.NR
+            [WarehouseNumber] = CAPIWHOUSE.NR
 		FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
-        LEFT JOIN L_CAPIWHOUSE AS CAPIWOUSE ON STLINE.SOURCEINDEX = CAPIWOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
-        WHERE STLINE.IOCODE(1,2,3,4) AND STFICHE.TRCODE IN (1,2,3,7,6,8) AND STLINE.STFICHEREF <> 0 AND STLINE.USREF <> 0 AND STLINE.UOMREF <> 0 AND CLCARD.LOGICALREF = {customerReferenceId}
+        LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
+        WHERE STLINE.IOCODE IN (1,2,3,4) AND STFICHE.TRCODE IN (1,2,3,7,6,8) AND STLINE.STFICHEREF <> 0 AND STLINE.USREF <> 0 AND STLINE.UOMREF <> 0 AND CLCARD.LOGICALREF = {customerReferenceId}
 		";
 
 		if (!string.IsNullOrEmpty(search))

@@ -90,20 +90,20 @@
                   ColumnDefinitions=".50*, .50*"
                   ColumnSpacing="10">
                 <Border Grid.Column="0"
-                        StrokeShape="RoundRectangle 10"
                         Padding="20,10,20,10"
                         BackgroundColor="{StaticResource PrimaryLight}"
+                        StrokeShape="RoundRectangle 10"
                         StrokeThickness="0">
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding InputQuantityTappedCommand}" />
                     </Border.GestureRecognizers>
                     <VerticalStackLayout VerticalOptions="Center">
-                        <Label HorizontalOptions="Center"
+                        <Label FontAttributes="Bold"
+                               FontSize="Medium"
+                               HorizontalOptions="Center"
                                Text="{Binding ProductDetailModel.InputQuantity}"
-                               FontAttributes="Bold"
-                               TextColor="{StaticResource White}"
-                               FontSize="Medium" />
-                        <Label HorizontalOptions="Center"               
+                               TextColor="{StaticResource White}" />
+                        <Label HorizontalOptions="Center"
                                Text="Giriş"
                                TextColor="{StaticResource WhiteSmoke}" />
                     </VerticalStackLayout>
@@ -111,18 +111,18 @@
 
                 <Border Grid.Column="1"
                         Padding="20,10,20,10"
-                        StrokeShape="RoundRectangle 10"
                         BackgroundColor="{StaticResource PrimaryLight}"
+                        StrokeShape="RoundRectangle 10"
                         StrokeThickness="0">
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding OutputQuantityTappedCommand}" />
                     </Border.GestureRecognizers>
                     <VerticalStackLayout VerticalOptions="Center">
-                        <Label HorizontalOptions="Center"
+                        <Label FontAttributes="Bold"
+                               FontSize="Medium"
+                               HorizontalOptions="Center"
                                Text="{Binding ProductDetailModel.OutputQuantity}"
-                               TextColor="{StaticResource White}"
-                               FontAttributes="Bold"
-                               FontSize="Medium" />
+                               TextColor="{StaticResource White}" />
                         <Label HorizontalOptions="Center"
                                Text="Çıkış"
                                TextColor="{StaticResource WhiteSmoke}" />
@@ -152,10 +152,10 @@
                                 StrokeThickness="0.1">
                             <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
                                 <VerticalStackLayout Grid.Column="0"
-                                                     VerticalOptions="Center" 
-                                                     Spacing="1">
-                                    <Label FontSize="Large"
-                                           FontAttributes="Bold"
+                                                     Spacing="1"
+                                                     VerticalOptions="Center">
+                                    <Label FontAttributes="Bold"
+                                           FontSize="Large"
                                            HorizontalOptions="Center"
                                            Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
                                            TextColor="{StaticResource OffBlack}" />
@@ -163,51 +163,55 @@
                                            HorizontalOptions="Center"
                                            Text="{Binding TransactionDate, StringFormat='{0:MM.yyyy}'}"
                                            TextColor="{StaticResource OffBlack}" />
-                                    <Label Text="{Binding TransactionTime,StringFormat='{0:hh\\:mm}'}"
-                                           TextColor="{StaticResource Gray400}"
-                                           HorizontalOptions="Center" />
+                                    <Label HorizontalOptions="Center"
+                                           Text="{Binding TransactionTime, StringFormat='{0:hh\\:mm}'}"
+                                           TextColor="{StaticResource Gray400}" />
                                 </VerticalStackLayout>
 
                                 <VerticalStackLayout Grid.Column="1"
                                                      Spacing="1"
                                                      VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
-                                           Text="{Binding BaseTransactionCode}"
-                                           FontSize="Medium" />
-                                    <Label Text="{Binding TransactionTypeName}"
+                                           FontSize="Medium"
+                                           Text="{Binding BaseTransactionCode}" />
+                                    <Label FontSize="13"
                                            LineBreakMode="TailTruncation"
-                                           FontSize="13" />
-                                    <Label Text="{Binding WarehouseName}"
+                                           Text="{Binding TransactionTypeName}" />
+                                    <Label FontSize="13"
                                            LineBreakMode="TailTruncation"
-                                           FontSize="13" />
+                                           Text="{Binding WarehouseName}" />
 
-                                    <HorizontalStackLayout Spacing="5">
-                                        <Label FontFamily="FAS"
-                                               FontSize="Small"
-                                               Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
-                                               TextColor="{StaticResource Primary}"
-                                               VerticalOptions="Center" />
-                                        <Label>
-                                            <Label.FormattedText>
-                                                <FormattedString>
-                                                    <Span FontAttributes="Bold"
-                                                          Text="{Binding Quantity}" />
-                                                    <Span Text=" " />
-                                                    <Span FontAttributes="Bold"
-                                                          Text="{Binding SubUnitsetCode}" />
-                                                </FormattedString>
-                                            </Label.FormattedText>
-                                        </Label>
-                                        <Image>
-                                            <Image.Source>
-                                                <FontImageSource FontFamily="FAS"
-                                                                 Glyph="{Binding IOTypeImageSource}"
-                                                                 Size="16"
-                                                                 Color="{StaticResource Primary}" />
-                                            </Image.Source>
-                                        </Image>
-                                        <Label Text="{Binding IOTypeName}"
-                                               FontAttributes="None" />
+                                    <HorizontalStackLayout Spacing="10">
+                                        <Grid ColumnDefinitions="Auto, Auto" ColumnSpacing="3">
+                                            <Label Grid.Column="0"
+                                                   FontFamily="FAS"
+                                                   FontSize="Small"
+                                                   Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
+                                                   TextColor="{StaticResource Primary}"
+                                                   VerticalOptions="Center" />
+                                            <Label Grid.Column="1">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span FontAttributes="Bold" Text="{Binding Quantity}" />
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold" Text="{Binding SubUnitsetCode}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                        </Grid>
+                                        <Grid ColumnDefinitions="Auto, Auto" ColumnSpacing="3">
+                                            <Label Grid.Column="0"
+                                                   FontFamily="FAS"
+                                                   HeightRequest="15"
+                                                   WidthRequest="10"
+                                                   Text="{Binding IOTypeImageSource}"
+                                                   TextColor="{Binding IOTypeColor}" />
+                                            <Label Grid.Column="1"
+                                                   VerticalOptions="Start"
+                                                   FontAttributes="Bold"
+                                                   Text="{Binding IOTypeName}" />
+                                        </Grid>
+
                                     </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Grid>
