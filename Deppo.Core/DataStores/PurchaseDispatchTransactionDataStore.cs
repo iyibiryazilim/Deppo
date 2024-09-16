@@ -16,7 +16,7 @@ namespace Deppo.Core.DataStores
     {
         public async Task<DataResult<ResponseModel>> InsertPurchaseDispatchTransaction(HttpClient httpClient, int firmNumber, PurchaseDispatchTransactionInsert dto)
         {
-            var postUrl = $"/gateway/purchase/PurchaseDispatchTransaction/Tiger?firmNumer={firmNumber}";
+            var postUrl = $"/gateway/purchase/PurchaseDispatchTransaction/Tiger?firmNumber={firmNumber}";
             var result = new DataResult<ResponseModel>();
             try
             {
