@@ -15,12 +15,11 @@ namespace Deppo.Core.DataStores
 {
     public class WastageTransactionDataStore : IWastageTransactionService
     {
-        private string postUrl = "/gateway/product/WastageTransaction/Tiger";
 
         public async Task<DataResult<ResponseModel>> InsertWastageTransaction(HttpClient httpClient, WastageTransactionInsert dto, int firmNumber)
         {
             
-                postUrl = $"/gateway/product/WastageTransaction/Tiger?firmNumber={firmNumber}";
+          var      postUrl = $"/gateway/product/WastageTransaction/Tiger?firmNumber={firmNumber}";
             
            
 
@@ -44,8 +43,9 @@ namespace Deppo.Core.DataStores
                 }
                 else
                 {
+                    var message = await responseMessage.Content.ReadAsStringAsync();
                     Debug.WriteLine($"Received non-successful HTTP status code: {responseMessage.StatusCode}");
-                    result.Message = "Failed to insert sales order.";
+                    result.Message = message;
                     result.IsSuccess = false;
                     return result;
                 }

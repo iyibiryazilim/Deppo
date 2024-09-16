@@ -349,24 +349,24 @@ WHERE TRCODE in (7 , 8);
         }
         private string LastCustomers(int firmNumber, int periodNumber)
         {
-            string baseQuery = $@"SELECT TOP(10)
+            string baseQuery = $@"SELECT TOP(5)
     [ReferenceId] = CLCARD.LOGICALREF,
     [Code] = CLCARD.CODE,
-    [Title] = CLCARD.DEFINITION_,
+    [Title] = ISNULL ( CLCARD.DEFINITION_ ,'') ,
     [IsPersonal] =
         CASE
             WHEN CLCARD.ISPERSCOMP = 0 THEN 0
             ELSE 1
         END,
-    [Name] = CLCARD.DEFINITION_,
-    [Email] = CLCARD.EMAILADDR,
+    [Name] = ISNULL (CLCARD.DEFINITION_,''),
+    [Email] = ISNULL(CLCARD.EMAILADDR,''),
 	[Telephone] = ISNULL(CLCARD.TELNRS1, '') + ' ' + ISNULL(CLCARD.TELNRS2, ''),    
-	[Address] = CLCARD.ADDR1,
-    [City] = CLCARD.CITY,
-    [Country] = CLCARD.COUNTRY,
-    [PostalCode] = CLCARD.POSTCODE,
-    [TaxOffice] = CLCARD.TAXOFFICE,
-    [TaxNumber] = CLCARD.TAXNR,
+	[Address] = ISNULL ( CLCARD.ADDR1 , ''),
+    [City] = ISNULL ( CLCARD.CITY, ''),
+    [Country] = ISNULL ( CLCARD.COUNTRY , '' ),
+    [PostalCode] = ISNULL (CLCARD.POSTCODE, ''),
+    [TaxOffice] = ISNULL ( CLCARD.TAXOFFICE, ''),
+    [TaxNumber] = ISNULL (CLCARD.TAXNR, ''),
     [IsActive] =
         CASE
             WHEN CLCARD.ACTIVE = 0 THEN 0
@@ -374,8 +374,7 @@ WHERE TRCODE in (7 , 8);
         END
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
-WHERE CLCARD.CODE LIKE '12%' 
-  AND CLCARD.CODE <> 'ÿ' 
+WHERE  CLCARD.CODE <> 'ÿ' 
   AND CLCARD.ACTIVE = 0
   AND STLINE.TRCODE in (7,8,2,3)
   
@@ -383,7 +382,7 @@ GROUP BY CLCARD.LOGICALREF, CLCARD.CODE, CLCARD.DEFINITION_, CLCARD.ISPERSCOMP,
          CLCARD.EMAILADDR, CLCARD.TELNRS1, CLCARD.TELNRS2, CLCARD.ADDR1, 
          CLCARD.CITY, CLCARD.COUNTRY, CLCARD.POSTCODE, CLCARD.TAXOFFICE, 
          CLCARD.TAXNR, CLCARD.ACTIVE
-ORDER BY MAX(STLINE.DATE_) DESC;
+ORDER BY MAX(STLINE.DATE_) DESC ;
 ";
             return baseQuery;
         }
@@ -391,9 +390,9 @@ ORDER BY MAX(STLINE.DATE_) DESC;
         {
             string baseQuery = $@"SELECT TOP(5)
     [ReferenceId] = ITEMS.LOGICALREF,
-    [Code] = ITEMS.CODE,
-    [Name] = ITEMS.NAME,
-    [VatRate] = ITEMS.VAT,
+    [Code] = ISNULL  (ITEMS.CODE,''),
+    [Name] = ISNULL(ITEMS.NAME,''),
+    [VatRate] = ISNULL (ITEMS.VAT, 0),
     [UnitsetReferenceId] = MAX(UNITSETF.LOGICALREF),
     [UnitsetCode] = MAX(UNITSETF.CODE),
     [UnitsetName] = MAX(UNITSETF.NAME),

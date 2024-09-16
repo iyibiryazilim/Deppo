@@ -15,12 +15,11 @@ namespace Deppo.Core.DataStores
 {
     public class OutCountingTransactionDataStore : IOutCountingTransactionService
     {
-        private string postUrl = "/gateway/product/ProductionTransaction/Tiger";
 
         public async Task<DataResult<ResponseModel>> InsertOutCountingTransaction(HttpClient httpClient, OutCountingTransactionInsert dto, int firmNumber)
         {
             
-                postUrl = $"/gateway/product/ProductionTransaction/Tiger?firmNumber={firmNumber}";
+          var  postUrl = $"/gateway/product/ProductionTransaction/Tiger?firmNumber={firmNumber}";
             
            
 
@@ -44,7 +43,7 @@ namespace Deppo.Core.DataStores
                 }
                 else
                 {
-                     var message = await responseMessage.Content.ReadAsStringAsync();
+                    var message = await responseMessage.Content.ReadAsStringAsync();
                     Debug.WriteLine($"Received non-successful HTTP status code: {responseMessage.StatusCode}");
                     result.Message = message;
                     result.IsSuccess = false;
