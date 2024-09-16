@@ -29,10 +29,10 @@ public partial class SalesCustomer : ObservableObject
     [ObservableProperty]
     string shipAddressCode = string.Empty;
 
-    //[ObservableProperty]
-    //int shipAddressCount;
+    [ObservableProperty]
+    int shipAddressCount;
 
-	public string TitleName => Name?.Length > 2 ? Name.Substring(0, 2) : Name;
+    public string TitleName => Name?.Length > 2 ? Name.Substring(0, 2) : Name;
 
 	[ObservableProperty]
     public List<SalesCustomerProduct> products = new();
@@ -40,5 +40,5 @@ public partial class SalesCustomer : ObservableObject
     [ObservableProperty]
     bool isSelected;
 
-    //public string ShipAddressIcon => ShipAddressCount > 0 ? "truck" : "" ;
+    public string ShipAddressIcon => ShipAddressCount > 0 ? "truck" : "" ;
 }
