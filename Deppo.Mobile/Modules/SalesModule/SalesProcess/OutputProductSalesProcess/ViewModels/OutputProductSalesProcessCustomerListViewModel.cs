@@ -55,6 +55,8 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 
 		ShowProductsCommand = new Command<SalesCustomer>(async (customer) => await ShowProductsAsync(customer));
 		LoadMoreProductsCommand = new Command(async () => await LoadMoreProductsAsync());
+
+		LoadMoreShipAddressesCommand = new Command(async () => await LoadMoreShipAddressesAsync());
 	}
 
 	public Page CurrentPage { get; set; } = null!;
@@ -68,6 +70,8 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 
 	public Command ShowProductsCommand { get; }
 	public Command LoadMoreProductsCommand { get; }
+
+	public Command LoadMoreShipAddressesCommand { get; }
 	#endregion
 
 	private async Task LoadItemsAsync()
@@ -348,7 +352,7 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 		}
 	}
 
-	private async Task LoadMoreShipAddressesAsync(SalesCustomer customer)
+	private async Task LoadMoreShipAddressesAsync()
 	{
 		if (IsBusy)
 			return;
@@ -361,7 +365,7 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
-				currentReferenceId: customer.ReferenceId,
+				currentReferenceId: SalesCustomer.ReferenceId,
 				search: string.Empty,
 				skip: ShipAddresses.Count,
 				take: 20
@@ -391,7 +395,7 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 		}
 	}
 
-
+	
 	private async Task NextViewAsync()
 	{
 		if (IsBusy)
