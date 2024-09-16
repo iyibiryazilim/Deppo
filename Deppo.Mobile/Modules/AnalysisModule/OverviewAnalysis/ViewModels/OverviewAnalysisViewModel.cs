@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.AnalysisModels;
+using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -31,6 +32,9 @@ public partial class OverviewAnalysisViewModel : BaseViewModel
 
     public Command LoadItemsCommand { get; }
 
+    [ObservableProperty]
+    public DateTime selectedDate;
+
     public async Task LoadItemsAsync()
     {
         if (IsBusy)
@@ -40,7 +44,7 @@ public partial class OverviewAnalysisViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            await Task.WhenAll(GetTotalProductCountAsync(), GetTotalInputProductCountAsync(), GetTotalOutputProductCountAsync(),GetInputTransactionCountAsync(),GetOutputTransactionCountAsync());
+            await Task.WhenAll(GetTotalProductCountAsync(), GetTotalInputProductCountAsync(), GetTotalOutputProductCountAsync(),GetInputTransactionCountAsync(),GetOutputTransactionCountAsync(), GetProductsWithNoTransactionsCountAsync());
 
         }
         catch (Exception ex)
@@ -59,11 +63,9 @@ public partial class OverviewAnalysisViewModel : BaseViewModel
 
     private async Task GetTotalProductCountAsync()
     {
-        if (IsBusy)
-            return;
+
         try
         {
-            IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _overviewAnalysisService.GetTotalProductCountAsync(httpClient, _httpClientService.FirmNumber);
@@ -87,10 +89,7 @@ public partial class OverviewAnalysisViewModel : BaseViewModel
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
-        finally
-        {
-            IsBusy = false;
-        }
+
     }
 
     private async Task GetTotalInputProductCountAsync()
@@ -191,7 +190,6 @@ public partial class OverviewAnalysisViewModel : BaseViewModel
 
         try
         {
-            IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _overviewAnalysisService.GetOutputTransactionCountAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber);
@@ -216,6 +214,63 @@ public partial class OverviewAnalysisViewModel : BaseViewModel
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
 
+    }
+
+    private async Task GetProductsWithNoTransactionsCountAsync()
+    {
+
+        try
+        {
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _overviewAnalysisService.GetProductsWithNoTransactionsCountAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber,SelectedDate);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                {
+                    var obj = Mapping.Mapper.Map<OverviewAnalysisModel>(item);
+                    OverviewAnalysisModel.ProductsWithNoTransactionsCount = obj.ProductsWithNoTransactionsCount;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+
+    }
+
+    private async Task GetProductsWithNoTransactionsAsync()
+    {
+        try
+        {
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _overviewAnalysisService.GetProductsWithNoTransactionsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SelectedDate, string.Empty, 0, 20);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                OverviewAnalysisModel.ProductsWithNoTransactions.Clear();
+                foreach (var item in result.Data)
+                    OverviewAnalysisModel.ProductsWithNoTransactions.Add(Mapping.Mapper.Map<ProductModel>(item));
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
     }
 
 }
