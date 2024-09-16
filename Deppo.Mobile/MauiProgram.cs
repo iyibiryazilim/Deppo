@@ -40,6 +40,10 @@ using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOr
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.ViewModels;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.Views;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseProcess.ViewModels;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ViewModels;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels;
@@ -375,6 +379,26 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessOtherProductListView, InputProductPurchaseOrderProcessOtherProductListViewModel>(nameof(InputProductPurchaseOrderProcessOtherProductListView));
 
         #endregion Siparişe Bağlı Satınalma İşlemleri
+
+        #region Satınalma İade İşlemleri
+
+        builder.Services.AddTransientWithShellRoute<ReturnPurchaseWarehouseListView, ReturnPurchaseWarehouseListViewModel>(nameof(ReturnPurchaseWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<ReturnPurchaseProductListView, ReturnPurchaseProductListViewModel>(nameof(ReturnPurchaseProductListView));
+        builder.Services.AddScopedWithShellRoute<ReturnPurchaseBasketView, ReturnPurchaseBasketViewModel>(nameof(ReturnPurchaseBasketView));
+        builder.Services.AddScopedWithShellRoute<ReturnPurchaseFormView, ReturnPurchaseFormViewModel>(nameof(ReturnPurchaseFormView));
+
+        #endregion
+
+        #region İrsaliyeye Bağlı Satınalma İade İşlemleri
+
+        builder.Services.AddTransientWithShellRoute<ReturnPurchaseDispatchWarehouseListView, ReturnPurchaseDispatchWarehouseListViewModel>(nameof(ReturnPurchaseDispatchWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<ReturnPurchaseDispatchSupplierListView, ReturnPurchaseDispatchSupplierListViewModel>(nameof(ReturnPurchaseDispatchSupplierListView));
+        builder.Services.AddScopedWithShellRoute<ReturnPurchaseDispatchListView, ReturnPurchaseDispatchListViewModel>(nameof(ReturnPurchaseDispatchListView));
+        builder.Services.AddScopedWithShellRoute<ReturnPurchaseDispatchProductListView, ReturnPurchaseDispatchProductListViewModel>(nameof(ReturnPurchaseDispatchProductListView));
+        builder.Services.AddScopedWithShellRoute<ReturnPurchaseDispatchBasketView, ReturnPurchaseDispatchBasketViewModel>(nameof(ReturnPurchaseDispatchBasketView));
+        builder.Services.AddScopedWithShellRoute<ReturnPurchaseDispatchFormView, ReturnPurchaseDispatchFormViewModel>(nameof(ReturnPurchaseDispatchFormView));
+
+        #endregion
 
         #endregion Purchase Modules
 
