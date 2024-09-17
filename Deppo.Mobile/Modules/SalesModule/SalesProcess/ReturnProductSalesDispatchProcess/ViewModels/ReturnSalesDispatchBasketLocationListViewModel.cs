@@ -12,6 +12,7 @@ using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.ViewModels;
 using DevExpress.Maui.Controls;
 using System;
 using System.Collections.Generic;
@@ -52,6 +53,7 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
     }
+
     [ObservableProperty]
     private WarehouseModel warehouseModel = null!;
 
@@ -463,7 +465,6 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
         }
     }
 
-
     private async Task ConfirmAsync()
     {
         if (IsBusy)
@@ -475,36 +476,32 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
 
             _userDialogs.ShowLoading("Loading...");
             //InputProductPurchaseProcessBasketListViewModel
-            var previousViewModel = _serviceProvider.GetRequiredService<ReturnSalesBasketModel>();
+            var previousViewModel = _serviceProvider.GetRequiredService<ReturnSalesBasketViewModel>();
 
-       /*     if (previousViewModel.Items.FirstOrDefault(x => x.ProductReferenceId == returnSalesBasketModel.ItemReferenceId) is not null)
-            {
-                foreach (var item in SelectedItems.Where(x => x.InputQuantity > 0)) //Locations
-                {
-                    var location = previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId).Details.FirstOrDefault(x => x.LocationCode == item.Code);
-                    if (location is not null)
-                    {
-                        location.Quantity = item.InputQuantity;
-                    }
-                    else
-                    {
-                        previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId).Details.Add(new InputPurchaseBasketDetailModel
-                        {
-                            LocationReferenceId = item.ReferenceId,
-                            LocationCode = item.Code,
-                            LocationName = item.Name,
-                            Quantity = item.InputQuantity
-                        });
+            /*     if (previousViewModel.Items.FirstOrDefault(x => x.ProductReferenceId == returnSalesBasketModel.ItemReferenceId) is not null)
+                 {
+                     foreach (var item in SelectedItems.Where(x => x.InputQuantity > 0)) //Locations
+                     {
+                         var location = previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId).Details.FirstOrDefault(x => x.LocationCode == item.Code);
+                         if (location is not null)
+                         {
+                             location.Quantity = item.InputQuantity;
+                         }
+                         else
+                         {
+                             previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId).Details.Add(new InputPurchaseBasketDetailModel
+                             {
+                                 LocationReferenceId = item.ReferenceId,
+                                 LocationCode = item.Code,
+                                 LocationName = item.Name,
+                                 Quantity = item.InputQuantity
+                             });
+                         }
 
-
-                    }
-
-                    var totalInputQuantity = SelectedItems.Where(x => x.InputQuantity > 0).Sum(x => x.InputQuantity);
-                    previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId).Quantity = totalInputQuantity;
-                }
-
-
-            }*/
+                         var totalInputQuantity = SelectedItems.Where(x => x.InputQuantity > 0).Sum(x => x.InputQuantity);
+                         previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId).Quantity = totalInputQuantity;
+                     }
+                 }*/
 
             await Shell.Current.GoToAsync("..");
             _userDialogs.HideHud();
