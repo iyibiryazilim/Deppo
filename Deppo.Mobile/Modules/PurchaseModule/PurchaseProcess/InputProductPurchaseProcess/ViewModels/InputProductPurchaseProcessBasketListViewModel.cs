@@ -12,6 +12,7 @@ using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views;
 using DevExpress.Maui.Controls;
 using Microsoft.Extensions.DependencyInjection;
@@ -318,7 +319,7 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
                 return;
             }
 
-            await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseProcessFormView)}", new Dictionary<string, object>
+            await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessOtherProductListView)}", new Dictionary<string, object>
             {
                 [nameof(WarehouseModel)] = WarehouseModel,
                 [nameof(Items)] = Items,

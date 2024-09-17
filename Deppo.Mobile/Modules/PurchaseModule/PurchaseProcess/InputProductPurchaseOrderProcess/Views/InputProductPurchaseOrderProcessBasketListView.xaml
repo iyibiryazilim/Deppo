@@ -36,7 +36,7 @@
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
     <ContentPage.ToolbarItems>
-        <ToolbarItem>
+        <ToolbarItem Command="{Binding ShowOtherProductCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="FAS"
                                  Glyph="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
