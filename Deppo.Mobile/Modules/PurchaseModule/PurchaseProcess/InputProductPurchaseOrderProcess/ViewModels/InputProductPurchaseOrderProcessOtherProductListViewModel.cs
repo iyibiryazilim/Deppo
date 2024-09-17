@@ -1,12 +1,18 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.BaseModels;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
+using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels;
+using DevExpress.Maui.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,15 +30,16 @@ public partial class InputProductPurchaseOrderProcessOtherProductListViewModel :
     private readonly IUserDialogs _userDialogs;
     private readonly IServiceProvider _serviceProvider;
     private readonly IPurchaseSupplierProductService _purchaseSupplierProductService;
-
-    [ObservableProperty]
-    private ObservableCollection<PurchaseSupplierProduct> selectedProducts = new();
+    private readonly IProductService _productService;
 
     [ObservableProperty]
     private WarehouseModel warehouseModel = null!;
 
     [ObservableProperty]
-    private PurchaseSupplier purchaseSupplier = null!;
+    private ProductModel? selectedProduct;
+
+    [ObservableProperty]
+    private ObservableCollection<InputPurchaseBasketModel> selectedProducts = new();
 
     [ObservableProperty]
     private int targetViewType = default;
@@ -41,25 +48,32 @@ public partial class InputProductPurchaseOrderProcessOtherProductListViewModel :
 
     public InputProductPurchaseOrderProcessOtherProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs,
         IServiceProvider serviceProvider,
-        IPurchaseSupplierProductService purchaseSupplierProductService)
+        IPurchaseSupplierProductService purchaseSupplierProductService, IProductService productService)
     {
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
         _serviceProvider = serviceProvider;
         _purchaseSupplierProductService = purchaseSupplierProductService;
+        _productService = productService;
 
         Title = "Ürün Listesi";
+
+        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+        LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+        ItemTappedCommand = new Command<ProductModel>(async (x) => await ItemTappedAsync(x));
+        ConfirmCommand = new Command(async () => await ConfirmAsync());
     }
 
     public Command LoadItemsCommand { get; }
 
     public Command LoadMoreItemsCommand { get; }
 
-    public Command<PurchaseSupplierProduct> ItemTappedCommand { get; }
-
     public Command NextViewCommand { get; }
 
-    public ObservableCollection<PurchaseSupplierProduct> Items { get; } = new();
+    public Command ItemTappedCommand { get; }
+    public Command ConfirmCommand { get; }
+
+    public ObservableCollection<ProductModel> Items { get; } = new();
 
     private async Task LoadItemsAsync()
     {
@@ -69,34 +83,55 @@ public partial class InputProductPurchaseOrderProcessOtherProductListViewModel :
         try
         {
             IsBusy = true;
-            _userDialogs.ShowLoading("Yükleniyor");
             Items.Clear();
+            SelectedProducts.Clear();
 
-            await Task.Delay(1000);
-
+            _userDialogs.Loading("Loading Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _purchaseSupplierProductService.GetObjects(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, PurchaseSupplier.ReferenceId, WarehouseModel.Number, string.Empty, 0, 20);
+            await Task.Delay(1000);
+            var result = await _productService.GetObjectsPurchaseProduct(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 20);
             if (result.IsSuccess)
             {
-                if (result.Data is not null)
+                if (result.Data == null)
+                    return;
+
+                foreach (var product in result.Data)
                 {
-                    foreach (var item in result.Data)
-                        Items.Add(Mapping.Mapper.Map<PurchaseSupplierProduct>(item));
+                    var item = Mapping.Mapper.Map<Product>(product);
+
+                    Items.Add(new ProductModel
+                    {
+                        ReferenceId = item.ReferenceId,
+                        Code = item.Code,
+                        Name = item.Name,
+                        UnitsetReferenceId = item.UnitsetReferenceId,
+                        UnitsetCode = item.UnitsetCode,
+                        UnitsetName = item.UnitsetName,
+                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                        SubUnitsetCode = item.SubUnitsetCode,
+                        SubUnitsetName = item.SubUnitsetName,
+                        StockQuantity = item.StockQuantity,
+                        TrackingType = item.TrackingType,
+                        LocTracking = item.LocTracking,
+                        IsVariant = item.IsVariant,
+                        IsSelected = false
+                    });
                 }
             }
 
-            _userDialogs.HideHud();
+            _userDialogs.Loading().Hide();
         }
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
+                _userDialogs.Loading().Hide();
 
-            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
             IsBusy = false;
+            _userDialogs.Loading().Dispose();
         }
     }
 
@@ -108,36 +143,56 @@ public partial class InputProductPurchaseOrderProcessOtherProductListViewModel :
         try
         {
             IsBusy = true;
-            _userDialogs.ShowLoading("Yükleniyor...");
-            await Task.Delay(1000);
 
+            _userDialogs.Loading("Loading More Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _purchaseSupplierProductService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseSupplier.ReferenceId, WarehouseModel.Number, string.Empty, Items.Count, 20);
+            var result = await _productService.GetObjectsPurchaseProduct(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, Items.Count, 20);
             if (result.IsSuccess)
             {
-                if (result.Data is not null)
-                {
-                    foreach (var item in result.Data)
-                        Items.Add(Mapping.Mapper.Map<PurchaseSupplierProduct>(item));
+                if (result.Data == null)
+                    return;
 
-                    _userDialogs.HideHud();
+                foreach (var product in result.Data)
+                {
+                    var item = Mapping.Mapper.Map<Product>(product);
+
+                    Items.Add(new ProductModel
+                    {
+                        ReferenceId = item.ReferenceId,
+                        Code = item.Code,
+                        Name = item.Name,
+                        UnitsetReferenceId = item.UnitsetReferenceId,
+                        UnitsetCode = item.UnitsetCode,
+                        UnitsetName = item.UnitsetName,
+                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                        SubUnitsetCode = item.SubUnitsetCode,
+                        SubUnitsetName = item.SubUnitsetName,
+                        StockQuantity = item.StockQuantity,
+                        TrackingType = item.TrackingType,
+                        LocTracking = item.LocTracking,
+                        IsVariant = item.IsVariant,
+                        IsSelected = false
+                    });
                 }
             }
+
+            _userDialogs.Loading().Hide();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
+                _userDialogs.Loading().Hide();
 
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
             IsBusy = false;
+            _userDialogs.Loading().Dispose();
         }
     }
 
-    private async Task ItemTappedAsync(PurchaseSupplierProduct purchaseSupplierProduct)
+    private async Task ItemTappedAsync(ProductModel item)
     {
         if (IsBusy)
             return;
@@ -146,56 +201,87 @@ public partial class InputProductPurchaseOrderProcessOtherProductListViewModel :
         {
             IsBusy = true;
 
-            var selectedItem = Items.FirstOrDefault(x => x.ItemReferenceId == purchaseSupplierProduct.ItemReferenceId);
-            if (selectedItem is not null)
-            {
-                if (selectedItem.IsSelected)
+            if (item is not null)
+                if (item.IsVariant)
                 {
-                    Items.FirstOrDefault(x => x.ItemReferenceId == purchaseSupplierProduct.ItemReferenceId).IsSelected = false;
-                    SelectedProducts.Remove(SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == selectedItem.ItemReferenceId));
+                    CurrentPage.FindByName<BottomSheet>("").State = BottomSheetState.HalfExpanded;
                 }
                 else
                 {
-                    Items.FirstOrDefault(x => x.ItemReferenceId == purchaseSupplierProduct.ItemReferenceId).IsSelected = true;
+                    if (!item.IsSelected)
+                    {
+                        Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = true;
 
-                    // var basketItem = new InputPurchaseBasketModel
-                    // {
-                    //     ItemReferenceId = selectedItem.ItemReferenceId,
-                    //     ItemCode = selectedItem.ItemCode,
-                    //     ItemName = selectedItem.ItemName,
-                    //     IsVariant = selectedItem.IsVariant,
-                    //     UnitsetReferenceId = selectedItem.UnitsetReferenceId,
-                    //     UnitsetCode = selectedItem.UnitsetCode,
-                    //     UnitsetName = selectedItem.UnitsetName,
-                    //     SubUnitsetReferenceId = selectedItem.SubUnitsetReferenceId,
-                    //     SubUnitsetCode = selectedItem.SubUnitsetCode,
-                    //     SubUnitsetName = selectedItem.SubUnitsetName,
-                    //     MainItemReferenceId = selectedItem.MainItemReferenceId,
-                    //     MainItemCode = selectedItem.MainItemCode,
-                    //     MainItemName = selectedItem.MainItemName,
-                    //     StockQuantity = default,
-                    //     IsSelected = false,
-                    //     TrackingType = selectedItem.TrackingType,
-                    //     LocTracking = selectedItem.LocTracking,
-                    //     Image = string.Empty,
-                    //     Quantity = selectedItem.WaitingQuantity,
+                        SelectedProduct = item;
 
-                    // };
+                        var basketItem = new InputPurchaseBasketModel
+                        {
+                            ItemReferenceId = item.ReferenceId,
+                            ItemCode = item.Code,
+                            ItemName = item.Name,
+                            UnitsetReferenceId = item.UnitsetReferenceId,
+                            UnitsetCode = item.UnitsetCode,
+                            UnitsetName = item.UnitsetName,
+                            SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                            SubUnitsetCode = item.SubUnitsetCode,
+                            SubUnitsetName = item.SubUnitsetName,
+                            IsSelected = false,
+                            MainItemCode = string.Empty,
+                            MainItemName = string.Empty,
+                            MainItemReferenceId = default,
+                            StockQuantity = item.StockQuantity,
+                            Quantity = item.LocTracking == 0 ? 1 : 0,
+                            InputQuantity = item.LocTracking == 0 ? 1 : 0,
+                            LocTracking = item.LocTracking,
+                            TrackingType = item.TrackingType,
+                            IsVariant = item.IsVariant
+                        };
 
-                    // if (selectedItem.LocTracking == 1 || selectedItem.TrackingType == 1)
-                    //     basketItem.InputQuantity = 0;
-                    // else
-                    //     basketItem.InputQuantity = 1;
-
-                    SelectedProducts.Add(selectedItem);
+                        SelectedProducts.Add(basketItem);
+                    }
+                    else
+                    {
+                        SelectedProduct = null;
+                        var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ReferenceId);
+                        if (selectedItem != null)
+                        {
+                            SelectedProducts.Remove(selectedItem);
+                            Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = false;
+                        }
+                    }
                 }
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ConfirmAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            var previouseViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseOrderProcessBasketListViewModel>();
+            if (previouseViewModel is not null)
+            {
+                foreach (var item in SelectedProducts)
+                    if (!previouseViewModel.Items.Any(x => x.ItemCode == item.ItemCode))
+                        previouseViewModel.Items.Add(item);
+
+                await Shell.Current.GoToAsync($"..");
             }
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally

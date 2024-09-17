@@ -63,6 +63,56 @@ public class PurchaseSupplierDataStore : IPurchaseSupplierService
         }
     }
 
+    public async Task<DataResult<IEnumerable<dynamic>>> GetSuppliersWithDispatch(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20)
+    {
+        var content = new StringContent(JsonConvert.SerializeObject(ReturnPurchaseSupplierQuery(firmNumber, periodNumber, warehouseNumber, search, skip, take)), Encoding.UTF8, "application/json");
+
+        HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+        DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            var data = await responseMessage.Content.ReadAsStringAsync();
+            if (data != null)
+            {
+                if (!string.IsNullOrEmpty(data))
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "success";
+                    return dataResult;
+                }
+                else
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "empty";
+                    return dataResult;
+                }
+            }
+            else
+            {
+                var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                dataResult.Data = Enumerable.Empty<dynamic>();
+                dataResult.IsSuccess = false;
+                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+                return dataResult;
+            }
+        }
+        else
+        {
+            dataResult.Data = Enumerable.Empty<dynamic>();
+            dataResult.IsSuccess = false;
+            dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+            return dataResult;
+        }
+    }
+
     private string PurchaseSupplierQuery(int firmNumber, int periodNumber, int warehouseNumber,string search = "", int skip = 0, int take = 20)
     {
         string baseQuery = $@"SELECT
@@ -78,6 +128,31 @@ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3,'0')}_CLCARD AS CLCARD
 WHERE ORFLINE.CLOSED = 0
     AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0
     AND ORFLINE.TRCODE = 2 AND ORFLINE.SOURCEINDEX = {warehouseNumber}";
+
+        if (!string.IsNullOrEmpty(search))
+            baseQuery += $@" AND (CLCARD.CODE LIKE '{search}%' OR CLCARD.DEFINITION_ LIKE '%{search}%')";
+
+        baseQuery += $@" GROUP BY CLCARD.LOGICALREF, CLCARD.CODE, CLCARD.DEFINITION_, CLCARD.COUNTRY, CLCARD.CITY
+ORDER BY CLCARD.DEFINITION_ ASC
+OFFSET {skip} ROWS
+FETCH NEXT {take} ROWS ONLY";
+
+        return baseQuery;
+    }
+
+    private string ReturnPurchaseSupplierQuery(int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20)
+    {
+        string baseQuery = $@"SELECT
+    [ReferenceId] = CLCARD.LOGICALREF,
+    [Code] = CLCARD.CODE,
+    [Name] = CLCARD.DEFINITION_,
+    [ProductReferenceCount] = COUNT(DISTINCT STLINE.STOCKREF),
+    [Country] = CLCARD.COUNTRY,
+    [City] = CLCARD.CITY
+FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
+LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD
+    ON STLINE.CLIENTREF = CLCARD.LOGICALREF
+WHERE  STLINE.TRCODE = 1 AND STLINE.SOURCEINDEX = {warehouseNumber}";
 
         if (!string.IsNullOrEmpty(search))
             baseQuery += $@" AND (CLCARD.CODE LIKE '{search}%' OR CLCARD.DEFINITION_ LIKE '%{search}%')";

@@ -5,6 +5,7 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.Views;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.ViewModels;
@@ -169,7 +170,7 @@ public partial class ReturnPurchaseDispatchWarehouseListViewModel : BaseViewMode
 
             if (SelectedWarehouseModel is not null)
             {
-                await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessSupplierListView)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseDispatchSupplierListView)}", new Dictionary<string, object>
                 {
                     [nameof(WarehouseModel)] = SelectedWarehouseModel,
                 });
