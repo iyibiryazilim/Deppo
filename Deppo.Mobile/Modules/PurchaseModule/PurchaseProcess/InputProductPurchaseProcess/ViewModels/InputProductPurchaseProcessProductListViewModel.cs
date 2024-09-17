@@ -53,7 +53,6 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<ProductModel>(async (parameter) => await ItemTappedAsync(parameter));
-        ShowSelectedProductsCommand = new Command<BottomSheet>(async (parameter) => await ShowSelectedProductsAsync(parameter));
         //LoadVariantItemsCommand = new Command<ProductModel>(async (parameter) => await LoadVariantItemsAsync(parameter));
         //LoadMoreVariantItemsCommand = new Command(async () => await LoadMoreVariantItemsAsync());
         //VariantTappedCommand = new Command<VariantModel>(async (parameter) => await VariantTappedAsync(parameter));
@@ -67,7 +66,6 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
-    public Command ShowSelectedProductsCommand { get; }
     public Command<ProductModel> LoadVariantItemsCommand { get; }
     public Command LoadMoreVariantItemsCommand { get; }
     public Command<VariantModel> VariantTappedCommand { get; }
@@ -264,26 +262,6 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
         }
     }
 
-    private async Task ShowSelectedProductsAsync(BottomSheet bottomSheet)
-    {
-        if (IsBusy)
-            return;
-
-        try
-        {
-            IsBusy = true;
-
-            bottomSheet.State = BottomSheetState.HalfExpanded;
-        }
-        catch (Exception ex)
-        {
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
 
     //private async Task LoadVariantItemsAsync(ProductModel item)
     //{
