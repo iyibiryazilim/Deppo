@@ -142,10 +142,10 @@ public class SalesCustomerDataStore : ISalesCustomerService
     [ProductReferenceCount] = COUNT(DISTINCT STLINE.STOCKREF),
     [Country] = CLCARD.COUNTRY,
     [City] = CLCARD.CITY
-FROM LG_001_01_STFICHE AS STFICHE
-LEFT JOIN LG_001_CLCARD AS CLCARD
+FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2,'0')}_STFICHE AS STFICHE
+LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD
     ON STFICHE.CLIENTREF = CLCARD.LOGICALREF
-left join LG_001_01_STLINE AS STLINE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+left join LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2,'0')}_STLINE AS STLINE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
 WHERE
    STFICHE.TRCODE in  (7,8)
     AND  STLINE.SOURCEINDEX = {warehouseNumber}";

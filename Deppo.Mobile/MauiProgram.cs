@@ -235,6 +235,10 @@ public static class MauiProgram
         builder.Services.AddSingleton<IWholeSalesReturnDispatchTransactionService, WholeSalesReturnDispatchTransactionDataStore>();
         builder.Services.AddSingleton<ITransferTransactionService, TransferTransactionDataStore>();
 
+
+        builder.Services.AddSingleton<ISalesDispatchTransactionService, SalesDispatchTransactionDataStore>();
+
+
         builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
         builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
         builder.Services.AddTransientWithShellRoute<CompanyListView, CompanyListViewModel>(nameof(CompanyListView));
@@ -299,6 +303,7 @@ public static class MauiProgram
         builder.Services.AddScopedWithShellRoute<OutputProductSalesProcessCustomerListView, OutputProductSalesProcessCustomerListViewModel>(nameof(OutputProductSalesProcessCustomerListView));
         builder.Services.AddScopedWithShellRoute<OutputProductSalesProcessBasketListView, OutputProductSalesProcessBasketListViewModel>(nameof(OutputProductSalesProcessBasketListView));
         builder.Services.AddScopedWithShellRoute<OutputProductSalesProcessProductListView, OutputProductSalesProcessProductListViewModel>(nameof(OutputProductSalesProcessProductListView));
+        builder.Services.AddScopedWithShellRoute<OutputProductSalesProcessFormView, OutputProductSalesProcessFormViewModel>(nameof(OutputProductSalesProcessFormView));
 
         #endregion Sevk Islemleri
 

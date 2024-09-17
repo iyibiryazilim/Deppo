@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.LocationModels;
@@ -351,9 +351,9 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
 
             SelectedItem = locationModel;
 
-            if (ReturnSalesBasketModel.TrackingType != 0)
-            {
-                await Shell.Current.GoToAsync($"{nameof(ReturnSalesBasketLocationListView)}", new Dictionary<string, object>
+            if (returnSalesBasketModel.TrackingType != 0)
+            {//InputProductProcessBasketSeriLotListView
+                await Shell.Current.GoToAsync($"{nameof(ReturnSalesBasketSeriLotListView)}", new Dictionary<string, object>
                 {
                     [nameof(WarehouseModel)] = WarehouseModel,
                     [nameof(ReturnSalesBasketModel)] = ReturnSalesBasketModel
@@ -389,7 +389,8 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
 
                 if (returnSalesBasketModel.TrackingType != 0)
                 {
-                    await Shell.Current.GoToAsync($"{nameof(ReturnSalesBasketLocationListView)}", new Dictionary<string, object>
+                   // InputProductProcessBasketSeriLotListView
+                    await Shell.Current.GoToAsync($"{nameof(ReturnSalesBasketSeriLotListView)}", new Dictionary<string, object>
                     {
                         [nameof(WarehouseModel)] = WarehouseModel,
                         [nameof(returnSalesBasketModel)] = returnSalesBasketModel
@@ -475,10 +476,10 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
             IsBusy = true;
 
             _userDialogs.ShowLoading("Loading...");
+            //InputProductPurchaseProcessBasketListViewModel
+            var previousViewModel = _serviceProvider.GetRequiredService<ReturnSalesBasketModel>();
+       /*     if (previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId) is not null)
 
-            var previousViewModel = _serviceProvider.GetRequiredService<ReturnSalesBasketViewModel>();
-
-            if (previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId) is not null)
             {
                 foreach (var item in SelectedItems.Where(x => x.InputQuantity > 0)) //Locations
                 {
@@ -501,7 +502,8 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
                     var totalInputQuantity = SelectedItems.Where(x => x.InputQuantity > 0).Sum(x => x.InputQuantity);
                     previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId).Quantity = totalInputQuantity;
                 }
-            }
+            }*/
+
 
             await Shell.Current.GoToAsync("..");
             _userDialogs.HideHud();

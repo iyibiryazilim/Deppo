@@ -1,67 +1,20 @@
 ﻿using Deppo.Core.DataResultModel;
-using Deppo.Core.DTOs.PurchaseDispatchTransaction;
-using Deppo.Core.ResponseResultModels;
 using Deppo.Core.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Deppo.Core.DataStores
 {
-    public class PurchaseDispatchTransactionDataStore : IPurchaseDispatchTransactionService
+    public class SalesDispatchTransactionDataStore : ISalesDispatchTransactionService
     {
-
-        public async Task<DataResult<ResponseModel>> InsertPurchaseDispatchTransaction(HttpClient httpClient, int firmNumber, PurchaseDispatchTransactionInsert dto)
-        {
-            var postUrl = $"/gateway/purchase/PurchaseDispatchTransaction/Tiger?firmNumber={firmNumber}";
-            var result = new DataResult<ResponseModel>();
-            try
-            {
-                var json = JsonConvert.SerializeObject(dto);
-                var content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json");
-
-
-                var responseMessage = await httpClient.PostAsync($"{postUrl}", content);
-
-                if (responseMessage.IsSuccessStatusCode)
-                {
-                    var data = await responseMessage.Content.ReadAsStringAsync();
-                    var dtos = data.Trim('"').Replace("\\\"", "\"").Replace("\\", "");
-                    var dtos2 = JsonConvert.DeserializeObject<DataResult<ResponseModel>>(dtos);
-                    result.Message = dtos2.Message;
-                    result.IsSuccess = dtos2.IsSuccess;
-                    result.Data = dtos2.Data;
-                    return result;
-
-                }
-                else
-                {
-
-                    var message = await responseMessage.Content.ReadAsStringAsync();
-                    result.Message = message;
-                    result.IsSuccess = false;
-                    return result;
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-                return new DataResult<ResponseModel>
-                {
-                    IsSuccess = false,
-                    Message = $"An error occurred: {ex.Message}"
-                };
-            }
-        }
-
-        public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber,int supplierReferenceId, string search = "", int skip = 0, int take = 20)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int customerReferenceId, string search = "", int skip = 0, int take = 20)
         {
             var postUrl = $"/gateway/customQuery/CustomQuery";
-            var content = new StringContent(JsonConvert.SerializeObject(GetPurchaseDispatchQuery(firmNumber, periodNumber, warehouseNumber, supplierReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetSalesDispatchQuery(firmNumber, periodNumber, warehouseNumber, customerReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -108,7 +61,6 @@ namespace Deppo.Core.DataStores
                 return dataResult;
             }
         }
-
         public async Task<DataResult<IEnumerable<dynamic>>> GetTransactionsByFicheReferenceId(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId, string search = "", int skip = 0, int take = 20)
         {
             var postUrl = $"/gateway/customQuery/CustomQuery";
@@ -160,39 +112,6 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        private string GetPurchaseDispatchQuery(int firmNumber, int periodNumber, int warehouseNumber,int supplierReferenceId, string search = "", int skip = 0, int take = 20)
-        {
-            string baseQuery = $@"Select
-            [ReferenceId] = STFICHE.LOGICALREF,
-			[FicheType] = STFICHE.TRCODE,
-			[FicheNumber] = STFICHE.FICHENO,
-            [FicheDate] = STFICHE.DATE_,
-            [FicheTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
-			[DocumentNumber] =ISNULL (STFICHE.DOCODE , ''),
-			[DocumentDate] =  STFICHE.DOCDATE,
-			[SpecialCode] = ISNULL  ( STFICHE.SPECODE , ''),
-			[CurrentReferenceID] = ISNULL ( CLCARD.LOGICALREF, 0),
-			[CurrentCode] = ISNULL (CLCARD.CODE , '' ),
-			[CurrentName] = ISNULL ( CLCARD.DEFINITION_ ,''),
-			[WarehouseName] =  ISNULL (CAPIWHOUSE.NAME , ''),
-			[WarehouseNumber] = ISNULL( CAPIWHOUSE.NR, 0),
-			[Description] =  ISNULL (STFICHE.GENEXP1, '')
-			From LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
-			LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
-			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
-			WHERE STFICHE.TRCODE IN (1) AND STFICHE.SOURCEINDEX = {warehouseNumber} AND STFICHE.CLIENTREF = {supplierReferenceId} ";
-
-            if (!string.IsNullOrEmpty(search))
-                baseQuery += $@" AND (STFICHE.FICHENO LIKE '{search}%' OR STFICHE.GENEXP1 LIKE '%{search}%')";
-
-            baseQuery += $@"
-ORDER BY CLCARD.DEFINITION_ ASC
-OFFSET {skip} ROWS
-FETCH NEXT {take} ROWS ONLY";
-
-            return baseQuery;
-        }
-
         private string GetTrancationsByFicheReferenceIdQuery(int firmNumber, int periodNumber, int ficheReferenceId, string search = "", int skip = 0, int take = 20)
         {
             string baseQuery = $@"Select
@@ -232,11 +151,11 @@ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD as CLCARD ON STLINE.
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS subunitset ON STLINE.UOMREF = subunitset.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS unitset ON STLINE.USREF = unitset.LOGICALREF
 LEFT JOIN L_CAPIWHOUSE AS capiwhouse ON STLINE.SOURCEINDEX = capiwhouse.NR AND capiwhouse.FIRMNR = {firmNumber}
-where STFICHE.TRCODE IN(1) AND STLINE.LINETYPE = 0 AND STFICHE.LOGICALREF = {ficheReferenceId}
+where STFICHE.TRCODE IN(7,8) AND STLINE.LINETYPE = 0 AND STFICHE.LOGICALREF = {ficheReferenceId}
 ";
 
             if (!string.IsNullOrEmpty(search))
-                baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')"; 
+                baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";
 
             baseQuery += $@"
 OFFSET {skip} ROWS
@@ -244,5 +163,42 @@ FETCH NEXT {take} ROWS ONLY";
 
             return baseQuery;
         }
+    
+
+
+
+    private string GetSalesDispatchQuery(int firmNumber, int periodNumber, int warehouseNumber, int customerReferenceId, string search, int skip, int take)
+        {
+            string baseQuery = $@"Select
+            [ReferenceId] = STFICHE.LOGICALREF,
+			[FicheType] = STFICHE.TRCODE,
+			[FicheNumber] = STFICHE.FICHENO,
+            [FicheDate] = STFICHE.DATE_,
+            [FicheTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
+			[DocumentNumber] =ISNULL (STFICHE.DOCODE , ''),
+			[DocumentDate] =  STFICHE.DOCDATE,
+			[SpecialCode] = ISNULL  ( STFICHE.SPECODE , ''),
+			[CurrentReferenceID] = ISNULL ( CLCARD.LOGICALREF, 0),
+			[CurrentCode] = ISNULL (CLCARD.CODE , '' ),
+			[CurrentName] = ISNULL ( CLCARD.DEFINITION_ ,''),
+			[WarehouseName] =  ISNULL (CAPIWHOUSE.NAME , ''),
+			[WarehouseNumber] = ISNULL( CAPIWHOUSE.NR, 0),
+			[Description] =  ISNULL (STFICHE.GENEXP1, '')
+			From LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
+			LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
+			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
+			WHERE STFICHE.TRCODE IN (7,8) AND STFICHE.SOURCEINDEX = {warehouseNumber} AND STFICHE.CLIENTREF = {customerReferenceId} ";
+
+            if (!string.IsNullOrEmpty(search))
+                baseQuery += $@" AND (STFICHE.FICHENO LIKE '{search}%' OR STFICHE.GENEXP1 LIKE '%{search}%')";
+
+            baseQuery += $@"
+ORDER BY CLCARD.DEFINITION_ ASC
+OFFSET {skip} ROWS
+FETCH NEXT {take} ROWS ONLY";
+
+            return baseQuery;
+        }
     }
 }
+
