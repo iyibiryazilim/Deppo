@@ -46,6 +46,7 @@ public partial class ReturnSalesDispatchBasketSeriLotListViewModel : BaseViewMod
         DecreaseCommand = new Command<SeriLotModel>(async (SeriLotModel) => await DecreaseAsync(SeriLotModel));
         ConfirmCommand = new Command(async () => await ConfirmAsync());
         CancelCommand = new Command(async () => await CancelAsync());
+        Title = "Sepet Listesi";
 
         CloseSeriLotsCommand = new Command(async () => await CloseSeriLotsAsync());
         ItemTappedCommand = new Command<SeriLotModel>(async (SeriLotModel) => await ItemTappedAsync(SeriLotModel));

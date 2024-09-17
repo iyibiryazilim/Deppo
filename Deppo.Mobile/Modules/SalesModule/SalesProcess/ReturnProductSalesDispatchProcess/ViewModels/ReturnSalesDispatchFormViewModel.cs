@@ -9,5 +9,6 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
 {
     public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
     {
+        //Form
     }
 }

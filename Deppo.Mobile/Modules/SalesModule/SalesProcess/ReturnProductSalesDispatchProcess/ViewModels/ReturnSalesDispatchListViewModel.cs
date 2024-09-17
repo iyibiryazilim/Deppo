@@ -36,7 +36,7 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
         _salesDispatchTransactionService = salesDispatchTransactionService;
-
+        Title = "Sipariş Listesi";
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<SalesFicheModel>(async (x) => await ItemTappedAsync(x));

@@ -45,7 +45,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
             _userDialogs = userDialogs;
             _salesCustomerProductService = salesCustomerProductService;
 
-            Title = "Müşteriler";
+            Title = "Müşteri Listesi";
 
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
             LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
