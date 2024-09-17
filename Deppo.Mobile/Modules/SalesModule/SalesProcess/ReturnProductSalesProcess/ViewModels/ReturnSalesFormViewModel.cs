@@ -16,24 +16,33 @@ using Deppo.Core.DTOs.PurchaseDispatchTransaction;
 using Deppo.Mobile.Modules.ResultModule.Views;
 using Deppo.Mobile.Modules.ResultModule;
 using Deppo.Core.DTOs.SeriLotTransactionDto;
+using Deppo.Mobile.Core.Models.ShipAddressModels;
+using Deppo.Mobile.Helpers.MappingHelper;
+using Deppo.Mobile.Core.Services;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.ViewModels;
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(Items), queryId: nameof(Items))]
-[QueryProperty(name: nameof(CustomerModel), queryId: nameof(CustomerModel))]
 //ToDo
 public partial class ReturnSalesFormViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
     private readonly IUserDialogs _userDialogs;
     private readonly IPurchaseDispatchTransactionService _purchaseDispatchTransactionService;
+    private readonly ISalesCustomerService _salesCustomerService;
+    private readonly IShipAddressService _shipAddressService;
 
     [ObservableProperty]
     private WarehouseModel warehouseModel = null!;
 
+    public ObservableCollection<SalesCustomer> Customers { get; } = new();
+    public ObservableCollection<ShipAddressModel> ShipAddresses { get; } = new();
+
     [ObservableProperty]
-    private CustomerModel customerModel= null!;
+    SalesCustomer? selectedCustomer;
+    [ObservableProperty]
+    ShipAddressModel? selectedShipAddress;
 
     [ObservableProperty]
     private DateTime ficheDate = DateTime.Now;
@@ -53,16 +62,20 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
     [ObservableProperty]
     private ObservableCollection<ReturnSalesBasketModel> items = null!;
 
-    public ReturnSalesFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IPurchaseDispatchTransactionService purchaseDispatchTransactionService)
+    public ReturnSalesFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IPurchaseDispatchTransactionService purchaseDispatchTransactionService, ISalesCustomerService salesCustomerService, IShipAddressService shipAddressService)
     {
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
         _purchaseDispatchTransactionService = purchaseDispatchTransactionService;
+        _salesCustomerService = salesCustomerService;
+        _shipAddressService = shipAddressService;
         Items = new();
-        Title = "Mal Kabul İşlemi";
+        Title = "Satış İade Form İşlemi";
 
         LoadPageCommand = new Command(async () => await LoadPageAsync());
         ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
+        LoadCustomersCommand = new Command(async () => await LoadCustomersAsync());
+        LoadShipAddressesCommand = new Command<SalesCustomer>(async (x) => await LoadShipAddressesAsync(x));
         SaveCommand = new Command(async () => await SaveAsync());
     }
 
@@ -71,8 +84,10 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
     public Command BackCommand { get; }
     public Command SaveCommand { get; }
     public Command ShowBasketItemCommand { get; }
+    public Command LoadCustomersCommand { get; }
+    public Command<SalesCustomer> LoadShipAddressesCommand { get; }
 
-      private async Task ShowBasketItemAsync()
+    private async Task ShowBasketItemAsync()
     {
         if (IsBusy)
             return;
@@ -117,22 +132,10 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
         }
     }
 
-    public static string GetEnumDescription(Enum value)
-    {
-        FieldInfo fi = value.GetType().GetField(value.ToString());
-
-        DescriptionAttribute[] attributes = fi.GetCustomAttributes(typeof(DescriptionAttribute), false) as DescriptionAttribute[];
-
-        if (attributes != null && attributes.Any())
-        {
-            return attributes.First().Description;
-        }
-
-        return value.ToString();
-    }
+  
 
     private async Task SaveAsync()
-    {
+    {/*
         if (IsBusy)
             return;
 
@@ -145,10 +148,10 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var purchaseDispatchDto = new PurchaseDispatchTransactionInsert
+           var purchaseDispatchDto = new PurchaseDispatchTransactionInsert
             {
                 SpeCode = SpecialCode,
-                CurrentCode = CustomerModel.Code,
+                CurrentCode = selectedCustomer.Code,
                 Code = string.Empty,
                 DocTrackingNumber = DocumentTrackingNumber,
                 DoCode = DocumentNumber,
@@ -158,7 +161,7 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                 Description = Description
             };
 
-            foreach (var item in Items)
+           foreach (var item in Items)
             {
                 var purchaseDispatchTransactionLineDto = new PurchaseDispatchTransactionLineDto
                 {
@@ -222,6 +225,104 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }*/
+    }
+    private async Task LoadShipAddressesAsync(SalesCustomer salesCustomer)
+    {
+        if (salesCustomer is null)
+        {
+            await _userDialogs.AlertAsync("Lütfen müşteri seçiniz.", "Uyarı", "Tamam");
+            return;
+        }
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            ShipAddresses.Clear();
+            SelectedShipAddress = null;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            var result = await _shipAddressService.GetObjects(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                currentReferenceId: salesCustomer.ReferenceId,
+                skip: 0,
+                take: 9999999,
+                search: ""
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                {
+                    Customers.Add(Mapping.Mapper.Map<ShipAddressModel>(item));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+    private async Task LoadCustomersAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            Customers.Clear();
+            SelectedCustomer = null;
+
+            IsBusy = true;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            var result = await _salesCustomerService.GetObjectsAsync(
+                    httpClient: httpClient,
+                    firmNumber: _httpClientService.FirmNumber,
+                    periodNumber: _httpClientService.PeriodNumber,
+                    warehouseNumber: WarehouseModel.Number,
+                    skip: 0,
+                    take: 9999999,
+                    search: ""
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                {
+                    Customers.Add(Mapping.Mapper.Map<SalesCustomer>(item));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
         finally
