@@ -17,7 +17,6 @@ using System.Collections.ObjectModel;
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.ViewModels;
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
-[QueryProperty(name: nameof(SalesCustomer), queryId: nameof(SalesCustomer))]
 public partial class OutputProductSalesProcessBasketListViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
@@ -27,8 +26,6 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 
 	[ObservableProperty]
 	WarehouseModel warehouseModel = null!;
-	[ObservableProperty]
-	SalesCustomer salesCustomer = null!;
 
 	[ObservableProperty]
 	OutputSalesBasketModel? selectedItem;
@@ -76,6 +73,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 		SeriLotTransactionConfirmCommand = new Command(() => ConfirmSeriLotTransactionAsync());
 		SeriLotTransactionCloseCommand = new Command(async () => await SeriLotTransactionCloseAsync());
 
+		NextViewCommand = new Command(async () => await NextViewAsync());
 		BackCommand = new Command(async () => await BackAsync());
 
 		
@@ -116,7 +114,6 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 			await Shell.Current.GoToAsync($"{nameof(OutputProductSalesProcessProductListView)}", new Dictionary<string, object> 
 			{
 				[nameof(WarehouseModel)] = WarehouseModel,
-				[nameof(SalesCustomer)] = SalesCustomer
 			});
 		}
 		catch (Exception ex)
@@ -660,6 +657,39 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 		});
 	}
 
+	private async Task NextViewAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			if (Items.Count > 0)
+			{
+				await Shell.Current.GoToAsync($"{nameof(OutputProductSalesProcessFormView)}", new Dictionary<string, object>
+				{
+					[nameof(WarehouseModel)] = WarehouseModel,
+					[nameof(Items)] = Items,
+				});
+			}
+			else
+			{
+				await _userDialogs.AlertAsync("Sepetinizde ürün bulunmamaktadır.", "Uyarı", "Tamam");
+			}
+		}
+		catch(Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 
 	private async Task BackAsync()
 	{

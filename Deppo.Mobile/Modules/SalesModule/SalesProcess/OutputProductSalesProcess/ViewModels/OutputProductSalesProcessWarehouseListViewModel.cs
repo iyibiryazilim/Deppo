@@ -167,7 +167,7 @@ public partial class OutputProductSalesProcessWarehouseListViewModel : BaseViewM
 
 			if (SelectedWarehouseModel is not null)
 			{
-				await Shell.Current.GoToAsync($"{nameof(OutputProductSalesProcessCustomerListView)}", new Dictionary<string, object>
+				await Shell.Current.GoToAsync($"{nameof(OutputProductSalesProcessBasketListView)}", new Dictionary<string, object>
 				{
 					[nameof(WarehouseModel)] = SelectedWarehouseModel
 				});
