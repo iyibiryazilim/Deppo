@@ -32,7 +32,7 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
     private WarehouseModel warehouseModel= null!;
 
     [ObservableProperty]
-    private ProductModel? selectedProduct;
+    private WarehouseTotalModel? selectedProduct;
     [ObservableProperty]
     private ObservableCollection<ReturnSalesBasketModel> selectedProducts = new();
 
@@ -56,7 +56,7 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
         BackCommand = new Command(async () => await BackAsync());
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-        ItemTappedCommand = new Command<ProductModel>(async (item) => await ItemTappedAsync(item));
+        ItemTappedCommand = new Command<WarehouseTotalModel>(async (item) => await ItemTappedAsync(item));
         ConfirmCommand = new Command(async () => await ConfirmAsync());
 
 
@@ -149,7 +149,7 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-    private async Task ItemTappedAsync(ProductModel item)
+    private async Task ItemTappedAsync(WarehouseTotalModel item)
     {
         if (IsBusy)
             return;
@@ -167,15 +167,15 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
                 {
                     if (!item.IsSelected)
                     {
-                        Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ReferenceId).IsSelected = true;
+                        Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = true;
 
                         SelectedProduct = item;
 
                         var basketItem = new ReturnSalesBasketModel
                         {
-                            ItemReferenceId = item.ReferenceId,
-                            ItemCode = item.Code,
-                            ItemName = item.Name,
+                            ItemReferenceId = item.ProductReferenceId,
+                            ItemCode = item.ProductCode,
+                            ItemName = item.ProductName,
                             UnitsetReferenceId = item.UnitsetReferenceId,
                             UnitsetCode = item.UnitsetCode,
                             UnitsetName = item.UnitsetName,
@@ -199,11 +199,11 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
                     else
                     {
                         SelectedProduct = null;
-                        var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ReferenceId);
+                        var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ProductReferenceId);
                         if (selectedItem != null)
                         {
                             SelectedProducts.Remove(selectedItem);
-                            Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ReferenceId).IsSelected = false;
+                            Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
                         }
                     }
                 }
