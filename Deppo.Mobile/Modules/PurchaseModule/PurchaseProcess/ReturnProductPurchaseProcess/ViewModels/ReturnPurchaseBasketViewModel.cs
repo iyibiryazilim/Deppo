@@ -120,7 +120,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            await Shell.Current.GoToAsync($"{nameof(OutputProductProcessProductListView)}", new Dictionary<string, object>
+            await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseProductListView)}", new Dictionary<string, object>
             {
                 [nameof(WarehouseModel)] = WarehouseModel
             });
