@@ -30,8 +30,19 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
         _userDialogs = userDialogs;
         _purchaseDispatchTransactionService = purchaseDispatchTransactionService;
 
-        
+        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+        LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+        ItemTappedCommand = new Command<PurchaseTransactionModel>(async (x) => await ItemTappedAsync(x));
+
+        NextViewCommand = new Command(async () => await NextViewAsync());
+
     }
+
+    public Command LoadItemsCommand { get; }
+    public Command LoadMoreItemsCommand { get; }
+    public Command ItemTappedCommand { get; }
+    public Command NextViewCommand { get; }
+
 
     public ObservableCollection<PurchaseTransactionModel> Items { get; } = new();
 
