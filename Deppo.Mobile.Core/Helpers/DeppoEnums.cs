@@ -37,4 +37,14 @@ public static class DeppoEnums
         [Description("Malzeme Virmanı")]
         OtherTransferProcess = 1
     }
+
+    public enum SalesReturnEnumType
+    {
+        [Description("Perakende Satış İade")]
+        Retail = 0,
+
+        [Description("Toptan İade")]
+        Whole= 1
+    }
+   
 }

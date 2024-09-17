@@ -175,7 +175,7 @@ public partial class ReturnSalesDispatchWarehouseListViewModel : BaseViewModel
 
             if (SelectedWarehouseModel is not null)
             {
-                await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchBasketView)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchCustomerListView)}", new Dictionary<string, object>
                 {
                     [nameof(WarehouseModel)] = SelectedWarehouseModel,
                 });
