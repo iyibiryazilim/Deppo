@@ -60,9 +60,10 @@ public partial class ReturnPurchaseDispatchSupplierListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            Items.Clear();
+
             _userDialogs.ShowLoading("Yükleniyor...");
             await Task.Delay(1000);
-            Items.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _purchaseSupplierService.GetSuppliersWithDispatch(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, string.Empty, 0, 20);
@@ -101,8 +102,6 @@ public partial class ReturnPurchaseDispatchSupplierListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            _userDialogs.ShowLoading("Yükleniyor...");
-            await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _purchaseSupplierService.GetSuppliersWithDispatch(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, string.Empty, Items.Count, 20);
