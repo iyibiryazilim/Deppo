@@ -46,6 +46,7 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
         DecreaseCommand = new Command<LocationModel>(async (locationModel) => await DecreaseAsync(locationModel));
         ConfirmCommand = new Command(async () => await ConfirmAsync());
         CancelCommand = new Command(async () => await CancelAsync());
+        Title = "Sipariş Listesi";
 
         CloseLocationsCommand = new Command(async () => await CloseLocationsAsync());
         ItemTappedCommand = new Command<LocationModel>(async (locationModel) => await ItemTappedAsync(locationModel));
@@ -476,9 +477,9 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
 
             _userDialogs.ShowLoading("Loading...");
             //InputProductPurchaseProcessBasketListViewModel
-            var previousViewModel = _serviceProvider.GetRequiredService<ReturnSalesBasketViewModel>();
+            var previousViewModel = _serviceProvider.GetRequiredService<ReturnSalesDispatchBasketViewModel>();
 
-            /*     if (previousViewModel.Items.FirstOrDefault(x => x.ProductReferenceId == returnSalesBasketModel.ItemReferenceId) is not null)
+           /*   if (previousViewModel.ıtem.FirstOrDefault(x => x.ProductReferenceId == returnSalesBasketModel.ItemReferenceId) is not null)
                  {
                      foreach (var item in SelectedItems.Where(x => x.InputQuantity > 0)) //Locations
                      {

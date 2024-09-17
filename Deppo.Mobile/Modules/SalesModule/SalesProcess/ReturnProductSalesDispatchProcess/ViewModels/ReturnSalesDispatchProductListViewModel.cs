@@ -24,6 +24,7 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
     public ReturnSalesDispatchProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ISalesDispatchTransactionService salesDispatchTransactionService)
     {
         _httpClientService = httpClientService;
+        Title = "Ürün Listesi";
         _userDialogs = userDialogs;
         _salesDispatchTransactionService = salesDispatchTransactionService;
 
