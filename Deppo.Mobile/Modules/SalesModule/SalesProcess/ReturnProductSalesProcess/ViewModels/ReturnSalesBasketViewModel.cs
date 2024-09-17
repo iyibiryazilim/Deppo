@@ -33,7 +33,6 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProces
         [ObservableProperty]
         private WarehouseModel warehouseModel = null!;
 
- 
         [ObservableProperty]
         private ReturnSalesBasketModel? selectedInputProductBasketModel;
 
@@ -57,6 +56,8 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProces
             LocationIncreaseCommand = new Command<LocationModel>(async (locationModel) => await LocationIncreaseAsync(locationModel));
             LocationDecreaseCommand = new Command<LocationModel>(async (LocationModel) => await LocationDecreaseAsync(LocationModel));
 
+            LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
+
             NextViewCommand = new Command(async () => await NextViewAsync());
             BackCommand = new Command(async () => await BackAsync());
 
@@ -77,6 +78,8 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProces
 
         public Command NextViewCommand { get; }
         public Command BackCommand { get; }
+
+        public Command LocationTransactionCloseCommand { get; }
 
         public ObservableCollection<ReturnSalesBasketModel> Items { get; } = new();
         public ObservableCollection<LocationModel> Locations { get; }
@@ -147,7 +150,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProces
                     {nameof(WarehouseModel), WarehouseModel},
                     {nameof(ReturnSalesBasketModel), item}
                 });
-                  //  await nextViewModel.LoadSelectedItemsAsync();
+                    //  await nextViewModel.LoadSelectedItemsAsync();
                 }
                 else
                     item.Quantity++;
@@ -294,6 +297,14 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProces
             {
                 IsBusy = false;
             }
+        }
+
+        private async Task LocationTransactionCloseAsync()
+        {
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.Hidden;
+            });
         }
 
         private async Task NextViewAsync()

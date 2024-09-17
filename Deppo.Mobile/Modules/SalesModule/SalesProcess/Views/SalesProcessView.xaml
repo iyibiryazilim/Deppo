@@ -9,7 +9,8 @@
              Title="{Binding Title}"
              x:DataType="viewModel:SalesProcessViewModel">
     <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -20,7 +21,8 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android" Value="artboard.png" />
+            <On Platform="Android"
+                Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
     <Grid RowDefinitions=".30*,.70*">
@@ -36,13 +38,15 @@
                        Text="Giriş İşlemleri"
                        TextColor="{StaticResource OffBlack}" />
 
-                <Grid RowDefinitions="Auto,Auto" RowSpacing="0">
+                <Grid RowDefinitions="Auto,Auto"
+                      RowSpacing="0">
 
                     <Border Grid.Row="0"
                             Padding="5"
                             StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
+                        <Grid ColumnDefinitions=".85*,.15*"
+                              ColumnSpacing="0">
                             <Grid Grid.Column="0"
                                   ColumnDefinitions="Auto,*"
                                   ColumnSpacing="10">
@@ -58,7 +62,6 @@
                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
                                            TextColor="{StaticResource White}"
                                            VerticalOptions="Center" />
-
                                 </Border>
                                 <Label Grid.Column="1"
                                        FontAttributes="Bold"
@@ -68,7 +71,8 @@
                                        VerticalOptions="Center" />
                             </Grid>
 
-                            <Border Grid.Column="1" StrokeThickness="0">
+                            <Border Grid.Column="1"
+                                    StrokeThickness="0">
                                 <toolkit:AvatarView Padding="2"
                                                     BorderColor="{StaticResource Primary}"
                                                     CornerRadius="15"
@@ -80,16 +84,14 @@
                                                     TextColor="{StaticResource Primary}"
                                                     WidthRequest="30" />
                             </Border>
-
-
-
                         </Grid>
                     </Border>
                     <Border Grid.Row="1"
                             Padding="5"
                             StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
+                        <Grid ColumnDefinitions=".85*,.15*"
+                              ColumnSpacing="0">
                             <Grid Grid.Column="0"
                                   ColumnDefinitions="Auto,*"
                                   ColumnSpacing="10">
@@ -105,7 +107,6 @@
                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
                                            TextColor="{StaticResource White}"
                                            VerticalOptions="Center" />
-
                                 </Border>
                                 <Label Grid.Column="1"
                                        FontAttributes="Bold"
@@ -115,7 +116,8 @@
                                        VerticalOptions="Center" />
                             </Grid>
 
-                            <Border Grid.Column="1" StrokeThickness="0">
+                            <Border Grid.Column="1"
+                                    StrokeThickness="0">
                                 <toolkit:AvatarView Padding="2"
                                                     BorderColor="{StaticResource Primary}"
                                                     CornerRadius="15"
@@ -127,14 +129,9 @@
                                                     TextColor="{StaticResource Primary}"
                                                     WidthRequest="30" />
                             </Border>
-
-
-
                         </Grid>
                     </Border>
-
                 </Grid>
-
             </VerticalStackLayout>
             <VerticalStackLayout Grid.Row="1"
                                  Padding="5"
@@ -144,15 +141,20 @@
                        Text="Çıkış İşlemleri"
                        TextColor="{StaticResource OffBlack}" />
 
-                <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="0">
+                <Grid RowDefinitions="Auto,Auto,Auto"
+                      RowSpacing="0">
                     <Border Grid.Row="0"
                             Padding="5"
                             StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
+                        <Grid ColumnDefinitions=".85*,.15*"
+                              ColumnSpacing="0">
                             <Grid Grid.Column="0"
                                   ColumnDefinitions="Auto,*"
                                   ColumnSpacing="10">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ReturnSalesProcessCommand}" />
+                                </Grid.GestureRecognizers>
                                 <Border Padding="5"
                                         BackgroundColor="{StaticResource Primary}"
                                         StrokeShape="RoundRectangle 5">
@@ -162,7 +164,6 @@
                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
                                            TextColor="{StaticResource White}"
                                            VerticalOptions="Center" />
-
                                 </Border>
                                 <Label Grid.Column="1"
                                        FontAttributes="Bold"
@@ -172,7 +173,8 @@
                                        VerticalOptions="Center" />
                             </Grid>
 
-                            <Border Grid.Column="1" StrokeThickness="0">
+                            <Border Grid.Column="1"
+                                    StrokeThickness="0">
                                 <toolkit:AvatarView Padding="2"
                                                     BorderColor="{StaticResource Primary}"
                                                     CornerRadius="15"
@@ -184,19 +186,20 @@
                                                     TextColor="{StaticResource Primary}"
                                                     WidthRequest="30" />
                             </Border>
-
-
-
                         </Grid>
                     </Border>
                     <Border Grid.Row="1"
                             Padding="5"
                             StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
+                        <Grid ColumnDefinitions=".85*,.15*"
+                              ColumnSpacing="0">
                             <Grid Grid.Column="0"
                                   ColumnDefinitions="Auto,*"
                                   ColumnSpacing="10">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding RetrunSalesDispatchProcessCommand}" />
+                                </Grid.GestureRecognizers>
                                 <Border Padding="5"
                                         BackgroundColor="{StaticResource Primary}"
                                         StrokeShape="RoundRectangle 5">
@@ -206,7 +209,6 @@
                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
                                            TextColor="{StaticResource White}"
                                            VerticalOptions="Center" />
-
                                 </Border>
                                 <Label Grid.Column="1"
                                        FontAttributes="Bold"
@@ -216,7 +218,8 @@
                                        VerticalOptions="Center" />
                             </Grid>
 
-                            <Border Grid.Column="1" StrokeThickness="0">
+                            <Border Grid.Column="1"
+                                    StrokeThickness="0">
                                 <toolkit:AvatarView Padding="2"
                                                     BorderColor="{StaticResource Primary}"
                                                     CornerRadius="15"
@@ -228,21 +231,10 @@
                                                     TextColor="{StaticResource Primary}"
                                                     WidthRequest="30" />
                             </Border>
-
-
-
                         </Grid>
                     </Border>
-
                 </Grid>
-
             </VerticalStackLayout>
-
-
-
-
         </Grid>
-
-
     </Grid>
 </ContentPage>      

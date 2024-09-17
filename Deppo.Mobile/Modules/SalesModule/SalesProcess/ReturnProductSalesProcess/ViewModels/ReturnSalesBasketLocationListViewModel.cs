@@ -12,6 +12,7 @@ using Deppo.Mobile.Helpers.MessageHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.Views;
 using DevExpress.Maui.Controls;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.ViewModels;
-
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(ReturnSalesBasketModel), queryId: nameof(ReturnSalesBasketModel))]
@@ -53,6 +53,7 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
     }
+
     [ObservableProperty]
     private WarehouseModel warehouseModel = null!;
 
@@ -99,9 +100,9 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
             await Task.Delay(500);
 
             SelectedItems.Clear();
-            if (returnSalesBasketModel.Details.Count > 0)
+            if (ReturnSalesBasketModel.Details.Count > 0)
             {
-                foreach (var item in returnSalesBasketModel.Details)
+                foreach (var item in ReturnSalesBasketModel.Details)
                     SelectedItems.Add(new LocationModel
                     {
                         Code = item.LocationCode,
@@ -157,7 +158,7 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, returnSalesBasketModel.ItemReferenceId, string.Empty, 0, 20);
+            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, ReturnSalesBasketModel.ItemReferenceId, string.Empty, 0, 20);
 
             if (result.IsSuccess)
             {
@@ -197,7 +198,7 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 warehouseNumber: WarehouseModel.Number,
-                productReferenceId: returnSalesBasketModel.ItemReferenceId,
+                productReferenceId: ReturnSalesBasketModel.ItemReferenceId,
                 skip: Items.Count,
                 take: 20);
 
@@ -350,12 +351,12 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
 
             SelectedItem = locationModel;
 
-            if (returnSalesBasketModel.TrackingType != 0)
+            if (ReturnSalesBasketModel.TrackingType != 0)
             {
-                await Shell.Current.GoToAsync($"{nameof(InputProductProcessBasketSeriLotListView)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"{nameof(ReturnSalesBasketLocationListView)}", new Dictionary<string, object>
                 {
                     [nameof(WarehouseModel)] = WarehouseModel,
-                    [nameof(returnSalesBasketModel)] = returnSalesBasketModel
+                    [nameof(ReturnSalesBasketModel)] = ReturnSalesBasketModel
                 });
             }
             else
@@ -388,7 +389,7 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
 
                 if (returnSalesBasketModel.TrackingType != 0)
                 {
-                    await Shell.Current.GoToAsync($"{nameof(InputProductProcessBasketSeriLotListView)}", new Dictionary<string, object>
+                    await Shell.Current.GoToAsync($"{nameof(ReturnSalesBasketLocationListView)}", new Dictionary<string, object>
                     {
                         [nameof(WarehouseModel)] = WarehouseModel,
                         [nameof(returnSalesBasketModel)] = returnSalesBasketModel
@@ -464,7 +465,6 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
         }
     }
 
-  
     private async Task ConfirmAsync()
     {
         if (IsBusy)
@@ -476,7 +476,7 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
 
             _userDialogs.ShowLoading("Loading...");
 
-            var previousViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseProcessBasketListViewModel>();
+            var previousViewModel = _serviceProvider.GetRequiredService<ReturnSalesBasketViewModel>();
 
             if (previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId) is not null)
             {
@@ -489,22 +489,18 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
                     }
                     else
                     {
-                        previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId).Details.Add(new InputPurchaseBasketDetailModel
+                        previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId).Details.Add(new ReturnSalesBasketDetailModel
                         {
                             LocationReferenceId = item.ReferenceId,
                             LocationCode = item.Code,
                             LocationName = item.Name,
                             Quantity = item.InputQuantity
                         });
-
-
                     }
 
                     var totalInputQuantity = SelectedItems.Where(x => x.InputQuantity > 0).Sum(x => x.InputQuantity);
                     previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId).Quantity = totalInputQuantity;
                 }
-
-
             }
 
             await Shell.Current.GoToAsync("..");
@@ -543,5 +539,4 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
 }
