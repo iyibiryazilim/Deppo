@@ -60,8 +60,9 @@ public partial class ReturnPurchaseDispatchListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            _userDialogs.ShowLoading("Yükleniyor...");
+
             Items.Clear();
+            _userDialogs.ShowLoading("Yükleniyor...");
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
@@ -73,7 +74,7 @@ public partial class ReturnPurchaseDispatchListViewModel : BaseViewModel
                     foreach (var fiche in result.Data)
                     {
 
-                        var item = Mapping.Mapper.Map<PurchaseFiche>(fiche);
+                        var item = Mapping.Mapper.Map<PurchaseFicheModel>(fiche);
                         Items.Add(item);
                     }
                 }
@@ -102,9 +103,7 @@ public partial class ReturnPurchaseDispatchListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            _userDialogs.ShowLoading("Yükleniyor...");
-            await Task.Delay(1000);
-
+           
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _purchaseDispatchTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, PurchaseSupplier.ReferenceId, string.Empty, Items.Count, 20);
             if (result.IsSuccess)
@@ -114,7 +113,7 @@ public partial class ReturnPurchaseDispatchListViewModel : BaseViewModel
                     foreach (var fiche in result.Data)
                     {
 
-                        var item = Mapping.Mapper.Map<PurchaseFiche>(fiche);
+                        var item = Mapping.Mapper.Map<PurchaseFicheModel>(fiche);
                         Items.Add(item);
                     }
 
