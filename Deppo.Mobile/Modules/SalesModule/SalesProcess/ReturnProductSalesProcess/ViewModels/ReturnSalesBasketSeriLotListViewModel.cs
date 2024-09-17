@@ -196,7 +196,7 @@ public partial class ReturnSalesBasketSeriLotListViewModel : BaseViewModel
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 warehouseNumber: WarehouseModel.Number,
-            //    productReferenceId: returnSalesBasketModel.ItemReferenceId,
+               
                 skip: Items.Count,
                 take: 20);
 

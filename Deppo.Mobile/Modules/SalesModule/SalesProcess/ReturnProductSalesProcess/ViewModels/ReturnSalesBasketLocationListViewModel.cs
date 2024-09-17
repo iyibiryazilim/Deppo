@@ -352,7 +352,7 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
             SelectedItem = locationModel;
 
             if (returnSalesBasketModel.TrackingType != 0)
-            {//InputProductProcessBasketSeriLotListView
+            {
                 await Shell.Current.GoToAsync($"{nameof(ReturnSalesBasketSeriLotListView)}", new Dictionary<string, object>
                 {
                     [nameof(WarehouseModel)] = WarehouseModel,
@@ -389,7 +389,7 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
 
                 if (returnSalesBasketModel.TrackingType != 0)
                 {
-                    // InputProductProcessBasketSeriLotListView
+                    
                     await Shell.Current.GoToAsync($"{nameof(ReturnSalesBasketSeriLotListView)}", new Dictionary<string, object>
                     {
                         [nameof(WarehouseModel)] = WarehouseModel,
@@ -476,7 +476,7 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
             IsBusy = true;
 
             _userDialogs.ShowLoading("Loading...");
-            //InputProductPurchaseProcessBasketListViewModel
+            
             var previousViewModel = _serviceProvider.GetRequiredService<ReturnSalesBasketViewModel>();
             if (previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId) is not null)
 
