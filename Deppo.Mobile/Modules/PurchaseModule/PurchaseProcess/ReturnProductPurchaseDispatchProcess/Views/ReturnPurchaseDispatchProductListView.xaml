@@ -6,9 +6,9 @@
              xmlns:purchaseModel="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels;assembly=Deppo.Mobile.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.ViewModels"
-             Shell.TabBarIsVisible="False"
              Title="{Binding Title}"
-             x:DataType="viewModel:ReturnPurchaseDispatchProductListViewModel">
+             x:DataType="viewModel:ReturnPurchaseDispatchProductListViewModel"
+             Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
@@ -56,14 +56,21 @@
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnPurchaseDispatchProductListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>
+                        <Border.Triggers>
+                            <DataTrigger Binding="{Binding IsSelected}"
+                                         TargetType="Border"
+                                         Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
+                            </DataTrigger>
+                        </Border.Triggers>
                         <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="10">
                             <Border BackgroundColor="{StaticResource Secondary}"
                                     StrokeShape="RoundRectangle 5"
                                     StrokeThickness="0.5">
-                                <!--<Image Grid.Column="0"
+                                <Image Grid.Column="0"
                                        HeightRequest="50"
-                                       Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
-                                       WidthRequest="50" />-->
+                                     
+                                       WidthRequest="50" />
                             </Border>
 
                             <VerticalStackLayout Grid.Column="1" Spacing="2">
@@ -124,7 +131,6 @@
         <Button Grid.Row="2"
                 Margin="10,10,10,20"
                 Command="{Binding NextViewCommand}"
-                IsEnabled="{Binding PurchaseFicheModel, Converter={StaticResource IsNotNullConverter}}"
                 Text="İleri" />
     </Grid>
 </ContentPage>
