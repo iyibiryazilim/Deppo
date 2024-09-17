@@ -19,6 +19,12 @@ using Deppo.Core.DTOs.SeriLotTransactionDto;
 using Deppo.Mobile.Core.Models.ShipAddressModels;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Core.Services;
+using static Deppo.Mobile.Core.Helpers.DeppoEnums;
+using Deppo.Core.DTOs.SalesDispatchTransaction;
+using Deppo.Core.DataResultModel;
+using Deppo.Core.ResponseResultModels;
+using Deppo.Core.DTOs.RetailSalesReturnDispatchTransaction;
+using Deppo.Core.DTOs.WholeSalesReturnDispatchTransaction;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.ViewModels;
 
@@ -29,7 +35,8 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
     private readonly IUserDialogs _userDialogs;
-    private readonly IPurchaseDispatchTransactionService _purchaseDispatchTransactionService;
+    private readonly IRetailSalesReturnDispatchTransactionService _retailService;
+    private readonly IWholeSalesReturnDispatchTransactionService _wholeService;
     private readonly ISalesCustomerService _salesCustomerService;
     private readonly IShipAddressService _shipAddressService;
 
@@ -58,15 +65,17 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
 
     [ObservableProperty]
     private string description = string.Empty;
+    [ObservableProperty]
+    private SalesReturnEnumType salesReturnEnumType = SalesReturnEnumType.Retail;
+
 
     [ObservableProperty]
     private ObservableCollection<ReturnSalesBasketModel> items = null!;
 
-    public ReturnSalesFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IPurchaseDispatchTransactionService purchaseDispatchTransactionService, ISalesCustomerService salesCustomerService, IShipAddressService shipAddressService)
+    public ReturnSalesFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ISalesCustomerService salesCustomerService, IShipAddressService shipAddressService, IRetailSalesReturnDispatchTransactionService retailService, IWholeSalesReturnDispatchTransactionService wholeService)
     {
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
-        _purchaseDispatchTransactionService = purchaseDispatchTransactionService;
         _salesCustomerService = salesCustomerService;
         _shipAddressService = shipAddressService;
         Items = new();
@@ -77,6 +86,8 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
         LoadCustomersCommand = new Command(async () => await LoadCustomersAsync());
         LoadShipAddressesCommand = new Command<SalesCustomer>(async (x) => await LoadShipAddressesAsync(x));
         SaveCommand = new Command(async () => await SaveAsync());
+        _retailService = retailService;
+        _wholeService = wholeService;
     }
 
     public Page CurrentPage { get; set; }
@@ -135,63 +146,114 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
   
 
     private async Task SaveAsync()
-    {/*
+    {
         if (IsBusy)
             return;
 
         try
         {
+            
             IsBusy = true;
-
+            
             _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-
-           var purchaseDispatchDto = new PurchaseDispatchTransactionInsert
+            DataResult<ResponseModel> result = new();
+            if (salesReturnEnumType == SalesReturnEnumType.Retail)
             {
-                SpeCode = SpecialCode,
-                CurrentCode = selectedCustomer.Code,
-                Code = string.Empty,
-                DocTrackingNumber = DocumentTrackingNumber,
-                DoCode = DocumentNumber,
-                TransactionDate = FicheDate,
-                FirmNumber = _httpClientService.FirmNumber,
-                WarehouseNumber = WarehouseModel.Number,
-                Description = Description
-            };
-
-           foreach (var item in Items)
-            {
-                var purchaseDispatchTransactionLineDto = new PurchaseDispatchTransactionLineDto
+                RetailSalesReturnDispatchTransactionInsert dto = new()
                 {
-                    ProductCode = item.ItemCode,
-                    WarehouseNumber = (short)WarehouseModel.Number,
-                    Quantity = item.Quantity,
-                    ConversionFactor = 1,
-                    OtherConversionFactor = 1,
-                    SubUnitsetCode = item.SubUnitsetCode,
+
+                    SpeCode = SpecialCode,
+                    CurrentCode = selectedCustomer.Code,
+                    Code = string.Empty,
+                    DocTrackingNumber = DocumentTrackingNumber,
+                    DoCode = DocumentNumber,
+                    TransactionDate = FicheDate,
+                    FirmNumber = _httpClientService.FirmNumber,
+                    WarehouseNumber = WarehouseModel.Number,
+                    Description = Description
+
                 };
-
-                foreach (var detail in item.Details)
+                foreach (var item in Items)
                 {
-                    var seriLotTransactionDto = new SeriLotTransactionDto
+                    var line = new RetailSalesReturnDispatchTransactionLineInsert
                     {
-                        StockLocationCode = detail.LocationCode,
-                        SubUnitsetCode = item.SubUnitsetCode,
-                        Quantity = detail.Quantity,
+                        ProductCode = item.ItemCode,
+                        WarehouseNumber = (short)WarehouseModel.Number,
+                        Quantity = item.Quantity,
                         ConversionFactor = 1,
                         OtherConversionFactor = 1,
-                        DestinationStockLocationCode = string.Empty,
+                        SubUnitsetCode = item.SubUnitsetCode,
+                         //DispatchReferenceId =0
+                        
                     };
-                    purchaseDispatchTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
+                    dto.Lines.Add(line);
+                    foreach (var detail in item.Details)
+                    {
+                        var seriLotTransactionDto = new SeriLotTransactionDto
+                        {
+                            StockLocationCode = detail.LocationCode,
+                            SubUnitsetCode = item.SubUnitsetCode,
+                            Quantity = detail.Quantity,
+                            ConversionFactor = 1,
+                            OtherConversionFactor = 1,
+                            DestinationStockLocationCode = string.Empty,
+                        };
+                        line.SeriLotTransactions.Add(seriLotTransactionDto);
+                    }
                 }
+               result = await _retailService.InsertRetailSalesReturnDispatchTransaction(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, dto);
+            }
+            else
+            {
+                WholeSalesReturnDispatchTransactionInsert dto = new()
+                {
+                    SpeCode = SpecialCode,
+                    CurrentCode = selectedCustomer.Code,
+                    Code = string.Empty,
+                    DocTrackingNumber = DocumentTrackingNumber,
+                    DoCode = DocumentNumber,
+                    TransactionDate = FicheDate,
+                    FirmNumber = _httpClientService.FirmNumber,
+                    WarehouseNumber = WarehouseModel.Number,
+                    Description = Description
+                   
 
-                purchaseDispatchDto.Lines.Add(purchaseDispatchTransactionLineDto);
+                };
+                foreach (var item in Items)
+                {
+                    var wholeSalesDispatchTransactionLineInsert = new WholeSalesReturnTransactionLineInsert
+                    {
+                        ProductCode = item.ItemCode,
+                        WarehouseNumber = (short)WarehouseModel.Number,
+                        Quantity = item.Quantity,
+                        ConversionFactor = 1,
+                        OtherConversionFactor = 1,
+                        SubUnitsetCode = item.SubUnitsetCode,
+                         //DispatchReferenceId =0
+                    };
+                    dto.Lines.Add(wholeSalesDispatchTransactionLineInsert);
+                    foreach (var detail in item.Details)
+                    {
+                        var seriLotTransactionDto = new SeriLotTransactionDto
+                        {
+                            StockLocationCode = detail.LocationCode,
+                            SubUnitsetCode = item.SubUnitsetCode,
+                            Quantity = detail.Quantity,
+                            ConversionFactor = 1,
+                            OtherConversionFactor = 1,
+                            DestinationStockLocationCode = string.Empty,
+                        };
+                        wholeSalesDispatchTransactionLineInsert.SeriLotTransactions.Add(seriLotTransactionDto);
+                    }
+                }
+                result = await _wholeService.InsertWholeSalesReturnDispatchTransaction(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, dto);
             }
 
-            var result = await _purchaseDispatchTransactionService.InsertPurchaseDispatchTransaction(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, purchaseDispatchDto);
 
+            
             Console.WriteLine(result);
             ResultModel resultModel = new();
             if (result.IsSuccess)
@@ -230,7 +292,7 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
-        }*/
+        }
     }
     private async Task LoadShipAddressesAsync(SalesCustomer salesCustomer)
     {
