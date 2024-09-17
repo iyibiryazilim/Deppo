@@ -20,10 +20,10 @@ public static class DeppoEnums
     public enum OutputProductProcessType
     {
         [Description("Sarf Fişi")]
-        ConsumableProcess = 0,
+        ConsumableProcess = 3,
 
         [Description("Sayım Eksiği")]
-        UnderCountProcess = 1,
+        UnderCountProcess = 3,
 
         [Description("Fire Fişi")]
         WasteProcess = 3
