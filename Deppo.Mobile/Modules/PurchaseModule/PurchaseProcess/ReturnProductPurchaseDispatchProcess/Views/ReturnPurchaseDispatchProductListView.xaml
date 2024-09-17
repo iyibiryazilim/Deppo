@@ -8,8 +8,8 @@
             xmlns:purchaseModel="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels;assembly=Deppo.Mobile.Core"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              x:DataType="viewModel:ReturnPurchaseDispatchProductListViewModel">
-    <!--<ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="" EventName="Loaded" />
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Loaded" Command="{Binding LoadItemsCommand}"  />
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
     <ContentPage.Resources>
@@ -39,42 +39,23 @@
                     TextColor="{StaticResource OffBlack}" />
         </Border>
 
-        <CollectionView Grid.Row="1"
+        <!--<CollectionView Grid.Row="1"
                      ItemsSource="{Binding Items}"
                      RemainingItemsThreshold="2"
-                     RemainingItemsThresholdReachedCommand="">
+                     RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="purchaseModel:PurchaseTransactionModel">
-                    <Border Padding="5"
-                         BackgroundColor="Transparent"
-                         StrokeThickness="0.1">
-                        --><!--Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnPurchaseDispatchProductListViewModel}}, Path=}" CommandParameter="{Binding .}" />
-                        </Border.GestureRecognizers>--><!--
-                        <Border.Triggers>
-                            <DataTrigger TargetType="Border"
-                                      Binding="{Binding IsSelected}"
-                                      Value="True">
-                                <Setter Property="BackgroundColor"
-                                     Value="{StaticResource SecondaryLight}" />
-                            </DataTrigger>
-                        </Border.Triggers>
-                        <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
-                            
-                            
-                        </Grid>
-                    </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
-        </CollectionView>
+        </CollectionView>-->
 
         <Button Grid.Row="2"
              Margin="10,10,10,20"
-             Command=""
+             Command="{Binding NextViewCommand}"
              IsEnabled="{Binding PurchaseFicheModel, Converter={StaticResource IsNotNullConverter}}"
              Text="İleri" />
-    </Grid>-->
+    </Grid>
 </ContentPage>
