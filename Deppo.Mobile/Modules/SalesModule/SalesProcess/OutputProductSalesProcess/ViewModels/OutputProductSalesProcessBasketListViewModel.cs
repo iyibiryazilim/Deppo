@@ -73,6 +73,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 		SeriLotTransactionConfirmCommand = new Command(() => ConfirmSeriLotTransactionAsync());
 		SeriLotTransactionCloseCommand = new Command(async () => await SeriLotTransactionCloseAsync());
 
+		NextViewCommand = new Command(async () => await NextViewAsync());
 		BackCommand = new Command(async () => await BackAsync());
 
 		
