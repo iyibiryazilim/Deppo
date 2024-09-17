@@ -448,6 +448,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 					SelectedItem.Details.Add(new OutputProductBasketDetailModel
 					{
 						ReferenceId = item.ReferenceId,
+						LocationReferenceId = item.LocationReferenceId,
 						LocationCode = item.LocationCode,
 						LocationName = item.LocationName,
 						TransactionReferenceId = item.TransactionReferenceId,

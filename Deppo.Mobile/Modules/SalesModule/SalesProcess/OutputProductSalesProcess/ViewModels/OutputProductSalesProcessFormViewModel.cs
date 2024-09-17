@@ -210,7 +210,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 
 				foreach (var item in result.Data)
 				{
-					Customers.Add(Mapping.Mapper.Map<ShipAddressModel>(item));
+					ShipAddresses.Add(Mapping.Mapper.Map<ShipAddressModel>(item));
 				}
 			}
 		}
@@ -221,6 +221,27 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 
 			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task SaveAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{
