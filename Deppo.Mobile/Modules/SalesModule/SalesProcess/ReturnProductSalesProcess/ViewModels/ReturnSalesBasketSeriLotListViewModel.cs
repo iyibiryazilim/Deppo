@@ -20,6 +20,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Java.Util.Jar.Attributes;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.Views;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.ViewModels;
 
@@ -347,10 +348,10 @@ public partial class ReturnSalesBasketSeriLotListViewModel : BaseViewModel
             IsBusy = true;
 
             SelectedItem = SeriLotModel;
-
-            if (returnSalesBasketModel.TrackingType != 0)
-            {
-                await Shell.Current.GoToAsync($"{nameof(InputProductProcessBasketSeriLotListView)}", new Dictionary<string, object>
+            //ToDo
+            if (returnSalesBasketModel.TrackingType ==1 || returnSalesBasketModel.TrackingType == 2)
+            {//InputProductProcessBasketSeriLotListView
+                await Shell.Current.GoToAsync($"{nameof(ReturnSalesBasketSeriLotListView)}", new Dictionary<string, object>
                 {
                     [nameof(WarehouseModel)] = WarehouseModel,
                     [nameof(returnSalesBasketModel)] = returnSalesBasketModel
@@ -386,7 +387,7 @@ public partial class ReturnSalesBasketSeriLotListViewModel : BaseViewModel
 
                 if (returnSalesBasketModel.TrackingType != 0)
                 {
-                    await Shell.Current.GoToAsync($"{nameof(InputProductProcessBasketSeriLotListView)}", new Dictionary<string, object>
+                    await Shell.Current.GoToAsync($"{nameof(ReturnSalesBasketSeriLotListView)}", new Dictionary<string, object>
                     {
                         [nameof(WarehouseModel)] = WarehouseModel,
                         [nameof(returnSalesBasketModel)] = returnSalesBasketModel

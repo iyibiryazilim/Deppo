@@ -1,13 +1,191 @@
-﻿using Deppo.Mobile.Helpers.MVVMHelper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Controls.UserDialogs.Maui;
+using Deppo.Core.Models;
+using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.SalesModels;
+using Deppo.Mobile.Core.Models.WarehouseModels;
+using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
+using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.Views;
+using System.Collections.ObjectModel;
 
-namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.ViewModels
+namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.ViewModels;
+//fiş
+[QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
+[QueryProperty(name: nameof(SalesCustomer), queryId: nameof(SalesCustomer))]
+public partial class ReturnSalesDispatchListViewModel : BaseViewModel
 {
-    public partial class ReturnSalesDispatchListViewModel : BaseViewModel
+
+    private readonly IHttpClientService _httpClientService;
+    private readonly IUserDialogs _userDialogs;
+    private readonly ISalesDispatchTransactionService _salesDispatchTransactionService;
+
+
+    [ObservableProperty]
+    private WarehouseModel warehouseModel = null!;
+
+    [ObservableProperty]
+    private SalesCustomer salesCustomer = null!;
+
+    [ObservableProperty]
+    private SalesFicheModel salesFicheModel= null!;
+
+    public ReturnSalesDispatchListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ISalesDispatchTransactionService salesDispatchTransactionService)
     {
+        _httpClientService = httpClientService;
+        _userDialogs = userDialogs;
+        _salesDispatchTransactionService = salesDispatchTransactionService;
+
+        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+        LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+        ItemTappedCommand = new Command<SalesFicheModel>(async (x) => await ItemTappedAsync(x));
+
+        NextViewCommand = new Command(async () => await NextViewAsync());
+    }
+
+    public Command LoadItemsCommand { get; }
+    public Command LoadMoreItemsCommand { get; }
+    public Command<SearchBar> PerformSearchCommand { get; }
+    public Command ItemTappedCommand { get; }
+    public Command NextViewCommand { get; }
+
+    public ObservableCollection<SalesFicheModel> Items { get; } = new();
+
+    private async Task LoadItemsAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+            _userDialogs.ShowLoading("Yükleniyor...");
+            Items.Clear();
+            await Task.Delay(1000);
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _salesDispatchTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, SalesCustomer.ReferenceId, string.Empty, 0, 20);
+            if (result.IsSuccess)
+            {
+                if (result.Data is not null)
+                {
+                    foreach (var fiche in result.Data)
+                    {
+
+                        var item = Mapping.Mapper.Map<SalesFiche>(fiche);
+                        Items.Add(item);
+                    }
+                }
+            }
+
+            _userDialogs.HideHud();
+        }
+        catch (System.Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task LoadMoreItemsAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+            _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(1000);
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _salesDispatchTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, SalesCustomer.ReferenceId, string.Empty, Items.Count, 20);
+            if (result.IsSuccess)
+            {
+                if (result.Data is not null)
+                {
+                    foreach (var fiche in result.Data)
+                    {
+
+                        var item = Mapping.Mapper.Map<SalesFiche>(fiche);
+                        Items.Add(item);
+                    }
+
+                    _userDialogs.HideHud();
+                }
+            }
+        }
+        catch (System.Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ItemTappedAsync(SalesFicheModel item)
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            Items.ToList().ForEach(x => x.IsSelected = false);
+
+            var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
+            if (selectedItem != null)
+                selectedItem.IsSelected = true;
+
+            SalesFicheModel = item;
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task NextViewAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            if (SalesFicheModel is not null)
+            {
+                await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchProductListView)}", new Dictionary<string, object>
+                {
+                    [nameof(SalesFicheModel)] = SalesFicheModel,
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 }
