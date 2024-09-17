@@ -56,5 +56,6 @@ public class MappingProfile : Profile
         CreateMap<PurchaseFicheModel, dynamic>();
         CreateMap<PurchaseTransaction, dynamic>();
         CreateMap<PurchaseTransactionModel, dynamic>();
+        CreateMap<SalesFicheModel, dynamic>();
 	}
 }
