@@ -19,7 +19,7 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
     private readonly ISalesDispatchTransactionService _salesDispatchTransactionService;
 
     [ObservableProperty]
-    private PurchaseFicheModel purchaseFicheModel = null!;
+    private SalesFicheModel salesFicheModel = null!;
 
     public ReturnSalesDispatchProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ISalesDispatchTransactionService salesDispatchTransactionService)
     {
@@ -49,7 +49,7 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _salesDispatchTransactionService.GetTransactionsByFicheReferenceId(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseFicheModel.ReferenceId, string.Empty, 0, 20);
+            var result = await _salesDispatchTransactionService.GetTransactionsByFicheReferenceId(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SalesFicheModel.ReferenceId, string.Empty, 0, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -89,7 +89,7 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _salesDispatchTransactionService.GetTransactionsByFicheReferenceId(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseFicheModel.ReferenceId, string.Empty, Items.Count, 20);
+            var result = await _salesDispatchTransactionService.GetTransactionsByFicheReferenceId(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SalesFicheModel.ReferenceId, string.Empty, Items.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)

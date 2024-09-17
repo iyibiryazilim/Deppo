@@ -73,7 +73,7 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
                     foreach (var fiche in result.Data)
                     {
 
-                        var item = Mapping.Mapper.Map<SalesFiche>(fiche);
+                        var item = Mapping.Mapper.Map<SalesFicheModel>(fiche);
                         Items.Add(item);
                     }
                 }
@@ -114,7 +114,7 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
                     foreach (var fiche in result.Data)
                     {
 
-                        var item = Mapping.Mapper.Map<SalesFiche>(fiche);
+                        var item = Mapping.Mapper.Map<SalesFicheModel>(fiche);
                         Items.Add(item);
                     }
 
