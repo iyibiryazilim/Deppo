@@ -52,5 +52,9 @@ public class MappingProfile : Profile
 		CreateMap<SeriLotTransaction, dynamic>();
 		CreateMap<SeriLotTransactionModel, dynamic>();
         CreateMap<ShipAddressModel, dynamic>();
+        CreateMap<PurchaseFiche, dynamic>();
+        CreateMap<PurchaseFicheModel, dynamic>();
+        CreateMap<PurchaseTransaction, dynamic>();
+        CreateMap<PurchaseTransactionModel, dynamic>();
 	}
 }
