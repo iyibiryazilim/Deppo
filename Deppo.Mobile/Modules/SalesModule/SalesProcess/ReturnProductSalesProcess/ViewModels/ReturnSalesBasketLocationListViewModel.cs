@@ -236,7 +236,7 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 warehouseNumber: WarehouseModel.Number,
-                productReferenceId: returnSalesBasketModel.ItemReferenceId,
+                productReferenceId: ReturnSalesBasketModel.ItemReferenceId,
                 search: searchText.Text,
                 skip: 0,
                 take: 20
@@ -434,7 +434,7 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
                         firmNumber: _httpClientService.FirmNumber,
                         periodNumber: _httpClientService.PeriodNumber,
                         warehouseNumber: WarehouseModel.Number,
-                        productReferenceId: returnSalesBasketModel.ItemReferenceId,
+                        productReferenceId: ReturnSalesBasketModel.ItemReferenceId,
                         search: barcodeEntry.Text,
                         skip: 0,
                         take: 1);

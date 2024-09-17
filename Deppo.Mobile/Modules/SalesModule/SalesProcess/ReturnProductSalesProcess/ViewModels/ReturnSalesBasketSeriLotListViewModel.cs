@@ -98,9 +98,9 @@ public partial class ReturnSalesBasketSeriLotListViewModel : BaseViewModel
             await Task.Delay(500);
 
             SelectedItems.Clear();
-            if (returnSalesBasketModel.Details.Count > 0)
+            if (ReturnSalesBasketModel.Details.Count > 0)
             {
-                foreach (var item in returnSalesBasketModel.Details)
+                foreach (var item in ReturnSalesBasketModel.Details)
                     SelectedItems.Add(new SeriLotModel
                     {
                         Code = item.SeriLotCode,
@@ -156,7 +156,7 @@ public partial class ReturnSalesBasketSeriLotListViewModel : BaseViewModel
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _SeriLotService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, returnSalesBasketModel.ItemReferenceId, string.Empty, 0, 20);
+            var result = await _SeriLotService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, ReturnSalesBasketModel.ItemReferenceId, string.Empty, 0, 20);
 
             if (result.IsSuccess)
             {
@@ -349,12 +349,12 @@ public partial class ReturnSalesBasketSeriLotListViewModel : BaseViewModel
 
             SelectedItem = SeriLotModel;
             //ToDo
-            if (returnSalesBasketModel.TrackingType ==1 || returnSalesBasketModel.TrackingType == 2)
+            if (ReturnSalesBasketModel.TrackingType ==1 || ReturnSalesBasketModel.TrackingType == 2)
             {//InputProductProcessBasketSeriLotListView
                 await Shell.Current.GoToAsync($"{nameof(ReturnSalesBasketSeriLotListView)}", new Dictionary<string, object>
                 {
                     [nameof(WarehouseModel)] = WarehouseModel,
-                    [nameof(returnSalesBasketModel)] = returnSalesBasketModel
+                    [nameof(ReturnSalesBasketModel)] = ReturnSalesBasketModel
                 });
             }
             else
@@ -385,12 +385,12 @@ public partial class ReturnSalesBasketSeriLotListViewModel : BaseViewModel
             {
                 SelectedItem = SeriLotModel;
 
-                if (returnSalesBasketModel.TrackingType != 0)
+                if (ReturnSalesBasketModel.TrackingType != 0)
                 {
                     await Shell.Current.GoToAsync($"{nameof(ReturnSalesBasketSeriLotListView)}", new Dictionary<string, object>
                     {
                         [nameof(WarehouseModel)] = WarehouseModel,
-                        [nameof(returnSalesBasketModel)] = returnSalesBasketModel
+                        [nameof(ReturnSalesBasketModel)] = ReturnSalesBasketModel
                     });
                 }
                 else
@@ -477,18 +477,18 @@ public partial class ReturnSalesBasketSeriLotListViewModel : BaseViewModel
 
             var previousViewModel = _serviceProvider.GetRequiredService<ReturnSalesBasketViewModel>();
 
-            if (previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId) is not null)
+            if (previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == ReturnSalesBasketModel.ItemReferenceId) is not null)
             {
                 foreach (var item in SelectedItems.Where(x => x.InputQuantity > 0)) //SeriLots
                 {
-                    var SeriLot = previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId).Details.FirstOrDefault(x => x.SeriLotCode == item.Code);
+                    var SeriLot = previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == ReturnSalesBasketModel.ItemReferenceId).Details.FirstOrDefault(x => x.SeriLotCode == item.Code);
                     if (SeriLot is not null)
                     {
                         SeriLot.Quantity = item.InputQuantity;
                     }
                     else
                     {
-                        previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId).Details.Add(new ReturnSalesBasketDetailModel
+                        previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == ReturnSalesBasketModel.ItemReferenceId).Details.Add(new ReturnSalesBasketDetailModel
                         {
                             SeriLotReferenceId = item.ReferenceId,
                             SeriLotCode = item.Code,
@@ -500,7 +500,7 @@ public partial class ReturnSalesBasketSeriLotListViewModel : BaseViewModel
                     }
 
                     var totalInputQuantity = SelectedItems.Where(x => x.InputQuantity > 0).Sum(x => x.InputQuantity);
-                    previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId).Quantity = totalInputQuantity;
+                    previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == ReturnSalesBasketModel.ItemReferenceId).Quantity = totalInputQuantity;
                 }
 
 
