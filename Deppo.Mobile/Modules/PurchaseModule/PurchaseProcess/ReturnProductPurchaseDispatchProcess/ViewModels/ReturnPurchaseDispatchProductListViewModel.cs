@@ -69,7 +69,7 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
                 {
                     foreach (var transaction in result.Data)
                     {
-                        var item = Mapping.Mapper.Map<PurchaseTransaction>(transaction);
+                        var item = Mapping.Mapper.Map<PurchaseTransactionModel>(transaction);
                         Items.Add(item);
                     }
                 }
