@@ -16,6 +16,7 @@ using System.Collections.ObjectModel;
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.ViewModels;
 
 [QueryProperty(name: nameof(PurchaseFicheModel), queryId: nameof(PurchaseFicheModel))]
+[QueryProperty(name: nameof(PurchaseSupplier), queryId: nameof(PurchaseSupplier))]
 public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
 {
 
@@ -25,6 +26,9 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
 
     [ObservableProperty]
     private PurchaseFicheModel purchaseFicheModel = null!;
+
+    [ObservableProperty]
+    private PurchaseSupplier purchaseSupplier = null!;
 
     public ReturnPurchaseDispatchProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IPurchaseDispatchTransactionService purchaseDispatchTransactionService)
     {

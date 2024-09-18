@@ -2,6 +2,7 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
@@ -15,6 +16,8 @@ using System.Collections.ObjectModel;
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.ViewModels;
 
 [QueryProperty(name: nameof(Items), queryId: nameof(Items))]
+[QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
+[QueryProperty(name: nameof(PurchaseSupplier), queryId: nameof(PurchaseSupplier))]
 public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -24,6 +27,9 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
 
     [ObservableProperty]
     WarehouseModel warehouseModel = null!;
+
+    [ObservableProperty]
+    PurchaseSupplier purchaseSupplier = null!;
 
     [ObservableProperty]
     ReturnPurchaseBasketModel? selectedItem;
@@ -55,7 +61,7 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
 
         Title = "Sepet Listesi";
 
-        ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
+        //ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
         IncreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await IncreaseAsync(item));
         DecreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DecreaseAsync(item));
         DeleteItemCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DeleteItemAsync(item));
@@ -79,7 +85,7 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
     }
 
     #region Commands
-    public Command ShowProductViewCommand { get; }
+    //public Command ShowProductViewCommand { get; }
     public Command IncreaseCommand { get; }
     public Command DecreaseCommand { get; }
     public Command DeleteItemCommand { get; }
@@ -109,28 +115,28 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
     #endregion
 
 
-    private async Task ShowProductViewAsync()
-    {
-        if (IsBusy)
-            return;
-        try
-        {
-            IsBusy = true;
+    //private async Task ShowProductViewAsync()
+    //{
+    //    if (IsBusy)
+    //        return;
+    //    try
+    //    {
+    //        IsBusy = true;
 
-            await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseProductListView)}", new Dictionary<string, object>
-            {
-                [nameof(WarehouseModel)] = WarehouseModel
-            });
-        }
-        catch (Exception ex)
-        {
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
+    //        await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseProductListView)}", new Dictionary<string, object>
+    //        {
+    //            [nameof(WarehouseModel)] = WarehouseModel
+    //        });
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+    //    }
+    //    finally
+    //    {
+    //        IsBusy = false;
+    //    }
+    //}
 
     private async Task IncreaseAsync(ReturnPurchaseBasketModel item)
     {
@@ -693,6 +699,8 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
             await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseFormView)}", new Dictionary<string, object>
             {
                 [nameof(WarehouseModel)] = WarehouseModel,
+                [nameof(PurchaseSupplier)] = PurchaseSupplier,
+                [nameof(Items)] = Items
             });
         }
         catch (Exception ex)
