@@ -26,8 +26,10 @@ public class ReturnPurchaseBasketModel : INotifyPropertyChanged, IDisposable
     private int _locTracking;
     private bool _isSelected;
     private string _image;
+	private int _dispatchReferenceId;
 
-    private List<ReturnPurchaseBasketDetailModel> _details = new();
+	private List<ReturnPurchaseBasketDetailModel> _details = new();
+   
 
     private string _locTrackingIcon;
     private string _locTrackingIconColor;
@@ -286,6 +288,17 @@ public class ReturnPurchaseBasketModel : INotifyPropertyChanged, IDisposable
             NotifyPropertyChanged();
         }
     }
+
+    public int DispatchReferenceId
+    {
+		get => _dispatchReferenceId;
+		set
+		{
+			if (_dispatchReferenceId == value) return;
+			_dispatchReferenceId = value;
+			NotifyPropertyChanged();
+		}
+	}
 
     public List<ReturnPurchaseBasketDetailModel> Details
     {

@@ -5,6 +5,7 @@
              xmlns:basketModel="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;assembly=Deppo.Mobile.Core"
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:models="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              xmlns:purchaseModel="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels;assembly=Deppo.Mobile.Core"
              xmlns:shipAddressModel="clr-namespace:Deppo.Mobile.Core.Models.ShipAddressModels;assembly=Deppo.Mobile.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -84,7 +85,7 @@
                     <dx:FormItem.ContentTemplate>
                         <DataTemplate>
                             <VerticalStackLayout>
-                                <!--#region Customer Picker-->
+                                <!--#region Supplier Picker-->
                                 <dx:FormListPickerItem InlineContent="{x:Null}"
                                                        ItemsSource="{Binding Suppliers}"
                                                        PickerShowMode="BottomSheet"
@@ -133,6 +134,64 @@
                                                 <Label FontAttributes="Bold"
                                                        LineBreakMode="TailTruncation"
                                                        Text="{Binding Name}"
+                                                       TextColor="{StaticResource OffBlack}"
+                                                       VerticalOptions="Center" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </dx:FormListPickerItem.ItemTemplate>
+                                </dx:FormListPickerItem>
+                                <!--#endregion-->
+
+                                <!--#region Carrier Picker-->
+                                <dx:FormListPickerItem InlineContent="{x:Null}"
+                                                       ItemsSource="{Binding Carriers}"
+                                                       PickerShowMode="BottomSheet"
+                                                       PickerTitle="Taşıyıcı Seçiniz"
+                                                       SelectedItem="{Binding SelectedCarrier}"
+                                                       TapCommand="{Binding LoadCarriersCommand}"
+                                                       TapCommandParameter="{Binding SelectedCarrier}"
+                                                       Text="{Binding SelectedCarrier.Name}">
+                                    <dx:FormListPickerItem.ImageSource>
+                                        <FontImageSource FontFamily="FAS"
+                                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.LocationDot}"
+                                                         Size="15"
+                                                         Color="{StaticResource White}" />
+                                    </dx:FormListPickerItem.ImageSource>
+                                    <dx:FormListPickerItem.ItemTemplate>
+                                        <DataTemplate x:DataType="models:Carrier">
+                                            <Border Padding="15" StrokeShape="RoundRectangle 5">
+                                                <Label FontAttributes="Bold"
+                                                       LineBreakMode="TailTruncation"
+                                                       Text="{Binding Name}"
+                                                       TextColor="{StaticResource OffBlack}"
+                                                       VerticalOptions="Center" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </dx:FormListPickerItem.ItemTemplate>
+                                </dx:FormListPickerItem>
+                                <!--#endregion-->
+
+                                <!--#region Driver Picker-->
+                                <dx:FormListPickerItem InlineContent="{x:Null}"
+                                                       ItemsSource="{Binding Drivers}"
+                                                       PickerShowMode="BottomSheet"
+                                                       PickerTitle="Sürücü seçiniz"
+                                                       SelectedItem="{Binding SelectedDriver}"
+                                                       TapCommand="{Binding LoadDriversCommand}"
+                                                       TapCommandParameter="{Binding SelectedDriver}"
+                                                       Text="{Binding SelectedDriver.FullName}">
+                                    <dx:FormListPickerItem.ImageSource>
+                                        <FontImageSource FontFamily="FAS"
+                                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.LocationDot}"
+                                                         Size="15"
+                                                         Color="{StaticResource White}" />
+                                    </dx:FormListPickerItem.ImageSource>
+                                    <dx:FormListPickerItem.ItemTemplate>
+                                        <DataTemplate x:DataType="models:Driver">
+                                            <Border Padding="15" StrokeShape="RoundRectangle 5">
+                                                <Label FontAttributes="Bold"
+                                                       LineBreakMode="TailTruncation"
+                                                       Text="{Binding FullName}"
                                                        TextColor="{StaticResource OffBlack}"
                                                        VerticalOptions="Center" />
                                             </Border>

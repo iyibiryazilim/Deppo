@@ -17,6 +17,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurch
 
 [QueryProperty(name: nameof(PurchaseFicheModel), queryId: nameof(PurchaseFicheModel))]
 [QueryProperty(name: nameof(PurchaseSupplier), queryId: nameof(PurchaseSupplier))]
+[QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
 {
 
@@ -29,6 +30,9 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
 
     [ObservableProperty]
     private PurchaseSupplier purchaseSupplier = null!;
+
+    [ObservableProperty]
+    private WarehouseModel warehouseModel = null!;
 
     public ReturnPurchaseDispatchProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IPurchaseDispatchTransactionService purchaseDispatchTransactionService)
     {
@@ -185,6 +189,7 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
 						LocTrackingIcon = item.LocTrackingIcon,
 						VariantIcon = item.VariantIcon,
 						TrackingTypeIcon = item.TrackingTypeIcon,
+                        DispatchReferenceId = item.ReferenceId,
 					};
 
 					SelectedProducts.Add(basketItem);
@@ -219,7 +224,11 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
 
             await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseDispatchBasketView)}", new Dictionary<string, object>
             {
+                [nameof(WarehouseModel)] = WarehouseModel,
+                [nameof(PurchaseFicheModel)] = PurchaseFicheModel,
+                [nameof(PurchaseSupplier)] = PurchaseSupplier,
                 [nameof(Items)] = SelectedProducts,
+                [nameof(SelectedPurchaseTransactions)] = SelectedPurchaseTransactions,
             });
         }
         catch (System.Exception)
