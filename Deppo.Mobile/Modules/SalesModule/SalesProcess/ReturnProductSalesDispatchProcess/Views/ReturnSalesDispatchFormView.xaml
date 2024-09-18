@@ -2,12 +2,21 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.Views.ReturnSalesDispatchFormView"
-             Title="ReturnSalesDispatchFormView">
+             xmlns:basketModel="clr-namespace:Deppo.Mobile.Core.Models.SalesModels.BasketModels;assembly=Deppo.Mobile.Core"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:salesModel="clr-namespace:Deppo.Mobile.Core.Models.SalesModels;assembly=Deppo.Mobile.Core"
+             xmlns:shipAddressModel="clr-namespace:Deppo.Mobile.Core.Models.ShipAddressModels;assembly=Deppo.Mobile.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:ReturnSalesDispatchFormViewModel"
+             Shell.TabBarIsVisible="False">
     <!--<Shell.BackButtonBehavior>
         <BackButtonBehavior Command="{Binding BackCommand}" />
-    </Shell.BackButtonBehavior>
+    </Shell.BackButtonBehavior>-->
 
-    <ContentPage.ToolbarItems>
+    <!--<ContentPage.ToolbarItems>
         <ToolbarItem Command="{Binding ShowBasketItemCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="FAS"
@@ -15,40 +24,44 @@
                                  Size="Large" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
-    </ContentPage.ToolbarItems>
+    </ContentPage.ToolbarItems>-->
 
-    <ContentPage.Behaviors>
+    <!--<ContentPage.Behaviors>
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
                                    StatusBarStyle="Default" />
         <toolkit:EventToCommandBehavior Command="{Binding LoadPageCommand}"
                                         EventName="Loaded" />
-    </ContentPage.Behaviors>
+    </ContentPage.Behaviors>-->
 
-    <ContentPage.Resources>
+    <!--<ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
             <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
         </ResourceDictionary>
-    </ContentPage.Resources>
+    </ContentPage.Resources>-->
 
-    <ContentPage.BackgroundImageSource>
+    <!--<ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
             <On Platform="Android"
                 Value="artboard.png" />
         </OnPlatform>
-    </ContentPage.BackgroundImageSource>
+    </ContentPage.BackgroundImageSource>-->
 
-    <Grid RowDefinitions="*,Auto"
+    <!--<Grid RowDefinitions="*, Auto"
           RowSpacing="10">
+
         <VerticalStackLayout Grid.Row="0"
                              Spacing="5">
+            -->
+    <!--#region Fiş Bilgileri-->
+    <!--
             <dx:FormGroupItem Header="Fiş Bilgileri"
                               HeaderFontAttributes="Bold"
                               HeaderFontSize="18">
                 <dx:FormItem>
                     <dx:FormItem.ContentTemplate>
                         <DataTemplate>
-                            <VerticalStackLayout Spacing="5">
+                            <VerticalStackLayout>
                                 <dx:DateEdit Grid.Column="0"
                                              BorderColor="{StaticResource PrimaryLight}"
                                              Date="{Binding FicheDate}"
@@ -62,13 +75,6 @@
                                              LabelText="Ambar"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
                                              Text="{Binding WarehouseModel.Name}" />
-
-                                <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
-                                             FocusedBorderColor="{StaticResource Primary}"
-                                             IsReadOnly="True"
-                                             LabelText="Tedarikçi Adı"
-                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding PurchaseSupplier.Name}" />
 
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
@@ -98,6 +104,90 @@
                     </dx:FormItem.ContentTemplate>
                 </dx:FormItem>
             </dx:FormGroupItem>
+            -->
+    <!--#endregion-->
+
+    <!--#region Sevk Bilgileri-->
+    <!--
+            <dx:FormGroupItem Header="Sevk Bilgileri"
+                              HeaderFontAttributes="Bold"
+                              HeaderFontSize="18">
+                <dx:FormItem>
+                    <dx:FormItem.ContentTemplate>
+                        <DataTemplate>
+                            <VerticalStackLayout>
+                                -->
+    <!--#region Customer Picker-->
+    <!--
+                                <dx:FormListPickerItem InlineContent="{x:Null}"
+                                                       ItemsSource="{Binding Customers}"
+                                                       PickerShowMode="BottomSheet"
+                                                       PickerTitle="Müşteri seçiniz"
+                                                       SelectedItem="{Binding SelectedCustomer}"
+                                                       TapCommand="{Binding LoadCustomersCommand}"
+                                                       Text="{Binding SelectedCustomer.Name}">
+                                    <dx:FormListPickerItem.ImageSource>
+                                        <FontImageSource FontFamily="FAS"
+                                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.User}"
+                                                         Size="15"
+                                                         Color="{StaticResource White}" />
+                                    </dx:FormListPickerItem.ImageSource>
+                                    <dx:FormListPickerItem.ItemTemplate>
+                                        <DataTemplate x:DataType="salesModel:SalesCustomer">
+                                            <Border Padding="15"
+                                                    StrokeShape="RoundRectangle 5">
+                                                <Label FontAttributes="Bold"
+                                                       LineBreakMode="TailTruncation"
+                                                       Text="{Binding Name}"
+                                                       TextColor="{StaticResource OffBlack}"
+                                                       VerticalOptions="Center" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </dx:FormListPickerItem.ItemTemplate>
+                                </dx:FormListPickerItem>
+                                -->
+    <!--#endregion-->
+
+    <!--#region ShipAddress Picker-->
+    <!--
+                                <dx:FormListPickerItem InlineContent="{x:Null}"
+                                                       ItemsSource="{Binding ShipAddresses}"
+                                                       PickerShowMode="BottomSheet"
+                                                       PickerTitle="Sevk Adresi Seçiniz"
+                                                       SelectedItem="{Binding SelectedShipAddress}"
+                                                       TapCommand="{Binding LoadShipAddressesCommand}"
+                                                       TapCommandParameter="{Binding SelectedCustomer}"
+                                                       Text="{Binding SelectedShipAddress.Name}">
+                                    <dx:FormListPickerItem.ImageSource>
+                                        <FontImageSource FontFamily="FAS"
+                                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.LocationDot}"
+                                                         Size="15"
+                                                         Color="{StaticResource White}" />
+                                    </dx:FormListPickerItem.ImageSource>
+                                    <dx:FormListPickerItem.ItemTemplate>
+                                        <DataTemplate x:DataType="shipAddressModel:ShipAddressModel">
+                                            <Border Padding="15"
+                                                    StrokeShape="RoundRectangle 5">
+                                                <Label FontAttributes="Bold"
+                                                       LineBreakMode="TailTruncation"
+                                                       Text="{Binding Name}"
+                                                       TextColor="{StaticResource OffBlack}"
+                                                       VerticalOptions="Center" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </dx:FormListPickerItem.ItemTemplate>
+                                </dx:FormListPickerItem>
+                                -->
+    <!--#endregion-->
+    <!--
+                            </VerticalStackLayout>
+                        </DataTemplate>
+                    </dx:FormItem.ContentTemplate>
+                </dx:FormItem>
+            </dx:FormGroupItem>
+            -->
+    <!--#endregion-->
+    <!--
         </VerticalStackLayout>
 
         <Button Grid.Row="1"
@@ -105,6 +195,9 @@
                 Text="Kaydet"
                 VerticalOptions="End" />
 
+        -->
+    <!--#region BasketItem BottomSheet-->
+    <!--
         <dx:BottomSheet x:Name="basketItemBottomSheet"
                         AllowDismiss="True"
                         BackgroundColor="White"
@@ -115,9 +208,9 @@
             -->
     <!--#region BottomSheetContent-->
     <!--
-            <Grid RowDefinitions="Auto,*"
-                  RowSpacing="20"
-                  Padding="10">
+            <Grid Padding="10"
+                  RowDefinitions="Auto,*"
+                  RowSpacing="20">
 
                 <VerticalStackLayout Grid.Row="0"
                                      Spacing="5">
@@ -131,7 +224,7 @@
                 <CollectionView Grid.Row="1"
                                 ItemsSource="{Binding Items}">
                     <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="basketModel:InputPurchaseBasketModel">
+                        <DataTemplate x:DataType="basketModel:OutputSalesBasketModel">
                             <Border Padding="10"
                                     BackgroundColor="Transparent"
                                     StrokeShape="RoundRectangle 10"
@@ -167,7 +260,7 @@
                                                           TextColor="{StaticResource Primary}" />
                                                     <Span Text=" " />
                                                     <Span FontAttributes="Bold"
-                                                          Text="{Binding InputQuantity, StringFormat='{0:N2}'}"
+                                                          Text="{Binding Quantity, StringFormat='{0:N2}'}"
                                                           TextColor="{StaticResource Primary}" />
                                                     <Span Text=" " />
                                                     <Span FontAttributes="Bold"
@@ -209,5 +302,8 @@
     <!--#endregion-->
     <!--
         </dx:BottomSheet>
+        -->
+    <!--#endregion-->
+    <!--
     </Grid>-->
 </ContentPage>
