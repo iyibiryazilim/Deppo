@@ -6,39 +6,42 @@ namespace Deppo.Mobile.Core.Models.SalesModels;
 public partial class SalesCustomer : ObservableObject
 {
     [ObservableProperty]
-    int referenceId;
+    private int referenceId;
 
     [ObservableProperty]
-    string code = string.Empty;
+    private string code = string.Empty;
 
     [ObservableProperty]
-    string name = string.Empty;
+    private string name = string.Empty;
 
     [ObservableProperty]
-    int productReferenceCount;
+    private int productReferenceCount;
 
     [ObservableProperty]
-    string country = string.Empty;
+    private string country = string.Empty;
 
     [ObservableProperty]
-    string city = string.Empty;
+    private string city = string.Empty;
 
     [ObservableProperty]
-    int shipAddressReferenceId;
+    private int shipAddressReferenceId;
 
     [ObservableProperty]
-    string shipAddressCode = string.Empty;
+    private string shipAddressCode = string.Empty;
 
     [ObservableProperty]
-    int shipAddressCount;
+    private int shipAddressCount;
 
     public string TitleName => Name?.Length > 2 ? Name.Substring(0, 2) : Name;
 
-	[ObservableProperty]
+    [ObservableProperty]
     public List<SalesCustomerProduct> products = new();
 
     [ObservableProperty]
-    bool isSelected;
+    private bool isSelected;
 
-    public string ShipAddressIcon => ShipAddressCount > 0 ? "truck" : "" ;
+    [ObservableProperty]
+    private int ficheType = default;
+
+    public string ShipAddressIcon => ShipAddressCount > 0 ? "truck" : "";
 }

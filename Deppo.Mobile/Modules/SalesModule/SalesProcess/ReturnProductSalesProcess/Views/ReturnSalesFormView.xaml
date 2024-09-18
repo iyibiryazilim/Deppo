@@ -294,16 +294,22 @@
                            FontSize="Subtitle"
                            Text="Fiş Türü" />
                     <BoxView HeightRequest="2"
-                             Color="{StaticResource OffBlack}" />
+                             Color="{StaticResource Primary}" />
                 </VerticalStackLayout>
                 <VerticalStackLayout Grid.Row="1">
-                    <Border>
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0.1">
                         <Label Text="Toptan" />
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding SelectWholeCommand}" />
                         </Border.GestureRecognizers>
                     </Border>
-                    <Border>
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0.1">
                         <Label Text="Perakende" />
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding SelectRetailCommand}" />

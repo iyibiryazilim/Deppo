@@ -184,13 +184,14 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
             SelectedCustomer.ShipAddressReferenceId = SelectedShipAddress.ReferenceId;
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             DataResult<ResponseModel> result = new();
-            if (salesReturnEnumType == SalesReturnEnumType.Retail)
+            if (SalesReturnEnumType == SalesReturnEnumType.Retail)
             {
                 RetailSalesReturnDispatchTransactionInsert dto = new()
                 {
                     SpeCode = SpecialCode,
                     CurrentCode = SelectedCustomer.Code,
-
+                    DispatchType = (short)SelectedCustomer.FicheType,
+                    IsEDispatch = (short)SelectedCustomer.FicheType,
                     Code = string.Empty,
                     DocTrackingNumber = DocumentTrackingNumber,
                     DoCode = DocumentNumber,
@@ -198,6 +199,7 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                     FirmNumber = _httpClientService.FirmNumber,
                     WarehouseNumber = WarehouseModel.Number,
                     Description = Description,
+                    ShipInfoCode = SelectedShipAddress.Code,
                 };
                 foreach (var item in Items)
                 {
@@ -235,13 +237,16 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                 {
                     SpeCode = SpecialCode,
                     CurrentCode = SelectedCustomer.Code,
+                    DispatchType = (short)SelectedCustomer.FicheType,
+                    IsEDispatch = (short)SelectedCustomer.FicheType,
                     Code = string.Empty,
                     DocTrackingNumber = DocumentTrackingNumber,
                     DoCode = DocumentNumber,
                     TransactionDate = FicheDate,
                     FirmNumber = _httpClientService.FirmNumber,
                     WarehouseNumber = WarehouseModel.Number,
-                    Description = Description
+                    Description = Description,
+                    ShipInfoCode = SelectedShipAddress.Code,
                 };
                 foreach (var item in Items)
                 {
@@ -253,6 +258,7 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                         ConversionFactor = 1,
                         OtherConversionFactor = 1,
                         SubUnitsetCode = item.SubUnitsetCode,
+
                         //DispatchReferenceId =0
                     };
                     dto.Lines.Add(wholeSalesDispatchTransactionLineInsert);

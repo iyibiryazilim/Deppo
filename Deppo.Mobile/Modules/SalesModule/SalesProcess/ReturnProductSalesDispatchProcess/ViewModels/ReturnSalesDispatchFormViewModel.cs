@@ -161,7 +161,6 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             DataResult<ResponseModel> result = new();
 
-
             if (salesReturnEnumType == SalesReturnEnumType.Retail)
             {
                 RetailSalesReturnDispatchTransactionInsert dto = new()
@@ -197,7 +196,6 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
                                 Description = Description,
                                 OrderReferenceId = orders.ReferenceId,
                                 SpeCode = SpecialCode,
-                               
                             };
 
                             dto.Lines.Add(line);
@@ -258,7 +256,6 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
                 }
 
                 result = await _retailService.InsertRetailSalesReturnDispatchTransaction(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, dto);
-
             }
             else
             {
@@ -291,13 +288,10 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
                                 ConversionFactor = 1,
                                 OtherConversionFactor = 1,
                                 SubUnitsetCode = orders.SubUnitsetCode,
-                                 DispatchReferenceId = orders.ReferenceId,
-                                 Description = Description,
-                                 OrderReferenceId = orders.ReferenceId,
-                                  SpeCode = SpecialCode,
-                                 
-                                  
-                                 
+                                DispatchReferenceId = orders.ReferenceId,
+                                Description = Description,
+                                OrderReferenceId = orders.ReferenceId,
+                                SpeCode = SpecialCode,
                             };
 
                             dto.Lines.Add(wholeSalesDispatchTransactionLineInsert);
@@ -350,7 +344,6 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
                                 ConversionFactor = 1,
                                 OtherConversionFactor = 1,
                                 DestinationStockLocationCode = string.Empty,
-                                 
                             };
 
                             wholeSalesDispatchTransactionLineInsert.SeriLotTransactions.Add(seriLotTransactionDto);
@@ -366,7 +359,7 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
             ResultModel resultModel = new();
             if (result.IsSuccess)
             {
-                resultModel.Message = "Başarılı" + result.Message  ;
+                resultModel.Message = "Başarılı" + result.Message;
                 resultModel.Code = result.Data.Code;
                 resultModel.PageTitle = Title;
                 resultModel.PageCountToBack = 5;

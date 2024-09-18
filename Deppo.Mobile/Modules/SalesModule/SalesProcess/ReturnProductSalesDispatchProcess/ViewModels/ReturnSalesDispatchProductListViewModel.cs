@@ -12,7 +12,7 @@ using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.ViewModels;
 
-[QueryProperty(name: nameof(PurchaseFicheModel), queryId: nameof(PurchaseFicheModel))]
+[QueryProperty(name: nameof(SalesFicheModel), queryId: nameof(SalesFicheModel))]
 public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -66,7 +66,7 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
                 {
                     foreach (var transaction in result.Data)
                     {
-                        var item = Mapping.Mapper.Map<SalesTransaction>(transaction);
+                        var item = Mapping.Mapper.Map<SalesTransactionModel>(transaction);
                         Items.Add(item);
                     }
                 }
