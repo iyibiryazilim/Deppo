@@ -80,6 +80,9 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
         _purchaseReturnDispatchTransactionService = purchaseReturnDispatchTransactionService;
         _userDialogs = userDialogs;
         Items = new();
+
+        Title = "Satınalma İade İrsaliyesi";
+
         SaveCommand = new Command(async () => await SaveAsync());
         LoadPageCommand = new Command(async () => await LoadPageAsync());
         LoadCarriersCommand = new Command(async () => await LoadCarriersAsync());

@@ -36,6 +36,9 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
         _userDialogs = userDialogs;
         _purchaseDispatchTransactionService = purchaseDispatchTransactionService;
 
+
+        Title = "Ürünler";
+
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<PurchaseTransactionModel>(async (x) => await ItemTappedAsync(x));
