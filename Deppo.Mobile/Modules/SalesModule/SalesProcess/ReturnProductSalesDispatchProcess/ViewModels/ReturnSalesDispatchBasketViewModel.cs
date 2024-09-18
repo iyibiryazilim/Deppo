@@ -24,7 +24,6 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(SalesCustomer), queryId: nameof(SalesCustomer))]
 [QueryProperty(name: nameof(Items), queryId: nameof(Items))]
-[QueryProperty(name: nameof(SalesTransactionModel), queryId: nameof(Items))]
 public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -68,7 +67,7 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
         SeriLotDecreaseCommand = new Command<SeriLotModel>(SeriLotDecrease);
         SeriLotConfirmCommand = new Command(SeriLotConfirm);
         SeriLotCloseCommand = new Command(async () => await SeriLotCloseAsync());
-
+        DecreaseCommand = new Command<ReturnSalesBasketModel>(async (x) => await DecreaseAsync(x));
         NextViewCommand = new Command(async () => await NextViewAsync());
 
         BackCommand = new Command(async () => await BackAsync());
@@ -163,7 +162,7 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
 
             if (returnbasket is not null)
             {
-                if (returnbasket.Quantity > 1)
+                if (returnbasket.Quantity >= 1)
                 {
                     // Stok Yeri takipli ise locationTransactionBottomSheet aç
                     if (returnbasket.LocTracking == 1)

@@ -75,7 +75,7 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
         _userDialogs = userDialogs;
         Items = new();
 
-        Title = "Siparişe Bağlı Mal Kabul İşlemi";
+        Title = "Form Sayfası";
 
         LoadPageCommand = new Command(async () => await LoadPageAsync());
         ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
