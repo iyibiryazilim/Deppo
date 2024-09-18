@@ -14,6 +14,7 @@ using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
+using DevExpress.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseProcess.ViewModels;
 
@@ -60,6 +61,7 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
         SaveCommand = new Command(async () => await SaveAsync());
         LoadPageCommand = new Command(async () => await LoadPageAsync());
     }
+    public Page CurrentPage { get; set; }
 
     public Command SaveCommand { get; }
     public Command LoadPageCommand { get; }
@@ -73,8 +75,7 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            //Title = GetEnumDescription(OutputProductProcessType);
-            //CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
+            CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
 
 
         }

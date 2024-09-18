@@ -175,6 +175,8 @@ public partial class ReturnPurchaseDispatchListViewModel : BaseViewModel
                 await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseDispatchProductListView)}", new Dictionary<string, object>
                 {
                     [nameof(PurchaseFicheModel)] = PurchaseFicheModel,
+                    [nameof(PurchaseSupplier)] = PurchaseSupplier,
+                    [nameof(WarehouseModel)] = WarehouseModel
                 });
             }
         }

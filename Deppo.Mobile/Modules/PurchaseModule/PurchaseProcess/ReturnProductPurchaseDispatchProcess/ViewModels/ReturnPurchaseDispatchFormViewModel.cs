@@ -16,22 +16,26 @@ using System.ComponentModel;
 using System.Reflection;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Core.DTOs.PurchaseReturnDispatchTransaction;
+using Deppo.Mobile.Core.Models.PurchaseModels;
+using DevExpress.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.ViewModels;
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(Items), queryId: nameof(Items))]
+[QueryProperty(name: nameof(PurchaseSupplier), queryId: nameof(PurchaseSupplier))]
 public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
     private readonly IPurchaseReturnDispatchTransactionService _purchaseReturnDispatchTransactionService;
     private readonly IUserDialogs _userDialogs;
 
-    [ObservableProperty]
-    OutputProductProcessType outputProductProcessType;
 
     [ObservableProperty]
     WarehouseModel warehouseModel = null!;
+
+    [ObservableProperty]
+    PurchaseSupplier purchaseSupplier = null!;
 
     [ObservableProperty]
     ObservableCollection<ReturnPurchaseBasketModel> items = null!;
@@ -51,6 +55,8 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 
     [ObservableProperty]
     string specialCode = string.Empty;
+
+    public Page CurrentPage { get; set; }
 
 
     public ReturnPurchaseDispatchFormViewModel(IHttpClientService httpClientService, IPurchaseReturnDispatchTransactionService purchaseReturnDispatchTransactionService, IUserDialogs userDialogs)
@@ -75,8 +81,8 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            //Title = GetEnumDescription(OutputProductProcessType);
-            //CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
+            
+            CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
 
 
         }

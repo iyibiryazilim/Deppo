@@ -2,6 +2,7 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
@@ -15,6 +16,8 @@ using System.Collections.ObjectModel;
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.ViewModels;
 
 [QueryProperty(name: nameof(Items), queryId: nameof(Items))]
+[QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
+[QueryProperty(name: nameof(PurchaseSupplier), queryId: nameof(PurchaseSupplier))]
 public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -24,6 +27,9 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
 
     [ObservableProperty]
     WarehouseModel warehouseModel = null!;
+
+    [ObservableProperty]
+    PurchaseSupplier purchaseSupplier = null!;
 
     [ObservableProperty]
     ReturnPurchaseBasketModel? selectedItem;
@@ -693,6 +699,7 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
             await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseFormView)}", new Dictionary<string, object>
             {
                 [nameof(WarehouseModel)] = WarehouseModel,
+                [nameof(PurchaseSupplier)] = PurchaseSupplier,
                 [nameof(Items)] = Items
             });
         }
