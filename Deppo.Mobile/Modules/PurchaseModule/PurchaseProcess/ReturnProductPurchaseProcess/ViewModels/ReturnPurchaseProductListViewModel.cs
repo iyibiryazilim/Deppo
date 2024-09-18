@@ -247,7 +247,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
                         Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
                         SelectedProduct = item;
 
-                        var basketItem = new OutputProductBasketModel
+                        var basketItem = new ReturnPurchaseBasketModel
                         {
                             ItemReferenceId = item.ProductReferenceId,
                             ItemCode = item.ProductCode,
@@ -419,7 +419,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
             IsBusy = true;
 
             var item = ItemVariants.FirstOrDefault(x => x.IsSelected);
-            var basketItem = new OutputProductBasketModel
+            var basketItem = new ReturnPurchaseBasketModel
             {
                 ItemReferenceId = item.ReferenceId,
                 ItemCode = item.Code,
@@ -461,7 +461,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            var previousViewModel = _serviceProvider.GetRequiredService<OutputProductProcessBasketListViewModel>();
+            var previousViewModel = _serviceProvider.GetRequiredService<ReturnPurchaseBasketViewModel>();
             if (previousViewModel is not null)
             {
                 if (SelectedProducts.Any())
