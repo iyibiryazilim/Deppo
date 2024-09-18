@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
@@ -97,9 +98,9 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
             IsBusy = true;
 
             _userDialogs.ShowLoading("Loading...");
-            await Task.Delay(500);
-
             SelectedItems.Clear();
+            await Task.Delay(1000);
+
             if (ReturnSalesBasketModel.Details.Count > 0)
             {
                 foreach (var item in ReturnSalesBasketModel.Details)
@@ -479,7 +480,6 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
             
             var previousViewModel = _serviceProvider.GetRequiredService<ReturnSalesBasketViewModel>();
             if (previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId) is not null)
-
             {
                 foreach (var item in SelectedItems.Where(x => x.InputQuantity > 0)) //Locations
                 {
@@ -501,7 +501,9 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
 
                     var totalInputQuantity = SelectedItems.Where(x => x.InputQuantity > 0).Sum(x => x.InputQuantity);
                     previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId).Quantity = totalInputQuantity;
+
                 }
+              
             }
 
             await Shell.Current.GoToAsync("..");

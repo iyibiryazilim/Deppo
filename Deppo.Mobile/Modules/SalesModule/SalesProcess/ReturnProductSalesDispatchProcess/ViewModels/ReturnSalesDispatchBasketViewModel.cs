@@ -106,29 +106,6 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
 
     #endregion Commands
 
-    //private async Task ShowProductViewAsync()
-    //{
-    //    if (IsBusy)
-    //        return;
-
-    //    try
-    //    {
-    //        IsBusy = true;
-
-    //        await Shell.Current.GoToAsync($"{nameof(InputProductProcessProductListView)}", new Dictionary<string, object>
-    //        {
-    //            {nameof(WarehouseModel), WarehouseModel}
-    //        });
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-    //    }
-    //    finally
-    //    {
-    //        IsBusy = false;
-    //    }
-    //}
 
     private async Task IncreaseAsync(ReturnSalesBasketModel inputPurchaseBasketModel)
     {

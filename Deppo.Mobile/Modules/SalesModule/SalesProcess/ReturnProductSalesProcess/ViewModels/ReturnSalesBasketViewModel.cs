@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.SalesModels.BasketModels;
@@ -8,6 +9,8 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.Views;
@@ -150,7 +153,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProces
                     {nameof(WarehouseModel), WarehouseModel},
                     {nameof(ReturnSalesBasketModel), item}
                 });
-                    //  await nextViewModel.LoadSelectedItemsAsync();
+                      await nextViewModel.LoadSelectedItemsAsync();
                 }
                 else
                     item.Quantity++;
@@ -174,12 +177,46 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProces
             {
                 IsBusy = true;
 
-                if (item.Quantity > 1)
-                    item.Quantity--;
+                if (item is not null)
+                {
+                    if (item.Quantity > 1)
+                    {
+                        // Stok Yeri takipli ise locationTransactionBottomSheet aç
+                        if (item.LocTracking == 1)
+                        {
+                            var nextViewModel = _serviceProvider.GetRequiredService<ReturnSalesBasketLocationListViewModel>();
+
+                            await Shell.Current.GoToAsync($"{nameof(ReturnSalesBasketLocationListView)}", new Dictionary<string, object>
+                        {
+                            {nameof(WarehouseModel), WarehouseModel},
+                            {nameof(ReturnSalesBasketModel), item}
+                            });
+
+                            await nextViewModel.LoadSelectedItemsAsync();
+                        }
+                        // Sadece SeriLot takipli ise serilotTransactionBottomSheet aç
+                        else if (item.LocTracking == 0 && (item.TrackingType == 1 || item.TrackingType == 2))
+                        {
+                            await Shell.Current.GoToAsync($"{nameof(ReturnSalesBasketSeriLotListView)}", new Dictionary<string, object>
+                        {
+                            {nameof(WarehouseModel), WarehouseModel},
+                            {nameof(ReturnSalesBasketModel), item}
+                        });
+                        }
+                        // Stok yeri ve SeriLot takipli değilse
+                        else
+                        {
+                            item.Quantity--;
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
-                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                _userDialogs.Alert(ex.Message, "Hata", "Tamam");
             }
             finally
             {
