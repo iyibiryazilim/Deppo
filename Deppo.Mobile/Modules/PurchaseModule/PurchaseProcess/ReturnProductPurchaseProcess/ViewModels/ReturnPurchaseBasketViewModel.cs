@@ -1,18 +1,16 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
-using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
-using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseProcess.Views;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
-using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseProcess.ViewModels;
 
@@ -29,7 +27,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
     WarehouseModel warehouseModel = null!;
 
     [ObservableProperty]
-    OutputProductBasketModel? selectedItem;
+    ReturnPurchaseBasketModel? selectedItem;
 
     [ObservableProperty]
     SeriLotTransactionModel? selectedSeriLotTransaction;
@@ -44,7 +42,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
     public ObservableCollection<LocationTransactionModel> selectedLocationTransactions = new();
 
     #region Collections
-    public ObservableCollection<OutputProductBasketModel> Items { get; } = new();
+    public ObservableCollection<ReturnPurchaseBasketModel> Items { get; } = new();
     public ObservableCollection<SeriLotTransactionModel> SeriLotTransactions { get; } = new();
     public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
     #endregion
@@ -59,9 +57,9 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
         Title = "Sepet Listesi";
 
         ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
-        IncreaseCommand = new Command<OutputProductBasketModel>(async (item) => await IncreaseAsync(item));
-        DecreaseCommand = new Command<OutputProductBasketModel>(async (item) => await DecreaseAsync(item));
-        DeleteItemCommand = new Command<OutputProductBasketModel>(async (item) => await DeleteItemAsync(item));
+        IncreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await IncreaseAsync(item));
+        DecreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DecreaseAsync(item));
+        DeleteItemCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DeleteItemAsync(item));
 
 
         LoadMoreSeriLotTransactionsCommand = new Command(async () => await LoadMoreSeriLotTransactionsAsync());
@@ -135,7 +133,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
         }
     }
 
-    private async Task IncreaseAsync(OutputProductBasketModel item)
+    private async Task IncreaseAsync(ReturnPurchaseBasketModel item)
     {
         if (IsBusy)
             return;
@@ -178,7 +176,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
         }
     }
 
-    private async Task DecreaseAsync(OutputProductBasketModel item)
+    private async Task DecreaseAsync(ReturnPurchaseBasketModel item)
     {
         if (IsBusy)
             return;
@@ -220,7 +218,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
         }
     }
 
-    private async Task DeleteItemAsync(OutputProductBasketModel item)
+    private async Task DeleteItemAsync(ReturnPurchaseBasketModel item)
     {
         if (IsBusy)
             return;
@@ -437,7 +435,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
                     }
 
 
-                    SelectedItem.Details.Add(new OutputProductBasketDetailModel
+                    SelectedItem.Details.Add(new ReturnPurchaseBasketDetailModel
                     {
                         LocationReferenceId = item.ReferenceId,
                         LocationCode = item.LocationCode,
@@ -628,7 +626,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
 
                     foreach (var item in SelectedSeriLotTransactions)
                     {
-                        SelectedItem.Details.Add(new OutputProductBasketDetailModel
+                        SelectedItem.Details.Add(new ReturnPurchaseBasketDetailModel
                         {
                             SeriLotReferenceId = item.ReferenceId,
                             SeriLotCode = item.SerilotCode,

@@ -3,6 +3,7 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
+using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.VariantModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
@@ -32,7 +33,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
     public ObservableCollection<VariantModel> ItemVariants { get; } = new();
 
     [ObservableProperty]
-    public ObservableCollection<OutputProductBasketModel> selectedProducts = new();
+    public ObservableCollection<ReturnPurchaseBasketModel> selectedProducts = new();
 
     [ObservableProperty]
     WarehouseTotalModel selectedProduct = null!;
