@@ -15,22 +15,38 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
 using DevExpress.Maui.Controls;
+using Deppo.Mobile.Core.Models.PurchaseModels;
+using Deppo.Mobile.Core.Models.SalesModels;
+using Deppo.Mobile.Core.Models.ShipAddressModels;
+using Deppo.Core.Models;
+using Deppo.Mobile.Core.Services;
+using Deppo.Mobile.Helpers.MappingHelper;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseProcess.ViewModels;
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(Items), queryId: nameof(Items))]
+
 public partial class ReturnPurchaseFormViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
     private readonly IPurchaseReturnDispatchTransactionService _purchaseReturnDispatchTransactionService;
+    private readonly IPurchaseSupplierService _purchaseSupplierService;
     private readonly IUserDialogs _userDialogs;
+    private readonly IShipAddressService _shipAddressService;
 
     [ObservableProperty]
     OutputProductProcessType outputProductProcessType;
 
     [ObservableProperty]
     WarehouseModel warehouseModel = null!;
+
+    [ObservableProperty]
+    PurchaseSupplier? selectedSupplier;
+    [ObservableProperty]
+    ShipAddressModel? selectedShipAddress;
+    public ObservableCollection<PurchaseSupplier> Suppliers { get; } = new();
+    public ObservableCollection<ShipAddressModel> ShipAddresses { get; } = new();
 
     [ObservableProperty]
     ObservableCollection<ReturnPurchaseBasketModel> items = null!;
@@ -52,7 +68,7 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
     string specialCode = string.Empty;
 
 
-    public ReturnPurchaseFormViewModel(IHttpClientService httpClientService, IPurchaseReturnDispatchTransactionService purchaseReturnDispatchTransactionService, IUserDialogs userDialogs)
+    public ReturnPurchaseFormViewModel(IHttpClientService httpClientService, IPurchaseReturnDispatchTransactionService purchaseReturnDispatchTransactionService, IUserDialogs userDialogs, IPurchaseSupplierService purchaseSupplierService, IShipAddressService shipAddressService)
     {
         _httpClientService = httpClientService;
         _purchaseReturnDispatchTransactionService = purchaseReturnDispatchTransactionService;
@@ -60,6 +76,8 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
         Items = new();
         SaveCommand = new Command(async () => await SaveAsync());
         LoadPageCommand = new Command(async () => await LoadPageAsync());
+        _purchaseSupplierService = purchaseSupplierService;
+        _shipAddressService = shipAddressService;
     }
     public Page CurrentPage { get; set; }
 
@@ -104,6 +122,104 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
         return value.ToString();
     }
 
+    private async Task LoadSuppliersAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            Suppliers.Clear();
+            SelectedSupplier = null;
+            IsBusy = true;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            var result = await _purchaseSupplierService.GetObjects(
+                    httpClient: httpClient,
+                    firmNumber: _httpClientService.FirmNumber,
+                    periodNumber: _httpClientService.PeriodNumber,
+                    warehouseNumber: WarehouseModel.Number,
+                    skip: 0,
+                    take: 9999999,
+                    search: ""
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                {
+                    Suppliers.Add(Mapping.Mapper.Map<PurchaseSupplier>(item));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task LoadShipAddressesAsync(PurchaseSupplier purchaseSupplier)
+    {
+        if (purchaseSupplier is null)
+        {
+            await _userDialogs.AlertAsync("Lütfen tedarikçi seçiniz.", "Uyarı", "Tamam");
+            return;
+        }
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            ShipAddresses.Clear();
+            SelectedShipAddress = null;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            var result = await _shipAddressService.GetObjects(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                currentReferenceId: purchaseSupplier.ReferenceId,
+                skip: 0,
+                take: 9999999,
+                search: ""
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                {
+                    ShipAddresses.Add(Mapping.Mapper.Map<ShipAddressModel>(item));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
     private async Task SaveAsync()
     {
