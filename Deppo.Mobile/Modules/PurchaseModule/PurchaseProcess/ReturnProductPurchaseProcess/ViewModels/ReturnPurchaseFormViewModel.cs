@@ -34,6 +34,8 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
     private readonly IPurchaseSupplierService _purchaseSupplierService;
     private readonly IUserDialogs _userDialogs;
     private readonly IShipAddressService _shipAddressService;
+    private readonly ICarrierService _carrierService;
+    private readonly IDriverService _driverService;
 
     [ObservableProperty]
     OutputProductProcessType outputProductProcessType;
@@ -45,8 +47,15 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
     PurchaseSupplier? selectedSupplier;
     [ObservableProperty]
     ShipAddressModel? selectedShipAddress;
+    [ObservableProperty]
+    Carrier? selectedCarrier;
+    [ObservableProperty]
+    Driver? selectedDriver;
+
     public ObservableCollection<PurchaseSupplier> Suppliers { get; } = new();
     public ObservableCollection<ShipAddressModel> ShipAddresses { get; } = new();
+    public ObservableCollection<Carrier> Carriers { get; } = new();
+    public ObservableCollection<Driver> Drivers { get; } = new();
 
     [ObservableProperty]
     ObservableCollection<ReturnPurchaseBasketModel> items = null!;
@@ -68,7 +77,7 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
     string specialCode = string.Empty;
 
 
-    public ReturnPurchaseFormViewModel(IHttpClientService httpClientService, IPurchaseReturnDispatchTransactionService purchaseReturnDispatchTransactionService, IUserDialogs userDialogs, IPurchaseSupplierService purchaseSupplierService, IShipAddressService shipAddressService)
+    public ReturnPurchaseFormViewModel(IHttpClientService httpClientService, IPurchaseReturnDispatchTransactionService purchaseReturnDispatchTransactionService, IUserDialogs userDialogs, IPurchaseSupplierService purchaseSupplierService, IShipAddressService shipAddressService, ICarrierService carrierService, IDriverService driverService)
     {
         _httpClientService = httpClientService;
         _purchaseReturnDispatchTransactionService = purchaseReturnDispatchTransactionService;
@@ -79,8 +88,11 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
         SaveCommand = new Command(async () => await SaveAsync());
         LoadPageCommand = new Command(async () => await LoadPageAsync());
         LoadSuppliersCommand = new Command(async () => await LoadSuppliersAsync());
+        LoadCarriersCommand = new Command(async () => await LoadCarriersAsync());
+        LoadDriversCommand = new Command(async () => await LoadDriversAsync());
         LoadShipAddressesCommand = new Command<PurchaseSupplier>(async (purchaseSupplier) => await LoadShipAddressesAsync(purchaseSupplier));
-
+        _carrierService = carrierService;
+        _driverService = driverService;
     }
     public Page CurrentPage { get; set; }
 
@@ -88,6 +100,8 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
     public Command LoadPageCommand { get; }
     public Command LoadSuppliersCommand { get; }
     public Command LoadShipAddressesCommand { get; }
+    public Command LoadCarriersCommand { get; }
+    public Command LoadDriversCommand { get; }
 
 
     private async Task LoadPageAsync()
@@ -220,6 +234,88 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
 
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task LoadCarriersAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            Carriers.Clear();
+            SelectedCarrier = null;
+            IsBusy = true;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            var result = await _carrierService.GetObjects(
+                    httpClient: httpClient,
+                    firmNumber: _httpClientService.FirmNumber
+                    
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                {
+                    Carriers.Add(Mapping.Mapper.Map<Carrier>(item));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task LoadDriversAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            Drivers.Clear();
+            SelectedDriver = null;
+            IsBusy = true;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            var result = await _driverService.GetObjects(
+                    httpClient: httpClient
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                {
+                    Drivers.Add(Mapping.Mapper.Map<Driver>(item));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
         finally
         {

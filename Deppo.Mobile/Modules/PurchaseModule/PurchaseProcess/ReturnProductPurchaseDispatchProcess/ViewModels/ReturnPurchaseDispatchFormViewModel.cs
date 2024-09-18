@@ -18,6 +18,11 @@ using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Core.DTOs.PurchaseReturnDispatchTransaction;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using DevExpress.Maui.Controls;
+using Android.Service.Carrier;
+using Deppo.Core.Models;
+using Deppo.Mobile.Helpers.MappingHelper;
+using static Android.Provider.Telephony;
+using Deppo.Mobile.Core.Models.ShipAddressModels;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.ViewModels;
 
@@ -29,6 +34,8 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
     private readonly IHttpClientService _httpClientService;
     private readonly IPurchaseReturnDispatchTransactionService _purchaseReturnDispatchTransactionService;
     private readonly IUserDialogs _userDialogs;
+    private readonly ICarrierService _carrierService;
+    private readonly IDriverService _driverService;
 
 
     [ObservableProperty]
@@ -36,6 +43,14 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 
     [ObservableProperty]
     PurchaseSupplier purchaseSupplier = null!;
+
+    [ObservableProperty]
+    Carrier? selectedCarrier;
+    [ObservableProperty]
+    Driver? selectedDriver;
+
+    public ObservableCollection<Carrier> Carriers { get; } = new();
+    public ObservableCollection<Driver> Drivers { get; } = new();
 
     [ObservableProperty]
     ObservableCollection<ReturnPurchaseBasketModel> items = null!;
@@ -59,7 +74,7 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
     public Page CurrentPage { get; set; }
 
 
-    public ReturnPurchaseDispatchFormViewModel(IHttpClientService httpClientService, IPurchaseReturnDispatchTransactionService purchaseReturnDispatchTransactionService, IUserDialogs userDialogs)
+    public ReturnPurchaseDispatchFormViewModel(IHttpClientService httpClientService, IPurchaseReturnDispatchTransactionService purchaseReturnDispatchTransactionService, IUserDialogs userDialogs, ICarrierService carrierService, IDriverService driverService)
     {
         _httpClientService = httpClientService;
         _purchaseReturnDispatchTransactionService = purchaseReturnDispatchTransactionService;
@@ -67,10 +82,16 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
         Items = new();
         SaveCommand = new Command(async () => await SaveAsync());
         LoadPageCommand = new Command(async () => await LoadPageAsync());
+        LoadCarriersCommand = new Command(async () => await LoadCarriersAsync());
+        LoadDriversCommand = new Command(async () => await LoadDriversAsync());
+        _carrierService = carrierService;
+        _driverService = driverService;
     }
 
     public Command SaveCommand { get; }
     public Command LoadPageCommand { get; }
+    public Command LoadCarriersCommand { get; }
+    public Command LoadDriversCommand { get; }
 
     private async Task LoadPageAsync()
     {
@@ -111,7 +132,87 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
         return value.ToString();
     }
 
+    private async Task LoadCarriersAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            Carriers.Clear();
+            SelectedCarrier = null;
+            IsBusy = true;
 
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            var result = await _carrierService.GetObjects(
+                    httpClient: httpClient,
+                    firmNumber: _httpClientService.FirmNumber
+
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                {
+                    Carriers.Add(Mapping.Mapper.Map<Carrier>(item));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task LoadDriversAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            Drivers.Clear();
+            SelectedDriver = null;
+            IsBusy = true;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            var result = await _driverService.GetObjects(
+                    httpClient: httpClient
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                {
+                    Drivers.Add(Mapping.Mapper.Map<Driver>(item));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
     private async Task SaveAsync()
     {
         if (IsBusy)

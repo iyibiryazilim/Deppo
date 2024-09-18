@@ -1,17 +1,16 @@
-﻿using Deppo.Core.BaseModels;
-using Deppo.Core.DataResultModel;
+﻿using Deppo.Core.DataResultModel;
 using Deppo.Core.Services;
 using Newtonsoft.Json;
 using System.Text;
 
 namespace Deppo.Core.DataStores
 {
-    public class DriverDataStore : IDriverService
+    public class CarrierDataStore : ICarrierService
     {
         private string postUrl = "/gateway/customQuery/CustomQuery";
-        public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient,int firmNumber)
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetDrivers()), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetCarriers(firmNumber)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -59,17 +58,11 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        private string GetDrivers()
+        private string GetCarriers(int firmNumber)
         {
-            string baseQuery = $@"SELECT LOGICALREF AS [ReferenceId],
-            ISNULL(NAME,'') AS [Name],
-            ISNULL(SURNAME,'') AS [Surname],
-            ISNULL(TCNO,'') AS [IdentityNumber],
-            ISNULL(PLATENUM,'') AS [PlateNumber]
-            FROM L_DRIVERS";
+            string baseQuery = $@"SELECT LOGICALREF AS [ReferenceId],CODE AS [Code], TITLE AS [Name] FROM L_SHPAGENT WHERE FIRMTYPE = {firmNumber}";
 
             return baseQuery;
         }
-
     }
 }
