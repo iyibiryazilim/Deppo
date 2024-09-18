@@ -41,7 +41,8 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
     public ObservableCollection<LocationTransactionModel> selectedLocationTransactions = new();
 
     #region Collections
-    public ObservableCollection<ReturnPurchaseBasketModel> Items { get; } = new();
+    [ObservableProperty]
+    public ObservableCollection<ReturnPurchaseBasketModel> items;
     public ObservableCollection<SeriLotTransactionModel> SeriLotTransactions { get; } = new();
     public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
     #endregion

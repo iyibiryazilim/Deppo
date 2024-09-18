@@ -150,41 +150,40 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
                 {
                     Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
                     SelectedPurchaseTransactions.Remove(SelectedPurchaseTransactions.FirstOrDefault(x => x.ProductReferenceId == selectedItem.ProductReferenceId));
-
-                    var basketItem = new ReturnPurchaseBasketModel
-                    {
-                        ItemReferenceId = item.ProductReferenceId,
-                        ItemCode = item.ProductCode,
-                        ItemName = item.ProductName,
-                        UnitsetReferenceId = item.UnitsetReferenceId,
-                        UnitsetCode = item.UnitsetCode,
-                        UnitsetName = item.UnitsetName,
-                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                        SubUnitsetCode = item.SubUnitsetCode,
-                        SubUnitsetName = item.SubUnitsetName,
-                        MainItemReferenceId = default,  //
-                        MainItemCode = string.Empty,    //
-                        MainItemName = string.Empty,    //
-                        StockQuantity = item.Quantity,
-                        IsSelected = false,   //
-                        IsVariant = item.IsVariant,
-                        LocTracking = item.LocTracking,
-                        TrackingType = item.TrackingType,
-                        Quantity = item.LocTracking == 0 ? 1 : 0,
-                        LocTrackingIcon = item.LocTrackingIcon,
-                        VariantIcon = item.VariantIcon,
-                        TrackingTypeIcon = item.TrackingTypeIcon,
-                    };
-
-                    SelectedProducts.Add(basketItem);
                 }
                 else
                 {
                     Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
 
-                   
+					var basketItem = new ReturnPurchaseBasketModel
+					{
+						ItemReferenceId = item.ProductReferenceId,
+						ItemCode = item.ProductCode,
+						ItemName = item.ProductName,
+						UnitsetReferenceId = item.UnitsetReferenceId,
+						UnitsetCode = item.UnitsetCode,
+						UnitsetName = item.UnitsetName,
+						SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+						SubUnitsetCode = item.SubUnitsetCode,
+						SubUnitsetName = item.SubUnitsetName,
+						MainItemReferenceId = default,  //
+						MainItemCode = string.Empty,    //
+						MainItemName = string.Empty,    //
+						StockQuantity = item.Quantity,
+						IsSelected = false,   //
+						IsVariant = item.IsVariant,
+						LocTracking = item.LocTracking,
+						TrackingType = item.TrackingType,
+						Quantity = item.LocTracking == 0 ? 1 : 0,
+						LocTrackingIcon = item.LocTrackingIcon,
+						VariantIcon = item.VariantIcon,
+						TrackingTypeIcon = item.TrackingTypeIcon,
+					};
 
-                    SelectedPurchaseTransactions.Add(selectedItem);
+					SelectedProducts.Add(basketItem);
+
+
+					SelectedPurchaseTransactions.Add(selectedItem);
                 }
             }
         }
@@ -209,6 +208,7 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            Console.WriteLine(SelectedProducts);
 
             await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseDispatchBasketView)}", new Dictionary<string, object>
             {
