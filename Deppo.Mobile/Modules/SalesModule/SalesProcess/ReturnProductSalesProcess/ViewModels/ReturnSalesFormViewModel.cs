@@ -25,12 +25,12 @@ using Deppo.Core.DataResultModel;
 using Deppo.Core.ResponseResultModels;
 using Deppo.Core.DTOs.RetailSalesReturnDispatchTransaction;
 using Deppo.Core.DTOs.WholeSalesReturnDispatchTransaction;
+using System.Windows.Input;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.ViewModels;
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(Items), queryId: nameof(Items))]
-//ToDo
 public partial class ReturnSalesFormViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -47,9 +47,10 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
     public ObservableCollection<ShipAddressModel> ShipAddresses { get; } = new();
 
     [ObservableProperty]
-    SalesCustomer? selectedCustomer;
+    private SalesCustomer? selectedCustomer;
+
     [ObservableProperty]
-    ShipAddressModel? selectedShipAddress;
+    private ShipAddressModel? selectedShipAddress;
 
     [ObservableProperty]
     private DateTime ficheDate = DateTime.Now;
@@ -65,9 +66,9 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
 
     [ObservableProperty]
     private string description = string.Empty;
+
     [ObservableProperty]
     private SalesReturnEnumType salesReturnEnumType = SalesReturnEnumType.Retail;
-
 
     [ObservableProperty]
     private ObservableCollection<ReturnSalesBasketModel> items = null!;
@@ -85,7 +86,11 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
         ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
         LoadCustomersCommand = new Command(async () => await LoadCustomersAsync());
         LoadShipAddressesCommand = new Command<SalesCustomer>(async (x) => await LoadShipAddressesAsync(x));
-        SaveCommand = new Command(async () => await SaveAsync());
+        SelectWholeCommand = new Command(async (x) => await SelectTransactionTypeAsync(SalesReturnEnumType.Whole));
+        SelectRetailCommand = new Command(async (x) => await SelectTransactionTypeAsync(SalesReturnEnumType.Retail));
+
+        SaveCommand = new Command(OpenBottomSheetAsync);
+
         _retailService = retailService;
         _wholeService = wholeService;
     }
@@ -97,6 +102,9 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
     public Command ShowBasketItemCommand { get; }
     public Command LoadCustomersCommand { get; }
     public Command<SalesCustomer> LoadShipAddressesCommand { get; }
+
+    public Command SelectWholeCommand { get; }
+    public Command SelectRetailCommand { get; }
 
     private async Task ShowBasketItemAsync()
     {
@@ -143,7 +151,22 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
         }
     }
 
-  
+    private void OpenBottomSheetAsync()
+    {
+        // BottomSheet'i aç
+        CurrentPage.FindByName<BottomSheet>("selectConfirmBottomSheet").State = BottomSheetState.HalfExpanded;
+    }
+
+    private async Task SelectTransactionTypeAsync(SalesReturnEnumType selectedType)
+    {
+        SalesReturnEnumType = selectedType;
+
+        // BottomSheet'i kapat
+        CurrentPage.FindByName<BottomSheet>("selectConfirmBottomSheet").State = BottomSheetState.Hidden;
+
+        // SaveCommand'i tetikle
+        await SaveAsync();
+    }
 
     private async Task SaveAsync()
     {
@@ -152,9 +175,8 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
 
         try
         {
-            
             IsBusy = true;
-            
+
             _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
             await Task.Delay(1000);
 
@@ -164,7 +186,6 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
             {
                 RetailSalesReturnDispatchTransactionInsert dto = new()
                 {
-
                     SpeCode = SpecialCode,
                     CurrentCode = selectedCustomer.Code,
                     Code = string.Empty,
@@ -174,7 +195,6 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                     FirmNumber = _httpClientService.FirmNumber,
                     WarehouseNumber = WarehouseModel.Number,
                     Description = Description
-
                 };
                 foreach (var item in Items)
                 {
@@ -186,8 +206,7 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                         ConversionFactor = 1,
                         OtherConversionFactor = 1,
                         SubUnitsetCode = item.SubUnitsetCode,
-                         //DispatchReferenceId =0
-                        
+                        //DispatchReferenceId =0
                     };
                     dto.Lines.Add(line);
                     foreach (var detail in item.Details)
@@ -204,7 +223,7 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                         line.SeriLotTransactions.Add(seriLotTransactionDto);
                     }
                 }
-               result = await _retailService.InsertRetailSalesReturnDispatchTransaction(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, dto);
+                result = await _retailService.InsertRetailSalesReturnDispatchTransaction(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, dto);
             }
             else
             {
@@ -219,8 +238,6 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                     FirmNumber = _httpClientService.FirmNumber,
                     WarehouseNumber = WarehouseModel.Number,
                     Description = Description
-                   
-
                 };
                 foreach (var item in Items)
                 {
@@ -232,7 +249,7 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                         ConversionFactor = 1,
                         OtherConversionFactor = 1,
                         SubUnitsetCode = item.SubUnitsetCode,
-                         //DispatchReferenceId =0
+                        //DispatchReferenceId =0
                     };
                     dto.Lines.Add(wholeSalesDispatchTransactionLineInsert);
                     foreach (var detail in item.Details)
@@ -252,8 +269,6 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                 result = await _wholeService.InsertWholeSalesReturnDispatchTransaction(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, dto);
             }
 
-
-            
             Console.WriteLine(result);
             ResultModel resultModel = new();
             if (result.IsSuccess)
@@ -294,6 +309,7 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
     private async Task LoadShipAddressesAsync(SalesCustomer salesCustomer)
     {
         if (salesCustomer is null)
@@ -339,13 +355,13 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                 _userDialogs.HideHud();
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-
         }
         finally
         {
             IsBusy = false;
         }
     }
+
     private async Task LoadCustomersAsync()
     {
         if (IsBusy)
@@ -392,5 +408,4 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
 }
