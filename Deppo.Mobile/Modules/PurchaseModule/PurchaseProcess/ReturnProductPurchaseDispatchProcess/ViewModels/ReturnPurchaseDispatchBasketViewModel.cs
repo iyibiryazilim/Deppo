@@ -14,6 +14,7 @@ using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.ViewModels;
 
+[QueryProperty(name: nameof(Items), queryId: nameof(Items))]
 public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
