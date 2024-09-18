@@ -10,10 +10,12 @@ namespace Deppo.Mobile.Core.Models.SalesModels
     public class SalesTransactionModel : SalesTransaction
     {
         private bool _isSelected;
+        private string? _image;
 
         public SalesTransactionModel()
         {
         }
+
         public bool IsSelected
         {
             get => _isSelected;
@@ -22,6 +24,17 @@ namespace Deppo.Mobile.Core.Models.SalesModels
                 if (_isSelected == value) return;
                 _isSelected = value;
                 NotifyPropertyChanged(nameof(IsSelected));
+            }
+        }
+
+        public string? Image
+        {
+            get => _image;
+            set
+            {
+                if (_image == value) return;
+                _image = value;
+                NotifyPropertyChanged();
             }
         }
     }

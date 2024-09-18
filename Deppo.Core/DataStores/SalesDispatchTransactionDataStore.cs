@@ -157,7 +157,7 @@ where STFICHE.TRCODE IN(7,8) AND STLINE.LINETYPE = 0 AND STFICHE.LOGICALREF = {f
             if (!string.IsNullOrEmpty(search))
                 baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";
 
-            baseQuery += $@"
+            baseQuery += $@" ORDER BY ITEMS.LOGICALREF DESC 
 OFFSET {skip} ROWS
 FETCH NEXT {take} ROWS ONLY";
 

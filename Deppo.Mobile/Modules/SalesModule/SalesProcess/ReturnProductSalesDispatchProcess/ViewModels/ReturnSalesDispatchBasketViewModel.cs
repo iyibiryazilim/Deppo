@@ -18,12 +18,13 @@ using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchasePr
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.Views;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
-namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.ViewModels;
 
+namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.ViewModels;
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(SalesCustomer), queryId: nameof(SalesCustomer))]
 [QueryProperty(name: nameof(Items), queryId: nameof(Items))]
+[QueryProperty(name: nameof(SalesTransactionModel), queryId: nameof(Items))]
 public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -44,7 +45,6 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
     [ObservableProperty]
     private ObservableCollection<ReturnSalesBasketModel> items;
 
-
     public ReturnSalesDispatchBasketViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider)
     {
         _httpClientService = httpClientService;
@@ -53,7 +53,7 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
         _seriLotService = seriLotService;
         _serviceProvider = serviceProvider;
 
-        Title = "Satınalma Sepeti";
+        Title = "Satış İade Sepeti";
 
         IncreaseCommand = new Command<ReturnSalesBasketModel>(async (x) => await IncreaseAsync(x));
 
@@ -73,7 +73,7 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
 
         BackCommand = new Command(async () => await BackAsync());
 
-      //  ShowOtherProductCommand = new Command(async () => await ShowOtherProductAsync());
+        //  ShowOtherProductCommand = new Command(async () => await ShowOtherProductAsync());
     }
 
     public Page CurrentPage { get; set; }
@@ -105,7 +105,6 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
     public Command ShowOtherProductCommand { get; }
 
     #endregion Commands
-
 
     private async Task IncreaseAsync(ReturnSalesBasketModel inputPurchaseBasketModel)
     {
