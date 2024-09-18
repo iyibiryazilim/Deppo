@@ -209,6 +209,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<ISalesCustomerService, SalesCustomerDataStore>();
         builder.Services.AddSingleton<ISalesCustomerProductService, SalesCustomerProductDataStore>();
         builder.Services.AddSingleton<IShipAddressService, ShipAddressDataStore>();
+        builder.Services.AddSingleton<ICarrierService, CarrierDataStore>();
+        builder.Services.AddSingleton<IDriverService,DriverDataStore>();
 
         builder.Services.AddSingleton<IProductPanelService, ProductPanelDataStore>();
         builder.Services.AddSingleton<ISalesPanelService, SalesPanelDataStore>();
