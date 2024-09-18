@@ -4,6 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:customerModel="clr-namespace:Deppo.Mobile.Core.Models.SalesModels;assembly=Deppo.Mobile.Core"
              xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:shipAddressModel="clr-namespace:Deppo.Mobile.Core.Models.ShipAddressModels;assembly=Deppo.Mobile.Core"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:salesModel="clr-namespace:Deppo.Mobile.Core.Models.SalesModels;assembly=Deppo.Mobile.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -232,7 +233,7 @@
 
 
         <!--#region ShipAddress BottomSheet-->
-        <!--<dx:BottomSheet x:Name="shipAddressBottomSheet"
+        <dx:BottomSheet x:Name="shipAddressBottomSheet"
                  Grid.Row="1"
                  Padding="10,30,10,10"
                  AllowDismiss="False"
@@ -277,7 +278,7 @@
                                  BackgroundColor="{StaticResource WhiteSmoke}"
                                  StrokeThickness="0.1">
                                     <Border.GestureRecognizers>
-                                        <TapGestureRecognizer  Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesProcessCustomerListViewModel}}, Path=ShipAddressTappedCommand}" CommandParameter="{Binding .}" />
+                                        <TapGestureRecognizer  Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessCustomerListViewModel}}, Path=ShipAddressTappedCommand}" CommandParameter="{Binding .}" />
                                     </Border.GestureRecognizers>
                                     <Border.Triggers>
                                         <DataTrigger Binding="{Binding IsSelected}"
@@ -307,10 +308,10 @@
                         </CollectionView.ItemTemplate>
                     </CollectionView>
 
-                    <Button Grid.Row="1" Text="Tamam" />
+                    <Button Grid.Row="1" Text="Tamam" Command="{Binding ConfirmShipAddressCommand}" />
                 </Grid>
             </Grid>
-        </dx:BottomSheet>-->
+        </dx:BottomSheet>
         <!--#endregion-->
     </Grid>
 </ContentPage>
