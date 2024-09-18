@@ -180,7 +180,7 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
                 resultModel.Message = "Başarılı";
                 resultModel.Code = result.Data.Code;
                 resultModel.PageTitle = Title;
-                resultModel.PageCountToBack = (int)OutputProductProcessType.ConsumableProcess + 1;
+                resultModel.PageCountToBack = 6;
 
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();
@@ -197,7 +197,7 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 
                 resultModel.Message = "Başarısız";
                 resultModel.PageTitle = Title;
-                resultModel.PageCountToBack = (int)OutputProductProcessType.ConsumableProcess;
+                resultModel.PageCountToBack = 1;
                 await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
                 {
                     [nameof(ResultModel)] = resultModel

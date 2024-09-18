@@ -422,11 +422,14 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
             if (LocationTransactions.Count > 0)
             {
                 SelectedLocationTransactions.Clear();
-                SelectedLocationTransactions.ToList().AddRange(LocationTransactions.Where(x => x.OutputQuantity > 0));
+				foreach (var x in LocationTransactions.Where(x => x.OutputQuantity > 0))
+				{
+					SelectedLocationTransactions.Add(x);
+				}
 
 
 
-                foreach (var item in SelectedLocationTransactions)
+				foreach (var item in SelectedLocationTransactions)
                 {
                     var selectedLocationTransactionItem = SelectedItem.Details.FirstOrDefault(x => x.TransactionReferenceId == item.TransactionReferenceId);
                     if (selectedLocationTransactionItem is not null)

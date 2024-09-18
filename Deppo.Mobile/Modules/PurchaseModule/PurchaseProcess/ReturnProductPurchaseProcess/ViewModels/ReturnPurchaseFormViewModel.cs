@@ -243,7 +243,7 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
             var dto = new PurchaseReturnDispatchTransactionInsert
             {
                 Code = "",
-                CurrentCode = "",
+                CurrentCode = SelectedSupplier.Code,
                 Description = Description,
                 DoCode = DocumentNumber,
                 DocTrackingNumber = DocumentTrackingNumber,
@@ -295,7 +295,7 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
                 resultModel.Message = "Başarılı";
                 resultModel.Code = result.Data.Code;
                 resultModel.PageTitle = Title;
-                resultModel.PageCountToBack = (int)OutputProductProcessType.ConsumableProcess + 1;
+                resultModel.PageCountToBack = 5;
 
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();
@@ -312,7 +312,7 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
 
                 resultModel.Message = "Başarısız";
                 resultModel.PageTitle = Title;
-                resultModel.PageCountToBack = (int)OutputProductProcessType.ConsumableProcess;
+                resultModel.PageCountToBack = 1;
                 await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
                 {
                     [nameof(ResultModel)] = resultModel
