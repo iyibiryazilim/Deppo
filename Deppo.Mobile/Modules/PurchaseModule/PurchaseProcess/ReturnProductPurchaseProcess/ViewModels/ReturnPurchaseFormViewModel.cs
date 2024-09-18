@@ -85,6 +85,9 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
         Items = new();
         _purchaseSupplierService = purchaseSupplierService;
         _shipAddressService = shipAddressService;
+
+        Title = "Satınalma İade İrsaliyesi";
+
         SaveCommand = new Command(async () => await SaveAsync());
         LoadPageCommand = new Command(async () => await LoadPageAsync());
         LoadSuppliersCommand = new Command(async () => await LoadSuppliersAsync());
