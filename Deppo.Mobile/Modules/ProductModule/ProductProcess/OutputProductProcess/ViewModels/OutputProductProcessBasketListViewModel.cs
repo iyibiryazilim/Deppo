@@ -267,7 +267,9 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
 				productReferenceId: SelectedItem.ItemReferenceId,
-				warehouseNumber: WarehouseModel.Number
+				warehouseNumber: WarehouseModel.Number,
+				skip: 0,
+				take: 20
 			);
 
 			if (result.IsSuccess)
@@ -350,7 +352,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				}
 				else
 				{
-					if(item.OutputQuantity < item.Quantity)
+					if(item.OutputQuantity < item.RemainingQuantity)
 						item.OutputQuantity++;
 				}
 
@@ -426,11 +428,15 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 			if (LocationTransactions.Count > 0)
 			{
 				SelectedLocationTransactions.Clear();
-				SelectedLocationTransactions.ToList().AddRange(LocationTransactions.Where(x => x.OutputQuantity > 0));
+                //SelectedLocationTransactions.ToList().AddRange(LocationTransactions.Where(x => x.OutputQuantity > 0));
+                foreach (var x in LocationTransactions.Where(x => x.OutputQuantity > 0))
+                {
+					SelectedLocationTransactions.Add(x);
+                }
 
 
 
-				foreach (var item in SelectedLocationTransactions)
+                foreach (var item in SelectedLocationTransactions)
 				{
 					var selectedLocationTransactionItem = SelectedItem.Details.FirstOrDefault(x => x.TransactionReferenceId == item.TransactionReferenceId);
 					if (selectedLocationTransactionItem is not null)
@@ -441,14 +447,16 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 
 					SelectedItem.Details.Add(new OutputProductBasketDetailModel
 					{
-						LocationReferenceId = item.ReferenceId,
+						ReferenceId = item.ReferenceId,
+						LocationReferenceId = item.LocationReferenceId,
 						LocationCode = item.LocationCode,
 						LocationName = item.LocationName,
 						TransactionReferenceId = item.TransactionReferenceId,
+						InSerilotTransactionReferenceId = item.InSerilotTransactionReferenceId,
 						TransactionFicheReferenceId = item.TransactionFicheReferenceId,
 						InTransactionReferenceId = item.InTransactionReferenceId,
 						Quantity = item.OutputQuantity,
-						RemainingQuantity = item.Quantity - item.OutputQuantity,
+						RemainingQuantity = item.OutputQuantity,
 					});
 				}
 
@@ -634,12 +642,13 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 							SeriLotReferenceId = item.ReferenceId,
 							SeriLotCode = item.SerilotCode,
 							SeriLotName = item.SerilotName,
+							ReferenceId = item.ReferenceId,
 							TransactionFicheReferenceId = item.TransactionFicheReferenceId,
 							TransactionReferenceId = item.TransactionReferenceId,
 							InTransactionReferenceId = item.InTransactionReferenceId,
 							Quantity = item.OutputQuantity,
 							InSerilotTransactionReferenceId = item.InSerilotTransactionReferenceId,
-							RemainingQuantity = item.Quantity - item.OutputQuantity
+							RemainingQuantity = item.OutputQuantity
 						});
 					}
 
@@ -697,7 +706,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
             await Shell.Current.GoToAsync($"{nameof(OutputProductProcessFormView)}", new Dictionary<string, object>
 			{
 				[nameof(WarehouseModel)] = WarehouseModel,
-				[nameof(OutputProductProcessType)] = OutputProductProcessType
+				[nameof(OutputProductProcessType)] = OutputProductProcessType,
+				[nameof(Items)] = Items
 			});
 		}
 		catch (Exception ex)

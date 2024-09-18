@@ -4,6 +4,7 @@ using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
@@ -11,6 +12,7 @@ using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views;
 using DevExpress.Maui.Controls;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +27,7 @@ using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels;
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
-[QueryProperty(name: nameof(Supplier), queryId: nameof(Supplier))]
+[QueryProperty(name: nameof(SupplierModel), queryId: nameof(SupplierModel))]
 public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -38,7 +40,7 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
     private WarehouseModel warehouseModel = null!;
 
     [ObservableProperty]
-    private Supplier supplier = null!;
+    private SupplierModel supplierModel = null!;
 
     [ObservableProperty]
     private InputPurchaseBasketModel? selectedInputProductBasketModel;
@@ -317,10 +319,11 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
                 return;
             }
 
-            await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseProcessFormView)}", new Dictionary<string, object>
+            await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessOtherProductListView)}", new Dictionary<string, object>
             {
                 [nameof(WarehouseModel)] = WarehouseModel,
-                [nameof(Items)] = Items
+                [nameof(Items)] = Items,
+                [nameof(SupplierModel)] = SupplierModel
             });
         }
         catch (Exception ex)

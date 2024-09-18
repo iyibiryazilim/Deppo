@@ -40,6 +40,10 @@ using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOr
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.ViewModels;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.Views;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseProcess.ViewModels;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ViewModels;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels;
@@ -56,6 +60,10 @@ using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProce
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.ViewModels;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.ViewModels;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.ViewModels;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ViewModels;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.WaitingOrderMenu.ViewModels;
@@ -202,6 +210,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<ISalesCustomerService, SalesCustomerDataStore>();
         builder.Services.AddSingleton<ISalesCustomerProductService, SalesCustomerProductDataStore>();
         builder.Services.AddSingleton<IShipAddressService, ShipAddressDataStore>();
+        builder.Services.AddSingleton<ICarrierService, CarrierDataStore>();
+        builder.Services.AddSingleton<IDriverService,DriverDataStore>();
 
         builder.Services.AddSingleton<IProductPanelService, ProductPanelDataStore>();
         builder.Services.AddSingleton<ISalesPanelService, SalesPanelDataStore>();
@@ -222,10 +232,15 @@ public static class MauiProgram
         builder.Services.AddSingleton<IRetailSalesDispatchTransactionService ,RetailSalesDispatchTransactionDataStore>();
         builder.Services.AddSingleton<IWholeSalesDispatchTransactionService, WholeSalesDispatchTransactionDataStore>();
 
+
         builder.Services.AddSingleton<IPurchaseReturnDispatchTransactionService, PurchaseReturnDispatchTransactionDataStore>();
         builder.Services.AddSingleton<IRetailSalesReturnDispatchTransactionService, RetailSalesReturnDispatchTransactionDataStore>();
         builder.Services.AddSingleton<IWholeSalesReturnDispatchTransactionService, WholeSalesReturnDispatchTransactionDataStore>();
         builder.Services.AddSingleton<ITransferTransactionService, TransferTransactionDataStore>();
+
+
+        builder.Services.AddSingleton<ISalesDispatchTransactionService, SalesDispatchTransactionDataStore>();
+
 
         builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
         builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
@@ -291,6 +306,7 @@ public static class MauiProgram
         builder.Services.AddScopedWithShellRoute<OutputProductSalesProcessCustomerListView, OutputProductSalesProcessCustomerListViewModel>(nameof(OutputProductSalesProcessCustomerListView));
         builder.Services.AddScopedWithShellRoute<OutputProductSalesProcessBasketListView, OutputProductSalesProcessBasketListViewModel>(nameof(OutputProductSalesProcessBasketListView));
         builder.Services.AddScopedWithShellRoute<OutputProductSalesProcessProductListView, OutputProductSalesProcessProductListViewModel>(nameof(OutputProductSalesProcessProductListView));
+        builder.Services.AddScopedWithShellRoute<OutputProductSalesProcessFormView, OutputProductSalesProcessFormViewModel>(nameof(OutputProductSalesProcessFormView));
 
         #endregion Sevk Islemleri
 
@@ -302,6 +318,31 @@ public static class MauiProgram
         builder.Services.AddScopedWithShellRoute<OutputProductSalesOrderProcessBasketListView, OutputProductSalesOrderProcessBasketListViewModel>(nameof(OutputProductSalesOrderProcessBasketListView));
 
         #endregion Siparise Bagli Sevk Islemleri
+
+        #region Satış İade İşlemleri
+
+        builder.Services.AddTransientWithShellRoute<ReturnSalesWarehouseListView, ReturnSalesWarehouseListViewModel>(nameof(ReturnSalesWarehouseListView));
+
+        builder.Services.AddScopedWithShellRoute<ReturnSalesBasketView, ReturnSalesBasketViewModel>(nameof(ReturnSalesBasketView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesProductListView, ReturnSalesProductListViewModel>(nameof(ReturnSalesProductListView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesBasketLocationListView, ReturnSalesBasketLocationListViewModel>(nameof(ReturnSalesBasketLocationListView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesBasketSeriLotListView, ReturnSalesBasketSeriLotListViewModel>(nameof(ReturnSalesBasketSeriLotListView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesFormView, ReturnSalesFormViewModel>(nameof(ReturnSalesFormView));
+
+        #endregion Satış İade İşlemleri
+
+        #region İrsaliyeye Bağlı Satış İade İşlemleri
+
+        builder.Services.AddTransientWithShellRoute<ReturnSalesDispatchWarehouseListView, ReturnSalesDispatchWarehouseListViewModel>(nameof(ReturnSalesDispatchWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesDispatchCustomerListView, ReturnSalesDispatchCustomerListViewModel>(nameof(ReturnSalesDispatchCustomerListView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesDispatchProductListView, ReturnSalesDispatchProductListViewModel>(nameof(ReturnSalesDispatchProductListView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesDispatchListView, ReturnSalesDispatchListViewModel>(nameof(ReturnSalesDispatchListView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesDispatchBasketView, ReturnSalesDispatchBasketViewModel>(nameof(ReturnSalesDispatchBasketView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesDispatchBasketLocationListView, ReturnSalesDispatchBasketLocationListViewModel>(nameof(ReturnSalesDispatchBasketLocationListView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesDispatchBasketSeriLotListView, ReturnSalesDispatchBasketSeriLotListViewModel>(nameof(ReturnSalesDispatchBasketSeriLotListView));
+        builder.Services.AddScopedWithShellRoute<ReturnSalesDispatchFormView, ReturnSalesDispatchFormViewModel>(nameof(ReturnSalesDispatchFormView));
+
+        #endregion İrsaliyeye Bağlı Satış İade İşlemleri
 
         #endregion Sales Modules
 
@@ -343,7 +384,29 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
 
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessFormView, InputProductPurchaseOrderProcessFormViewModel>(nameof(InputProductPurchaseOrderProcessFormView));
 
+        builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessOtherProductListView, InputProductPurchaseOrderProcessOtherProductListViewModel>(nameof(InputProductPurchaseOrderProcessOtherProductListView));
+
         #endregion Siparişe Bağlı Satınalma İşlemleri
+
+        #region Satınalma İade İşlemleri
+
+        builder.Services.AddTransientWithShellRoute<ReturnPurchaseWarehouseListView, ReturnPurchaseWarehouseListViewModel>(nameof(ReturnPurchaseWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<ReturnPurchaseProductListView, ReturnPurchaseProductListViewModel>(nameof(ReturnPurchaseProductListView));
+        builder.Services.AddScopedWithShellRoute<ReturnPurchaseBasketView, ReturnPurchaseBasketViewModel>(nameof(ReturnPurchaseBasketView));
+        builder.Services.AddScopedWithShellRoute<ReturnPurchaseFormView, ReturnPurchaseFormViewModel>(nameof(ReturnPurchaseFormView));
+
+        #endregion
+
+        #region İrsaliyeye Bağlı Satınalma İade İşlemleri
+
+        builder.Services.AddTransientWithShellRoute<ReturnPurchaseDispatchWarehouseListView, ReturnPurchaseDispatchWarehouseListViewModel>(nameof(ReturnPurchaseDispatchWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<ReturnPurchaseDispatchSupplierListView, ReturnPurchaseDispatchSupplierListViewModel>(nameof(ReturnPurchaseDispatchSupplierListView));
+        builder.Services.AddScopedWithShellRoute<ReturnPurchaseDispatchListView, ReturnPurchaseDispatchListViewModel>(nameof(ReturnPurchaseDispatchListView));
+        builder.Services.AddScopedWithShellRoute<ReturnPurchaseDispatchProductListView, ReturnPurchaseDispatchProductListViewModel>(nameof(ReturnPurchaseDispatchProductListView));
+        builder.Services.AddScopedWithShellRoute<ReturnPurchaseDispatchBasketView, ReturnPurchaseDispatchBasketViewModel>(nameof(ReturnPurchaseDispatchBasketView));
+        builder.Services.AddScopedWithShellRoute<ReturnPurchaseDispatchFormView, ReturnPurchaseDispatchFormViewModel>(nameof(ReturnPurchaseDispatchFormView));
+
+        #endregion
 
         #endregion Purchase Modules
 
@@ -360,10 +423,12 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         #endregion Fast Production Modules
 
         #region Result Modules
-        builder.Services.AddTransientWithShellRoute<InsertSuccessPageView, InsertSuccessPageViewModel>(nameof(InsertSuccessPageView));
-		builder.Services.AddTransientWithShellRoute<InsertFailurePageView, InsertFailurePageViewModel>(nameof(InsertFailurePageView));
-		#endregion
 
-		return builder.Build();
+        builder.Services.AddTransientWithShellRoute<InsertSuccessPageView, InsertSuccessPageViewModel>(nameof(InsertSuccessPageView));
+        builder.Services.AddTransientWithShellRoute<InsertFailurePageView, InsertFailurePageViewModel>(nameof(InsertFailurePageView));
+
+        #endregion Result Modules
+
+        return builder.Build();
     }
 }

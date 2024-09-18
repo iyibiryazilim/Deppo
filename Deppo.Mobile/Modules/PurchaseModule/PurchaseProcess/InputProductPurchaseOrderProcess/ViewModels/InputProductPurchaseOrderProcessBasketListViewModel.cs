@@ -75,6 +75,8 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
         NextViewCommand = new Command(async () => await NextViewAsync());
 
         BackCommand = new Command(async () => await BackAsync());
+
+        ShowOtherProductCommand = new Command(async () => await ShowOtherProductAsync());
     }
 
     public Page CurrentPage { get; set; }
@@ -102,6 +104,8 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
 
     public Command NextViewCommand { get; }
     public Command BackCommand { get; }
+
+    public Command ShowOtherProductCommand { get; }
 
     #endregion Commands
 
@@ -588,6 +592,31 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
                 [nameof(WarehouseModel)] = WarehouseModel,
                 [nameof(PurchaseSupplier)] = PurchaseSupplier,
                 [nameof(Items)] = Items
+            });
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ShowOtherProductAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessOtherProductListView)}", new Dictionary<string, object>
+            {
+                {nameof(WarehouseModel), WarehouseModel},
+                {nameof(PurchaseSupplier),PurchaseSupplier }
             });
         }
         catch (Exception ex)

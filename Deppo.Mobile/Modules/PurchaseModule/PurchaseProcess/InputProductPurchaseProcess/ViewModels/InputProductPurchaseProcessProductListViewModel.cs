@@ -4,6 +4,7 @@ using Deppo.Core.BaseModels;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.ProductModels;
+using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.VariantModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
@@ -30,9 +31,6 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
     private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty]
-    private WarehouseModel warehouseModel = null!;
-
-    [ObservableProperty]
     private ProductModel? selectedProduct;
 
     [ObservableProperty]
@@ -55,11 +53,10 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<ProductModel>(async (parameter) => await ItemTappedAsync(parameter));
-        ShowSelectedProductsCommand = new Command<BottomSheet>(async (parameter) => await ShowSelectedProductsAsync(parameter));
-        LoadVariantItemsCommand = new Command<ProductModel>(async (parameter) => await LoadVariantItemsAsync(parameter));
-        LoadMoreVariantItemsCommand = new Command(async () => await LoadMoreVariantItemsAsync());
-        VariantTappedCommand = new Command<VariantModel>(async (parameter) => await VariantTappedAsync(parameter));
-        ConfirmVariantCommand = new Command(async () => await ConfirmVariantAsync());
+        //LoadVariantItemsCommand = new Command<ProductModel>(async (parameter) => await LoadVariantItemsAsync(parameter));
+        //LoadMoreVariantItemsCommand = new Command(async () => await LoadMoreVariantItemsAsync());
+        //VariantTappedCommand = new Command<VariantModel>(async (parameter) => await VariantTappedAsync(parameter));
+        //ConfirmVariantCommand = new Command(async () => await ConfirmVariantAsync());
         ConfirmCommand = new Command(async () => await ConfirmAsync());
         BackCommand = new Command(async () => await BackAsync());
     }
@@ -69,7 +66,6 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
-    public Command ShowSelectedProductsCommand { get; }
     public Command<ProductModel> LoadVariantItemsCommand { get; }
     public Command LoadMoreVariantItemsCommand { get; }
     public Command<VariantModel> VariantTappedCommand { get; }
@@ -266,174 +262,154 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
         }
     }
 
-    private async Task ShowSelectedProductsAsync(BottomSheet bottomSheet)
-    {
-        if (IsBusy)
-            return;
 
-        try
-        {
-            IsBusy = true;
+    //private async Task LoadVariantItemsAsync(ProductModel item)
+    //{
+    //    if (IsBusy)
+    //        return;
 
-            bottomSheet.State = BottomSheetState.HalfExpanded;
-        }
-        catch (Exception ex)
-        {
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
+    //    try
+    //    {
+    //        IsBusy = true;
+    //        Items.Clear();
+    //        SelectedProducts.Clear();
 
-    private async Task LoadVariantItemsAsync(ProductModel item)
-    {
-        if (IsBusy)
-            return;
+    //        _userDialogs.Loading("Loading Variant Items...");
+    //        var httpClient = _httpClientService.GetOrCreateHttpClient();
+    //        await Task.Delay(1000);
+    //        var result = await _variantService
+    //                            .GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, item.ReferenceId, WarehouseModel.Number, string.Empty, 0, 20);
 
-        try
-        {
-            IsBusy = true;
-            Items.Clear();
-            SelectedProducts.Clear();
+    //        if (result.IsSuccess)
+    //        {
+    //            if (result.Data == null)
+    //                return;
 
-            _userDialogs.Loading("Loading Variant Items...");
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
-            await Task.Delay(1000);
-            var result = await _variantService
-                                .GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, item.ReferenceId, WarehouseModel.Number, string.Empty, 0, 20);
+    //            foreach (var variant in result.Data)
+    //                ItemVariants.Add(variant);
+    //        }
 
-            if (result.IsSuccess)
-            {
-                if (result.Data == null)
-                    return;
+    //        _userDialogs.Loading().Hide();
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        if (_userDialogs.IsHudShowing)
+    //            _userDialogs.Loading().Hide();
 
-                foreach (var variant in result.Data)
-                    ItemVariants.Add(variant);
-            }
+    //        await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+    //    }
+    //    finally
+    //    {
+    //        IsBusy = false;
+    //        _userDialogs.Loading().Dispose();
+    //    }
+    //}
 
-            _userDialogs.Loading().Hide();
-        }
-        catch (Exception ex)
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+    //private async Task LoadMoreVariantItemsAsync()
+    //{
+    //    if (IsBusy)
+    //        return;
 
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-            _userDialogs.Loading().Dispose();
-        }
-    }
+    //    try
+    //    {
+    //        IsBusy = true;
 
-    private async Task LoadMoreVariantItemsAsync()
-    {
-        if (IsBusy)
-            return;
+    //        _userDialogs.Loading("Loading More Variant Items...");
+    //        var httpClient = _httpClientService.GetOrCreateHttpClient();
+    //        var result = await _variantService
+    //                            .GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SelectedProduct.ReferenceId, WarehouseModel.Number, string.Empty, 0, 20);
 
-        try
-        {
-            IsBusy = true;
+    //        if (result.IsSuccess)
+    //        {
+    //            if (result.Data == null)
+    //                return;
 
-            _userDialogs.Loading("Loading More Variant Items...");
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _variantService
-                                .GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SelectedProduct.ReferenceId, WarehouseModel.Number, string.Empty, 0, 20);
+    //            foreach (var variant in result.Data)
+    //                ItemVariants.Add(variant);
+    //        }
 
-            if (result.IsSuccess)
-            {
-                if (result.Data == null)
-                    return;
+    //        _userDialogs.Loading().Hide();
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        if (_userDialogs.IsHudShowing)
+    //            _userDialogs.Loading().Hide();
 
-                foreach (var variant in result.Data)
-                    ItemVariants.Add(variant);
-            }
+    //        await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+    //    }
+    //    finally
+    //    {
+    //        IsBusy = false;
+    //        _userDialogs.Loading().Dispose();
+    //    }
+    //}
 
-            _userDialogs.Loading().Hide();
-        }
-        catch (Exception ex)
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+    //private async Task VariantTappedAsync(VariantModel item)
+    //{
+    //    if (IsBusy)
+    //        return;
 
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-            _userDialogs.Loading().Dispose();
-        }
-    }
+    //    try
+    //    {
+    //        IsBusy = true;
 
-    private async Task VariantTappedAsync(VariantModel item)
-    {
-        if (IsBusy)
-            return;
+    //        ItemVariants.ToList().ForEach(x => x.IsSelected = false);
+    //        var selectedItem = ItemVariants.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
+    //        if (selectedItem != null)
+    //            selectedItem.IsSelected = true;
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+    //    }
+    //    finally
+    //    {
+    //        IsBusy = false;
+    //    }
+    //}
 
-        try
-        {
-            IsBusy = true;
+    //private async Task ConfirmVariantAsync()
+    //{
+    //    if (IsBusy)
+    //        return;
 
-            ItemVariants.ToList().ForEach(x => x.IsSelected = false);
-            var selectedItem = ItemVariants.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-            if (selectedItem != null)
-                selectedItem.IsSelected = true;
-        }
-        catch (Exception ex)
-        {
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
+    //    try
+    //    {
+    //        IsBusy = true;
 
-    private async Task ConfirmVariantAsync()
-    {
-        if (IsBusy)
-            return;
+    //        var item = ItemVariants.FirstOrDefault(x => x.IsSelected);
+    //        var basketItem = new InputPurchaseBasketModel
+    //        {
+    //            ItemReferenceId = item.ReferenceId,
+    //            ItemCode = item.Code,
+    //            ItemName = item.Name,
+    //            UnitsetReferenceId = item.UnitsetReferenceId,
+    //            UnitsetCode = item.UnitsetCode,
+    //            UnitsetName = item.UnitsetName,
+    //            SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+    //            SubUnitsetCode = item.SubUnitsetCode,
+    //            SubUnitsetName = item.SubUnitsetName,
+    //            IsSelected = false,
+    //            MainItemCode = item.ProductCode,
+    //            MainItemName = item.ProductName,
+    //            MainItemReferenceId = item.ProductReferenceId,
+    //            StockQuantity = item.StockQuantity,
+    //            Quantity = item.LocTracking == 0 ? 1 : 0,
+    //            TrackingType = item.TrackingType,
+    //            LocTracking = item.LocTracking,
+    //        };
 
-        try
-        {
-            IsBusy = true;
-
-            var item = ItemVariants.FirstOrDefault(x => x.IsSelected);
-            var basketItem = new InputPurchaseBasketModel
-            {
-                ItemReferenceId = item.ReferenceId,
-                ItemCode = item.Code,
-                ItemName = item.Name,
-                UnitsetReferenceId = item.UnitsetReferenceId,
-                UnitsetCode = item.UnitsetCode,
-                UnitsetName = item.UnitsetName,
-                SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                SubUnitsetCode = item.SubUnitsetCode,
-                SubUnitsetName = item.SubUnitsetName,
-                IsSelected = false,
-                MainItemCode = item.ProductCode,
-                MainItemName = item.ProductName,
-                MainItemReferenceId = item.ProductReferenceId,
-                StockQuantity = item.StockQuantity,
-                Quantity = item.LocTracking == 0 ? 1 : 0,
-                TrackingType = item.TrackingType,
-                LocTracking = item.LocTracking,
-            };
-
-            SelectedProducts.Add(basketItem);
-        }
-        catch (Exception ex)
-        {
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
+    //        SelectedProducts.Add(basketItem);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+    //    }
+    //    finally
+    //    {
+    //        IsBusy = false;
+    //    }
+    //}
 
     private async Task ConfirmAsync()
     {

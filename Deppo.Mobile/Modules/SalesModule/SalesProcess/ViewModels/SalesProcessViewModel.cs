@@ -4,6 +4,8 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.Views;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ViewModels;
 
@@ -21,14 +23,21 @@ public partial class SalesProcessViewModel : BaseViewModel
 
         OutputProductSalesProcessCommand = new Command(async () => await OutputProductSalesProcessAsync());
         OutputProductSalesOrderProcessCommand = new Command(async () => await OutputProductSalesOrderProcessAsync());
+        ReturnSalesProcessCommand = new Command(async () => await ReturnSalesProcessAsync());
+        RetrunSalesDispatchProcessCommand = new Command(async () => await RetrunSalesDispatchProcessAsync());
     }
 
     #region Commands
+
     public Command OutputProductSalesProcessCommand { get; }
     public Command OutputProductSalesOrderProcessCommand { get; }
-    #endregion
 
-    async Task OutputProductSalesProcessAsync()
+    public Command ReturnSalesProcessCommand { get; }
+    public Command RetrunSalesDispatchProcessCommand { get; }
+
+    #endregion Commands
+
+    private async Task OutputProductSalesProcessAsync()
     {
         try
         {
@@ -38,18 +47,18 @@ public partial class SalesProcessViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
-		}
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
         finally
         {
             IsBusy = false;
         }
     }
 
-    async Task OutputProductSalesOrderProcessAsync()
+    private async Task OutputProductSalesOrderProcessAsync()
     {
         try
         {
@@ -59,9 +68,9 @@ public partial class SalesProcessViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            if(_userDialogs.IsHudShowing)
+            if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
-            
+
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
         finally
@@ -70,5 +79,45 @@ public partial class SalesProcessViewModel : BaseViewModel
         }
     }
 
+    private async Task ReturnSalesProcessAsync()
+    {
+        try
+        {
+            IsBusy = true;
 
+            await Shell.Current.GoToAsync($"{nameof(ReturnSalesWarehouseListView)}");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task RetrunSalesDispatchProcessAsync()
+    {
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchWarehouseListView)}");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 }

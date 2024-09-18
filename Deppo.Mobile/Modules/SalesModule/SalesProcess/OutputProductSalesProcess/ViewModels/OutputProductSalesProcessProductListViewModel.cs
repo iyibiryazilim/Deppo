@@ -13,7 +13,6 @@ using System.Collections.ObjectModel;
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.ViewModels;
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
-[QueryProperty(name: nameof(SalesCustomer), queryId: nameof(SalesCustomer))]
 public partial class OutputProductSalesProcessProductListViewModel : BaseViewModel
 {
 	IHttpClientService _httpClientService;
@@ -24,8 +23,6 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 
 	[ObservableProperty]
 	WarehouseModel warehouseModel = null!;
-	[ObservableProperty]
-	SalesCustomer salesCustomer = null!;
 
 	[ObservableProperty]
 	WarehouseTotalModel? selectedProduct;
@@ -285,7 +282,7 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 				if(SelectedProducts.Any())
 				{
 					foreach (var item in SelectedProducts)
-						if (!previousViewModel.Items.Any(x => x.ItemCode == item.ItemName))
+						if (!previousViewModel.Items.Any(x => x.ItemCode == item.ItemCode))
 							previousViewModel.Items.Add(item);
 
 					SelectedProducts.Clear();
