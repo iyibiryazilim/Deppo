@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.Views.ReturnSalesFormView"
              xmlns:basketModel="clr-namespace:Deppo.Mobile.Core.Models.SalesModels.BasketModels;assembly=Deppo.Mobile.Core"
+             xmlns:salesModel="clr-namespace:Deppo.Mobile.Core.Models.SalesModels;assembly=Deppo.Mobile.Core"
+             xmlns:shipAddressModel="clr-namespace:Deppo.Mobile.Core.Models.ShipAddressModels;assembly=Deppo.Mobile.Core"
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -92,6 +94,77 @@
                                              LabelText="Açıklama"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
                                              Text="{Binding Description}" />
+
+                                <dx:FormGroupItem Header="Sevk Bilgileri"
+                                                  HeaderFontAttributes="Bold"
+                                                  HeaderFontSize="18">
+                                    <dx:FormItem>
+                                        <dx:FormItem.ContentTemplate>
+                                            <DataTemplate>
+                                                <VerticalStackLayout>
+                                                    <!--#region Customer Picker-->
+                                                    <dx:FormListPickerItem InlineContent="{x:Null}"
+                                                                           ItemsSource="{Binding Customers}"
+                                                                           PickerShowMode="BottomSheet"
+                                                                           PickerTitle="Müşteri seçiniz"
+                                                                           SelectedItem="{Binding SelectedCustomer}"
+                                                                           TapCommand="{Binding LoadCustomersCommand}"
+                                                                           Text="{Binding SelectedCustomer.Name}">
+                                                        <dx:FormListPickerItem.ImageSource>
+                                                            <FontImageSource FontFamily="FAS"
+                                                                             Glyph="{x:Static fontAwesome:FontAwesomeIcons.User}"
+                                                                             Size="13"
+                                                                             Color="{StaticResource White}" />
+                                                        </dx:FormListPickerItem.ImageSource>
+                                                        <dx:FormListPickerItem.ItemTemplate>
+                                                            <DataTemplate x:DataType="salesModel:SalesCustomer">
+                                                                <Border Padding="13"
+                                                                        StrokeShape="RoundRectangle 5">
+                                                                    <Label FontAttributes="Bold"
+                                                                           LineBreakMode="TailTruncation"
+                                                                           Text="{Binding Name}"
+                                                                           TextColor="{StaticResource OffBlack}"
+                                                                           VerticalOptions="Center" />
+                                                                </Border>
+                                                            </DataTemplate>
+                                                        </dx:FormListPickerItem.ItemTemplate>
+                                                    </dx:FormListPickerItem>
+                                                    <!--#endregion-->
+
+                                                    <!--#region ShipAddress Picker-->
+                                                    <dx:FormListPickerItem InlineContent="{x:Null}"
+                                                                           ItemsSource="{Binding ShipAddresses}"
+                                                                           PickerShowMode="BottomSheet"
+                                                                           PickerTitle="Sevk Adresi Seçiniz"
+                                                                           SelectedItem="{Binding SelectedShipAddress}"
+                                                                           TapCommand="{Binding LoadShipAddressesCommand}"
+                                                                           TapCommandParameter="{Binding SelectedCustomer}"
+                                                                           Text="{Binding SelectedShipAddress.Name}">
+                                                        <dx:FormListPickerItem.ImageSource>
+                                                            <FontImageSource FontFamily="FAS"
+                                                                             Glyph="{x:Static fontAwesome:FontAwesomeIcons.LocationDot}"
+                                                                             Size="15"
+                                                                             Color="{StaticResource White}" />
+                                                        </dx:FormListPickerItem.ImageSource>
+                                                        <dx:FormListPickerItem.ItemTemplate>
+                                                            <DataTemplate x:DataType="shipAddressModel:ShipAddressModel">
+                                                                <Border Padding="13"
+                                                                        StrokeShape="RoundRectangle 5">
+                                                                    <Label FontAttributes="Bold"
+                                                                           LineBreakMode="TailTruncation"
+                                                                           Text="{Binding Name}"
+                                                                           TextColor="{StaticResource OffBlack}"
+                                                                           VerticalOptions="Center" />
+                                                                </Border>
+                                                            </DataTemplate>
+                                                        </dx:FormListPickerItem.ItemTemplate>
+                                                    </dx:FormListPickerItem>
+                                                    <!--#endregion-->
+                                                </VerticalStackLayout>
+                                            </DataTemplate>
+                                        </dx:FormItem.ContentTemplate>
+                                    </dx:FormItem>
+                                </dx:FormGroupItem>
                             </VerticalStackLayout>
                         </DataTemplate>
                     </dx:FormItem.ContentTemplate>

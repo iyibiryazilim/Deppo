@@ -13,5 +13,6 @@ public class WholeSalesReturnDispatchTransactionInsert : BaseDispatchTransaction
     {
         Lines = new List<WholeSalesReturnTransactionLineInsert>();
     }
+
     public List<WholeSalesReturnTransactionLineInsert> Lines { get; set; }
 }

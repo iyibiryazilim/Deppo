@@ -180,6 +180,8 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
             _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
             await Task.Delay(1000);
 
+            SelectedCustomer.ShipAddressCode = SelectedShipAddress.Code;
+            SelectedCustomer.ShipAddressReferenceId = SelectedShipAddress.ReferenceId;
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             DataResult<ResponseModel> result = new();
             if (salesReturnEnumType == SalesReturnEnumType.Retail)
@@ -187,14 +189,15 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                 RetailSalesReturnDispatchTransactionInsert dto = new()
                 {
                     SpeCode = SpecialCode,
-                    CurrentCode = selectedCustomer.Code,
+                    CurrentCode = SelectedCustomer.Code,
+
                     Code = string.Empty,
                     DocTrackingNumber = DocumentTrackingNumber,
                     DoCode = DocumentNumber,
                     TransactionDate = FicheDate,
                     FirmNumber = _httpClientService.FirmNumber,
                     WarehouseNumber = WarehouseModel.Number,
-                    Description = Description
+                    Description = Description,
                 };
                 foreach (var item in Items)
                 {
@@ -206,6 +209,7 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                         ConversionFactor = 1,
                         OtherConversionFactor = 1,
                         SubUnitsetCode = item.SubUnitsetCode,
+
                         //DispatchReferenceId =0
                     };
                     dto.Lines.Add(line);
@@ -230,7 +234,7 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                 WholeSalesReturnDispatchTransactionInsert dto = new()
                 {
                     SpeCode = SpecialCode,
-                    CurrentCode = selectedCustomer.Code,
+                    CurrentCode = SelectedCustomer.Code,
                     Code = string.Empty,
                     DocTrackingNumber = DocumentTrackingNumber,
                     DoCode = DocumentNumber,
@@ -310,6 +314,53 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
         }
     }
 
+    private async Task LoadCustomersAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            Customers.Clear();
+            SelectedCustomer = null;
+
+            IsBusy = true;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            var result = await _salesCustomerService.GetObjectsAsync(
+                    httpClient: httpClient,
+                    firmNumber: _httpClientService.FirmNumber,
+                    periodNumber: _httpClientService.PeriodNumber,
+                    warehouseNumber: WarehouseModel.Number,
+                    skip: 0,
+                    take: 9999999,
+                    search: ""
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                {
+                    Customers.Add(Mapping.Mapper.Map<SalesCustomer>(item));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
     private async Task LoadShipAddressesAsync(SalesCustomer salesCustomer)
     {
         if (salesCustomer is null)
@@ -345,54 +396,7 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
 
                 foreach (var item in result.Data)
                 {
-                    Customers.Add(Mapping.Mapper.Map<ShipAddressModel>(item));
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
-            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
-    private async Task LoadCustomersAsync()
-    {
-        if (IsBusy)
-            return;
-        try
-        {
-            Customers.Clear();
-            SelectedCustomer = null;
-
-            IsBusy = true;
-
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
-
-            var result = await _salesCustomerService.GetObjectsAsync(
-                    httpClient: httpClient,
-                    firmNumber: _httpClientService.FirmNumber,
-                    periodNumber: _httpClientService.PeriodNumber,
-                    warehouseNumber: WarehouseModel.Number,
-                    skip: 0,
-                    take: 9999999,
-                    search: ""
-            );
-
-            if (result.IsSuccess)
-            {
-                if (result.Data is null)
-                    return;
-
-                foreach (var item in result.Data)
-                {
-                    Customers.Add(Mapping.Mapper.Map<SalesCustomer>(item));
+                    ShipAddresses.Add(Mapping.Mapper.Map<ShipAddressModel>(item));
                 }
             }
         }
