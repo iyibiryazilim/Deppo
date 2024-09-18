@@ -422,11 +422,14 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
             if (LocationTransactions.Count > 0)
             {
                 SelectedLocationTransactions.Clear();
-                SelectedLocationTransactions.ToList().AddRange(LocationTransactions.Where(x => x.OutputQuantity > 0));
+				foreach (var x in LocationTransactions.Where(x => x.OutputQuantity > 0))
+				{
+					SelectedLocationTransactions.Add(x);
+				}
 
 
 
-                foreach (var item in SelectedLocationTransactions)
+				foreach (var item in SelectedLocationTransactions)
                 {
                     var selectedLocationTransactionItem = SelectedItem.Details.FirstOrDefault(x => x.TransactionReferenceId == item.TransactionReferenceId);
                     if (selectedLocationTransactionItem is not null)
@@ -437,14 +440,15 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
 
                     SelectedItem.Details.Add(new ReturnPurchaseBasketDetailModel
                     {
-                        LocationReferenceId = item.ReferenceId,
+                        ReferenceId = item.ReferenceId,
+                        LocationReferenceId = item.LocationReferenceId,
                         LocationCode = item.LocationCode,
                         LocationName = item.LocationName,
                         TransactionReferenceId = item.TransactionReferenceId,
                         TransactionFicheReferenceId = item.TransactionFicheReferenceId,
                         InTransactionReferenceId = item.InTransactionReferenceId,
                         Quantity = item.OutputQuantity,
-                        RemainingQuantity = item.Quantity - item.OutputQuantity,
+                        RemainingQuantity = item.OutputQuantity,
                     });
                 }
 
