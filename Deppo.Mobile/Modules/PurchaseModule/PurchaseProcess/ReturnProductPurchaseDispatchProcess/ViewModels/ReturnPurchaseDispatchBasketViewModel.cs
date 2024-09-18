@@ -55,7 +55,7 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
 
         Title = "Sepet Listesi";
 
-        ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
+        //ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
         IncreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await IncreaseAsync(item));
         DecreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DecreaseAsync(item));
         DeleteItemCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DeleteItemAsync(item));
@@ -79,7 +79,7 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
     }
 
     #region Commands
-    public Command ShowProductViewCommand { get; }
+    //public Command ShowProductViewCommand { get; }
     public Command IncreaseCommand { get; }
     public Command DecreaseCommand { get; }
     public Command DeleteItemCommand { get; }
@@ -109,28 +109,28 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
     #endregion
 
 
-    private async Task ShowProductViewAsync()
-    {
-        if (IsBusy)
-            return;
-        try
-        {
-            IsBusy = true;
+    //private async Task ShowProductViewAsync()
+    //{
+    //    if (IsBusy)
+    //        return;
+    //    try
+    //    {
+    //        IsBusy = true;
 
-            await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseProductListView)}", new Dictionary<string, object>
-            {
-                [nameof(WarehouseModel)] = WarehouseModel
-            });
-        }
-        catch (Exception ex)
-        {
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
+    //        await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseProductListView)}", new Dictionary<string, object>
+    //        {
+    //            [nameof(WarehouseModel)] = WarehouseModel
+    //        });
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+    //    }
+    //    finally
+    //    {
+    //        IsBusy = false;
+    //    }
+    //}
 
     private async Task IncreaseAsync(ReturnPurchaseBasketModel item)
     {
@@ -693,6 +693,7 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
             await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseFormView)}", new Dictionary<string, object>
             {
                 [nameof(WarehouseModel)] = WarehouseModel,
+                [nameof(Items)] = Items
             });
         }
         catch (Exception ex)

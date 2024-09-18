@@ -694,6 +694,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
             await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseFormView)}", new Dictionary<string, object>
             {
                 [nameof(WarehouseModel)] = WarehouseModel,
+                [nameof(Items)] = Items
             });
         }
         catch (Exception ex)
