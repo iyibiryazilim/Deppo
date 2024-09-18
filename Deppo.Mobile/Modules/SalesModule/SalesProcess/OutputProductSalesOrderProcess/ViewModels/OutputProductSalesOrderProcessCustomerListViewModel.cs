@@ -9,6 +9,7 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views;
+using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.ViewModels;
@@ -50,14 +51,16 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
 		ItemTappedCommand = new Command<SalesCustomer>(async (customer) => await ItemTappedAsync(customer));
 		NextViewCommand = new Command(async () => await NextViewAsync());
-		ShowOrdersCommand = new Command<SalesCustomer>(async (customer) => await ShowOrdersAsync(customer));
+		SwipeItemCommand = new Command<SalesCustomer>(async (customer) => await SwipeItemAsync(customer));
 	}
+
+	public Page CurrentPage { get; set; } = null!;
 
 	#region Commands
 	public Command LoadItemsCommand { get; }
 	public Command LoadMoreItemsCommand { get; }
 	public Command ItemTappedCommand { get; }
-	public Command ShowOrdersCommand { get; }
+	public Command SwipeItemCommand { get; }
 	public Command NextViewCommand { get; }
 	#endregion
 
@@ -126,6 +129,29 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 				_userDialogs.HideHud();
 
 			_userDialogs.Alert(ex.Message);
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+
+	private async Task SwipeItemAsync(SalesCustomer selectedItem)
+	{
+		if (IsBusy)
+			return;
+		try
+		{	
+			await ShowOrdersAsync(selectedItem);
+			CurrentPage.FindByName<BottomSheet>("customerProductsBottomSheet").State = BottomSheetState.HalfExpanded;
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{
