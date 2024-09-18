@@ -11,6 +11,7 @@ using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchPr
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.ViewModels;
+
 [QueryProperty(name: nameof(PurchaseFicheModel), queryId: nameof(PurchaseFicheModel))]
 public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
 {
@@ -28,13 +29,22 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
         _userDialogs = userDialogs;
         _salesDispatchTransactionService = salesDispatchTransactionService;
 
-
+        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+        LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+        ItemTappedCommand = new Command<SalesTransactionModel>(async (x) => await ItemTappedAsync(x));
+        NextViewCommand = new Command(async () => await NextViewAsync());
     }
 
     public ObservableCollection<SalesTransactionModel> Items { get; } = new();
 
     public ObservableCollection<SalesTransactionModel> SelectedSalesTransactions { get; } = new();
 
+    public Command LoadItemsCommand { get; }
+    public Command LoadMoreItemsCommand { get; }
+
+    public Command ItemTappedCommand { get; }
+
+    public Command NextViewCommand { get; }
 
     private async Task LoadItemsAsync()
     {
@@ -96,7 +106,6 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
                 {
                     foreach (var transaction in result.Data)
                     {
-
                         var item = Mapping.Mapper.Map<SalesTransactionModel>(transaction);
                         Items.Add(item);
                     }
@@ -139,8 +148,6 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
                 {
                     Items.FirstOrDefault(x => x.ProductReferenceId == salesTransactionModel.ProductReferenceId).IsSelected = true;
 
-
-
                     SelectedSalesTransactions.Add(selectedItem);
                 }
             }
@@ -174,7 +181,6 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
         }
         catch (System.Exception)
         {
-
             throw;
         }
         finally
