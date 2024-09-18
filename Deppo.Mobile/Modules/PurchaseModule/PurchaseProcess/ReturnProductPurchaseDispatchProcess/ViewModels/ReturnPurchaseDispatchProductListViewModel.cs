@@ -2,7 +2,9 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
+using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
@@ -48,6 +50,7 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
 
     public ObservableCollection<PurchaseTransactionModel> SelectedPurchaseTransactions { get; } = new();
 
+    public ObservableCollection<ReturnPurchaseBasketModel> SelectedProducts = new();
 
     private async Task LoadItemsAsync()
     {
@@ -131,7 +134,7 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
         }
     }
 
-    private async Task ItemTappedAsync(PurchaseTransactionModel purchaseTransactionModel)
+    private async Task ItemTappedAsync(PurchaseTransactionModel item)
     {
         if (IsBusy)
             return;
@@ -140,17 +143,44 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            var selectedItem = Items.FirstOrDefault(x => x.ProductReferenceId == purchaseTransactionModel.ProductReferenceId);
+            var selectedItem = Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
             if (selectedItem is not null)
             {
                 if (selectedItem.IsSelected)
                 {
-                    Items.FirstOrDefault(x => x.ProductReferenceId == purchaseTransactionModel.ProductReferenceId).IsSelected = false;
+                    Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
                     SelectedPurchaseTransactions.Remove(SelectedPurchaseTransactions.FirstOrDefault(x => x.ProductReferenceId == selectedItem.ProductReferenceId));
+
+                    var basketItem = new ReturnPurchaseBasketModel
+                    {
+                        ItemReferenceId = item.ProductReferenceId,
+                        ItemCode = item.ProductCode,
+                        ItemName = item.ProductName,
+                        UnitsetReferenceId = item.UnitsetReferenceId,
+                        UnitsetCode = item.UnitsetCode,
+                        UnitsetName = item.UnitsetName,
+                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                        SubUnitsetCode = item.SubUnitsetCode,
+                        SubUnitsetName = item.SubUnitsetName,
+                        MainItemReferenceId = default,  //
+                        MainItemCode = string.Empty,    //
+                        MainItemName = string.Empty,    //
+                        StockQuantity = item.Quantity,
+                        IsSelected = false,   //
+                        IsVariant = item.IsVariant,
+                        LocTracking = item.LocTracking,
+                        TrackingType = item.TrackingType,
+                        Quantity = item.LocTracking == 0 ? 1 : 0,
+                        LocTrackingIcon = item.LocTrackingIcon,
+                        VariantIcon = item.VariantIcon,
+                        TrackingTypeIcon = item.TrackingTypeIcon,
+                    };
+
+                    SelectedProducts.Add(basketItem);
                 }
                 else
                 {
-                    Items.FirstOrDefault(x => x.ProductReferenceId == purchaseTransactionModel.ProductReferenceId).IsSelected = true;
+                    Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
 
                    
 
@@ -182,7 +212,7 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
 
             await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseDispatchBasketView)}", new Dictionary<string, object>
             {
-                [nameof(SelectedPurchaseTransactions)] = SelectedPurchaseTransactions,
+                [nameof(Items)] = SelectedProducts,
             });
         }
         catch (System.Exception)
