@@ -4,5 +4,6 @@
              x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.Views.ReturnPurchaseDispatchBasketView"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.ViewModels"
              Title="{Binding Title}"
-             x:DataType="viewModel:ReturnPurchaseDispatchBasketViewModel">
+             x:DataType="viewModel:ReturnPurchaseDispatchBasketViewModel"
+             Shell.TabBarIsVisible="False">
 </ContentPage>

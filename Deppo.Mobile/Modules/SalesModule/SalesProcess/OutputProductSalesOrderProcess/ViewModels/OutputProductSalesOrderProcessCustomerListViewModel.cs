@@ -3,12 +3,14 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.SalesModels;
+using Deppo.Mobile.Core.Models.ShipAddressModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views;
+using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.ViewModels;
@@ -19,6 +21,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 	private readonly IHttpClientService _httpClientService;
 	private readonly ISalesCustomerService _salesCustomerService;
 	private readonly ISalesCustomerProductService _salesCustomerProductService;
+	private readonly IShipAddressService _shipAddressService;
 	private readonly IUserDialogs _userDialogs;
 
 	[ObservableProperty]
@@ -32,15 +35,19 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 
 	#region Collections
 	public ObservableCollection<SalesCustomer> Items { get; } = new();
+
+	public ObservableCollection<ShipAddressModel> ShipAddresses { get; } = new();
 	#endregion
 
 	public OutputProductSalesOrderProcessCustomerListViewModel(IHttpClientService httpClientService,
 	ISalesCustomerService salesCustomerService,
+	IShipAddressService shipAddressService,
 	IUserDialogs userDialogs,
 	ISalesCustomerProductService salesCustomerProductService)
 	{
 		_httpClientService = httpClientService;
 		_salesCustomerService = salesCustomerService;
+		_shipAddressService = shipAddressService;
 		_userDialogs = userDialogs;
 		_salesCustomerProductService = salesCustomerProductService;
 
@@ -50,15 +57,24 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
 		ItemTappedCommand = new Command<SalesCustomer>(async (customer) => await ItemTappedAsync(customer));
 		NextViewCommand = new Command(async () => await NextViewAsync());
-		ShowOrdersCommand = new Command<SalesCustomer>(async (customer) => await ShowOrdersAsync(customer));
+		SwipeItemCommand = new Command<SalesCustomer>(async (customer) => await SwipeItemAsync(customer));
+
+		ShipAddressTappedCommand = new Command<ShipAddressModel>(async (shipAddress) => await ShipAddressTappedAsync(shipAddress));
+		ConfirmShipAddressCommand = new Command(async () => await ConfirmShipAddressConfirmAsync());
 	}
+
+	public Page CurrentPage { get; set; } = null!;
 
 	#region Commands
 	public Command LoadItemsCommand { get; }
 	public Command LoadMoreItemsCommand { get; }
 	public Command ItemTappedCommand { get; }
-	public Command ShowOrdersCommand { get; }
+	public Command SwipeItemCommand { get; }
 	public Command NextViewCommand { get; }
+
+
+	public Command ConfirmShipAddressCommand { get; }
+	public Command ShipAddressTappedCommand { get; }
 	#endregion
 
 	private async Task LoadItemsAsync()
@@ -133,6 +149,28 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 		}
 	}
 
+	private async Task SwipeItemAsync(SalesCustomer selectedItem)
+	{
+		if (IsBusy)
+			return;
+		try
+		{	
+			await ShowOrdersAsync(selectedItem);
+			CurrentPage.FindByName<BottomSheet>("customerProductsBottomSheet").State = BottomSheetState.HalfExpanded;
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
 	private async Task ShowOrdersAsync(SalesCustomer selectedItem)
 	{
 		if (IsBusy)
@@ -140,6 +178,11 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 		try
 		{
 			IsBusy = true;
+
+			_userDialogs.ShowLoading("Loading Orders...");
+			await Task.Delay(1000);
+
+			SwipedSalesCustomer = selectedItem;
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			var customerOrders = await _salesCustomerProductService.GetObjects(
@@ -149,7 +192,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 				customerReferenceId: selectedItem.ReferenceId,
 				warehouseNumber: WarehouseModel.Number,
 				skip: 0,
-				take: 20
+				take: 9999999
 			);
 
 			if (customerOrders.IsSuccess)
@@ -159,14 +202,46 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 
 				foreach (var item in customerOrders.Data)
 				{
-					Items.FirstOrDefault(x => x.ReferenceId == selectedItem.ReferenceId)?
-					.Products.Add(Mapping.Mapper.Map<SalesCustomerProduct>(item));
+					var customer = Items.FirstOrDefault(x => x.ReferenceId == selectedItem.ReferenceId);
+					Console.WriteLine(customer);
+					if(customer is not null)
+					{
+						customer.Products.Add(Mapping.Mapper.Map<SalesCustomerProduct>(item));
+
+						//customer.Products.Add(new SalesCustomerProduct
+						//{
+						//	ItemReferenceId = item.ItemReferenceId,
+						//	ItemCode = item.ItemCode,
+						//	ItemName = item.ItemName,
+						//	MainItemReferenceId = item.MainItemReferenceId,
+						//	MainItemCode = item.MainItemCode,
+						//	MainItemName = item.MainItemName,
+						//	IsVariant = item.IsVariant,
+						//	UnitsetReferenceId = item.UnitsetReferenceId,
+						//	UnitsetCode = item.UnitsetCode,
+						//	UnitsetName = item.UnitsetName,
+						//	SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+						//	SubUnitsetCode = item.SubUnitsetCode,
+						//	SubUnitsetName = item.SubUnitsetName,
+						//	LocTracking = item.LocTracking,
+						//	TrackingType = item.TrackingType,
+						//	Quantity = item.Quantity,
+						//	ShippedQuantity = item.ShippedQuantity,
+						//	WaitingQuantity = item.WaitingQuantity,
+						//});
+					}
+						
 
 				}
 			}
+
+			_userDialogs.HideHud();
 		}
 		catch (Exception ex)
 		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
 			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
 		finally
@@ -188,12 +263,29 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 			}
 			else
 			{
-				if (SalesCustomer is not null)
+				if(item.ShipAddressCount > 0)
 				{
-					SalesCustomer.IsSelected = false;
+					await LoadShipAddressesAsync(item);
+					CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
+
+					if (SalesCustomer is not null)
+					{
+						SalesCustomer.IsSelected = false;
+					}
+					SalesCustomer = item;
+					SalesCustomer.IsSelected = true;
 				}
-				SalesCustomer = item;
-				SalesCustomer.IsSelected = true;
+				else
+				{
+					if (SalesCustomer is not null)
+					{
+						SalesCustomer.IsSelected = false;
+					}
+					SalesCustomer = item;
+					SalesCustomer.IsSelected = true;
+				}
+
+				
 			}
 		}
 		catch (Exception ex)
@@ -205,6 +297,107 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 			IsBusy = false;
 		}
 	}
+
+	private async Task LoadShipAddressesAsync(SalesCustomer  customer)
+	{
+		
+		try
+		{
+			ShipAddresses.Clear();
+			_userDialogs.Loading("Loading Ship Addresses...");
+			await Task.Delay(1000);
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _shipAddressService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				currentReferenceId: customer.ReferenceId,
+				search: "",
+				skip: 0,
+				take: 99999
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+					ShipAddresses.Add(Mapping.Mapper.Map<ShipAddressModel>(item));
+			}
+
+			_userDialogs.HideHud();
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+	}
+
+	private async Task ShipAddressTappedAsync(ShipAddressModel shipAddressModel)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			ShipAddresses.ToList().ForEach(x => x.IsSelected = false);
+
+			var selectedItem = ShipAddresses.FirstOrDefault(x => x.ReferenceId == shipAddressModel.ReferenceId);
+			if (selectedItem != null)
+				selectedItem.IsSelected = true;
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task ConfirmShipAddressConfirmAsync() { 		
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var selectedShipAddress = ShipAddresses.FirstOrDefault(x => x.IsSelected);
+			if (selectedShipAddress is not null)
+			{
+				SalesCustomer.ShipAddressReferenceId = selectedShipAddress.ReferenceId;
+				SalesCustomer.ShipAddressCode = selectedShipAddress.Code;
+				CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.Hidden;
+			}
+			else
+			{
+				_userDialogs.Alert("Lütfen bir adres seçiniz.", "Hata", "Tamam");
+			}
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	
 
 	private async Task NextViewAsync()
 	{

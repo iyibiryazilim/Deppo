@@ -9,5 +9,6 @@ public partial class OutputProductSalesOrderProcessCustomerListView : ContentPag
 	{
 		InitializeComponent();
 		BindingContext = _viewModel = viewModel;
+		_viewModel.CurrentPage = this;
 	}
 }
