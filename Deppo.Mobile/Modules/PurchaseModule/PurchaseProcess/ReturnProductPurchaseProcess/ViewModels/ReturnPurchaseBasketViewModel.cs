@@ -437,14 +437,15 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
 
                     SelectedItem.Details.Add(new ReturnPurchaseBasketDetailModel
                     {
-                        LocationReferenceId = item.ReferenceId,
+                        ReferenceId = item.ReferenceId,
+                        LocationReferenceId = item.LocationReferenceId,
                         LocationCode = item.LocationCode,
                         LocationName = item.LocationName,
                         TransactionReferenceId = item.TransactionReferenceId,
                         TransactionFicheReferenceId = item.TransactionFicheReferenceId,
                         InTransactionReferenceId = item.InTransactionReferenceId,
                         Quantity = item.OutputQuantity,
-                        RemainingQuantity = item.Quantity - item.OutputQuantity,
+                        RemainingQuantity = item.OutputQuantity,
                     });
                 }
 

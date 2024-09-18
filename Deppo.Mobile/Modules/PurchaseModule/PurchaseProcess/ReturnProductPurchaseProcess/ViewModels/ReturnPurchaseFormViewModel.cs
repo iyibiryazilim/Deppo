@@ -74,15 +74,21 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
         _purchaseReturnDispatchTransactionService = purchaseReturnDispatchTransactionService;
         _userDialogs = userDialogs;
         Items = new();
-        SaveCommand = new Command(async () => await SaveAsync());
-        LoadPageCommand = new Command(async () => await LoadPageAsync());
         _purchaseSupplierService = purchaseSupplierService;
         _shipAddressService = shipAddressService;
+        SaveCommand = new Command(async () => await SaveAsync());
+        LoadPageCommand = new Command(async () => await LoadPageAsync());
+        LoadSuppliersCommand = new Command(async () => await LoadSuppliersAsync());
+        LoadShipAddressesCommand = new Command<PurchaseSupplier>(async (purchaseSupplier) => await LoadShipAddressesAsync(purchaseSupplier));
+
     }
     public Page CurrentPage { get; set; }
 
     public Command SaveCommand { get; }
     public Command LoadPageCommand { get; }
+    public Command LoadSuppliersCommand { get; }
+    public Command LoadShipAddressesCommand { get; }
+
 
     private async Task LoadPageAsync()
     {
