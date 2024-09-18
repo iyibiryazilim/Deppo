@@ -6,6 +6,7 @@
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:models="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              xmlns:purchaseModel="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels;assembly=Deppo.Mobile.Core"
+              xmlns:basketModel="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;assembly=Deppo.Mobile.Core"
              xmlns:shipAddressModel="clr-namespace:Deppo.Mobile.Core.Models.ShipAddressModels;assembly=Deppo.Mobile.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.ViewModels"
@@ -14,7 +15,26 @@
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadPageCommand}" EventName="Loaded" />
     </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Command="{Binding LoadPageCommand}">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.BasketShopping}"
+                         Size="Large" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
+
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
@@ -159,5 +179,100 @@
                 Command="{Binding SaveCommand}"
                 Text="Kaydet"
                 VerticalOptions="End" />
+
+        <dx:BottomSheet x:Name="basketItemBottomSheet"
+                 AllowDismiss="True"
+                 BackgroundColor="White"
+                 CornerRadius="15"
+                 HalfExpandedRatio="0.5"
+                 IsModal="True"
+                 ShowGrabber="True">
+            <!--#region BottomSheetContent-->
+            <Grid Padding="10"
+           RowDefinitions="Auto,*"
+           RowSpacing="20">
+
+                <VerticalStackLayout Grid.Row="0" Spacing="5">
+                    <Label FontAttributes="Bold"
+                    FontSize="Subtitle"
+                    Text="Malzeme Listesi" />
+                    <BoxView HeightRequest="2" Color="{StaticResource OffBlack}" />
+                </VerticalStackLayout>
+
+                <CollectionView Grid.Row="1" ItemsSource="{Binding Items}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="basketModel:ReturnPurchaseBasketModel">
+                            <Border Padding="10"
+                             BackgroundColor="Transparent"
+                             StrokeShape="RoundRectangle 10"
+                             StrokeThickness="0.1">
+                                <Grid ColumnDefinitions="Auto,*, Auto" ColumnSpacing="10">
+                                    <Border BackgroundColor="{StaticResource Secondary}"
+                                     StrokeShape="RoundRectangle 5"
+                                     StrokeThickness="0.5">
+                                        <Image Grid.Column="0"
+                                        HeightRequest="50"
+                                        Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                        WidthRequest="50" />
+                                    </Border>
+
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2">
+
+                                        <Label FontAttributes="Bold"
+                                        LineBreakMode="TailTruncation"
+                                        Text="{Binding ItemCode}" />
+                                        <Label LineBreakMode="TailTruncation"
+                                        Text="{Binding ItemName}"
+                                        TextColor="{StaticResource Gray600}" />
+
+                                        <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span FontAttributes="Bold"
+                                                   FontFamily="FAS"
+                                                   Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                   TextColor="{StaticResource Primary}" />
+                                                    <Span Text=" " />
+                                                    <Span FontAttributes="Bold"
+                                                   Text="{Binding Quantity, StringFormat='{0:N2}'}"
+                                                   TextColor="{StaticResource Primary}" />
+                                                    <Span Text=" " />
+                                                    <Span FontAttributes="Bold"
+                                                   Text="{Binding SubUnitsetCode}"
+                                                   TextColor="{StaticResource Primary}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </VerticalStackLayout>
+
+                                    <Grid Grid.Column="2"
+                                   ColumnDefinitions="Auto, Auto, Auto"
+                                   ColumnSpacing="3"
+                                   HorizontalOptions="End"
+                                   VerticalOptions="Start">
+                                        <Label Grid.Column="0"
+                                        FontFamily="FAS"
+                                        FontSize="10"
+                                        Text="{Binding VariantIcon}"
+                                        TextColor="{Binding VariantIconColor}" />
+                                        <Label Grid.Column="1"
+                                        FontFamily="FAS"
+                                        FontSize="10"
+                                        Text="{Binding LocTrackingIcon}"
+                                        TextColor="{Binding LocTrackingIconColor}" />
+                                        <Label Grid.Column="2"
+                                        FontFamily="FAS"
+                                        FontSize="10"
+                                        Text="{Binding TrackingTypeIcon}"
+                                        TextColor="{Binding TrackingTypeIconColor}" />
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+            <!--#endregion-->
+        </dx:BottomSheet>
     </Grid>
 </ContentPage>

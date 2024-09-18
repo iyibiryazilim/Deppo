@@ -106,6 +106,7 @@ public partial class ReturnPurchaseDispatchListViewModel : BaseViewModel
         {
             IsBusy = true;
            
+            _userDialogs.ShowLoading("Yükleniyor...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _purchaseDispatchTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, PurchaseSupplier.ReferenceId, string.Empty, Items.Count, 20);
             if (result.IsSuccess)
@@ -118,11 +119,12 @@ public partial class ReturnPurchaseDispatchListViewModel : BaseViewModel
                         var item = Mapping.Mapper.Map<PurchaseFicheModel>(fiche);
                         Items.Add(item);
                     }
-
-                    _userDialogs.HideHud();
                 }
             }
-        }
+
+			_userDialogs.HideHud();
+
+		}
         catch (System.Exception ex)
         {
             if (_userDialogs.IsHudShowing)
@@ -145,17 +147,28 @@ public partial class ReturnPurchaseDispatchListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            Items.ToList().ForEach(x => x.IsSelected = false);
+			if (item == PurchaseFicheModel)
+			{
+				PurchaseFicheModel.IsSelected = false;
+				PurchaseFicheModel = null;
+			}
+			else
+			{
+				if (PurchaseFicheModel != null)
+				{
+					PurchaseFicheModel.IsSelected = false;
+				}
 
-            var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-            if (selectedItem != null)
-                selectedItem.IsSelected = true;
-
-            PurchaseFicheModel = item;
+				PurchaseFicheModel = item;
+				PurchaseFicheModel.IsSelected = true;
+			}
         }
         catch (Exception ex)
         {
-            _userDialogs.Alert(ex.Message);
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message);
         }
         finally
         {

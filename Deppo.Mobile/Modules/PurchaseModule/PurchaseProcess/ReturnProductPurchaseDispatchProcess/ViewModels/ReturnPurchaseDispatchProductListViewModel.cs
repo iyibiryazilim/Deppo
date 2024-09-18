@@ -34,7 +34,13 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
     [ObservableProperty]
     private WarehouseModel warehouseModel = null!;
 
-    public ReturnPurchaseDispatchProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IPurchaseDispatchTransactionService purchaseDispatchTransactionService)
+	public ObservableCollection<PurchaseTransactionModel> Items { get; } = new();
+
+	public ObservableCollection<PurchaseTransactionModel> SelectedPurchaseTransactions { get; } = new();
+
+	public ObservableCollection<ReturnPurchaseBasketModel> SelectedProducts = new();
+
+	public ReturnPurchaseDispatchProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IPurchaseDispatchTransactionService purchaseDispatchTransactionService)
     {
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
@@ -46,22 +52,15 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<PurchaseTransactionModel>(async (x) => await ItemTappedAsync(x));
-
         NextViewCommand = new Command(async () => await NextViewAsync());
-
     }
+
+    public Page CurrentPage { get; set; } = null!;
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
-
-
-    public ObservableCollection<PurchaseTransactionModel> Items { get; } = new();
-
-    public ObservableCollection<PurchaseTransactionModel> SelectedPurchaseTransactions { get; } = new();
-
-    public ObservableCollection<ReturnPurchaseBasketModel> SelectedProducts = new();
 
     private async Task LoadItemsAsync()
     {
@@ -113,8 +112,6 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
         {
             IsBusy = true;
             _userDialogs.ShowLoading("Yükleniyor...");
-            await Task.Delay(1000);
-
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _purchaseDispatchTransactionService.GetTransactionsByFicheReferenceId(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseFicheModel.ReferenceId,string.Empty, Items.Count, 20);
             if (result.IsSuccess)
