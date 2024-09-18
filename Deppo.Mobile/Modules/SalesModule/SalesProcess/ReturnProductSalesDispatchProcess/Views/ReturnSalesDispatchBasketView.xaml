@@ -134,7 +134,7 @@
                                                               TextColor="{StaticResource Primary}" />
                                                         <Span Text=" " />
                                                         <Span FontAttributes="Bold"
-                                                              Text="{Binding Quantity, StringFormat='{0:N2}'}"
+                                                              Text="{Binding InputQuantity, StringFormat='{0:N2}'}"
                                                               TextColor="{StaticResource Primary}" />
                                                     </FormattedString>
                                                 </Label.FormattedText>
@@ -153,14 +153,15 @@
                                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
                                                            TextColor="{StaticResource Secondary}" />
 
-                                                    <!-- <Border.GestureRecognizers>
-                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessBasketListViewModel}}, Path=DecreaseCommand}" CommandParameter="{Binding .}" />
-                                                </Border.GestureRecognizers>-->
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:ReturnSalesDispatchBasketViewModel}}, Path=DecreaseCommand}"
+                                                                              CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
                                                 </Border>
                                                 <Label Grid.Column="1"
                                                        FontAttributes="Bold"
                                                        FontSize="Large"
-                                                       Text="{Binding InputQuantity, StringFormat='{0:N2}'}"
+                                                       Text="{Binding Quantity, StringFormat='{0:N2}'}"
                                                        TextColor="{StaticResource OffBlack}"
                                                        VerticalOptions="Center" />
                                                 <Border Grid.Column="2"
@@ -173,10 +174,10 @@
                                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
                                                            TextColor="{StaticResource White}" />
 
-                                                    <Border.GestureRecognizers>
+                                                    <!--<Border.GestureRecognizers>
                                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:ReturnSalesDispatchBasketViewModel}}, Path=IncreaseCommand}"
                                                                               CommandParameter="{Binding .}" />
-                                                    </Border.GestureRecognizers>
+                                                    </Border.GestureRecognizers>-->
                                                 </Border>
                                             </Grid>
                                         </VerticalStackLayout>

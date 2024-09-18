@@ -12,11 +12,11 @@
              Title="{Binding Title}"
              x:DataType="viewModel:ReturnSalesDispatchFormViewModel"
              Shell.TabBarIsVisible="False">
-    <!--<Shell.BackButtonBehavior>
+    <Shell.BackButtonBehavior>
         <BackButtonBehavior Command="{Binding BackCommand}" />
-    </Shell.BackButtonBehavior>-->
+    </Shell.BackButtonBehavior>
 
-    <!--<ContentPage.ToolbarItems>
+    <ContentPage.ToolbarItems>
         <ToolbarItem Command="{Binding ShowBasketItemCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="FAS"
@@ -24,37 +24,35 @@
                                  Size="Large" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
-    </ContentPage.ToolbarItems>-->
+    </ContentPage.ToolbarItems>
 
-    <!--<ContentPage.Behaviors>
+    <ContentPage.Behaviors>
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
                                    StatusBarStyle="Default" />
         <toolkit:EventToCommandBehavior Command="{Binding LoadPageCommand}"
                                         EventName="Loaded" />
-    </ContentPage.Behaviors>-->
+    </ContentPage.Behaviors>
 
-    <!--<ContentPage.Resources>
+    <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
             <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
         </ResourceDictionary>
-    </ContentPage.Resources>-->
+    </ContentPage.Resources>
 
-    <!--<ContentPage.BackgroundImageSource>
+    <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
             <On Platform="Android"
                 Value="artboard.png" />
         </OnPlatform>
-    </ContentPage.BackgroundImageSource>-->
+    </ContentPage.BackgroundImageSource>
 
-    <!--<Grid RowDefinitions="*, Auto"
+    <Grid RowDefinitions="*, Auto"
           RowSpacing="10">
 
         <VerticalStackLayout Grid.Row="0"
                              Spacing="5">
-            -->
-    <!--#region Fiş Bilgileri-->
-    <!--
+
             <dx:FormGroupItem Header="Fiş Bilgileri"
                               HeaderFontAttributes="Bold"
                               HeaderFontSize="18">
@@ -75,6 +73,13 @@
                                              LabelText="Ambar"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
                                              Text="{Binding WarehouseModel.Name}" />
+
+                                <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                             FocusedBorderColor="{StaticResource Primary}"
+                                             IsReadOnly="True"
+                                             LabelText="Müşteri"
+                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                             Text="{Binding SalesCustomer.Name}" />
 
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
@@ -104,52 +109,15 @@
                     </dx:FormItem.ContentTemplate>
                 </dx:FormItem>
             </dx:FormGroupItem>
-            -->
-    <!--#endregion-->
 
-    <!--#region Sevk Bilgileri-->
-    <!--
-            <dx:FormGroupItem Header="Sevk Bilgileri"
+            <!--<dx:FormGroupItem Header="Sevk Bilgileri"
                               HeaderFontAttributes="Bold"
                               HeaderFontSize="18">
                 <dx:FormItem>
                     <dx:FormItem.ContentTemplate>
                         <DataTemplate>
                             <VerticalStackLayout>
-                                -->
-    <!--#region Customer Picker-->
-    <!--
-                                <dx:FormListPickerItem InlineContent="{x:Null}"
-                                                       ItemsSource="{Binding Customers}"
-                                                       PickerShowMode="BottomSheet"
-                                                       PickerTitle="Müşteri seçiniz"
-                                                       SelectedItem="{Binding SelectedCustomer}"
-                                                       TapCommand="{Binding LoadCustomersCommand}"
-                                                       Text="{Binding SelectedCustomer.Name}">
-                                    <dx:FormListPickerItem.ImageSource>
-                                        <FontImageSource FontFamily="FAS"
-                                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.User}"
-                                                         Size="15"
-                                                         Color="{StaticResource White}" />
-                                    </dx:FormListPickerItem.ImageSource>
-                                    <dx:FormListPickerItem.ItemTemplate>
-                                        <DataTemplate x:DataType="salesModel:SalesCustomer">
-                                            <Border Padding="15"
-                                                    StrokeShape="RoundRectangle 5">
-                                                <Label FontAttributes="Bold"
-                                                       LineBreakMode="TailTruncation"
-                                                       Text="{Binding Name}"
-                                                       TextColor="{StaticResource OffBlack}"
-                                                       VerticalOptions="Center" />
-                                            </Border>
-                                        </DataTemplate>
-                                    </dx:FormListPickerItem.ItemTemplate>
-                                </dx:FormListPickerItem>
-                                -->
-    <!--#endregion-->
 
-    <!--#region ShipAddress Picker-->
-    <!--
                                 <dx:FormListPickerItem InlineContent="{x:Null}"
                                                        ItemsSource="{Binding ShipAddresses}"
                                                        PickerShowMode="BottomSheet"
@@ -177,17 +145,11 @@
                                         </DataTemplate>
                                     </dx:FormListPickerItem.ItemTemplate>
                                 </dx:FormListPickerItem>
-                                -->
-    <!--#endregion-->
-    <!--
                             </VerticalStackLayout>
                         </DataTemplate>
                     </dx:FormItem.ContentTemplate>
                 </dx:FormItem>
-            </dx:FormGroupItem>
-            -->
-    <!--#endregion-->
-    <!--
+            </dx:FormGroupItem>-->
         </VerticalStackLayout>
 
         <Button Grid.Row="1"
@@ -195,9 +157,6 @@
                 Text="Kaydet"
                 VerticalOptions="End" />
 
-        -->
-    <!--#region BasketItem BottomSheet-->
-    <!--
         <dx:BottomSheet x:Name="basketItemBottomSheet"
                         AllowDismiss="True"
                         BackgroundColor="White"
@@ -205,9 +164,7 @@
                         HalfExpandedRatio="0.5"
                         IsModal="True"
                         ShowGrabber="True">
-            -->
-    <!--#region BottomSheetContent-->
-    <!--
+
             <Grid Padding="10"
                   RowDefinitions="Auto,*"
                   RowSpacing="20">
@@ -298,12 +255,6 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
             </Grid>
-            -->
-    <!--#endregion-->
-    <!--
         </dx:BottomSheet>
-        -->
-    <!--#endregion-->
-    <!--
-    </Grid>-->
+    </Grid>
 </ContentPage>

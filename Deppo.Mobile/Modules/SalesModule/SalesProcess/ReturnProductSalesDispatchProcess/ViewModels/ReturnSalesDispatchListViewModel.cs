@@ -11,16 +11,15 @@ using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchPr
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.ViewModels;
+
 //fiş
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(SalesCustomer), queryId: nameof(SalesCustomer))]
 public partial class ReturnSalesDispatchListViewModel : BaseViewModel
 {
-
     private readonly IHttpClientService _httpClientService;
     private readonly IUserDialogs _userDialogs;
     private readonly ISalesDispatchTransactionService _salesDispatchTransactionService;
-
 
     [ObservableProperty]
     private WarehouseModel warehouseModel = null!;
@@ -29,7 +28,7 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
     private SalesCustomer salesCustomer = null!;
 
     [ObservableProperty]
-    private SalesFicheModel salesFicheModel= null!;
+    private SalesFicheModel salesFicheModel = null!;
 
     public ReturnSalesDispatchListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ISalesDispatchTransactionService salesDispatchTransactionService)
     {
@@ -72,7 +71,6 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
                 {
                     foreach (var fiche in result.Data)
                     {
-
                         var item = Mapping.Mapper.Map<SalesFicheModel>(fiche);
                         Items.Add(item);
                     }
@@ -113,7 +111,6 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
                 {
                     foreach (var fiche in result.Data)
                     {
-
                         var item = Mapping.Mapper.Map<SalesFicheModel>(fiche);
                         Items.Add(item);
                     }
@@ -176,6 +173,8 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
                 await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchProductListView)}", new Dictionary<string, object>
                 {
                     [nameof(SalesFicheModel)] = SalesFicheModel,
+                    [nameof(WarehouseModel)] = WarehouseModel,
+                    [nameof(SalesCustomer)] = SalesCustomer
                 });
             }
         }

@@ -3,7 +3,10 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.PurchaseModels;
+using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.SalesModels;
+using Deppo.Mobile.Core.Models.SalesModels.BasketModels;
+using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -13,6 +16,8 @@ using System.Collections.ObjectModel;
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.ViewModels;
 
 [QueryProperty(name: nameof(SalesFicheModel), queryId: nameof(SalesFicheModel))]
+[QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
+[QueryProperty(name: nameof(SalesCustomer), queryId: nameof(SalesCustomer))]
 public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -21,6 +26,12 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
 
     [ObservableProperty]
     private SalesFicheModel salesFicheModel = null!;
+
+    [ObservableProperty]
+    private WarehouseModel warehouseModel = null!;
+
+    [ObservableProperty]
+    private SalesCustomer salesCustomer = null!;
 
     public ReturnSalesDispatchProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ISalesDispatchTransactionService salesDispatchTransactionService)
     {
@@ -38,6 +49,7 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
     public ObservableCollection<SalesTransactionModel> Items { get; } = new();
 
     public ObservableCollection<SalesTransactionModel> SelectedSalesTransactions { get; } = new();
+    public ObservableCollection<ReturnSalesBasketModel> SelectedProducts = new();
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
@@ -144,9 +156,41 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
                     Items.FirstOrDefault(x => x.ProductReferenceId == salesTransactionModel.ProductReferenceId).IsSelected = false;
                     SelectedSalesTransactions.Remove(SelectedSalesTransactions.FirstOrDefault(x => x.ProductReferenceId == selectedItem.ProductReferenceId));
                 }
+
+                /*   Items.FirstOrDefault(x => x.ProductReferenceId == salesTransactionModel.ProductReferenceId).IsSelected = true;
+
+                   SelectedSalesTransactions.Add(selectedItem);*/
                 else
                 {
                     Items.FirstOrDefault(x => x.ProductReferenceId == salesTransactionModel.ProductReferenceId).IsSelected = true;
+
+                    var basketItem = new ReturnSalesBasketModel
+                    {
+                        ItemReferenceId = salesTransactionModel.ProductReferenceId,
+                        ItemCode = salesTransactionModel.ProductCode,
+                        ItemName = salesTransactionModel.ProductName,
+                        UnitsetReferenceId = salesTransactionModel.UnitsetReferenceId,
+                        UnitsetCode = salesTransactionModel.UnitsetCode,
+                        UnitsetName = salesTransactionModel.UnitsetName,
+                        SubUnitsetReferenceId = salesTransactionModel.SubUnitsetReferenceId,
+                        SubUnitsetCode = salesTransactionModel.SubUnitsetCode,
+                        SubUnitsetName = salesTransactionModel.SubUnitsetName,
+                        MainItemReferenceId = default,  //
+                        MainItemCode = string.Empty,    //
+                        MainItemName = string.Empty,    //
+                        StockQuantity = salesTransactionModel.Quantity,
+                        IsSelected = false,   //
+                        IsVariant = salesTransactionModel.IsVariant,
+                        LocTracking = salesTransactionModel.LocTracking,
+                        TrackingType = salesTransactionModel.TrackingType,
+                        Quantity = salesTransactionModel.Quantity,
+                        InputQuantity = salesTransactionModel.Quantity,
+                        LocTrackingIcon = salesTransactionModel.LocTrackingIcon,
+                        VariantIcon = salesTransactionModel.VariantIcon,
+                        TrackingTypeIcon = salesTransactionModel.TrackingTypeIcon,
+                    };
+
+                    SelectedProducts.Add(basketItem);
 
                     SelectedSalesTransactions.Add(selectedItem);
                 }
@@ -176,7 +220,9 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
 
             await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchBasketView)}", new Dictionary<string, object>
             {
-                [nameof(SelectedSalesTransactions)] = SelectedSalesTransactions,
+                [nameof(Items)] = SelectedProducts,
+                [nameof(WarehouseModel)] = WarehouseModel,
+                [nameof(SalesCustomer)] = SalesCustomer,
             });
         }
         catch (System.Exception)

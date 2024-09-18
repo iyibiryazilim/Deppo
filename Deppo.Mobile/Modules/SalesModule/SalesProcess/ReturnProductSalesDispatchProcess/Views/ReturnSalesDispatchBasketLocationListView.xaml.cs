@@ -11,5 +11,6 @@ public partial class ReturnSalesDispatchBasketLocationListView : ContentPage
         InitializeComponent();
         _viewModel = viewModel;
         BindingContext = _viewModel;
+        _viewModel.CurrentPage = this;
     }
 }
