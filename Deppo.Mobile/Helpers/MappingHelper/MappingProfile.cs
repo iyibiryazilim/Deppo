@@ -39,23 +39,23 @@ public class MappingProfile : Profile
         CreateMap<CustomerModel, dynamic>();
         CreateMap<OutputProductBasketDetailModel, dynamic>();
         CreateMap<SalesCustomer, dynamic>();
-		CreateMap<SalesCustomerProduct, dynamic>();
-		CreateMap<WaitingSalesOrder, dynamic>();
+        CreateMap<SalesCustomerProduct, dynamic>();
+        CreateMap<WaitingSalesOrder, dynamic>();
         CreateMap<PurchaseSupplier, dynamic>();
         CreateMap<PurchaseSupplierProduct, dynamic>();
         CreateMap<WaitingPurchaseOrderModel, dynamic>();
-		CreateMap<WaitingSalesOrderModel, dynamic>();
-		CreateMap<LocationTransaction, dynamic>();
-		CreateMap<LocationModel, dynamic>();
+        CreateMap<WaitingSalesOrderModel, dynamic>();
+        CreateMap<LocationTransaction, dynamic>();
+        CreateMap<LocationModel, dynamic>();
         CreateMap<LocationTransactionModel, dynamic>();
-		CreateMap<SeriLotModel, dynamic>();
-		CreateMap<SeriLotTransaction, dynamic>();
-		CreateMap<SeriLotTransactionModel, dynamic>();
+        CreateMap<SeriLotModel, dynamic>();
+        CreateMap<SeriLotTransaction, dynamic>();
+        CreateMap<SeriLotTransactionModel, dynamic>();
         CreateMap<ShipAddressModel, dynamic>();
         CreateMap<PurchaseFiche, dynamic>();
         CreateMap<PurchaseFicheModel, dynamic>();
         CreateMap<PurchaseTransaction, dynamic>();
         CreateMap<PurchaseTransactionModel, dynamic>();
         CreateMap<SalesFicheModel, dynamic>();
-	}
+    }
 }
