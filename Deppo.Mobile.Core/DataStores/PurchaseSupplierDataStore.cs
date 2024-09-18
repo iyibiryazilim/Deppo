@@ -143,7 +143,7 @@ FETCH NEXT {take} ROWS ONLY";
     private string ReturnPurchaseSupplierQuery(int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20)
     {
         string baseQuery = $@"SELECT
-    [ReferenceId] = CLCARD.LOGICALREF,
+    [ReferenceId] = ISNULL(CLCARD.LOGICALREF,0),
     [Code] = CLCARD.CODE,
     [Name] = CLCARD.DEFINITION_,
     [ProductReferenceCount] = COUNT(DISTINCT STLINE.STOCKREF),
@@ -152,7 +152,7 @@ FETCH NEXT {take} ROWS ONLY";
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD
     ON STLINE.CLIENTREF = CLCARD.LOGICALREF
-WHERE  STLINE.TRCODE = 1 AND STLINE.SOURCEINDEX = {warehouseNumber}";
+WHERE  STLINE.TRCODE = 1 AND STLINE.SOURCEINDEX = {warehouseNumber} AND CLCARD.LOGICALREF <> 0";
 
         if (!string.IsNullOrEmpty(search))
             baseQuery += $@" AND (CLCARD.CODE LIKE '{search}%' OR CLCARD.DEFINITION_ LIKE '%{search}%')";
