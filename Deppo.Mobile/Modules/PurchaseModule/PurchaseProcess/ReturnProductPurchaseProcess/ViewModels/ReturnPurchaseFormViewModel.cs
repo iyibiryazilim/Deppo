@@ -343,6 +343,12 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
             {
                 Code = "",
                 CurrentCode = SelectedSupplier.Code,
+                CarrierCode = SelectedCarrier != null ? SelectedCarrier.Code : "",
+                DriverFirstName = SelectedDriver != null ? SelectedDriver.Name : "",
+                DriverLastName = SelectedDriver != null ? SelectedDriver.Surname : "",
+                Plaque = SelectedDriver != null ? SelectedDriver.PlateNumber : "",
+                IdentityNumber = SelectedDriver != null ? SelectedDriver.IdentityNumber : "",
+                ShipInfoCode = SelectedShipAddress != null ? SelectedShipAddress.Code : "",
                 Description = Description,
                 DoCode = DocumentNumber,
                 DocTrackingNumber = DocumentTrackingNumber,

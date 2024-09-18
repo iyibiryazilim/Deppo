@@ -67,6 +67,8 @@ namespace Deppo.Core.Models
             }
         }
 
+        public string FullName => $"{Name} {Surname}";
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")

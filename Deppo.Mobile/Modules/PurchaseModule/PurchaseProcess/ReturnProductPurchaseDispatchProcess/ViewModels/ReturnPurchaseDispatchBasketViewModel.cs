@@ -9,6 +9,7 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseProcess.Views;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
@@ -18,6 +19,8 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurch
 [QueryProperty(name: nameof(Items), queryId: nameof(Items))]
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(PurchaseSupplier), queryId: nameof(PurchaseSupplier))]
+[QueryProperty(name: nameof(SelectedPurchaseTransactions), queryId: nameof(SelectedPurchaseTransactions))]
+[QueryProperty(name: nameof(PurchaseFicheModel), queryId: nameof(PurchaseFicheModel))]
 public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -32,6 +35,15 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
     PurchaseSupplier purchaseSupplier = null!;
 
     [ObservableProperty]
+    PurchaseFicheModel purchaseFicheModel = null!;
+
+	[ObservableProperty]
+	public ObservableCollection<ReturnPurchaseBasketModel> items;
+
+    [ObservableProperty]
+	public ObservableCollection<PurchaseTransactionModel> selectedPurchaseTransactions;
+
+	[ObservableProperty]
     ReturnPurchaseBasketModel? selectedItem;
 
     [ObservableProperty]
@@ -47,8 +59,6 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
     public ObservableCollection<LocationTransactionModel> selectedLocationTransactions = new();
 
     #region Collections
-    [ObservableProperty]
-    public ObservableCollection<ReturnPurchaseBasketModel> items;
     public ObservableCollection<SeriLotTransactionModel> SeriLotTransactions { get; } = new();
     public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
     #endregion
@@ -697,12 +707,14 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
                 return;
             }
 
-            await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseFormView)}", new Dictionary<string, object>
+            await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseDispatchFormView)}", new Dictionary<string, object>
             {
                 [nameof(WarehouseModel)] = WarehouseModel,
                 [nameof(PurchaseSupplier)] = PurchaseSupplier,
-                [nameof(Items)] = Items
-            });
+				[nameof(PurchaseFicheModel)] = PurchaseFicheModel,
+				[nameof(Items)] = Items,
+				[nameof(SelectedPurchaseTransactions)] = SelectedPurchaseTransactions
+			});
         }
         catch (Exception ex)
         {
