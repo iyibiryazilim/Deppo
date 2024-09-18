@@ -21,5 +21,6 @@ namespace Deppo.Mobile.Core.Models.AnalysisModels
         private int negativeStockProductQuantity;
 
         public ObservableCollection<WarehouseModel> LastWarehouses { get; } = new();
+        public ObservableCollection<IORateModel> IORates { get; } = new();
     }
 }

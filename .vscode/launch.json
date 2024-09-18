@@ -9,7 +9,14 @@
             "type": "dotnet-meteor.debugger",
             "request": "launch",
             "preLaunchTask": "dotnet-meteor: Build"
+        },
+        {
+            "name": ".NET MAUI",
+            "type": "maui",
+            "request": "launch",
+            "preLaunchTask": "maui: Build"
         }
+        
         
     ]
 }
