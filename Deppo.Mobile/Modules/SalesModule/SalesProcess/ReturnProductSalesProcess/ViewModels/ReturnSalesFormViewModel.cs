@@ -202,7 +202,7 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                     FirmNumber = _httpClientService.FirmNumber,
                     WarehouseNumber = WarehouseModel.Number,
                     Description = Description,
-                    ShipInfoCode = SelectedShipAddress.Code,
+                    ShipInfoCode = SelectedShipAddress.Code ?? string.Empty,
                 };
                 foreach (var item in Items)
                 {
@@ -249,7 +249,7 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                     FirmNumber = _httpClientService.FirmNumber,
                     WarehouseNumber = WarehouseModel.Number,
                     Description = Description,
-                    ShipInfoCode = SelectedShipAddress.Code,
+                    ShipInfoCode = SelectedShipAddress.Code ?? string.Empty,
                 };
                 foreach (var item in Items)
                 {
