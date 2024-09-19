@@ -43,7 +43,7 @@ namespace Deppo.Mobile.Core.Models.SalesModels.BasketModels
         private string _variantIconColor;
         private string _trackingTypeIcon;
         private string _trackingTypeIconColor;
-
+        private int? _dispatchReferenceId;
         public ReturnSalesBasketModel()
         {
             ReferenceId = Guid.NewGuid();
@@ -356,6 +356,16 @@ namespace Deppo.Mobile.Core.Models.SalesModels.BasketModels
             {
                 if (_trackingTypeIcon == value) return;
                 _trackingTypeIcon = value;
+                NotifyPropertyChanged();
+            }
+        }
+        public int? DispatchReferenceId
+        {
+            get => _dispatchReferenceId;
+            set
+            {
+                if (_dispatchReferenceId == value) return;
+                _dispatchReferenceId = value;
                 NotifyPropertyChanged();
             }
         }

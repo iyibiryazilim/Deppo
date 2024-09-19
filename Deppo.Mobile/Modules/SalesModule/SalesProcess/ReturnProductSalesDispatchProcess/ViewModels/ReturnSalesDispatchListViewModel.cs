@@ -2,12 +2,14 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.ViewModels;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.ViewModels;
@@ -20,6 +22,7 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
     private readonly IHttpClientService _httpClientService;
     private readonly IUserDialogs _userDialogs;
     private readonly ISalesDispatchTransactionService _salesDispatchTransactionService;
+    private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty]
     private WarehouseModel warehouseModel = null!;
@@ -30,7 +33,7 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
     [ObservableProperty]
     private SalesFicheModel salesFicheModel = null!;
 
-    public ReturnSalesDispatchListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ISalesDispatchTransactionService salesDispatchTransactionService)
+    public ReturnSalesDispatchListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ISalesDispatchTransactionService salesDispatchTransactionService, IServiceProvider serviceProvider)
     {
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
@@ -41,6 +44,7 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
         ItemTappedCommand = new Command<SalesFicheModel>(async (x) => await ItemTappedAsync(x));
 
         NextViewCommand = new Command(async () => await NextViewAsync());
+        _serviceProvider = serviceProvider;
     }
 
     public Command LoadItemsCommand { get; }
@@ -141,22 +145,34 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            Items.ToList().ForEach(x => x.IsSelected = false);
+            if (item == SalesFicheModel)
+            {
+                SalesFicheModel.IsSelected = false;
+                SalesFicheModel = null;
+            }
+            else
+            {
+                if (SalesFicheModel != null)
+                {
+                    SalesFicheModel.IsSelected = false;
+                }
 
-            var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-            if (selectedItem != null)
-                selectedItem.IsSelected = true;
-
-            SalesFicheModel = item;
+                SalesFicheModel = item;
+                SalesFicheModel.IsSelected = true;
+            }
         }
         catch (Exception ex)
         {
-            _userDialogs.Alert(ex.Message);
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message);
         }
         finally
         {
             IsBusy = false;
         }
+
     }
 
     private async Task NextViewAsync()
@@ -170,6 +186,8 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
 
             if (SalesFicheModel is not null)
             {
+                var viewModel = _serviceProvider.GetRequiredService<ReturnSalesDispatchProductListViewModel>();
+                await viewModel.LoadPageAsync();
                 await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchProductListView)}", new Dictionary<string, object>
                 {
                     [nameof(SalesFicheModel)] = SalesFicheModel,
@@ -186,5 +204,23 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
         {
             IsBusy = false;
         }
+    }
+    public async Task LoadPageAsync()
+    {
+        try
+        {
+
+
+            if (Items?.Count > 0)
+                Items.Clear();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+
     }
 }

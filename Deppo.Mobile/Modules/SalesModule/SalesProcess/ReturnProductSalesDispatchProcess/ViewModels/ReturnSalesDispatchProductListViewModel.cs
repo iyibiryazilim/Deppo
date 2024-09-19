@@ -11,6 +11,7 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.ViewModels;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.ViewModels;
@@ -23,6 +24,7 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
     private readonly IHttpClientService _httpClientService;
     private readonly IUserDialogs _userDialogs;
     private readonly ISalesDispatchTransactionService _salesDispatchTransactionService;
+    private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty]
     private SalesFicheModel salesFicheModel = null!;
@@ -33,7 +35,7 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
     [ObservableProperty]
     private SalesCustomer salesCustomer = null!;
 
-    public ReturnSalesDispatchProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ISalesDispatchTransactionService salesDispatchTransactionService)
+    public ReturnSalesDispatchProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ISalesDispatchTransactionService salesDispatchTransactionService, IServiceProvider serviceProvider)
     {
         _httpClientService = httpClientService;
         Title = "Ürün Listesi";
@@ -44,6 +46,7 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<SalesTransactionModel>(async (x) => await ItemTappedAsync(x));
         NextViewCommand = new Command(async () => await NextViewAsync());
+        _serviceProvider = serviceProvider;
     }
 
     public ObservableCollection<SalesTransactionModel> Items { get; } = new();
@@ -108,8 +111,6 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
         {
             IsBusy = true;
             _userDialogs.ShowLoading("Yükleniyor...");
-            await Task.Delay(1000);
-
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _salesDispatchTransactionService.GetTransactionsByFicheReferenceId(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SalesFicheModel.ReferenceId, string.Empty, Items.Count, 20);
             if (result.IsSuccess)
@@ -118,7 +119,8 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
                 {
                     foreach (var transaction in result.Data)
                     {
-                        var item = Mapping.Mapper.Map<SalesTransactionModel>(transaction);
+
+                        var item = Mapping.Mapper.Map<PurchaseTransactionModel>(transaction);
                         Items.Add(item);
                     }
 
@@ -139,7 +141,7 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
         }
     }
 
-    private async Task ItemTappedAsync(SalesTransactionModel salesTransactionModel)
+    private async Task ItemTappedAsync(SalesTransactionModel item)
     {
         if (IsBusy)
             return;
@@ -148,49 +150,46 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            var selectedItem = Items.FirstOrDefault(x => x.ProductReferenceId == salesTransactionModel.ProductReferenceId);
+            var selectedItem = Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
             if (selectedItem is not null)
             {
                 if (selectedItem.IsSelected)
                 {
-                    Items.FirstOrDefault(x => x.ProductReferenceId == salesTransactionModel.ProductReferenceId).IsSelected = false;
+                    Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
                     SelectedSalesTransactions.Remove(SelectedSalesTransactions.FirstOrDefault(x => x.ProductReferenceId == selectedItem.ProductReferenceId));
                 }
-
-                /*   Items.FirstOrDefault(x => x.ProductReferenceId == salesTransactionModel.ProductReferenceId).IsSelected = true;
-
-                   SelectedSalesTransactions.Add(selectedItem);*/
                 else
                 {
-                    Items.FirstOrDefault(x => x.ProductReferenceId == salesTransactionModel.ProductReferenceId).IsSelected = true;
+                    Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
 
                     var basketItem = new ReturnSalesBasketModel
                     {
-                        ItemReferenceId = salesTransactionModel.ProductReferenceId,
-                        ItemCode = salesTransactionModel.ProductCode,
-                        ItemName = salesTransactionModel.ProductName,
-                        UnitsetReferenceId = salesTransactionModel.UnitsetReferenceId,
-                        UnitsetCode = salesTransactionModel.UnitsetCode,
-                        UnitsetName = salesTransactionModel.UnitsetName,
-                        SubUnitsetReferenceId = salesTransactionModel.SubUnitsetReferenceId,
-                        SubUnitsetCode = salesTransactionModel.SubUnitsetCode,
-                        SubUnitsetName = salesTransactionModel.SubUnitsetName,
+                        ItemReferenceId = item.ProductReferenceId,
+                        ItemCode = item.ProductCode,
+                        ItemName = item.ProductName,
+                        UnitsetReferenceId = item.UnitsetReferenceId,
+                        UnitsetCode = item.UnitsetCode,
+                        UnitsetName = item.UnitsetName,
+                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                        SubUnitsetCode = item.SubUnitsetCode,
+                        SubUnitsetName = item.SubUnitsetName,
                         MainItemReferenceId = default,  //
                         MainItemCode = string.Empty,    //
                         MainItemName = string.Empty,    //
-                        StockQuantity = salesTransactionModel.Quantity,
+                        StockQuantity = item.Quantity,
                         IsSelected = false,   //
-                        IsVariant = salesTransactionModel.IsVariant,
-                        LocTracking = salesTransactionModel.LocTracking,
-                        TrackingType = salesTransactionModel.TrackingType,
-                        Quantity = salesTransactionModel.Quantity,
-                        InputQuantity = salesTransactionModel.Quantity,
-                        LocTrackingIcon = salesTransactionModel.LocTrackingIcon,
-                        VariantIcon = salesTransactionModel.VariantIcon,
-                        TrackingTypeIcon = salesTransactionModel.TrackingTypeIcon,
+                        IsVariant = item.IsVariant,
+                        LocTracking = item.LocTracking,
+                        TrackingType = item.TrackingType,
+                        Quantity = item.LocTracking == 0 ? 1 : 0,
+                        LocTrackingIcon = item.LocTrackingIcon,
+                        VariantIcon = item.VariantIcon,
+                        TrackingTypeIcon = item.TrackingTypeIcon,
+                        DispatchReferenceId = item.ReferenceId,
                     };
 
                     SelectedProducts.Add(basketItem);
+
 
                     SelectedSalesTransactions.Add(selectedItem);
                 }
@@ -217,12 +216,15 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-
+            var viewModel = _serviceProvider.GetRequiredService<ReturnSalesDispatchBasketViewModel>();
+           // await viewModel.LoadPageAsync();
             await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchBasketView)}", new Dictionary<string, object>
             {
                 [nameof(Items)] = SelectedProducts,
                 [nameof(WarehouseModel)] = WarehouseModel,
                 [nameof(SalesCustomer)] = SalesCustomer,
+                [nameof(SelectedSalesTransactions)] = SelectedSalesTransactions,
+                [nameof(SalesFicheModel)] = SalesFicheModel
             });
         }
         catch (System.Exception)
@@ -233,5 +235,23 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
         {
             IsBusy = false;
         }
+    }
+    public async Task LoadPageAsync()
+    {
+        try
+        {
+
+
+            if (Items?.Count > 0)
+                Items.Clear();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+
     }
 }

@@ -6,7 +6,9 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.ViewModels;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.Views;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,13 +22,15 @@ public partial class ReturnSalesDispatchWarehouseListViewModel : BaseViewModel
     private readonly IHttpClientService _httpClientService;
     private readonly IWarehouseService _warehouseService;
     private readonly IUserDialogs _userDialogs;
+    private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty]
     private WarehouseModel selectedWarehouseModel = null!;
 
     public ReturnSalesDispatchWarehouseListViewModel(IHttpClientService httpClientService,
         IWarehouseService warehouseService,
-        IUserDialogs userDialogs)
+        IUserDialogs userDialogs,
+        IServiceProvider serviceProvider)
     {
         _httpClientService = httpClientService;
         _warehouseService = warehouseService;
@@ -38,6 +42,7 @@ public partial class ReturnSalesDispatchWarehouseListViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<WarehouseModel>(ItemTappedAsync);
         NextViewCommand = new Command(async () => await NextViewAsync());
+        _serviceProvider = serviceProvider;
     }
 
     public Command LoadItemsCommand { get; }
@@ -141,22 +146,31 @@ public partial class ReturnSalesDispatchWarehouseListViewModel : BaseViewModel
     {
         if (IsBusy)
             return;
-
         try
         {
             IsBusy = true;
 
-            Items.ToList().ForEach(x => x.IsSelected = false);
+            if (item == SelectedWarehouseModel)
+            {
+                SelectedWarehouseModel.IsSelected = false;
+                SelectedWarehouseModel = null;
+            }
+            else
+            {
+                if (SelectedWarehouseModel != null)
+                {
+                    SelectedWarehouseModel.IsSelected = false;
+                }
 
-            var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-            if (selectedItem != null)
-                selectedItem.IsSelected = true;
+                SelectedWarehouseModel = item;
+                SelectedWarehouseModel.IsSelected = true;
 
-            SelectedWarehouseModel = item;
+            }
+
         }
         catch (Exception ex)
         {
-            _userDialogs.Alert(ex.Message);
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
         finally
         {
@@ -168,13 +182,14 @@ public partial class ReturnSalesDispatchWarehouseListViewModel : BaseViewModel
     {
         if (IsBusy)
             return;
-
         try
         {
             IsBusy = true;
 
             if (SelectedWarehouseModel is not null)
             {
+                var viewModel = _serviceProvider.GetRequiredService<ReturnSalesDispatchCustomerListViewModel>();
+                await viewModel.LoadPageAsync();
                 await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchCustomerListView)}", new Dictionary<string, object>
                 {
                     [nameof(WarehouseModel)] = SelectedWarehouseModel,
