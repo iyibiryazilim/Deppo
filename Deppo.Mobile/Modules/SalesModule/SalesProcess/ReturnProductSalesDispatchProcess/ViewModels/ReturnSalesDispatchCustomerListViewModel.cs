@@ -11,6 +11,7 @@ using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.ViewModels;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
 
@@ -23,6 +24,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
         private readonly ISalesCustomerService _salesCustomerService;
         private readonly ISalesCustomerProductService _salesCustomerProductService;
         private readonly IUserDialogs _userDialogs;
+        private readonly IServiceProvider _serviceProvider;
 
         [ObservableProperty]
         WarehouseModel warehouseModel = null!;
@@ -38,7 +40,8 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
         public ReturnSalesDispatchCustomerListViewModel(IHttpClientService httpClientService,
         ISalesCustomerService salesCustomerService,
         IUserDialogs userDialogs,
-        ISalesCustomerProductService salesCustomerProductService)
+        ISalesCustomerProductService salesCustomerProductService,
+        IServiceProvider serviceProvider)
         {
             _httpClientService = httpClientService;
             _salesCustomerService = salesCustomerService;
@@ -49,9 +52,10 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
 
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
             LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-            ItemTappedCommand = new Command<SalesCustomer>(async (customer) => await ItemTappedAsync(customer));
+            ItemTappedCommand = new Command<SalesCustomer>(async (customer) => ItemTappedAsync(customer));
             NextViewCommand = new Command(async () => await NextViewAsync());
             ShowOrdersCommand = new Command<SalesCustomer>(async (customer) => await ShowOrdersAsync(customer));
+            _serviceProvider = serviceProvider;
         }
 
         #region Commands
@@ -176,26 +180,31 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
             }
         }
 
-        private async Task ItemTappedAsync(SalesCustomer item)
+        private void ItemTappedAsync(SalesCustomer item)
         {
+            if (IsBusy)
+                return;
             try
             {
                 IsBusy = true;
 
-                if (SelectedSalesCustomer == item)
+                if (item == SelectedSalesCustomer)
                 {
                     SelectedSalesCustomer.IsSelected = false;
                     SelectedSalesCustomer = null;
                 }
                 else
                 {
-                    if (SelectedSalesCustomer is not null)
+                    if (SelectedSalesCustomer != null)
                     {
                         SelectedSalesCustomer.IsSelected = false;
                     }
+
                     SelectedSalesCustomer = item;
                     SelectedSalesCustomer.IsSelected = true;
+
                 }
+
             }
             catch (Exception ex)
             {
@@ -217,6 +226,8 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
 
                 if (SelectedSalesCustomer is not null)
                 {
+                    var viewModel = _serviceProvider.GetRequiredService<ReturnSalesDispatchListViewModel>();
+                    await viewModel.LoadPageAsync();
                     await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchListView)}", new Dictionary<string, object>
                     {
                         [nameof(SalesCustomer)] = SelectedSalesCustomer,
@@ -242,6 +253,24 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
             {
                 IsBusy = false;
             }
+        }
+        public async Task LoadPageAsync()
+        {
+            try
+            {
+
+
+                if (Items?.Count > 0)
+                    Items.Clear();
+            }
+            catch (Exception ex)
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            }
+
         }
     }
 }

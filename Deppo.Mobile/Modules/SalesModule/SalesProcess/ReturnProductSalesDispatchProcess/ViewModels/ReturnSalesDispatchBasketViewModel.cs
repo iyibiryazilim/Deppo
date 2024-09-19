@@ -24,6 +24,10 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(SalesCustomer), queryId: nameof(SalesCustomer))]
 [QueryProperty(name: nameof(Items), queryId: nameof(Items))]
+[QueryProperty(name: nameof(SalesFicheModel), queryId: nameof(SalesFicheModel))]
+[QueryProperty(name: nameof(SelectedSalesTransactions), queryId: nameof(SelectedSalesTransactions))]
+
+
 public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -43,6 +47,13 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
 
     [ObservableProperty]
     private ObservableCollection<ReturnSalesBasketModel> items;
+
+
+    [ObservableProperty]
+    SalesFicheModel salesFicheModel = null!;
+    [ObservableProperty]
+    public ObservableCollection<SalesTransactionModel> selectedSalesTransactions;
+
 
     public ReturnSalesDispatchBasketViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider)
     {
@@ -629,5 +640,23 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
         {
             IsBusy = false;
         }
+    }
+    public async Task LoadPageAsync()
+    {
+        try
+        {
+
+
+            if (Items?.Count > 0)
+                Items.Clear();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+
     }
 }
