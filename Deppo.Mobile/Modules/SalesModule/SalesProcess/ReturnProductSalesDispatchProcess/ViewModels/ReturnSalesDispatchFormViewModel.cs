@@ -93,8 +93,6 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
         ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
         LoadShipAddressesCommand = new Command<SalesCustomer>(async (x) => await LoadShipAddressesAsync(x));
 
-
-
         SaveCommand = new Command(async () => await SaveAsync());
 
         _retailService = retailSalesDispatchTransactionService;
@@ -212,7 +210,6 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
                     FirmNumber = _httpClientService.FirmNumber,
                     WarehouseNumber = WarehouseModel.Number,
                     Description = Description,
-                    
                 };
 
                 foreach (var item in Items)
@@ -310,7 +307,6 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
                     FirmNumber = _httpClientService.FirmNumber,
                     WarehouseNumber = WarehouseModel.Number,
                     Description = Description
-                    
                 };
 
                 foreach (var item in Items)
@@ -419,6 +415,7 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
                     _userDialogs.HideHud();
 
                 resultModel.Message = "Başarısız";
+                resultModel.ErrorMessage = result.Message;
                 resultModel.PageTitle = Title;
                 resultModel.PageCountToBack = 4;
                 await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
@@ -433,6 +430,7 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
         }
         finally { IsBusy = false; }
     }
+
     private async Task LoadShipAddressesAsync(SalesCustomer salesCustomer)
     {
         if (salesCustomer is null)

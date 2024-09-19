@@ -305,6 +305,7 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                     _userDialogs.HideHud();
 
                 resultModel.Message = "Başarısız";
+                resultModel.ErrorMessage = result.Message;
                 resultModel.PageTitle = Title;
                 resultModel.PageCountToBack = 4;
                 await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
