@@ -321,6 +321,14 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                 {
                     [nameof(ResultModel)] = resultModel
                 });
+                DocumentNumber = string.Empty;
+                DocumentTrackingNumber = string.Empty;
+                SpecialCode = string.Empty;
+                Description = string.Empty;
+                FicheNo = string.Empty;
+                SelectedShipAddress = null;
+                SelectedCustomer = null;
+                Items.Clear();
             }
         }
         catch (Exception ex)
