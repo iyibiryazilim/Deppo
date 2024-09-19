@@ -50,7 +50,13 @@ public partial class InsertSuccessPageViewModel : BaseViewModel
 					case 6:
 						await Shell.Current.GoToAsync("../../../../../..");
 						break;
-					default:
+                    case 7:
+                        await Shell.Current.GoToAsync("../../../../../../..");
+                        break;
+                    case 8:
+                        await Shell.Current.GoToAsync("../../../../../../../..");
+                        break;
+                    default:
 						await Shell.Current.GoToAsync("..");
 						break;
 				}

@@ -110,7 +110,7 @@
                         <DataTemplate>
                             <VerticalStackLayout>
                                 <!--#region Carrier Picker-->
-                                <dx:FormListPickerItem InlineContent="{x:Null}"
+                                <dx:FormListPickerItem InlineContent="Taşıyıcı"
                                                        ItemsSource="{Binding Carriers}"
                                                        PickerShowMode="BottomSheet"
                                                        PickerTitle="Taşıyıcı Seçiniz"
@@ -120,7 +120,7 @@
                                                        Text="{Binding SelectedCarrier.Name}">
                                     <dx:FormListPickerItem.ImageSource>
                                         <FontImageSource FontFamily="FAS"
-                                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.LocationDot}"
+                                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Truck}"
                                                          Size="15"
                                                          Color="{StaticResource White}" />
                                     </dx:FormListPickerItem.ImageSource>
@@ -139,17 +139,17 @@
                                 <!--#endregion-->
 
                                 <!--#region Driver Picker-->
-                                <dx:FormListPickerItem InlineContent="{x:Null}"
+                                <dx:FormListPickerItem InlineContent="Şoför"
                                                        ItemsSource="{Binding Drivers}"
                                                        PickerShowMode="BottomSheet"
-                                                       PickerTitle="Sürücü seçiniz"
+                                                       PickerTitle="Şoför seçiniz"
                                                        SelectedItem="{Binding SelectedDriver}"
                                                        TapCommand="{Binding LoadDriversCommand}"
                                                        TapCommandParameter="{Binding SelectedDriver}"
                                                        Text="{Binding SelectedDriver.FullName}">
                                     <dx:FormListPickerItem.ImageSource>
                                         <FontImageSource FontFamily="FAS"
-                                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.LocationDot}"
+                                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.IdCardClip}"
                                                          Size="15"
                                                          Color="{StaticResource White}" />
                                     </dx:FormListPickerItem.ImageSource>

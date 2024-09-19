@@ -31,11 +31,13 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
     private readonly IPurchaseReturnDispatchTransactionService _purchaseReturnDispatchTransactionService;
+    private readonly ISupplierService _supplierService;
     private readonly IPurchaseSupplierService _purchaseSupplierService;
     private readonly IUserDialogs _userDialogs;
     private readonly IShipAddressService _shipAddressService;
     private readonly ICarrierService _carrierService;
     private readonly IDriverService _driverService;
+    private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty]
     OutputProductProcessType outputProductProcessType;
@@ -44,7 +46,7 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
     WarehouseModel warehouseModel = null!;
 
     [ObservableProperty]
-    PurchaseSupplier? selectedSupplier;
+    SupplierModel? selectedSupplier;
     [ObservableProperty]
     ShipAddressModel? selectedShipAddress;
     [ObservableProperty]
@@ -52,7 +54,7 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
     [ObservableProperty]
     Driver? selectedDriver;
 
-    public ObservableCollection<PurchaseSupplier> Suppliers { get; } = new();
+    public ObservableCollection<SupplierModel> Suppliers { get; } = new();
     public ObservableCollection<ShipAddressModel> ShipAddresses { get; } = new();
     public ObservableCollection<Carrier> Carriers { get; } = new();
     public ObservableCollection<Driver> Drivers { get; } = new();
@@ -77,18 +79,20 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
     string specialCode = string.Empty;
 
 
-    public ReturnPurchaseFormViewModel(IHttpClientService httpClientService, IPurchaseReturnDispatchTransactionService purchaseReturnDispatchTransactionService, IUserDialogs userDialogs, IPurchaseSupplierService purchaseSupplierService, IShipAddressService shipAddressService, ICarrierService carrierService, IDriverService driverService)
+    public ReturnPurchaseFormViewModel(IHttpClientService httpClientService, IPurchaseReturnDispatchTransactionService purchaseReturnDispatchTransactionService, IUserDialogs userDialogs, IPurchaseSupplierService purchaseSupplierService, IShipAddressService shipAddressService, ICarrierService carrierService, IDriverService driverService, ISupplierService supplierService, IServiceProvider serviceProvider)
     {
         _httpClientService = httpClientService;
         _purchaseReturnDispatchTransactionService = purchaseReturnDispatchTransactionService;
         _userDialogs = userDialogs;
         _purchaseSupplierService = purchaseSupplierService;
         _shipAddressService = shipAddressService;
-		_carrierService = carrierService;
-		_driverService = driverService;
+        _carrierService = carrierService;
+        _driverService = driverService;
+        _supplierService = supplierService;
+        _serviceProvider = serviceProvider;
         Items = new();
 
-		Title = "Satınalma İade İrsaliyesi";
+        Title = "Satınalma İade İrsaliyesi";
 
         SaveCommand = new Command(async () => await SaveAsync());
         LoadPageCommand = new Command(async () => await LoadPageAsync());
@@ -158,11 +162,10 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _purchaseSupplierService.GetObjects(
+            var result = await _supplierService.GetObjects(
                     httpClient: httpClient,
                     firmNumber: _httpClientService.FirmNumber,
                     periodNumber: _httpClientService.PeriodNumber,
-                    warehouseNumber: WarehouseModel.Number,
                     skip: 0,
                     take: 9999999,
                     search: ""
@@ -175,7 +178,7 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
 
                 foreach (var item in result.Data)
                 {
-                    Suppliers.Add(Mapping.Mapper.Map<PurchaseSupplier>(item));
+                    Suppliers.Add(Mapping.Mapper.Map<SupplierModel>(item));
                 }
             }
         }
@@ -398,6 +401,11 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
             ResultModel resultModel = new();
             if (result.IsSuccess)
             {
+                var basketViewModel = _serviceProvider.GetRequiredService<ReturnPurchaseBasketViewModel>();
+                basketViewModel.Items.Clear();
+                basketViewModel.SelectedLocationTransactions.Clear();
+                basketViewModel.SelectedSeriLotTransactions.Clear();
+
                 resultModel.Message = "Başarılı";
                 resultModel.Code = result.Data.Code;
                 resultModel.PageTitle = Title;

@@ -17,6 +17,10 @@
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding BackCommand}" />
+    </Shell.BackButtonBehavior>
+
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
             <On Platform="Android" Value="artboard.png" />
@@ -233,9 +237,26 @@
                                         BackgroundColor="{StaticResource WhiteSmoke}"
                                         StrokeShape="RoundRectangle 10"
                                         StrokeThickness="0.1">
-                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
-
-                                            <VerticalStackLayout Grid.Column="0">
+                                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                            <Border Grid.Column="0"
+                                                    Padding="8,8,8,8"
+                                                    BackgroundColor="{StaticResource Secondary}"
+                                                    StrokeShape="RoundRectangle 10">
+                                                <VerticalStackLayout Grid.Column="0"
+                                                                     Spacing="1"
+                                                                     VerticalOptions="Center">
+                                                    <Label FontAttributes="Bold"
+                                                           FontSize="Large"
+                                                           HorizontalOptions="Center"
+                                                           Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
+                                                           TextColor="{StaticResource OffBlack}" />
+                                                    <Label FontSize="Medium"
+                                                           HorizontalOptions="Center"
+                                                           Text="{Binding TransactionDate, StringFormat='{0:MM/yyyy}'}"
+                                                           TextColor="{StaticResource OffBlack}" />
+                                                </VerticalStackLayout>
+                                            </Border>
+                                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
                                                 <Label FontAttributes="Bold"
                                                    LineBreakMode="TailTruncation"
                                                    Text="{Binding LocationCode}" />
@@ -252,7 +273,7 @@
                                                               TextColor="{StaticResource Primary}" />
                                                             <Span Text=" " />
                                                             <Span FontAttributes="Bold"
-                                                              Text="{Binding Quantity, StringFormat='{0:N2}'}"
+                                                              Text="{Binding RemainingQuantity, StringFormat='{0:N2}'}"
                                                               TextColor="{StaticResource Primary}" />
                                                         </FormattedString>
                                                     </Label.FormattedText>
@@ -260,7 +281,7 @@
 
 
                                             </VerticalStackLayout>
-                                            <Grid Grid.Column="1"
+                                            <Grid Grid.Column="2"
                                               ColumnDefinitions="Auto,Auto,Auto"
                                               ColumnSpacing="10"
                                               HorizontalOptions="EndAndExpand"
