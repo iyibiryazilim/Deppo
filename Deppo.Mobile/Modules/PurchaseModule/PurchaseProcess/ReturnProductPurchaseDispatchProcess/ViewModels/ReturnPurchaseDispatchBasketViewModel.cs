@@ -72,37 +72,40 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
 
         Title = "Sepet Listesi";
 
-        //ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
         IncreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await IncreaseAsync(item));
         DecreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DecreaseAsync(item));
         DeleteItemCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DeleteItemAsync(item));
+		NextViewCommand = new Command(async () => await NextViewAsync());
+		BackCommand = new Command(async () => await BackAsync());
 
 
-        LoadMoreSeriLotTransactionsCommand = new Command(async () => await LoadMoreSeriLotTransactionsAsync());
+		LoadMoreSeriLotTransactionsCommand = new Command(async () => await LoadMoreSeriLotTransactionsAsync());
         SeriLotTransactionIncreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionIncreaseAsync(item));
         SeriLotTransactionDecreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionDecreaseAsync(item));
         ConfirmSeriLotTransactionCommand = new Command(ConfirmSeriLotTransactionAsync);
         SeriLotTransactionCloseCommand = new Command(async () => await SeriLotTransactionCloseAsync());
-
 
         LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
         LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
         LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
         ConfirmLocationTransactionCommand = new Command(ConfirmLocationTransactionAsync);
         LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
-
-        NextViewCommand = new Command(async () => await NextViewAsync());
-        BackCommand = new Command(async () => await BackAsync());
     }
 
-    #region Commands
-    //public Command ShowProductViewCommand { get; }
-    public Command IncreaseCommand { get; }
+	#region Properties
+	public ContentPage CurrentPage { get; set; } = null!;
+
+	#endregion
+
+	#region Commands
+	public Command IncreaseCommand { get; }
     public Command DecreaseCommand { get; }
     public Command DeleteItemCommand { get; }
+	public Command NextViewCommand { get; }
+	public Command BackCommand { get; }
 
-    #region Location Transaction Command
-    public Command LoadMoreLocationTransactionsCommand { get; }
+	#region Location Transaction Command
+	public Command LoadMoreLocationTransactionsCommand { get; }
     public Command LocationTransactionIncreaseCommand { get; }
     public Command LocationTransactionDecreaseCommand { get; }
     public Command ConfirmLocationTransactionCommand { get; }
@@ -116,38 +119,10 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
     public Command ConfirmSeriLotTransactionCommand { get; }
     public Command SeriLotTransactionCloseCommand { get; }
     #endregion
-    public Command NextViewCommand { get; }
-    public Command BackCommand { get; }
+   
     #endregion
 
-    #region Properties
-    public ContentPage CurrentPage { get; set; } = null!;
-
-    #endregion
-
-
-    //private async Task ShowProductViewAsync()
-    //{
-    //    if (IsBusy)
-    //        return;
-    //    try
-    //    {
-    //        IsBusy = true;
-
-    //        await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseProductListView)}", new Dictionary<string, object>
-    //        {
-    //            [nameof(WarehouseModel)] = WarehouseModel
-    //        });
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-    //    }
-    //    finally
-    //    {
-    //        IsBusy = false;
-    //    }
-    //}
+   
 
     private async Task IncreaseAsync(ReturnPurchaseBasketModel item)
     {
@@ -268,9 +243,9 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
     {
         try
         {
+            LocationTransactions.Clear();
             _userDialogs.ShowLoading("Load Location Items...");
             await Task.Delay(1000);
-            LocationTransactions.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _locationTransactionService.GetInputObjectsAsync(
@@ -313,6 +288,7 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
         {
             IsBusy = true;
 
+            _userDialogs.Loading("Load Location Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _locationTransactionService.GetInputObjectsAsync(httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
@@ -332,9 +308,14 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
                     LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
                 }
             }
+
+            _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
@@ -438,7 +419,10 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
             if (LocationTransactions.Count > 0)
             {
                 SelectedLocationTransactions.Clear();
-                SelectedLocationTransactions.ToList().AddRange(LocationTransactions.Where(x => x.OutputQuantity > 0));
+                foreach (var locationTransaction in LocationTransactions.Where(x => x.OutputQuantity > 0))
+                {
+                    SelectedLocationTransactions.Add(locationTransaction);
+                }
 
 
 
@@ -453,14 +437,16 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
 
                     SelectedItem.Details.Add(new ReturnPurchaseBasketDetailModel
                     {
-                        LocationReferenceId = item.ReferenceId,
+                        ReferenceId = item.ReferenceId,
+                        LocationReferenceId = item.LocationReferenceId,
                         LocationCode = item.LocationCode,
                         LocationName = item.LocationName,
                         TransactionReferenceId = item.TransactionReferenceId,
+                        InSerilotTransactionReferenceId = item.InSerilotTransactionReferenceId,
                         TransactionFicheReferenceId = item.TransactionFicheReferenceId,
                         InTransactionReferenceId = item.InTransactionReferenceId,
                         Quantity = item.OutputQuantity,
-                        RemainingQuantity = item.Quantity - item.OutputQuantity,
+                        RemainingQuantity = item.OutputQuantity,
                     });
                 }
 

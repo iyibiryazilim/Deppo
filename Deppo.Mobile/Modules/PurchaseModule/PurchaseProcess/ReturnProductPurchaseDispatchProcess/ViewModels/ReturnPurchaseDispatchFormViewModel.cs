@@ -20,10 +20,10 @@ using System.Reflection;
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.ViewModels;
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
-[QueryProperty(name: nameof(Items), queryId: nameof(Items))]
 [QueryProperty(name: nameof(PurchaseSupplier), queryId: nameof(PurchaseSupplier))]
 [QueryProperty(name: nameof(PurchaseFicheModel), queryId: nameof(PurchaseFicheModel))]
 [QueryProperty(name: nameof(SelectedPurchaseTransactions), queryId: nameof(SelectedPurchaseTransactions))]
+[QueryProperty(name: nameof(Items), queryId: nameof(Items))]
 
 public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 {
@@ -45,6 +45,8 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 
 	[ObservableProperty]
 	public ObservableCollection<PurchaseTransactionModel> selectedPurchaseTransactions;
+	[ObservableProperty]
+	public ObservableCollection<ReturnPurchaseBasketModel> items = null!;
 
 
 	[ObservableProperty]
@@ -54,9 +56,6 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 
 	public ObservableCollection<Carrier> Carriers { get; } = new();
 	public ObservableCollection<Driver> Drivers { get; } = new();
-
-	[ObservableProperty]
-	ObservableCollection<ReturnPurchaseBasketModel> items = null!;
 
 
 	[ObservableProperty]
@@ -74,9 +73,6 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 	[ObservableProperty]
 	string specialCode = string.Empty;
 
-	public Page CurrentPage { get; set; }
-
-
 	public ReturnPurchaseDispatchFormViewModel(IHttpClientService httpClientService, IPurchaseReturnDispatchTransactionService purchaseReturnDispatchTransactionService, IUserDialogs userDialogs, ICarrierService carrierService, IDriverService driverService)
 	{
 		_httpClientService = httpClientService;
@@ -93,6 +89,7 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 		_carrierService = carrierService;
 		_driverService = driverService;
 	}
+	public Page CurrentPage { get; set; }
 
 	public Command SaveCommand { get; }
 	public Command LoadPageCommand { get; }
@@ -110,13 +107,13 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 
 
 			CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
-
-
 		}
-		catch (System.Exception)
+		catch (Exception ex)
 		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 
-			throw;
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{
@@ -297,7 +294,7 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 				resultModel.Message = "Başarılı";
 				resultModel.Code = result.Data.Code;
 				resultModel.PageTitle = Title;
-				resultModel.PageCountToBack = 6;
+				resultModel.PageCountToBack = 7;
 
 				if (_userDialogs.IsHudShowing)
 					_userDialogs.HideHud();

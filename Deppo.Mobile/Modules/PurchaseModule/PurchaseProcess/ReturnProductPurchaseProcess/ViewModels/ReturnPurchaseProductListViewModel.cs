@@ -38,7 +38,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
     [ObservableProperty]
     WarehouseTotalModel selectedProduct = null!;
 
-    public ContentPage CurrentPage { get; set; } = null!;
+    public Page CurrentPage { get; set; } = null!;
 
     private bool IsSearchMode
     {
@@ -75,26 +75,29 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<WarehouseTotalModel>(async (parameter) => await ItemTappedAsync(parameter));
+        PerformSearchCommand = new Command<SearchBar>(async (parameter) => await PerformSearchAsync(parameter));
+        ConfirmCommand = new Command(async () => await ConfirmAsync());
+        BackCommand = new Command(async () => await BackAsync());
+
         LoadVariantItemsCommand = new Command(async () => await LoadVariantItemsAsync());
         LoadMoreVariantItemsCommand = new Command(async () => await LoadMoreVariantItemsAsync());
         VariantTappedCommand = new Command<VariantModel>(async (parameter) => await VariantTappedAsync(parameter));
         ConfirmVariantCommand = new Command(async () => await ConfirmVariantAsync());
-        ConfirmCommand = new Command(async () => await ConfirmAsync());
-        PerformSearchCommand = new Command<SearchBar>(async (parameter) => await PerformSearchAsync(parameter));
-        BackCommand = new Command(async () => await BackAsync());
     }
 
     #region Commands
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
-    public Command LoadVariantItemsCommand { get; }
+	public Command ConfirmCommand { get; }
+	public Command<SearchBar> PerformSearchCommand { get; }
+	public Command BackCommand { get; }
+
+
+	public Command LoadVariantItemsCommand { get; }
     public Command LoadMoreVariantItemsCommand { get; }
     public Command VariantTappedCommand { get; }
     public Command ConfirmVariantCommand { get; }
-    public Command ConfirmCommand { get; }
-    public Command<SearchBar> PerformSearchCommand { get; }
-    public Command BackCommand { get; }
     #endregion
 
     private async Task LoadItemsAsync()
@@ -105,9 +108,10 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            _userDialogs.Loading("Loading Items...");
             Items.Clear();
+            _userDialogs.Loading("Loading Items...");
             await Task.Delay(1000);
+
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number);
 
@@ -170,6 +174,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
+            _userDialogs.Loading("Loading Items");
             var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: Items.Count, take: 20);
 
             if (result.IsSuccess)
@@ -207,7 +212,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.Loading().Hide();
+            _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
@@ -236,8 +241,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
                 #region Varyantlı olma durumu
                 if (item.IsVariant)
                 {
-                    OutputProductProcessProductListView currentPage = CurrentPage as OutputProductProcessProductListView;
-                    currentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.HalfExpanded;
+                    //CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.HalfExpanded;
                 }
                 #endregion
                 else
@@ -307,6 +311,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
             IsBusy = true;
 
             _userDialogs.Loading("Loading Variant Items");
+            await Task.Delay(1000);
             ItemVariants.Clear();
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _variantService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, productReferenceId: SelectedProduct.ProductReferenceId, warehouseNumber: WarehouseModel.Number, skip: 0, take: 20);
@@ -318,14 +323,9 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
 
                 foreach (var variant in result.Data)
                 {
-                    var item = Mapping.Mapper.Map<Variant>(variant);
-                    ItemVariants.Add(new VariantModel
-                    {
-                        Code = item.Code,
-                        Name = item.Name,
-
-                        IsSelected = false,
-                    });
+                    var item = Mapping.Mapper.Map<VariantModel>(variant);
+                    item.IsSelected = false;
+                    ItemVariants.Add(item);
                 }
             }
 
@@ -363,15 +363,10 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
 
                 foreach (var variant in result.Data)
                 {
-                    var item = Mapping.Mapper.Map<Variant>(variant);
-                    ItemVariants.Add(new VariantModel
-                    {
-                        Code = item.Code,
-                        Name = item.Name,
-
-                        IsSelected = false,
-                    });
-                }
+					var item = Mapping.Mapper.Map<VariantModel>(variant);
+					item.IsSelected = false;
+					ItemVariants.Add(item);
+				}
             }
         }
         catch (Exception ex)

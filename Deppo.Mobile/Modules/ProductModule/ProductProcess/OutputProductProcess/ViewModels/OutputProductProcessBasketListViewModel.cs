@@ -84,6 +84,11 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		BackCommand = new Command(async () => await BackAsync());
 	}
 
+	#region Properties
+	public ContentPage CurrentPage { get; set; } = null!;
+
+	#endregion
+
 	#region Commands
 	public Command ShowProductViewCommand { get; }
 	public Command IncreaseCommand { get; }
@@ -108,12 +113,6 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	public Command NextViewCommand { get; }
 	public Command BackCommand { get; }
 	#endregion
-
-	#region Properties
-	public ContentPage CurrentPage { get; set; } = null!;
-
-	#endregion
-
 
 	private async Task ShowProductViewAsync()
 	{

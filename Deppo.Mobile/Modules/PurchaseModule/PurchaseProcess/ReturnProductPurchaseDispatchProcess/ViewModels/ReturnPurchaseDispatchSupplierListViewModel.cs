@@ -24,7 +24,9 @@ public partial class ReturnPurchaseDispatchSupplierListViewModel : BaseViewModel
     [ObservableProperty]
     private PurchaseSupplier purchaseSupplier = null!;
 
-    public ReturnPurchaseDispatchSupplierListViewModel(IHttpClientService httpClientService,
+	public ObservableCollection<PurchaseSupplier> Items { get; } = new();
+
+	public ReturnPurchaseDispatchSupplierListViewModel(IHttpClientService httpClientService,
 
     IUserDialogs userDialogs,
     IPurchaseSupplierService purchaseSupplierService)
@@ -42,8 +44,7 @@ public partial class ReturnPurchaseDispatchSupplierListViewModel : BaseViewModel
         NextViewCommand = new Command(async () => await NextViewAsync());
     }
 
-    public ObservableCollection<PurchaseSupplier> Items { get; } = new();
-
+    public Page CurrentPage { get; set; } = null!;
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
@@ -132,7 +133,31 @@ public partial class ReturnPurchaseDispatchSupplierListViewModel : BaseViewModel
         }
     }
 
-    private async Task ItemTappedAsync(PurchaseSupplier purchaseSupplier)
+	private async Task LoadPageAsync()
+	{
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            if (Items.Count > 0)
+                Items.Clear();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+	private async Task ItemTappedAsync(PurchaseSupplier item)
     {
         if (IsBusy)
             return;
@@ -141,16 +166,21 @@ public partial class ReturnPurchaseDispatchSupplierListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            Items.ToList().ForEach(x => x.IsSelected = false);
+			if (item == PurchaseSupplier)
+			{
+				PurchaseSupplier.IsSelected = false;
+				PurchaseSupplier = null;
+			}
+			else
+			{
+				if (PurchaseSupplier != null)
+				{
+					PurchaseSupplier.IsSelected = false;
+				}
 
-            var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == purchaseSupplier.ReferenceId);
-            if (selectedItem is not null)
-            {
-                selectedItem.IsSelected = true;
-                PurchaseSupplier = selectedItem;
-            }
-
-
+				PurchaseSupplier = item;
+				PurchaseSupplier.IsSelected = true;
+			}
         }
         catch (System.Exception ex)
         {

@@ -82,11 +82,13 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
         _httpClientService = httpClientService;
         _purchaseReturnDispatchTransactionService = purchaseReturnDispatchTransactionService;
         _userDialogs = userDialogs;
-        Items = new();
         _purchaseSupplierService = purchaseSupplierService;
         _shipAddressService = shipAddressService;
+		_carrierService = carrierService;
+		_driverService = driverService;
+        Items = new();
 
-        Title = "Satınalma İade İrsaliyesi";
+		Title = "Satınalma İade İrsaliyesi";
 
         SaveCommand = new Command(async () => await SaveAsync());
         LoadPageCommand = new Command(async () => await LoadPageAsync());
@@ -94,8 +96,7 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
         LoadCarriersCommand = new Command(async () => await LoadCarriersAsync());
         LoadDriversCommand = new Command(async () => await LoadDriversAsync());
         LoadShipAddressesCommand = new Command<PurchaseSupplier>(async (purchaseSupplier) => await LoadShipAddressesAsync(purchaseSupplier));
-        _carrierService = carrierService;
-        _driverService = driverService;
+        
     }
     public Page CurrentPage { get; set; }
 
