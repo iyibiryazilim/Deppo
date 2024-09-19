@@ -69,6 +69,8 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
 
     [ObservableProperty]
     private SalesReturnEnumType salesReturnEnumType = SalesReturnEnumType.Retail;
+    [ObservableProperty]
+    private string ficheNo  = string.Empty;
 
     [ObservableProperty]
     private ObservableCollection<ReturnSalesBasketModel> items = null!;
@@ -188,11 +190,12 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
             {
                 RetailSalesReturnDispatchTransactionInsert dto = new()
                 {
+                    
                     SpeCode = SpecialCode,
                     CurrentCode = SelectedCustomer.Code,
                     DispatchType = (short)SelectedCustomer.FicheType,
                     IsEDispatch = (short)SelectedCustomer.FicheType,
-                    Code = string.Empty,
+                    Code = FicheNo,
                     DocTrackingNumber = DocumentTrackingNumber,
                     DoCode = DocumentNumber,
                     TransactionDate = FicheDate,
@@ -239,7 +242,7 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                     CurrentCode = SelectedCustomer.Code,
                     DispatchType = (short)SelectedCustomer.FicheType,
                     IsEDispatch = (short)SelectedCustomer.FicheType,
-                    Code = string.Empty,
+                    Code = FicheNo,
                     DocTrackingNumber = DocumentTrackingNumber,
                     DoCode = DocumentNumber,
                     TransactionDate = FicheDate,
