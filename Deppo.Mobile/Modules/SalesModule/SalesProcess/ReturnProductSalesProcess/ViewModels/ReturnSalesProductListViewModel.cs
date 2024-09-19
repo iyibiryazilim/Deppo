@@ -27,17 +27,17 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
     private readonly IWarehouseTotalService _warehouseTotalService;
     private readonly IUserDialogs _userDialogs;
     private readonly IServiceProvider _serviceProvider;
-
+   private readonly IProductService _productService;
     [ObservableProperty]
     private WarehouseModel warehouseModel= null!;
 
     [ObservableProperty]
-    private WarehouseTotalModel? selectedProduct;
+    private ProductModel? selectedProduct;
     [ObservableProperty]
     private ObservableCollection<ReturnSalesBasketModel> selectedProducts = new();
 
 
-    public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
+    public ObservableCollection<ProductModel> Items { get; } = new();
 
     public ReturnSalesProductListViewModel(
         IHttpClientService httpClientService,
@@ -49,6 +49,7 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
         _serviceProvider = serviceProvider;
+        _productService = productService;
         _warehouseTotalService = warehouseTotalService;
         Title = "Ürün Listesi";
 
@@ -56,7 +57,7 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
         BackCommand = new Command(async () => await BackAsync());
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-        ItemTappedCommand = new Command<WarehouseTotalModel>(async (item) => await ItemTappedAsync(item));
+        ItemTappedCommand = new Command<ProductModel>(async (item) => await ItemTappedAsync(item));
         ConfirmCommand = new Command(async () => await ConfirmAsync());
 
 
@@ -84,15 +85,15 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _warehouseTotalService.GetObjects(httpClient, _httpClientService.FirmNumber , _httpClientService.PeriodNumber ,WarehouseModel.Number ,"",0,20 );
-            if(result.IsSuccess)
+            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 20);
+            if (result.IsSuccess)
             {
                 if(result.Data is not null)
                 {
                     foreach (var item in result.Data)
                     {
 
-                        Items.Add(Mapping.Mapper.Map<WarehouseTotalModel>(item));
+                        Items.Add(Mapping.Mapper.Map<ProductModel>(item));
                     }
                 }
             }
@@ -122,7 +123,7 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _warehouseTotalService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, "", Items.Count, 20);
+            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -130,7 +131,7 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
                     foreach (var item in result.Data)
                     {
 
-                        Items.Add(Mapping.Mapper.Map<WarehouseTotalModel>(item));
+                        Items.Add(Mapping.Mapper.Map<ProductModel>(item));
                     }
                 }
             }
@@ -149,7 +150,7 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-    private async Task ItemTappedAsync(WarehouseTotalModel item)
+    private async Task ItemTappedAsync(ProductModel item)
     {
         if (IsBusy)
             return;
@@ -173,9 +174,9 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
 
                         var basketItem = new ReturnSalesBasketModel
                         {
-                            ItemReferenceId = item.ProductReferenceId,
-                            ItemCode = item.ProductCode,
-                            ItemName = item.ProductName,
+                            ItemReferenceId = item.ReferenceId,
+                            ItemCode = item.Code,
+                            ItemName = item.Name,
                             UnitsetReferenceId = item.UnitsetReferenceId,
                             UnitsetCode = item.UnitsetCode,
                             UnitsetName = item.UnitsetName,
@@ -199,11 +200,11 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
                     else
                     {
                         SelectedProduct = null;
-                        var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ProductReferenceId);
+                        var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ReferenceId);
                         if (selectedItem != null)
                         {
                             SelectedProducts.Remove(selectedItem);
-                            Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
+                            Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = false;
                         }
                     }
                 }
