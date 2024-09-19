@@ -57,7 +57,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderP
         Driver? selectedDriver;
 
         [ObservableProperty]
-        DateTime ficheDate = DateTime.Now;
+        DateTime transactionDate = DateTime.Now;
 
         [ObservableProperty]
         string documentNumber = string.Empty;
@@ -252,7 +252,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderP
                 Description = Description,
                 DoCode = DocumentNumber,
                 DocTrackingNumber = DocumentTrackingNumber,
-                //TransactionDate = TransactionDate,
+                TransactionDate = TransactionDate,
                 FirmNumber = _httpClientService.FirmNumber,
                 SpeCode = SpecialCode,
                 WarehouseNumber = WarehouseModel.Number,
