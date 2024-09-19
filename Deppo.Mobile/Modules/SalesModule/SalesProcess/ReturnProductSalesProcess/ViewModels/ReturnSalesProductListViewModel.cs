@@ -212,6 +212,7 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
         catch (Exception ex)
         {
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+
         }
         finally
         {
