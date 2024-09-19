@@ -92,12 +92,11 @@
                                              LabelText="Doküman İzleme Numarası"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
                                              Text="{Binding DocumentTrackingNumber}" />
-                                
+
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
                                              LabelText="Fiş Numarası"
-                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             />
+                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}" />
 
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
@@ -116,7 +115,7 @@
                 </dx:FormItem>
             </dx:FormGroupItem>
 
-            <!--<dx:FormGroupItem Header="Sevk Bilgileri"
+            <dx:FormGroupItem Header="Sevk Bilgileri"
                               HeaderFontAttributes="Bold"
                               HeaderFontSize="18">
                 <dx:FormItem>
@@ -130,7 +129,7 @@
                                                        PickerTitle="Sevk Adresi Seçiniz"
                                                        SelectedItem="{Binding SelectedShipAddress}"
                                                        TapCommand="{Binding LoadShipAddressesCommand}"
-                                                       TapCommandParameter="{Binding SelectedCustomer}"
+                                                       TapCommandParameter="{Binding SalesCustomer}"
                                                        Text="{Binding SelectedShipAddress.Name}">
                                     <dx:FormListPickerItem.ImageSource>
                                         <FontImageSource FontFamily="FAS"
@@ -155,7 +154,7 @@
                         </DataTemplate>
                     </dx:FormItem.ContentTemplate>
                 </dx:FormItem>
-            </dx:FormGroupItem>-->
+            </dx:FormGroupItem>
         </VerticalStackLayout>
 
         <Button Grid.Row="1"
