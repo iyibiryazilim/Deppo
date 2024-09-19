@@ -113,6 +113,8 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
                 IsBusy = true;
 
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+                _userDialogs.Loading("Loading Items...");
                 var result = await _salesCustomerService.SalesCustomerQueryFiche(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: Items.Count, take: 20, search: "");
                 if (result.IsSuccess)
                 {

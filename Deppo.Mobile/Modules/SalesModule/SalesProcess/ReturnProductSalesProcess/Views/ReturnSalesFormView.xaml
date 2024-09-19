@@ -83,6 +83,10 @@
                                              LabelText="Doküman İzleme Numarası"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
                                              Text="{Binding DocumentTrackingNumber}" />
+                                <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                             FocusedBorderColor="{StaticResource Primary}"
+                                             LabelText="Fiş Numarası"
+                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}" />
 
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"

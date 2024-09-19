@@ -104,7 +104,7 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
 
             _userDialogs.ShowLoading("Loading...");
             await Task.Delay(500);
-            // SelectedItems.Clear();
+            SelectedItems.Clear();
             if (ReturnSalesBasketModel?.Details.Count > 0)
             {
                 foreach (var item in ReturnSalesBasketModel.Details)
@@ -356,7 +356,8 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
         {
             IsBusy = true;
 
-            if (locationModel.InputQuantity > 0)
+            // InputQuantity'nin stockQuantity'yi aşmaması için kontrol
+            if (locationModel.InputQuantity >= 0 && locationModel.InputQuantity < ReturnSalesBasketModel.StockQuantity)
             {
                 SelectedItem = locationModel;
 
@@ -372,6 +373,11 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
                 {
                     locationModel.InputQuantity++;
                 }
+            }
+            else
+            {
+                // Eğer stok sınırına ulaşılmışsa bir uyarı verebilirsin.
+                _userDialogs.Alert("Stok miktarını geçemez.");
             }
         }
         catch (Exception ex)
@@ -508,7 +514,7 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
                     }
 
                     var totalInputQuantity = SelectedItems.Where(x => x.InputQuantity > 0).Sum(x => x.InputQuantity);
-                    previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId).Quantity = totalInputQuantity;
+                    previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId).InputQuantity = totalInputQuantity;
                 }
             }
 
