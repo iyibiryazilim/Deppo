@@ -20,16 +20,16 @@
 
 
     <Grid
-        Padding="10"
+        Padding="5"
         RowDefinitions=".40*,.60*"
-        RowSpacing="10">
+        RowSpacing="5">
 
         <Grid
             Grid.Row="0"
             ColumnDefinitions="*,*"
-            ColumnSpacing="10"
+            ColumnSpacing="5"
             RowDefinitions="Auto,Auto"
-            RowSpacing="10">
+            RowSpacing="5">
 
             <Border
                 Grid.Row="0"

@@ -324,7 +324,7 @@
                                     <Label FontFamily="FAS"
                                            FontSize="24"
                                            HorizontalOptions="Center"
-                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                           Text="{x:Static fontAwesome:FontAwesomeIcons.ArrowRightArrowLeft}"
                                            TextColor="{StaticResource White}"
                                            VerticalOptions="Center" />
 
@@ -368,7 +368,7 @@
                                     <Label FontFamily="FAS"
                                            FontSize="24"
                                            HorizontalOptions="Center"
-                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                           Text="{x:Static fontAwesome:FontAwesomeIcons.ArrowRightArrowLeft}"
                                            TextColor="{StaticResource White}"
                                            VerticalOptions="Center" />
 

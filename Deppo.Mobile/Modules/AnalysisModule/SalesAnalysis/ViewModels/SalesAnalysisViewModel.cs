@@ -80,7 +80,7 @@ public partial class SalesAnalysisViewModel : BaseViewModel
                 }
 
                 SalesAnalysisModel.SalesProductReferenceAnalysis.Clear();
-                foreach (var item in cacheItems)
+                foreach (var item in cacheItems.OrderBy(x=> x.ArgumentMonth))
                     SalesAnalysisModel.SalesProductReferenceAnalysis.Add(item);
             }
         }

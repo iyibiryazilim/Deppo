@@ -315,35 +315,114 @@ namespace Deppo.Core.DataStores
             }
         }
 
+        public async Task<DataResult<IEnumerable<dynamic>>> PurchaseProductReferenceAnalysis(HttpClient httpClient, int firmNumber, int periodNumber, DateTime dateTime)
+        {
+            var content = new StringContent(JsonConvert.SerializeObject(PurchaseProductReferenceAnalysisQuery(firmNumber, periodNumber, dateTime)), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+            DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+            if (responseMessage.IsSuccessStatusCode)
+            {
+                var data = await responseMessage.Content.ReadAsStringAsync();
+                if (data != null)
+                {
+                    if (!string.IsNullOrEmpty(data))
+                    {
+                        var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+
+                        dataResult.Data = result?.Data;
+                        dataResult.IsSuccess = true;
+                        dataResult.Message = "success";
+                        return dataResult;
+                    }
+                    else
+                    {
+                        var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                        dataResult.Data = result?.Data;
+                        dataResult.IsSuccess = true;
+                        dataResult.Message = "empty";
+                        return dataResult;
+                    }
+                }
+                else
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                    dataResult.Data = Enumerable.Empty<dynamic>();
+                    dataResult.IsSuccess = false;
+                    dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+                    return dataResult;
+                }
+            }
+            else
+            {
+                dataResult.Data = Enumerable.Empty<dynamic>();
+                dataResult.IsSuccess = false;
+                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+                return dataResult;
+            }
+        }
+
+        private string PurchaseProductReferenceAnalysisQuery(int firmNumber, int periodNumber, DateTime dateTime)
+        {
+            string baseQuery = $@"";
+            DateTime xDate = dateTime;
+            for (int i = 1; i < 7; i++)
+            {
+                if (i != 1)
+                    xDate = xDate.AddMonths(-1);
+
+if(i != 6)
+                baseQuery += $@"
+SELECT 
+[Argument] = '{xDate.ToString("MMMM")}',
+[ArgumentMonth] = {xDate.Month.ToString().PadLeft(2, '0')},
+[PurchaseReferenceCount] = ISNULL((SELECT COUNT(DISTINCT STLINE.STOCKREF) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK) WHERE TRCODE IN(1,5) AND LINETYPE = 0 AND YEAR(STLINE.DATE_) = {xDate.Year} AND MONTH(STLINE.DATE_) = {xDate.Month}),0),
+[ReturnReferenceCount] = ISNULL((SELECT COUNT(DISTINCT STLINE.STOCKREF) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK) WHERE TRCODE = 6 AND LINETYPE = 0 AND YEAR(STLINE.DATE_) = {xDate.Year} AND MONTH(STLINE.DATE_) = {xDate.Month}),0)
+UNION All ";
+else{
+                    baseQuery += $@"
+SELECT 
+[Argument] = '{xDate.ToString("MMMM")}',
+[ArgumentMonth] = {xDate.Month.ToString().PadLeft(2, '0')},
+[PurchaseReferenceCount] = ISNULL((SELECT COUNT(DISTINCT STLINE.STOCKREF) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK) WHERE TRCODE IN(1,5) AND LINETYPE = 0 AND YEAR(STLINE.DATE_) = {xDate.Year} AND MONTH(STLINE.DATE_) = {xDate.Month}),0),
+[ReturnReferenceCount] = ISNULL((SELECT COUNT(DISTINCT STLINE.STOCKREF) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK) WHERE TRCODE = 6 AND LINETYPE = 0 AND YEAR(STLINE.DATE_) = {xDate.Year} AND MONTH(STLINE.DATE_) = {xDate.Month}),0)";
+}
+            }
+
+            return baseQuery;
+        }
         private string DueDatePassedSuppliersCount(int firmNumber, int periodNumber)
         {
-            string baseQuery = $@"select COUNT(DISTINCT CLIENTREF) 
+            string baseQuery = $@"select ISNULL(COUNT(DISTINCT CLIENTREF),0) 
             AS DueDatePassedSuppliersCount from LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE as ORFLINE
-            WHERE ORFLINE.DUEDATE < CAST(GETDATE() AS DATE) and  ORFLINE.TRCODE = 2;";
+            WHERE ORFLINE.DUEDATE < CAST(GETDATE() AS DATE) and  ORFLINE.TRCODE = 2 AND ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.LINETYPE = 0;";
 
             return baseQuery;
         }
         private string DueDatePassedProductsCount(int firmNumber, int periodNumber)
         {
-            string baseQuery = $@"select  COUNT(DISTINCT STOCKREF) 
+            string baseQuery = $@"select  ISNULL(COUNT(DISTINCT STOCKREF),0) 
             AS DueDatePassedProductsCount from LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE as ORFLINE
-            WHERE ORFLINE.DUEDATE < CAST(GETDATE() AS DATE) and  ORFLINE.TRCODE = 2;";
+            WHERE ORFLINE.DUEDATE < CAST(GETDATE() AS DATE) and  ORFLINE.TRCODE = 2 AND ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.LINETYPE = 0;";
 
             return baseQuery;
         }
         private string ReturnProductReferenceCount(int firmNumber, int periodNumber)
         {
-            string baseQuery = $@"SELECT COUNT(DISTINCT STOCKREF) AS ReturnProductReferenceCount
+            string baseQuery = $@"SELECT ISNULL(COUNT(DISTINCT STOCKREF),0) AS ReturnProductReferenceCount
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE
-WHERE TRCODE in (6);";
+WHERE TRCODE = 6 AND LINETYPE = 0;";
 
             return baseQuery;
         }
         private string PurchaseProductReferenceCount(int firmNumber, int periodNumber)
         {
-            string baseQuery = $@"SELECT COUNT(DISTINCT STOCKREF) AS PurchaseProductReferenceCount
+            string baseQuery = $@"SELECT ISNULL(COUNT(DISTINCT STOCKREF),0) AS PurchaseProductReferenceCount
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE
-WHERE TRCODE in (1);
+WHERE TRCODE in (1,5) AND LINETYPE = 0;
 ";
             return baseQuery;
         }

@@ -35,7 +35,7 @@ public partial class WaitingSalesOrderListViewModel : BaseViewModel
 		_customerService = customerService;
 		_userDialogs = userDialogs;
 
-		Title = "Bekleyen Satýþ Sipariþleri";
+		Title = "Bekleyen SatÄ±ÅŸ SipariÅŸleri";
 
 		LoadCustomersCommand = new Command(async () => await LoadCustomersAsync());
 		LoadItemsCommand = new Command<Customer>(async (customer) => await LoadItemsAsync(customer));

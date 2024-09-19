@@ -397,33 +397,33 @@ SELECT
 
         private string DueDatePassedCustomersCount(int firmNumber, int periodNumber)
         {
-            string baseQuery = $@"select COUNT(DISTINCT CLIENTREF) 
+            string baseQuery = $@"select ISNULL(COUNT(DISTINCT CLIENTREF),0) 
             AS DueDatePassedCustomersCount from LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE as ORFLINE
-            WHERE ORFLINE.DUEDATE < CAST(GETDATE() AS DATE) and  ORFLINE.TRCODE = 1;";
+            WHERE ORFLINE.DUEDATE <= CAST(GETDATE() AS DATE) and  ORFLINE.TRCODE = 1 AND ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.LINETYPE = 0;";
 
             return baseQuery;
         }
         private string DueDatePassedProductsCount(int firmNumber, int periodNumber)
         {
-            string baseQuery = $@"select  COUNT(DISTINCT STOCKREF) 
+            string baseQuery = $@"select  ISNULL(COUNT(DISTINCT STOCKREF),0) 
             AS DueDatePassedProductsCount from LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE as ORFLINE
-            WHERE ORFLINE.DUEDATE < CAST(GETDATE() AS DATE) and  ORFLINE.TRCODE = 1;";
+            WHERE ORFLINE.DUEDATE <= CAST(GETDATE() AS DATE) and  ORFLINE.TRCODE = 1 AND ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.LINETYPE = 0;";
 
             return baseQuery;
         }
         private string ReturnProductReferenceCount(int firmNumber, int periodNumber)
         {
-            string baseQuery = $@"SELECT COUNT(DISTINCT STOCKREF) AS ReturnProductReferenceCount
+            string baseQuery = $@"SELECT ISNULL(COUNT(DISTINCT STOCKREF),0) AS ReturnProductReferenceCount
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE
-WHERE TRCODE in (2,3);";
+WHERE TRCODE in (2,3) AND LINETYPE = 0;";
 
             return baseQuery;
         }
         private string SoldProductReferenceCount(int firmNumber, int periodNumber)
         {
-            string baseQuery = $@"SELECT COUNT(DISTINCT STOCKREF) AS SoldProductReferenceCount
+            string baseQuery = $@"SELECT ISNULL(COUNT(DISTINCT STOCKREF),0) AS SoldProductReferenceCount
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE
-WHERE TRCODE in (7 , 8);
+WHERE TRCODE in (7 , 8) AND LINETYPE = 0;
 ";
             return baseQuery;
         }

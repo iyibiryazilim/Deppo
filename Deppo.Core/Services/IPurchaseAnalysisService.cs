@@ -13,6 +13,7 @@ namespace Deppo.Core.Services
         Task<DataResult<dynamic>> DueDatePassedProductsCount(HttpClient httpClient, int firmNumber, int periodNumber);
         Task<DataResult<dynamic>> PurchaseProductReferenceCount(HttpClient httpClient, int firmNumber, int periodNumber);
         Task<DataResult<dynamic>> ReturnProductReferenceCount(HttpClient httpClient, int firmNumber, int periodNumber);
+        Task<DataResult<IEnumerable<dynamic>>> PurchaseProductReferenceAnalysis(HttpClient httpClient, int firmNumber, int periodNumber, DateTime dateTime);
         Task<DataResult<IEnumerable<dynamic>>> LastSuppliers(HttpClient httpClient, int firmNumber, int periodNumber);
         Task<DataResult<IEnumerable<dynamic>>> LastProducts(HttpClient httpClient, int firmNumber, int periodNumber);
     }

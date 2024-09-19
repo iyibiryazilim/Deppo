@@ -30,7 +30,7 @@ public partial class CustomerListViewModel : BaseViewModel
         _customerService = customerService;
         _userDialogs = userDialogs;
 
-        Title = "Müþteriler";
+        Title = "MÃ¼ÅŸteriler";
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());

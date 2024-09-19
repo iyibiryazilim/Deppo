@@ -8,6 +8,9 @@
     xmlns:fastProductionView="clr-namespace:Deppo.Mobile.Modules.FastProductionModule.Views"
     xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
     xmlns:local="clr-namespace:Deppo.Mobile"
+    xmlns:oursourcePanelView="clr-namespace:Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.Views"
+    xmlns:outsourceProcessView="clr-namespace:Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.Views"
+    xmlns:outsourceView="clr-namespace:Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.Views"
     xmlns:overviewAnalysisView="clr-namespace:Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.Views"
     xmlns:productAnalysisView="clr-namespace:Deppo.Mobile.Modules.AnalysisModule.ProductAnalysis.Views"
     xmlns:productPanelView="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductPanel.Views"
@@ -20,6 +23,7 @@
     xmlns:salesPanelView="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesPanel.Views"
     xmlns:salesProcessView="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.Views"
     xmlns:supplierView="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views"
+    xmlns:waitingOutsourceProductView="clr-namespace:Deppo.Mobile.Modules.OutsourceModule.WaitingOutsourceMenu.Views"
     xmlns:waitingPurchaseOrderView="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.WaitingOrderMenu.Views"
     xmlns:waitingSalesOrderView="clr-namespace:Deppo.Mobile.Modules.SalesModule.WaitingOrderMenu.Views"
     xmlns:warehouseView="clr-namespace:Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views"
@@ -79,12 +83,12 @@
     </Shell.FlyoutFooterTemplate>
 
 
-    <FlyoutItem Title="Panel">
+    <FlyoutItem Title="Genel Bakış">
         <Tab Title="Genel">
             <Tab.Icon>
                 <FontImageSource
                     FontFamily="FAS"
-                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.Grip}"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.ChartSimple}"
                     Size="20"
                     Color="{AppThemeBinding Light={StaticResource Primary},
                                             Dark={StaticResource White}}" />
@@ -96,7 +100,7 @@
             <Tab.Icon>
                 <FontImageSource
                     FontFamily="FAS"
-                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.TableList}"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.ChartPie}"
                     Size="20"
                     Color="{AppThemeBinding Light={StaticResource Primary},
                                             Dark={StaticResource White}}" />
@@ -109,7 +113,7 @@
             <Tab.Icon>
                 <FontImageSource
                     FontFamily="FAS"
-                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.ListCheck}"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.CartShopping}"
                     Size="20"
                     Color="{AppThemeBinding Light={StaticResource Primary},
                                             Dark={StaticResource White}}" />
@@ -121,7 +125,7 @@
             <Tab.Icon>
                 <FontImageSource
                     FontFamily="FAS"
-                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.CalendarDays}"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.CartPlus}"
                     Size="20"
                     Color="{AppThemeBinding Light={StaticResource Primary},
                                             Dark={StaticResource White}}" />
@@ -131,7 +135,7 @@
         <FlyoutItem.Icon>
             <FontImageSource
                 FontFamily="FAS"
-                Glyph="{x:Static fontAwesome:FontAwesomeIcons.Grip}"
+                Glyph="{x:Static fontAwesome:FontAwesomeIcons.ChartSimple}"
                 Size="20"
                 Color="{AppThemeBinding Light={StaticResource Primary},
                                         Dark={StaticResource White}}" />
@@ -144,7 +148,7 @@
             <Tab.Icon>
                 <FontImageSource
                     FontFamily="FAS"
-                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.Grip}"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.ChartSimple}"
                     Size="20"
                     Color="{AppThemeBinding Light={StaticResource Primary},
                                             Dark={StaticResource White}}" />
@@ -156,7 +160,7 @@
             <Tab.Icon>
                 <FontImageSource
                     FontFamily="FAS"
-                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.TableList}"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.Cubes}"
                     Size="20"
                     Color="{AppThemeBinding Light={StaticResource Primary},
                                             Dark={StaticResource White}}" />
@@ -169,7 +173,7 @@
             <Tab.Icon>
                 <FontImageSource
                     FontFamily="FAS"
-                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.ListCheck}"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.Industry}"
                     Size="20"
                     Color="{AppThemeBinding Light={StaticResource Primary},
                                             Dark={StaticResource White}}" />
@@ -181,7 +185,7 @@
             <Tab.Icon>
                 <FontImageSource
                     FontFamily="FAS"
-                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.CalendarDays}"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.GripVertical}"
                     Size="20"
                     Color="{AppThemeBinding Light={StaticResource Primary},
                                             Dark={StaticResource White}}" />
@@ -191,7 +195,7 @@
         <FlyoutItem.Icon>
             <FontImageSource
                 FontFamily="FAS"
-                Glyph="{x:Static fontAwesome:FontAwesomeIcons.Grip}"
+                Glyph="{x:Static fontAwesome:FontAwesomeIcons.Cubes}"
                 Size="20"
                 Color="{AppThemeBinding Light={StaticResource Primary},
                                         Dark={StaticResource White}}" />
@@ -204,7 +208,7 @@
             <Tab.Icon>
                 <FontImageSource
                     FontFamily="FAS"
-                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.Grip}"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.ChartSimple}"
                     Size="20"
                     Color="{AppThemeBinding Light={StaticResource Primary},
                                             Dark={StaticResource White}}" />
@@ -216,7 +220,7 @@
             <Tab.Icon>
                 <FontImageSource
                     FontFamily="FAS"
-                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.TableList}"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.User}"
                     Size="20"
                     Color="{AppThemeBinding Light={StaticResource Primary},
                                             Dark={StaticResource White}}" />
@@ -241,7 +245,7 @@
             <Tab.Icon>
                 <FontImageSource
                     FontFamily="FAS"
-                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.CalendarDays}"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.GripVertical}"
                     Size="20"
                     Color="{AppThemeBinding Light={StaticResource Primary},
                                             Dark={StaticResource White}}" />
@@ -251,7 +255,7 @@
         <FlyoutItem.Icon>
             <FontImageSource
                 FontFamily="FAS"
-                Glyph="{x:Static fontAwesome:FontAwesomeIcons.Grip}"
+                Glyph="{x:Static fontAwesome:FontAwesomeIcons.CartShopping}"
                 Size="20"
                 Color="{AppThemeBinding Light={StaticResource Primary},
                                         Dark={StaticResource White}}" />
@@ -264,7 +268,7 @@
             <Tab.Icon>
                 <FontImageSource
                     FontFamily="FAS"
-                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.Grip}"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.ChartSimple}"
                     Size="20"
                     Color="{AppThemeBinding Light={StaticResource Primary},
                                             Dark={StaticResource White}}" />
@@ -276,7 +280,7 @@
             <Tab.Icon>
                 <FontImageSource
                     FontFamily="FAS"
-                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.TableList}"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.User}"
                     Size="20"
                     Color="{AppThemeBinding Light={StaticResource Primary},
                                             Dark={StaticResource White}}" />
@@ -301,7 +305,7 @@
             <Tab.Icon>
                 <FontImageSource
                     FontFamily="FAS"
-                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.CalendarDays}"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.GripVertical}"
                     Size="20"
                     Color="{AppThemeBinding Light={StaticResource Primary},
                                             Dark={StaticResource White}}" />
@@ -311,7 +315,67 @@
         <FlyoutItem.Icon>
             <FontImageSource
                 FontFamily="FAS"
-                Glyph="{x:Static fontAwesome:FontAwesomeIcons.Grip}"
+                Glyph="{x:Static fontAwesome:FontAwesomeIcons.CartPlus}"
+                Size="20"
+                Color="{AppThemeBinding Light={StaticResource Primary},
+                                        Dark={StaticResource White}}" />
+        </FlyoutItem.Icon>
+
+    </FlyoutItem>
+
+    <FlyoutItem Title="Fason İşlemleri">
+        <Tab Title="Panel">
+            <Tab.Icon>
+                <FontImageSource
+                    FontFamily="FAS"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.ChartSimple}"
+                    Size="20"
+                    Color="{AppThemeBinding Light={StaticResource Primary},
+                                            Dark={StaticResource White}}" />
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate oursourcePanelView:OutsourcePanelView}" />
+        </Tab>
+
+        <Tab Title="Fason Cariler">
+            <Tab.Icon>
+                <FontImageSource
+                    FontFamily="FAS"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.User}"
+                    Size="20"
+                    Color="{AppThemeBinding Light={StaticResource Primary},
+                                            Dark={StaticResource White}}" />
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate outsourceView:OutsourceListView}" />
+        </Tab>
+
+
+        <Tab Title="Bekleyen Ürünler">
+            <Tab.Icon>
+                <FontImageSource
+                    FontFamily="FAS"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.Cubes}"
+                    Size="20"
+                    Color="{AppThemeBinding Light={StaticResource Primary},
+                                            Dark={StaticResource White}}" />
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate waitingOutsourceProductView:WaitingOutsourceProductListView}" />
+        </Tab>
+
+        <Tab Title="İşlemler">
+            <Tab.Icon>
+                <FontImageSource
+                    FontFamily="FAS"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.GripVertical}"
+                    Size="20"
+                    Color="{AppThemeBinding Light={StaticResource Primary},
+                                            Dark={StaticResource White}}" />
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate outsourceProcessView:OutsourceProcessView}" />
+        </Tab>
+        <FlyoutItem.Icon>
+            <FontImageSource
+                FontFamily="FAS"
+                Glyph="{x:Static fontAwesome:FontAwesomeIcons.ArrowRightArrowLeft}"
                 Size="20"
                 Color="{AppThemeBinding Light={StaticResource Primary},
                                         Dark={StaticResource White}}" />
