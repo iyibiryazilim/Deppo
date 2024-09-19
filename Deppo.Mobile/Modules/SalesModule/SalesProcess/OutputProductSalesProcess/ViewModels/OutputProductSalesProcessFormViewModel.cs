@@ -57,7 +57,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
     Driver? selectedDriver;
 
     [ObservableProperty]
-	DateTime ficheDate = DateTime.Now;
+	DateTime transactionDate = DateTime.Now;
 
 	[ObservableProperty]
 	string documentNumber = string.Empty;
@@ -71,7 +71,15 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 	[ObservableProperty]
 	string description = string.Empty;
 
-    public OutputProductSalesProcessFormViewModel(IHttpClientService httpClientService, IShipAddressService shipAddressService, IUserDialogs userDialogs, ICustomerService customerService, ICarrierService carrierService, IDriverService driverService, IWholeSalesDispatchTransactionService wholeSalesDispatchTransactionService, IRetailSalesDispatchTransactionService retailSalesDispatchTransactionService, IServiceProvider serviceProvider)
+	[ObservableProperty]
+	string insertType = string.Empty;
+
+	public ObservableCollection<SalesDispatchInsertModel> SalesDispatchInsertModels { get; set; } = new();
+
+    [ObservableProperty]
+    SalesDispatchInsertModel selectedSalesDispatchInsertModel;
+
+	public OutputProductSalesProcessFormViewModel(IHttpClientService httpClientService, IShipAddressService shipAddressService, IUserDialogs userDialogs, ICustomerService customerService, ICarrierService carrierService, IDriverService driverService, IWholeSalesDispatchTransactionService wholeSalesDispatchTransactionService, IRetailSalesDispatchTransactionService retailSalesDispatchTransactionService, IServiceProvider serviceProvider)
     {
         _httpClientService = httpClientService;
         _shipAddressService = shipAddressService;
@@ -86,6 +94,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
         Title = "Sevk İşlemi";
 
         LoadPageCommand = new Command(async () => await LoadPageAsync());
+        SaveCommand = new Command(async () => await SaveAsync());
         ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
 
 
@@ -93,8 +102,23 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
         LoadShipAddressesCommand = new Command<CustomerModel>(async (x) => await LoadShipAddressesAsync(x));
         LoadCarriersCommand = new Command(async () => await LoadCarriersAsync());
         LoadDriversCommand = new Command(async () => await LoadDriversAsync());
+        InsertTypeTappedCommand = new Command<SalesDispatchInsertModel>(async (x) => await InsertTypeTappedAsync(x));
+        InsertTypeConfirmCommand = new Command(async () => await InsertTypeConfirmAsync());
 
-    }
+
+		SalesDispatchInsertModels.Add(new SalesDispatchInsertModel
+        {
+            IsSelected = false,
+            TypeName = "Toptan Satış İrsaliyesi"
+        });
+
+		SalesDispatchInsertModels.Add(new SalesDispatchInsertModel
+		{
+			IsSelected = false,
+			TypeName = "Perakende Satış İrsaliyesi"
+		});
+
+	}
 
     public Page CurrentPage { get; set; } = null!;
 
@@ -108,6 +132,97 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 	public Command LoadCarriersCommand { get; }
 
 	public Command LoadDriversCommand { get; }
+
+	public Command<SalesDispatchInsertModel> InsertTypeTappedCommand { get; }
+	public Command InsertTypeConfirmCommand { get; }
+
+    private async Task InsertTypeTappedAsync(SalesDispatchInsertModel item)
+    {
+        try
+        {
+            IsBusy = true;
+
+			if (item == SelectedSalesDispatchInsertModel)
+			{
+				SelectedSalesDispatchInsertModel.IsSelected = false;
+				SelectedSalesDispatchInsertModel = null;
+			}
+			else
+			{
+				if (SelectedSalesDispatchInsertModel != null)
+				{
+					SelectedSalesDispatchInsertModel.IsSelected = false;
+				}
+
+				SelectedSalesDispatchInsertModel = item;
+				SelectedSalesDispatchInsertModel.IsSelected = true;
+
+			}
+		}
+        catch (Exception ex)
+        {
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task InsertTypeConfirmAsync()
+    {
+        try
+        {
+            IsBusy = true;
+
+			//CurrentPage.FindByName<BottomSheet>("insertOptionsBottomSheet").State = BottomSheetState.Hidden;
+
+            if(SelectedSalesDispatchInsertModel is null)
+            {
+				await _userDialogs.AlertAsync("Lütfen işlem tipi seçiniz.", "Uyarı", "Tamam");
+				return;
+			}
+
+            InsertType = SelectedSalesDispatchInsertModel.TypeName;
+
+			if (SelectedSalesDispatchInsertModel is null)
+			{
+				await _userDialogs.AlertAsync("Lütfen işlem tipi seçiniz.", "Uyarı", "Tamam");
+				return;
+			}
+
+			var confirm = await _userDialogs.ConfirmAsync($"{SelectedSalesDispatchInsertModel.TypeName} oluşturulacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+			if (!confirm)
+				return;
+            CurrentPage.FindByName<BottomSheet>("insertOptionsBottomSheet").State = BottomSheetState.Hidden;
+
+			_userDialogs.ShowLoading("İşlem Tamamlanıyor...");
+			await Task.Delay(1000);
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			if (SelectedSalesDispatchInsertModel.TypeName == "Toptan Satış İrsaliyesi")
+			{
+				await WholeSalesDispatchTransactionInsertAsync(httpClient);
+			}
+			else if (SelectedSalesDispatchInsertModel.TypeName == "Perakende Satış İrsaliyesi")
+			{
+				await RetailSalesDispatchTransactionInsertAsync(httpClient);
+			}
+		}
+        catch (Exception ex)
+        {
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
 	private async Task ShowBasketItemAsync()
 	{
@@ -350,18 +465,9 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            var confirm = await _userDialogs.ConfirmAsync("Satınalma İade İrsaliyesi oluşturulacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
-            if (!confirm)
-                return;
+            CurrentPage.FindByName<BottomSheet>("insertOptionsBottomSheet").State = BottomSheetState.HalfExpanded;
 
-
-            _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
-            await Task.Delay(1000);
-
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
-
-            await WholeSalesDispatchTransactionInsertAsync(httpClient);
-
+            
         }
         catch (Exception ex)
         {
@@ -396,7 +502,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
             Description = Description,
             DoCode = DocumentNumber,
             DocTrackingNumber = DocumentTrackingNumber,
-            //TransactionDate = TransactionDate,
+            TransactionDate = TransactionDate,
             FirmNumber = _httpClientService.FirmNumber,
             SpeCode = SpecialCode,
             WarehouseNumber = WarehouseModel.Number,
@@ -495,7 +601,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
             Description = Description,
             DoCode = DocumentNumber,
             DocTrackingNumber = DocumentTrackingNumber,
-            //TransactionDate = TransactionDate,
+            TransactionDate = TransactionDate,
             FirmNumber = _httpClientService.FirmNumber,
             SpeCode = SpecialCode,
             WarehouseNumber = WarehouseModel.Number,

@@ -3,11 +3,11 @@
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:basketModel="clr-namespace:Deppo.Mobile.Core.Models.SalesModels.BasketModels;assembly=Deppo.Mobile.Core"
+             xmlns:coreModel="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:salesModel="clr-namespace:Deppo.Mobile.Core.Models.SalesModels;assembly=Deppo.Mobile.Core"
              xmlns:shipAddressModel="clr-namespace:Deppo.Mobile.Core.Models.ShipAddressModels;assembly=Deppo.Mobile.Core"
-             xmlns:coreModel ="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.ViewModels"
              Title="{Binding Title}"
@@ -58,7 +58,7 @@
                             <VerticalStackLayout>
                                 <dx:DateEdit Grid.Column="0"
                                              BorderColor="{StaticResource PrimaryLight}"
-                                             Date="{Binding FicheDate}"
+                                             Date="{Binding TransactionDate}"
                                              FocusedBorderColor="{StaticResource Primary}"
                                              LabelText="Fiş Tarihi"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.CalendarDay}" />
@@ -181,8 +181,7 @@
                                     </dx:FormListPickerItem.ImageSource>
                                     <dx:FormListPickerItem.ItemTemplate>
                                         <DataTemplate x:DataType="coreModel:Carrier">
-                                            <Border Padding="15"
-                                                    StrokeShape="RoundRectangle 5">
+                                            <Border Padding="15" StrokeShape="RoundRectangle 5">
                                                 <Label FontAttributes="Bold"
                                                        LineBreakMode="TailTruncation"
                                                        Text="{Binding Name}"
@@ -193,7 +192,7 @@
                                     </dx:FormListPickerItem.ItemTemplate>
                                 </dx:FormListPickerItem>
                                 <!--#endregion-->
-                                
+
                                 <!--#region Driver Picker-->
                                 <dx:FormListPickerItem InlineContent="Şoför"
                                                        ItemsSource="{Binding Drivers}"
@@ -210,8 +209,7 @@
                                     </dx:FormListPickerItem.ImageSource>
                                     <dx:FormListPickerItem.ItemTemplate>
                                         <DataTemplate x:DataType="coreModel:Driver">
-                                            <Border Padding="15"
-                                                    StrokeShape="RoundRectangle 5">
+                                            <Border Padding="15" StrokeShape="RoundRectangle 5">
                                                 <Label FontAttributes="Bold"
                                                        LineBreakMode="TailTruncation"
                                                        Text="{Binding FullName}"
@@ -329,6 +327,46 @@
                 </CollectionView>
             </Grid>
             <!--#endregion-->
+        </dx:BottomSheet>
+        <!--#endregion-->
+
+        <!--#region InsertOptions BottomSheet-->
+        <dx:BottomSheet x:Name="insertOptionsBottomSheet"
+                        AllowDismiss="True"
+                        BackgroundColor="WhiteSmoke"
+                        CornerRadius="15"
+                        HalfExpandedRatio="0.5"
+                        IsModal="True"
+                        ShowGrabber="True">
+
+            <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
+
+                <CollectionView Grid.Row="1" ItemsSource="{Binding SalesDispatchInsertModels}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="salesModel:SalesDispatchInsertModel">
+                            <Border Padding="10,20,10,20"
+                                    BackgroundColor="White"
+                                    StrokeShape="RoundRectangle 10">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesProcessFormViewModel}}, Path=InsertTypeTappedCommand}" CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border"
+                                                 Binding="{Binding IsSelected}"
+                                                 Value="True">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                                <Label HorizontalOptions="Center"
+                                       Text="{Binding TypeName}"
+                                       VerticalOptions="Center" />
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Button Grid.Row="2" Text="Tamam" Command="{Binding InsertTypeConfirmCommand}" />
+            </Grid>
         </dx:BottomSheet>
         <!--#endregion-->
     </Grid>
