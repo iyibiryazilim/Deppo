@@ -2,12 +2,13 @@
 <ContentPage x:Class="Deppo.Mobile.Modules.ResultModule.Views.InsertFailurePageView"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:skia="clr-namespace:SkiaSharp.Extended.UI.Controls;assembly=SkiaSharp.Extended.UI"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ResultModule.ViewModels"
-             x:DataType="viewModel:InsertFailurePageViewModel"
              Title="InsertFailurePageView"
+             x:DataType="viewModel:InsertFailurePageViewModel"
              Shell.NavBarIsVisible="False"
              Shell.PresentationMode="ModalAnimated"
              Shell.TabBarIsVisible="False">
@@ -40,14 +41,49 @@
                            TextColor="Red" />
                 </Border>
 
+                <Border Padding="10"
+                        BackgroundColor="Red"
+                        StrokeThickness="0">
+                    <Label LineBreakMode="TailTruncation"
+                           MaxLines="1"
+                           Text="{Binding ResultModel.ErrorMessage}"
+                           TextColor="{StaticResource White}" />
+                </Border>
+
+                <Button BackgroundColor="Red"
+                        Command="{Binding ErrorTappedCommand}"
+                        Text="Hata Mesajlarını Görüntüle" />
+
+
+
             </VerticalStackLayout>
         </Grid>
 
 
-        <Button Grid.Row="1"
-                Margin="10,10,10,20"
-                BackgroundColor="Red"
-                Command="{Binding BackCommand}"
-                Text="Yeniden Dene" />
+        <Grid Grid.Row="1" Padding="0,0,0,30">
+            <Button Grid.Row="1"
+                    Margin="10,10,10,20"
+                    BackgroundColor="Red"
+                    Command="{Binding BackCommand}"
+                    Text="Yeniden Dene" />
+        </Grid>
+
+
+        <dx:BottomSheet x:Name="errorBottomSheet"
+                        Padding="10,30,10,10"
+                        AllowDismiss="True"
+                        BackgroundColor="{StaticResource WhiteSmoke}"
+                        CornerRadius="10"
+                        HalfExpandedRatio="0.5"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <Grid>
+                <Label LineBreakMode="CharacterWrap"
+                       Text="{Binding ResultModel.ErrorMessage}"
+                       TextColor="{StaticResource OffBlack}" />
+            </Grid>
+        </dx:BottomSheet>
     </Grid>
+
+
 </ContentPage>
