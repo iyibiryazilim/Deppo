@@ -43,7 +43,7 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
     private SalesCustomer salesCustomer;
 
     [ObservableProperty]
-    private ReturnSalesBasketModel? returnSalesBasketModel;
+    private ReturnSalesBasketModel? selectedItem;
 
     [ObservableProperty]
     private ObservableCollection<ReturnSalesBasketModel> items;
@@ -116,7 +116,7 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
 
     #endregion Commands
 
-    private async Task IncreaseAsync(ReturnSalesBasketModel inputPurchaseBasketModel)
+    private async Task IncreaseAsync(ReturnSalesBasketModel item)
     {
         if (IsBusy)
             return;
@@ -125,32 +125,34 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            ReturnSalesBasketModel = inputPurchaseBasketModel;
-            if (inputPurchaseBasketModel.LocTracking == 1)
+            SelectedItem = item;
+            if (item.LocTracking == 1)
             {
                 var nextViewModel = _serviceProvider.GetRequiredService<ReturnSalesDispatchBasketLocationListViewModel>();
 
                 await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchBasketLocationListView)}", new Dictionary<string, object>
                 {
                     {nameof(WarehouseModel), WarehouseModel},
-                    {nameof(ReturnSalesBasketModel), ReturnSalesBasketModel}
+                    {nameof(ReturnSalesBasketModel), item},
+                    {nameof(LocationModel) , Locations }
                 });
                 await nextViewModel.LoadSelectedItemsAsync();
             }
 
             // Sadece SeriLot takipli ise
-            else if (inputPurchaseBasketModel.LocTracking == 0 && (inputPurchaseBasketModel.TrackingType == 1 || inputPurchaseBasketModel.TrackingType == 2))
+            else if (item.LocTracking == 0 && (item.TrackingType == 1 || item.TrackingType == 2))
             {
                 await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchBasketSeriLotListView)}", new Dictionary<string, object>
                 {
                      {nameof(WarehouseModel), WarehouseModel},
-                    {nameof(ReturnSalesBasketModel), inputPurchaseBasketModel}
+                    {nameof(ReturnSalesBasketModel), item}
+                    ,{nameof(SeriLotModel), SeriLots}
                 });
             }
             //stok yeri ve serilot takipli değilse
             else
             {
-                inputPurchaseBasketModel.Quantity++;
+                item.Quantity++;
             }
         }
         catch (Exception ex)
@@ -163,7 +165,7 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
         }
     }
 
-    private async Task DecreaseAsync(ReturnSalesBasketModel returnbasket)
+    private async Task DecreaseAsync(ReturnSalesBasketModel item)
     {
         if (IsBusy)
             return;
@@ -171,32 +173,33 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            if (returnbasket is not null)
+            if (item is not null)
             {
-                if (returnbasket.Quantity >= 1)
+                if (item.Quantity >= 1)
                 {
                     // Stok Yeri takipli ise locationTransactionBottomSheet aç
-                    if (returnbasket.LocTracking == 1)
+                    if (item.LocTracking == 1)
                     {
                         await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchBasketLocationListView)}", new Dictionary<string, object>
                         {
                             {nameof(WarehouseModel), WarehouseModel},
-                            {nameof(ReturnSalesBasketModel), ReturnSalesBasketModel}
+                            {nameof(ReturnSalesBasketModel), item},
+                            {nameof(SalesCustomer),SalesCustomer}
                         });
                     }
                     // Sadece SeriLot takipli ise serilotTransactionBottomSheet aç
-                    else if (returnbasket.LocTracking == 0 && (returnbasket.TrackingType == 1 || returnbasket.TrackingType == 2))
+                    else if (item.LocTracking == 0 && (item.TrackingType == 1 || item.TrackingType == 2))
                     {
                         await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchBasketSeriLotListView)}", new Dictionary<string, object>
                         {
                             {nameof(WarehouseModel), WarehouseModel},
-                            {nameof(ReturnSalesBasketModel), ReturnSalesBasketModel}
+                            {nameof(ReturnSalesBasketModel), item}
                         });
                     }
                     // Stok yeri ve SeriLot takipli değilse
                     else
                     {
-                        returnbasket.Quantity--;
+                        item.Quantity--;
                     }
                 }
             }
@@ -277,7 +280,7 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, ReturnSalesBasketModel.ItemReferenceId, search: string.Empty, skip: Locations.Count, take: 20);
+            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, SelectedItem.ItemReferenceId, search: string.Empty, skip: Locations.Count, take: 20);
 
             if (result.IsSuccess)
             {
@@ -347,7 +350,7 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
                         totalInputQuantity += location.InputQuantity;
                     }
                 }
-                ReturnSalesBasketModel.Quantity = totalInputQuantity;
+                SelectedItem.Quantity = totalInputQuantity;
 
                 CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
             }
@@ -533,7 +536,7 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
                         totalInputQuantity += seriLot.InputQuantity;
                 }
 
-                ReturnSalesBasketModel.Quantity = totalInputQuantity;
+                SelectedItem.Quantity = totalInputQuantity;
 
                 CurrentPage.FindByName<BottomSheet>("serilotBottomSheet").State = BottomSheetState.Hidden;
             }
@@ -596,7 +599,7 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchProductListView/*InputProductPurchaseOrderProcessOtherProductListView*/)}", new Dictionary<string, object>
+            await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchProductListView)}", new Dictionary<string, object>
             {
                 {nameof(WarehouseModel), WarehouseModel},
                 {nameof(SalesCustomer),SalesCustomer}
