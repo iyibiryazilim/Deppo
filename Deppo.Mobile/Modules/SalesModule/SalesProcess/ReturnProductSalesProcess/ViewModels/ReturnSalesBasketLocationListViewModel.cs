@@ -542,4 +542,22 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+    public async Task LoadPageAsync()
+    {
+     
+        try
+        {
+           
+            if(Items?.Count >0)
+                Items.Clear();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        
+    }
 }

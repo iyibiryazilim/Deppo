@@ -95,7 +95,8 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProces
             try
             {
                 IsBusy = true;
-
+                var viewModel = _serviceProvider.GetRequiredService<ReturnSalesProductListViewModel>();
+                await viewModel.LoadPageAsync();
                 await Shell.Current.GoToAsync($"{nameof(ReturnSalesProductListView)}", new Dictionary<string, object>
             {
                 {nameof(WarehouseModel), WarehouseModel}
@@ -153,7 +154,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProces
                     {nameof(WarehouseModel), WarehouseModel},
                     {nameof(ReturnSalesBasketModel), item}
                 });
-                      await nextViewModel.LoadSelectedItemsAsync();
+                    await nextViewModel.LoadSelectedItemsAsync();
                 }
                 else
                     item.Quantity++;
@@ -358,7 +359,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProces
                     await _userDialogs.AlertAsync("Sepetinizde ürün bulunmamaktadır.", "Hata", "Tamam");
                     return;
                 }
-
+                
                 await Shell.Current.GoToAsync($"{nameof(ReturnSalesFormView)}", new Dictionary<string, object>
                 {
                     [nameof(WarehouseModel)] = WarehouseModel,
@@ -403,6 +404,24 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProces
             {
                 IsBusy = false;
             }
+        }
+        public async Task LoadPageAsync()
+        {
+            try
+            {
+   
+                
+                if (Items?.Count > 0)
+                    Items.Clear();
+            }
+            catch (Exception ex)
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            }
+           
         }
     }
 }

@@ -219,9 +219,9 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
     }
     private async Task ConfirmAsync()
     {
+        
         if (IsBusy)
             return;
-
         try
         {
             IsBusy = true;
@@ -242,6 +242,7 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
         }
         finally
         {
+            SelectedProducts.Clear();
             IsBusy = false;
         }
     }
@@ -268,5 +269,24 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-    
+    public async Task LoadPageAsync()
+    {
+   
+        try
+        {
+
+
+            if (Items?.Count > 0)
+                Items.Clear();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+
+    }
+
 }
