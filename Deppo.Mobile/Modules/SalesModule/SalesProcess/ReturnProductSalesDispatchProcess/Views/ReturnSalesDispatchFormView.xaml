@@ -258,7 +258,7 @@
             </Grid>
         </dx:BottomSheet>
 
-        <dx:BottomSheet x:Name="selectConfirmBottomSheet"
+        <!--<dx:BottomSheet x:Name="selectConfirmBottomSheet"
                         AllowDismiss="True"
                         BackgroundColor="White"
                         CornerRadius="15"
@@ -297,6 +297,6 @@
                     </Border>
                 </VerticalStackLayout>
             </Grid>
-        </dx:BottomSheet>
+        </dx:BottomSheet>-->
     </Grid>
 </ContentPage>
