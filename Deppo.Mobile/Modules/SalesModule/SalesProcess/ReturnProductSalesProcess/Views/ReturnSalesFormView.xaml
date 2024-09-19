@@ -11,7 +11,7 @@
              xmlns:viewModels="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.ViewModels"
              Title="{Binding Title}"
              x:DataType="viewModels:ReturnSalesFormViewModel"
-             Shell.NavBarIsVisible="False">
+             Shell.TabBarIsVisible="False">
     <Shell.BackButtonBehavior>
         <BackButtonBehavior Command="{Binding BackCommand}" />
     </Shell.BackButtonBehavior>
@@ -175,6 +175,7 @@
 
         <Button Grid.Row="1"
                 Command="{Binding SaveCommand}"
+                Margin="10,10,10,10"
                 Text="Kaydet"
                 VerticalOptions="End" />
 

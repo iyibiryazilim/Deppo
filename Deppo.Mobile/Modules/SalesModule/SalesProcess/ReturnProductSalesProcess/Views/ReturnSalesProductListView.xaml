@@ -38,16 +38,29 @@
               RowDefinitions="Auto,Auto,*,Auto"
               RowSpacing="10">
 
-            <ImageButton Grid.Row="0"
-                         Command="{Binding BackCommand}"
-                         HeightRequest="25"
-                         HorizontalOptions="End">
-                <ImageButton.Source>
-                    <FontImageSource FontFamily="FAS"
-                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
-                                     Color="{StaticResource WhiteSmoke}" />
-                </ImageButton.Source>
-            </ImageButton>
+            <Grid Grid.Row="0"
+                  ColumnDefinitions="*, Auto"
+                  ColumnSpacing="10">
+                <Label Grid.Column="0"
+                       FontAttributes="Bold"
+                       Margin="5"
+                       FontSize="Medium"
+                       Text="{Binding WarehouseModel.Name, StringFormat='{0} Ambarı Ürünleri'}"
+                       TextColor="{StaticResource WhiteSmoke}"
+                       VerticalOptions="Center" />
+
+                <ImageButton Grid.Column="1"
+                             Command="{Binding BackCommand}"
+                             HeightRequest="25"
+                             HorizontalOptions="End">
+                    <ImageButton.Source>
+                        <FontImageSource FontFamily="FAS"
+                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                                         Size="Medium"
+                                         Color="{StaticResource WhiteSmoke}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </Grid>
             <Border Grid.Row="1"
                     Margin="5,0,5,0"
                     Padding="0"
@@ -80,12 +93,11 @@
                                 StrokeThickness="0.1">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:ReturnSalesProductListViewModel}}, Path=ItemTappedCommand}"
-                                                      CommandParameter="{Binding .}">
-                                </TapGestureRecognizer>
+                                                      CommandParameter="{Binding .}" />
                             </Border.GestureRecognizers>
-                            <Grid ColumnDefinitions="Auto,*"
+                            <Grid ColumnDefinitions="Auto,*, Auto"
                                   ColumnSpacing="10">
-                                <Border BackgroundColor="{StaticResource Primary}"
+                                <Border BackgroundColor="{StaticResource Secondary}"
                                         StrokeShape="RoundRectangle 5"
                                         StrokeThickness="0.5">
                                     <Image Grid.Column="0"
@@ -96,18 +108,14 @@
 
                                 <VerticalStackLayout Grid.Column="1"
                                                      Spacing="2">
-                                    <Label x:Name="itemReferenceId"
-                                           IsVisible="Hidden"
-                                           Text="{Binding ProductReferenceId}" />
                                     <Label FontAttributes="Bold"
                                            LineBreakMode="TailTruncation"
-                                           Text="{Binding ProductCode}"
-                                           TextColor="{StaticResource OffBlack}" />
+                                           Text="{Binding ProductCode}" />
                                     <Label LineBreakMode="TailTruncation"
                                            Text="{Binding ProductName}"
                                            TextColor="{StaticResource Gray600}" />
 
-                                    <Label TextColor="{StaticResource Gray500}"
+                                    <Label TextColor="{StaticResource Gray600}"
                                            VerticalOptions="Center">
                                         <Label.FormattedText>
                                             <FormattedString>
@@ -127,6 +135,28 @@
                                         </Label.FormattedText>
                                     </Label>
                                 </VerticalStackLayout>
+
+                                <Grid Grid.Column="2"
+                                      ColumnDefinitions="Auto, Auto, Auto"
+                                      ColumnSpacing="3"
+                                      HorizontalOptions="Start"
+                                      VerticalOptions="Start">
+                                    <Label Grid.Column="0"
+                                           FontFamily="FAS"
+                                           FontSize="10"
+                                           Text="{Binding VariantIcon}"
+                                           TextColor="{Binding VariantIconColor}" />
+                                    <Label Grid.Column="1"
+                                           FontFamily="FAS"
+                                           FontSize="10"
+                                           Text="{Binding LocTrackingIcon}"
+                                           TextColor="{Binding LocTrackingIconColor}" />
+                                    <Label Grid.Column="2"
+                                           FontFamily="FAS"
+                                           FontSize="10"
+                                           Text="{Binding TrackingTypeIcon}"
+                                           TextColor="{Binding TrackingTypeIconColor}" />
+                                </Grid>
                             </Grid>
 
                             <Border.Triggers>
