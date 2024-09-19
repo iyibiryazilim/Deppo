@@ -13,8 +13,10 @@ using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.SalesModels.BasketModels;
+using Deppo.Mobile.Core.Models.ShipAddressModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ResultModule;
 using Deppo.Mobile.Modules.ResultModule.Views;
@@ -42,6 +44,7 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
     private readonly IUserDialogs _userDialogs;
     private readonly IRetailSalesReturnDispatchTransactionService _retailService;
     private readonly IWholeSalesReturnDispatchTransactionService _wholeService;
+    private readonly IShipAddressService _shipAddressService;
 
     [ObservableProperty]
     private WarehouseModel warehouseModel = null!;
@@ -70,7 +73,15 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
     [ObservableProperty]
     private SalesFicheModel salesFicheModel = null!;
 
-    public ReturnSalesDispatchFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IRetailSalesReturnDispatchTransactionService retailSalesDispatchTransactionService, IWholeSalesReturnDispatchTransactionService wholeSalesReturnDispatchTransactionService)
+    [ObservableProperty]
+    private string ficheNo = string.Empty;
+
+    [ObservableProperty]
+    private ShipAddressModel? selectedShipAddress;
+
+    public ObservableCollection<ShipAddressModel> ShipAddresses { get; } = new();
+
+    public ReturnSalesDispatchFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IRetailSalesReturnDispatchTransactionService retailSalesDispatchTransactionService, IWholeSalesReturnDispatchTransactionService wholeSalesReturnDispatchTransactionService, IShipAddressService shipAddressService)
     {
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
@@ -80,14 +91,15 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
 
         LoadPageCommand = new Command(async () => await LoadPageAsync());
         ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
+        LoadShipAddressesCommand = new Command<SalesCustomer>(async (x) => await LoadShipAddressesAsync(x));
 
-        //SelectWholeCommand = new Command(async (x) => await SelectTransactionTypeAsync(SalesReturnEnumType.Whole));
-        //SelectRetailCommand = new Command(async (x) => await SelectTransactionTypeAsync(SalesReturnEnumType.Retail));
+
 
         SaveCommand = new Command(async () => await SaveAsync());
 
         _retailService = retailSalesDispatchTransactionService;
         _wholeService = wholeSalesReturnDispatchTransactionService;
+        _shipAddressService = shipAddressService;
     }
 
     public Page CurrentPage { get; set; }
@@ -96,6 +108,7 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
     public Command BackCommand { get; }
     public Command SaveCommand { get; }
     public Command ShowBasketItemCommand { get; }
+    public Command<SalesCustomer> LoadShipAddressesCommand { get; }
 
     public Command SelectWholeCommand { get; }
     public Command SelectRetailCommand { get; }
@@ -189,15 +202,17 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
             {
                 RetailSalesReturnDispatchTransactionInsert dto = new()
                 {
+                    ShipInfoCode = SelectedShipAddress?.Code,
                     SpeCode = SpecialCode,
                     CurrentCode = SalesCustomer.Code,
-                    Code = string.Empty,
+                    Code = FicheNo,
                     DocTrackingNumber = DocumentTrackingNumber,
                     DoCode = DocumentNumber,
                     TransactionDate = FicheDate,
                     FirmNumber = _httpClientService.FirmNumber,
                     WarehouseNumber = WarehouseModel.Number,
-                    Description = Description
+                    Description = Description,
+                    
                 };
 
                 foreach (var item in Items)
@@ -285,15 +300,17 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
             {
                 WholeSalesReturnDispatchTransactionInsert dto = new()
                 {
+                    ShipInfoCode = SelectedShipAddress?.Code ?? string.Empty,
                     SpeCode = SpecialCode,
                     CurrentCode = SalesCustomer.Code,
-                    Code = string.Empty,
+                    Code = FicheNo,
                     DocTrackingNumber = DocumentTrackingNumber,
                     DoCode = DocumentNumber,
                     TransactionDate = FicheDate,
                     FirmNumber = _httpClientService.FirmNumber,
                     WarehouseNumber = WarehouseModel.Number,
                     Description = Description
+                    
                 };
 
                 foreach (var item in Items)
@@ -415,5 +432,56 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
         finally { IsBusy = false; }
+    }
+    private async Task LoadShipAddressesAsync(SalesCustomer salesCustomer)
+    {
+        if (salesCustomer is null)
+        {
+            await _userDialogs.AlertAsync("Lütfen müşteri seçiniz.", "Uyarı", "Tamam");
+            return;
+        }
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            ShipAddresses.Clear();
+            SelectedShipAddress = null;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            var result = await _shipAddressService.GetObjects(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                currentReferenceId: salesCustomer.ReferenceId,
+                skip: 0,
+                take: 9999999,
+                search: ""
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                {
+                    ShipAddresses.Add(Mapping.Mapper.Map<ShipAddressModel>(item));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 }
