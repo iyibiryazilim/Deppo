@@ -20,13 +20,15 @@ public partial class ReturnSalesWarehouseListViewModel : BaseViewModel
     private readonly IHttpClientService _httpClientService;
     private readonly IWarehouseService _warehouseService;
     private readonly IUserDialogs _userDialogs;
+    private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty]
     private WarehouseModel selectedWarehouseModel = null!;
 
     public ReturnSalesWarehouseListViewModel(IHttpClientService httpClientService,
         IWarehouseService warehouseService,
-        IUserDialogs userDialogs)
+        IUserDialogs userDialogs,
+        IServiceProvider serviceProvider)
     {
         _httpClientService = httpClientService;
         _warehouseService = warehouseService;
@@ -38,6 +40,7 @@ public partial class ReturnSalesWarehouseListViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<WarehouseModel>(ItemTappedAsync);
         NextViewCommand = new Command(async () => await NextViewAsync());
+        _serviceProvider = serviceProvider;
     }
 
     public Command LoadItemsCommand { get; }
@@ -172,9 +175,11 @@ public partial class ReturnSalesWarehouseListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-
+           
             if (SelectedWarehouseModel is not null)
             {
+                var viewModel = _serviceProvider.GetRequiredService<ReturnSalesBasketViewModel>();
+                await viewModel.LoadPageAsync();
                 await Shell.Current.GoToAsync($"{nameof(ReturnSalesBasketView)}", new Dictionary<string, object>
                 {
                     [nameof(WarehouseModel)] = SelectedWarehouseModel,

@@ -333,11 +333,11 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _salesCustomerService.GetObjectsAsync(
+            var result = await _salesCustomerService.GetObjectsReturnAsync(
                     httpClient: httpClient,
                     firmNumber: _httpClientService.FirmNumber,
                     periodNumber: _httpClientService.PeriodNumber,
-                    warehouseNumber: WarehouseModel.Number,
+              //      warehouseNumber: WarehouseModel.Number,
                     skip: 0,
                     take: 9999999,
                     search: ""
@@ -418,4 +418,6 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+   
+
 }
