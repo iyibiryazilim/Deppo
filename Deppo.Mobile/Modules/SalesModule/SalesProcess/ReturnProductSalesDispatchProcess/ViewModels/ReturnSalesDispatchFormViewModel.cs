@@ -412,6 +412,14 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
                 {
                     [nameof(ResultModel)] = resultModel
                 });
+                FicheNo = string.Empty;
+                DocumentNumber = string.Empty;
+                DocumentTrackingNumber = string.Empty;
+                SpecialCode = string.Empty;
+                Description = string.Empty;
+                SelectedShipAddress = null;
+                Items.Clear();
+
             }
             else
             {
