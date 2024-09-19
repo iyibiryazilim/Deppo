@@ -37,13 +37,13 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
     [ObservableProperty]
     PurchaseFicheModel purchaseFicheModel = null!;
 
-	[ObservableProperty]
-	public ObservableCollection<ReturnPurchaseBasketModel> items;
+    [ObservableProperty]
+    public ObservableCollection<ReturnPurchaseBasketModel> items;
 
     [ObservableProperty]
-	public ObservableCollection<PurchaseTransactionModel> selectedPurchaseTransactions;
+    public ObservableCollection<PurchaseTransactionModel> selectedPurchaseTransactions;
 
-	[ObservableProperty]
+    [ObservableProperty]
     ReturnPurchaseBasketModel? selectedItem;
 
     [ObservableProperty]
@@ -75,11 +75,11 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
         IncreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await IncreaseAsync(item));
         DecreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DecreaseAsync(item));
         DeleteItemCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DeleteItemAsync(item));
-		NextViewCommand = new Command(async () => await NextViewAsync());
-		BackCommand = new Command(async () => await BackAsync());
+        NextViewCommand = new Command(async () => await NextViewAsync());
+        BackCommand = new Command(async () => await BackAsync());
 
 
-		LoadMoreSeriLotTransactionsCommand = new Command(async () => await LoadMoreSeriLotTransactionsAsync());
+        LoadMoreSeriLotTransactionsCommand = new Command(async () => await LoadMoreSeriLotTransactionsAsync());
         SeriLotTransactionIncreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionIncreaseAsync(item));
         SeriLotTransactionDecreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionDecreaseAsync(item));
         ConfirmSeriLotTransactionCommand = new Command(ConfirmSeriLotTransactionAsync);
@@ -92,20 +92,21 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
         LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
     }
 
-	#region Properties
-	public ContentPage CurrentPage { get; set; } = null!;
+    #region Properties
+    public ContentPage CurrentPage { get; set; } = null!;
 
-	#endregion
+    #endregion
 
-	#region Commands
-	public Command IncreaseCommand { get; }
+    #region Commands
+    public Command IncreaseCommand { get; }
     public Command DecreaseCommand { get; }
     public Command DeleteItemCommand { get; }
-	public Command NextViewCommand { get; }
-	public Command BackCommand { get; }
+    public Command NextViewCommand { get; }
+    public Command BackCommand { get; }
 
-	#region Location Transaction Command
-	public Command LoadMoreLocationTransactionsCommand { get; }
+
+    #region Location Transaction Command
+    public Command LoadMoreLocationTransactionsCommand { get; }
     public Command LocationTransactionIncreaseCommand { get; }
     public Command LocationTransactionDecreaseCommand { get; }
     public Command ConfirmLocationTransactionCommand { get; }
@@ -119,10 +120,10 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
     public Command ConfirmSeriLotTransactionCommand { get; }
     public Command SeriLotTransactionCloseCommand { get; }
     #endregion
-   
+
     #endregion
 
-   
+
 
     private async Task IncreaseAsync(ReturnPurchaseBasketModel item)
     {
@@ -313,7 +314,7 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            if(_userDialogs.IsHudShowing)
+            if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
 
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -343,8 +344,13 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
                 }
                 else
                 {
-                    if (item.OutputQuantity < item.Quantity)
-                        item.OutputQuantity++;
+                    var totalQuantity = LocationTransactions.Sum(x => x.OutputQuantity);
+                    if (SelectedItem.StockQuantity > totalQuantity)
+                    {
+                        if (item.OutputQuantity < item.RemainingQuantity && SelectedItem.StockQuantity > item.OutputQuantity)
+                            item.OutputQuantity++;
+                    }
+
                 }
 
                 if (item.OutputQuantity > 0 && !item.IsSelected)
@@ -693,14 +699,22 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
                 return;
             }
 
+            bool isQuantityValid = Items.All(x => x.Quantity > 0);
+            if(!isQuantityValid)
+            {
+                await _userDialogs.AlertAsync("Sepetinizde miktarı 0 olan ürünler bulunmaktadır.", "Uyarı", "Tamam");
+                return;
+            }
+                
+
             await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseDispatchFormView)}", new Dictionary<string, object>
             {
                 [nameof(WarehouseModel)] = WarehouseModel,
                 [nameof(PurchaseSupplier)] = PurchaseSupplier,
-				[nameof(PurchaseFicheModel)] = PurchaseFicheModel,
-				[nameof(Items)] = Items,
-				[nameof(SelectedPurchaseTransactions)] = SelectedPurchaseTransactions
-			});
+                [nameof(PurchaseFicheModel)] = PurchaseFicheModel,
+                [nameof(Items)] = Items,
+                [nameof(SelectedPurchaseTransactions)] = SelectedPurchaseTransactions
+            });
         }
         catch (Exception ex)
         {
@@ -720,21 +734,23 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            if (Items.Count > 0)
-            {
-                var result = await _userDialogs.ConfirmAsync("Sepetinizdeki ürünler silinecektir. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
-                if (!result)
-                    return;
+            var result = await _userDialogs.ConfirmAsync("Sepetinizdeki ürünler silinecektir. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+            if (!result)
+                return;
 
-                SelectedLocationTransactions.Clear();
-                SelectedSeriLotTransactions.Clear();
-                Items.Clear();
-                await Shell.Current.GoToAsync("..");
-            }
-            else
+            foreach (var item in Items)
             {
-                await Shell.Current.GoToAsync("..");
+                item.IsSelected = false;
             }
+            foreach (var item in SelectedPurchaseTransactions)
+            {
+                item.IsSelected = false;
+            }
+            SelectedLocationTransactions.Clear();
+            SelectedSeriLotTransactions.Clear();
+            SelectedPurchaseTransactions.Clear();
+            Items.Clear();
+            await Shell.Current.GoToAsync("..");
         }
         catch (Exception ex)
         {
@@ -743,6 +759,19 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    public async Task ClearBasketItemAsync()
+    {
+        try
+        {
+            if (Items?.Count > 0)
+                Items.Clear();
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
     }
 }

@@ -346,8 +346,12 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
                 }
                 else
                 {
-                    if (item.OutputQuantity < item.Quantity)
-                        item.OutputQuantity++;
+                    var totalQuantity = LocationTransactions.Sum(x => x.OutputQuantity);
+                    if (SelectedItem.StockQuantity > totalQuantity)
+                    {
+                        if (item.OutputQuantity < item.RemainingQuantity && SelectedItem.StockQuantity > item.OutputQuantity)
+                            item.OutputQuantity++;
+                    }
                 }
 
                 if (item.OutputQuantity > 0 && !item.IsSelected)
@@ -692,6 +696,13 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
             if (Items.Count == 0)
             {
                 await _userDialogs.AlertAsync("Sepetinizde ürün bulunmamaktadır.", "Hata", "Tamam");
+                return;
+            }
+
+            bool isQuantityValid = Items.All(x => x.Quantity > 0);
+            if (!isQuantityValid)
+            {
+                await _userDialogs.AlertAsync("Sepetinizde miktarı 0 olan ürünler bulunmaktadır.", "Uyarı", "Tamam");
                 return;
             }
 

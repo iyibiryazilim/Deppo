@@ -32,6 +32,7 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 	private readonly IUserDialogs _userDialogs;
 	private readonly ICarrierService _carrierService;
 	private readonly IDriverService _driverService;
+	private readonly IServiceProvider _serviceProvider;
 
 
 	[ObservableProperty]
@@ -73,23 +74,24 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 	[ObservableProperty]
 	string specialCode = string.Empty;
 
-	public ReturnPurchaseDispatchFormViewModel(IHttpClientService httpClientService, IPurchaseReturnDispatchTransactionService purchaseReturnDispatchTransactionService, IUserDialogs userDialogs, ICarrierService carrierService, IDriverService driverService)
-	{
-		_httpClientService = httpClientService;
-		_purchaseReturnDispatchTransactionService = purchaseReturnDispatchTransactionService;
-		_userDialogs = userDialogs;
-		Items = new();
+    public ReturnPurchaseDispatchFormViewModel(IHttpClientService httpClientService, IPurchaseReturnDispatchTransactionService purchaseReturnDispatchTransactionService, IUserDialogs userDialogs, ICarrierService carrierService, IDriverService driverService, IServiceProvider serviceProvider)
+    {
+        _httpClientService = httpClientService;
+        _purchaseReturnDispatchTransactionService = purchaseReturnDispatchTransactionService;
+        _userDialogs = userDialogs;
+        Items = new();
 
-		Title = "Satınalma İade İrsaliyesi";
+        Title = "Satınalma İade İrsaliyesi";
 
-		SaveCommand = new Command(async () => await SaveAsync());
-		LoadPageCommand = new Command(async () => await LoadPageAsync());
-		LoadCarriersCommand = new Command(async () => await LoadCarriersAsync());
-		LoadDriversCommand = new Command(async () => await LoadDriversAsync());
-		_carrierService = carrierService;
-		_driverService = driverService;
-	}
-	public Page CurrentPage { get; set; }
+        SaveCommand = new Command(async () => await SaveAsync());
+        LoadPageCommand = new Command(async () => await LoadPageAsync());
+        LoadCarriersCommand = new Command(async () => await LoadCarriersAsync());
+        LoadDriversCommand = new Command(async () => await LoadDriversAsync());
+        _carrierService = carrierService;
+        _driverService = driverService;
+        _serviceProvider = serviceProvider;
+    }
+    public Page CurrentPage { get; set; }
 
 	public Command SaveCommand { get; }
 	public Command LoadPageCommand { get; }
@@ -298,6 +300,12 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 
 				if (_userDialogs.IsHudShowing)
 					_userDialogs.HideHud();
+
+				var basketViewModel = _serviceProvider.GetRequiredService<ReturnPurchaseDispatchBasketViewModel>();
+			    basketViewModel.Items.Clear();
+				basketViewModel.SelectedPurchaseTransactions.Clear();
+				basketViewModel.SelectedLocationTransactions.Clear();
+				basketViewModel.SelectedSeriLotTransactions.Clear();
 
 				await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
 				{

@@ -16,6 +16,11 @@
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding BackCommand}" />
+    </Shell.BackButtonBehavior>
+
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
@@ -31,7 +36,7 @@
         <Grid Grid.Row="0"
               RowDefinitions="Auto,Auto,*,Auto"
               RowSpacing="10">
-            <Grid Grid.Row="0"
+            <Grid Grid.Row="0" Padding="10,10,0,0"
                   ColumnDefinitions="*, Auto"
                   ColumnSpacing="10">
                 <Label Grid.Column="0"

@@ -116,6 +116,7 @@ public class LocationTransactionDataStore : ILocationTransactionService
 	{
 		var baseQuery = @$"SELECT
         [ReferenceId] = LGMAIN.LOGICALREF,
+        [TransactionDate] = LGMAIN.DATE_,
         [TransactionReferenceId] = LGMAIN.STTRANSREF,
         [TransactionFicheReferenceId] = LGMAIN.STFICHEREF,
 		[SerilotReferenceId] = LGMAIN.SLREF,

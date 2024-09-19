@@ -7,7 +7,8 @@ namespace Deppo.Core.Models;
 public class LocationTransaction :INotifyPropertyChanged, IDisposable
 {
 	private int _referenceId;
-	private int _transactionReferenceId;
+    private DateTime _transactionDate;
+    private int _transactionReferenceId;
 	private int _transactionFicheReferenceId;
 	private int _serilotReferenceId;
 	private int _inTransactionReferenceId;
@@ -47,7 +48,18 @@ public class LocationTransaction :INotifyPropertyChanged, IDisposable
 		}
 	}
 
-	[Browsable(false)]
+    public DateTime TransactionDate
+    {
+        get => _transactionDate;
+        set
+        {
+            if (_transactionDate == value) return;
+            _transactionDate = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    [Browsable(false)]
 	public int TransactionReferenceId
 	{
 		get => _transactionReferenceId;

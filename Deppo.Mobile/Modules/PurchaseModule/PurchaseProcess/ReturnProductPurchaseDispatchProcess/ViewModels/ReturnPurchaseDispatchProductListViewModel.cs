@@ -24,6 +24,7 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
     private readonly IHttpClientService _httpClientService;
     private readonly IUserDialogs _userDialogs;
     private readonly IPurchaseDispatchTransactionService _purchaseDispatchTransactionService;
+    private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty]
     private PurchaseFicheModel purchaseFicheModel = null!;
@@ -40,7 +41,7 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
 
 	public ObservableCollection<ReturnPurchaseBasketModel> SelectedProducts = new();
 
-	public ReturnPurchaseDispatchProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IPurchaseDispatchTransactionService purchaseDispatchTransactionService)
+    public ReturnPurchaseDispatchProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IPurchaseDispatchTransactionService purchaseDispatchTransactionService, IServiceProvider serviceProvider)
     {
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
@@ -53,6 +54,7 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<PurchaseTransactionModel>(async (x) => await ItemTappedAsync(x));
         NextViewCommand = new Command(async () => await NextViewAsync());
+        _serviceProvider = serviceProvider;
     }
 
     public Page CurrentPage { get; set; } = null!;
@@ -158,6 +160,7 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
                 {
                     Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
                     SelectedPurchaseTransactions.Remove(SelectedPurchaseTransactions.FirstOrDefault(x => x.ProductReferenceId == selectedItem.ProductReferenceId));
+                    SelectedProducts.Remove(SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == selectedItem.ProductReferenceId));
                 }
                 else
                 {
@@ -217,7 +220,8 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            Console.WriteLine(SelectedProducts);
+
+            
 
             await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseDispatchBasketView)}", new Dictionary<string, object>
             {
