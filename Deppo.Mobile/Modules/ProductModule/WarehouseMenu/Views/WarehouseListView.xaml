@@ -7,8 +7,7 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels"
              Title="{Binding Title}"
-             x:DataType="viewModel:WarehouseListViewModel"
-             Shell.NavBarIsVisible="False">
+             Shell.NavBarIsVisible="True">
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PrimaryLight}" StatusBarStyle="Default" />
@@ -25,30 +24,10 @@
             <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
-    <Grid RowDefinitions="Auto, *">
-        <!--#region Custom Navigation Bar-->
-        <Grid Grid.Row="0"
-              Margin="10,20"
-              ColumnDefinitions="Auto, *"
-              ColumnSpacing="5"
-              VerticalOptions="Center">
-            <Label Grid.Column="0"
-                   FontFamily="FAS"
-                   FontSize="28"
-                   Text="{x:Static fontAwesome:FontAwesomeIcons.Warehouse}"
-                   TextColor="{StaticResource WhiteSmoke}"
-                   VerticalOptions="Center" />
-            <Label Grid.Column="1"
-                   FontAttributes="None"
-                   FontSize="32"
-                   VerticalOptions="Center"
-                   Text="{Binding Title}"
-                   TextColor="{StaticResource White}" />
-        </Grid>
-        <!--#endregion-->
+
 
         <!--#region Warehouse List-->
-        <Grid Grid.Row="1"
+        <Grid
               RowDefinitions="Auto, *"
               RowSpacing="10">
             <!--#region Search area-->
@@ -134,8 +113,7 @@
             </RefreshView>
             <!--#endregion-->
         </Grid>
-        <!--#endregion-->
-    </Grid>
+       
 
 
 

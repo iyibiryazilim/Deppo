@@ -20,6 +20,14 @@ using Deppo.Mobile.Modules.FastProductionModule.ViewModels;
 using Deppo.Mobile.Modules.FastProductionModule.Views;
 using Deppo.Mobile.Modules.LoginModule.ViewModels;
 using Deppo.Mobile.Modules.LoginModule.Views;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.Views;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.ViewModels;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.Views;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.ViewModels;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.Views;
+using Deppo.Mobile.Modules.OutsourceModule.WaitingOutsourceMenu.ViewModels;
+using Deppo.Mobile.Modules.OutsourceModule.WaitingOutsourceMenu.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductPanel.ViewModels;
@@ -211,7 +219,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<ISalesCustomerProductService, SalesCustomerProductDataStore>();
         builder.Services.AddSingleton<IShipAddressService, ShipAddressDataStore>();
         builder.Services.AddSingleton<ICarrierService, CarrierDataStore>();
-        builder.Services.AddSingleton<IDriverService,DriverDataStore>();
+        builder.Services.AddSingleton<IDriverService, DriverDataStore>();
 
         builder.Services.AddSingleton<IProductPanelService, ProductPanelDataStore>();
         builder.Services.AddSingleton<ISalesPanelService, SalesPanelDataStore>();
@@ -229,7 +237,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IOutCountingTransactionService, OutCountingTransactionDataStore>();
         builder.Services.AddSingleton<IWastageTransactionService, WastageTransactionDataStore>();
         builder.Services.AddSingleton<IPurchaseDispatchTransactionService, PurchaseDispatchTransactionDataStore>();
-        builder.Services.AddSingleton<IRetailSalesDispatchTransactionService ,RetailSalesDispatchTransactionDataStore>();
+        builder.Services.AddSingleton<IRetailSalesDispatchTransactionService, RetailSalesDispatchTransactionDataStore>();
         builder.Services.AddSingleton<IWholeSalesDispatchTransactionService, WholeSalesDispatchTransactionDataStore>();
 
 
@@ -428,6 +436,16 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddTransientWithShellRoute<InsertFailurePageView, InsertFailurePageViewModel>(nameof(InsertFailurePageView));
 
         #endregion Result Modules
+
+        #region Outsource Modules
+
+        builder.Services.AddSingletonWithShellRoute<OutsourcePanelView, OutsourcePanelViewModel>(nameof(OutsourcePanelView));
+        builder.Services.AddSingletonWithShellRoute<OutsourceListView, OutsourceListViewModel>(nameof(OutsourceListView));
+        builder.Services.AddScopedWithShellRoute<OutsourceDetailView, OutsourceDetailViewModel>(nameof(OutsourceDetailView));
+        builder.Services.AddSingletonWithShellRoute<WaitingOutsourceProductListView, WaitingOutsourceProductListViewModel>(nameof(WaitingOutsourceProductListView));
+        builder.Services.AddSingletonWithShellRoute<OutsourceProcessView, OutsourceProcessViewModel>(nameof(OutsourceProcessView));
+
+        #endregion
 
         return builder.Build();
     }

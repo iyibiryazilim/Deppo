@@ -29,7 +29,7 @@ public partial class SupplierListViewModel : BaseViewModel
         _supplierService = supplierService;
         _userDialogs = userDialogs;
 
-        Title = "Tedarikçiler";
+        Title = "TedarikÃ§iler";
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());

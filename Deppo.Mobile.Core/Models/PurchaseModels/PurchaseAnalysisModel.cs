@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
+using Deppo.Mobile.Core.Models.AnalysisModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -26,5 +27,6 @@ public partial class PurchaseAnalysisModel : ObservableObject
 
     public ObservableCollection<Supplier> LastSupplier { get; } = new();
     public ObservableCollection<Product> LastProduct { get; } = new();
+    public ObservableCollection<PurchaseProductReferenceAnalysis> PurchaseProductReferenceAnalysis { get; } = new();
 
 }

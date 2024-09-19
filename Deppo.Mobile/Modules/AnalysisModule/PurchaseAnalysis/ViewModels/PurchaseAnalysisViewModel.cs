@@ -4,6 +4,7 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.AnalysisModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
@@ -40,7 +41,7 @@ public partial class PurchaseAnalysisViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            await Task.WhenAll(LastProduct(), LastSupplier(), DueDatePassedSupplierCount(), DueDatePassedProductsCount(), ReturnProductReferenceCount(), PurchaseProductReferenceCount());
+            await Task.WhenAll(DueDatePassedSupplierCount(), DueDatePassedProductsCount(), ReturnProductReferenceCount(), PurchaseProductReferenceCount(),GetPurchaseProductReferenceAnalysisAsync());
 
         }
         catch (Exception ex)
@@ -54,6 +55,40 @@ public partial class PurchaseAnalysisViewModel : BaseViewModel
         {
             IsBusy = false;
 
+        }
+    }
+
+    private async Task GetPurchaseProductReferenceAnalysisAsync()
+    {
+        try
+        {
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _purchaseAnalysisService.PurchaseProductReferenceAnalysis(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, DateTime.Now);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+
+                List<PurchaseProductReferenceAnalysis> cacheItems = new();
+                foreach (var item in result.Data)
+                {
+                    var value = Mapping.Mapper.Map<PurchaseProductReferenceAnalysis>(item);
+                    cacheItems.Add(value);
+                }
+
+                PurchaseAnalysisModel.PurchaseProductReferenceAnalysis.Clear();
+                foreach (var item in cacheItems.OrderBy(x=> x.ArgumentMonth))
+                    PurchaseAnalysisModel.PurchaseProductReferenceAnalysis.Add(item);
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
     }
 
@@ -74,8 +109,8 @@ public partial class PurchaseAnalysisViewModel : BaseViewModel
 
                 foreach (var item in result.Data)
                 {
-                    var value = (Mapping.Mapper.Map<PurchaseAnalysisModel>(item));
-                    PurchaseAnalysisModel.DueDatePassedSuppliersCount = value.DueDatePassedSupplierCount;
+                    var value = Mapping.Mapper.Map<PurchaseAnalysisModel>(item);
+                    PurchaseAnalysisModel.DueDatePassedSuppliersCount = value.DueDatePassedSuppliersCount;
                 }
 
 
