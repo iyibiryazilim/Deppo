@@ -79,7 +79,12 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
 
         LoadPageCommand = new Command(async () => await LoadPageAsync());
         ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
-        SaveCommand = new Command(async () => await SaveAsync());
+
+        SelectWholeCommand = new Command(async (x) => await SelectTransactionTypeAsync(SalesReturnEnumType.Whole));
+        SelectRetailCommand = new Command(async (x) => await SelectTransactionTypeAsync(SalesReturnEnumType.Retail));
+
+        SaveCommand = new Command(OpenBottomSheetAsync);
+
         _retailService = retailSalesDispatchTransactionService;
         _wholeService = wholeSalesReturnDispatchTransactionService;
     }
@@ -90,6 +95,9 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
     public Command BackCommand { get; }
     public Command SaveCommand { get; }
     public Command ShowBasketItemCommand { get; }
+
+    public Command SelectWholeCommand { get; }
+    public Command SelectRetailCommand { get; }
 
     private async Task ShowBasketItemAsync()
     {
@@ -132,6 +140,23 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
         {
             IsBusy = false;
         }
+    }
+
+    private void OpenBottomSheetAsync()
+    {
+        // BottomSheet'i aç
+        CurrentPage.FindByName<BottomSheet>("selectConfirmBottomSheet").State = BottomSheetState.HalfExpanded;
+    }
+
+    private async Task SelectTransactionTypeAsync(SalesReturnEnumType selectedType)
+    {
+        SalesReturnEnumType = selectedType;
+
+        // BottomSheet'i kapat
+        CurrentPage.FindByName<BottomSheet>("selectConfirmBottomSheet").State = BottomSheetState.Hidden;
+
+        // SaveCommand'i tetikle
+        await SaveAsync();
     }
 
     public static string GetEnumDescription(Enum value)

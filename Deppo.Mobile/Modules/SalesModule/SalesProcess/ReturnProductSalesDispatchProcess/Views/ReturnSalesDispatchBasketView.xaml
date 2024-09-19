@@ -161,7 +161,7 @@
                                                 <Label Grid.Column="1"
                                                        FontAttributes="Bold"
                                                        FontSize="Large"
-                                                       Text="{Binding Quantity, StringFormat='{0:N2}'}"
+                                                       Text="{Binding InputQuantity, StringFormat='{0:N2}'}"
                                                        TextColor="{StaticResource OffBlack}"
                                                        VerticalOptions="Center" />
                                                 <Border Grid.Column="2"
