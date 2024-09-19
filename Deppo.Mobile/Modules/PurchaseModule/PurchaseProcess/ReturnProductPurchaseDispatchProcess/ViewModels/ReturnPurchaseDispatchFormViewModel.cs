@@ -87,6 +87,7 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
         LoadPageCommand = new Command(async () => await LoadPageAsync());
         LoadCarriersCommand = new Command(async () => await LoadCarriersAsync());
         LoadDriversCommand = new Command(async () => await LoadDriversAsync());
+        BackCommand = new Command(async () => await BackAsync());
         _carrierService = carrierService;
         _driverService = driverService;
         _serviceProvider = serviceProvider;
@@ -97,6 +98,8 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 	public Command LoadPageCommand { get; }
 	public Command LoadCarriersCommand { get; }
 	public Command LoadDriversCommand { get; }
+
+	public Command BackCommand { get; }
 
 	private async Task LoadPageAsync()
 	{
@@ -176,7 +179,9 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 		finally
 		{
 			IsBusy = false;
-		}
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+        }
 	}
 
 	private async Task LoadDriversAsync()
@@ -216,7 +221,9 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 		finally
 		{
 			IsBusy = false;
-		}
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+        }
 	}
 	private async Task SaveAsync()
 	{
@@ -226,7 +233,12 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
-			_userDialogs.ShowLoading("İşlem Tamamlanıyor...");
+            var confirm = await _userDialogs.ConfirmAsync("Satınalma İade İrsaliyesi oluşturulacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+            if (!confirm)
+                return;
+
+
+            _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
 			await Task.Delay(1000);
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
@@ -301,7 +313,9 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 				if (_userDialogs.IsHudShowing)
 					_userDialogs.HideHud();
 
-				var basketViewModel = _serviceProvider.GetRequiredService<ReturnPurchaseDispatchBasketViewModel>();
+				await ClearFormAsync();
+
+                var basketViewModel = _serviceProvider.GetRequiredService<ReturnPurchaseDispatchBasketViewModel>();
 			    basketViewModel.Items.Clear();
 				basketViewModel.SelectedPurchaseTransactions.Clear();
 				basketViewModel.SelectedLocationTransactions.Clear();
@@ -319,6 +333,7 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 
 				resultModel.Message = "Başarısız";
 				resultModel.PageTitle = Title;
+				resultModel.ErrorMessage = result.Message;
 				resultModel.PageCountToBack = 1;
 				await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
 				{
@@ -337,6 +352,60 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 		finally
 		{
 			IsBusy = false;
-		}
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+        }
+	}
+
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            var result = await _userDialogs.ConfirmAsync("Form verileri silinecektir. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+            if (!result)
+                return;
+
+            DocumentNumber = string.Empty;
+            SpecialCode = string.Empty;
+            DocumentTrackingNumber = string.Empty;
+            Description = string.Empty;
+            SelectedCarrier = null;
+            SelectedDriver = null;
+
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+        }
+    }
+
+	private async Task ClearFormAsync()
+	{
+		try
+		{
+            DocumentNumber = string.Empty;
+            SpecialCode = string.Empty;
+            DocumentTrackingNumber = string.Empty;
+            Description = string.Empty;
+            SelectedCarrier = null;
+            SelectedDriver = null;
+
+        }
+        catch (Exception ex)
+		{
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
 	}
 }

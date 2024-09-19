@@ -186,7 +186,7 @@ namespace Deppo.Core.DataStores
                 baseQuery += $@" AND (STFICHE.FICHENO LIKE '{search}%' OR STFICHE.GENEXP1 LIKE '%{search}%')";
 
             baseQuery += $@"
-ORDER BY CLCARD.DEFINITION_ ASC
+ORDER BY STFICHE.DATE_ DESC
 OFFSET {skip} ROWS
 FETCH NEXT {take} ROWS ONLY";
 
@@ -241,7 +241,7 @@ where STFICHE.TRCODE IN(1) AND STLINE.LINETYPE = 0 AND STFICHE.LOGICALREF = {fic
             if (!string.IsNullOrEmpty(search))
                 baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')"; 
 
-            baseQuery += $@" ORDER BY ITEMS.CODE OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+            baseQuery += $@" ORDER BY STLINE.DATE_ DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
             return baseQuery;
         }

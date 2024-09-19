@@ -11,6 +11,9 @@ public partial class ResultModel : ObservableObject
 	string message = string.Empty;
 
 	[ObservableProperty]
+	string errorMessage = string.Empty;
+
+	[ObservableProperty]
 	string code = string.Empty;
 
 	[ObservableProperty]

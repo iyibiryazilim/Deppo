@@ -153,49 +153,63 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            var selectedItem = Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
+            var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
             if (selectedItem is not null)
             {
                 if (selectedItem.IsSelected)
                 {
-                    Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
-                    SelectedPurchaseTransactions.Remove(SelectedPurchaseTransactions.FirstOrDefault(x => x.ProductReferenceId == selectedItem.ProductReferenceId));
+                    Items.FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = false;
+                    SelectedPurchaseTransactions.Remove(SelectedPurchaseTransactions.FirstOrDefault(x => x.ReferenceId == selectedItem.ReferenceId));
                     SelectedProducts.Remove(SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == selectedItem.ProductReferenceId));
                 }
                 else
                 {
-                    Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
+                    Items.FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = true;
 
-					var basketItem = new ReturnPurchaseBasketModel
-					{
-						ItemReferenceId = item.ProductReferenceId,
-						ItemCode = item.ProductCode,
-						ItemName = item.ProductName,
-						UnitsetReferenceId = item.UnitsetReferenceId,
-						UnitsetCode = item.UnitsetCode,
-						UnitsetName = item.UnitsetName,
-						SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-						SubUnitsetCode = item.SubUnitsetCode,
-						SubUnitsetName = item.SubUnitsetName,
-						MainItemReferenceId = default,  //
-						MainItemCode = string.Empty,    //
-						MainItemName = string.Empty,    //
-						StockQuantity = item.Quantity,
-						IsSelected = false,   //
-						IsVariant = item.IsVariant,
-						LocTracking = item.LocTracking,
-						TrackingType = item.TrackingType,
-						Quantity = item.LocTracking == 0 ? 1 : 0,
-						LocTrackingIcon = item.LocTrackingIcon,
-						VariantIcon = item.VariantIcon,
-						TrackingTypeIcon = item.TrackingTypeIcon,
-                        DispatchReferenceId = item.ReferenceId,
-					};
+                    bool isExistingItem = SelectedProducts.Any(x => x.ItemReferenceId == item.ProductReferenceId);
 
-					SelectedProducts.Add(basketItem);
+                    if (isExistingItem)
+                    {
+                        var existingItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ProductReferenceId);
+                        existingItem.StockQuantity += item.Quantity;
+                    }
+                    else
+                    {
+                        var basketItem = new ReturnPurchaseBasketModel
+                        {
+                            ItemReferenceId = item.ProductReferenceId,
+                            ItemCode = item.ProductCode,
+                            ItemName = item.ProductName,
+                            UnitsetReferenceId = item.UnitsetReferenceId,
+                            UnitsetCode = item.UnitsetCode,
+                            UnitsetName = item.UnitsetName,
+                            SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                            SubUnitsetCode = item.SubUnitsetCode,
+                            SubUnitsetName = item.SubUnitsetName,
+                            MainItemReferenceId = default,  //
+                            MainItemCode = string.Empty,    //
+                            MainItemName = string.Empty,    //
+                            StockQuantity = item.Quantity,
+                            IsSelected = false,   //
+                            IsVariant = item.IsVariant,
+                            LocTracking = item.LocTracking,
+                            TrackingType = item.TrackingType,
+                            Quantity = item.LocTracking == 0 ? 1 : 0,
+                            LocTrackingIcon = item.LocTrackingIcon,
+                            VariantIcon = item.VariantIcon,
+                            TrackingTypeIcon = item.TrackingTypeIcon,
+                            DispatchReferenceId = item.ReferenceId,
+                        };
+                        SelectedProducts.Add(basketItem);
+
+                    }
 
 
-					SelectedPurchaseTransactions.Add(selectedItem);
+
+
+
+
+                    SelectedPurchaseTransactions.Add(selectedItem);
                 }
             }
         }
