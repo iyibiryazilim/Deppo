@@ -12,6 +12,7 @@
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
                                         EventName="Loaded" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadPageCommand}" EventName="Loaded" />
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
                                    StatusBarStyle="Default" />
     </ContentPage.Behaviors>
@@ -139,7 +140,7 @@
 
         <Button Grid.Row="2"
                 Margin="10,10,10,20"
-                IsEnabled="{Binding SalesFicheModel, Converter={StaticResource IsNotNullConverter}}"
+               
                 Command="{Binding NextViewCommand}"
                 Text="İleri" />
     </Grid>

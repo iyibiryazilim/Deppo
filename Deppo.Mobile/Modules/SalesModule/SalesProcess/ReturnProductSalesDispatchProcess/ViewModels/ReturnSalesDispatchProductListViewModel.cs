@@ -46,8 +46,11 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<SalesTransactionModel>(async (x) => await ItemTappedAsync(x));
         NextViewCommand = new Command(async () => await NextViewAsync());
+        LoadPageCommand = new Command(async () => await LoadPageAsync());
         _serviceProvider = serviceProvider;
     }
+
+    
 
     public ObservableCollection<SalesTransactionModel> Items { get; } = new();
 
@@ -60,6 +63,11 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
     public Command ItemTappedCommand { get; }
 
     public Command NextViewCommand { get; }
+
+    public Command LoadPageCommand { get; }
+
+    
+
 
     private async Task LoadItemsAsync()
     {
@@ -181,7 +189,7 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
                         IsVariant = item.IsVariant,
                         LocTracking = item.LocTracking,
                         TrackingType = item.TrackingType,
-                        Quantity = item.LocTracking == 0 ? 1 : 0,
+                        Quantity = item.Quantity,
                         LocTrackingIcon = item.LocTrackingIcon,
                         VariantIcon = item.VariantIcon,
                         TrackingTypeIcon = item.TrackingTypeIcon,
@@ -236,22 +244,24 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-    public async Task LoadPageAsync()
+    private async Task LoadPageAsync()
     {
-        try
-        {
+        
+            try
+            {
 
 
-            if (Items?.Count > 0)
-                Items.Clear();
+                if (Items?.Count > 0)
+                    Items.Clear();
+            }
+            catch (Exception ex)
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            }
+
         }
-        catch (Exception ex)
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-
-    }
+    
 }

@@ -187,7 +187,7 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
             if (SalesFicheModel is not null)
             {
                 var viewModel = _serviceProvider.GetRequiredService<ReturnSalesDispatchProductListViewModel>();
-                await viewModel.LoadPageAsync();
+                //await viewModel.LoadPageAsync();
                 await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchProductListView)}", new Dictionary<string, object>
                 {
                     [nameof(SalesFicheModel)] = SalesFicheModel,

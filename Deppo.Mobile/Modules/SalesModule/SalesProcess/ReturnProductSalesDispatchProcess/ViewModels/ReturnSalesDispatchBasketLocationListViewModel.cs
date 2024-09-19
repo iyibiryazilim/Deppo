@@ -105,7 +105,6 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
             _userDialogs.ShowLoading("Loading...");
             await Task.Delay(500);
 
-            SelectedItems.Clear();
             if (ReturnSalesBasketModel.Details.Count > 0)
             {
                 foreach (var item in ReturnSalesBasketModel.Details)
@@ -204,7 +203,7 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 warehouseNumber: WarehouseModel.Number,
-                productReferenceId: returnSalesBasketModel.ItemReferenceId,
+                productReferenceId: ReturnSalesBasketModel.ItemReferenceId,
                 skip: Items.Count,
                 take: 20);
 
