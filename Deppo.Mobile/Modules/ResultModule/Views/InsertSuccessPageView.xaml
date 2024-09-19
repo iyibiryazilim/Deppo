@@ -33,8 +33,8 @@
                        FontSize="Title"
                        HorizontalOptions="Center"
                        HorizontalTextAlignment="Center"
-                       TextColor="{StaticResource OffBlack}"
-                       Text="{Binding ResultModel.Code}" />
+                       Text="{Binding ResultModel.Code}"
+                       TextColor="{StaticResource OffBlack}" />
                 <Label FontAttributes="Bold"
                        FontSize="19"
                        HorizontalOptions="Center"
@@ -43,12 +43,15 @@
                        Text="{Binding ResultModel.PageTitle, StringFormat='{0} Başarıyla Gönderildi'}" />
             </VerticalStackLayout>
         </Grid>
-        
-        <Button Grid.Row="1"
-                Margin="10,10,10,20"
-                BackgroundColor="#2ca57c"
-                Command="{Binding BackCommand}"
-                Text="Tamam" />
+
+        <Grid Grid.Row="1" Padding="0,0,0,30">
+            <Button Grid.Row="1"
+                    Margin="10,10,10,20"
+                    BackgroundColor="#2ca57c"
+                    Command="{Binding BackCommand}"
+                    Text="Tamam" />
+        </Grid>
+
     </Grid>
 
 </ContentPage>
