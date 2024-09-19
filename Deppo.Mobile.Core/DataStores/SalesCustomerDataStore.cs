@@ -208,7 +208,7 @@ public class SalesCustomerDataStore : ISalesCustomerService
         if (!string.IsNullOrEmpty(search))
             baseQuery += $@" AND (CLCARD.CODE LIKE '{search}%' OR CLCARD.DEFINITION_ LIKE '%{search}%')";
 
-        baseQuery += $@" GROUP BY CLCARD.LOGICALREF,CLCARD.ACCEPTEINV, CLCARD.CODE, CLCARD.DEFINITION_, CLCARD.COUNTRY, CLCARD.CITY ORDER BY CLCARD.DEFINITION_ ASC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+        baseQuery += $@" GROUP BY CLCARD.LOGICALREF,CLCARD.ACCEPTEINV, CLCARD.CODE, CLCARD.DEFINITION_, CLCARD.COUNTRY, CLCARD.CITY ORDER BY CLCARD.DEFINITION_ desc OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
         return baseQuery;
     }
