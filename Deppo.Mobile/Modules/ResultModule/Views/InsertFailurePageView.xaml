@@ -48,6 +48,6 @@
                 Margin="10,10,10,20"
                 BackgroundColor="Red"
                 Command="{Binding BackCommand}"
-                Text="Tamam" />
+                Text="Yeniden Dene" />
     </Grid>
 </ContentPage>
