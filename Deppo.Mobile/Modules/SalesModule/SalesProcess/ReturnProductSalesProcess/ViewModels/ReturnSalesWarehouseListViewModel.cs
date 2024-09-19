@@ -129,6 +129,7 @@ public partial class ReturnSalesWarehouseListViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
+            _userDialogs.HideHud();
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
 
@@ -189,6 +190,7 @@ public partial class ReturnSalesWarehouseListViewModel : BaseViewModel
         catch (Exception ex)
         {
             _userDialogs.Alert(ex.Message);
+
         }
         finally
         {
