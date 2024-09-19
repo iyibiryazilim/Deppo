@@ -284,7 +284,7 @@
                         AllowDismiss="True"
                         BackgroundColor="White"
                         CornerRadius="15"
-                        HalfExpandedRatio="0.5"
+                        HalfExpandedRatio="0.3"
                         IsModal="True"
                         ShowGrabber="True">
             <Grid RowDefinitions="Auto,*"
@@ -293,17 +293,37 @@
                 <VerticalStackLayout Grid.Row="0"
                                      Spacing="5">
                     <Label FontAttributes="Bold"
+                           Padding="10"
                            FontSize="Subtitle"
-                           Text="Fiş Türü" />
+                           Text="İade İrsaliye Türü Seçiniz" />
                     <BoxView HeightRequest="2"
                              Color="{StaticResource Primary}" />
                 </VerticalStackLayout>
-                <VerticalStackLayout Grid.Row="1">
+                <VerticalStackLayout Grid.Row="1"
+                                     Spacing="10">
                     <Border Padding="10"
                             BackgroundColor="Transparent"
                             StrokeShape="RoundRectangle 10"
-                            StrokeThickness="0.1">
-                        <Label Text="Toptan" />
+                            StrokeThickness="0">
+
+                        <Label TextColor="{StaticResource Gray600}"
+                               VerticalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontAttributes="Bold"
+                                          FontFamily="FAS"
+                                          Text="{x:Static fontAwesome:FontAwesomeIcons.List}"
+                                          TextColor="{StaticResource OffBlack}" />
+                                    <Span Text=" " />
+
+                                    <Span Text=" " />
+                                    <Span FontAttributes="Bold"
+                                          Text="Toptan Satış İade İrsaliyesi"
+                                          TextColor="{StaticResource OffBlack}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding SelectWholeCommand}" />
                         </Border.GestureRecognizers>
@@ -311,8 +331,23 @@
                     <Border Padding="10"
                             BackgroundColor="Transparent"
                             StrokeShape="RoundRectangle 10"
-                            StrokeThickness="0.1">
-                        <Label Text="Perakende" />
+                            StrokeThickness="0">
+                        <Label TextColor="{StaticResource Gray600}"
+                               VerticalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontAttributes="Bold"
+                                          FontFamily="FAS"
+                                          Text="{x:Static fontAwesome:FontAwesomeIcons.List}"
+                                          TextColor="{StaticResource OffBlack}" />
+                                    <Span Text=" " />
+
+                                    <Span FontAttributes="Bold"
+                                          Text="Perakende Satış İade İrsaliyesi"
+                                          TextColor="{StaticResource OffBlack}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding SelectRetailCommand}" />
                         </Border.GestureRecognizers>
