@@ -104,8 +104,8 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
 
             _userDialogs.ShowLoading("Loading...");
             await Task.Delay(500);
-           // SelectedItems.Clear();
-            if (ReturnSalesBasketModel?.Details.Count > 0 )
+            // SelectedItems.Clear();
+            if (ReturnSalesBasketModel?.Details.Count > 0)
             {
                 foreach (var item in ReturnSalesBasketModel.Details)
                     SelectedItems.Add(new LocationModel
@@ -122,7 +122,6 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
         catch (Exception ex)
         {
             _userDialogs.HideHud();
-
 
             _userDialogs.Alert(ex.Message);
         }
@@ -357,19 +356,22 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
         {
             IsBusy = true;
 
-            SelectedItem = locationModel;
+            if (locationModel.InputQuantity > 0)
+            {
+                SelectedItem = locationModel;
 
-            if (ReturnSalesBasketModel.TrackingType != 0)
-            {
-                await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchBasketSeriLotListView)}", new Dictionary<string, object>
+                if (ReturnSalesBasketModel.TrackingType != 0)
                 {
-                    [nameof(WarehouseModel)] = WarehouseModel,
-                    [nameof(ReturnSalesBasketModel)] = ReturnSalesBasketModel
-                });
-            }
-            else
-            {
-                locationModel.InputQuantity++;
+                    await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchBasketSeriLotListView)}", new Dictionary<string, object>
+                    {
+                        [nameof(WarehouseModel)] = WarehouseModel,
+                        [nameof(ReturnSalesBasketModel)] = ReturnSalesBasketModel
+                    });
+                }
+                else
+                {
+                    locationModel.InputQuantity++;
+                }
             }
         }
         catch (Exception ex)
