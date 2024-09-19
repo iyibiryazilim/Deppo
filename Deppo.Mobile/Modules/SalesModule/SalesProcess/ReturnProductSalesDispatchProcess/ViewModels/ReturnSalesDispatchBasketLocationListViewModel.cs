@@ -104,8 +104,8 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
 
             _userDialogs.ShowLoading("Loading...");
             await Task.Delay(500);
-            SelectedItems.Clear();
-            if (ReturnSalesBasketModel.Details.Count > 0)
+           // SelectedItems.Clear();
+            if (ReturnSalesBasketModel?.Details.Count > 0 )
             {
                 foreach (var item in ReturnSalesBasketModel.Details)
                     SelectedItems.Add(new LocationModel
@@ -121,6 +121,9 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
         }
         catch (Exception ex)
         {
+            _userDialogs.HideHud();
+
+
             _userDialogs.Alert(ex.Message);
         }
         finally

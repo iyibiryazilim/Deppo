@@ -126,7 +126,6 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
             if (item.LocTracking == 1)
             {
                 var nextViewModel = _serviceProvider.GetRequiredService<ReturnSalesDispatchBasketLocationListViewModel>();
-                await nextViewModel.LoadSelectedItemsAsync();
 
                 await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchBasketLocationListView)}", new Dictionary<string, object>
                 {
@@ -134,7 +133,10 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
                     {nameof(ReturnSalesBasketModel), item},
                     {nameof(LocationModel) , Locations }
                 });
+                await nextViewModel.LoadSelectedItemsAsync();
+
             }
+
 
             // Sadece SeriLot takipli ise
             else if (item.LocTracking == 0 && (item.TrackingType == 1 || item.TrackingType == 2))
@@ -178,13 +180,14 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
                     if (item.LocTracking == 1)
                     {
                         var nextViewModel = _serviceProvider.GetRequiredService<ReturnSalesDispatchBasketLocationListViewModel>();
-                        await nextViewModel.LoadSelectedItemsAsync();
                         await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchBasketLocationListView)}", new Dictionary<string, object>
                         {
                             {nameof(WarehouseModel), WarehouseModel},
                             {nameof(ReturnSalesBasketModel), item},
                             {nameof(SalesCustomer),SalesCustomer}
                         });
+                        await nextViewModel.LoadSelectedItemsAsync();
+
                     }
                     // Sadece SeriLot takipli ise serilotTransactionBottomSheet aç
                     else if (item.LocTracking == 0 && (item.TrackingType == 1 || item.TrackingType == 2))
