@@ -50,8 +50,6 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
         _serviceProvider = serviceProvider;
     }
 
-    
-
     public ObservableCollection<SalesTransactionModel> Items { get; } = new();
 
     public ObservableCollection<SalesTransactionModel> SelectedSalesTransactions { get; } = new();
@@ -65,9 +63,6 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
     public Command NextViewCommand { get; }
 
     public Command LoadPageCommand { get; }
-
-    
-
 
     private async Task LoadItemsAsync()
     {
@@ -127,7 +122,6 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
                 {
                     foreach (var transaction in result.Data)
                     {
-
                         var item = Mapping.Mapper.Map<PurchaseTransactionModel>(transaction);
                         Items.Add(item);
                     }
@@ -165,6 +159,7 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
                 {
                     Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
                     SelectedSalesTransactions.Remove(SelectedSalesTransactions.FirstOrDefault(x => x.ProductReferenceId == selectedItem.ProductReferenceId));
+                    SelectedProducts.Remove(SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == selectedItem.ProductReferenceId));
                 }
                 else
                 {
@@ -198,7 +193,6 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
 
                     SelectedProducts.Add(basketItem);
 
-
                     SelectedSalesTransactions.Add(selectedItem);
                 }
             }
@@ -225,7 +219,7 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
         {
             IsBusy = true;
             var viewModel = _serviceProvider.GetRequiredService<ReturnSalesDispatchBasketViewModel>();
-           // await viewModel.LoadPageAsync();
+            // await viewModel.LoadPageAsync();
             await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchBasketView)}", new Dictionary<string, object>
             {
                 [nameof(Items)] = SelectedProducts,
@@ -244,24 +238,20 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
     private async Task LoadPageAsync()
     {
-        
-            try
-            {
-
-
-                if (Items?.Count > 0)
-                    Items.Clear();
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.HideHud();
-
-                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-            }
-
+        try
+        {
+            if (Items?.Count > 0)
+                Items.Clear();
         }
-    
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+    }
 }

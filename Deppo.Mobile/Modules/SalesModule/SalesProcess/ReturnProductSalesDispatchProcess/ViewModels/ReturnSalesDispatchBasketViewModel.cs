@@ -26,8 +26,6 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
 [QueryProperty(name: nameof(Items), queryId: nameof(Items))]
 [QueryProperty(name: nameof(SalesFicheModel), queryId: nameof(SalesFicheModel))]
 [QueryProperty(name: nameof(SelectedSalesTransactions), queryId: nameof(SelectedSalesTransactions))]
-
-
 public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -48,12 +46,11 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
     [ObservableProperty]
     private ObservableCollection<ReturnSalesBasketModel> items;
 
-
     [ObservableProperty]
-    SalesFicheModel salesFicheModel = null!;
+    private SalesFicheModel salesFicheModel = null!;
+
     [ObservableProperty]
     public ObservableCollection<SalesTransactionModel> selectedSalesTransactions;
-
 
     public ReturnSalesDispatchBasketViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider)
     {
@@ -129,6 +126,7 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
             if (item.LocTracking == 1)
             {
                 var nextViewModel = _serviceProvider.GetRequiredService<ReturnSalesDispatchBasketLocationListViewModel>();
+                await nextViewModel.LoadSelectedItemsAsync();
 
                 await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchBasketLocationListView)}", new Dictionary<string, object>
                 {
@@ -136,7 +134,6 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
                     {nameof(ReturnSalesBasketModel), item},
                     {nameof(LocationModel) , Locations }
                 });
-                await nextViewModel.LoadSelectedItemsAsync();
             }
 
             // Sadece SeriLot takipli ise
@@ -180,6 +177,8 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
                     // Stok Yeri takipli ise locationTransactionBottomSheet aç
                     if (item.LocTracking == 1)
                     {
+                        var nextViewModel = _serviceProvider.GetRequiredService<ReturnSalesDispatchBasketLocationListViewModel>();
+                        await nextViewModel.LoadSelectedItemsAsync();
                         await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchBasketLocationListView)}", new Dictionary<string, object>
                         {
                             {nameof(WarehouseModel), WarehouseModel},
@@ -577,6 +576,7 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
             {
                 [nameof(WarehouseModel)] = WarehouseModel,
                 [nameof(SalesCustomer)] = SalesCustomer,
+                [nameof(SalesFicheModel)] = SalesFicheModel,
                 [nameof(Items)] = Items
             });
         }
@@ -629,6 +629,15 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
                 if (!result)
                     return;
 
+                foreach (var item in Items)
+                {
+                    item.IsSelected = false;
+                }
+                foreach(var item in SelectedSalesTransactions)
+                {
+                    item.IsSelected=false;
+                }
+                SelectedSalesTransactions.Clear();
                 Items.Clear();
                 await Shell.Current.GoToAsync("..");
             }
@@ -644,12 +653,11 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
     public async Task LoadPageAsync()
     {
         try
         {
-
-
             if (Items?.Count > 0)
                 Items.Clear();
         }
@@ -660,6 +668,5 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
 
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
-
     }
 }

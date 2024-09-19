@@ -26,7 +26,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(SalesCustomer), queryId: nameof(SalesCustomer))]
-[QueryProperty(name: nameof(ReturnSalesBasketModel), queryId: nameof(SelectedItem))]
+[QueryProperty(name: nameof(ReturnSalesBasketModel), queryId: nameof(ReturnSalesBasketModel))]
 public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -104,7 +104,7 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
 
             _userDialogs.ShowLoading("Loading...");
             await Task.Delay(500);
-
+            SelectedItems.Clear();
             if (ReturnSalesBasketModel.Details.Count > 0)
             {
                 foreach (var item in ReturnSalesBasketModel.Details)
@@ -480,9 +480,9 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
             IsBusy = true;
 
             _userDialogs.ShowLoading("Loading...");
-            
-            var previousViewModel = _serviceProvider.GetRequiredService<ReturnSalesBasketViewModel>();
-            if (previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId) is not null)
+
+            var previousViewModel = _serviceProvider.GetRequiredService<ReturnSalesDispatchBasketViewModel>();
+            if (previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == ReturnSalesBasketModel.ItemReferenceId) is not null)
             {
                 foreach (var item in SelectedItems.Where(x => x.InputQuantity > 0)) //Locations
                 {
@@ -504,9 +504,7 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
 
                     var totalInputQuantity = SelectedItems.Where(x => x.InputQuantity > 0).Sum(x => x.InputQuantity);
                     previousViewModel.Items.FirstOrDefault(x => x.ItemReferenceId == returnSalesBasketModel.ItemReferenceId).Quantity = totalInputQuantity;
-
                 }
-              
             }
 
             await Shell.Current.GoToAsync("..");

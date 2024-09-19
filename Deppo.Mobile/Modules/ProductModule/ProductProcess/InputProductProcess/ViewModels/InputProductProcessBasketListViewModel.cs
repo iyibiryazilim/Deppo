@@ -125,14 +125,14 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 			if (inputProductBasketModel.LocTracking == 1)
 			{
 				var nextViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketLocationListViewModel>();
-				
 
-				await Shell.Current.GoToAsync($"{nameof(InputProductProcessBasketLocationListView)}", new Dictionary<string, object>
+                await nextViewModel.LoadSelectedItemsAsync();
+
+                await Shell.Current.GoToAsync($"{nameof(InputProductProcessBasketLocationListView)}", new Dictionary<string, object>
 				{
 					{nameof(WarehouseModel), WarehouseModel},
 					{nameof(InputProductBasketModel), inputProductBasketModel}
 				});
-				await nextViewModel.LoadSelectedItemsAsync();
 
 			}
 
@@ -177,14 +177,14 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 					if (inputProductBasketModel.LocTracking == 1)
 					{
 						var nextViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketLocationListViewModel>();
-
-						await Shell.Current.GoToAsync($"{nameof(InputProductProcessBasketLocationListView)}", new Dictionary<string, object>
+                        await nextViewModel.LoadSelectedItemsAsync();
+                        await Shell.Current.GoToAsync($"{nameof(InputProductProcessBasketLocationListView)}", new Dictionary<string, object>
 						{
 							{nameof(WarehouseModel), WarehouseModel},
 							{nameof(InputProductBasketModel), inputProductBasketModel}
 						});
 
-						await nextViewModel.LoadSelectedItemsAsync();
+						
 					}
 					// Sadece SeriLot takipli ise serilotTransactionBottomSheet aç
 					else if (inputProductBasketModel.LocTracking == 0 && (inputProductBasketModel.TrackingType == 1 || inputProductBasketModel.TrackingType == 2))

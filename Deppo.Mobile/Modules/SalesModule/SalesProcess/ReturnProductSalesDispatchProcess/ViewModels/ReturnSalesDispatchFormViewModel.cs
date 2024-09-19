@@ -35,6 +35,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(SalesCustomer), queryId: nameof(SalesCustomer))]
 [QueryProperty(name: nameof(Items), queryId: nameof(Items))]
+[QueryProperty(name: nameof(SalesFicheModel), queryId: nameof(SalesFicheModel))]
 public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -67,7 +68,7 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
     private ObservableCollection<ReturnSalesBasketModel> items = null!;
 
     [ObservableProperty]
-    private SalesReturnEnumType salesReturnEnumType = SalesReturnEnumType.Retail;
+    private SalesFicheModel salesFicheModel = null!;
 
     public ReturnSalesDispatchFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IRetailSalesReturnDispatchTransactionService retailSalesDispatchTransactionService, IWholeSalesReturnDispatchTransactionService wholeSalesReturnDispatchTransactionService)
     {
@@ -80,10 +81,10 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
         LoadPageCommand = new Command(async () => await LoadPageAsync());
         ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
 
-        SelectWholeCommand = new Command(async (x) => await SelectTransactionTypeAsync(SalesReturnEnumType.Whole));
-        SelectRetailCommand = new Command(async (x) => await SelectTransactionTypeAsync(SalesReturnEnumType.Retail));
+        //SelectWholeCommand = new Command(async (x) => await SelectTransactionTypeAsync(SalesReturnEnumType.Whole));
+        //SelectRetailCommand = new Command(async (x) => await SelectTransactionTypeAsync(SalesReturnEnumType.Retail));
 
-        SaveCommand = new Command(OpenBottomSheetAsync);
+        SaveCommand = new Command(async () => await SaveAsync());
 
         _retailService = retailSalesDispatchTransactionService;
         _wholeService = wholeSalesReturnDispatchTransactionService;
@@ -148,30 +149,28 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
         CurrentPage.FindByName<BottomSheet>("selectConfirmBottomSheet").State = BottomSheetState.HalfExpanded;
     }
 
-    private async Task SelectTransactionTypeAsync(SalesReturnEnumType selectedType)
-    {
-        SalesReturnEnumType = selectedType;
+    //private async Task SelectTransactionTypeAsync(SalesReturnEnumType selectedType)
+    //{
+    //    // BottomSheet'i kapat
+    //    CurrentPage.FindByName<BottomSheet>("selectConfirmBottomSheet").State = BottomSheetState.Hidden;
 
-        // BottomSheet'i kapat
-        CurrentPage.FindByName<BottomSheet>("selectConfirmBottomSheet").State = BottomSheetState.Hidden;
+    //    // SaveCommand'i tetikle
+    //    await SaveAsync();
+    //}
 
-        // SaveCommand'i tetikle
-        await SaveAsync();
-    }
+    //public static string GetEnumDescription(Enum value)
+    //{
+    //    FieldInfo fi = value.GetType().GetField(value.ToString());
 
-    public static string GetEnumDescription(Enum value)
-    {
-        FieldInfo fi = value.GetType().GetField(value.ToString());
+    //    DescriptionAttribute[] attributes = fi.GetCustomAttributes(typeof(DescriptionAttribute), false) as DescriptionAttribute[];
 
-        DescriptionAttribute[] attributes = fi.GetCustomAttributes(typeof(DescriptionAttribute), false) as DescriptionAttribute[];
+    //    if (attributes != null && attributes.Any())
+    //    {
+    //        return attributes.First().Description;
+    //    }
 
-        if (attributes != null && attributes.Any())
-        {
-            return attributes.First().Description;
-        }
-
-        return value.ToString();
-    }
+    //    return value.ToString();
+    //}
 
     private async Task SaveAsync()
     {
@@ -186,7 +185,7 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             DataResult<ResponseModel> result = new();
 
-            if (salesReturnEnumType == SalesReturnEnumType.Retail)
+            if (SalesFicheModel.FicheType == 7)
             {
                 RetailSalesReturnDispatchTransactionInsert dto = new()
                 {
@@ -282,7 +281,7 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
 
                 result = await _retailService.InsertRetailSalesReturnDispatchTransaction(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, dto);
             }
-            else
+            if (salesFicheModel.FicheType == 8)
             {
                 WholeSalesReturnDispatchTransactionInsert dto = new()
                 {
