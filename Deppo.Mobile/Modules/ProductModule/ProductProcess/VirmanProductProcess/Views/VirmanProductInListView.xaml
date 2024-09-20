@@ -5,7 +5,7 @@
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.ViewModels"
-             xmlns:warehouseModel="clr-namespace:Deppo.Mobile.Core.Models.WarehouseModels;assembly=Deppo.Mobile.Core"
+             xmlns:productModel="clr-namespace:Deppo.Mobile.Core.Models.ProductModels;assembly=Deppo.Mobile.Core"
              Title="{Binding Title}"
              x:DataType="viewModel:VirmanProductInListViewModel"
              Shell.TabBarIsVisible="False">
@@ -54,7 +54,7 @@
                                    Orientation="Vertical" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="warehouseModel:WarehouseTotalModel">
+                <DataTemplate x:DataType="productModel:ProductModel">
                     <Border Padding="10"
                             BackgroundColor="Transparent"
                             StrokeShape="RoundRectangle 10"
@@ -85,9 +85,9 @@
                                                  Spacing="2">
                                 <Label FontAttributes="Bold"
                                        LineBreakMode="TailTruncation"
-                                       Text="{Binding ProductCode}" />
+                                       Text="{Binding Code}" />
                                 <Label LineBreakMode="TailTruncation"
-                                       Text="{Binding ProductName}"
+                                       Text="{Binding Name}"
                                        TextColor="{StaticResource Gray600}" />
 
                                 <Label TextColor="{StaticResource Gray600}"
