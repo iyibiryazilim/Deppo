@@ -19,4 +19,6 @@ public partial class VirmanBasketModel : ObservableObject
     [ObservableProperty]
     InVirmanProductModel inVirmanProduct = null!;
 
+    
+
 }
