@@ -14,10 +14,16 @@ public partial class VirmanBasketModel : ObservableObject
     OutVirmanProductModel outVirmanProduct = null!;
 
     [ObservableProperty]
+    double outVirmanQuantity = 0;
+
+    [ObservableProperty]
     WarehouseModel inVirmanWarehouse = null!;
 
     [ObservableProperty]
     InVirmanProductModel inVirmanProduct = null!;
+
+    [ObservableProperty]
+    double inVirmanQuantity = 0;
 
     
 

@@ -10,16 +10,6 @@ public  class InVirmanProductModel : ProductModel
 {
     public ObservableCollection<LocationModel> Locations { get; set; } = new ObservableCollection<LocationModel>();
     
-    private double _virmanQuantity;
-    public double VirmanQuantity
-    {
-        get => _virmanQuantity;
-        set
-        {
-            if (_virmanQuantity == value) return;
-            _virmanQuantity = value;
-            NotifyPropertyChanged();
-        }
-    }
+ 
 
 }
