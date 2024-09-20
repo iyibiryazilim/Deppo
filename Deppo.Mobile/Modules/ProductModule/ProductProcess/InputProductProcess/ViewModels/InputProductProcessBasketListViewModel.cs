@@ -48,6 +48,8 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		IncreaseCommand = new Command<InputProductBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<InputProductBasketModel>(async (item) => await DecreaseAsync(item));
 
+	
+		
 		LoadMoreLocationsCommand = new Command(async () => await LoadMoreWarehouseLocationsAsync());
 		LocationCloseCommand = new Command(async () => await LocationCloseAsync());
 		LocationConfirmCommand = new Command<LocationModel>(async (locationModel) => await LocationConfirmAsync(locationModel));
