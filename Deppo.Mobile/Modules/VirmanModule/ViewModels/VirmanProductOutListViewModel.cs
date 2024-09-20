@@ -22,8 +22,6 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
     private readonly IUserDialogs _userDialogs;
     private readonly IWarehouseTotalService _warehouseTotalService;
 
-
-
     public VirmanProductOutListViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, IUserDialogs userDialogs, IWarehouseTotalService warehouseTotalService)
     {
         _httpClientService = httpClientService;
@@ -32,5 +30,5 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
         _warehouseTotalService = warehouseTotalService;
     }
 
-    
+    public Page CurrentPage { get; set; }
 }
