@@ -109,7 +109,7 @@
                                                               TextColor="{StaticResource Primary}" />
                                                         <Span Text=" " />
                                                         <Span FontAttributes="Bold"
-                                                              Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                                              Text="{Binding Quantity, StringFormat='{0:N2}'}"
                                                               TextColor="{StaticResource Primary}" />
                                                     </FormattedString>
                                                 </Label.FormattedText>
@@ -161,7 +161,7 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
-                <Button Grid.Row="2" Text="İleri" />
+                <Button Grid.Row="2" Text="İleri" Command="{Binding NextViewCommand}" />
 
             </Grid>
 

@@ -42,6 +42,8 @@ using Deppo.Mobile.Modules.ProductModule.ProductProcess.TransferProductProcess.V
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.TransferProductProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.Views;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.ViewModels;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchasePanel.ViewModels;
@@ -242,15 +244,12 @@ public static class MauiProgram
         builder.Services.AddSingleton<IRetailSalesDispatchTransactionService, RetailSalesDispatchTransactionDataStore>();
         builder.Services.AddSingleton<IWholeSalesDispatchTransactionService, WholeSalesDispatchTransactionDataStore>();
 
-
         builder.Services.AddSingleton<IPurchaseReturnDispatchTransactionService, PurchaseReturnDispatchTransactionDataStore>();
         builder.Services.AddSingleton<IRetailSalesReturnDispatchTransactionService, RetailSalesReturnDispatchTransactionDataStore>();
         builder.Services.AddSingleton<IWholeSalesReturnDispatchTransactionService, WholeSalesReturnDispatchTransactionDataStore>();
         builder.Services.AddSingleton<ITransferTransactionService, TransferTransactionDataStore>();
 
-
         builder.Services.AddSingleton<ISalesDispatchTransactionService, SalesDispatchTransactionDataStore>();
-
 
         builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
         builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
@@ -309,6 +308,16 @@ public static class MauiProgram
 
 
         #endregion
+
+        #region VirmanProduct Modules
+
+        builder.Services.AddTransientWithShellRoute<VirmanProductOutWarehouseListView, VirmanProductOutWarehouseListViewModel>(nameof(VirmanProductOutWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<VirmanProductOutListView, VirmanProductOutListViewModel>(nameof(VirmanProductOutListView));
+        builder.Services.AddScopedWithShellRoute<VirmanProductInWarehouseListView, VirmanProductInWarehouseListViewModel>(nameof(VirmanProductInWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<VirmanProductInListView, VirmanProductInListViewModel>(nameof(VirmanProductInListView));
+
+        #endregion VirmanProduct Modules
+
 
         #endregion Product Modules
 
@@ -418,7 +427,7 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddScopedWithShellRoute<ReturnPurchaseBasketView, ReturnPurchaseBasketViewModel>(nameof(ReturnPurchaseBasketView));
         builder.Services.AddScopedWithShellRoute<ReturnPurchaseFormView, ReturnPurchaseFormViewModel>(nameof(ReturnPurchaseFormView));
 
-        #endregion
+        #endregion Satınalma İade İşlemleri
 
         #region İrsaliyeye Bağlı Satınalma İade İşlemleri
 
@@ -429,7 +438,7 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddScopedWithShellRoute<ReturnPurchaseDispatchBasketView, ReturnPurchaseDispatchBasketViewModel>(nameof(ReturnPurchaseDispatchBasketView));
         builder.Services.AddScopedWithShellRoute<ReturnPurchaseDispatchFormView, ReturnPurchaseDispatchFormViewModel>(nameof(ReturnPurchaseDispatchFormView));
 
-        #endregion
+        #endregion İrsaliyeye Bağlı Satınalma İade İşlemleri
 
         #endregion Purchase Modules
 
@@ -460,7 +469,7 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddSingletonWithShellRoute<WaitingOutsourceProductListView, WaitingOutsourceProductListViewModel>(nameof(WaitingOutsourceProductListView));
         builder.Services.AddSingletonWithShellRoute<OutsourceProcessView, OutsourceProcessViewModel>(nameof(OutsourceProcessView));
 
-        #endregion
+        #endregion Outsource Modules
 
         return builder.Build();
     }

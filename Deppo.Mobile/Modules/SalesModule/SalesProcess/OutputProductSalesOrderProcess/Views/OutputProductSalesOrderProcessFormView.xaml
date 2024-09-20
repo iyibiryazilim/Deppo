@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentPage x:Class="Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views.OutputProductSalesOrderProcessFormView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views.OutputProductSalesOrderProcessFormView"
-             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
-             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.ViewModels"
-             x:DataType="viewModel:OutputProductSalesOrderProcessFormViewModel"
              xmlns:basketModel="clr-namespace:Deppo.Mobile.Core.Models.SalesModels.BasketModels;assembly=Deppo.Mobile.Core"
-             xmlns:shipAddressModel="clr-namespace:Deppo.Mobile.Core.Models.ShipAddressModels;assembly=Deppo.Mobile.Core"
              xmlns:dx="http://schemas.devexpress.com/maui"
-             Shell.TabBarIsVisible="False"
-             Title="{Binding Title}">
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:shipAddressModel="clr-namespace:Deppo.Mobile.Core.Models.ShipAddressModels;assembly=Deppo.Mobile.Core"
+             xmlns:coreModel="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:OutputProductSalesOrderProcessFormViewModel"
+             Shell.TabBarIsVisible="False">
     <Shell.BackButtonBehavior>
         <BackButtonBehavior Command="{Binding BackCommand}" />
     </Shell.BackButtonBehavior>
@@ -19,8 +20,8 @@
         <ToolbarItem Command="{Binding ShowBasketItemCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="FAS"
-                             Glyph="{x:Static fontAwesome:FontAwesomeIcons.BasketShopping}"
-                             Size="Large" />
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.BasketShopping}"
+                                 Size="Large" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </ContentPage.ToolbarItems>
@@ -47,49 +48,49 @@
         <VerticalStackLayout Grid.Row="0" Spacing="5">
             <!--#region Fiş Bilgileri-->
             <dx:FormGroupItem Header="Fiş Bilgileri"
-                  HeaderFontAttributes="Bold"
-                  HeaderFontSize="18">
+                              HeaderFontAttributes="Bold"
+                              HeaderFontSize="18">
                 <dx:FormItem>
                     <dx:FormItem.ContentTemplate>
                         <DataTemplate>
                             <VerticalStackLayout>
                                 <dx:DateEdit Grid.Column="0"
-                                 BorderColor="{StaticResource PrimaryLight}"
-                                 Date="{Binding TransactionDate}"
-                                 FocusedBorderColor="{StaticResource Primary}"
-                                 LabelText="Fiş Tarihi"
-                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.CalendarDay}" />
+                                             BorderColor="{StaticResource PrimaryLight}"
+                                             Date="{Binding TransactionDate}"
+                                             FocusedBorderColor="{StaticResource Primary}"
+                                             LabelText="Fiş Tarihi"
+                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.CalendarDay}" />
 
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
-                                 FocusedBorderColor="{StaticResource Primary}"
-                                 IsReadOnly="True"
-                                 LabelText="Ambar"
-                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                 Text="{Binding WarehouseModel.Name}" />
+                                             FocusedBorderColor="{StaticResource Primary}"
+                                             IsReadOnly="True"
+                                             LabelText="Ambar"
+                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                             Text="{Binding WarehouseModel.Name}" />
 
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
-                                 FocusedBorderColor="{StaticResource Primary}"
-                                 LabelText="Belge Numarası"
-                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                 Text="{Binding DocumentNumber}" />
+                                             FocusedBorderColor="{StaticResource Primary}"
+                                             LabelText="Belge Numarası"
+                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                             Text="{Binding DocumentNumber}" />
 
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
-                                 FocusedBorderColor="{StaticResource Primary}"
-                                 LabelText="Doküman İzleme Numarası"
-                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                 Text="{Binding DocumentTrackingNumber}" />
+                                             FocusedBorderColor="{StaticResource Primary}"
+                                             LabelText="Doküman İzleme Numarası"
+                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                             Text="{Binding DocumentTrackingNumber}" />
 
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
-                                 FocusedBorderColor="{StaticResource Primary}"
-                                 LabelText="Özel Kod"
-                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                 Text="{Binding SpecialCode}" />
+                                             FocusedBorderColor="{StaticResource Primary}"
+                                             LabelText="Özel Kod"
+                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                             Text="{Binding SpecialCode}" />
 
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
-                                 FocusedBorderColor="{StaticResource Primary}"
-                                 LabelText="Açıklama"
-                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                 Text="{Binding Description}" />
+                                             FocusedBorderColor="{StaticResource Primary}"
+                                             LabelText="Açıklama"
+                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                             Text="{Binding Description}" />
                             </VerticalStackLayout>
                         </DataTemplate>
                     </dx:FormItem.ContentTemplate>
@@ -99,8 +100,8 @@
 
             <!--#region Sevk Bilgileri-->
             <dx:FormGroupItem Header="Sevk Bilgileri"
-                  HeaderFontAttributes="Bold"
-                  HeaderFontSize="18">
+                              HeaderFontAttributes="Bold"
+                              HeaderFontSize="18">
                 <dx:FormItem>
                     <dx:FormItem.ContentTemplate>
                         <DataTemplate>
@@ -108,35 +109,35 @@
 
                                 <!--#region ShipAddress Picker-->
                                 <dx:FormListPickerItem InlineContent="Sevk Adresi"
-                                           ItemsSource="{Binding ShipAddresses}"
-                                           PickerShowMode="BottomSheet"
-                                           PickerTitle="Sevk Adresi Seçiniz"
-                                           SelectedItem="{Binding SelectedShipAddress}"
-                                           TapCommand="{Binding LoadShipAddressesCommand}"
-                                           TapCommandParameter="{Binding SelectedCustomer}"
-                                           Text="{Binding SelectedShipAddress.Name}">
+                                                       ItemsSource="{Binding ShipAddresses}"
+                                                       PickerShowMode="BottomSheet"
+                                                       PickerTitle="Sevk Adresi Seçiniz"
+                                                       SelectedItem="{Binding SelectedShipAddress}"
+                                                       TapCommand="{Binding LoadShipAddressesCommand}"
+                                                       TapCommandParameter="{Binding SalesCustomer}"
+                                                       Text="{Binding SelectedShipAddress.Name}">
                                     <dx:FormListPickerItem.ImageSource>
                                         <FontImageSource FontFamily="FAS"
-                                             Glyph="{x:Static fontAwesome:FontAwesomeIcons.LocationDot}"
-                                             Size="15"
-                                             Color="{StaticResource White}" />
+                                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.LocationDot}"
+                                                         Size="15"
+                                                         Color="{StaticResource White}" />
                                     </dx:FormListPickerItem.ImageSource>
                                     <dx:FormListPickerItem.ItemTemplate>
                                         <DataTemplate x:DataType="shipAddressModel:ShipAddressModel">
                                             <Border Padding="15" StrokeShape="RoundRectangle 5">
                                                 <Label FontAttributes="Bold"
-                                           LineBreakMode="TailTruncation"
-                                           Text="{Binding Name}"
-                                           TextColor="{StaticResource OffBlack}"
-                                           VerticalOptions="Center" />
+                                                       LineBreakMode="TailTruncation"
+                                                       Text="{Binding Name}"
+                                                       TextColor="{StaticResource OffBlack}"
+                                                       VerticalOptions="Center" />
                                             </Border>
                                         </DataTemplate>
                                     </dx:FormListPickerItem.ItemTemplate>
                                 </dx:FormListPickerItem>
                                 <!--#endregion-->
 
-                                <!--#region Carrier Picker-->
-                                <!--<dx:FormListPickerItem InlineContent="Taşıyıcı"
+                                <!--#region Carrier Picker -->
+                                <dx:FormListPickerItem InlineContent="Taşıyıcı"
                                            ItemsSource="{Binding Carriers}"
                                            PickerShowMode="BottomSheet"
                                            PickerTitle="Taşıyıcı Seçiniz"
@@ -160,11 +161,12 @@
                                             </Border>
                                         </DataTemplate>
                                     </dx:FormListPickerItem.ItemTemplate>
-                                </dx:FormListPickerItem>-->
+                                </dx:FormListPickerItem>
                                 <!--#endregion-->
 
+
                                 <!--#region Driver Picker-->
-                                <!--<dx:FormListPickerItem InlineContent="Şoför"
+                                <dx:FormListPickerItem InlineContent="Şoför"
                                            ItemsSource="{Binding Drivers}"
                                            PickerShowMode="BottomSheet"
                                            PickerTitle="Taşıyıcı Seçiniz"
@@ -188,7 +190,7 @@
                                             </Border>
                                         </DataTemplate>
                                     </dx:FormListPickerItem.ItemTemplate>
-                                </dx:FormListPickerItem>-->
+                                </dx:FormListPickerItem>
                                 <!--#endregion-->
                             </VerticalStackLayout>
                         </DataTemplate>
@@ -198,25 +200,29 @@
             <!--#endregion-->
         </VerticalStackLayout>
 
-        <Button Grid.Row="1" Command="{Binding SaveCommand}" Text="Kaydet" VerticalOptions="End" />
+        <Button Grid.Row="1"
+                Margin="5,10,5,20"
+                Command="{Binding SaveCommand}"
+                Text="Kaydet"
+                VerticalOptions="End" />
 
         <!--#region BasketItem BottomSheet-->
         <dx:BottomSheet x:Name="basketItemBottomSheet"
-                 AllowDismiss="True"
-                 BackgroundColor="White"
-                 CornerRadius="15"
-                 HalfExpandedRatio="0.5"
-                 IsModal="True"
-                 ShowGrabber="True">
+                        AllowDismiss="True"
+                        BackgroundColor="White"
+                        CornerRadius="15"
+                        HalfExpandedRatio="0.5"
+                        IsModal="True"
+                        ShowGrabber="True">
             <!--#region BottomSheetContent-->
             <Grid Padding="10"
-           RowDefinitions="Auto,*"
-           RowSpacing="20">
+                  RowDefinitions="Auto,*"
+                  RowSpacing="20">
 
                 <VerticalStackLayout Grid.Row="0" Spacing="5">
                     <Label FontAttributes="Bold"
-                    FontSize="Subtitle"
-                    Text="Malzeme Listesi" />
+                           FontSize="Subtitle"
+                           Text="Malzeme Listesi" />
                     <BoxView HeightRequest="2" Color="{StaticResource OffBlack}" />
                 </VerticalStackLayout>
 
@@ -224,68 +230,68 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="basketModel:OutputSalesBasketModel">
                             <Border Padding="10"
-                             BackgroundColor="Transparent"
-                             StrokeShape="RoundRectangle 10"
-                             StrokeThickness="0.1">
+                                    BackgroundColor="Transparent"
+                                    StrokeShape="RoundRectangle 10"
+                                    StrokeThickness="0.1">
                                 <Grid ColumnDefinitions="Auto,*, Auto" ColumnSpacing="10">
                                     <Border BackgroundColor="{StaticResource Secondary}"
-                                     StrokeShape="RoundRectangle 5"
-                                     StrokeThickness="0.5">
+                                            StrokeShape="RoundRectangle 5"
+                                            StrokeThickness="0.5">
                                         <Image Grid.Column="0"
-                                        HeightRequest="50"
-                                        Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
-                                        WidthRequest="50" />
+                                               HeightRequest="50"
+                                               Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                               WidthRequest="50" />
                                     </Border>
 
                                     <VerticalStackLayout Grid.Column="1" Spacing="2">
 
                                         <Label FontAttributes="Bold"
-                                        LineBreakMode="TailTruncation"
-                                        Text="{Binding ItemCode}" />
+                                               LineBreakMode="TailTruncation"
+                                               Text="{Binding ItemCode}" />
                                         <Label LineBreakMode="TailTruncation"
-                                        Text="{Binding ItemName}"
-                                        TextColor="{StaticResource Gray600}" />
+                                               Text="{Binding ItemName}"
+                                               TextColor="{StaticResource Gray600}" />
 
                                         <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
                                             <Label.FormattedText>
                                                 <FormattedString>
                                                     <Span FontAttributes="Bold"
-                                                   FontFamily="FAS"
-                                                   Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                                                   TextColor="{StaticResource Primary}" />
+                                                          FontFamily="FAS"
+                                                          Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                          TextColor="{StaticResource Primary}" />
                                                     <Span Text=" " />
                                                     <Span FontAttributes="Bold"
-                                                   Text="{Binding Quantity, StringFormat='{0:N2}'}"
-                                                   TextColor="{StaticResource Primary}" />
+                                                          Text="{Binding OutputQuantity, StringFormat='{0:N2}'}"
+                                                          TextColor="{StaticResource Primary}" />
                                                     <Span Text=" " />
                                                     <Span FontAttributes="Bold"
-                                                   Text="{Binding SubUnitsetCode}"
-                                                   TextColor="{StaticResource Primary}" />
+                                                          Text="{Binding SubUnitsetCode}"
+                                                          TextColor="{StaticResource Primary}" />
                                                 </FormattedString>
                                             </Label.FormattedText>
                                         </Label>
                                     </VerticalStackLayout>
 
                                     <Grid Grid.Column="2"
-                                   ColumnDefinitions="Auto, Auto, Auto"
-                                   ColumnSpacing="3"
-                                   HorizontalOptions="End"
-                                   VerticalOptions="Start">
+                                          ColumnDefinitions="Auto, Auto, Auto"
+                                          ColumnSpacing="3"
+                                          HorizontalOptions="End"
+                                          VerticalOptions="Start">
                                         <Label Grid.Column="0"
-                                        FontFamily="FAS"
-                                        FontSize="10"
-                                        Text="{Binding VariantIcon}"
-                                        TextColor="{Binding VariantIconColor}" />
+                                               FontFamily="FAS"
+                                               FontSize="10"
+                                               Text="{Binding VariantIcon}"
+                                               TextColor="{Binding VariantIconColor}" />
                                         <Label Grid.Column="1"
-                                        FontFamily="FAS"
-                                        FontSize="10"
-                                        Text="{Binding LocTrackingIcon}"
-                                        TextColor="{Binding LocTrackingIconColor}" />
+                                               FontFamily="FAS"
+                                               FontSize="10"
+                                               Text="{Binding LocTrackingIcon}"
+                                               TextColor="{Binding LocTrackingIconColor}" />
                                         <Label Grid.Column="2"
-                                        FontFamily="FAS"
-                                        FontSize="10"
-                                        Text="{Binding TrackingTypeIcon}"
-                                        TextColor="{Binding TrackingTypeIconColor}" />
+                                               FontFamily="FAS"
+                                               FontSize="10"
+                                               Text="{Binding TrackingTypeIcon}"
+                                               TextColor="{Binding TrackingTypeIconColor}" />
                                     </Grid>
                                 </Grid>
                             </Border>
@@ -295,6 +301,79 @@
             </Grid>
             <!--#endregion-->
         </dx:BottomSheet>
+        <!--#endregion-->
+
+        <!--#region InsertOptions BottomSheet-->
+        <dx:BottomSheet x:Name="insertOptionsBottomSheet"
+                        AllowDismiss="True"
+                        BackgroundColor="White"
+                        CornerRadius="15"
+                        HalfExpandedRatio="0.3"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <Grid Padding="10"
+                  RowDefinitions="Auto,*"
+                  RowSpacing="20">
+                <VerticalStackLayout Grid.Row="0" Spacing="5">
+                    <Label Padding="10"
+                           FontAttributes="Bold"
+                           FontSize="Subtitle"
+                           Text="İade İrsaliye Türü Seçiniz" />
+                    <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Row="1" Spacing="10">
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectWholeCommand}" />
+                        </Border.GestureRecognizers>
+
+                        <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontAttributes="Bold"
+                                          FontFamily="FAS"
+                                          Text="{x:Static fontAwesome:FontAwesomeIcons.List}"
+                                          TextColor="{StaticResource OffBlack}" />
+                                    <Span Text=" " />
+
+                                    <Span Text=" " />
+                                    <Span FontAttributes="Bold"
+                                          Text="Toptan Satış İrsaliyesi"
+                                          TextColor="{StaticResource OffBlack}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </Border>
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectRetailCommand}" />
+                        </Border.GestureRecognizers>
+                        <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontAttributes="Bold"
+                                          FontFamily="FAS"
+                                          Text="{x:Static fontAwesome:FontAwesomeIcons.List}"
+                                          TextColor="{StaticResource OffBlack}" />
+                                    <Span Text=" " />
+
+                                    <Span FontAttributes="Bold"
+                                          Text="Perakende Satış İrsaliyesi"
+                                          TextColor="{StaticResource OffBlack}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </Border>
+                </VerticalStackLayout>
+            </Grid>
+        </dx:BottomSheet>
+
         <!--#endregion-->
     </Grid>
 </ContentPage>

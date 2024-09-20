@@ -9,6 +9,7 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
 
@@ -62,7 +63,8 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 		IncreaseCommand = new Command<OutputSalesBasketModel>(async (outputSalesBasketModel) => await IncreaseAsync(outputSalesBasketModel));
 		DecreaseCommand = new Command<OutputSalesBasketModel>(async (outputSalesBasketModel) => await DecreaseAsync(outputSalesBasketModel));
 		BackCommand = new Command(async () => await BackAsync());
-		
+		NextViewCommand = new Command(async () => await NextViewAsync());
+
 		LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreWarehouseLocationTransactionsAsync());
 		LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
 		LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
@@ -78,7 +80,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 	public ContentPage CurrentPage { get; set; } = null!;
 
 	#region Commands
-	public Command<OutputSalesBasketModel> IncreaseCommand {get; }
+	public Command<OutputSalesBasketModel> IncreaseCommand { get; }
 	public Command<OutputSalesBasketModel> DecreaseCommand { get; }
 	public Command<OutputSalesBasketModel> DeleteItemCommand { get; }
 
@@ -91,7 +93,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 	#endregion
 
 	#region SeriLotTransaction Command
-	public Command LoadMoreSeriLotTransactionsCommand { get; }   
+	public Command LoadMoreSeriLotTransactionsCommand { get; }
 	public Command SeriLotTransactionIncreaseCommand { get; }
 	public Command SeriLotTransactionDecreaseCommand { get; }
 	public Command SeriLotTransactionConfirmCommand { get; }
@@ -114,25 +116,25 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 
 			SelectedItem = outputSalesBasketModel;
 			// Stok Yeri Takipli olma durumu
-			if(outputSalesBasketModel.LocTracking == 1)
+			if (outputSalesBasketModel.LocTracking == 1)
 			{
 				await LoadWarehouseLocationTransactionsAsync(outputSalesBasketModel);
 				CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.FullExpanded;
-				
+
 			}
-			else if(outputSalesBasketModel.TrackingType == 1)
+			else if (outputSalesBasketModel.TrackingType == 1)
 			{
 				CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.FullExpanded;
 			}
 			else
 			{
-				if(outputSalesBasketModel.OutputQuantity < outputSalesBasketModel.StockQuantity)
+				if (outputSalesBasketModel.OutputQuantity < outputSalesBasketModel.StockQuantity)
 					outputSalesBasketModel.OutputQuantity += 1;
 			}
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
@@ -152,9 +154,9 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 		{
 			IsBusy = true;
 
-			if(outputSalesBasketModel is not null)
+			if (outputSalesBasketModel is not null)
 			{
-				if(outputSalesBasketModel.OutputQuantity > 1)
+				if (outputSalesBasketModel.OutputQuantity > 1)
 				{
 					// Stok Yeri Takipli olma durumu
 					if (outputSalesBasketModel.LocTracking == 1)
@@ -170,10 +172,10 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 					}
 					else
 					{
-							outputSalesBasketModel.OutputQuantity -= 1;
+						outputSalesBasketModel.OutputQuantity -= 1;
 					}
 				}
-				
+
 			}
 		}
 		catch (Exception ex)
@@ -200,7 +202,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			var result = await _locationTransactionService.GetInputObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, outputSalesBasketModel.ItemReferenceId, warehouseNumber: WarehouseModel.Number, 0, 20, "");
-			if(result.IsSuccess)
+			if (result.IsSuccess)
 			{
 				if (result.Data is null)
 					return;
@@ -211,8 +213,9 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 
 			_userDialogs.HideHud();
 		}
-		catch(Exception ex) { 
-			if(_userDialogs.IsHudShowing)
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
@@ -267,24 +270,24 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 		{
 			IsBusy = true;
 
-			if(item is not null)
+			if (item is not null)
 			{
 				SelectedLocationTransaction = item;
-				if(SelectedItem.TrackingType == 1 ||SelectedItem.TrackingType == 2)
+				if (SelectedItem.TrackingType == 1 || SelectedItem.TrackingType == 2)
 				{
 					await LoadSeriLotTransactionsAsync();
 					CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.FullExpanded;
 				}
 				else
 				{
-                    var totalQuantity = LocationTransactions.Sum(x => x.OutputQuantity);
-                    if (SelectedItem.StockQuantity > totalQuantity)
-                    {
-                        if (item.OutputQuantity < item.RemainingQuantity && SelectedItem.StockQuantity > item.OutputQuantity)
-                            item.OutputQuantity++;
-                    }
+					var totalQuantity = LocationTransactions.Sum(x => x.OutputQuantity);
+					if (SelectedItem.Quantity > totalQuantity)
+					{
+						if (item.OutputQuantity < item.RemainingQuantity && SelectedItem.Quantity > item.OutputQuantity)
+							item.OutputQuantity++;
+					}
 
-                    if (item.OutputQuantity > 0 && !item.IsSelected)
+					if (item.OutputQuantity > 0 && !item.IsSelected)
 						item.IsSelected = true;
 				}
 			}
@@ -325,7 +328,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 					if (item.OutputQuantity > 0)
 						item.OutputQuantity--;
 
-					if(item.OutputQuantity == 0)
+					if (item.OutputQuantity == 0)
 						item.IsSelected = false;
 				}
 			}
@@ -351,13 +354,16 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 		{
 			IsBusy = true;
 
-			if(LocationTransactions.Count > 0)
+			if (LocationTransactions.Count > 0)
 			{
 				SelectedLocationTransactions.Clear();
-				SelectedLocationTransactions.ToList().AddRange(LocationTransactions.Where(x => x.OutputQuantity > 0));
+                foreach (var item in LocationTransactions.Where( x => x.OutputQuantity > 0))
+                {
+					SelectedLocationTransactions.Add(item);
+                }
 
                 foreach (var item in SelectedLocationTransactions)
-                {
+				{
 					var selectedLocationTransactionItem = SelectedItem.Details.FirstOrDefault(x => x.TransactionReferenceId == item.TransactionReferenceId);
 					if (selectedLocationTransactionItem is not null)
 					{
@@ -376,11 +382,11 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 						RemainingQuantity = item.RemainingQuantity,
 						RemainingUnitQuantity = item.RemainingUnitQuantity,
 					});
-                }
+				}
 
 
-                var totalOutputQuantity = SelectedLocationTransactions.Sum(x => (double)x.OutputQuantity);
-				SelectedItem.OutputQuantity = totalOutputQuantity;
+				var totalOutputQuantity = SelectedLocationTransactions.Sum(x => (double)x.OutputQuantity);
+				SelectedItem.Quantity = totalOutputQuantity;
 
 				CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.Hidden;
 			}
@@ -495,9 +501,9 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 		{
 			IsBusy = true;
 
-			if(item is not null)
+			if (item is not null)
 			{
-				if(item.OutputQuantity < item.Quantity)
+				if (item.OutputQuantity < item.Quantity)
 				{
 					item.OutputQuantity++;
 
@@ -558,12 +564,12 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 		{
 			IsBusy = true;
 
-			if(SeriLotTransactions.Count > 0)
+			if (SeriLotTransactions.Count > 0)
 			{
 				SelectedSeriLotTransactions.Clear();
 				SelectedSeriLotTransactions.ToList().AddRange(SeriLotTransactions.Where(x => x.OutputQuantity > 0));
 				// Stok yeri takipli değilse
-				if(SelectedItem.LocTracking == 0)
+				if (SelectedItem.LocTracking == 0)
 				{
 					var totalOutputQuantity = SeriLotTransactions.Where(x => x.OutputQuantity > 0).Sum(x => (double)x.OutputQuantity);
 					SelectedItem.OutputQuantity = totalOutputQuantity;
@@ -572,7 +578,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 				}
 				// Stok yeri takipli ise
 				else
-				{	
+				{
 					var totalOutputQuantity = SeriLotTransactions.Where(x => x.OutputQuantity > 0).Sum(x => (double)x.OutputQuantity);
 					SelectedLocationTransaction.OutputQuantity = totalOutputQuantity;
 					CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.Hidden;
@@ -580,7 +586,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 			}
 			CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.Hidden;
 		}
-		catch(Exception ex)
+		catch (Exception ex)
 		{
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
@@ -600,6 +606,47 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 		{
 			CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.Hidden;
 		});
+	}
+
+	private async Task NextViewAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			if (Items.Count == 0)
+			{
+				await _userDialogs.AlertAsync("Sepetinizde ürün bulunmamaktadır.", "Hata", "Tamam");
+				return;
+			}
+
+			bool isQuantityValid = Items.All(x => x.OutputQuantity > 0);
+			if (!isQuantityValid)
+			{
+				await _userDialogs.AlertAsync("Sepetinizde miktarı 0 olan ürünler bulunmaktadır.", "Uyarı", "Tamam");
+				return;
+			}
+
+			await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessFormView)}", new Dictionary<string, object>
+			{
+				[nameof(WarehouseModel)] = WarehouseModel,
+				[nameof(Items)] = Items,
+				[nameof(SalesCustomer)] = SalesCustomer
+			});
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
 	}
 
 	private async Task BackAsync()
