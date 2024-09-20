@@ -138,13 +138,21 @@ public partial class OutputProductSalesProcessWarehouseListViewModel : BaseViewM
 		{
 			IsBusy = true;
 
-			Items.ToList().ForEach(x => x.IsSelected = false);
+			if (item == SelectedWarehouseModel)
+			{
+				SelectedWarehouseModel.IsSelected = false;
+				SelectedWarehouseModel = null;
+			}
+			else
+			{
+				if (SelectedWarehouseModel != null)
+				{
+					SelectedWarehouseModel.IsSelected = false;
+				}
 
-			var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-			if (selectedItem != null)
-				selectedItem.IsSelected = true;
-
-			SelectedWarehouseModel = item;
+				SelectedWarehouseModel = item;
+				SelectedWarehouseModel.IsSelected = true;
+			}
 		}
 		catch (Exception ex)
 		{

@@ -437,7 +437,7 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 			{
 				ProductCode = item.ItemCode,
 				WarehouseNumber = (short?)WarehouseModel.Number,
-				Quantity = item.Quantity,
+				Quantity = item.OutputQuantity,
 				ConversionFactor = 1,
 				OtherConversionFactor = 1,
 				SubUnitsetCode = item.SubUnitsetCode,
@@ -537,7 +537,7 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 			{
 				ProductCode = item.ItemCode,
 				WarehouseNumber = (short?)WarehouseModel.Number,
-				Quantity = item.Quantity,
+				Quantity = item.OutputQuantity,
 				ConversionFactor = 1,
 				OtherConversionFactor = 1,
 				SubUnitsetCode = item.SubUnitsetCode,

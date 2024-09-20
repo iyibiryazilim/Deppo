@@ -281,9 +281,9 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 				else
 				{
 					var totalQuantity = LocationTransactions.Sum(x => x.OutputQuantity);
-					if (SelectedItem.StockQuantity > totalQuantity)
+					if (SelectedItem.Quantity > totalQuantity)
 					{
-						if (item.OutputQuantity < item.RemainingQuantity && SelectedItem.StockQuantity > item.OutputQuantity)
+						if (item.OutputQuantity < item.RemainingQuantity && SelectedItem.Quantity > item.OutputQuantity)
 							item.OutputQuantity++;
 					}
 
@@ -357,9 +357,12 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 			if (LocationTransactions.Count > 0)
 			{
 				SelectedLocationTransactions.Clear();
-				SelectedLocationTransactions.ToList().AddRange(LocationTransactions.Where(x => x.OutputQuantity > 0));
+                foreach (var item in LocationTransactions.Where( x => x.OutputQuantity > 0))
+                {
+					SelectedLocationTransactions.Add(item);
+                }
 
-				foreach (var item in SelectedLocationTransactions)
+                foreach (var item in SelectedLocationTransactions)
 				{
 					var selectedLocationTransactionItem = SelectedItem.Details.FirstOrDefault(x => x.TransactionReferenceId == item.TransactionReferenceId);
 					if (selectedLocationTransactionItem is not null)
@@ -383,7 +386,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 
 
 				var totalOutputQuantity = SelectedLocationTransactions.Sum(x => (double)x.OutputQuantity);
-				SelectedItem.OutputQuantity = totalOutputQuantity;
+				SelectedItem.Quantity = totalOutputQuantity;
 
 				CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.Hidden;
 			}
@@ -619,7 +622,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 				return;
 			}
 
-			bool isQuantityValid = Items.All(x => x.Quantity > 0);
+			bool isQuantityValid = Items.All(x => x.OutputQuantity > 0);
 			if (!isQuantityValid)
 			{
 				await _userDialogs.AlertAsync("Sepetinizde miktarı 0 olan ürünler bulunmaktadır.", "Uyarı", "Tamam");

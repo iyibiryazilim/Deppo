@@ -261,7 +261,7 @@
                                                           TextColor="{StaticResource Primary}" />
                                                     <Span Text=" " />
                                                     <Span FontAttributes="Bold"
-                                                          Text="{Binding Quantity, StringFormat='{0:N2}'}"
+                                                          Text="{Binding OutputQuantity, StringFormat='{0:N2}'}"
                                                           TextColor="{StaticResource Primary}" />
                                                     <Span Text=" " />
                                                     <Span FontAttributes="Bold"
