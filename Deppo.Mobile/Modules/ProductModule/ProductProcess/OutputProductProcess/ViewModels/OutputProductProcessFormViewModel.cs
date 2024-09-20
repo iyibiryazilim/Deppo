@@ -122,9 +122,13 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
         {
             IsBusy = true;
 
+            var confirm = await _userDialogs.ConfirmAsync("Fiş oluşturulacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+            if (!confirm)
+                return;
+
             _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
             await Task.Delay(1000);
-
+         
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
             switch(OutputProductProcessType)

@@ -277,10 +277,14 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 				}
 				else
 				{
-					if(item.OutputQuantity < item.Quantity)
-						item.OutputQuantity += 1;
+                    var totalQuantity = LocationTransactions.Sum(x => x.OutputQuantity);
+                    if (SelectedItem.StockQuantity > totalQuantity)
+                    {
+                        if (item.OutputQuantity < item.RemainingQuantity && SelectedItem.StockQuantity > item.OutputQuantity)
+                            item.OutputQuantity++;
+                    }
 
-					if (item.OutputQuantity > 0 && !item.IsSelected)
+                    if (item.OutputQuantity > 0 && !item.IsSelected)
 						item.IsSelected = true;
 				}
 			}
