@@ -77,11 +77,11 @@ ILocationService locationService)
 
 
 
-        LoadMoreLocationsCommand = new Command(async () => await LoadMoreWarehouseLocationsAsync());
-        LocationCloseCommand = new Command(async () => await LocationCloseAsync());
-        LocationConfirmCommand = new Command<LocationModel>(async (locationModel) => await LocationConfirmAsync(locationModel));
-        LocationIncreaseCommand = new Command<LocationModel>(async (locationModel) => await LocationIncreaseAsync(locationModel));
-        LocationDecreaseCommand = new Command<LocationModel>(async (LocationModel) => await LocationDecreaseAsync(LocationModel));
+        //LoadMoreLocationsCommand = new Command(async () => await LoadMoreWarehouseLocationsAsync());
+        //LocationCloseCommand = new Command(async () => await LocationCloseAsync());
+        //LocationConfirmCommand = new Command<LocationModel>(async (locationModel) => await LocationConfirmAsync(locationModel));
+        //LocationIncreaseCommand = new Command<LocationModel>(async (locationModel) => await LocationIncreaseAsync(locationModel));
+        //LocationDecreaseCommand = new Command<LocationModel>(async (LocationModel) => await LocationDecreaseAsync(LocationModel));
 
 
     }
