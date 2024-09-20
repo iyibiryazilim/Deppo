@@ -22,20 +22,15 @@ public partial class VirmanProductInListViewModel : BaseViewModel
     private readonly IUserDialogs _userDialogs;
     private readonly IWarehouseTotalService _warehouseTotalService;
 
-
     [ObservableProperty]
     private WarehouseModel outWarehouse = null!;
 
-
     public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
-
 
     [ObservableProperty]
     private WarehouseTotalModel? selectedProduct;
+
     public Page CurrentPage { get; set; }
-
-
-
 
     public VirmanProductInListViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, IUserDialogs userDialogs, IWarehouseTotalService warehouseTotalService)
     {
@@ -44,16 +39,13 @@ public partial class VirmanProductInListViewModel : BaseViewModel
         _userDialogs = userDialogs;
         _warehouseTotalService = warehouseTotalService;
 
-        Title = "Çıkış Ürünleri Listesi";
-
+        Title = "Giriş Ürünleri Listesi";
 
         BackCommand = new Command(async () => await BackAsync());
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<WarehouseTotalModel>(async (parameter) => await ItemTappedAsync(parameter));
         NextViewCommand = new Command(async () => await NextViewAsync());
-
-
     }
 
     public Command LoadItemsCommand { get; }
@@ -65,28 +57,27 @@ public partial class VirmanProductInListViewModel : BaseViewModel
 
     private async Task NextViewAsync()
     {
-        if (IsBusy)
-            return;
+        //if (IsBusy)
+        //    return;
 
-        try
-        {
-            IsBusy = true;
+        //try
+        //{
+        //    IsBusy = true;
 
-
-            await Shell.Current.GoToAsync($"{nameof(VirmanProductInWarehouseListViewModel)}", new Dictionary<string, object>
-            {
-                ["OutWarehouse"] = OutWarehouse,
-                [nameof(WarehouseTotalModel)] = SelectedProduct
-            });
-        }
-        catch (System.Exception ex)
-        {
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
+        //    await Shell.Current.GoToAsync($"{nameof(VirmanProductInWarehouseListViewModel)}", new Dictionary<string, object>
+        //    {
+        //        ["OutWarehouse"] = OutWarehouse,
+        //        [nameof(WarehouseTotalModel)] = SelectedProduct
+        //    });
+        //}
+        //catch (System.Exception ex)
+        //{
+        //    await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        //}
+        //finally
+        //{
+        //    IsBusy = false;
+        //}
     }
 
     private async Task ItemTappedAsync(WarehouseTotalModel item)
@@ -100,23 +91,31 @@ public partial class VirmanProductInListViewModel : BaseViewModel
 
             if (item is not null)
             {
-
-                if (!item.IsSelected)
+                // Eğer item zaten seçiliyse, seçimi kaldır
+                if (item == SelectedProduct)
                 {
-
-                    Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
-                    SelectedProduct = item;
+                    SelectedProduct.IsSelected = false;
+                    SelectedProduct = null;
                 }
                 else
                 {
-                    SelectedProduct = null;
+                    // Daha önce seçili olan varsa, onun seçimini kaldır
+                    if (SelectedProduct != null)
+                    {
+                        SelectedProduct.IsSelected = false;
+                    }
+
+                    // Yeni item'i seç ve IsSelected durumunu true yap
+                    SelectedProduct = item;
+                    SelectedProduct.IsSelected = true;
+
+                    // Items listesindeki ilgili öğenin IsSelected durumunu güncelle
                     var selectedItem = Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
                     if (selectedItem is not null)
                     {
-                        Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
+                        selectedItem.IsSelected = true;
                     }
                 }
-
             }
         }
         catch (Exception ex)
@@ -239,7 +238,6 @@ public partial class VirmanProductInListViewModel : BaseViewModel
 
                 foreach (var product in result.Data)
                 {
-
                     var item = Mapping.Mapper.Map<WarehouseTotal>(product);
                     Items.Add(new WarehouseTotalModel
                     {
