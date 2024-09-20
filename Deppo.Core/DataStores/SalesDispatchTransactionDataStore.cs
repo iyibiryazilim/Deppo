@@ -196,7 +196,7 @@ FETCH NEXT {take} ROWS ONLY";
                 baseQuery += $@" AND (STFICHE.FICHENO LIKE '{search}%' OR STFICHE.GENEXP1 LIKE '%{search}%')";
 
             baseQuery += $@"
-ORDER BY CLCARD.DEFINITION_ ASC
+ORDER BY STFICHE.DATE_ DESC
 OFFSET {skip} ROWS
 FETCH NEXT {take} ROWS ONLY";
 
