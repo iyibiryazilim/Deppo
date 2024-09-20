@@ -1,4 +1,9 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.WarehouseModels;
@@ -11,20 +16,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Deppo.Mobile.Modules.VirmanModule.ViewModels;
 
-public partial class VirmanProductOutWarehouseListVİewModel : BaseViewModel
+namespace Deppo.Mobile.Modules.VirmanModule.ViewModels;
+[QueryProperty(name: nameof(OutWarehouse), queryId: nameof(OutWarehouse))]
+[QueryProperty(name: nameof(WarehouseTotalModel), queryId: nameof(WarehouseTotalModel))]
+
+public partial class VirmanProductInWarehouseListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
     private readonly IWarehouseService _warehouseService;
     private readonly IUserDialogs _userDialogs;
+
+
+    [ObservableProperty]
+    private WarehouseModel outWarehouse = null!;
+    [ObservableProperty]
+    private WarehouseTotalModel warehouseTotalModel= null!;
 
     [ObservableProperty]
     private WarehouseModel selectedWarehouseModel = null!;
 
     public ObservableCollection<WarehouseModel> Items { get; } = new();
 
-    public VirmanProductOutWarehouseListVİewModel(IHttpClientService httpClientService,
+    public VirmanProductInWarehouseListViewModel(IHttpClientService httpClientService,
     IWarehouseService warehouseService,
     IUserDialogs userDialogs)
     {
@@ -32,7 +46,7 @@ public partial class VirmanProductOutWarehouseListVİewModel : BaseViewModel
         _warehouseService = warehouseService;
         _userDialogs = userDialogs;
 
-        Title = "Çıkış Ambarı Seçimi";
+        Title = "Giriş Ambarı Seçimi";
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
@@ -183,7 +197,10 @@ public partial class VirmanProductOutWarehouseListVİewModel : BaseViewModel
             {
                 await Shell.Current.GoToAsync($"{nameof(VirmanProductOutListViewModel)}", new Dictionary<string, object>
                 {
-                    ["OutWarehouse"] = SelectedWarehouseModel,
+                    ["OutWarehouse"] = OutWarehouse,
+                    ["InWarehouse"] = SelectedWarehouseModel,
+                    [nameof(WarehouseTotalModel)] = WarehouseTotalModel
+
                 });
             }
         }
