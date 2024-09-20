@@ -31,6 +31,7 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
     private readonly IUserDialogs _userDialogs;
     private readonly IWarehouseTotalService _warehouseTotalService;
 
+
     [ObservableProperty]
     private WarehouseModel outWarehouse = null!;
 
@@ -40,6 +41,7 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
 
     [ObservableProperty]
     private WarehouseTotalModel? selectedProduct;
+
 
 
     public VirmanProductOutListViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, IUserDialogs userDialogs, IWarehouseTotalService warehouseTotalService)
@@ -134,6 +136,10 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+
+    public Page CurrentPage { get; set; }
+}
 
     private async Task LoadMoreItemsAsync()
     {
@@ -292,3 +298,4 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
 
 
 }
+

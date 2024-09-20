@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Modules.VirmanModule.ViewModels;
 
-public partial class VirmanProductOutWarehouseListVİewModel : BaseViewModel
+public partial class VirmanProductOutWarehouseListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
     private readonly IWarehouseService _warehouseService;
@@ -24,7 +24,7 @@ public partial class VirmanProductOutWarehouseListVİewModel : BaseViewModel
 
     public ObservableCollection<WarehouseModel> Items { get; } = new();
 
-    public VirmanProductOutWarehouseListVİewModel(IHttpClientService httpClientService,
+    public VirmanProductOutWarehouseListViewModel(IHttpClientService httpClientService,
     IWarehouseService warehouseService,
     IUserDialogs userDialogs)
     {
@@ -39,6 +39,8 @@ public partial class VirmanProductOutWarehouseListVİewModel : BaseViewModel
         ItemTappedCommand = new Command<WarehouseModel>(ItemTappedAsync);
         NextViewCommand = new Command(async () => await NextViewAsync());
     }
+
+    public Page CurrentPage { get; set; }
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
