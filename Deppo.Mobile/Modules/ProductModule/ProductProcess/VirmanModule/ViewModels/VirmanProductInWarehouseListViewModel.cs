@@ -17,7 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace Deppo.Mobile.Modules.ProductModule.VirmanModule.ViewModels;
+namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanModule.ViewModels;
 [QueryProperty(name: nameof(OutWarehouse), queryId: nameof(OutWarehouse))]
 [QueryProperty(name: nameof(WarehouseTotalModel), queryId: nameof(WarehouseTotalModel))]
 
@@ -195,7 +195,7 @@ public partial class VirmanProductInWarehouseListViewModel : BaseViewModel
 
             if (SelectedWarehouseModel is not null)
             {
-                await Shell.Current.GoToAsync($"{nameof(VirmanProductOutListViewModel)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"{nameof(VirmanProductInListViewModel)}", new Dictionary<string, object>
                 {
                     ["OutWarehouse"] = OutWarehouse,
                     ["InWarehouse"] = SelectedWarehouseModel,
