@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using System;
 using System.Collections.Generic;
@@ -15,13 +12,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Deppo.Core.Models;
-using Deppo.Mobile.Helpers.MappingHelper;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanModule.ViewModels;
 
-[QueryProperty(name: nameof(OutWarehouse), queryId: nameof(OutWarehouse))]
-public partial class VirmanProductOutListViewModel : BaseViewModel
+public partial class VirmanProductInListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
     private readonly ISeriLotTransactionService _serilotTransactionService;
@@ -43,7 +37,7 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
 
 
 
-    public VirmanProductOutListViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, IUserDialogs userDialogs, IWarehouseTotalService warehouseTotalService)
+    public VirmanProductInListViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, IUserDialogs userDialogs, IWarehouseTotalService warehouseTotalService)
     {
         _httpClientService = httpClientService;
         _serilotTransactionService = serilotTransactionService;
@@ -287,18 +281,4 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
-
 }
-
-  
-
-
-   
-    
-
-
-
-
-
-

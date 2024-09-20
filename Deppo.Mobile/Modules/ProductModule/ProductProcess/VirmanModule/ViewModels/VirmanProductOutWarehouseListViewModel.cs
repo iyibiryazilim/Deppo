@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Deppo.Mobile.Modules.ProductModule.VirmanModule.ViewModels;
+namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanModule.ViewModels;
 
 public partial class VirmanProductOutWarehouseListViewModel : BaseViewModel
 {
