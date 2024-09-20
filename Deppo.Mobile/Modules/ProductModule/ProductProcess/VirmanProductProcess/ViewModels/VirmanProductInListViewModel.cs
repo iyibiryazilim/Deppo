@@ -35,32 +35,18 @@ public partial class VirmanProductInListViewModel : BaseViewModel
     [ObservableProperty]
     private WarehouseTotalModel warehouseTotalModel = null!;
 
-
-    public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
-
     public ObservableCollection<ProductModel> Items { get; } = new();
 
 
     [ObservableProperty]
-
-    private WarehouseTotalModel? selectedProduct;
-
     private ProductModel? selectedProduct;
     public Page CurrentPage { get; set; }
 
-
-
-
-    public Page CurrentPage { get; set; }
-
-    public VirmanProductInListViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, IUserDialogs userDialogs,  IProductService productService)
+    public VirmanProductInListViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, IUserDialogs userDialogs, IProductService productService)
     {
         _httpClientService = httpClientService;
         _serilotTransactionService = serilotTransactionService;
         _userDialogs = userDialogs;
-
-        _warehouseTotalService = warehouseTotalService;
-
         Title = "Giriş Ürünleri Listesi";
 
         _productService = productService;
@@ -86,79 +72,27 @@ public partial class VirmanProductInListViewModel : BaseViewModel
     private async Task LoadItemsAsync()
     {
 
-        //if (IsBusy)
-        //    return;
-
-        //try
-        //{
-        //    IsBusy = true;
-
-        //    await Shell.Current.GoToAsync($"{nameof(VirmanProductInWarehouseListViewModel)}", new Dictionary<string, object>
-        //    {
-        //        ["OutWarehouse"] = OutWarehouse,
-        //        [nameof(WarehouseTotalModel)] = SelectedProduct
-        //    });
-        //}
-        //catch (System.Exception ex)
-        //{
-        //    await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        //}
-        //finally
-        //{
-        //    IsBusy = false;
-        //}
-    }
-
-    private async Task ItemTappedAsync(WarehouseTotalModel item)
-    {
-      
-
         if (IsBusy)
             return;
-
         try
         {
             IsBusy = true;
-            Items.Clear();
-            _userDialogs.Loading("Loading Items...");
-            await Task.Delay(1000);
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 20);
+            Items.Clear();
+            _userDialogs.Loading("Yükleniyor...");
+            await Task.Delay(1000);
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _productService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, skip: 0, take: 20);
+
             if (result.IsSuccess)
             {
-
-                // Eğer item zaten seçiliyse, seçimi kaldır
-                if (item == SelectedProduct)
-                {
-                    SelectedProduct.IsSelected = false;
-                    SelectedProduct = null;
-                }
-                else
-                {
-                    // Daha önce seçili olan varsa, onun seçimini kaldır
-                    if (SelectedProduct != null)
-                    {
-                        SelectedProduct.IsSelected = false;
-                    }
-
-                    // Yeni item'i seç ve IsSelected durumunu true yap
-                    SelectedProduct = item;
-                    SelectedProduct.IsSelected = true;
-
-                    // Items listesindeki ilgili öğenin IsSelected durumunu güncelle
-                    var selectedItem = Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
-                    if (selectedItem is not null)
-                    {
-                        selectedItem.IsSelected = true;
-                    }
-
-                if (result.Data == null)
+                if (result.Data is null)
                     return;
 
                 foreach (var product in result.Data)
                 {
-                    var item = Mapping.Mapper.Map<Product>(product);
+                    var item = Mapping.Mapper.Map<ProductModel>(product);
 
                     Items.Add(new ProductModel
                     {
@@ -172,18 +106,14 @@ public partial class VirmanProductInListViewModel : BaseViewModel
                         SubUnitsetCode = item.SubUnitsetCode,
                         SubUnitsetName = item.SubUnitsetName,
                         StockQuantity = item.StockQuantity,
-                        TrackingType = item.TrackingType,
                         LocTracking = item.LocTracking,
-                        GroupCode = item.GroupCode,
-                        BrandReferenceId = item.BrandReferenceId,
-                        BrandCode = item.BrandCode,
-                        BrandName = item.BrandName,
-                        VatRate = item.VatRate,
-                        Image = item.Image,
                         IsVariant = item.IsVariant,
-                        IsSelected = false
+                        TrackingType = item.TrackingType,
+                        IsSelected = false,
+                        LocTrackingIcon = product.LocTrackingIcon,
+                        VariantIcon = product.VariantIcon,
+                        TrackingTypeIcon = product.TrackingTypeIcon,
                     });
-
                 }
             }
 
@@ -199,8 +129,8 @@ public partial class VirmanProductInListViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
-            _userDialogs.Loading().Dispose();
         }
+
     }
 
     private async Task LoadMoreItemsAsync()
@@ -210,6 +140,9 @@ public partial class VirmanProductInListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            _userDialogs.Loading("Yükleniyor...");
+            await Task.Delay(1000);
+
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _productService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, skip: Items.Count, take: 20);
@@ -269,26 +202,24 @@ public partial class VirmanProductInListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            if (item is not null)
+            if (SelectedProduct == item)
             {
-
-                if (!item.IsSelected)
+                SelectedProduct.IsSelected = false;
+                SelectedProduct = null;
+            }
+            else
+            {
+                if (SelectedProduct is not null)
                 {
+                    SelectedProduct.IsSelected = false;
 
-                    Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = true;
-                    SelectedProduct = item;
                 }
-                else
-                {
-                    SelectedProduct = null;
-                    var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-                    if (selectedItem is not null)
-                    {
-                        Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = false;
-                    }
-                }
+                SelectedProduct = item;
+                SelectedProduct.IsSelected = true;
 
             }
+
+
         }
         catch (Exception ex)
         {
@@ -300,7 +231,7 @@ public partial class VirmanProductInListViewModel : BaseViewModel
         }
     }
 
-    
+
     private async Task BackAsync()
     {
         if (IsBusy)
@@ -342,85 +273,56 @@ public partial class VirmanProductInListViewModel : BaseViewModel
             virmanBasket.InVirmanWarehouse = InWarehouse;
 
             InVirmanProductModel ınVirmanProductModel = new();
-                ınVirmanProductModel.ReferenceId = (int)SelectedProduct?.ReferenceId;
-                ınVirmanProductModel.Code = SelectedProduct?.Code;
-                ınVirmanProductModel.Name = SelectedProduct?.Name;
-                ınVirmanProductModel.UnitsetReferenceId = (int)SelectedProduct?.UnitsetReferenceId;
-                ınVirmanProductModel.UnitsetCode = SelectedProduct?.UnitsetCode;
-                ınVirmanProductModel.UnitsetName = SelectedProduct?.UnitsetName;
-                ınVirmanProductModel.SubUnitsetReferenceId = (int)SelectedProduct?.SubUnitsetReferenceId;
-                ınVirmanProductModel.SubUnitsetCode = SelectedProduct?.SubUnitsetCode;
-                ınVirmanProductModel.SubUnitsetName = SelectedProduct?.SubUnitsetName;
-                ınVirmanProductModel.StockQuantity = (int)SelectedProduct?.StockQuantity;
-                ınVirmanProductModel.LocTracking = SelectedProduct.LocTracking;
-                ınVirmanProductModel.IsVariant = SelectedProduct.IsVariant;
-                ınVirmanProductModel.TrackingType = SelectedProduct.TrackingType;
-                ınVirmanProductModel.IsSelected = false;
-                ınVirmanProductModel.LocTrackingIcon = SelectedProduct?.LocTrackingIcon;
-                ınVirmanProductModel.VariantIcon = SelectedProduct?.VariantIcon;
-                ınVirmanProductModel.TrackingTypeIcon = SelectedProduct?.TrackingTypeIcon;
-               
+            ınVirmanProductModel.ReferenceId = (int)SelectedProduct?.ReferenceId;
+            ınVirmanProductModel.Code = SelectedProduct?.Code;
+            ınVirmanProductModel.Name = SelectedProduct?.Name;
+            ınVirmanProductModel.UnitsetReferenceId = (int)SelectedProduct?.UnitsetReferenceId;
+            ınVirmanProductModel.UnitsetCode = SelectedProduct?.UnitsetCode;
+            ınVirmanProductModel.UnitsetName = SelectedProduct?.UnitsetName;
+            ınVirmanProductModel.SubUnitsetReferenceId = (int)SelectedProduct?.SubUnitsetReferenceId;
+            ınVirmanProductModel.SubUnitsetCode = SelectedProduct?.SubUnitsetCode;
+            ınVirmanProductModel.SubUnitsetName = SelectedProduct?.SubUnitsetName;
+            ınVirmanProductModel.StockQuantity = (int)SelectedProduct?.StockQuantity;
+            ınVirmanProductModel.LocTracking = SelectedProduct.LocTracking;
+            ınVirmanProductModel.IsVariant = SelectedProduct.IsVariant;
+            ınVirmanProductModel.TrackingType = SelectedProduct.TrackingType;
+            ınVirmanProductModel.IsSelected = false;
+            ınVirmanProductModel.LocTrackingIcon = SelectedProduct?.LocTrackingIcon;
+            ınVirmanProductModel.VariantIcon = SelectedProduct?.VariantIcon;
+            ınVirmanProductModel.TrackingTypeIcon = SelectedProduct?.TrackingTypeIcon;
+
             virmanBasket.InVirmanProduct = ınVirmanProductModel;
 
             OutVirmanProductModel outVirmanProductModel = new OutVirmanProductModel();
-                outVirmanProductModel.ReferenceId = warehouseTotalModel.ProductReferenceId;
-                outVirmanProductModel.Code = warehouseTotalModel.ProductCode;
-                outVirmanProductModel.Name = warehouseTotalModel.ProductName ;
-                outVirmanProductModel.UnitsetReferenceId = warehouseTotalModel.UnitsetReferenceId ;
-                outVirmanProductModel.UnitsetCode = warehouseTotalModel.UnitsetCode ;
-                outVirmanProductModel.UnitsetName = warehouseTotalModel.UnitsetName ;
-                outVirmanProductModel.SubUnitsetReferenceId = warehouseTotalModel.SubUnitsetReferenceId ;
-                outVirmanProductModel.SubUnitsetCode = warehouseTotalModel.SubUnitsetCode ;
-                outVirmanProductModel.SubUnitsetName = warehouseTotalModel.SubUnitsetName ;
-                outVirmanProductModel.StockQuantity =warehouseTotalModel.StockQuantity  ;
-                outVirmanProductModel.LocTracking = warehouseTotalModel.WarehouseReferenceId ;
-                outVirmanProductModel.IsVariant = warehouseTotalModel.IsVariant ;
-                outVirmanProductModel.TrackingType = warehouseTotalModel.TrackingType ;
-                outVirmanProductModel.IsSelected = false ;
-                outVirmanProductModel.LocTrackingIcon = warehouseTotalModel.LocTrackingIcon;
-                outVirmanProductModel.VariantIcon =  warehouseTotalModel.VariantIcon;
-                outVirmanProductModel.TrackingTypeIcon = warehouseTotalModel.TrackingTypeIcon ;
+            outVirmanProductModel.ReferenceId = warehouseTotalModel.ProductReferenceId;
+            outVirmanProductModel.Code = warehouseTotalModel.ProductCode;
+            outVirmanProductModel.Name = warehouseTotalModel.ProductName;
+            outVirmanProductModel.UnitsetReferenceId = warehouseTotalModel.UnitsetReferenceId;
+            outVirmanProductModel.UnitsetCode = warehouseTotalModel.UnitsetCode;
+            outVirmanProductModel.UnitsetName = warehouseTotalModel.UnitsetName;
+            outVirmanProductModel.SubUnitsetReferenceId = warehouseTotalModel.SubUnitsetReferenceId;
+            outVirmanProductModel.SubUnitsetCode = warehouseTotalModel.SubUnitsetCode;
+            outVirmanProductModel.SubUnitsetName = warehouseTotalModel.SubUnitsetName;
+            outVirmanProductModel.StockQuantity = warehouseTotalModel.StockQuantity;
+            outVirmanProductModel.LocTracking = warehouseTotalModel.WarehouseReferenceId;
+            outVirmanProductModel.IsVariant = warehouseTotalModel.IsVariant;
+            outVirmanProductModel.TrackingType = warehouseTotalModel.TrackingType;
+            outVirmanProductModel.IsSelected = false;
+            outVirmanProductModel.LocTrackingIcon = warehouseTotalModel.LocTrackingIcon;
+            outVirmanProductModel.VariantIcon = warehouseTotalModel.VariantIcon;
+            outVirmanProductModel.TrackingTypeIcon = warehouseTotalModel.TrackingTypeIcon;
 
-            
-            
-             virmanBasket.OutVirmanProduct = outVirmanProductModel;
+
+
+
+
+            virmanBasket.OutVirmanProduct = outVirmanProductModel;
+
+
+
 
             await Shell.Current.GoToAsync($"{nameof(VirmanProductBasketListViewModel)}", new Dictionary<string, object>
             {
-
-                if (result.Data is null)
-                    return;
-
-                foreach (var product in result.Data)
-                {
-                    var item = Mapping.Mapper.Map<WarehouseTotal>(product);
-                    Items.Add(new WarehouseTotalModel
-                    {
-                        ProductReferenceId = item.ProductReferenceId,
-                        ProductCode = item.ProductCode,
-                        ProductName = item.ProductName,
-                        UnitsetReferenceId = item.UnitsetReferenceId,
-                        UnitsetCode = item.UnitsetCode,
-                        UnitsetName = item.UnitsetName,
-                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                        SubUnitsetCode = item.SubUnitsetCode,
-                        SubUnitsetName = item.SubUnitsetName,
-                        StockQuantity = item.StockQuantity,
-                        WarehouseReferenceId = item.WarehouseReferenceId,
-                        WarehouseName = item.WarehouseName,
-                        WarehouseNumber = item.WarehouseNumber,
-                        LocTracking = item.LocTracking,
-                        IsVariant = item.IsVariant,
-                        TrackingType = item.TrackingType,
-                        IsSelected = false,
-                        LocTrackingIcon = product.LocTrackingIcon,
-                        VariantIcon = product.VariantIcon,
-                        TrackingTypeIcon = product.TrackingTypeIcon,
-                    });
-                }
-            }
-
-            _userDialogs.Loading().Hide();
 
                 [nameof(VirmanBasketModel)] = virmanBasket
             });
@@ -436,9 +338,5 @@ public partial class VirmanProductInListViewModel : BaseViewModel
         }
     }
 
-}
-
-
 
 }
-

@@ -76,7 +76,7 @@ ILocationService locationService)
 
 
 
-    private async Task DecreaseAsync(VirmanBasketModel item)
+   /* private async Task DecreaseAsync(VirmanBasketModel item)
     {
         if (IsBusy)
             return;
@@ -117,7 +117,7 @@ ILocationService locationService)
             IsBusy = false;
         }
     }
-
+   */
 
     private async Task LoadSeriLotTransactionsAsync()
     {
