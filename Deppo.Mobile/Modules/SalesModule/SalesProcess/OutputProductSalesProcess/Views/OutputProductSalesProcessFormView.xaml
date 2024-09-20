@@ -231,6 +231,7 @@
         <Button Grid.Row="1"
                 Command="{Binding SaveCommand}"
                 Text="Kaydet"
+                Margin="5,10,5,20"
                 VerticalOptions="End" />
 
         <!--#region BasketItem BottomSheet-->

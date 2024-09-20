@@ -60,7 +60,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 		SwipeItemCommand = new Command<SalesCustomer>(async (customer) => await SwipeItemAsync(customer));
 
 		ShipAddressTappedCommand = new Command<ShipAddressModel>(async (shipAddress) => await ShipAddressTappedAsync(shipAddress));
-		ConfirmShipAddressCommand = new Command(async () => await ConfirmShipAddressConfirmAsync());
+		ConfirmShipAddressCommand = new Command(async () => await ConfirmShipAddressAsync());
 	}
 
 	public Page CurrentPage { get; set; } = null!;
@@ -252,6 +252,8 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 
 	private async Task ItemTappedAsync(SalesCustomer item)
 	{
+		if (IsBusy)
+			return;
 		try
 		{
 			IsBusy = true;
@@ -263,34 +265,20 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 			}
 			else
 			{
-				if(item.ShipAddressCount > 0)
+				if (SalesCustomer is not null)
 				{
-					await LoadShipAddressesAsync(item);
-					CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
-
-					if (SalesCustomer is not null)
-					{
-						SalesCustomer.IsSelected = false;
-					}
-					SalesCustomer = item;
-					SalesCustomer.IsSelected = true;
+					SalesCustomer.IsSelected = false;
 				}
-				else
-				{
-					if (SalesCustomer is not null)
-					{
-						SalesCustomer.IsSelected = false;
-					}
-					SalesCustomer = item;
-					SalesCustomer.IsSelected = true;
-				}
-
-				
+				SalesCustomer = item;
+				SalesCustomer.IsSelected = true;
 			}
 		}
 		catch (Exception ex)
 		{
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{
@@ -365,7 +353,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 		}
 	}
 
-	private async Task ConfirmShipAddressConfirmAsync() { 		
+	private async Task ConfirmShipAddressAsync() { 		
 		if (IsBusy)
 			return;
 		try

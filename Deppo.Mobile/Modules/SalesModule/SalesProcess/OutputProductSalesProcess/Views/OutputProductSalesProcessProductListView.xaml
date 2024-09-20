@@ -32,16 +32,30 @@
               Margin="0,0,0,0"
               RowDefinitions="Auto, Auto, *, Auto"
               RowSpacing="10">
-            <ImageButton Grid.Row="0"
-                         Command="{Binding BackCommand}"
-                         HeightRequest="25"
-                         HorizontalOptions="End">
-                <ImageButton.Source>
-                    <FontImageSource FontFamily="FAS"
-                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
-                                     Color="{StaticResource WhiteSmoke}" />
-                </ImageButton.Source>
-            </ImageButton>
+            <Grid Grid.Row="0"
+                  Padding="10,10,0,0"
+                  ColumnDefinitions="*, Auto"
+                  ColumnSpacing="10">
+                <Label Grid.Column="0"
+                       FontAttributes="Bold"
+                       FontSize="Medium"
+                       Text="{Binding WarehouseModel.Name, StringFormat='{0} Ambarı Ürünleri'}"
+                       TextColor="{StaticResource WhiteSmoke}"
+                       VerticalOptions="Center" />
+
+                <ImageButton Grid.Column="1"
+                             Command="{Binding BackCommand}"
+                             HeightRequest="25"
+                             HorizontalOptions="End">
+                    <ImageButton.Source>
+                        <FontImageSource FontFamily="FAS"
+                                         Size="Medium"
+                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                                         Color="{StaticResource WhiteSmoke}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </Grid>
+
             <Border Grid.Row="1"
                     Margin="5,0,5,0"
                     Padding="0"
