@@ -24,6 +24,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderP
 {
     [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
     [QueryProperty(name: nameof(SalesCustomer), queryId: nameof(SalesCustomer))]
+    [QueryProperty(name: nameof(Items), queryId:nameof(Items))]
     public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
     {
         private readonly IHttpClientService _httpClientService;
