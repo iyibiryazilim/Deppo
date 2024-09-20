@@ -38,6 +38,8 @@ using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Vie
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.ProductionInput.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.ProductionInput.Views;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.TransferProductProcess.ViewModels;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.TransferProductProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels;
@@ -295,6 +297,18 @@ public static class MauiProgram
         builder.Services.AddTransientWithShellRoute<OutputProductProcessFormView, OutputProductProcessFormViewModel>(nameof(OutputProductProcessFormView));
 
         #endregion OutputProductProcess Modules
+
+        #region TransferProductProcess Modules
+
+        builder.Services.AddTransientWithShellRoute<TransferOutWarehouseListView, TransferOutWarehouseListViewModel>(nameof(TransferOutWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<TransferOutProductListView, TransferOutProductListViewModel>(nameof(TransferOutProductListView));
+        builder.Services.AddScopedWithShellRoute<TransferOutBasketView, TransferOutBasketViewModel>(nameof(TransferOutBasketView));
+        builder.Services.AddScopedWithShellRoute<TransferInWarehouseView, TransferInWarehouseViewModel>(nameof(TransferInWarehouseView));
+        builder.Services.AddScopedWithShellRoute<TransferInBasketView, TransferInBasketViewModel>(nameof(TransferInBasketView));
+        builder.Services.AddScopedWithShellRoute<TransferFormView, TransferFormViewModel>(nameof(TransferFormView));
+
+
+        #endregion
 
         #endregion Product Modules
 
