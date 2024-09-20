@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 using Deppo.Core.Models;
 using Deppo.Mobile.Helpers.MappingHelper;
 
-namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanModule.ViewModels;
+namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.ViewModels;
 
 [QueryProperty(name: nameof(OutWarehouse), queryId: nameof(OutWarehouse))]
 public partial class VirmanProductOutListViewModel : BaseViewModel

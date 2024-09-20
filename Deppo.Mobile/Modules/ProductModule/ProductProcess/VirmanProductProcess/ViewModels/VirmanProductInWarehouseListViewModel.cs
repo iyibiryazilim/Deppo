@@ -17,7 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanModule.ViewModels;
+namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.ViewModels;
 [QueryProperty(name: nameof(OutWarehouse), queryId: nameof(OutWarehouse))]
 [QueryProperty(name: nameof(WarehouseTotalModel), queryId: nameof(WarehouseTotalModel))]
 
