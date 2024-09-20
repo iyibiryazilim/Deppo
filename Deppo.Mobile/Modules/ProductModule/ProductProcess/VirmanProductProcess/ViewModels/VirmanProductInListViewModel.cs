@@ -9,6 +9,7 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -30,16 +31,18 @@ public partial class VirmanProductInListViewModel : BaseViewModel
 
     [ObservableProperty]
     private WarehouseModel outWarehouse = null!;
+
     [ObservableProperty]
     private WarehouseModel inWarehouse = null!;
+
     [ObservableProperty]
     private WarehouseTotalModel warehouseTotalModel = null!;
 
     public ObservableCollection<ProductModel> Items { get; } = new();
 
-
     [ObservableProperty]
     private ProductModel? selectedProduct;
+
     public Page CurrentPage { get; set; }
 
     public VirmanProductInListViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, IUserDialogs userDialogs, IProductService productService)
@@ -50,8 +53,6 @@ public partial class VirmanProductInListViewModel : BaseViewModel
         Title = "Giriş Ürünleri Listesi";
 
         _productService = productService;
-
-
 
         BackCommand = new Command(async () => await BackAsync());
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
@@ -67,11 +68,8 @@ public partial class VirmanProductInListViewModel : BaseViewModel
     public Command BackCommand { get; }
     public Command NextViewCommand { get; }
 
-
-
     private async Task LoadItemsAsync()
     {
-
         if (IsBusy)
             return;
         try
@@ -130,7 +128,6 @@ public partial class VirmanProductInListViewModel : BaseViewModel
         {
             IsBusy = false;
         }
-
     }
 
     private async Task LoadMoreItemsAsync()
@@ -142,7 +139,6 @@ public partial class VirmanProductInListViewModel : BaseViewModel
             IsBusy = true;
             _userDialogs.Loading("Yükleniyor...");
             await Task.Delay(1000);
-
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _productService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, skip: Items.Count, take: 20);
@@ -193,6 +189,7 @@ public partial class VirmanProductInListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
     private async Task ItemTappedAsync(ProductModel item)
     {
         if (IsBusy)
@@ -212,14 +209,10 @@ public partial class VirmanProductInListViewModel : BaseViewModel
                 if (SelectedProduct is not null)
                 {
                     SelectedProduct.IsSelected = false;
-
                 }
                 SelectedProduct = item;
                 SelectedProduct.IsSelected = true;
-
             }
-
-
         }
         catch (Exception ex)
         {
@@ -230,7 +223,6 @@ public partial class VirmanProductInListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
 
     private async Task BackAsync()
     {
@@ -259,6 +251,7 @@ public partial class VirmanProductInListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
     private async Task NextViewAsync()
     {
         if (IsBusy)
@@ -312,21 +305,12 @@ public partial class VirmanProductInListViewModel : BaseViewModel
             outVirmanProductModel.VariantIcon = warehouseTotalModel.VariantIcon;
             outVirmanProductModel.TrackingTypeIcon = warehouseTotalModel.TrackingTypeIcon;
 
-
-
-
-
             virmanBasket.OutVirmanProduct = outVirmanProductModel;
 
-
-
-
-            await Shell.Current.GoToAsync($"{nameof(VirmanProductBasketListViewModel)}", new Dictionary<string, object>
+            await Shell.Current.GoToAsync($"{nameof(VirmanProductBasketListView)}", new Dictionary<string, object>
             {
-
                 [nameof(VirmanBasketModel)] = virmanBasket
             });
-
         }
         catch (System.Exception ex)
         {
@@ -337,6 +321,4 @@ public partial class VirmanProductInListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
-
 }
