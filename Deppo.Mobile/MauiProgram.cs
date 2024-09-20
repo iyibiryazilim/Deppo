@@ -301,6 +301,7 @@ public static class MauiProgram
         builder.Services.AddScopedWithShellRoute<VirmanProductOutListView, VirmanProductOutListViewModel>(nameof(VirmanProductOutListView));
         builder.Services.AddScopedWithShellRoute<VirmanProductInWarehouseListView, VirmanProductInWarehouseListViewModel>(nameof(VirmanProductInWarehouseListView));
         builder.Services.AddScopedWithShellRoute<VirmanProductInListView, VirmanProductInListViewModel>(nameof(VirmanProductInListView));
+        builder.Services.AddScopedWithShellRoute<VirmanProductBasketListView, VirmanProductBasketListViewModel>(nameof(VirmanProductBasketListView));
 
         #endregion VirmanProduct Modules
 

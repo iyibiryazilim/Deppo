@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.Views.VirmanProductBasketListView"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.ViewModels"
+             xmlns:basketModel="clr-namespace:Deppo.Mobile.Core.Models.VirmanModels;assembly=Deppo.Mobile.Core"
+             Title="{Binding Title}"
+             x:DataType="viewModel:VirmanProductBasketListViewModel"
+             Shell.TabBarIsVisible="False">
+
+    <!--<Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding BackCommand}" />
+    </Shell.BackButtonBehavior>-->
+
+    <!--<ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadPageCommand}"
+                                        EventName="Loaded" />
+    </ContentPage.Behaviors>-->
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*">
+        <Border Grid.Row="0"
+                Padding="10"
+                BackgroundColor="Transparent"
+                StrokeShape="RoundRectangle 10"
+                StrokeThickness="0.5">
+            <Grid RowDefinitions="*,*,*"
+                  ColumnDefinitions="Auto, *"
+                  ColumnSpacing="10">
+                <Border  Grid.Column="0"
+                         Grid.Row="0"
+                         BackgroundColor="{StaticResource Secondary}"
+                         StrokeShape="RoundRectangle 5"
+                         StrokeThickness="0.5">
+                    <Image Grid.Column="0"
+                           HeightRequest="50"
+                           WidthRequest="50" />
+                </Border>
+
+                <VerticalStackLayout Grid.Column="1"
+                                     Grid.Row="0"
+                                     Spacing="2">
+                    <Label FontAttributes="Bold"
+                           LineBreakMode="TailTruncation"
+                           Text="Kodu" />
+                    <Label LineBreakMode="TailTruncation"
+                           Text="Adı"
+                           TextColor="{StaticResource Gray600}" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Grid.Row="1" Grid.ColumnSpan="1" >
+                    <Label HorizontalOptions="Center"
+                        Text="Ambar"></Label>
+                </VerticalStackLayout>
+
+                <Grid  Grid.Row="2" Grid.Column="1"  ColumnDefinitions="Auto,Auto,Auto"  
+                      ColumnSpacing="10"
+                      HorizontalOptions="EndAndExpand">
+                    <Border Grid.Column="0"
+                            Padding="5"
+                            BackgroundColor="Transparent"
+                            Stroke="{StaticResource Secondary}"
+                            StrokeShape="RoundRectangle 2">
+                        <Label FontFamily="FAS"
+                               FontSize="Medium"
+                               Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                               TextColor="{StaticResource Secondary}" />
+
+                        <!--<Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:VirmanProductBasketListViewModel}}, Path=DecreaseCommand}"
+                                                  CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>-->
+                    </Border>
+                    <Label Grid.Column="1"
+                           FontAttributes="Bold"
+                           FontSize="Large"
+                           Text="1"
+                           TextColor="{StaticResource OffBlack}"
+                           VerticalOptions="Center" />
+                    <Border Grid.Column="2"
+                            Padding="5"
+                            BackgroundColor="{StaticResource Secondary}"
+                            Stroke="{StaticResource Secondary}"
+                            StrokeShape="RoundRectangle 2">
+                        <Label FontFamily="FAS"
+                               FontSize="Medium"
+                               Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                               TextColor="{StaticResource White}" />
+
+                        <!--<Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:VirmanProductBasketListViewModel}}, Path=IncreaseCommand}"
+                                                  CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>-->
+                    </Border>
+                </Grid>
+            </Grid>
+        </Border>
+        <VerticalStackLayout Grid.Row="1" HorizontalOptions="Center">
+
+            <Border Grid.Column="0" 
+                    Padding="5"
+                    BackgroundColor="Transparent"
+                    StrokeThickness="0">
+                <Label FontFamily="FAS"
+                       FontSize="30"
+                       Text="{x:Static fontAwesome:FontAwesomeIcons.ArrowDown}"
+                       TextColor="{StaticResource Secondary}" />
+
+            </Border>
+
+        </VerticalStackLayout>
+        <Border Grid.Row="2"
+                Padding="10"
+                BackgroundColor="Transparent"
+                StrokeShape="RoundRectangle 10"
+                StrokeThickness="0.5">
+            <Grid RowDefinitions="*,*,*"
+                  ColumnDefinitions="Auto, *"
+                  ColumnSpacing="10">
+                <Border  Grid.Column="0"
+                         Grid.Row="0"
+                         BackgroundColor="{StaticResource Secondary}"
+                         StrokeShape="RoundRectangle 5"
+                         StrokeThickness="0.5">
+                    <Image Grid.Column="0"
+                           HeightRequest="50"
+                           WidthRequest="50" />
+                </Border>
+
+                <VerticalStackLayout Grid.Column="1"
+                                     Grid.Row="0"
+                                     Spacing="2">
+                    <Label FontAttributes="Bold"
+                           LineBreakMode="TailTruncation"
+                           Text="Kodu" />
+                    <Label LineBreakMode="TailTruncation"
+                           Text="Adı"
+                           TextColor="{StaticResource Gray600}" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Grid.Row="1"
+                                     Grid.ColumnSpan="1">
+                    <Label HorizontalOptions="Center"
+                           Text="Ambar"></Label>
+                </VerticalStackLayout>
+
+                <Grid  Grid.Row="2"
+                       Grid.Column="1"
+                       ColumnDefinitions="Auto,Auto,Auto"
+                       ColumnSpacing="10"
+                       HorizontalOptions="EndAndExpand">
+                    <Border Grid.Column="0"
+                            Padding="5"
+                            BackgroundColor="Transparent"
+                            Stroke="{StaticResource Secondary}"
+                            StrokeShape="RoundRectangle 2">
+                        <Label FontFamily="FAS"
+                               FontSize="Medium"
+                               Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                               TextColor="{StaticResource Secondary}" />
+
+                        <!--<Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:VirmanProductBasketListViewModel}}, Path=DecreaseCommand}"
+                                          CommandParameter="{Binding .}" />
+                </Border.GestureRecognizers>-->
+                    </Border>
+                    <Label Grid.Column="1"
+                           FontAttributes="Bold"
+                           FontSize="Large"
+                           Text="1"
+                           TextColor="{StaticResource OffBlack}"
+                           VerticalOptions="Center" />
+                    <Border Grid.Column="2"
+                            Padding="5"
+                            BackgroundColor="{StaticResource Secondary}"
+                            Stroke="{StaticResource Secondary}"
+                            StrokeShape="RoundRectangle 2">
+                        <Label FontFamily="FAS"
+                               FontSize="Medium"
+                               Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                               TextColor="{StaticResource White}" />
+
+                        <!--<Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:VirmanProductBasketListViewModel}}, Path=IncreaseCommand}"
+                                          CommandParameter="{Binding .}" />
+                </Border.GestureRecognizers>-->
+                    </Border>
+                </Grid>
+            </Grid>
+        </Border>
+        <Button Grid.Row="3"
+                VerticalOptions="End"
+                Text="İleri"
+                Margin="5,10,5,20"></Button>
+
+    </Grid>
+</ContentPage>
