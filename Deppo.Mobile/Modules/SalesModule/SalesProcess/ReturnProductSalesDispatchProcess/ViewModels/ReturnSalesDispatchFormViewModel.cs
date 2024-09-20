@@ -399,7 +399,7 @@ public partial class ReturnSalesDispatchFormViewModel : BaseViewModel
                 resultModel.Message = "Başarılı" + result.Message;
                 resultModel.Code = result.Data.Code;
                 resultModel.PageTitle = Title;
-                resultModel.PageCountToBack = 5;
+                resultModel.PageCountToBack = 7;
 
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();
