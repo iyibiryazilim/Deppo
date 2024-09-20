@@ -3,11 +3,14 @@
     x:Class="Deppo.Mobile.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:countingPanelView="clr-namespace:Deppo.Mobile.Modules.CountingModule.CountingPanel.Views"
+    xmlns:countingProcessView="clr-namespace:Deppo.Mobile.Modules.CountingModule.CountingProcess.Views"
     xmlns:countingView="clr-namespace:Deppo.Mobile.Modules.CountingModule.Views"
     xmlns:customerView="clr-namespace:Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views"
     xmlns:fastProductionView="clr-namespace:Deppo.Mobile.Modules.FastProductionModule.Views"
     xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
     xmlns:local="clr-namespace:Deppo.Mobile"
+    xmlns:negativeProductView="clr-namespace:Deppo.Mobile.Modules.CountingModule.NegativeProductMenu.Views"
     xmlns:oursourcePanelView="clr-namespace:Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.Views"
     xmlns:outsourceProcessView="clr-namespace:Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.Views"
     xmlns:outsourceView="clr-namespace:Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.Views"
@@ -19,6 +22,9 @@
     xmlns:purchaseAnalysisView="clr-namespace:Deppo.Mobile.Modules.AnalysisModule.PurchaseAnalysis.Views"
     xmlns:purchasePanelView="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchasePanel.Views"
     xmlns:purchaseProcessView="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.Views"
+    xmlns:quicklyProductionBOMMenuView="clr-namespace:Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionBOMMenu.Views"
+    xmlns:quicklyProductionPanelView="clr-namespace:Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionPanel.Views"
+    xmlns:quicklyProductionProcessView="clr-namespace:Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Views"
     xmlns:salesAnalysisView="clr-namespace:Deppo.Mobile.Modules.AnalysisModule.SalesAnalysis.Views"
     xmlns:salesPanelView="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesPanel.Views"
     xmlns:salesProcessView="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.Views"
@@ -383,28 +389,98 @@
 
     </FlyoutItem>
 
-    <FlyoutItem Title="Sayım İşlemi">
-        <ShellContent ContentTemplate="{DataTemplate countingView:CountingWarehouseListView}" />
+    <FlyoutItem Title="Sayım İşlemleri">
+        <Tab Title="Panel">
+            <Tab.Icon>
+                <FontImageSource
+                    FontFamily="FAS"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.ChartSimple}"
+                    Size="20"
+                    Color="{AppThemeBinding Light={StaticResource Primary},
+                                            Dark={StaticResource White}}" />
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate countingPanelView:CountingPanelView}" />
+        </Tab>
+
+        <Tab Title="Negatif Malzemeler">
+            <Tab.Icon>
+                <FontImageSource
+                    FontFamily="FAS"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.Cubes}"
+                    Size="20"
+                    Color="{AppThemeBinding Light={StaticResource Primary},
+                                            Dark={StaticResource White}}" />
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate negativeProductView:NegativeProductListView}" />
+        </Tab>
+
+        <Tab Title="İşlemler">
+            <Tab.Icon>
+                <FontImageSource
+                    FontFamily="FAS"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.GripVertical}"
+                    Size="20"
+                    Color="{AppThemeBinding Light={StaticResource Primary},
+                                            Dark={StaticResource White}}" />
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate countingProcessView:CountingProcessView}" />
+        </Tab>
         <FlyoutItem.Icon>
             <FontImageSource
                 FontFamily="FAS"
-                Glyph="{x:Static fontAwesome:FontAwesomeIcons.FileContract}"
+                Glyph="{x:Static fontAwesome:FontAwesomeIcons.BoxOpen}"
                 Size="20"
                 Color="{AppThemeBinding Light={StaticResource Primary},
                                         Dark={StaticResource White}}" />
         </FlyoutItem.Icon>
+
     </FlyoutItem>
 
-    <FlyoutItem Title="Hızlı Üretim">
-        <ShellContent ContentTemplate="{DataTemplate fastProductionView:FastProductionProductView}" />
+    <FlyoutItem Title="Hızlı Üretim İşlemleri">
+        <Tab Title="Panel">
+            <Tab.Icon>
+                <FontImageSource
+                    FontFamily="FAS"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.ChartSimple}"
+                    Size="20"
+                    Color="{AppThemeBinding Light={StaticResource Primary},
+                                            Dark={StaticResource White}}" />
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate quicklyProductionPanelView:QuicklyProductionPanelView}" />
+        </Tab>
+
+        <Tab Title="Reçeteler">
+            <Tab.Icon>
+                <FontImageSource
+                    FontFamily="FAS"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.Recycle}"
+                    Size="20"
+                    Color="{AppThemeBinding Light={StaticResource Primary},
+                                            Dark={StaticResource White}}" />
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate quicklyProductionBOMMenuView:QuicklyProductionBOMMenuView}" />
+        </Tab>
+
+        <Tab Title="İşlemler">
+            <Tab.Icon>
+                <FontImageSource
+                    FontFamily="FAS"
+                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.GripVertical}"
+                    Size="20"
+                    Color="{AppThemeBinding Light={StaticResource Primary},
+                                            Dark={StaticResource White}}" />
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate quicklyProductionProcessView:QuicklyProductionProcessView}" />
+        </Tab>
         <FlyoutItem.Icon>
             <FontImageSource
                 FontFamily="FAS"
-                Glyph="{x:Static fontAwesome:FontAwesomeIcons.UserTie}"
+                Glyph="{x:Static fontAwesome:FontAwesomeIcons.Recycle}"
                 Size="20"
                 Color="{AppThemeBinding Light={StaticResource Primary},
                                         Dark={StaticResource White}}" />
         </FlyoutItem.Icon>
+
     </FlyoutItem>
 
 

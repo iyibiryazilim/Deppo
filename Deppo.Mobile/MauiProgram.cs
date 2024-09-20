@@ -14,6 +14,12 @@ using Deppo.Mobile.Modules.AnalysisModule.PurchaseAnalysis.ViewModels;
 using Deppo.Mobile.Modules.AnalysisModule.PurchaseAnalysis.Views;
 using Deppo.Mobile.Modules.AnalysisModule.SalesAnalysis.ViewModels;
 using Deppo.Mobile.Modules.AnalysisModule.SalesAnalysis.Views;
+using Deppo.Mobile.Modules.CountingModule.CountingPanel.ViewModels;
+using Deppo.Mobile.Modules.CountingModule.CountingPanel.Views;
+using Deppo.Mobile.Modules.CountingModule.CountingProcess.ViewModels;
+using Deppo.Mobile.Modules.CountingModule.CountingProcess.Views;
+using Deppo.Mobile.Modules.CountingModule.NegativeProductMenu.ViewModels;
+using Deppo.Mobile.Modules.CountingModule.NegativeProductMenu.Views;
 using Deppo.Mobile.Modules.CountingModule.ViewModels;
 using Deppo.Mobile.Modules.CountingModule.Views;
 using Deppo.Mobile.Modules.FastProductionModule.ViewModels;
@@ -58,6 +64,12 @@ using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels;
 using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views;
 using Deppo.Mobile.Modules.PurchaseModule.WaitingOrderMenu.ViewModels;
 using Deppo.Mobile.Modules.PurchaseModule.WaitingOrderMenu.Views;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionBOMMenu.ViewModels;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionBOMMenu.Views;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionPanel.ViewModels;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionPanel.Views;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.ViewModels;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Views;
 using Deppo.Mobile.Modules.ResultModule.ViewModels;
 using Deppo.Mobile.Modules.ResultModule.Views;
 using Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels;
@@ -420,15 +432,19 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
 
         #region Counting Modules
 
-        builder.Services.AddSingletonWithShellRoute<CountingWarehouseListView, CountingWarehouseListViewModel>(nameof(CountingWarehouseListView));
+        builder.Services.AddSingletonWithShellRoute<CountingPanelView, CountingPanelViewModel>(nameof(CountingPanelView));
+        builder.Services.AddSingletonWithShellRoute<NegativeProductListView, NegativeProductListViewModel>(nameof(NegativeProductListView));
+        builder.Services.AddSingletonWithShellRoute<CountingProcessView, CountingProcessViewModel>(nameof(CountingProcessView));
 
         #endregion Counting Modules
 
-        #region Fast Production Modules
+        #region Quickly Production Modules
 
-        builder.Services.AddSingletonWithShellRoute<FastProductionProductView, FastProductionProductViewModel>(nameof(FastProductionProductView));
+        builder.Services.AddSingletonWithShellRoute<QuicklyProductionPanelView, QuicklyProductionPanelViewModel>(nameof(QuicklyProductionPanelView));
+        builder.Services.AddSingletonWithShellRoute<QuicklyProductionBOMMenuView, QuicklyProductionBOMMenuViewModel>(nameof(QuicklyProductionBOMMenuView));
+        builder.Services.AddSingletonWithShellRoute<QuicklyProductionProcessView, QuicklyProductionProcessViewModel>(nameof(QuicklyProductionProcessView));
 
-        #endregion Fast Production Modules
+        #endregion Quickly Production Modules
 
         #region Result Modules
 

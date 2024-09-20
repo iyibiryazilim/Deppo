@@ -3,17 +3,18 @@ using Controls.UserDialogs.Maui;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 
-namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels;
+namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionPanel.ViewModels;
 
-public partial class OutsourceListViewModel : BaseViewModel
+public partial class QuicklyProductionPanelViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
     private readonly IUserDialogs _userDialogs;
-    public OutsourceListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs)
+
+    public QuicklyProductionPanelViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs)
     {
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
 
-        Title = "Fason Cariler";
+        Title = "Hızlı Üretim Paneli";
     }
 }
