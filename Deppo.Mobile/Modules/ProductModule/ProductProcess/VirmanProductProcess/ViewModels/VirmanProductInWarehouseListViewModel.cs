@@ -9,29 +9,33 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
+
 using System;
 using System.Collections.Generic;
+
 using System.Collections.ObjectModel;
+
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.Views;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.ViewModels;
+
 [QueryProperty(name: nameof(OutWarehouse), queryId: nameof(OutWarehouse))]
 [QueryProperty(name: nameof(WarehouseTotalModel), queryId: nameof(WarehouseTotalModel))]
-
 public partial class VirmanProductInWarehouseListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
     private readonly IWarehouseService _warehouseService;
     private readonly IUserDialogs _userDialogs;
 
-
     [ObservableProperty]
     private WarehouseModel outWarehouse = null!;
+
     [ObservableProperty]
-    private WarehouseTotalModel warehouseTotalModel= null!;
+    private WarehouseTotalModel warehouseTotalModel = null!;
 
     [ObservableProperty]
     private WarehouseModel selectedWarehouseModel = null!;
@@ -53,6 +57,8 @@ public partial class VirmanProductInWarehouseListViewModel : BaseViewModel
         ItemTappedCommand = new Command<WarehouseModel>(ItemTappedAsync);
         NextViewCommand = new Command(async () => await NextViewAsync());
     }
+
+    public Page CurrentPage { get; set; }
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
@@ -195,12 +201,11 @@ public partial class VirmanProductInWarehouseListViewModel : BaseViewModel
 
             if (SelectedWarehouseModel is not null)
             {
-                await Shell.Current.GoToAsync($"{nameof(VirmanProductInListViewModel)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"{nameof(VirmanProductInListView)}", new Dictionary<string, object>
                 {
                     ["OutWarehouse"] = OutWarehouse,
                     ["InWarehouse"] = SelectedWarehouseModel,
                     [nameof(WarehouseTotalModel)] = WarehouseTotalModel
-
                 });
             }
         }

@@ -9,14 +9,19 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
+
 using System;
 using System.Collections.Generic;
+
 using System.Collections.ObjectModel;
+
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Deppo.Core.Models;
 using Deppo.Mobile.Helpers.MappingHelper;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.Views;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.ViewModels;
 
@@ -28,20 +33,15 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
     private readonly IUserDialogs _userDialogs;
     private readonly IWarehouseTotalService _warehouseTotalService;
 
-
     [ObservableProperty]
     private WarehouseModel outWarehouse = null!;
 
-
     public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
-
 
     [ObservableProperty]
     private WarehouseTotalModel? selectedProduct;
+
     public Page CurrentPage { get; set; }
-
-
-
 
     public VirmanProductOutListViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, IUserDialogs userDialogs, IWarehouseTotalService warehouseTotalService)
     {
@@ -52,14 +52,11 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
 
         Title = "Çıkış Ürünleri Listesi";
 
-
         BackCommand = new Command(async () => await BackAsync());
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<WarehouseTotalModel>(async (parameter) => await ItemTappedAsync(parameter));
         NextViewCommand = new Command(async () => await NextViewAsync());
-
-
     }
 
     public Command LoadItemsCommand { get; }
@@ -78,8 +75,7 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-
-            await Shell.Current.GoToAsync($"{nameof(VirmanProductInWarehouseListViewModel)}", new Dictionary<string, object>
+            await Shell.Current.GoToAsync($"{nameof(VirmanProductInWarehouseListView)}", new Dictionary<string, object>
             {
                 ["OutWarehouse"] = OutWarehouse,
                 [nameof(WarehouseTotalModel)] = SelectedProduct
@@ -106,23 +102,31 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
 
             if (item is not null)
             {
-
-                if (!item.IsSelected)
+                // Eğer item zaten seçiliyse, seçimi kaldır
+                if (item == SelectedProduct)
                 {
-
-                    Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
-                    SelectedProduct = item;
+                    SelectedProduct.IsSelected = false;
+                    SelectedProduct = null;
                 }
                 else
                 {
-                    SelectedProduct = null;
+                    // Daha önce seçili olan varsa, onun seçimini kaldır
+                    if (SelectedProduct != null)
+                    {
+                        SelectedProduct.IsSelected = false;
+                    }
+
+                    // Yeni item'i seç ve IsSelected durumunu true yap
+                    SelectedProduct = item;
+                    SelectedProduct.IsSelected = true;
+
+                    // Items listesindeki ilgili öğenin IsSelected durumunu güncelle
                     var selectedItem = Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
                     if (selectedItem is not null)
                     {
-                        Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
+                        selectedItem.IsSelected = true;
                     }
                 }
-
             }
         }
         catch (Exception ex)
@@ -245,7 +249,6 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
 
                 foreach (var product in result.Data)
                 {
-
                     var item = Mapping.Mapper.Map<WarehouseTotal>(product);
                     Items.Add(new WarehouseTotalModel
                     {
@@ -287,18 +290,4 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
-
 }
-
-  
-
-
-   
-    
-
-
-
-
-
-

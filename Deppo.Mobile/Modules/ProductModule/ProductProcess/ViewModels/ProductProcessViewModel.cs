@@ -4,6 +4,7 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Views;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.Views;
 using Deppo.Mobile.Modules.ResultModule;
 using Deppo.Mobile.Modules.ResultModule.Views;
 using static Deppo.Mobile.Core.Helpers.DeppoEnums;
@@ -27,6 +28,7 @@ public partial class ProductProcessViewModel : BaseViewModel
         ConsumableProcessCommand = new Command(async () => await ConsumableProcessAsync());
         UnderCountProcessCommand = new Command(async () => await UnderCountProcessAsync());
         WasteProcessCommand = new Command(async () => await WasteProcessAsync());
+        VirmanProductProcessCommand = new Command(async () => await VirmanProductProcessAsync());
     }
 
     public Command ProductionInputCommand { get; }
@@ -35,14 +37,17 @@ public partial class ProductProcessViewModel : BaseViewModel
     public Command UnderCountProcessCommand { get; }
     public Command WasteProcessCommand { get; }
 
+    public Command VirmanProductProcessCommand { get; }
+
     #region Will be removed
-    public Command SuccessPageCommand { get; } 
+
+    public Command SuccessPageCommand { get; }
     public Command FailurePageCommand { get; }
-    #endregion
+
+    #endregion Will be removed
 
     private async Task ProductionInputAsync()
     {
-
         await Shell.Current.GoToAsync($"{nameof(InputProductProcessWarehouseListView)}", new Dictionary<string, object>
         {
             {nameof(InputProductProcessType), InputProductProcessType.ProductionInputProcess}
@@ -51,7 +56,6 @@ public partial class ProductProcessViewModel : BaseViewModel
 
     private async Task OverCountAsync()
     {
-
         await Shell.Current.GoToAsync($"{nameof(InputProductProcessWarehouseListView)}", new Dictionary<string, object>
         {
             {nameof(InputProductProcessType), InputProductProcessType.OverCountProcess}
@@ -60,11 +64,11 @@ public partial class ProductProcessViewModel : BaseViewModel
 
     private async Task ConsumableProcessAsync()
     {
-		await Shell.Current.GoToAsync($"{nameof(OutputProductProcessWarehouseListView)}", new Dictionary<string, object>
-		{
-			{nameof(OutputProductProcessType), OutputProductProcessType.ConsumableProcess}
-		});
-	}
+        await Shell.Current.GoToAsync($"{nameof(OutputProductProcessWarehouseListView)}", new Dictionary<string, object>
+        {
+            {nameof(OutputProductProcessType), OutputProductProcessType.ConsumableProcess}
+        });
+    }
 
     private async Task UnderCountProcessAsync()
     {
@@ -72,14 +76,21 @@ public partial class ProductProcessViewModel : BaseViewModel
         {
             { nameof(OutputProductProcessType), OutputProductProcessType.UnderCountProcess }
         });
-        
     }
 
     private async Task WasteProcessAsync()
-	{
-		await Shell.Current.GoToAsync($"{nameof(OutputProductProcessWarehouseListView)}", new Dictionary<string, object>
-		{
-			{ nameof(OutputProductProcessType), OutputProductProcessType.WasteProcess }
-		});
-	}
+    {
+        await Shell.Current.GoToAsync($"{nameof(OutputProductProcessWarehouseListView)}", new Dictionary<string, object>
+        {
+            { nameof(OutputProductProcessType), OutputProductProcessType.WasteProcess }
+        });
+    }
+
+    private async Task VirmanProductProcessAsync()
+    {
+        await Shell.Current.GoToAsync($"{nameof(VirmanProductOutWarehouseListView)}", new Dictionary<string, object>
+        {
+            //{ nameof(OutputProductProcessType), OutputProductProcessType.WasteProcess }
+        });
+    }
 }

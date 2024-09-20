@@ -4,6 +4,7 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -32,7 +33,7 @@ public partial class VirmanProductOutWarehouseListViewModel : BaseViewModel
         _warehouseService = warehouseService;
         _userDialogs = userDialogs;
 
-        Title = "Çıkış Ambarı Seçimi";
+        Title = "Çıkış Ambarları";
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
@@ -183,7 +184,7 @@ public partial class VirmanProductOutWarehouseListViewModel : BaseViewModel
 
             if (SelectedWarehouseModel is not null)
             {
-                await Shell.Current.GoToAsync($"{nameof(VirmanProductOutListViewModel)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"{nameof(VirmanProductOutListView)}", new Dictionary<string, object>
                 {
                     ["OutWarehouse"] = SelectedWarehouseModel,
                 });

@@ -28,7 +28,6 @@ public partial class VirmanProductInListViewModel : BaseViewModel
     private readonly IUserDialogs _userDialogs;
     private readonly IProductService _productService;
 
-
     [ObservableProperty]
     private WarehouseModel outWarehouse = null!;
     [ObservableProperty]
@@ -36,23 +35,36 @@ public partial class VirmanProductInListViewModel : BaseViewModel
     [ObservableProperty]
     private WarehouseTotalModel warehouseTotalModel = null!;
 
+
+    public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
+
     public ObservableCollection<ProductModel> Items { get; } = new();
 
 
     [ObservableProperty]
+
+    private WarehouseTotalModel? selectedProduct;
+
     private ProductModel? selectedProduct;
     public Page CurrentPage { get; set; }
 
 
 
 
+    public Page CurrentPage { get; set; }
+
     public VirmanProductInListViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, IUserDialogs userDialogs,  IProductService productService)
     {
         _httpClientService = httpClientService;
         _serilotTransactionService = serilotTransactionService;
         _userDialogs = userDialogs;
+
+        _warehouseTotalService = warehouseTotalService;
+
+        Title = "Giriş Ürünleri Listesi";
+
         _productService = productService;
-        Title = "Çıkış Ürünleri Listesi";
+
 
 
         BackCommand = new Command(async () => await BackAsync());
@@ -73,6 +85,34 @@ public partial class VirmanProductInListViewModel : BaseViewModel
 
     private async Task LoadItemsAsync()
     {
+
+        //if (IsBusy)
+        //    return;
+
+        //try
+        //{
+        //    IsBusy = true;
+
+        //    await Shell.Current.GoToAsync($"{nameof(VirmanProductInWarehouseListViewModel)}", new Dictionary<string, object>
+        //    {
+        //        ["OutWarehouse"] = OutWarehouse,
+        //        [nameof(WarehouseTotalModel)] = SelectedProduct
+        //    });
+        //}
+        //catch (System.Exception ex)
+        //{
+        //    await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        //}
+        //finally
+        //{
+        //    IsBusy = false;
+        //}
+    }
+
+    private async Task ItemTappedAsync(WarehouseTotalModel item)
+    {
+      
+
         if (IsBusy)
             return;
 
@@ -80,9 +120,6 @@ public partial class VirmanProductInListViewModel : BaseViewModel
         {
             IsBusy = true;
             Items.Clear();
-
-
-
             _userDialogs.Loading("Loading Items...");
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
@@ -90,6 +127,32 @@ public partial class VirmanProductInListViewModel : BaseViewModel
             var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 20);
             if (result.IsSuccess)
             {
+
+                // Eğer item zaten seçiliyse, seçimi kaldır
+                if (item == SelectedProduct)
+                {
+                    SelectedProduct.IsSelected = false;
+                    SelectedProduct = null;
+                }
+                else
+                {
+                    // Daha önce seçili olan varsa, onun seçimini kaldır
+                    if (SelectedProduct != null)
+                    {
+                        SelectedProduct.IsSelected = false;
+                    }
+
+                    // Yeni item'i seç ve IsSelected durumunu true yap
+                    SelectedProduct = item;
+                    SelectedProduct.IsSelected = true;
+
+                    // Items listesindeki ilgili öğenin IsSelected durumunu güncelle
+                    var selectedItem = Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
+                    if (selectedItem is not null)
+                    {
+                        selectedItem.IsSelected = true;
+                    }
+
                 if (result.Data == null)
                     return;
 
@@ -120,6 +183,7 @@ public partial class VirmanProductInListViewModel : BaseViewModel
                         IsVariant = item.IsVariant,
                         IsSelected = false
                     });
+
                 }
             }
 
@@ -323,8 +387,44 @@ public partial class VirmanProductInListViewModel : BaseViewModel
 
             await Shell.Current.GoToAsync($"{nameof(VirmanProductBasketListViewModel)}", new Dictionary<string, object>
             {
+
+                if (result.Data is null)
+                    return;
+
+                foreach (var product in result.Data)
+                {
+                    var item = Mapping.Mapper.Map<WarehouseTotal>(product);
+                    Items.Add(new WarehouseTotalModel
+                    {
+                        ProductReferenceId = item.ProductReferenceId,
+                        ProductCode = item.ProductCode,
+                        ProductName = item.ProductName,
+                        UnitsetReferenceId = item.UnitsetReferenceId,
+                        UnitsetCode = item.UnitsetCode,
+                        UnitsetName = item.UnitsetName,
+                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                        SubUnitsetCode = item.SubUnitsetCode,
+                        SubUnitsetName = item.SubUnitsetName,
+                        StockQuantity = item.StockQuantity,
+                        WarehouseReferenceId = item.WarehouseReferenceId,
+                        WarehouseName = item.WarehouseName,
+                        WarehouseNumber = item.WarehouseNumber,
+                        LocTracking = item.LocTracking,
+                        IsVariant = item.IsVariant,
+                        TrackingType = item.TrackingType,
+                        IsSelected = false,
+                        LocTrackingIcon = product.LocTrackingIcon,
+                        VariantIcon = product.VariantIcon,
+                        TrackingTypeIcon = product.TrackingTypeIcon,
+                    });
+                }
+            }
+
+            _userDialogs.Loading().Hide();
+
                 [nameof(VirmanBasketModel)] = virmanBasket
             });
+
         }
         catch (System.Exception ex)
         {
@@ -336,5 +436,9 @@ public partial class VirmanProductInListViewModel : BaseViewModel
         }
     }
 
+}
+
+
 
 }
+
