@@ -207,7 +207,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderP
             {
                 IsBusy = true;
 
-                var confirm = await _userDialogs.ConfirmAsync("Satınalma İade İrsaliyesi oluşturulacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+                var confirm = await _userDialogs.ConfirmAsync("Satış İrsaliyesi oluşturulacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
                 if (!confirm)
                     return;
 
@@ -294,6 +294,105 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderP
             Console.WriteLine(dto);
 
             var result = await _wholeSalesDispatchTransactionService.InsertWholeSalesDispatchTransaction(httpClient, _httpClientService.FirmNumber, dto);
+
+            ResultModel resultModel = new();
+            if (result.IsSuccess)
+            {
+                resultModel.Message = "Başarılı";
+                resultModel.Code = result.Data.Code;
+                resultModel.PageTitle = Title;
+                resultModel.PageCountToBack = 7;
+
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                await ClearFormAsync();
+
+                var basketViewModel = _serviceProvider.GetRequiredService<OutputProductSalesOrderProcessBasketListViewModel>();
+                basketViewModel.Items.Clear();
+                basketViewModel.SelectedLocationTransactions.Clear();
+                basketViewModel.SelectedSeriLotTransactions.Clear();
+
+                await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
+                {
+                    [nameof(ResultModel)] = resultModel
+                });
+            }
+            else
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                resultModel.Message = "Başarısız";
+                resultModel.PageTitle = Title;
+                resultModel.ErrorMessage = result.Message;
+                resultModel.PageCountToBack = 1;
+                await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+                {
+                    [nameof(ResultModel)] = resultModel
+                });
+            }
+        }
+
+        private async Task RetailSalesDispatchTransactionInsertAsync(HttpClient httpClient)
+        {
+            var dto = new RetailSalesDispatchTransactionInsert
+            {
+                Code = "",
+                CurrentCode = SelectedCustomer != null ? SelectedCustomer.Code : "",
+                DriverFirstName = SelectedDriver != null ? SelectedDriver.Name : "",
+                DriverLastName = SelectedDriver != null ? SelectedDriver.Surname : "",
+                CarrierCode = SelectedCarrier != null ? SelectedCarrier.Code : "",
+                IdentityNumber = SelectedDriver != null ? SelectedDriver.IdentityNumber : "",
+                Plaque = SelectedDriver != null ? SelectedDriver.PlateNumber : "",
+                IsEDispatch = 1,
+                DispatchType = 0,
+                DispatchStatus = 1,
+                EDispatchProfileId = 1,
+                Description = Description,
+                DoCode = DocumentNumber,
+                DocTrackingNumber = DocumentTrackingNumber,
+                TransactionDate = TransactionDate,
+                FirmNumber = _httpClientService.FirmNumber,
+                SpeCode = SpecialCode,
+                WarehouseNumber = WarehouseModel.Number,
+
+            };
+
+            foreach (var item in Items)
+            {
+                var retailSalesDispatchTransactionLineDto = new RetailSalesDispatchTransactionLineInsert
+                {
+                    ProductCode = item.ItemCode,
+                    WarehouseNumber = (short?)WarehouseModel.Number,
+                    Quantity = item.Quantity,
+                    ConversionFactor = 1,
+                    OtherConversionFactor = 1,
+                    SubUnitsetCode = item.SubUnitsetCode,
+                };
+
+                foreach (var detail in item.Details)
+                {
+                    var serilotTransactionDto = new SeriLotTransactionDto
+                    {
+                        StockLocationCode = detail.LocationCode,
+                        InProductTransactionLineReferenceId = detail.TransactionReferenceId,
+                        OutProductTransactionLineReferenceId = detail.ReferenceId,
+                        Quantity = detail.RemainingQuantity,
+                        SubUnitsetCode = item.SubUnitsetCode,
+                        DestinationStockLocationCode = string.Empty,
+                        ConversionFactor = 1,
+                        OtherConversionFactor = 1,
+                    };
+
+                    retailSalesDispatchTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+                }
+
+                dto.Lines.Add(retailSalesDispatchTransactionLineDto);
+            }
+            Console.WriteLine(dto);
+
+            var result = await _retailSalesDispatchTransactionService.InsertRetailSalesDispatchTransaction(httpClient, _httpClientService.FirmNumber, dto);
 
             ResultModel resultModel = new();
             if (result.IsSuccess)
