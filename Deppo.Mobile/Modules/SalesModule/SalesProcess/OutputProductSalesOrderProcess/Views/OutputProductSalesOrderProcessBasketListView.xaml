@@ -161,7 +161,7 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
-                <Button Grid.Row="2" Text="İleri" />
+                <Button Grid.Row="2" Text="İleri" Command="{Binding NextViewCommand}" />
 
             </Grid>
 

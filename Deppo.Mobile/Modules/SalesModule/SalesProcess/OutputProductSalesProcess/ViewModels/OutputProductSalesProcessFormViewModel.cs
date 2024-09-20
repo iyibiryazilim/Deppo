@@ -662,6 +662,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 	{
 		try
 		{
+			CargoTrackingNumber = string.Empty;
 			DocumentNumber = string.Empty;
 			SpecialCode = string.Empty;
 			DocumentTrackingNumber = string.Empty;
