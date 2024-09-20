@@ -1,6 +1,4 @@
-﻿using Android.Net.Wifi.Aware;
-using Android.Service.Carrier;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.DTOs.SalesDispatchTransaction;
 using Deppo.Core.DTOs.SeriLotTransactionDto;
@@ -10,12 +8,11 @@ using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.SalesModels.BasketModels;
 using Deppo.Mobile.Core.Models.ShipAddressModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
-using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
-using Deppo.Mobile.Modules.ResultModule.Views;
 using Deppo.Mobile.Modules.ResultModule;
+using Deppo.Mobile.Modules.ResultModule.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.ViewModels;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
@@ -32,11 +29,11 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 	private readonly IUserDialogs _userDialogs;
 	private readonly ICarrierService _carrierService;
 	private readonly IDriverService _driverService;
-    private readonly IWholeSalesDispatchTransactionService _wholeSalesDispatchTransactionService;
-    private readonly IRetailSalesDispatchTransactionService _retailSalesDispatchTransactionService;
-    private readonly IServiceProvider _serviceProvider;
+	private readonly IWholeSalesDispatchTransactionService _wholeSalesDispatchTransactionService;
+	private readonly IRetailSalesDispatchTransactionService _retailSalesDispatchTransactionService;
+	private readonly IServiceProvider _serviceProvider;
 
-    [ObservableProperty]
+	[ObservableProperty]
 	WarehouseModel warehouseModel = null!;
 
 	[ObservableProperty]
@@ -44,19 +41,19 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 
 	public ObservableCollection<CustomerModel> Customers { get; } = new();
 	public ObservableCollection<ShipAddressModel> ShipAddresses { get; } = new();
-    public ObservableCollection<Carrier> Carriers { get; } = new();
-    public ObservableCollection<Driver> Drivers { get; } = new();
+	public ObservableCollection<Carrier> Carriers { get; } = new();
+	public ObservableCollection<Driver> Drivers { get; } = new();
 
-    [ObservableProperty]
+	[ObservableProperty]
 	CustomerModel? selectedCustomer;
 	[ObservableProperty]
 	ShipAddressModel? selectedShipAddress;
-    [ObservableProperty]
-    Carrier? selectedCarrier;
-    [ObservableProperty]
-    Driver? selectedDriver;
+	[ObservableProperty]
+	Carrier? selectedCarrier;
+	[ObservableProperty]
+	Driver? selectedDriver;
 
-    [ObservableProperty]
+	[ObservableProperty]
 	DateTime transactionDate = DateTime.Now;
 
 	[ObservableProperty]
@@ -72,55 +69,36 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 	string description = string.Empty;
 
 	[ObservableProperty]
-	string insertType = string.Empty;
-
-	public ObservableCollection<SalesDispatchInsertModel> SalesDispatchInsertModels { get; set; } = new();
-
-    [ObservableProperty]
-    SalesDispatchInsertModel selectedSalesDispatchInsertModel;
+	string cargoTrackingNumber = string.Empty;
 
 	public OutputProductSalesProcessFormViewModel(IHttpClientService httpClientService, IShipAddressService shipAddressService, IUserDialogs userDialogs, ICustomerService customerService, ICarrierService carrierService, IDriverService driverService, IWholeSalesDispatchTransactionService wholeSalesDispatchTransactionService, IRetailSalesDispatchTransactionService retailSalesDispatchTransactionService, IServiceProvider serviceProvider)
-    {
-        _httpClientService = httpClientService;
-        _shipAddressService = shipAddressService;
-        _userDialogs = userDialogs;
-        _customerService = customerService;
-        _carrierService = carrierService;
-        _driverService = driverService;
-        _wholeSalesDispatchTransactionService = wholeSalesDispatchTransactionService;
-        _retailSalesDispatchTransactionService = retailSalesDispatchTransactionService;
-        _serviceProvider = serviceProvider;
+	{
+		_httpClientService = httpClientService;
+		_shipAddressService = shipAddressService;
+		_userDialogs = userDialogs;
+		_customerService = customerService;
+		_carrierService = carrierService;
+		_driverService = driverService;
+		_wholeSalesDispatchTransactionService = wholeSalesDispatchTransactionService;
+		_retailSalesDispatchTransactionService = retailSalesDispatchTransactionService;
+		_serviceProvider = serviceProvider;
 
-        Title = "Sevk İşlemi";
+		Title = "Sevk İşlemi";
 
-        LoadPageCommand = new Command(async () => await LoadPageAsync());
-        SaveCommand = new Command(async () => await SaveAsync());
-        ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
+		LoadPageCommand = new Command(async () => await LoadPageAsync());
+		SaveCommand = new Command(async () => await SaveAsync());
+		ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
 
+		LoadCustomersCommand = new Command(async () => await LoadCustomersAsync());
+		LoadShipAddressesCommand = new Command<CustomerModel>(async (x) => await LoadShipAddressesAsync(x));
+		LoadCarriersCommand = new Command(async () => await LoadCarriersAsync());
+		LoadDriversCommand = new Command(async () => await LoadDriversAsync());
 
-        LoadCustomersCommand = new Command(async () => await LoadCustomersAsync());
-        LoadShipAddressesCommand = new Command<CustomerModel>(async (x) => await LoadShipAddressesAsync(x));
-        LoadCarriersCommand = new Command(async () => await LoadCarriersAsync());
-        LoadDriversCommand = new Command(async () => await LoadDriversAsync());
-        InsertTypeTappedCommand = new Command<SalesDispatchInsertModel>(async (x) => await InsertTypeTappedAsync(x));
-        InsertTypeConfirmCommand = new Command(async () => await InsertTypeConfirmAsync());
-
-
-		SalesDispatchInsertModels.Add(new SalesDispatchInsertModel
-        {
-            IsSelected = false,
-            TypeName = "Toptan Satış İrsaliyesi"
-        });
-
-		SalesDispatchInsertModels.Add(new SalesDispatchInsertModel
-		{
-			IsSelected = false,
-			TypeName = "Perakende Satış İrsaliyesi"
-		});
-
+		SelectWholeCommand = new Command(async () => await SelectWholeAsync());
+		SelectRetailCommand = new Command(async () => await SelectRetailAsync());
 	}
 
-    public Page CurrentPage { get; set; } = null!;
+	public Page CurrentPage { get; set; } = null!;
 
 	public Command LoadPageCommand { get; }
 	public Command BackCommand { get; }
@@ -132,97 +110,9 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 	public Command LoadCarriersCommand { get; }
 
 	public Command LoadDriversCommand { get; }
+	public Command SelectWholeCommand { get; }
+	public Command SelectRetailCommand { get; }
 
-	public Command<SalesDispatchInsertModel> InsertTypeTappedCommand { get; }
-	public Command InsertTypeConfirmCommand { get; }
-
-    private async Task InsertTypeTappedAsync(SalesDispatchInsertModel item)
-    {
-        try
-        {
-            IsBusy = true;
-
-			if (item == SelectedSalesDispatchInsertModel)
-			{
-				SelectedSalesDispatchInsertModel.IsSelected = false;
-				SelectedSalesDispatchInsertModel = null;
-			}
-			else
-			{
-				if (SelectedSalesDispatchInsertModel != null)
-				{
-					SelectedSalesDispatchInsertModel.IsSelected = false;
-				}
-
-				SelectedSalesDispatchInsertModel = item;
-				SelectedSalesDispatchInsertModel.IsSelected = true;
-
-			}
-		}
-        catch (Exception ex)
-        {
-            if(_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
-    private async Task InsertTypeConfirmAsync()
-    {
-        try
-        {
-            IsBusy = true;
-
-			//CurrentPage.FindByName<BottomSheet>("insertOptionsBottomSheet").State = BottomSheetState.Hidden;
-
-            if(SelectedSalesDispatchInsertModel is null)
-            {
-				await _userDialogs.AlertAsync("Lütfen işlem tipi seçiniz.", "Uyarı", "Tamam");
-				return;
-			}
-
-            InsertType = SelectedSalesDispatchInsertModel.TypeName;
-
-			if (SelectedSalesDispatchInsertModel is null)
-			{
-				await _userDialogs.AlertAsync("Lütfen işlem tipi seçiniz.", "Uyarı", "Tamam");
-				return;
-			}
-
-			var confirm = await _userDialogs.ConfirmAsync($"{SelectedSalesDispatchInsertModel.TypeName} oluşturulacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
-			if (!confirm)
-				return;
-            CurrentPage.FindByName<BottomSheet>("insertOptionsBottomSheet").State = BottomSheetState.Hidden;
-
-			_userDialogs.ShowLoading("İşlem Tamamlanıyor...");
-			await Task.Delay(1000);
-
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
-
-			if (SelectedSalesDispatchInsertModel.TypeName == "Toptan Satış İrsaliyesi")
-			{
-				await WholeSalesDispatchTransactionInsertAsync(httpClient);
-			}
-			else if (SelectedSalesDispatchInsertModel.TypeName == "Perakende Satış İrsaliyesi")
-			{
-				await RetailSalesDispatchTransactionInsertAsync(httpClient);
-			}
-		}
-        catch (Exception ex)
-        {
-            if(_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
 
 	private async Task ShowBasketItemAsync()
 	{
@@ -237,7 +127,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -261,7 +151,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -294,20 +184,20 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 					search: ""
 			);
 
-			if(result.IsSuccess)
+			if (result.IsSuccess)
 			{
 				if (result.Data is null)
 					return;
 
-                foreach (var item in result.Data)
-                {
+				foreach (var item in result.Data)
+				{
 					Customers.Add(Mapping.Mapper.Map<CustomerModel>(item));
-                }
+				}
 			}
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
@@ -320,7 +210,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 
 	private async Task LoadShipAddressesAsync(CustomerModel salesCustomer)
 	{
-		if(salesCustomer is null)
+		if (salesCustomer is null)
 		{
 			await _userDialogs.AlertAsync("Lütfen müşteri seçiniz.", "Uyarı", "Tamam");
 			return;
@@ -359,7 +249,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
@@ -371,335 +261,421 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 		}
 	}
 
-    private async Task LoadCarriersAsync()
-    {
-        if (IsBusy)
-            return;
-        try
-        {
-            Carriers.Clear();
-            SelectedCarrier = null;
-            IsBusy = true;
+	private async Task LoadCarriersAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			Carriers.Clear();
+			SelectedCarrier = null;
+			IsBusy = true;
 
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _carrierService.GetObjects(
-                    httpClient: httpClient,
-                    firmNumber: _httpClientService.FirmNumber
+			var result = await _carrierService.GetObjects(
+					httpClient: httpClient,
+					firmNumber: _httpClientService.FirmNumber
 
-            );
+			);
 
-            if (result.IsSuccess)
-            {
-                if (result.Data is null)
-                    return;
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
 
-                foreach (var item in result.Data)
-                {
-                    Carriers.Add(Mapping.Mapper.Map<Carrier>(item));
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
+				foreach (var item in result.Data)
+				{
+					Carriers.Add(Mapping.Mapper.Map<Carrier>(item));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 
-            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-        }
-    }
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
+	}
 
-    private async Task LoadDriversAsync()
-    {
-        if (IsBusy)
-            return;
-        try
-        {
-            Drivers.Clear();
-            SelectedDriver = null;
-            IsBusy = true;
+	private async Task LoadDriversAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			Drivers.Clear();
+			SelectedDriver = null;
+			IsBusy = true;
 
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _driverService.GetObjects(
-                    httpClient: httpClient
-            );
+			var result = await _driverService.GetObjects(
+					httpClient: httpClient
+			);
 
-            if (result.IsSuccess)
-            {
-                if (result.Data is null)
-                    return;
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
 
-                foreach (var item in result.Data)
-                {
-                    Drivers.Add(Mapping.Mapper.Map<Driver>(item));
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
+				foreach (var item in result.Data)
+				{
+					Drivers.Add(Mapping.Mapper.Map<Driver>(item));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 
-            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-        }
-    }
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
+	}
 
-    private async Task SaveAsync()
-    {
-        if (IsBusy)
-            return;
-        try
-        {
-            IsBusy = true;
+	private async Task SaveAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
 
-            CurrentPage.FindByName<BottomSheet>("insertOptionsBottomSheet").State = BottomSheetState.HalfExpanded;
+			await OpenInsertOptionsAsync();
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 
-            
-        }
-        catch (Exception ex)
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
+	}
 
-            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-        }
-    }
+	private async Task SelectWholeAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
 
-    private async Task WholeSalesDispatchTransactionInsertAsync(HttpClient httpClient)
-    {
-        var dto = new WholeSalesDispatchTransactionInsert
-        {
-            Code = "",
-            CurrentCode = SelectedCustomer != null ? SelectedCustomer.Code : "",
-            DriverFirstName = SelectedDriver != null ? SelectedDriver.Name : "",
-            DriverLastName = SelectedDriver != null ? SelectedDriver.Surname : "",
-            CarrierCode = SelectedCarrier != null ? SelectedCarrier.Code : "",
-            IdentityNumber = SelectedDriver != null ? SelectedDriver.IdentityNumber : "",
-            Plaque = SelectedDriver != null ? SelectedDriver.PlateNumber : "",
-            IsEDispatch = 1,
-            DispatchType = 0,
-            DispatchStatus = 1,
-            EDispatchProfileId = 1,
-            Description = Description,
-            DoCode = DocumentNumber,
-            DocTrackingNumber = DocumentTrackingNumber,
-            TransactionDate = TransactionDate,
-            FirmNumber = _httpClientService.FirmNumber,
-            SpeCode = SpecialCode,
-            WarehouseNumber = WarehouseModel.Number,
+			var confirmInsert = await _userDialogs.ConfirmAsync("Toptan Satış İrsaliyesi oluşturulacaktır. Devam etmek istediğinize emin misiniz?", "Onay", "Evet", "Hayır");
+			if (!confirmInsert)
+			{
+				await CloseInsertOptionsAsync();
+				return;
+			}
 
-        };
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-        foreach (var item in Items)
-        {
-            var wholeSalesDispatchTransactionLineDto = new WholeSalesDispatchTransactionLineInsert
-            {
-                ProductCode = item.ItemCode,
-                WarehouseNumber = (short?)WarehouseModel.Number,
-                Quantity = item.Quantity,
-                ConversionFactor = 1,
-                OtherConversionFactor = 1,
-                SubUnitsetCode = item.SubUnitsetCode,
-            };
+			_userDialogs.Loading("İşlem tamamlanıyor...");
 
-            foreach (var detail in item.Details)
-            {
-                var serilotTransactionDto = new SeriLotTransactionDto
-                {
-                    StockLocationCode = detail.LocationCode,
-                    InProductTransactionLineReferenceId = detail.TransactionReferenceId,
-                    OutProductTransactionLineReferenceId = detail.ReferenceId,
-                    Quantity = detail.RemainingQuantity,
-                    SubUnitsetCode = item.SubUnitsetCode,
-                    DestinationStockLocationCode = string.Empty,
-                    ConversionFactor = 1,
-                    OtherConversionFactor = 1,
-                };
+			await WholeSalesDispatchTransactionInsertAsync(httpClient);
 
-                wholeSalesDispatchTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
-            }
+			_userDialogs.HideHud();
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 
-            dto.Lines.Add(wholeSalesDispatchTransactionLineDto);
-        }
-        Console.WriteLine(dto);
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 
-        var result = await _wholeSalesDispatchTransactionService.InsertWholeSalesDispatchTransaction(httpClient, _httpClientService.FirmNumber, dto);
+	private async Task SelectRetailAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
 
-        ResultModel resultModel = new();
-        if (result.IsSuccess)
-        {
-            resultModel.Message = "Başarılı";
-            resultModel.Code = result.Data.Code;
-            resultModel.PageTitle = Title;
-            resultModel.PageCountToBack = 7;
+			var confirmInsert = await _userDialogs.ConfirmAsync("Perakende Satış İrsaliyesi oluşturulacaktır. Devam etmek istediğinize emin misiniz?", "Onay", "Evet", "Hayır");
+			if (!confirmInsert)
+			{
+				await CloseInsertOptionsAsync();
+				return;
+			}
+				
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
+			_userDialogs.Loading("İşlem tamamlanıyor...");
 
-            await ClearFormAsync();
+			await RetailSalesDispatchTransactionInsertAsync(httpClient);
 
-            var basketViewModel = _serviceProvider.GetRequiredService<OutputProductSalesOrderProcessBasketListViewModel>();
-            basketViewModel.Items.Clear();
-            basketViewModel.SelectedLocationTransactions.Clear();
-            basketViewModel.SelectedSeriLotTransactions.Clear();
+			_userDialogs.HideHud();
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 
-            await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
-            {
-                [nameof(ResultModel)] = resultModel
-            });
-        }
-        else
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 
-            resultModel.Message = "Başarısız";
-            resultModel.PageTitle = Title;
-            resultModel.ErrorMessage = result.Message;
-            resultModel.PageCountToBack = 1;
-            await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
-            {
-                [nameof(ResultModel)] = resultModel
-            });
-        }
-    }
+	private async Task WholeSalesDispatchTransactionInsertAsync(HttpClient httpClient)
+	{
+		var dto = new WholeSalesDispatchTransactionInsert
+		{
+			Code = "",
+			CurrentCode = SelectedCustomer != null ? SelectedCustomer.Code : "",
+			DriverFirstName = SelectedDriver != null ? SelectedDriver.Name : "",
+			DriverLastName = SelectedDriver != null ? SelectedDriver.Surname : "",
+			CarrierCode = SelectedCarrier != null ? SelectedCarrier.Code : "",
+			IdentityNumber = SelectedDriver != null ? SelectedDriver.IdentityNumber : "",
+			Plaque = SelectedDriver != null ? SelectedDriver.PlateNumber : "",
+			IsEDispatch = 1,
+			DispatchType = 0,
+			DispatchStatus = 1,
+			EDispatchProfileId = 1,
+			Description = Description,
+			DoCode = DocumentNumber,
+			DocTrackingNumber = DocumentTrackingNumber,
+			TransactionDate = TransactionDate,
+			FirmNumber = _httpClientService.FirmNumber,
+			SpeCode = SpecialCode,
+			WarehouseNumber = WarehouseModel.Number,
 
-    private async Task RetailSalesDispatchTransactionInsertAsync(HttpClient httpClient)
-    {
-        var dto = new RetailSalesDispatchTransactionInsert
-        {
-            Code = "",
-            CurrentCode = SelectedCustomer != null ? SelectedCustomer.Code : "",
-            DriverFirstName = SelectedDriver != null ? SelectedDriver.Name : "",
-            DriverLastName = SelectedDriver != null ? SelectedDriver.Surname : "",
-            CarrierCode = SelectedCarrier != null ? SelectedCarrier.Code : "",
-            IdentityNumber = SelectedDriver != null ? SelectedDriver.IdentityNumber : "",
-            Plaque = SelectedDriver != null ? SelectedDriver.PlateNumber : "",
-            IsEDispatch = 1,
-            DispatchType = 0,
-            DispatchStatus = 1,
-            EDispatchProfileId = 1,
-            Description = Description,
-            DoCode = DocumentNumber,
-            DocTrackingNumber = DocumentTrackingNumber,
-            TransactionDate = TransactionDate,
-            FirmNumber = _httpClientService.FirmNumber,
-            SpeCode = SpecialCode,
-            WarehouseNumber = WarehouseModel.Number,
+		};
 
-        };
+		foreach (var item in Items)
+		{
+			var wholeSalesDispatchTransactionLineDto = new WholeSalesDispatchTransactionLineInsert
+			{
+				ProductCode = item.ItemCode,
+				WarehouseNumber = (short?)WarehouseModel.Number,
+				Quantity = item.Quantity,
+				ConversionFactor = 1,
+				OtherConversionFactor = 1,
+				SubUnitsetCode = item.SubUnitsetCode,
+			};
 
-        foreach (var item in Items)
-        {
-            var retailSalesDispatchTransactionLineDto = new RetailSalesDispatchTransactionLineInsert
-            {
-                ProductCode = item.ItemCode,
-                WarehouseNumber = (short?)WarehouseModel.Number,
-                Quantity = item.Quantity,
-                ConversionFactor = 1,
-                OtherConversionFactor = 1,
-                SubUnitsetCode = item.SubUnitsetCode,
-            };
+			foreach (var detail in item.Details)
+			{
+				var serilotTransactionDto = new SeriLotTransactionDto
+				{
+					StockLocationCode = detail.LocationCode,
+					InProductTransactionLineReferenceId = detail.TransactionReferenceId,
+					OutProductTransactionLineReferenceId = detail.ReferenceId,
+					Quantity = detail.RemainingQuantity,
+					SubUnitsetCode = item.SubUnitsetCode,
+					DestinationStockLocationCode = string.Empty,
+					ConversionFactor = 1,
+					OtherConversionFactor = 1,
+				};
 
-            foreach (var detail in item.Details)
-            {
-                var serilotTransactionDto = new SeriLotTransactionDto
-                {
-                    StockLocationCode = detail.LocationCode,
-                    InProductTransactionLineReferenceId = detail.TransactionReferenceId,
-                    OutProductTransactionLineReferenceId = detail.ReferenceId,
-                    Quantity = detail.RemainingQuantity,
-                    SubUnitsetCode = item.SubUnitsetCode,
-                    DestinationStockLocationCode = string.Empty,
-                    ConversionFactor = 1,
-                    OtherConversionFactor = 1,
-                };
+				wholeSalesDispatchTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+			}
 
-                retailSalesDispatchTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
-            }
+			dto.Lines.Add(wholeSalesDispatchTransactionLineDto);
+		}
+		Console.WriteLine(dto);
 
-            dto.Lines.Add(retailSalesDispatchTransactionLineDto);
-        }
-        Console.WriteLine(dto);
+		var result = await _wholeSalesDispatchTransactionService.InsertWholeSalesDispatchTransaction(httpClient, _httpClientService.FirmNumber, dto);
 
-        var result = await _retailSalesDispatchTransactionService.InsertRetailSalesDispatchTransaction(httpClient, _httpClientService.FirmNumber, dto);
+		ResultModel resultModel = new();
+		if (result.IsSuccess)
+		{
+			resultModel.Message = "Başarılı";
+			resultModel.Code = result.Data.Code;
+			resultModel.PageTitle = Title;
+			resultModel.PageCountToBack = 7;
 
-        ResultModel resultModel = new();
-        if (result.IsSuccess)
-        {
-            resultModel.Message = "Başarılı";
-            resultModel.Code = result.Data.Code;
-            resultModel.PageTitle = Title;
-            resultModel.PageCountToBack = 7;
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
+			await ClearFormAsync();
 
-            await ClearFormAsync();
+			var basketViewModel = _serviceProvider.GetRequiredService<OutputProductSalesOrderProcessBasketListViewModel>();
+			basketViewModel.Items.Clear();
+			basketViewModel.SelectedLocationTransactions.Clear();
+			basketViewModel.SelectedSeriLotTransactions.Clear();
 
-            var basketViewModel = _serviceProvider.GetRequiredService<OutputProductSalesProcessBasketListViewModel>();
-            basketViewModel.Items.Clear();
-            basketViewModel.SelectedLocationTransactions.Clear();
-            basketViewModel.SelectedSeriLotTransactions.Clear();
+			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
+			{
+				[nameof(ResultModel)] = resultModel
+			});
+		}
+		else
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 
-            await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
-            {
-                [nameof(ResultModel)] = resultModel
-            });
-        }
-        else
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
+			resultModel.Message = "Başarısız";
+			resultModel.PageTitle = Title;
+			resultModel.ErrorMessage = result.Message;
+			resultModel.PageCountToBack = 1;
+			await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+			{
+				[nameof(ResultModel)] = resultModel
+			});
+		}
+	}
 
-            resultModel.Message = "Başarısız";
-            resultModel.PageTitle = Title;
-            resultModel.ErrorMessage = result.Message;
-            resultModel.PageCountToBack = 1;
-            await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
-            {
-                [nameof(ResultModel)] = resultModel
-            });
-        }
-    }
+	private async Task RetailSalesDispatchTransactionInsertAsync(HttpClient httpClient)
+	{
+		var dto = new RetailSalesDispatchTransactionInsert
+		{
+			Code = "",
+			CurrentCode = SelectedCustomer != null ? SelectedCustomer.Code : "",
+			DriverFirstName = SelectedDriver != null ? SelectedDriver.Name : "",
+			DriverLastName = SelectedDriver != null ? SelectedDriver.Surname : "",
+			CarrierCode = SelectedCarrier != null ? SelectedCarrier.Code : "",
+			IdentityNumber = SelectedDriver != null ? SelectedDriver.IdentityNumber : "",
+			Plaque = SelectedDriver != null ? SelectedDriver.PlateNumber : "",
+			IsEDispatch = 1,
+			DispatchType = 0,
+			DispatchStatus = 1,
+			EDispatchProfileId = 1,
+			Description = Description,
+			DoCode = DocumentNumber,
+			DocTrackingNumber = DocumentTrackingNumber,
+			TransactionDate = TransactionDate,
+			FirmNumber = _httpClientService.FirmNumber,
+			SpeCode = SpecialCode,
+			WarehouseNumber = WarehouseModel.Number,
 
-    private async Task ClearFormAsync()
-    {
-        try
-        {
-            DocumentNumber = string.Empty;
-            SpecialCode = string.Empty;
-            DocumentTrackingNumber = string.Empty;
-            Description = string.Empty;
-            SelectedCarrier = null;
-            SelectedDriver = null;
-            SelectedCustomer = null;
-            SelectedShipAddress = null;
+		};
 
-        }
-        catch (Exception ex)
-        {
+		foreach (var item in Items)
+		{
+			var retailSalesDispatchTransactionLineDto = new RetailSalesDispatchTransactionLineInsert
+			{
+				ProductCode = item.ItemCode,
+				WarehouseNumber = (short?)WarehouseModel.Number,
+				Quantity = item.Quantity,
+				ConversionFactor = 1,
+				OtherConversionFactor = 1,
+				SubUnitsetCode = item.SubUnitsetCode,
+			};
 
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-    }
+			foreach (var detail in item.Details)
+			{
+				var serilotTransactionDto = new SeriLotTransactionDto
+				{
+					StockLocationCode = detail.LocationCode,
+					InProductTransactionLineReferenceId = detail.TransactionReferenceId,
+					OutProductTransactionLineReferenceId = detail.ReferenceId,
+					Quantity = detail.RemainingQuantity,
+					SubUnitsetCode = item.SubUnitsetCode,
+					DestinationStockLocationCode = string.Empty,
+					ConversionFactor = 1,
+					OtherConversionFactor = 1,
+				};
+
+				retailSalesDispatchTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+			}
+
+			dto.Lines.Add(retailSalesDispatchTransactionLineDto);
+		}
+		Console.WriteLine(dto);
+
+		var result = await _retailSalesDispatchTransactionService.InsertRetailSalesDispatchTransaction(httpClient, _httpClientService.FirmNumber, dto);
+
+		ResultModel resultModel = new();
+		if (result.IsSuccess)
+		{
+			resultModel.Message = "Başarılı";
+			resultModel.Code = result.Data.Code;
+			resultModel.PageTitle = Title;
+			resultModel.PageCountToBack = 7;
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await ClearFormAsync();
+
+			var basketViewModel = _serviceProvider.GetRequiredService<OutputProductSalesProcessBasketListViewModel>();
+			basketViewModel.Items.Clear();
+			basketViewModel.SelectedLocationTransactions.Clear();
+			basketViewModel.SelectedSeriLotTransactions.Clear();
+
+			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
+			{
+				[nameof(ResultModel)] = resultModel
+			});
+		}
+		else
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			resultModel.Message = "Başarısız";
+			resultModel.PageTitle = Title;
+			resultModel.ErrorMessage = result.Message;
+			resultModel.PageCountToBack = 1;
+			await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+			{
+				[nameof(ResultModel)] = resultModel
+			});
+		}
+	}
+
+	private async Task CloseInsertOptionsAsync()
+	{
+		await MainThread.InvokeOnMainThreadAsync(() =>
+		{
+			CurrentPage.FindByName<BottomSheet>("insertOptionsBottomSheet").State = BottomSheetState.Hidden;
+		});
+	}
+
+	private async Task OpenInsertOptionsAsync()
+	{
+		await MainThread.InvokeOnMainThreadAsync(() =>
+		{
+			CurrentPage.FindByName<BottomSheet>("insertOptionsBottomSheet").State = BottomSheetState.HalfExpanded;
+		});
+	}
+
+	private async Task ClearFormAsync()
+	{
+		try
+		{
+			DocumentNumber = string.Empty;
+			SpecialCode = string.Empty;
+			DocumentTrackingNumber = string.Empty;
+			Description = string.Empty;
+			SelectedCarrier = null;
+			SelectedDriver = null;
+			SelectedCustomer = null;
+			SelectedShipAddress = null;
+
+		}
+		catch (Exception ex)
+		{
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+	}
 }

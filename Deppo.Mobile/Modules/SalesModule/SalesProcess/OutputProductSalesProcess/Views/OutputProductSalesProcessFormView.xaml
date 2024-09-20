@@ -333,41 +333,74 @@
         <!--#region InsertOptions BottomSheet-->
         <dx:BottomSheet x:Name="insertOptionsBottomSheet"
                         AllowDismiss="True"
-                        BackgroundColor="WhiteSmoke"
+                        BackgroundColor="White"
                         CornerRadius="15"
-                        HalfExpandedRatio="0.5"
+                        HalfExpandedRatio="0.3"
                         IsModal="True"
                         ShowGrabber="True">
+            <Grid Padding="10"
+                  RowDefinitions="Auto,*"
+                  RowSpacing="20">
+                <VerticalStackLayout Grid.Row="0" Spacing="5">
+                    <Label Padding="10"
+                           FontAttributes="Bold"
+                           FontSize="Subtitle"
+                           Text="İade İrsaliye Türü Seçiniz" />
+                    <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Row="1" Spacing="10">
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectWholeCommand}" />
+                        </Border.GestureRecognizers>
 
-            <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
+                        <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontAttributes="Bold"
+                                          FontFamily="FAS"
+                                          Text="{x:Static fontAwesome:FontAwesomeIcons.List}"
+                                          TextColor="{StaticResource OffBlack}" />
+                                    <Span Text=" " />
 
-                <CollectionView Grid.Row="1" ItemsSource="{Binding SalesDispatchInsertModels}">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="salesModel:SalesDispatchInsertModel">
-                            <Border Padding="10,20,10,20"
-                                    BackgroundColor="White"
-                                    StrokeShape="RoundRectangle 10">
-                                <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesProcessFormViewModel}}, Path=InsertTypeTappedCommand}" CommandParameter="{Binding .}" />
-                                </Border.GestureRecognizers>
-                                <Border.Triggers>
-                                    <DataTrigger TargetType="Border"
-                                                 Binding="{Binding IsSelected}"
-                                                 Value="True">
-                                        <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
-                                    </DataTrigger>
-                                </Border.Triggers>
-                                <Label HorizontalOptions="Center"
-                                       Text="{Binding TypeName}"
-                                       VerticalOptions="Center" />
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
+                                    <Span Text=" " />
+                                    <Span FontAttributes="Bold"
+                                          Text="Toptan Satış İrsaliyesi"
+                                          TextColor="{StaticResource OffBlack}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </Border>
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectRetailCommand}" />
+                        </Border.GestureRecognizers>
+                        <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontAttributes="Bold"
+                                          FontFamily="FAS"
+                                          Text="{x:Static fontAwesome:FontAwesomeIcons.List}"
+                                          TextColor="{StaticResource OffBlack}" />
+                                    <Span Text=" " />
 
-                <Button Grid.Row="2" Text="Tamam" Command="{Binding InsertTypeConfirmCommand}" />
+                                    <Span FontAttributes="Bold"
+                                          Text="Perakende Satış İrsaliyesi"
+                                          TextColor="{StaticResource OffBlack}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </Border>
+                </VerticalStackLayout>
             </Grid>
         </dx:BottomSheet>
+
         <!--#endregion-->
     </Grid>
 </ContentPage>
