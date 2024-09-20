@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanModule.ViewModels;
+namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.ViewModels;
 
 public partial class VirmanProductInListViewModel : BaseViewModel
 {
