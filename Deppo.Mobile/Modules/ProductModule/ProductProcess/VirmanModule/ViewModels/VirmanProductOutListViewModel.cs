@@ -1,27 +1,24 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
-using Deppo.Core.Models;
 using Deppo.Core.Services;
-using Deppo.Mobile.Core.Models.BasketModels;
-using Deppo.Mobile.Core.Models.ProductModels;
-using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
-using Deppo.Mobile.Core.Models.PurchaseModels;
-using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
-using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
-using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Views;
-using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views;
-using DevExpress.Maui.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Deppo.Core.Models;
+using Deppo.Mobile.Helpers.MappingHelper;
 
-namespace Deppo.Mobile.Modules.VirmanModule.ViewModels;
+namespace Deppo.Mobile.Modules.ProductModule.VirmanModule.ViewModels;
 
 [QueryProperty(name: nameof(OutWarehouse), queryId: nameof(OutWarehouse))]
 public partial class VirmanProductOutListViewModel : BaseViewModel
@@ -41,6 +38,8 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
 
     [ObservableProperty]
     private WarehouseTotalModel? selectedProduct;
+    public Page CurrentPage { get; set; }
+
 
 
 
@@ -63,7 +62,160 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
 
     }
 
+    private async Task NextViewAsync()
+    {
+        if (IsBusy)
+            return;
 
+        try
+        {
+            IsBusy = true;
+
+
+            await Shell.Current.GoToAsync($"{nameof(VirmanProductInWarehouseListViewModel)}", new Dictionary<string, object>
+            {
+                ["OutWarehouse"] = OutWarehouse,
+                [nameof(WarehouseTotalModel)] = SelectedProduct
+            });
+        }
+        catch (System.Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ItemTappedAsync(WarehouseTotalModel item)
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            if (item is not null)
+            {
+
+                if (!item.IsSelected)
+                {
+
+                    Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
+                    SelectedProduct = item;
+                }
+                else
+                {
+                    SelectedProduct = null;
+                    var selectedItem = Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
+                    if (selectedItem is not null)
+                    {
+                        Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
+                    }
+                }
+
+            }
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task LoadMoreItemsAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: OutWarehouse.Number, skip: Items.Count, take: 20);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var product in result.Data)
+                {
+                    var item = Mapping.Mapper.Map<WarehouseTotal>(product);
+
+                    Items.Add(new WarehouseTotalModel
+                    {
+                        ProductReferenceId = item.ProductReferenceId,
+                        ProductCode = item.ProductCode,
+                        ProductName = item.ProductName,
+                        UnitsetReferenceId = item.UnitsetReferenceId,
+                        UnitsetCode = item.UnitsetCode,
+                        UnitsetName = item.UnitsetName,
+                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                        SubUnitsetCode = item.SubUnitsetCode,
+                        SubUnitsetName = item.SubUnitsetName,
+                        StockQuantity = item.StockQuantity,
+                        WarehouseReferenceId = item.WarehouseReferenceId,
+                        WarehouseName = item.WarehouseName,
+                        WarehouseNumber = item.WarehouseNumber,
+                        LocTracking = item.LocTracking,
+                        IsVariant = item.IsVariant,
+                        TrackingType = item.TrackingType,
+                        IsSelected = false,
+                        LocTrackingIcon = product.LocTrackingIcon,
+                        VariantIcon = product.VariantIcon,
+                        TrackingTypeIcon = product.TrackingTypeIcon,
+                    });
+                }
+            }
+
+            _userDialogs.Loading().Hide();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+            var confirm = await _userDialogs.ConfirmAsync("İşlemi iptal etmek istediğinize emin misiniz?", "İptal", "Evet", "Hayır");
+            if (!confirm)
+                return;
+            if (SelectedProduct != null)
+            {
+                SelectedProduct.IsSelected = false;
+                SelectedProduct = null;
+            }
+
+            await Shell.Current.GoToAsync($"..");
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
@@ -138,164 +290,16 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
     }
 
 
-    public Page CurrentPage { get; set; }
 }
 
-    private async Task LoadMoreItemsAsync()
-    {
-        if (IsBusy)
-            return;
-        try
-        {
-            IsBusy = true;
-
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: OutWarehouse.Number, skip: Items.Count, take: 20);
-
-            if (result.IsSuccess)
-            {
-                if (result.Data is null)
-                    return;
-
-                foreach (var product in result.Data)
-                {
-                    var item = Mapping.Mapper.Map<WarehouseTotal>(product);
-
-                    Items.Add(new WarehouseTotalModel
-                    {
-                        ProductReferenceId = item.ProductReferenceId,
-                        ProductCode = item.ProductCode,
-                        ProductName = item.ProductName,
-                        UnitsetReferenceId = item.UnitsetReferenceId,
-                        UnitsetCode = item.UnitsetCode,
-                        UnitsetName = item.UnitsetName,
-                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                        SubUnitsetCode = item.SubUnitsetCode,
-                        SubUnitsetName = item.SubUnitsetName,
-                        StockQuantity = item.StockQuantity,
-                        WarehouseReferenceId = item.WarehouseReferenceId,
-                        WarehouseName = item.WarehouseName,
-                        WarehouseNumber = item.WarehouseNumber,
-                        LocTracking = item.LocTracking,
-                        IsVariant = item.IsVariant,
-                        TrackingType = item.TrackingType,
-                        IsSelected = false,
-                        LocTrackingIcon = product.LocTrackingIcon,
-                        VariantIcon = product.VariantIcon,
-                        TrackingTypeIcon = product.TrackingTypeIcon,
-                    });
-                }
-            }
-
-            _userDialogs.Loading().Hide();
-        }
-        catch (Exception ex)
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
-
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
+  
 
 
-    private async Task ItemTappedAsync(WarehouseTotalModel item)
-    {
-        if (IsBusy)
-            return;
-
-        try
-        {
-            IsBusy = true;
-
-            if (item is not null)
-            {
-                
-                    if (!item.IsSelected)
-                    {
-
-                        Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
-                        SelectedProduct = item;
-                    }
-                    else
-                    {
-                        SelectedProduct = null;
-                        var selectedItem = Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
-                        if (selectedItem is not null)
-                        {
-                            Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
-                        }
-                    }
-                
-            }
-        }
-        catch (Exception ex)
-        {
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-    private async Task NextViewAsync()
-    {
-        if (IsBusy)
-            return;
-
-        try
-        {
-            IsBusy = true;
-           
-
-            await Shell.Current.GoToAsync($"{nameof(VirmanProductInWarehouseListViewModel)}", new Dictionary<string, object>
-            {
-                ["OutWarehouse"] = OutWarehouse,
-                [nameof(WarehouseTotalModel)] = SelectedProduct
-            });
-        }
-        catch (System.Exception ex)
-        {
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
-    private async Task BackAsync()
-    {
-        if (IsBusy)
-            return;
-        try
-        {
-            IsBusy = true;
-            var confirm = await _userDialogs.ConfirmAsync("İşlemi iptal etmek istediğinize emin misiniz?", "İptal", "Evet", "Hayır");
-            if (!confirm)
-                return;
-            if (SelectedProduct != null)
-            {
-                SelectedProduct.IsSelected = false;
-                SelectedProduct = null;
-            }
-
-            await Shell.Current.GoToAsync($"..");
-        }
-        catch (Exception ex)
-        {
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
+   
+    
 
 
-}
+
+
+
 
