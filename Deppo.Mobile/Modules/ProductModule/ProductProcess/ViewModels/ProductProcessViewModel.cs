@@ -4,6 +4,7 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Views;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.TransferProductProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.Views;
 using Deppo.Mobile.Modules.ResultModule;
 using Deppo.Mobile.Modules.ResultModule.Views;
@@ -29,6 +30,7 @@ public partial class ProductProcessViewModel : BaseViewModel
         UnderCountProcessCommand = new Command(async () => await UnderCountProcessAsync());
         WasteProcessCommand = new Command(async () => await WasteProcessAsync());
         VirmanProductProcessCommand = new Command(async () => await VirmanProductProcessAsync());
+        TransferProductProcessCommand = new Command(async () => await TransferProductProcessAsync());
     }
 
     public Command ProductionInputCommand { get; }
@@ -38,6 +40,7 @@ public partial class ProductProcessViewModel : BaseViewModel
     public Command WasteProcessCommand { get; }
 
     public Command VirmanProductProcessCommand { get; }
+    public Command TransferProductProcessCommand { get; }
 
     #region Will be removed
 
@@ -92,5 +95,10 @@ public partial class ProductProcessViewModel : BaseViewModel
         {
             //{ nameof(OutputProductProcessType), OutputProductProcessType.WasteProcess }
         });
+    }
+
+    private async Task TransferProductProcessAsync()
+    {
+        await Shell.Current.GoToAsync($"{nameof(TransferOutWarehouseListView)}");
     }
 }
