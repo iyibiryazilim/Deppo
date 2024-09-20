@@ -39,7 +39,7 @@ public partial class TransferOutProductListViewModel : BaseViewModel
     WarehouseTotalModel selectedProduct = null!;
 
     [ObservableProperty]
-    TransferBasketModel transferBasketModel = null!;
+    TransferBasketModel transferBasketModel = new();
 
     public ContentPage CurrentPage { get; set; } = null!;
 

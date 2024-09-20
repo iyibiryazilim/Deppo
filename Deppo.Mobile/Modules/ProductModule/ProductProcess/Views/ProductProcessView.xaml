@@ -310,6 +310,9 @@
                             <Grid Grid.Column="0"
                                   ColumnDefinitions="Auto,*"
                                   ColumnSpacing="10">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding TransferProductProcessCommand}" />
+                                </Grid.GestureRecognizers>
                                 <Border Padding="5"
                                         BackgroundColor="{StaticResource Secondary}"
                                         StrokeShape="RoundRectangle 5">

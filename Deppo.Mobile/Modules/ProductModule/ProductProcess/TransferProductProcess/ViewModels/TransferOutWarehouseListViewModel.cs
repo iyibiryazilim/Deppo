@@ -14,13 +14,22 @@ public partial class TransferOutWarehouseListViewModel : BaseViewModel
     private readonly IHttpClientService _httpClientService;
     private readonly IWarehouseService _warehouseService;
     private readonly IUserDialogs _userDialogs;
-    public TransferOutWarehouseListViewModel(IHttpClientService httpClientService, IWarehouseService warehouseService, IUserDialogs userDialogs)
+
+	#region Collections
+	public ObservableCollection<WarehouseModel> Items { get; } = new();
+	#endregion
+
+
+	[ObservableProperty]
+	WarehouseModel selectedWarehouseModel = null!;
+	
+	public TransferOutWarehouseListViewModel(IHttpClientService httpClientService, IWarehouseService warehouseService, IUserDialogs userDialogs)
     {
         _httpClientService = httpClientService;
         _warehouseService = warehouseService;
         _userDialogs = userDialogs;
 
-        Title = "Ambar seçimi";
+        Title = "Çıkış Ambarı Seçimi";
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
@@ -35,15 +44,7 @@ public partial class TransferOutWarehouseListViewModel : BaseViewModel
     public Command NextViewCommand { get; }
     #endregion
 
-    #region Collections
-    public ObservableCollection<WarehouseModel> Items { get; } = new();
-    #endregion
-
-    #region Properties
-
-    [ObservableProperty]
-    WarehouseModel selectedWarehouseModel = null!;
-    #endregion
+   
 
     private async Task LoadItemsAsync()
     {
@@ -145,18 +146,23 @@ public partial class TransferOutWarehouseListViewModel : BaseViewModel
 
         try
         {
-            IsBusy = true;
+			if (item == SelectedWarehouseModel)
+			{
+				SelectedWarehouseModel.IsSelected = false;
+				SelectedWarehouseModel = null;
+			}
+			else
+			{
+				if (SelectedWarehouseModel != null)
+				{
+					SelectedWarehouseModel.IsSelected = false;
+				}
 
+				SelectedWarehouseModel = item;
+				SelectedWarehouseModel.IsSelected = true;
+			}
 
-            Items.ToList().ForEach(x => x.IsSelected = false);
-
-            var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-            if (selectedItem != null)
-                selectedItem.IsSelected = true;
-
-            SelectedWarehouseModel = item;
-
-        }
+		}
         catch (Exception ex)
         {
             _userDialogs.Alert(ex.Message);

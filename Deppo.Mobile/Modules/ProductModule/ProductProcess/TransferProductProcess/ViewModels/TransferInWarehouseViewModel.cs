@@ -151,18 +151,25 @@ public partial class TransferInWarehouseViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+			if (item == SelectedWarehouseModel)
+			{
+				SelectedWarehouseModel.IsSelected = false;
+				SelectedWarehouseModel = null;
+			}
+			else
+			{
+				if (SelectedWarehouseModel != null)
+				{
+					SelectedWarehouseModel.IsSelected = false;
+				}
 
+				SelectedWarehouseModel = item;
+				SelectedWarehouseModel.IsSelected = true;
 
-            Items.ToList().ForEach(x => x.IsSelected = false);
+                TransferBasketModel.InWarehouse = SelectedWarehouseModel;
+			}
 
-            var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-            if (selectedItem != null)
-                selectedItem.IsSelected = true;
-
-            SelectedWarehouseModel = item;
-            TransferBasketModel.InWarehouse = SelectedWarehouseModel;
-
-        }
+		}
         catch (Exception ex)
         {
             _userDialogs.Alert(ex.Message);
@@ -180,6 +187,40 @@ public partial class TransferInWarehouseViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+
+            foreach (var item in TransferBasketModel.OutProducts)
+            {
+                TransferBasketModel.InProducts.Add(new InProductModel
+                {
+                    ReferenceId = item.ReferenceId,
+                    Code = item.Code,
+                    Name = item.Name,
+                    Image = item.Image,
+                    OutputQuantity = item.OutputQuantity,
+                    GroupCode = item.GroupCode,
+                    IsVariant = item.IsVariant,
+                    LocTracking = item.LocTracking,
+                    StockQuantity = item.StockQuantity,
+                    SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                    SubUnitsetCode = item.SubUnitsetCode,
+                    SubUnitsetName = item.SubUnitsetName,
+                    UnitsetReferenceId = item.UnitsetReferenceId,
+                    UnitsetCode = item.UnitsetCode,
+                    UnitsetName = item.UnitsetName,
+                    VatRate = item.VatRate,
+                    LocTrackingIcon = item.LocTrackingIcon,
+                    TrackingType = item.TrackingType,
+                    TrackingTypeIcon = item.TrackingTypeIcon,
+                    Unitset = item.Unitset,
+                    VariantIcon = item.VariantIcon,
+                    BrandReferenceId = item.BrandReferenceId,
+                    BrandCode = item.BrandCode,
+                    BrandName = item.BrandName,
+                });
+
+			}
+
+            
 
             await Shell.Current.GoToAsync($"{nameof(TransferInBasketView)}", new Dictionary<string, object>
             {
