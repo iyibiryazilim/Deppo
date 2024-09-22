@@ -626,7 +626,10 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
             if (SeriLotTransactions.Count > 0)
             {
                 SelectedSeriLotTransactions.Clear();
-                SelectedSeriLotTransactions.ToList().AddRange(SeriLotTransactions.Where(x => x.OutputQuantity > 0));
+				foreach (var item in SeriLotTransactions.Where(x => x.OutputQuantity > 0))
+				{
+					SelectedSeriLotTransactions.Add(item);
+				}
 
                 // Stok yeri takipli değilse
                 if (SelectedItem.LocTracking == 0)
@@ -636,7 +639,8 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
                     {
                         SelectedItem.Details.Add(new ReturnPurchaseBasketDetailModel
                         {
-                            SeriLotReferenceId = item.ReferenceId,
+                            ReferenceId = item.ReferenceId,
+                            SeriLotReferenceId = item.SerilotReferenceId,
                             SeriLotCode = item.SerilotCode,
                             SeriLotName = item.SerilotName,
                             TransactionFicheReferenceId = item.TransactionFicheReferenceId,
@@ -644,7 +648,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
                             InTransactionReferenceId = item.InTransactionReferenceId,
                             Quantity = item.OutputQuantity,
                             InSerilotTransactionReferenceId = item.InSerilotTransactionReferenceId,
-                            RemainingQuantity = item.Quantity - item.OutputQuantity
+                            RemainingQuantity =  item.OutputQuantity
                         });
                     }
 

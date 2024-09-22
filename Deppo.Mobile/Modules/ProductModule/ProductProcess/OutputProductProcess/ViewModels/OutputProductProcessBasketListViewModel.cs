@@ -351,8 +351,13 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				}
 				else
 				{
-					if(item.OutputQuantity < item.RemainingQuantity)
-						item.OutputQuantity++;
+					var totalQuantity = LocationTransactions.Sum(x => x.OutputQuantity);
+
+					if(SelectedItem.StockQuantity > totalQuantity)
+					{
+						if (item.OutputQuantity < item.RemainingQuantity && SelectedItem.StockQuantity > item.OutputQuantity)
+							item.OutputQuantity++;
+					}
 				}
 
 				if (item.OutputQuantity > 0 && !item.IsSelected)
@@ -427,13 +432,10 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 			if (LocationTransactions.Count > 0)
 			{
 				SelectedLocationTransactions.Clear();
-                //SelectedLocationTransactions.ToList().AddRange(LocationTransactions.Where(x => x.OutputQuantity > 0));
                 foreach (var x in LocationTransactions.Where(x => x.OutputQuantity > 0))
                 {
 					SelectedLocationTransactions.Add(x);
                 }
-
-
 
                 foreach (var item in SelectedLocationTransactions)
 				{
@@ -458,8 +460,6 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 						RemainingQuantity = item.OutputQuantity,
 					});
 				}
-
-
 
 				var totalOutputQuantity = LocationTransactions.Where(x => x.OutputQuantity > 0).Sum(x => (double)x.OutputQuantity);
 				SelectedItem.Quantity = totalOutputQuantity;
@@ -629,7 +629,10 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 			if (SeriLotTransactions.Count > 0)
 			{
 				SelectedSeriLotTransactions.Clear();
-				SelectedSeriLotTransactions.ToList().AddRange(SeriLotTransactions.Where(x => x.OutputQuantity > 0));
+                foreach (var item in SeriLotTransactions.Where(x => x.OutputQuantity > 0))
+                {
+					SelectedSeriLotTransactions.Add(item);
+				}
 
 				// Stok yeri takipli değilse
 				if (SelectedItem.LocTracking == 0) {
@@ -638,7 +641,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 					{
 						SelectedItem.Details.Add(new OutputProductBasketDetailModel
 						{
-							SeriLotReferenceId = item.ReferenceId,
+							SeriLotReferenceId = item.SerilotReferenceId,
 							SeriLotCode = item.SerilotCode,
 							SeriLotName = item.SerilotName,
 							ReferenceId = item.ReferenceId,
@@ -702,6 +705,13 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				return;
 			}
 
+			bool isQuantityValid = Items.All(x => x.Quantity > 0);
+			if (!isQuantityValid)
+			{
+				await _userDialogs.AlertAsync("Sepetinizde miktarı 0 olan ürünler bulunmaktadır.", "Uyarı", "Tamam");
+				return;
+			}
+
             await Shell.Current.GoToAsync($"{nameof(OutputProductProcessFormView)}", new Dictionary<string, object>
 			{
 				[nameof(WarehouseModel)] = WarehouseModel,
@@ -711,6 +721,9 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		}
 		catch (Exception ex)
 		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 		finally

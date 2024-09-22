@@ -70,6 +70,7 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
         LoadPageCommand = new Command(async () => await LoadPageAsync());
 
     }
+    public Page CurrentPage { get; set; }
 
     public Command SaveCommand { get; }
 	public Command LoadPageCommand { get; }
@@ -84,14 +85,14 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 			IsBusy = true;
 
 			Title = GetEnumDescription(OutputProductProcessType);
-			//CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
-
-
+			CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
 		}
-		catch (System.Exception)
+		catch (Exception ex)
 		{
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			throw;
+           await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{
