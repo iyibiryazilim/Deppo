@@ -346,7 +346,7 @@
                     <Label Padding="10"
                            FontAttributes="Bold"
                            FontSize="Subtitle"
-                           Text="İade İrsaliye Türü Seçiniz" />
+                           Text="İrsaliye Türü Seçiniz" />
                     <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
                 </VerticalStackLayout>
                 <VerticalStackLayout Grid.Row="1" Spacing="10">

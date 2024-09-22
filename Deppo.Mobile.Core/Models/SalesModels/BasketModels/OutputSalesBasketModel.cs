@@ -26,7 +26,6 @@ public class OutputSalesBasketModel : INotifyPropertyChanged, IDisposable
 	private bool _isSelected;
 	private string _image;
 	private double _outputQuantity;
-    private double _inputQuantity;
 	private int _shipAddressReferenceId;
 	private string _shipAddressCode = string.Empty;
 
@@ -301,17 +300,6 @@ public class OutputSalesBasketModel : INotifyPropertyChanged, IDisposable
 			NotifyPropertyChanged();
 		}
 	}
-
-    public double InputQuantity
-    {
-        get => _inputQuantity;
-        set
-        {
-            if (_inputQuantity == value) return;
-            _inputQuantity = value;
-            NotifyPropertyChanged();
-        }
-    }
 
 	[Browsable(false)]
 	public int ShipAddressReferenceId

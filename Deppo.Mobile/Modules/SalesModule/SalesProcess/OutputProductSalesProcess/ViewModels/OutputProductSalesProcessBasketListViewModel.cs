@@ -85,6 +85,8 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 	public Command<OutputSalesBasketModel> IncreaseCommand { get; }
 	public Command<OutputSalesBasketModel> DecreaseCommand { get; }
 	public Command<OutputSalesBasketModel> DeleteItemCommand { get; }
+	public Command NextViewCommand { get; }
+	public Command BackCommand { get; }
 
 	public Command LoadMoreLocationTransactionsCommand { get; }
 	public Command LocationTransactionIncreaseCommand { get; }
@@ -98,10 +100,6 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 	public Command SeriLotTransactionConfirmCommand { get; }
 	public Command SeriLotTransactionCloseCommand { get; }
 
-
-
-	public Command NextViewCommand { get; }
-	public Command BackCommand { get; }
 
 	private async Task ShowProductViewAsync()
 	{
@@ -141,11 +139,18 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 
 			if (item is not null)
 			{
-				var result = await _userDialogs.ConfirmAsync("Ürünü sepetten çıkarmak istediğinize emin misiniz?", "Uyarı", "Evet", "Hayır");
-				if (result)
+				var result = await _userDialogs.ConfirmAsync($"{item.ItemCode}\n{item.ItemName}\nİlgili ürün sepetinizden çıkarılacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+				if (!result)
 				{
-					Items.Remove(item);
+					return;
 				}
+				if(SelectedItem == item)
+				{
+					SelectedItem.IsSelected = false;
+					SelectedItem = null;
+				}
+
+				Items.Remove(item);
 			}
 		}
 		catch (Exception ex)
@@ -178,8 +183,9 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 				CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.FullExpanded;
 
 			}
-			else if (outputSalesBasketModel.TrackingType == 1)
+			else if (outputSalesBasketModel.TrackingType == 1 || outputSalesBasketModel.TrackingType == 0)
 			{
+				await LoadSeriLotTransactionsAsync();
 				CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.FullExpanded;
 			}
 			else
@@ -212,6 +218,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 
 			if (outputSalesBasketModel is not null)
 			{
+				SelectedItem = outputSalesBasketModel;
 				if (outputSalesBasketModel.Quantity > 1)
 				{
 					// Stok Yeri Takipli olma durumu
@@ -282,8 +289,6 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 	{
 		if (IsBusy)
 			return;
-		if (LocationTransactions.Count < (18))  // 18 = Take (20) - Remaining ItemsThreshold (2)
-			return;
 		try
 		{
 			IsBusy = true;
@@ -328,7 +333,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 
 			if (item is not null)
 			{
-				if (SelectedItem.TrackingType != 0)
+				if (SelectedItem.TrackingType == 1 || SelectedItem.TrackingType == 2)
 				{
 					await LoadSeriLotTransactionsAsync();
 					CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.FullExpanded;
@@ -372,7 +377,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 			if (item is not null)
 			{
 				// SeriLot takipli ise serilotTransactionBottomSheet aç
-				if (SelectedItem.TrackingType != 0)
+				if (SelectedItem.TrackingType == 1 || SelectedItem.TrackingType == 1)
 				{
 					await LoadSeriLotTransactionsAsync();
 					CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.FullExpanded;
@@ -417,8 +422,6 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
                 {
 					SelectedLocationTransactions.Add(x);
                 }
-
-
 
                 foreach (var item in SelectedLocationTransactions)
                 {
@@ -677,18 +680,25 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 		{
 			IsBusy = true;
 
-			if (Items.Count > 0)
+			if (Items.Count == 0)
 			{
-				await Shell.Current.GoToAsync($"{nameof(OutputProductSalesProcessFormView)}", new Dictionary<string, object>
-				{
-					[nameof(WarehouseModel)] = WarehouseModel,
-					[nameof(Items)] = Items,
-				});
+				await _userDialogs.AlertAsync("Sepetinizde ürün bulunmamaktadır.", "Hata", "Tamam");
+				return;
 			}
-			else
+
+
+			bool isQuantityValid = Items.All(x => x.Quantity > 0);
+			if (!isQuantityValid)
 			{
-				await _userDialogs.AlertAsync("Sepetinizde ürün bulunmamaktadır.", "Uyarı", "Tamam");
+				await _userDialogs.AlertAsync("Sepetinizde miktarı 0 olan ürünler bulunmaktadır.", "Uyarı", "Tamam");
+				return;
 			}
+
+			await Shell.Current.GoToAsync($"{nameof(OutputProductSalesProcessFormView)}", new Dictionary<string, object>
+			{
+				[nameof(WarehouseModel)] = WarehouseModel,
+				[nameof(Items)] = Items,
+			});
 		}
 		catch(Exception ex)
 		{
@@ -727,7 +737,10 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 		}
 		catch (Exception ex)
 		{
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{

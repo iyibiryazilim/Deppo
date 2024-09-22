@@ -68,12 +68,15 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
         Items = new();
         SaveCommand = new Command(async () => await SaveAsync());
         LoadPageCommand = new Command(async () => await LoadPageAsync());
+        ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
 
     }
     public Page CurrentPage { get; set; }
 
     public Command SaveCommand { get; }
 	public Command LoadPageCommand { get; }
+	public Command ShowBasketItemCommand { get; }
+    public Command BackCommand { get; }
 
 	private async Task LoadPageAsync()
 	{
@@ -99,6 +102,32 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 			IsBusy = false;
 		}
 	}
+
+	private async Task ShowBasketItemAsync()
+	{
+		if (IsBusy)
+			return;
+
+		try
+		{
+			IsBusy = true;
+
+			CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+
 
 	public static string GetEnumDescription(Enum value)
 	{

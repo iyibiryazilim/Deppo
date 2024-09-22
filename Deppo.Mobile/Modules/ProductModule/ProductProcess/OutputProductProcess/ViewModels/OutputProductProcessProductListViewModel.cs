@@ -86,13 +86,16 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 	public Command LoadItemsCommand { get; }
 	public Command LoadMoreItemsCommand { get; }
 	public Command ItemTappedCommand { get; }
+	public Command ConfirmCommand { get; }
+	public Command<SearchBar> PerformSearchCommand { get; }
+	public Command BackCommand { get; }
+
+
 	public Command LoadVariantItemsCommand { get; }
 	public Command LoadMoreVariantItemsCommand { get; }
 	public Command VariantTappedCommand { get; }
 	public Command ConfirmVariantCommand { get; }
-	public Command ConfirmCommand { get; }
-	public Command<SearchBar> PerformSearchCommand { get; }
-	public Command BackCommand { get; }
+	
 	#endregion
 
 	private async Task LoadItemsAsync()
@@ -234,8 +237,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 				#region Varyantlı olma durumu
 				if (item.IsVariant)
 				{
-					OutputProductProcessProductListView currentPage = CurrentPage as OutputProductProcessProductListView;
-					currentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.HalfExpanded;
+					CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.HalfExpanded;
 				}
 				#endregion
 				else
@@ -566,6 +568,11 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 			IsBusy = true;
 			if(SelectedProducts.Count > 0)
 			{
+				var result = await _userDialogs.ConfirmAsync("Seçtiğiniz ürünler silinecektir. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+				if(!result)
+				{
+					return;
+				}
 				SelectedProducts.Clear();
 			}
 
@@ -573,7 +580,10 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 		}
 		catch (Exception ex)
 		{
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{

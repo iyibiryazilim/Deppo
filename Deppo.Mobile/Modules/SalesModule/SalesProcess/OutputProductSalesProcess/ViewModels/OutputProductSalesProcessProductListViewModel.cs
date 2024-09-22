@@ -8,6 +8,7 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.ViewModels;
@@ -46,6 +47,7 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 		ConfirmCommand = new Command(async () => await ConfirmAsync());
 		BackCommand = new Command(async () => await BackAsync());
 	}
+	public Page CurrentPage { get; set; }
 
 	public Command LoadItemsCommand { get; }
 	public Command LoadMoreItemsCommand { get; }
@@ -107,6 +109,9 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 						IsVariant = product.IsVariant,
 						TrackingType = product.TrackingType,
 						IsSelected = false,
+						LocTrackingIcon = product.LocTrackingIcon,
+						VariantIcon = product.VariantIcon,
+						TrackingTypeIcon = product.TrackingTypeIcon,
 					};
 
 					Items.Add(item);
@@ -136,6 +141,8 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 		try
 		{
 			IsBusy = true;
+
+			_userDialogs.Loading("Loading Items...");
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			var result = await _warehouseTotalService.GetObjects(
@@ -172,14 +179,17 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 						LocTracking = product.LocTracking,
 						IsVariant = product.IsVariant,
 						TrackingType = product.TrackingType,
-						IsSelected = false
+						IsSelected = false,
+						LocTrackingIcon = product.LocTrackingIcon,
+						VariantIcon = product.VariantIcon,
+						TrackingTypeIcon = product.TrackingTypeIcon,
 					};
 
 					Items.Add(item);
 				}
 			}
 
-			_userDialogs.Loading().Hide();
+			_userDialogs.HideHud();
 		}
 		catch (Exception ex)
 		{
@@ -206,7 +216,7 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 			{
 				if (item.IsVariant)
 				{
-
+					CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.HalfExpanded;
 				}
 				else
 				{
@@ -235,7 +245,9 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 							LocTracking = item.LocTracking,
 							TrackingType = item.TrackingType,
 							Quantity = item.LocTracking == 0 ? 1 : 0,
-							OutputQuantity = item.LocTracking == 0 ? 1 : 0,
+							LocTrackingIcon = item.LocTrackingIcon,
+							VariantIcon = item.VariantIcon,
+							TrackingTypeIcon = item.TrackingTypeIcon,
 						};
 
 						SelectedProducts.Add(basketItem);
@@ -318,18 +330,13 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 			{
 				var result = await _userDialogs.ConfirmAsync("Seçtiğiniz ürünler silinecektir. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
 
-				if (result)
+				if (!result)
 				{
-					SelectedProducts.Clear();
-					await Shell.Current.GoToAsync("..");
+					return;
 				}
-
+				SelectedProducts.Clear();
 			}
-			else
-			{
-				await Shell.Current.GoToAsync("..");
-
-			}
+			await Shell.Current.GoToAsync("..");
 		}
 		catch (Exception ex)
 		{

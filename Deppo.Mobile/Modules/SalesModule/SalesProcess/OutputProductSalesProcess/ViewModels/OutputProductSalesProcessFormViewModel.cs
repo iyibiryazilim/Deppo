@@ -88,6 +88,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 		LoadPageCommand = new Command(async () => await LoadPageAsync());
 		SaveCommand = new Command(async () => await SaveAsync());
 		ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
+		BackCommand = new Command(async () => await BackAsync());
 
 		LoadCustomersCommand = new Command(async () => await LoadCustomersAsync());
 		LoadShipAddressesCommand = new Command<CustomerModel>(async (x) => await LoadShipAddressesAsync(x));
@@ -155,6 +156,35 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 				_userDialogs.HideHud();
 
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task BackAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var result = await _userDialogs.ConfirmAsync("Form verileri silinecektir. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+			if (!result)
+				return;
+
+			await ClearFormAsync();
+
+			await Shell.Current.GoToAsync("..");
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{
@@ -386,14 +416,16 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 				await CloseInsertOptionsAsync();
 				return;
 			}
-
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			await CloseInsertOptionsAsync();
 
 			_userDialogs.Loading("İşlem tamamlanıyor...");
+			await Task.Delay(1000);
 
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			await WholeSalesDispatchTransactionInsertAsync(httpClient);
 
-			_userDialogs.HideHud();
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 		}
 		catch (Exception ex)
 		{
@@ -422,14 +454,14 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 				await CloseInsertOptionsAsync();
 				return;
 			}
-				
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
-
 			_userDialogs.Loading("İşlem tamamlanıyor...");
+			await Task.Delay(1000);
 
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			await RetailSalesDispatchTransactionInsertAsync(httpClient);
 
-			_userDialogs.HideHud();
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 		}
 		catch (Exception ex)
 		{
@@ -454,6 +486,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 			DriverLastName = SelectedDriver != null ? SelectedDriver.Surname : "",
 			CarrierCode = SelectedCarrier != null ? SelectedCarrier.Code : "",
 			IdentityNumber = SelectedDriver != null ? SelectedDriver.IdentityNumber : "",
+			ShipInfoCode = SelectedShipAddress != null ? SelectedShipAddress.Code : "",
 			Plaque = SelectedDriver != null ? SelectedDriver.PlateNumber : "",
 			IsEDispatch = 1,
 			DispatchType = 0,
@@ -510,7 +543,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 			resultModel.Message = "Başarılı";
 			resultModel.Code = result.Data.Code;
 			resultModel.PageTitle = Title;
-			resultModel.PageCountToBack = 7;
+			resultModel.PageCountToBack = 5;
 
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
@@ -554,6 +587,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 			CarrierCode = SelectedCarrier != null ? SelectedCarrier.Code : "",
 			IdentityNumber = SelectedDriver != null ? SelectedDriver.IdentityNumber : "",
 			Plaque = SelectedDriver != null ? SelectedDriver.PlateNumber : "",
+			ShipInfoCode = SelectedShipAddress != null ? SelectedShipAddress.Code : "",
 			IsEDispatch = 1,
 			DispatchType = 0,
 			DispatchStatus = 1,
@@ -609,7 +643,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 			resultModel.Message = "Başarılı";
 			resultModel.Code = result.Data.Code;
 			resultModel.PageTitle = Title;
-			resultModel.PageCountToBack = 7;
+			resultModel.PageCountToBack = 5;
 
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();

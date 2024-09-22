@@ -129,7 +129,43 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		}
 		catch (Exception ex)
 		{
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task DeleteItemAsync(OutputProductBasketModel item)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+			var result = await _userDialogs.ConfirmAsync($"{item.ItemCode}\n{item.ItemName}\nİlgili ürün sepetinizden çıkarılacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+
+			if (!result)
+				return;
+
+			if (SelectedItem == item)
+			{
+				SelectedItem.IsSelected = false;
+				SelectedItem = null;
+			}
+
+			Items.Remove(item);
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{
@@ -172,7 +208,10 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		}
 		catch (Exception ex)
 		{
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{
@@ -190,6 +229,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 
 			if(item is not null)
 			{
+				SelectedItem = item;
 				if (item.Quantity > 1)
 				{
 					// Stok Yeri takipli ise locationTransactionBottomSheet aç
@@ -214,37 +254,10 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		}
 		catch (Exception ex)
 		{
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 
-	private async Task DeleteItemAsync(OutputProductBasketModel item)
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
-			var result = await _userDialogs.ConfirmAsync($"{item.ItemCode}\n{item.ItemName}\nİlgili ürün sepetinizden çıkarılacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
-
-			if (!result)
-				return;
-
-			if(SelectedItem == item)
-			{
-				SelectedItem.IsSelected = false;
-				SelectedItem = null;
-			}
-
-			Items.Remove(item);
-		}
-		catch (Exception ex)
-		{
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{
@@ -296,8 +309,6 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	private async Task LoadMoreLocationTransactionsAsync()
 	{
 		if (IsBusy)
-			return;
-		if (LocationTransactions.Count < (18))  // 18 = Take (20) - Remaining ItemsThreshold (2)
 			return;
 		try
 		{
@@ -517,7 +528,10 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		}
 		catch (Exception ex)
 		{
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{
@@ -758,7 +772,10 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		}
 		catch (Exception ex)
 		{
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{
