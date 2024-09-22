@@ -74,4 +74,19 @@ public partial class SalesCustomerProduct : ObservableObject
 	[ObservableProperty]
 	public List<WaitingSalesOrder> orders = new();
 
+
+	[ObservableProperty]
+	string locTrackingIcon = "location-dot";
+
+	public string LocTrackingIconColor => LocTracking == 1 ? "#F5004F" : "#C8C8C8";
+
+	[ObservableProperty]
+	string variantIcon = "bookmark";
+
+	public string VariantIconColor => IsVariant ? "#F5004F" : "#C8C8C8";
+
+	[ObservableProperty]
+	string trackingTypeIcon = "box-archive";
+
+	public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 }

@@ -122,14 +122,14 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 				CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.FullExpanded;
 
 			}
-			else if (outputSalesBasketModel.TrackingType == 1)
+			else if (outputSalesBasketModel.TrackingType == 1 ||outputSalesBasketModel.TrackingType == 2)
 			{
 				CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.FullExpanded;
 			}
 			else
 			{
-				if (outputSalesBasketModel.OutputQuantity < outputSalesBasketModel.StockQuantity)
-					outputSalesBasketModel.OutputQuantity += 1;
+				if (outputSalesBasketModel.OutputQuantity < outputSalesBasketModel.Quantity)
+					outputSalesBasketModel.OutputQuantity++;
 			}
 		}
 		catch (Exception ex)
@@ -172,7 +172,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 					}
 					else
 					{
-						outputSalesBasketModel.OutputQuantity -= 1;
+						outputSalesBasketModel.OutputQuantity--;
 					}
 				}
 
@@ -314,7 +314,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 		{
 			IsBusy = true;
 
-			if (item is not null)
+			if (item.OutputQuantity > 0)
 			{
 				// SeriLot takipli ise serilotTransactionBottomSheet aç
 				if (SelectedItem.TrackingType == 1 || SelectedItem.TrackingType == 2)
@@ -325,8 +325,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 				// SeriLot takipli değilse
 				else
 				{
-					if (item.OutputQuantity > 0)
-						item.OutputQuantity--;
+					item.OutputQuantity--;
 
 					if (item.OutputQuantity == 0)
 						item.IsSelected = false;
@@ -368,10 +367,12 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 					if (selectedLocationTransactionItem is not null)
 					{
 						selectedLocationTransactionItem.Quantity = item.OutputQuantity;
+						selectedLocationTransactionItem.RemainingQuantity = item.OutputQuantity;
 					}
 
 					SelectedItem.Details.Add(new OutputSalesBasketDetailModel
 					{
+						ReferenceId = item.ReferenceId,
 						LocationReferenceId = item.LocationReferenceId,
 						LocationCode = item.LocationCode,
 						LocationName = item.LocationName,
@@ -379,8 +380,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 						TransactionReferenceId = item.TransactionReferenceId,
 						TransactionFicheReferenceId = item.TransactionFicheReferenceId,
 						InTransactionReferenceId = item.InTransactionReferenceId,
-						RemainingQuantity = item.RemainingQuantity,
-						RemainingUnitQuantity = item.RemainingUnitQuantity,
+						RemainingQuantity = item.OutputQuantity,
 					});
 				}
 

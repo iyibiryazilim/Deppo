@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
-using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.SalesModels.BasketModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
@@ -10,7 +9,6 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views;
-using JetBrains.Annotations;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.ViewModels;
@@ -525,6 +523,9 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 					LocTracking = item.LocTracking,
 					Image = string.Empty,
 					Quantity = item.WaitingQuantity,
+					LocTrackingIcon = item.LocTrackingIcon,
+					TrackingTypeIcon = item.TrackingTypeIcon,
+					VariantIcon = item.VariantIcon,
 				};
 
 				if (item.LocTracking == 1 || item.TrackingType == 1)
@@ -568,6 +569,9 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 					LocTracking = item.LocTracking,
 					Image = string.Empty,
 					Quantity = item.WaitingQuantity,
+					LocTrackingIcon = item.LocTrackingIcon,
+					TrackingTypeIcon = item.TrackingTypeIcon,
+					VariantIcon = item.VariantIcon,
 				};
 
 				if (item.LocTracking == 1 || item.TrackingType == 1)
@@ -593,27 +597,28 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 					{
 						foreach (var productOrder in productOrders.Data)
 						{
-							basketItem.Orders.Add(new OutputSalesBasketOrderModel{
+							basketItem.Orders.Add(new OutputSalesBasketOrderModel
+							{
 
-									ReferenceId = productOrder.ReferenceId,
-									OrderReferenceId = productOrder.OrderReferenceId,
-									CustomerReferenceId = productOrder.CustomerReferenceId,
-									CustomerCode = productOrder.CustomerCode,
-									CustomerName = productOrder.CustomerName,
-									ProductReferenceId = productOrder.ProductReferenceId,
-									ProductCode = productOrder.ProductCode,
-									ProductName = productOrder.ProductName,
-									UnitsetReferenceId = productOrder.UnitsetReferenceId,
-									UnitsetCode = productOrder.UnitsetCode,
-									UnitsetName = productOrder.UnitsetName,
-									SubUnitsetReferenceId = productOrder.SubUnitsetReferenceId,
-									SubUnitsetCode = productOrder.SubUnitsetCode,
-									SubUnitsetName = productOrder.SubUnitsetName,
-									Quantity = productOrder.Quantity,
-									ShippedQuantity = productOrder.ShippedQuantity,
-									WaitingQuantity = productOrder.WaitingQuantity,
-									OrderDate = productOrder.OrderDate,
-									DueDate = productOrder.DueDate,
+								ReferenceId = productOrder.ReferenceId,
+								OrderReferenceId = productOrder.OrderReferenceId,
+								CustomerReferenceId = productOrder.CustomerReferenceId,
+								CustomerCode = productOrder.CustomerCode,
+								CustomerName = productOrder.CustomerName,
+								ProductReferenceId = productOrder.ProductReferenceId,
+								ProductCode = productOrder.ProductCode,
+								ProductName = productOrder.ProductName,
+								UnitsetReferenceId = productOrder.UnitsetReferenceId,
+								UnitsetCode = productOrder.UnitsetCode,
+								UnitsetName = productOrder.UnitsetName,
+								SubUnitsetReferenceId = productOrder.SubUnitsetReferenceId,
+								SubUnitsetCode = productOrder.SubUnitsetCode,
+								SubUnitsetName = productOrder.SubUnitsetName,
+								Quantity = productOrder.Quantity,
+								ShippedQuantity = productOrder.ShippedQuantity,
+								WaitingQuantity = productOrder.WaitingQuantity,
+								OrderDate = productOrder.OrderDate,
+								DueDate = productOrder.DueDate,
 							});
 						}
 					}

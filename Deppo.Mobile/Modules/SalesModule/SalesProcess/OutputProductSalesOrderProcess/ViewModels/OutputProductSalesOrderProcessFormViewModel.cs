@@ -304,17 +304,7 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
-			var confirm = await _userDialogs.ConfirmAsync("Satış İrsaliyesi oluşturulacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
-			if (!confirm)
-				return;
-
-
-			_userDialogs.ShowLoading("İşlem Tamamlanıyor...");
-			await Task.Delay(1000);
-
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
-
-			await WholeSalesDispatchTransactionInsertAsync(httpClient);
+			await OpenInsertOptionsAsync();
 
 		}
 		catch (Exception ex)
@@ -413,6 +403,7 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 			Code = "",
 			CurrentCode = SalesCustomer != null ? SalesCustomer.Code : "",
 			DriverFirstName = SelectedDriver != null ? SelectedDriver.Name : "",
+			ShipInfoCode = SelectedShipAddress != null ? SelectedShipAddress.Code : "",
 			DriverLastName = SelectedDriver != null ? SelectedDriver.Surname : "",
 			CarrierCode = SelectedCarrier != null ? SelectedCarrier.Code : "",
 			IdentityNumber = SelectedDriver != null ? SelectedDriver.IdentityNumber : "",
@@ -450,7 +441,7 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 					StockLocationCode = detail.LocationCode,
 					InProductTransactionLineReferenceId = detail.TransactionReferenceId,
 					OutProductTransactionLineReferenceId = detail.ReferenceId,
-					Quantity = detail.RemainingQuantity,
+					Quantity = detail.Quantity,
 					SubUnitsetCode = item.SubUnitsetCode,
 					DestinationStockLocationCode = string.Empty,
 					ConversionFactor = 1,
@@ -472,7 +463,7 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 			resultModel.Message = "Başarılı";
 			resultModel.Code = result.Data.Code;
 			resultModel.PageTitle = Title;
-			resultModel.PageCountToBack = 7;
+			resultModel.PageCountToBack = 6;
 
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
@@ -550,7 +541,7 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 					StockLocationCode = detail.LocationCode,
 					InProductTransactionLineReferenceId = detail.TransactionReferenceId,
 					OutProductTransactionLineReferenceId = detail.ReferenceId,
-					Quantity = detail.RemainingQuantity,
+					Quantity = detail.Quantity,
 					SubUnitsetCode = item.SubUnitsetCode,
 					DestinationStockLocationCode = string.Empty,
 					ConversionFactor = 1,
@@ -572,7 +563,7 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 			resultModel.Message = "Başarılı";
 			resultModel.Code = result.Data.Code;
 			resultModel.PageTitle = Title;
-			resultModel.PageCountToBack = 7;
+			resultModel.PageCountToBack = 6;
 
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
@@ -637,6 +628,7 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 	{
 		try
 		{
+			CargoTrackingNumber = string.Empty;
 			DocumentNumber = string.Empty;
 			SpecialCode = string.Empty;
 			DocumentTrackingNumber = string.Empty;
