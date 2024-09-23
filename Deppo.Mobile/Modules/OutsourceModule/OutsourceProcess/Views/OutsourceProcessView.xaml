@@ -70,7 +70,7 @@
                                     FontSize="Subtitle"
                                     Text="Fason Kabul İşlemleri"
                                     TextColor="{StaticResource Gray500}"
-                                    VerticalOptions="Center" />                               
+                                    VerticalOptions="Center" />
                             </Grid>
 
                             <Border Grid.Column="1" StrokeThickness="0">
@@ -116,7 +116,7 @@
                                     FontSize="Subtitle"
                                     Text="İş Emrine Bağlı Fason Kabul İşlemleri"
                                     TextColor="{StaticResource Gray500}"
-                                    VerticalOptions="Center" />                               
+                                    VerticalOptions="Center" />
                             </Grid>
 
                             <Border Grid.Column="1" StrokeThickness="0">
@@ -156,7 +156,10 @@
                             <Grid
                                 Grid.Column="0"
                                 ColumnDefinitions="Auto,*"
-                                ColumnSpacing="10">                               
+                                ColumnSpacing="10">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OutputOutsourceTransferCommand}" />
+                                </Grid.GestureRecognizers>
                                 <Border
                                     Padding="5"
                                     BackgroundColor="{StaticResource Secondary}"
@@ -203,7 +206,7 @@
                                 Grid.Column="0"
                                 ColumnDefinitions="Auto,*"
                                 ColumnSpacing="10">
-                               
+
                                 <Border
                                     Padding="5"
                                     BackgroundColor="{StaticResource Secondary}"
