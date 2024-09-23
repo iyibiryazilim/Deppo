@@ -1,14 +1,154 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:viewModels="clr-namespace:Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels"
-             x:Class="Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.Views.OutsourceListView"
-             x:DataType="viewModels:OutsourceListViewModel"
-             Title="{Binding Title}">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+<ContentPage
+    x:Class="Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.Views.OutsourceListView"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+    xmlns:model="clr-namespace:Deppo.Core.BaseModels;assembly=Deppo.Core"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:viewModels="clr-namespace:Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels"
+    Title="{Binding Title}"
+    x:DataType="viewModels:OutsourceListViewModel">
+
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid RowDefinitions="Auto,*">
+            <Border
+                Grid.Row="0"
+                Margin="5,0,5,0"
+                Padding="0"
+                BackgroundColor="{StaticResource PrimaryLight}"
+                HeightRequest="35"
+                Stroke="{StaticResource Primary}"
+                StrokeShape="RoundRectangle 5"
+                StrokeThickness="0.5">
+                <SearchBar
+                    x:Name="searchBar"
+                    Placeholder="Ara..."
+                    PlaceholderColor="{StaticResource OffBlack}"
+                    TextColor="{StaticResource OffBlack}">
+                    <SearchBar.Behaviors>
+                        <toolkit:EventToCommandBehavior
+                            Command="{Binding PerformSearchCommand}"
+                            CommandParameter="{Binding ., Source={x:Reference searchBar}}"
+                            EventName="TextChanged" />
+                    </SearchBar.Behaviors>
+                </SearchBar>
+            </Border>
+            <RefreshView
+                Grid.Row="1"
+                Command="{Binding LoadItemsCommand}"
+                IsRefreshing="{Binding IsBusy, Mode=OneWay}"
+                RefreshColor="Transparent">
+                <CollectionView
+                    ItemsSource="{Binding Items}"
+                    RemainingItemsThreshold="2"
+                    RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:Current">
+                            <Border StrokeShape="RoundRectangle 6" StrokeThickness="0.2">
+                                <Grid
+                                    Padding="10"
+                                    ColumnDefinitions="Auto,Auto,*"
+                                    ColumnSpacing="10">
+                                    <toolkit:AvatarView
+                                        Margin="5"
+                                        Background="{StaticResource PrimaryLight}"
+                                        BorderColor="{StaticResource Primary}"
+                                        CornerRadius="200"
+                                        FontAttributes="Bold"
+                                        FontSize="16"
+                                        HeightRequest="50"
+                                        Text="{Binding TitleName}"
+                                        TextColor="{StaticResource White}"
+                                        VerticalOptions="Start"
+                                        WidthRequest="50" />
+
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                        <Label
+                                            FontAttributes="Bold"
+                                            LineBreakMode="TailTruncation"
+                                            Text="{Binding Title}" />
+
+                                        <VerticalStackLayout Spacing="5" VerticalOptions="Center">
+                                            <HorizontalStackLayout Spacing="5">
+                                                <Image
+                                                    Aspect="AspectFit"
+                                                    HeightRequest="16"
+                                                    VerticalOptions="Center"
+                                                    WidthRequest="16">
+                                                    <Image.Source>
+                                                        <FontImageSource
+                                                            FontFamily="FAS"
+                                                            Glyph="{x:Static fontAwesome:FontAwesomeIcons.UserClock}"
+                                                            Size="16"
+                                                            Color="{StaticResource Primary}" />
+                                                    </Image.Source>
+                                                </Image>
+                                                <Label
+                                                    HorizontalOptions="Start"
+                                                    LineBreakMode="TailTruncation"
+                                                    Text="{Binding Name}"
+                                                    TextColor="{StaticResource Gray600}"
+                                                    VerticalOptions="Center"
+                                                    WidthRequest="200" />
+                                            </HorizontalStackLayout>
+                                            <HorizontalStackLayout Spacing="5">
+                                                <Image
+                                                    Aspect="AspectFit"
+                                                    HeightRequest="16"
+                                                    VerticalOptions="Center"
+                                                    WidthRequest="16">
+                                                    <Image.Source>
+                                                        <FontImageSource
+                                                            FontFamily="FAS"
+                                                            Glyph="{x:Static fontAwesome:FontAwesomeIcons.MapLocationDot}"
+                                                            Size="16"
+                                                            Color="{StaticResource Primary}" />
+                                                    </Image.Source>
+                                                </Image>
+                                                <Label
+                                                    HorizontalOptions="Start"
+                                                    LineBreakMode="TailTruncation"
+                                                    TextColor="{StaticResource Gray600}"
+                                                    VerticalOptions="Center"
+                                                    WidthRequest="200">
+                                                    <Label.Text>
+                                                        <MultiBinding StringFormat="{}{0} / {1}">
+                                                            <Binding Path="Country" />
+                                                            <Binding Path="City" />
+                                                        </MultiBinding>
+                                                    </Label.Text>
+                                                </Label>
+                                            </HorizontalStackLayout>
+                                        </VerticalStackLayout>
+                                    </VerticalStackLayout>
+                                </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OutsourceListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+        </Grid>
+
+
 </ContentPage>

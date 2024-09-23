@@ -33,6 +33,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 
 	[ObservableProperty]
 	LocationTransactionModel? selectedLocationTransaction;
+	
 	[ObservableProperty]
 	SeriLotTransactionModel? selectedSeriLotTransaction;
 
