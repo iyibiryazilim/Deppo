@@ -115,7 +115,7 @@ ILocationService locationService, ILocationTransactionService locationTransactio
 
             if (VirmanBasketModel.OutVirmanQuantity > 0)
             {
-                if (VirmanBasketModel.OutVirmanProduct.TrackingType == 1 || VirmanBasketModel.OutVirmanProduct.TrackingType == 2)
+                if (VirmanBasketModel.OutVirmanProduct.LocTracking == 1)
                 {
                     await LoadLocationTransactionsAsync();
                     CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.FullExpanded;
@@ -145,7 +145,7 @@ ILocationService locationService, ILocationTransactionService locationTransactio
         try
         {
             IsBusy = true;
-            if (VirmanBasketModel.OutVirmanProduct.TrackingType == 1 || VirmanBasketModel.OutVirmanProduct.TrackingType == 2)
+            if (VirmanBasketModel.OutVirmanProduct.LocTracking == 1)
             {
                 await LoadLocationTransactionsAsync();
                 CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.FullExpanded;
@@ -317,7 +317,7 @@ ILocationService locationService, ILocationTransactionService locationTransactio
                     var selectedLocationTransactionItem = VirmanBasketModel.OutVirmanProduct.LocationTransactionModels.FirstOrDefault(x => x.TransactionReferenceId == item.TransactionReferenceId);
                     if (selectedLocationTransactionItem is not null)
                     {
-                        selectedLocationTransactionItem.Quantity = virmanBasketModel.OutVirmanQuantity;
+                        selectedLocationTransactionItem.Quantity = VirmanBasketModel.OutVirmanQuantity;
                     }
 
 
@@ -417,9 +417,9 @@ ILocationService locationService, ILocationTransactionService locationTransactio
             VirmanBasketModel.InVirmanProduct = null!;
             VirmanBasketModel.OutVirmanWarehouse = null!;
             VirmanBasketModel.InVirmanWarehouse = null!;
-            VirmanBasketModel = null;
             SelectedLocationTransactions.Clear();
             SelectedLocations.Clear();
+            VirmanBasketModel = null;
             await Shell.Current.GoToAsync("..");
         }
         catch (Exception e)
@@ -515,7 +515,7 @@ ILocationService locationService, ILocationTransactionService locationTransactio
             Locations.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, virmanBasketModel.InVirmanWarehouse.Number, virmanBasketModel.InVirmanProduct.ReferenceId, string.Empty, 0, 20);
+            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, VirmanBasketModel.InVirmanWarehouse.Number, VirmanBasketModel.InVirmanProduct.ReferenceId, string.Empty, 0, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -542,7 +542,7 @@ ILocationService locationService, ILocationTransactionService locationTransactio
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, virmanBasketModel.InVirmanWarehouse.Number, virmanBasketModel.InVirmanProduct.ReferenceId, search: string.Empty, skip: Locations.Count, take: 20);
+            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, VirmanBasketModel.InVirmanWarehouse.Number, VirmanBasketModel.InVirmanProduct.ReferenceId, search: string.Empty, skip: Locations.Count, take: 20);
 
             if (result.IsSuccess)
             {
