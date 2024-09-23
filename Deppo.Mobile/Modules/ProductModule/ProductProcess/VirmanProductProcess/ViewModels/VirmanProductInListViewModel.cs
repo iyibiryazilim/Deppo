@@ -297,7 +297,7 @@ public partial class VirmanProductInListViewModel : BaseViewModel
             outVirmanProductModel.SubUnitsetCode = warehouseTotalModel.SubUnitsetCode;
             outVirmanProductModel.SubUnitsetName = warehouseTotalModel.SubUnitsetName;
             outVirmanProductModel.StockQuantity = warehouseTotalModel.StockQuantity;
-            outVirmanProductModel.LocTracking = warehouseTotalModel.WarehouseReferenceId;
+            outVirmanProductModel.LocTracking = warehouseTotalModel.LocTracking;
             outVirmanProductModel.IsVariant = warehouseTotalModel.IsVariant;
             outVirmanProductModel.TrackingType = warehouseTotalModel.TrackingType;
             outVirmanProductModel.IsSelected = false;

@@ -187,11 +187,11 @@
                                        Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
                                        TextColor="{StaticResource Secondary}" />
 
-                                <!--<Border.GestureRecognizers>
-             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:VirmanProductBasketListViewModel}}, Path=DecreaseCommand}"
-                                   CommandParameter="{Binding .}" />
-         </Border.GestureRecognizers>-->
-                            </Border>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:VirmanProductBasketListViewModel}}, Path=DecreaseInCommand}" />
+                                </Border.GestureRecognizers>
+                            
+                </Border>
                             <Label Grid.Column="1"
                                    FontAttributes="Bold"
                                    FontSize="Large"
@@ -208,11 +208,11 @@
                                        Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
                                        TextColor="{StaticResource White}" />
 
-                                <!--<Border.GestureRecognizers>
-             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:VirmanProductBasketListViewModel}}, Path=IncreaseCommand}"
-                                   CommandParameter="{Binding .}" />
-         </Border.GestureRecognizers>-->
-                            </Border>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:VirmanProductBasketListViewModel}}, Path=IncreaseInCommand}" />
+                                </Border.GestureRecognizers>
+                           
+                </Border>
                         </Grid>
                     </Grid>
                 </Border>
@@ -221,7 +221,7 @@
             <Button Grid.Row="1"
                     VerticalOptions="End"
                     Text="İleri"
-                    Margin="5,10,5,20"></Button>
+                    Margin="5,10,5,20" Command="{Binding NextViewCommand}"></Button>
         </Grid>
 
         <VerticalStackLayout Grid.Row="1">
