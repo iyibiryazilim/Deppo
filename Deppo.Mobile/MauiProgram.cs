@@ -318,8 +318,7 @@ public static class MauiProgram
         builder.Services.AddScopedWithShellRoute<TransferInBasketView, TransferInBasketViewModel>(nameof(TransferInBasketView));
         builder.Services.AddScopedWithShellRoute<TransferFormView, TransferFormViewModel>(nameof(TransferFormView));
 
-
-        #endregion
+        #endregion TransferProductProcess Modules
 
         #region VirmanProduct Modules
 
@@ -328,9 +327,9 @@ public static class MauiProgram
         builder.Services.AddScopedWithShellRoute<VirmanProductInWarehouseListView, VirmanProductInWarehouseListViewModel>(nameof(VirmanProductInWarehouseListView));
         builder.Services.AddScopedWithShellRoute<VirmanProductInListView, VirmanProductInListViewModel>(nameof(VirmanProductInListView));
         builder.Services.AddScopedWithShellRoute<VirmanProductBasketListView, VirmanProductBasketListViewModel>(nameof(VirmanProductBasketListView));
+        builder.Services.AddScopedWithShellRoute<VirmanProductFormListView, VirmanProductFormListViewModel>(nameof(VirmanProductFormListView));
 
         #endregion VirmanProduct Modules
-
 
         #endregion Product Modules
 

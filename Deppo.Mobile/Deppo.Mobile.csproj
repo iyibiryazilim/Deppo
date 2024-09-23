@@ -152,6 +152,9 @@
 	  <MauiXaml Update="Modules\ProductModule\ProductProcess\TransferProductProcess\Views\TransferOutWarehouseListView.xaml">
       <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\VirmanProductProcess\Views\VirmanProductFormListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\ProductModule\ProductProcess\VirmanProductProcess\Views\VirmanProductInListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
