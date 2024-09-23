@@ -60,6 +60,7 @@ public class MappingProfile : Profile
         CreateMap<PurchaseTransactionModel, dynamic>();
         CreateMap<SalesFicheModel, dynamic>();
         CreateMap<PurchaseProductReferenceAnalysis, dynamic>();
+        CreateMap<Outsource, dynamic>();
     }
 
 }

@@ -354,10 +354,6 @@
 	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/InputOutsourceProcess/InputOutsourceWorkOrder/" />
 	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/InputOutsourceProcess/InputOutsourceWorkOrder/ViewModels/" />
 	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/InputOutsourceProcess/InputOutsourceWorkOrder/Views/" />
-	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/OutputOutsourceProcess/" />
-	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/OutputOutsourceProcess/OutputOutsourceTransfer/" />
-	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/OutputOutsourceProcess/OutputOutsourceTransfer/ViewModels/" />
-	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/OutputOutsourceProcess/OutputOutsourceTransfer/Views/" />
 	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/OutputOutsourceProcess/OutputOutsourceWorkOrder/" />
 	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/OutputOutsourceProcess/OutputOutsourceWorkOrder/ViewModels/" />
 	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/OutputOutsourceProcess/OutputOutsourceWorkOrder/Views/" />
