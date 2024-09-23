@@ -11,7 +11,7 @@
              x:DataType="viewModels:VirmanProductFormListViewModel"
              Shell.TabBarIsVisible="False">
 
-    <!--<Shell.BackButtonBehavior>
+    <Shell.BackButtonBehavior>
         <BackButtonBehavior Command="{Binding BackCommand}" />
     </Shell.BackButtonBehavior>
 
@@ -53,7 +53,7 @@
             <dx:FormGroupItem Header="Fiş Bilgileri"
                               HeaderFontAttributes="Bold"
                               HeaderFontSize="18">
-                <dx:FormItem>
+                <!--<dx:FormItem>
                     <dx:FormItem.ContentTemplate>
                         <DataTemplate>
                             <VerticalStackLayout Spacing="5">
@@ -80,21 +80,7 @@
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
                                              IsReadOnly="True"
-                                             LabelText="Çıkış Ürünü"
-                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding WarehouseModel.Name}" />
-
-                                <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
-                                             FocusedBorderColor="{StaticResource Primary}"
-                                             IsReadOnly="True"
                                              LabelText="Giriş Ambarı"
-                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding WarehouseModel.Name}" />
-
-                                <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
-                                             FocusedBorderColor="{StaticResource Primary}"
-                                             IsReadOnly="True"
-                                             LabelText="Giriş Ürünü"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
                                              Text="{Binding WarehouseModel.Name}" />
 
@@ -121,63 +107,10 @@
                                              LabelText="Açıklama"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
                                              Text="{Binding Description}" />
-
-                                <dx:FormGroupItem Header="Sevk Bilgileri"
-                                                  HeaderFontAttributes="Bold"
-                                                  HeaderFontSize="18">
-                                    <dx:FormItem>
-                                        <dx:FormItem.ContentTemplate>
-                                            <DataTemplate>
-                                                <VerticalStackLayout>
-                                                    -->
-    <!--#region Customer Picker-->
-    <!--
-                                                    <dx:FormListPickerItem InlineContent="{x:Null}"
-                                                                           ItemsSource="{Binding Customers}"
-                                                                           PickerShowMode="BottomSheet"
-                                                                           PickerTitle="Müşteri seçiniz"
-                                                                           SelectedItem="{Binding SelectedCustomer}"
-                                                                           TapCommand="{Binding LoadCustomersCommand}"
-                                                                           Text="{Binding SelectedCustomer.Name}">
-                                                        <dx:FormListPickerItem.ImageSource>
-                                                            <FontImageSource FontFamily="FAS"
-                                                                             Glyph="{x:Static fontAwesome:FontAwesomeIcons.User}"
-                                                                             Size="13"
-                                                                             Color="{StaticResource White}" />
-                                                        </dx:FormListPickerItem.ImageSource>
-                                                    </dx:FormListPickerItem>
-                                                    -->
-    <!--#endregion-->
-
-    <!--#region ShipAddress Picker-->
-    <!--
-                                                    <dx:FormListPickerItem InlineContent="{x:Null}"
-                                                                           ItemsSource="{Binding ShipAddresses}"
-                                                                           PickerShowMode="BottomSheet"
-                                                                           PickerTitle="Sevk Adresi Seçiniz"
-                                                                           SelectedItem="{Binding SelectedShipAddress}"
-                                                                           TapCommand="{Binding LoadShipAddressesCommand}"
-                                                                           TapCommandParameter="{Binding SelectedCustomer}"
-                                                                           Text="{Binding SelectedShipAddress.Name}">
-                                                        <dx:FormListPickerItem.ImageSource>
-                                                            <FontImageSource FontFamily="FAS"
-                                                                             Glyph="{x:Static fontAwesome:FontAwesomeIcons.LocationDot}"
-                                                                             Size="15"
-                                                                             Color="{StaticResource White}" />
-                                                        </dx:FormListPickerItem.ImageSource>
-                                                    </dx:FormListPickerItem>
-                                                    -->
-    <!--#endregion-->
-    <!--
-                                                </VerticalStackLayout>
-                                            </DataTemplate>
-                                        </dx:FormItem.ContentTemplate>
-                                    </dx:FormItem>
-                                </dx:FormGroupItem>
                             </VerticalStackLayout>
                         </DataTemplate>
                     </dx:FormItem.ContentTemplate>
-                </dx:FormItem>
+                </dx:FormItem>-->
             </dx:FormGroupItem>
         </VerticalStackLayout>
 
@@ -194,9 +127,7 @@
                         HalfExpandedRatio="0.5"
                         IsModal="True"
                         ShowGrabber="True">
-            -->
-    <!--#region BottomSheetContent-->
-    <!--
+
             <Grid RowDefinitions="Auto,*"
                   RowSpacing="20"
                   Padding="10">
@@ -210,7 +141,7 @@
                              Color="{StaticResource OffBlack}" />
                 </VerticalStackLayout>
 
-                <CollectionView Grid.Row="1"
+                <!--<CollectionView Grid.Row="1"
                                 ItemsSource="{Binding Items}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="basketModel:VirmanBasketModel">
@@ -285,11 +216,8 @@
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
-                </CollectionView>
+                </CollectionView>-->
             </Grid>
-            -->
-    <!--#endregion-->
-    <!--
         </dx:BottomSheet>
-    </Grid>-->
+    </Grid>
 </ContentPage>
