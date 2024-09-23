@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
@@ -149,7 +150,17 @@ public partial class TransferInBasketViewModel : BaseViewModel
 				{
 					foreach (var item in result.Data)
 						Locations.Add(Mapping.Mapper.Map<LocationModel>(item));
-				}
+
+
+                    foreach (var location in Locations)
+                    {
+                        var matchingItem = SelectedInputProductModel.Locations.FirstOrDefault(item => item.ReferenceId == location.ReferenceId);
+                        if (matchingItem != null)
+                        {
+                            location.InputQuantity = matchingItem.InputQuantity;
+                        }
+                    }
+                }
 			}
 
 			_userDialogs.HideHud();
@@ -178,7 +189,16 @@ public partial class TransferInBasketViewModel : BaseViewModel
 
 				foreach (var item in result.Data)
 					Locations.Add(Mapping.Mapper.Map<LocationModel>(item));
-			}
+
+                foreach (var location in Locations)
+                {
+                    var matchingItem = SelectedInputProductModel.Locations.FirstOrDefault(item => item.ReferenceId == location.ReferenceId);
+                    if (matchingItem != null)
+                    {
+                        location.InputQuantity = matchingItem.InputQuantity;
+                    }
+                }
+            }
 		}
 		catch (Exception ex)
 		{

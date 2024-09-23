@@ -292,9 +292,20 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				{
 					LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
 				}
-			}
 
-			_userDialogs.Loading().Hide();
+                foreach (var locationTransaction in LocationTransactions)
+                {
+                    var matchingItem = SelectedItem.Details.FirstOrDefault(item => item.ReferenceId == locationTransaction.ReferenceId);
+                    if (matchingItem != null)
+                    {
+                        locationTransaction.OutputQuantity = matchingItem.Quantity;
+                    }
+                }
+
+
+            }
+
+            _userDialogs.Loading().Hide();
 		}
 		catch (Exception ex)
 		{
@@ -332,8 +343,18 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				{
 					LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
 				}
-			}
-		}
+
+                foreach (var locationTransaction in LocationTransactions)
+                {
+                    var matchingItem = SelectedItem.Details.FirstOrDefault(item => item.ReferenceId == locationTransaction.ReferenceId);
+                    if (matchingItem != null)
+                    {
+                        locationTransaction.OutputQuantity = matchingItem.Quantity;
+                    }
+                }
+
+            }
+        }
 		catch (Exception ex)
 		{
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
