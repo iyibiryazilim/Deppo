@@ -30,6 +30,8 @@ using Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.Views;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.ViewModels;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.Views;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcess.OutputOutsourceTransfer.ViewModels;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcess.OutputOutsourceTransfer.Views;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.ViewModels;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.Views;
 using Deppo.Mobile.Modules.OutsourceModule.WaitingOutsourceMenu.ViewModels;
@@ -262,7 +264,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<ITransferTransactionService, TransferTransactionDataStore>();
 
         builder.Services.AddSingleton<ISalesDispatchTransactionService, SalesDispatchTransactionDataStore>();
-        builder.Services.AddSingleton<IOutsourceService,OutsourceDataStore>();
+        builder.Services.AddSingleton<IOutsourceService, OutsourceDataStore>();
 
         builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
         builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
@@ -486,6 +488,10 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddSingletonWithShellRoute<WaitingOutsourceProductListView, WaitingOutsourceProductListViewModel>(nameof(WaitingOutsourceProductListView));
         builder.Services.AddSingletonWithShellRoute<OutsourceProcessView, OutsourceProcessViewModel>(nameof(OutsourceProcessView));
 
+        builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferWarehouseListView, OutputOutsourceTransferWarehouseListViewModel>(nameof(OutputOutsourceTransferWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferBasketListView, OutputOutsourceTransferBasketListViewModel>(nameof(OutputOutsourceTransferBasketListView));
+        builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferProductListView, OutputOutsourceTransferProductListViewModel>(nameof(OutputOutsourceTransferProductListView));
+        builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferFormView, OutputOutsourceTransferFormViewModel>(nameof(OutputOutsourceTransferFormView));
         #endregion Outsource Modules
 
         return builder.Build();
