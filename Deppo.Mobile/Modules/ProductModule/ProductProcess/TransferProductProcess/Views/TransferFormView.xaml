@@ -38,6 +38,11 @@
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding BackCommand}" />
+    </Shell.BackButtonBehavior>
+
+
     <Grid RowDefinitions="*,Auto" RowSpacing="10">
         <VerticalStackLayout Grid.Row="0" Spacing="5">
             <dx:FormGroupItem Header="Fiş Bilgileri"

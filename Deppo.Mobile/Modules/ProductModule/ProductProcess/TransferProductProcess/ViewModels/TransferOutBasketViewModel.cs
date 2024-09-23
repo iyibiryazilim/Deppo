@@ -24,7 +24,7 @@ public partial class TransferOutBasketViewModel : BaseViewModel
     private readonly ISeriLotTransactionService _serilotTransactionService;
     private readonly ILocationTransactionService _locationTransactionService;
     private readonly IUserDialogs _userDialogs;
-
+    private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty]
     TransferBasketModel transferBasketModel;
@@ -49,16 +49,18 @@ public partial class TransferOutBasketViewModel : BaseViewModel
     public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
     #endregion
 
-    public TransferOutBasketViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs)
+    public TransferOutBasketViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs, IServiceProvider serviceProvider)
     {
         _httpClientService = httpClientService;
         _serilotTransactionService = serilotTransactionService;
         _locationTransactionService = locationTransactionService;
         _userDialogs = userDialogs;
+        _serviceProvider = serviceProvider;
+
 
         Title = "Sepet Listesi";
 
-       // ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
+        // ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
         IncreaseCommand = new Command<OutProductModel>(async (item) => await IncreaseAsync(item));
         DecreaseCommand = new Command<OutProductModel>(async (item) => await DecreaseAsync(item));
         DeleteItemCommand = new Command<OutProductModel>(async (item) => await DeleteItemAsync(item));
@@ -253,6 +255,15 @@ public partial class TransferOutBasketViewModel : BaseViewModel
                 {
                     LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
                 }
+
+                foreach (var locationTransaction in LocationTransactions)
+                {
+                    var matchingItem = SelectedItem.LocationTransactions.FirstOrDefault(item => item.ReferenceId == locationTransaction.ReferenceId);
+                    if (matchingItem != null)
+                    {
+                        locationTransaction.OutputQuantity = matchingItem.Quantity;
+                    }
+                }
             }
 
             _userDialogs.Loading().Hide();
@@ -294,6 +305,15 @@ public partial class TransferOutBasketViewModel : BaseViewModel
                 foreach (var item in result.Data)
                 {
                     LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+                }
+
+                foreach (var locationTransaction in LocationTransactions)
+                {
+                    var matchingItem = SelectedItem.LocationTransactions.FirstOrDefault(item => item.ReferenceId == locationTransaction.ReferenceId);
+                    if (matchingItem != null)
+                    {
+                        locationTransaction.OutputQuantity = matchingItem.Quantity;
+                    }
                 }
             }
         }
@@ -712,6 +732,13 @@ public partial class TransferOutBasketViewModel : BaseViewModel
                 SelectedLocationTransactions.Clear();
                 SelectedSeriLotTransactions.Clear();
 				TransferBasketModel.OutProducts.Clear();
+
+                var inProductBasketViewModel = _serviceProvider.GetRequiredService<TransferInBasketViewModel>();
+
+                inProductBasketViewModel.TransferBasketModel.InProducts.Clear();
+                inProductBasketViewModel.TransferBasketModel.InWarehouse = null;
+
+
                 await Shell.Current.GoToAsync("..");
             }
             else

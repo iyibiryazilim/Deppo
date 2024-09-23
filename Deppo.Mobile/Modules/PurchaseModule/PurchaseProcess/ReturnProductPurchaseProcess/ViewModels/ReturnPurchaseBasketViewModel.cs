@@ -273,6 +273,15 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
                 {
                     LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
                 }
+
+                foreach (var locationTransaction in LocationTransactions)
+                {
+                    var matchingItem = SelectedItem.Details.FirstOrDefault(item => item.ReferenceId == locationTransaction.ReferenceId);
+                    if (matchingItem != null)
+                    {
+                        locationTransaction.OutputQuantity = matchingItem.Quantity;
+                    }
+                }
             }
 
             _userDialogs.Loading().Hide();
@@ -314,6 +323,15 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
                 foreach (var item in result.Data)
                 {
                     LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+                }
+
+                foreach (var locationTransaction in LocationTransactions)
+                {
+                    var matchingItem = SelectedItem.Details.FirstOrDefault(item => item.ReferenceId == locationTransaction.ReferenceId);
+                    if (matchingItem != null)
+                    {
+                        locationTransaction.OutputQuantity = matchingItem.Quantity;
+                    }
                 }
             }
         }
