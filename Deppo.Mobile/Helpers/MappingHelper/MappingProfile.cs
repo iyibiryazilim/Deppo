@@ -3,6 +3,7 @@ using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Mobile.Core.Models.AnalysisModels;
 using Deppo.Mobile.Core.Models.BasketModels;
+using Deppo.Mobile.Core.Models.CountingModels;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.LoginModels;
 using Deppo.Mobile.Core.Models.ProductModels;
@@ -61,6 +62,9 @@ public class MappingProfile : Profile
         CreateMap<SalesFicheModel, dynamic>();
         CreateMap<PurchaseProductReferenceAnalysis, dynamic>();
         CreateMap<Outsource, dynamic>();
-    }
+        CreateMap<NegativeProductModel, dynamic>();
+		CreateMap<NegativeWarehouseModel, dynamic>();
+		CreateMap<NegativeLocationModel, dynamic>();
+	}
 
 }

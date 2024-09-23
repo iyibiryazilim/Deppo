@@ -1,47 +1,61 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace Deppo.Mobile.Core.Models.CountingModels
+namespace Deppo.Mobile.Core.Models.CountingModels;
+
+public partial class NegativeProductModel : ObservableObject
 {
-    public partial class NegativeProductModel : ObservableObject
-    {
-        [ObservableProperty]
-        public int productReferenceId;
+    [ObservableProperty]
+    int productReferenceId;
 
-        [ObservableProperty]
-        public string productCode = string.Empty;
+    [ObservableProperty]
+    string productCode = string.Empty;
 
-        [ObservableProperty]
-        public string productName = string.Empty;
+    [ObservableProperty]
+    string productName = string.Empty;
 
-        [ObservableProperty]
-        public int unitsetReferenceId;
+    [ObservableProperty]
+    int unitsetReferenceId;
 
-        [ObservableProperty]
-        public string unitsetName = string.Empty;
+    [ObservableProperty]
+    string unitsetName = string.Empty;
 
-        [ObservableProperty]
-        public string unitsetCode = string.Empty;
+    [ObservableProperty]
+    string unitsetCode = string.Empty;
 
-        [ObservableProperty]
-        public int subUnitsetReferenceId;
+    [ObservableProperty]
+     int subUnitsetReferenceId;
 
-        [ObservableProperty]
-        public string subUnitsetName = string.Empty;
+    [ObservableProperty]
+    string subUnitsetName = string.Empty;
 
-        [ObservableProperty]
-        public string subUnitsetCode = string.Empty;
+    [ObservableProperty]
+    string subUnitsetCode = string.Empty;
 
-        [ObservableProperty]
-        public bool _isVariant;
+    [ObservableProperty]
+    bool isVariant;
 
-        [ObservableProperty]
-        public int _trackingType;
+    [ObservableProperty]
+    int trackingType;
 
-        [ObservableProperty]
-        public int _locTracking;
+    [ObservableProperty]
+    int locTracking;
 
-        [ObservableProperty]
-        public double stockQuantity;
+    [ObservableProperty]
+    double stockQuantity;
 
-    }
+	[ObservableProperty]
+	string locTrackingIcon = "location-dot";
+
+	public string LocTrackingIconColor => LocTracking == 1 ? "#F5004F" : "#C8C8C8";
+
+	[ObservableProperty]
+	string variantIcon = "bookmark";
+
+	public string VariantIconColor => IsVariant ? "#F5004F" : "#C8C8C8";
+
+	[ObservableProperty]
+	string trackingTypeIcon = "box-archive";
+
+	public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
+
 }

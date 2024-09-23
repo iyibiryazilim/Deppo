@@ -11,6 +11,7 @@ using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views;
 using Deppo.Mobile.Core.Models.CountingModels;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Core.Models.WarehouseModels;
+using DevExpress.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.CountingModule.NegativeProductMenu.ViewModels;
 
@@ -19,7 +20,21 @@ public partial class NegativeProductListViewModel : BaseViewModel
     private readonly IHttpClientService _httpClientService;
     private readonly IUserDialogs _userDialogs;
     private readonly IWarehouseCountingService _warehouseCountingService;
-    public NegativeProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IWarehouseCountingService warehouseCountingService)
+
+	#region Collections
+	public ObservableCollection<NegativeProductModel> Items { get; } = new();
+
+	public ObservableCollection<NegativeWarehouseModel> NegativeWarehouses { get; } = new();
+	#endregion
+
+	#region Properties
+	[ObservableProperty]
+	string searchText = string.Empty;
+
+    [ObservableProperty]
+    NegativeProductModel selectedItem;
+	#endregion
+	public NegativeProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IWarehouseCountingService warehouseCountingService)
     {
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
@@ -34,6 +49,8 @@ public partial class NegativeProductListViewModel : BaseViewModel
         ItemTappedCommand = new Command<NegativeProductModel>(ItemTappedAsync);
 
     }
+    public Page CurrentPage { get; set; } = null!;
+
 
     #region Commands
     public Command LoadItemsCommand { get; }
@@ -43,14 +60,7 @@ public partial class NegativeProductListViewModel : BaseViewModel
     public Command ItemTappedCommand { get; }
     #endregion
 
-    #region Collections
-    public ObservableCollection<NegativeProductModel> Items { get; } = new();
-    #endregion
-
-    #region Properties
-    [ObservableProperty]
-    string searchText = string.Empty;
-    #endregion
+   
 
     public async Task LoadItemsAsync()
     {
@@ -73,7 +83,12 @@ public partial class NegativeProductListViewModel : BaseViewModel
                     return;
 
                 foreach (var item in result.Data)
-                    Items.Add(Mapping.Mapper.Map<NegativeProductModel>(item));
+                {
+                    item.LocTrackingIcon = "location-dot";
+                    item.VariantIcon = "bookmark";
+                    item.TrackingTypeIcon = "box-archive";
+					Items.Add(Mapping.Mapper.Map<NegativeProductModel>(item));
+				}
                 
                 _userDialogs.Loading().Hide();
             }
@@ -117,7 +132,13 @@ public partial class NegativeProductListViewModel : BaseViewModel
                     return;
 
                 foreach (var item in result.Data)
-                    Items.Add(Mapping.Mapper.Map<NegativeProductModel>(item));
+                {
+					item.LocTrackingIcon = "location-dot";
+					item.VariantIcon = "bookmark";
+					item.TrackingTypeIcon = "box-archive";
+					Items.Add(Mapping.Mapper.Map<NegativeProductModel>(item));
+				}
+					
 
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.Loading().Hide();
@@ -182,7 +203,7 @@ public partial class NegativeProductListViewModel : BaseViewModel
             IsRefreshing = false;
         }
     }
-    private void ItemTappedAsync(NegativeProductModel negativeProductModel)
+    private async void ItemTappedAsync(NegativeProductModel negativeProductModel)
     {
         if (negativeProductModel is null)
             return;
@@ -192,6 +213,12 @@ public partial class NegativeProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
+            SelectedItem = negativeProductModel;
+
+            await LoadNegativeWarehousesAsync();
+
+            CurrentPage.FindByName<BottomSheet>("negativeWarehouseBottomSheet").State = BottomSheetState.HalfExpanded;
+
         }
         catch (Exception ex)
         {
@@ -200,6 +227,45 @@ public partial class NegativeProductListViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    private async Task LoadNegativeWarehousesAsync()
+    {
+        try
+        {
+            NegativeWarehouses.Clear();
+
+            _userDialogs.ShowLoading("Loading Negative Warehouses...");
+            await Task.Delay(1000);
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _warehouseCountingService.GetNegativeWarehousesByProductReferenceId(
+                httpClient,
+				_httpClientService.FirmNumber,
+				_httpClientService.PeriodNumber,
+				SelectedItem.ProductReferenceId
+            );
+
+            if(result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                {
+                    NegativeWarehouses.Add(Mapping.Mapper.Map<NegativeWarehouseModel>(item));
+                }
+            }
+
+            _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+            _userDialogs.Alert(ex.Message, "Hata");
         }
     }
 }
