@@ -1,7 +1,16 @@
 using System;
+using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.ObjectModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Models;
+using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views;
+using Deppo.Mobile.Core.Models.CountingModels;
+using Deppo.Mobile.Helpers.MappingHelper;
+using Deppo.Mobile.Core.Models.WarehouseModels;
 
 namespace Deppo.Mobile.Modules.CountingModule.NegativeProductMenu.ViewModels;
 
@@ -9,11 +18,188 @@ public partial class NegativeProductListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
     private readonly IUserDialogs _userDialogs;
-    public NegativeProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs)
+    private readonly IWarehouseCountingService _warehouseCountingService;
+    public NegativeProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IWarehouseCountingService warehouseCountingService)
     {
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
+        _warehouseCountingService = warehouseCountingService;
+
 
         Title = "Negatif Malzemeler";
+
+        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+        LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+        RefreshPageCommand = new Command(async () => await RefreshPageAsync());
+        ItemTappedCommand = new Command<NegativeProductModel>(ItemTappedAsync);
+
+    }
+
+    #region Commands
+    public Command LoadItemsCommand { get; }
+    public Command LoadMoreItemsCommand { get; }
+    public Command<SearchBar> PerformSearchCommand { get; }
+    public Command RefreshPageCommand { get; }
+    public Command ItemTappedCommand { get; }
+    #endregion
+
+    #region Collections
+    public ObservableCollection<NegativeProductModel> Items { get; } = new();
+    #endregion
+
+    #region Properties
+    [ObservableProperty]
+    string searchText = string.Empty;
+    #endregion
+
+    public async Task LoadItemsAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            Items.Clear();
+            _userDialogs.Loading("Loading Items...");
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            await Task.Delay(1000);
+
+            var result = await _warehouseCountingService.GetNegativeProducts(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty,0,20);
+            if (result.IsSuccess)
+            {
+                if (result.Data == null)
+                    return;
+
+                foreach (var item in result.Data)
+                    Items.Add(Mapping.Mapper.Map<NegativeProductModel>(item));
+                
+                _userDialogs.Loading().Hide();
+            }
+            else
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.Loading().Hide();
+
+                _userDialogs.Alert(message: result.Message, title: "Load Items");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
+
+            _userDialogs.Alert(message: ex.Message, title: "Load Items Error");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    public async Task LoadMoreItemsAsync()
+    {
+        if (IsBusy)
+            return;
+        if (Items.Count < 18)  // 18 equals to PageSize (20) - RemainingItemsThreshold (2)
+            return;
+
+        try
+        {
+            IsBusy = true;
+            _userDialogs.Loading("Load more Items...");
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _warehouseCountingService.GetNegativeProducts(httpClient,_httpClientService.FirmNumber,_httpClientService.PeriodNumber,string.Empty,Items.Count,20);
+            if (result.IsSuccess)
+            {
+                if (result.Data == null)
+                    return;
+
+                foreach (var item in result.Data)
+                    Items.Add(Mapping.Mapper.Map<NegativeProductModel>(item));
+
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.Loading().Hide();
+            }
+            else
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.Loading().Hide();
+
+                _userDialogs.Alert(message: result.Message, title: "Load Items");
+            }
+        }
+        catch (Exception ex)
+        {
+
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
+
+            _userDialogs.Alert(message: ex.Message, title: "Load Items Error");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    public async Task RefreshPageAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+            IsRefreshing = true;
+            IsRefreshing = false;
+
+            Items.Clear();
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _warehouseCountingService.GetNegativeProducts(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 20);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data == null)
+                    return;
+
+                foreach (var item in result.Data)
+                    Items.Add(Mapping.Mapper.Map<NegativeProductModel>(item));
+            }
+            else
+            {
+                _userDialogs.Alert(message: result.Message, title: "Hata");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+            IsRefreshing = false;
+        }
+    }
+    private void ItemTappedAsync(NegativeProductModel negativeProductModel)
+    {
+        if (negativeProductModel is null)
+            return;
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 }
