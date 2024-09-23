@@ -230,6 +230,47 @@ public partial class NegativeProductListViewModel : BaseViewModel
         }
     }
 
+    private async void ItemSwipedAsync(NegativeProductModel negativeProductModel)
+    {
+        if (negativeProductModel is null)
+            return;
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            SelectedItem = negativeProductModel;
+
+            // Sadece Raf takipli olma durumu
+            if(SelectedItem.LocTracking == 1 && (SelectedItem.TrackingType == 0))
+            {
+
+            }
+            else if(SelectedItem.LocTracking == 1 && (SelectedItem.TrackingType == 1))
+            {
+                //todo:Raf ve Seri takipli olma durumu
+            }
+            // Ne Raf takipli ne de Seri,Lot takipli olma durumu
+            else if(SelectedItem.LocTracking == 0 && (SelectedItem.TrackingType == 0))
+            {
+
+            }
+
+        }
+        catch (Exception ex) 
+        {
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
     private async Task LoadNegativeWarehousesAsync()
     {
         try
