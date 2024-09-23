@@ -56,6 +56,8 @@ ILocationService locationService, ILocationTransactionService locationTransactio
         // DeleteItemCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DeleteItemAsync(item));
         NextViewCommand = new Command(async () => await NextViewAsync());
         BackCommand = new Command(async () => await BackAsync());
+        IncreaseInCommand = new Command(async () => await IncreaseInAsync());
+        DecreaseInCommand = new Command(async () => await DecreaseInAsync());
 
         LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
         LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(item => LocationTransactionIncreaseAsync(item));
@@ -66,6 +68,12 @@ ILocationService locationService, ILocationTransactionService locationTransactio
         LoadMoreLocationsCommand = new Command(async () => await LoadMoreWarehouseLocationsAsync());
         LocationCloseCommand = new Command(async () => await LocationCloseAsync());
         LocationConfirmCommand = new Command(async () => await LocationConfirmAsync());
+        LocationTappedCommand = new Command<LocationModel>(async (item) => await LocationTappedAsync(item));
+        LocationIncreaseCommand = new Command<LocationModel>(async (item) => await LocationIncreaseAsync(item));
+        LocationDecreaseCommand = new Command<LocationModel>(async (item) => await LocationDecraseAsync(item));
+
+
+
 
     }
 
@@ -93,6 +101,8 @@ ILocationService locationService, ILocationTransactionService locationTransactio
     public Command<LocationModel> LocationIncreaseCommand { get; }
     public Command LocationConfirmCommand { get; }
     public Command LocationCloseCommand { get; }
+    public Command<LocationModel> LocationTappedCommand { get; }
+
 
     private async Task DecreaseAsync()
     {
@@ -155,11 +165,6 @@ ILocationService locationService, ILocationTransactionService locationTransactio
             IsBusy = false;
         }
     }
-
-
-    
-
-
 
     private async Task LoadLocationTransactionsAsync()
     {
@@ -431,8 +436,6 @@ ILocationService locationService, ILocationTransactionService locationTransactio
 
 
 
-
-
     private async Task DecreaseInAsync()
     {
         if (IsBusy)
@@ -696,7 +699,4 @@ ILocationService locationService, ILocationTransactionService locationTransactio
         }
     }
    
-
-
-
 }
