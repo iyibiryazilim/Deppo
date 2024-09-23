@@ -250,9 +250,7 @@ ILocationService locationService, ILocationTransactionService locationTransactio
 
 
                 }
-
                 
-
             }
             _userDialogs.Loading().Hide();
         }
@@ -291,7 +289,6 @@ ILocationService locationService, ILocationTransactionService locationTransactio
                     if (item.OutputQuantity > 0 && !item.IsSelected)
                         item.IsSelected = true;
                 }
-                
             }
         }
         catch (Exception e)
@@ -323,7 +320,7 @@ ILocationService locationService, ILocationTransactionService locationTransactio
                 {
                     item.OutputQuantity--;
                 }
-                
+
 
                 if (item.OutputQuantity == 0)
                 {
@@ -362,23 +359,26 @@ ILocationService locationService, ILocationTransactionService locationTransactio
 
                     if (selectedLocationTransactionItem is not null)
                     {
-                        item.OutputQuantity = selectedLocationTransactionItem.OutputQuantity;
+                        item.OutputQuantity = selectedLocationTransactionItem.Quantity;
                     }
 
-
-                    VirmanBasketModel.OutVirmanProduct.LocationTransactionModels.Add(new LocationTransactionModel
+                    else
                     {
-                        ReferenceId = item.ReferenceId,
-                        LocationReferenceId = item.LocationReferenceId,
-                        LocationCode = item.LocationCode,
-                        LocationName = item.LocationName,
-                        TransactionReferenceId = item.TransactionReferenceId,
-                        InSerilotTransactionReferenceId = item.InSerilotTransactionReferenceId,
-                        TransactionFicheReferenceId = item.TransactionFicheReferenceId,
-                        InTransactionReferenceId = item.InTransactionReferenceId,
-                        Quantity = item.OutputQuantity,
-                        RemainingQuantity = item.OutputQuantity,
-                    });
+                        VirmanBasketModel.OutVirmanProduct.LocationTransactionModels.Add(new LocationTransactionModel
+                        {
+                            ReferenceId = item.ReferenceId,
+                            LocationReferenceId = item.LocationReferenceId,
+                            LocationCode = item.LocationCode,
+                            LocationName = item.LocationName,
+                            TransactionReferenceId = item.TransactionReferenceId,
+                            InSerilotTransactionReferenceId = item.InSerilotTransactionReferenceId,
+                            TransactionFicheReferenceId = item.TransactionFicheReferenceId,
+                            InTransactionReferenceId = item.InTransactionReferenceId,
+                            Quantity = item.OutputQuantity,
+                            RemainingQuantity = item.OutputQuantity,
+                        });
+                    }
+                   
                 }
 
                 var totalOutputQuantity = LocationTransactions.Where(x => x.OutputQuantity > 0).Sum(x => (double)x.OutputQuantity);
