@@ -10,7 +10,7 @@
              x:DataType="viewModel:ManuelCalcWarehouseListViewModel"
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding .}"
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
                                         EventName="Loaded" />
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
                                    StatusBarStyle="Default" />
@@ -28,9 +28,11 @@
                 Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
-    <!--<Grid RowDefinitions="*,Auto"
+    <Grid RowDefinitions="*,Auto"
           RowSpacing="10">
-        <CollectionView ItemsSource="{Binding Items}">
+        <CollectionView ItemsSource="{Binding Items}"
+                        RemainingItemsThreshold="2"
+                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="warehouseModel:WarehouseModel">
                     <Border Padding="10"
@@ -38,7 +40,7 @@
                             StrokeShape="RoundRectangle 10"
                             StrokeThickness="0.1">
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnSalesWarehouseListViewModel}}, Path=ItemTappedCommand}"
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ManuelCalcWarehouseListViewModel}}, Path=ItemTappedCommand}"
                                                   CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="Auto, *">
@@ -87,5 +89,5 @@
                 Command="{Binding NextViewCommand}"
                 IsEnabled="{Binding SelectedWarehouseModel, Converter={StaticResource IsNotNullConverter}}"
                 Text="İleri" />
-    </Grid>-->
+    </Grid>
 </ContentPage>

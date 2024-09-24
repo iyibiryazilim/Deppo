@@ -278,6 +278,9 @@
 	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionBOMMenu\Views\QuicklyProductionBOMMenuDetailView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\Manuel\Views\ManuelCalcSubProductWarehouseView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\Manuel\Views\ManuelCalcView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
