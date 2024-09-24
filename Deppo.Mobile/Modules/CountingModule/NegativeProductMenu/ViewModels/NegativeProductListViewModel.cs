@@ -12,6 +12,7 @@ using Deppo.Mobile.Core.Models.CountingModels;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using DevExpress.Maui.Controls;
+using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 
 namespace Deppo.Mobile.Modules.CountingModule.NegativeProductMenu.ViewModels;
 
@@ -24,7 +25,9 @@ public partial class NegativeProductListViewModel : BaseViewModel
 	#region Collections
 	public ObservableCollection<NegativeProductModel> Items { get; } = new();
 
-	public ObservableCollection<NegativeWarehouseModel> NegativeWarehouses { get; } = new();
+    public ObservableCollection<NegativeProductModel> SelectedNegativeProducts { get; } = new();
+
+    public ObservableCollection<NegativeWarehouseModel> NegativeWarehouses { get; } = new();
 	#endregion
 
 	#region Properties
@@ -213,11 +216,24 @@ public partial class NegativeProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            SelectedItem = negativeProductModel;
+            var selectedItem = Items.FirstOrDefault(x => x.ProductReferenceId == negativeProductModel.ProductReferenceId);
 
-            await LoadNegativeWarehousesAsync();
+            if (selectedItem is not null)
+            {
+                if (selectedItem.IsSelected)
+                {
+                    Items.FirstOrDefault(x => x.ProductReferenceId == negativeProductModel.ProductReferenceId).IsSelected = false;
+                    SelectedNegativeProducts.Remove(SelectedNegativeProducts.FirstOrDefault(x => x.ProductReferenceId == selectedItem.ProductReferenceId));
+                }
+                else
+                {
+                    Items.FirstOrDefault(x => x.ProductReferenceId == negativeProductModel.ProductReferenceId).IsSelected = true;
 
-            CurrentPage.FindByName<BottomSheet>("negativeWarehouseBottomSheet").State = BottomSheetState.HalfExpanded;
+                    SelectedNegativeProducts.Add(selectedItem);
+                }
+            }
+
+            
 
         }
         catch (Exception ex)
@@ -242,20 +258,10 @@ public partial class NegativeProductListViewModel : BaseViewModel
 
             SelectedItem = negativeProductModel;
 
-            // Sadece Raf takipli olma durumu
-            if(SelectedItem.LocTracking == 1 && (SelectedItem.TrackingType == 0))
-            {
+            await LoadNegativeWarehousesAsync();
 
-            }
-            else if(SelectedItem.LocTracking == 1 && (SelectedItem.TrackingType == 1))
-            {
-                //todo:Raf ve Seri takipli olma durumu
-            }
-            // Ne Raf takipli ne de Seri,Lot takipli olma durumu
-            else if(SelectedItem.LocTracking == 0 && (SelectedItem.TrackingType == 0))
-            {
-
-            }
+            CurrentPage.FindByName<BottomSheet>("negativeWarehouseBottomSheet").State = BottomSheetState.HalfExpanded;
+           
 
         }
         catch (Exception ex) 

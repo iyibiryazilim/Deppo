@@ -58,4 +58,7 @@ public partial class NegativeProductModel : ObservableObject
 
 	public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 
+    [ObservableProperty]
+    bool isSelected;
+
 }
