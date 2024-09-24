@@ -5,42 +5,42 @@ namespace Deppo.Mobile.Core.Models.CountingModels
     public partial class NegativeWarehouseModel : ObservableObject
     {
         [ObservableProperty]
-        public int warehouseReferenceId;
+        int warehouseReferenceId;
 
         [ObservableProperty]
-        public short warehouseNumber;
+        short warehouseNumber;
 
         [ObservableProperty]
-        public string warehouseName = string.Empty;
+        string warehouseName = string.Empty;
 
         [ObservableProperty]
-        public int unitsetReferenceId;
+        int unitsetReferenceId;
 
         [ObservableProperty]
-        public string unitsetName = string.Empty;
+        string unitsetName = string.Empty;
 
         [ObservableProperty]
-        public string unitsetCode = string.Empty;
+        string unitsetCode = string.Empty;
 
         [ObservableProperty]
-        public int subUnitsetReferenceId;
+        int subUnitsetReferenceId;
 
         [ObservableProperty]
-        public string subUnitsetName = string.Empty;
+        string subUnitsetName = string.Empty;
 
         [ObservableProperty]
-        public string subUnitsetCode = string.Empty;
+        string subUnitsetCode = string.Empty;
 
         [ObservableProperty]
-        public bool _isVariant;
+        bool _isVariant;
 
         [ObservableProperty]
-        public int _trackingType;
+        int _trackingType;
 
         [ObservableProperty]
-        public int _locTracking;
+        int _locTracking;
 
         [ObservableProperty]
-        public double stockQuantity;
+        double stockQuantity;
     }
 }
