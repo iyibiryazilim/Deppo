@@ -78,6 +78,8 @@ using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manu
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.Views;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.ViewModels;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Views;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrder.ViewModels;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrder.Views;
 using Deppo.Mobile.Modules.ResultModule.ViewModels;
 using Deppo.Mobile.Modules.ResultModule.Views;
 using Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels;
@@ -473,6 +475,8 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddSingletonWithShellRoute<QuicklyProductionBOMMenuView, QuicklyProductionBOMMenuViewModel>(nameof(QuicklyProductionBOMMenuView));
         builder.Services.AddSingletonWithShellRoute<QuicklyProductionProcessView, QuicklyProductionProcessViewModel>(nameof(QuicklyProductionProcessView));
 
+        builder.Services.AddScopedWithShellRoute<QuicklyProductionBOMMenuDetailView, QuicklyProductionBOMMenuDetailView>(nameof(QuicklyProductionBOMMenuDetailView));
+
         #region Quickly Production Manuel
 
         builder.Services.AddSingletonWithShellRoute<ManuelProductListView, ManuelProductListViewModel>(nameof(ManuelProductListView));
@@ -482,6 +486,14 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddTransientWithShellRoute<ManuelFormListView, ManuelFormListViewModel>(nameof(ManuelFormListView));
 
         #endregion Quickly Production Manuel
+
+        #region Quickly Production WorkOrder
+
+        builder.Services.AddSingletonWithShellRoute<WorkOrderProductListView, WorkOrderProductListViewModel>(nameof(WorkOrderProductListView));
+        builder.Services.AddScopedWithShellRoute<WorkOrderCalcView, WorkOrderCalcViewModel>(nameof(WorkOrderCalcView));
+        builder.Services.AddTransientWithShellRoute<WorkOrderFormView, WorkOrderFormViewModel>(nameof(WorkOrderFormView));
+
+        #endregion Quickly Production WorkOrder
 
         #endregion Quickly Production Modules
 
@@ -504,6 +516,7 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferBasketListView, OutputOutsourceTransferBasketListViewModel>(nameof(OutputOutsourceTransferBasketListView));
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferProductListView, OutputOutsourceTransferProductListViewModel>(nameof(OutputOutsourceTransferProductListView));
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferFormView, OutputOutsourceTransferFormViewModel>(nameof(OutputOutsourceTransferFormView));
+
         #endregion Outsource Modules
 
         return builder.Build();

@@ -9,4 +9,8 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
 
 public partial class ManuelCalcWarehouseProductListViewModel : BaseViewModel
 {
+    public ManuelCalcWarehouseProductListViewModel()
+    {
+        Title = "Ambar Ürünleri";
+    }
 }
