@@ -33,7 +33,6 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
 public partial class WorkOrderProductListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
-    private readonly ISeriLotTransactionService _serilotTransactionService;
     private readonly IUserDialogs _userDialogs;
     private readonly IQuicklyBomService _quicklyBomService;
 
@@ -52,11 +51,11 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
 
     public Page CurrentPage { get; set; }
 
-    public ManuelProductListViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, IUserDialogs userDialogs, IQuicklyBomService quicklyBomService)
+    public WorkOrderProductListViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, IUserDialogs userDialogs, IQuicklyBomService quicklyBomService)
     {
         _httpClientService = httpClientService;
-        _serilotTransactionService = serilotTransactionService;
         _userDialogs = userDialogs;
+        _quicklyBomService = quicklyBomService;
 
         Title = "Reçete Ürün Listesi";
 
@@ -65,7 +64,6 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<QuicklyBOMProductModel>(async (parameter) => await ItemTappedAsync(parameter));
         NextViewCommand = new Command(async () => await NextViewAsync());
-        _quicklyBomService = quicklyBomService;
     }
 
     public Command LoadItemsCommand { get; }
@@ -84,10 +82,7 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-
             BasketModel.QuicklyBomProduct = selectedProduct;
-
-
             await Shell.Current.GoToAsync($"{nameof(ManuelCalcView)}", new Dictionary<string, object>
             {
 
@@ -256,27 +251,29 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
 
                 foreach (var product in result.Data)
                 {
-                    var item = Mapping.Mapper.Map<Product>(product);
-                    Items.Add(new QuicklyBOMProductModel
-                    {
-                        ReferenceId = (int)item.ProductReferenceId,
-                        Code = item.ProductCode,
-                        Name = item.ProductName,
-                        UnitsetReferenceId = item.UnitsetReferenceId,
-                        UnitsetCode = item.UnitsetCode,
-                        UnitsetName = item.UnitsetName,
-                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                        SubUnitsetCode = item.SubUnitsetCode,
-                        SubUnitsetName = item.SubUnitsetName,
-                        StockQuantity = item.StockQuantity,
-                        LocTracking = item.LocTracking,
-                        IsVariant = item.IsVariant,
-                        TrackingType = item.TrackingType,
-                        IsSelected = false,
-                        LocTrackingIcon = product.LocTrackingIcon,
-                        VariantIcon = product.VariantIcon,
-                        TrackingTypeIcon = product.TrackingTypeIcon,
-                    });
+                    var item = Mapping.Mapper.Map<QuicklyBOMProductModel>(product);
+
+                    Items.Add(item);
+                    /* Items.Add(new QuicklyBOMProductModel
+                     {
+                         ReferenceId = (int)item.ProductReferenceId,
+                         Code = item.ProductCode,
+                         Name = item.ProductName,
+                         UnitsetReferenceId = item.UnitsetReferenceId,
+                         UnitsetCode = item.UnitsetCode,
+                         UnitsetName = item.UnitsetName,
+                         SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                         SubUnitsetCode = item.SubUnitsetCode,
+                         SubUnitsetName = item.SubUnitsetName,
+                         StockQuantity = item.StockQuantity,
+                         LocTracking = item.LocTracking,
+                         IsVariant = item.IsVariant,
+                         TrackingType = item.TrackingType,
+                         IsSelected = false,
+                         LocTrackingIcon = product.LocTrackingIcon,
+                         VariantIcon = product.VariantIcon,
+                         TrackingTypeIcon = product.TrackingTypeIcon,
+                     });*/
                 }
             }
 
