@@ -1,9 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.DTOs.ConsumableTransaction;
+using Deppo.Core.DTOs.ProductionTransaction;
+using Deppo.Core.DTOs.SeriLotTransactionDto;
 using Deppo.Core.DTOs.TransferTransaction;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.TransferModels;
 using Deppo.Mobile.Core.Models.VirmanModels;
+using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ResultModule;
@@ -22,18 +26,23 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
     private readonly IHttpClientService _httpClientService;
     private readonly ITransferTransactionService _transferTransactionService;
 
+    private readonly IProductionTransactionService _productionTransactionService;
+
+    private readonly IConsumableTransactionService _consumableTransactionService;
+
+
     private readonly IUserDialogs _userDialogs;
 
 
     [ObservableProperty]
     VirmanBasketModel virmanBasketModel= null!;
 
-
-    [ObservableProperty]
-    TransferBasketModel transferBasketModel = null!;
-
     [ObservableProperty]
     DateTime ficheDate = DateTime.Now;
+
+
+    [ObservableProperty]
+    DateTime transactionDate = DateTime.Now;
 
     [ObservableProperty]
     string documentNumber = string.Empty;
@@ -49,7 +58,7 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
 
 
 
-    public VirmanProductFormListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ITransferTransactionService transferTransactionService)
+    public VirmanProductFormListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ITransferTransactionService transferTransactionService, IProductionTransactionService productionTransactionService, IConsumableTransactionService consumableTransactionService)
     {
         _httpClientService = httpClientService;
         _transferTransactionService = transferTransactionService;
@@ -57,6 +66,8 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
 
         Title = "Virman Formu";
         SaveCommand = new Command(async () => await SaveAsync());
+        _productionTransactionService = productionTransactionService;
+        _consumableTransactionService = consumableTransactionService;
     }
 
     public Page CurrentPage { get; set; }
@@ -66,51 +77,7 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
     public Command SaveCommand { get; }
     public Command ShowBasketItemCommand { get; }
 
-    //private async Task ShowBasketItemAsync()
-    //{
-    //	if (IsBusy)
-    //		return;
-
-    //	try
-    //	{
-    //		IsBusy = true;
-
-    //		CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
-    //	}
-    //	catch (System.Exception)
-    //	{
-
-    //		throw;
-    //	}
-    //	finally
-    //	{
-    //		IsBusy = false;
-    //	}
-    //}
-
-    //private async Task LoadPageAsync()
-    //{
-    //	if (IsBusy)
-    //		return;
-
-    //	try
-    //	{
-    //		IsBusy = true;
-
-    //		CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
-
-
-    //	}
-    //	catch (System.Exception)
-    //	{
-
-    //		throw;
-    //	}
-    //	finally
-    //	{
-    //		IsBusy = false;
-    //	}
-    //}
+    
 
 
     private async Task SaveAsync()
@@ -125,7 +92,74 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var transferTransactionInsertDto = new TransferTransactionInsert
+
+            var consumableTransactionDto = new ConsumableTransactionInsert
+            {
+                Code = "",
+                CurrentCode = "",
+                Description = Description,
+                DoCode = DocumentNumber,
+                DocTrackingNumber = DocumentTrackingNumber,
+                TransactionDate = TransactionDate,
+                FirmNumber = _httpClientService.FirmNumber,
+                SpeCode = SpecialCode,
+                WarehouseNumber = VirmanBasketModel.OutVirmanWarehouse.Number,
+
+            };
+
+            foreach (var item in VirmanBasketModel.OutVirmanProduct.LocationTransactionModels)
+            {
+                var consumableTransactionLineDto = new ConsumableTransactionLineDto
+                {
+                    ProductCode = item.ItemCode,
+                    WarehouseNumber = VirmanBasketModel.OutVirmanWarehouse.Number,
+                    Quantity = item.Quantity,
+                    ConversionFactor = 1,
+                    OtherConversionFactor = 1,
+                    SubUnitsetCode = item.SubUnitsetCode,
+                };
+
+                foreach (var detail in VirmanBasketModel.OutVirmanProduct.LocationTransactionModels)
+                {
+                    if (item.ReferenceId == detail.ReferenceId)
+                    {
+                        var seriLotTransactionDto = new SeriLotTransactionDto
+                        {
+                            StockLocationCode = detail.LocationCode,
+                            Quantity = detail.OutputQuantity,
+                            ConversionFactor = 1,
+                            OtherConversionFactor = 1,
+                            DestinationStockLocationCode = string.Empty,
+                        };
+
+                        consumableTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
+                    }
+
+                }
+                consumableTransactionDto.Lines.Add(consumableTransactionLineDto);
+            }
+
+            var result = await _consumableTransactionService.InsertConsumableTransaction(httpClient, consumableTransactionDto, _httpClientService.FirmNumber);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            var productionTransactionDto = new ProductionTransactionInsert
             {
                 SpeCode = SpecialCode,
                 CurrentCode = string.Empty,
@@ -134,50 +168,82 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
                 DoCode = DocumentNumber,
                 TransactionDate = FicheDate,
                 FirmNumber = _httpClientService.FirmNumber,
-                WarehouseNumber = TransferBasketModel.OutWarehouse.Number,
-                DestinationWarehouseNumber = TransferBasketModel.InWarehouse.Number,
+                WarehouseNumber = VirmanBasketModel.InVirmanWarehouse.Number,
                 Description = Description,
             };
 
-            foreach (var item in TransferBasketModel.InProducts)
+            foreach (var item in VirmanBasketModel.InVirmanProduct.Locations)
             {
-                var transferTransactionLineDto = new TransferTransactionLineDto
+                var productionTransactionLineDto = new ProductionTransactionLineDto
                 {
-                    ProductCode = item.Code,
-                    WarehouseNumber = TransferBasketModel.OutWarehouse.Number,
-                    DestinationWarehouseNumber = TransferBasketModel.InWarehouse.Number,
-                    Quantity = item.OutputQuantity,
+                    ProductCode = VirmanBasketModel.InVirmanProduct.Code,
+                    WarehouseNumber = VirmanBasketModel.InVirmanWarehouse.Number,
+                    Quantity = item.InputQuantity,
                     ConversionFactor = 1,
                     OtherConversionFactor = 1,
-                    SubUnitsetCode = item.SubUnitsetCode,
+                    SubUnitsetCode = VirmanBasketModel.InVirmanProduct.SubUnitsetCode,
                 };
 
-                //foreach (var detail in item.Locations)
-                //{
-                //	var seriLotTransactionDto = new SeriLotTransactionDto
-                //	{
-                //		StockLocationCode = detail.LocationCode,
-                //		Quantity = detail.In,
-                //		ConversionFactor = 1,
-                //		OtherConversionFactor = 1,
-                //		DestinationStockLocationCode = string.Empty,
-                //	};
+                foreach (var detail in VirmanBasketModel.InVirmanProduct.Locations)
+                {
+                    if(item.Code == detail.Code)
+                    {
+                        var seriLotTransactionDto = new SeriLotTransactionDto
+                        {
+                            StockLocationCode = detail.Code,
+                            Quantity = detail.InputQuantity,
+                            ConversionFactor = 1,
+                            OtherConversionFactor = 1,
+                            DestinationStockLocationCode = string.Empty,
+                        };
 
-                //	transferTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
-                //}
+                        productionTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
+                    }
+                    
+                }
 
-                transferTransactionInsertDto.Lines.Add(transferTransactionLineDto);
+                productionTransactionDto.Lines.Add(productionTransactionLineDto);
             }
 
-            var result = await _transferTransactionService.InsertTransferTransaction(httpClient, transferTransactionInsertDto, _httpClientService.FirmNumber);
-            Console.WriteLine(result);
-            ResultModel resultModel = new();
+            var result2 = await _productionTransactionService.InsertProductionTransaction(httpClient, productionTransactionDto, _httpClientService.FirmNumber);
 
+
+            ResultModel resultModel = new();
             if (result.IsSuccess)
             {
-                resultModel.Message = "Başarılı";
+                resultModel.Message = "Sarf Başarılı";
                 resultModel.Code = result.Data.Code;
-                resultModel.PageTitle = "Ambar Transferi";
+                resultModel.PageTitle = Title;
+                resultModel.PageCountToBack = 1;
+
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
+                {
+                    [nameof(ResultModel)] = resultModel
+                });
+            }
+            else
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                resultModel.Message = "Sarf Başarısız";
+                resultModel.PageTitle = Title;
+                resultModel.PageCountToBack = 1;
+                await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+                {
+                    [nameof(ResultModel)] = resultModel
+                });
+            }
+
+
+            if (result2.IsSuccess)
+            {
+                resultModel.Message = "Üretimden Giriş Başarılı";
+                resultModel.Code = result2.Data.Code;
+                resultModel.PageTitle = Title;
                 resultModel.PageCountToBack = 7;
 
                 if (_userDialogs.IsHudShowing)
@@ -190,22 +256,17 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
             }
             else
             {
-
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();
 
-                resultModel.Message = "Başarısız";
-                resultModel.PageTitle = "Ambar Transferi";
-                resultModel.PageCountToBack = 1;
-                resultModel.ErrorMessage = result.Message;
-
+                resultModel.Message = "Üretimden Giriş Başarısız";
+                resultModel.PageTitle = Title;
+                resultModel.PageCountToBack = 7;
                 await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
                 {
                     [nameof(ResultModel)] = resultModel
                 });
             }
-
-
         }
         catch (Exception ex)
         {
@@ -219,4 +280,7 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+
+
 }
