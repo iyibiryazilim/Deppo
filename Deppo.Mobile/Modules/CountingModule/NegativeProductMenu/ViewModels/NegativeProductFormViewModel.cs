@@ -11,6 +11,17 @@ public partial class NegativeProductFormViewModel : BaseViewModel
     [ObservableProperty]
     NegativeProductBasketModel negativeProductBasketModel = null!;
 
+    [ObservableProperty]
+    DateTime transactionDate = DateTime.Now;
+    [ObservableProperty]
+    string description = string.Empty;
+    [ObservableProperty]
+    string documentNumber = string.Empty;
+    [ObservableProperty]
+    string documentTrackingNumber = string.Empty;
+    [ObservableProperty]
+    string specialCode = string.Empty;
+
     public NegativeProductFormViewModel()
     {
         
