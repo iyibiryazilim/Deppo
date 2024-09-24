@@ -63,7 +63,7 @@
                                 <Label Grid.Column="1"
                                        FontAttributes="Bold"
                                        FontSize="Subtitle"
-                                       Text="Ambara Göre Sayım İşlemi"
+                                       Text="Manuel Hızlı Üretim"
                                        TextColor="{StaticResource Gray500}"
                                        VerticalOptions="Center" />
                                 <Grid.GestureRecognizers>
@@ -120,7 +120,7 @@
                                 <Label Grid.Column="1"
                                        FontAttributes="Bold"
                                        FontSize="Subtitle"
-                                       Text="Ürüne Göre Sayım İşlemi"
+                                       Text="İş Emrine Bağlı Hızlı Üretim"
                                        TextColor="{StaticResource Gray500}"
                                        VerticalOptions="Center" />
                             </Grid>

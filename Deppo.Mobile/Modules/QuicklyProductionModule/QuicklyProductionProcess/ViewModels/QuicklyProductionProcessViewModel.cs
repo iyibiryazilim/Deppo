@@ -2,7 +2,9 @@ using System;
 using Controls.UserDialogs.Maui;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.Views;
+using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.ViewModels;
 
@@ -25,6 +27,6 @@ public partial class QuicklyProductionProcessViewModel : BaseViewModel
 
     public async Task QuicklyProductionManuelAsync()
     {
-        await Shell.Current.GoToAsync($"{nameof(ManuelProductListView)}", new Dictionary<string, object>());
+        await Shell.Current.GoToAsync($"{nameof(ManuelProductListView)}", new Dictionary<string, object> { });
     }
 }

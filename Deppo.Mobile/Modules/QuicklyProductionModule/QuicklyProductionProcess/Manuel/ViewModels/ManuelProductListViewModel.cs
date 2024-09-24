@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,6 +27,7 @@ using Deppo.Mobile.Core.Models.QuicklyModels;
 using Deppo.Core.BaseModels;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.Views;
 using Deppo.Mobile.Core.Models.QuicklyModels.BasketModels;
+
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels;
 
@@ -83,11 +84,8 @@ public partial class ManuelProductListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-
-
+            
             BasketModel.QuicklyBomProduct = selectedProduct;
-
-
             await Shell.Current.GoToAsync($"{nameof(ManuelCalcView)}", new Dictionary<string, object>
             {
 
@@ -256,27 +254,29 @@ public partial class ManuelProductListViewModel : BaseViewModel
 
                 foreach (var product in result.Data)
                 {
-                    var item = Mapping.Mapper.Map<Product>(product);
-                    Items.Add(new QuicklyBOMProductModel
-                    {
-                        ReferenceId = (int)item.ProductReferenceId,
-                        Code = item.ProductCode,
-                        Name = item.ProductName,
-                        UnitsetReferenceId = item.UnitsetReferenceId,
-                        UnitsetCode = item.UnitsetCode,
-                        UnitsetName = item.UnitsetName,
-                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                        SubUnitsetCode = item.SubUnitsetCode,
-                        SubUnitsetName = item.SubUnitsetName,
-                        StockQuantity = item.StockQuantity,
-                        LocTracking = item.LocTracking,
-                        IsVariant = item.IsVariant,
-                        TrackingType = item.TrackingType,
-                        IsSelected = false,
-                        LocTrackingIcon = product.LocTrackingIcon,
-                        VariantIcon = product.VariantIcon,
-                        TrackingTypeIcon = product.TrackingTypeIcon,
-                    });
+                    var item = Mapping.Mapper.Map<QuicklyBOMProductModel>(product);
+
+                    Items.Add(item);
+                    /* Items.Add(new QuicklyBOMProductModel
+                     {
+                         ReferenceId = (int)item.ProductReferenceId,
+                         Code = item.ProductCode,
+                         Name = item.ProductName,
+                         UnitsetReferenceId = item.UnitsetReferenceId,
+                         UnitsetCode = item.UnitsetCode,
+                         UnitsetName = item.UnitsetName,
+                         SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                         SubUnitsetCode = item.SubUnitsetCode,
+                         SubUnitsetName = item.SubUnitsetName,
+                         StockQuantity = item.StockQuantity,
+                         LocTracking = item.LocTracking,
+                         IsVariant = item.IsVariant,
+                         TrackingType = item.TrackingType,
+                         IsSelected = false,
+                         LocTrackingIcon = product.LocTrackingIcon,
+                         VariantIcon = product.VariantIcon,
+                         TrackingTypeIcon = product.TrackingTypeIcon,
+                     });*/
                 }
             }
 
