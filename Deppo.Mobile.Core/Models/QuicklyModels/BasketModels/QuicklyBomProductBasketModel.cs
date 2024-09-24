@@ -12,12 +12,18 @@ namespace Deppo.Mobile.Core.Models.QuicklyModels.BasketModels;
 public partial class QuicklyBomProductBasketModel : ObservableObject
 {
     [ObservableProperty]
-    public QuicklyBOMProductModel quicklyBomProduct = null!;
+     QuicklyBOMProductModel quicklyBomProduct = null!;
 
     [ObservableProperty]
-    public double bOMQuantity =default;
+    int warehouseNumber = default;
+
+    [ObservableProperty]
+    string warehouseName= string.Empty;
+
+    [ObservableProperty]
+     double bOMQuantity =default;
 
 
     [ObservableProperty]
-    public ObservableCollection<QuicklyBomSubProductModel> subProducts  = new();
+    ObservableCollection<QuicklyBomSubProductModel> subProducts  = new();
 }

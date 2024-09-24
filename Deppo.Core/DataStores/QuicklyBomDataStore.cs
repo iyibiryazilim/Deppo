@@ -161,7 +161,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
 
 
-      /*  private string ProductQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+        private string ProductQueryWorkOrder(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
         {
             string baseQuery = $@"SELECT
 [ReferenceId] = ITEMS.LOGICALREF,
@@ -196,6 +196,8 @@ WHERE ITEMS.ACTIVE = 0 AND ITEMS.MOLD = 0 AND  TOOL = 0 AND ITEMS.CARDTYPE  IN(1
 OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
             return baseQuery;
-        }*/
+        }
     }
 }
+
+
