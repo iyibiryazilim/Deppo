@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Android.Net.Wifi.Rtt;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.LocationModels;
@@ -27,6 +28,8 @@ public partial class VirmanProductBasketListViewModel : BaseViewModel
     [ObservableProperty]
     private VirmanBasketModel virmanBasketModel = null!;
 
+    [ObservableProperty]
+    private double totalQuantity = 0;
     public ObservableCollection<LocationTransactionModel> SelectedLocationTransactions { get; } = new();
 
     [ObservableProperty]
@@ -169,7 +172,15 @@ ILocationService locationService, ILocationTransactionService locationTransactio
             await Task.Delay(1000);
             LocationTransactions.Clear();
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationTransactionService.GetInputObjectsAsync(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, productReferenceId: VirmanBasketModel.OutVirmanProduct.ReferenceId, warehouseNumber: VirmanBasketModel.OutVirmanWarehouse.Number);
+            var result = await _locationTransactionService.GetInputObjectsAsync(httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                productReferenceId: VirmanBasketModel.OutVirmanProduct.ReferenceId,
+                warehouseNumber: VirmanBasketModel.OutVirmanWarehouse.Number, skip: 0,
+                take: 20);
+
+
+
 
             if (result.IsSuccess)
             {
@@ -178,8 +189,18 @@ ILocationService locationService, ILocationTransactionService locationTransactio
 
                 foreach (var item in result.Data)
                 {
-                    LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+                    LocationTransactionModel locationItem = Mapping.Mapper.Map<LocationTransactionModel>(item);
+                    if (locationItem is not null)
+                    {
+                        LocationTransactionModel oldLocation = VirmanBasketModel?.OutVirmanProduct?.LocationTransactionModels?.FirstOrDefault(item => item.ReferenceId == locationItem.ReferenceId);
+                        if (oldLocation != null)
+                            locationItem.OutputQuantity = oldLocation.Quantity;
+
+                        LocationTransactions.Add(locationItem);
+                    }
+
                 }
+
             }
 
             _userDialogs.Loading().Hide();
@@ -203,7 +224,13 @@ ILocationService locationService, ILocationTransactionService locationTransactio
             IsBusy = true;
             _userDialogs.ShowLoading("Load Location Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationTransactionService.GetInputObjectsAsync(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, productReferenceId: VirmanBasketModel.OutVirmanProduct.ReferenceId, warehouseNumber: VirmanBasketModel.OutVirmanWarehouse.Number);
+            var result = await _locationTransactionService.GetInputObjectsAsync(httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                productReferenceId: VirmanBasketModel.OutVirmanProduct.ReferenceId,
+                warehouseNumber: VirmanBasketModel.OutVirmanWarehouse.Number,
+                skip: LocationTransactions.Count,
+                take: 20);
 
             if (result.IsSuccess)
             {
@@ -212,10 +239,19 @@ ILocationService locationService, ILocationTransactionService locationTransactio
 
                 foreach (var item in result.Data)
                 {
-                    LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
-                }
-            }
+                    LocationTransactionModel locationTransaction = Mapping.Mapper.Map<LocationTransactionModel>(item);
+                    if (locationTransaction is not null)
+                    {
+                        var oldItem = VirmanBasketModel?.OutVirmanProduct?.LocationTransactionModels?.FirstOrDefault(item => item.ReferenceId == locationTransaction.ReferenceId);   
+                        if(oldItem != null)
+                            locationTransaction.OutputQuantity = oldItem.Quantity;
+                        LocationTransactions.Add(locationTransaction);
+                    }
 
+
+                }
+                
+            }
             _userDialogs.Loading().Hide();
         }
         catch (Exception ex)
@@ -234,11 +270,18 @@ ILocationService locationService, ILocationTransactionService locationTransactio
             return;
         try
         {
+
             IsBusy = true;
 
             if (item is not null)
             {
-                selectedLocationTransaction = item;
+
+                if (!SelectedLocationTransactions.Any(x => x.ReferenceId == item.ReferenceId))
+                {
+                    SelectedLocationTransactions.Add(item);
+                }
+
+                SelectedLocationTransaction = item;
                 if (item.OutputQuantity < item.Quantity)
                 {
                     item.OutputQuantity++;
@@ -277,6 +320,12 @@ ILocationService locationService, ILocationTransactionService locationTransactio
                 {
                     item.OutputQuantity--;
                 }
+
+
+                if (item.OutputQuantity == 0)
+                {
+                    SelectedLocationTransactions.Remove(item);
+                }
             }
         }
         catch (Exception e)
@@ -301,37 +350,42 @@ ILocationService locationService, ILocationTransactionService locationTransactio
 
             if (LocationTransactions.Count > 0)
             {
-                SelectedLocationTransactions.Clear();
+                VirmanBasketModel.OutVirmanQuantity = 0;
 
-                foreach (var x in LocationTransactions.Where(x => x.OutputQuantity > 0))
-                {
-                    SelectedLocationTransactions.Add(x);
-                }
 
                 foreach (var item in SelectedLocationTransactions)
                 {
-                    var selectedLocationTransactionItem = VirmanBasketModel.OutVirmanProduct.LocationTransactionModels.FirstOrDefault(x => x.TransactionReferenceId == item.TransactionReferenceId);
+                    var selectedLocationTransactionItem = VirmanBasketModel.OutVirmanProduct.LocationTransactionModels.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
+
                     if (selectedLocationTransactionItem is not null)
                     {
-                        selectedLocationTransactionItem.Quantity = VirmanBasketModel.OutVirmanQuantity;
+                        item.OutputQuantity = selectedLocationTransactionItem.Quantity;
                     }
 
-                    VirmanBasketModel.OutVirmanProduct.LocationTransactionModels.Add(new LocationTransactionModel
+                    else
                     {
-                        ReferenceId = item.ReferenceId,
-                        LocationReferenceId = item.LocationReferenceId,
-                        LocationCode = item.LocationCode,
-                        LocationName = item.LocationName,
-                        TransactionReferenceId = item.TransactionReferenceId,
-                        InSerilotTransactionReferenceId = item.InSerilotTransactionReferenceId,
-                        TransactionFicheReferenceId = item.TransactionFicheReferenceId,
-                        InTransactionReferenceId = item.InTransactionReferenceId,
-                        Quantity = item.OutputQuantity,
-                        RemainingQuantity = item.OutputQuantity,
-                    });
+                        VirmanBasketModel.OutVirmanProduct.LocationTransactionModels.Add(new LocationTransactionModel
+                        {
+                            ReferenceId = item.ReferenceId,
+                            LocationReferenceId = item.LocationReferenceId,
+                            LocationCode = item.LocationCode,
+                            LocationName = item.LocationName,
+                            TransactionReferenceId = item.TransactionReferenceId,
+                            InSerilotTransactionReferenceId = item.InSerilotTransactionReferenceId,
+                            TransactionFicheReferenceId = item.TransactionFicheReferenceId,
+                            InTransactionReferenceId = item.InTransactionReferenceId,
+                            Quantity = item.OutputQuantity,
+                            RemainingQuantity = item.OutputQuantity,
+                        });
+                    }
+                   
                 }
 
                 var totalOutputQuantity = LocationTransactions.Where(x => x.OutputQuantity > 0).Sum(x => (double)x.OutputQuantity);
+
+
+                VirmanBasketModel.OutVirmanQuantity = (double)SelectedLocationTransactions.Sum(x => x.OutputQuantity);
+                VirmanBasketModel.InVirmanQuantity = VirmanBasketModel.OutVirmanQuantity;
                 VirmanBasketModel.OutVirmanQuantity = totalOutputQuantity;
                 VirmanBasketModel.InVirmanQuantity = totalOutputQuantity;
                 CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.Hidden;
@@ -509,8 +563,18 @@ ILocationService locationService, ILocationTransactionService locationTransactio
                 {
                     foreach (var item in result.Data)
                         Locations.Add(Mapping.Mapper.Map<LocationModel>(item));
+                    foreach (var location in Locations)
+                    {
+                        var matchingItem = VirmanBasketModel.InVirmanProduct.Locations.FirstOrDefault(item => item.ReferenceId == location.ReferenceId);
+                        Console.WriteLine(virmanBasketModel.InVirmanProduct.Locations);
+                        if (matchingItem != null)
+                        {
+                            location.InputQuantity = matchingItem.InputQuantity;
+                        }
+                    }
                 }
             }
+
 
             _userDialogs.HideHud();
         }
@@ -602,9 +666,17 @@ ILocationService locationService, ILocationTransactionService locationTransactio
             IsBusy = true;
             if (Locations.Count > 0 && SelectedLocations.Count > 0)
             {
-                if (VirmanBasketModel.OutVirmanQuantity != SelectedLocations.Sum(x => x.InputQuantity))
+                double counts = 0;
+                foreach (var i in SelectedLocations)
+                {
+                    counts += i.InputQuantity;
+                }
+
+
+                if (counts != VirmanBasketModel.OutVirmanQuantity)
                 {
                     _userDialogs.Alert("Miktarlar eşit olmalıdır.", "Hata", "Tamam");
+                    return;
                 }
                 else
                 {
@@ -634,25 +706,37 @@ ILocationService locationService, ILocationTransactionService locationTransactio
 
     private async Task LocationIncreaseAsync(LocationModel locationModel)
     {
+
         if (IsBusy) return;
         try
         {
             IsBusy = true;
-            double count = 0;
-            if (VirmanBasketModel.InVirmanQuantity <= VirmanBasketModel.OutVirmanQuantity)
-                locationModel.InputQuantity++;
-            //var count = SelectedLocations.Sum(x => x.InputQuantity);
-            foreach (var i in SelectedLocations)
+            if (SelectedLocations.Count == 0)
             {
-                if (count == VirmanBasketModel.OutVirmanQuantity)
-                {
-                    if (_userDialogs.IsHudShowing)
-                        _userDialogs.HideHud();
-                    await _userDialogs.AlertAsync("Çıkış Ürün Miktarından Fazla Giriş Ürünü Olamaz", "Hata", "Tamam");
-                }
-                else
-                    count += i.InputQuantity;
+                TotalQuantity = 0;
             }
+
+            if (!SelectedLocations.Any(x => x.ReferenceId == locationModel.ReferenceId))
+            {
+                SelectedLocations.Add(locationModel);
+                // locationModel.InputQuantity++;
+            }
+
+            if (locationModel.InputQuantity >= virmanBasketModel.InVirmanQuantity)
+            {
+                await _userDialogs.AlertAsync("Çıkış Ürün Miktarından Fazla Giriş Ürünü Olamaz", "Hata", "Tamam");
+            }
+            else if (VirmanBasketModel.InVirmanQuantity <= VirmanBasketModel.OutVirmanQuantity && TotalQuantity < VirmanBasketModel.OutVirmanQuantity)
+            {
+                TotalQuantity = TotalQuantity + 1;
+                locationModel.InputQuantity = locationModel.InputQuantity + 1;
+
+            }
+            else if (totalQuantity >= VirmanBasketModel.OutVirmanQuantity)
+            {
+                await _userDialogs.AlertAsync("Çıkış Ürün Miktarından Fazla Giriş Ürünü Olamaz", "Hata", "Tamam");
+            }
+
         }
         catch (Exception e)
         {
@@ -672,10 +756,23 @@ ILocationService locationService, ILocationTransactionService locationTransactio
         try
         {
             IsBusy = true;
+
+            if (SelectedLocations.Count == 0)
+            {
+                TotalQuantity = 0;
+            }
+
+
             if (locationModel.InputQuantity > 0)
             {
-                locationModel.InputQuantity--;
+                TotalQuantity = TotalQuantity - 1;
+                locationModel.InputQuantity = locationModel.InputQuantity - 1;
             }
+            else
+            {
+                SelectedLocations.Remove(locationModel);
+            }
+
         }
         catch (Exception e)
         {

@@ -80,14 +80,14 @@ public class OutsourceDataStore : IOutsourceService
 [PostalCode]=CUSTOMER.POSTCODE,
 [TaxOffice]=CUSTOMER.TAXOFFICE,
 [TaxNumber]=CUSTOMER.TAXNR,
-[OrderReferenceCount] = ISNULL((SELECT COUNT(DISTINCT STOCKREF) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE WHERE CLIENTREF = CUSTOMER.LOGICALREF AND (AMOUNT-SHIPPEDAMOUNT) > 0 AND CLOSED = 0  AND LINETYPE = 0 AND TRCODE = 1 ),0),
+[OrderReferenceCount] = 0,
 [IsActive]=
        CASE
 	      WHEN CUSTOMER.ACTIVE=0 THEN 0
 		  ELSE 1
 END
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CUSTOMER
-WHERE CUSTOMER.CODE LIKE '12%' AND CUSTOMER.CODE <> 'ÿ' AND CUSTOMER.ACTIVE = 0";
+WHERE CUSTOMER.SUBCONT = 1 AND CUSTOMER.CODE <> 'ÿ' AND CUSTOMER.ACTIVE = 0";
 
         if (!string.IsNullOrEmpty(search))
             baseQuery += $@" AND (CUSTOMER.CODE LIKE '{search}%' OR CUSTOMER.NAME LIKE '%{search}%')";

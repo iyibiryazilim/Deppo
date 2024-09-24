@@ -184,7 +184,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 				CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.FullExpanded;
 
 			}
-			else if (outputSalesBasketModel.TrackingType == 1 || outputSalesBasketModel.TrackingType == 0)
+			else if (outputSalesBasketModel.TrackingType == 1 || outputSalesBasketModel.LocTracking == 0)
 			{
 				await LoadSeriLotTransactionsAsync();
 				CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.FullExpanded;

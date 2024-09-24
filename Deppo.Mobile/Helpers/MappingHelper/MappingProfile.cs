@@ -63,8 +63,8 @@ public class MappingProfile : Profile
         CreateMap<PurchaseProductReferenceAnalysis, dynamic>();
         CreateMap<Outsource, dynamic>();
         CreateMap<NegativeProductModel, dynamic>();
-		CreateMap<NegativeWarehouseModel, dynamic>();
-		CreateMap<NegativeLocationModel, dynamic>();
+		    CreateMap<NegativeWarehouseModel, dynamic>();
+		    CreateMap<NegativeLocationModel, dynamic>();
 	}
 
 }
