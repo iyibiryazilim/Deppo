@@ -175,6 +175,7 @@ public partial class TransferOutProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
+            _userDialogs.Loading("Loading More Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: Items.Count, take: 20);
 
@@ -272,6 +273,7 @@ public partial class TransferOutProductListViewModel : BaseViewModel
                             LocTrackingIcon = item.LocTrackingIcon,
                             VariantIcon = item.VariantIcon,
                             TrackingTypeIcon = item.TrackingTypeIcon,
+                            OutputQuantity = item.LocTracking == 0 ? 1 : 0,
                             IsSelected = item.IsSelected,
                         };
 
