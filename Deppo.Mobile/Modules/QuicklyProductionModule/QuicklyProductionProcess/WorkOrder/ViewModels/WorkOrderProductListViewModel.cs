@@ -83,7 +83,10 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            BasketModel.QuicklyBomProduct = selectedProduct;
+            BasketModel.QuicklyBomProduct = SelectedProduct;
+            BasketModel.WarehouseNumber = (int)SelectedProduct.WarehouseNumber;
+
+
             await Shell.Current.GoToAsync($"{nameof(WorkOrderCalcView)}", new Dictionary<string, object>
             {
 
@@ -153,7 +156,7 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _quicklyBomService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, skip: Items.Count, take: 20);
+            var result = await _quicklyBomService.GetObjectsWorkOrder(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, skip: Items.Count, take: 20);
 
             if (result.IsSuccess)
             {
@@ -243,7 +246,7 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
             Items.Clear();
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _quicklyBomService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber);
+            var result = await _quicklyBomService.GetObjectsWorkOrder(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber);
 
             if (result.IsSuccess)
             {

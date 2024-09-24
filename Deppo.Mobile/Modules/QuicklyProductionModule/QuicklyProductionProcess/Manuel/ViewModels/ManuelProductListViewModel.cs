@@ -85,8 +85,8 @@ public partial class ManuelProductListViewModel : BaseViewModel
         {
             IsBusy = true;
             
-            BasketModel.QuicklyBomProduct = selectedProduct;
-            await Shell.Current.GoToAsync($"{nameof(ManuelCalcView)}", new Dictionary<string, object>
+            BasketModel.QuicklyBomProduct = SelectedProduct;
+            await Shell.Current.GoToAsync($"{nameof(ManuelCalcWarehouseListView)}", new Dictionary<string, object>
             {
 
                 [nameof(QuicklyBomProductBasketModel)] = BasketModel

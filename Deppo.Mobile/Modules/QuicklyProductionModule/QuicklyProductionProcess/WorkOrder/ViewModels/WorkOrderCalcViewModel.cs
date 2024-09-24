@@ -88,7 +88,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
 
             if (item is not null)
             {
-                item.bOMQuantity += 1;
+                item.BOMQuantity += 1;
             }
         }
         catch (Exception ex)
@@ -115,9 +115,9 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
 
             if (item is not null)
             {
-                if (item.bOMQuantity > 0)
+                if (item.BOMQuantity > 0)
                 {
-                    item.bOMQuantity -= 1;
+                    item.BOMQuantity -= 1;
                 }
             }
         }

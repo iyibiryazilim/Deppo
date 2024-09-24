@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using Deppo.Mobile.Core.Models.QuicklyModels;
 using Deppo.Mobile.Core.Models.QuicklyModels.BasketModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.Views;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.Views;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels;
 
@@ -201,11 +202,12 @@ public partial class ManuelCalcWarehouseListViewModel : BaseViewModel
 
             if (SelectedWarehouseModel is not null)
             {
-                QuicklyBasket.SubProducts.WarehouseModel = SelectedWarehouseModel;
+                QuicklyBasket.WarehouseName = SelectedWarehouseModel.Name;
+                QuicklyBasket.WarehouseNumber = SelectedWarehouseModel.Number;
 
-                await Shell.Current.GoToAsync($"{nameof(VirmanProductOutListView)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"{nameof(ManuelCalcView)}", new Dictionary<string, object>
                 {
-                    [nameof(QuicklyBomProductBasketModel)] = QuicklyBasket
+                    [nameof(ManuelCalcViewModel)] = QuicklyBasket
                 });
             }
         }

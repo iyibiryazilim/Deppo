@@ -9,5 +9,6 @@ namespace Deppo.Core.Models
 {
     public class QuicklyBOMProduct : Product
     {
+
     }
 }
