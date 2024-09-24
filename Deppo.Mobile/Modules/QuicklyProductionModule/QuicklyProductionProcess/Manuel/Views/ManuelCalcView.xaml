@@ -9,15 +9,6 @@
              Title="{Binding Title}"
              x:DataType="viewModel:ManuelCalcViewModel"
              Shell.TabBarIsVisible="False">
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Order="Primary">
-            <ToolbarItem.IconImageSource>
-                <FontImageSource FontFamily="FAS"
-                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.EllipsisVertical}"
-                                 Size="20" />
-            </ToolbarItem.IconImageSource>
-        </ToolbarItem>
-    </ContentPage.ToolbarItems>
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding .}"
                                         EventName="Loaded" />
@@ -66,7 +57,7 @@
                        HorizontalOptions="Center"
                        LineBreakMode="TailTruncation"
                        MaxLines="1"
-                       Text="{Binding .}" />
+                       Text="{Binding . }" />
                 <Label FontSize="Medium"
                        HorizontalOptions="Center"
                        LineBreakMode="TailTruncation"

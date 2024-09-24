@@ -4,6 +4,7 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.Views;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrder.Views;
 using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.ViewModels;
@@ -21,12 +22,19 @@ public partial class QuicklyProductionProcessViewModel : BaseViewModel
         Title = "Hızlı Üretim İşlemleri";
 
         QuicklyProductionManuelCommand = new Command(async () => await QuicklyProductionManuelAsync());
+        QuicklyProductionWorkOrderCommand = new Command(async () => await QuicklyProductionWorkOrderAsync());
     }
 
     public Command QuicklyProductionManuelCommand { get; }
+    public Command QuicklyProductionWorkOrderCommand { get; }
 
     public async Task QuicklyProductionManuelAsync()
     {
         await Shell.Current.GoToAsync($"{nameof(ManuelProductListView)}", new Dictionary<string, object> { });
+    }
+
+    public async Task QuicklyProductionWorkOrderAsync()
+    {
+        await Shell.Current.GoToAsync($"{nameof(WorkOrderProductListView)}", new Dictionary<string, object> { });
     }
 }
