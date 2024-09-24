@@ -84,7 +84,9 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
             IsBusy = true;
 
             BasketModel.QuicklyBomProduct = SelectedProduct;
-            BasketModel.WarehouseNumber = (int)SelectedProduct.WarehouseNumber;
+            BasketModel.WarehouseNumber = SelectedProduct.WarehouseNumber;
+            BasketModel.WarehouseName = SelectedProduct.Name;
+
 
 
             await Shell.Current.GoToAsync($"{nameof(WorkOrderCalcView)}", new Dictionary<string, object>
