@@ -474,19 +474,20 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddSingletonWithShellRoute<CountingProcessView, CountingProcessViewModel>(nameof(CountingProcessView));
 
         #region Ambara Gore Sayim
+
         builder.Services.AddScopedWithShellRoute<WarehouseCountingWarehouseListView, WarehouseCountingWarehouseListViewModel>(nameof(WarehouseCountingWarehouseListView));
-		builder.Services.AddScopedWithShellRoute<WarehouseCountingLocationListView, WarehouseCountingLocationListViewModel>(nameof(WarehouseCountingLocationListView));
-		builder.Services.AddScopedWithShellRoute<WarehouseCountingBasketView, WarehouseCountingBasketViewModel>(nameof(WarehouseCountingBasketView));
-		builder.Services.AddScopedWithShellRoute<WarehouseCountingProductListView, WarehouseCountingProductListViewModel>(nameof(WarehouseCountingProductListView));
-		builder.Services.AddScopedWithShellRoute<WarehouseCountingFormView, WarehouseCountingFormViewModel>(nameof(WarehouseCountingFormView));
+        builder.Services.AddScopedWithShellRoute<WarehouseCountingLocationListView, WarehouseCountingLocationListViewModel>(nameof(WarehouseCountingLocationListView));
+        builder.Services.AddScopedWithShellRoute<WarehouseCountingBasketView, WarehouseCountingBasketViewModel>(nameof(WarehouseCountingBasketView));
+        builder.Services.AddScopedWithShellRoute<WarehouseCountingProductListView, WarehouseCountingProductListViewModel>(nameof(WarehouseCountingProductListView));
+        builder.Services.AddScopedWithShellRoute<WarehouseCountingFormView, WarehouseCountingFormViewModel>(nameof(WarehouseCountingFormView));
 
-		#endregion
+        #endregion Ambara Gore Sayim
 
-		#endregion Counting Modules
+        #endregion Counting Modules
 
-		#region Quickly Production Modules
+        #region Quickly Production Modules
 
-		builder.Services.AddSingletonWithShellRoute<QuicklyProductionPanelView, QuicklyProductionPanelViewModel>(nameof(QuicklyProductionPanelView));
+        builder.Services.AddSingletonWithShellRoute<QuicklyProductionPanelView, QuicklyProductionPanelViewModel>(nameof(QuicklyProductionPanelView));
         builder.Services.AddSingletonWithShellRoute<QuicklyProductionBOMMenuView, QuicklyProductionBOMMenuViewModel>(nameof(QuicklyProductionBOMMenuView));
         builder.Services.AddSingletonWithShellRoute<QuicklyProductionProcessView, QuicklyProductionProcessViewModel>(nameof(QuicklyProductionProcessView));
 
@@ -496,6 +497,7 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
 
         builder.Services.AddSingletonWithShellRoute<ManuelProductListView, ManuelProductListViewModel>(nameof(ManuelProductListView));
         builder.Services.AddScopedWithShellRoute<ManuelCalcView, ManuelCalcViewModel>(nameof(ManuelCalcView));
+        builder.Services.AddSingletonWithShellRoute<ManuelCalcSubProductWarehouseView, ManuelCalcSubProductWarehouseViewModel>(nameof(ManuelCalcSubProductWarehouseView));
         builder.Services.AddTransientWithShellRoute<ManuelCalcWarehouseListView, ManuelCalcWarehouseListViewModel>(nameof(ManuelCalcWarehouseListView));
         builder.Services.AddScopedWithShellRoute<ManuelCalcWarehouseProductListView, ManuelCalcWarehouseProductListViewModel>(nameof(ManuelCalcWarehouseProductListView));
         builder.Services.AddTransientWithShellRoute<ManuelFormListView, ManuelFormListViewModel>(nameof(ManuelFormListView));
