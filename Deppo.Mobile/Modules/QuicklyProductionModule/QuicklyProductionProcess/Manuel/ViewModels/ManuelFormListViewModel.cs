@@ -9,4 +9,8 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
 
 public partial class ManuelFormListViewModel : BaseViewModel
 {
+    public ManuelFormListViewModel()
+    {
+        Title = "Form Sayfası";
+    }
 }

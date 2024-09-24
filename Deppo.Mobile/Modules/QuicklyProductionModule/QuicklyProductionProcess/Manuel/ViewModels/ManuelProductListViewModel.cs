@@ -9,4 +9,8 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
 
 public partial class ManuelProductListViewModel : BaseViewModel
 {
+    public ManuelProductListViewModel()
+    {
+        Title = "Ürünler";
+    }
 }

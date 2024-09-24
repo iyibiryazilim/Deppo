@@ -17,4 +17,10 @@ public partial class QuicklyProductionBOMMenuViewModel : BaseViewModel
 
         Title = "Hızlı Üretim Reçeteleri";
     }
+
+    public Command LoadItems { get; }
+
+    public Command ItemTappedCommand { get; }
+
+    public Command LoadMoreItemsCommand { get; }
 }

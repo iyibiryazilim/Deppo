@@ -9,4 +9,8 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
 
 public partial class ManuelCalcViewModel : BaseViewModel
 {
+    public ManuelCalcViewModel()
+    {
+        Title = "Ürün Detayı";
+    }
 }

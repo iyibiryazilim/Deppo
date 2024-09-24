@@ -66,6 +66,9 @@
                                        Text="Ambara Göre Sayım İşlemi"
                                        TextColor="{StaticResource Gray500}"
                                        VerticalOptions="Center" />
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding QuicklyProductionManuelCommand}" />
+                                </Grid.GestureRecognizers>
                             </Grid>
 
                             <Border Grid.Column="1"
