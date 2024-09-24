@@ -10,6 +10,7 @@ public partial class NegativeProductFormView : ContentPage
         InitializeComponent();
         _viewModel = viewModel;
         BindingContext = _viewModel;
+        _viewModel.CurrentPage = this;
         
     }
 }
