@@ -47,7 +47,7 @@ public partial class ManuelProductListViewModel : BaseViewModel
 
 
     [ObservableProperty]
-    private QuicklyBomProductBasketModel? basketModel;
+    private QuicklyBomProductBasketModel? basketModel = new();
 
 
 

@@ -43,7 +43,7 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
     private QuicklyBOMProductModel? selectedProduct;
 
     [ObservableProperty]
-    private QuicklyBomProductBasketModel? basketModel;
+    private QuicklyBomProductBasketModel? basketModel = new();
 
     public Page CurrentPage { get; set; }
 
