@@ -25,7 +25,7 @@ using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manu
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels;
 
-[QueryProperty(name: nameof(QuicklyBomProductBasketModel), queryId: nameof(QuicklyBomProductBasketModel))]
+[QueryProperty(name: nameof(QuicklyBomProductBasketModel), queryId: nameof(QuicklyBasket))]
 
 
 public partial class ManuelCalcWarehouseListViewModel : BaseViewModel
