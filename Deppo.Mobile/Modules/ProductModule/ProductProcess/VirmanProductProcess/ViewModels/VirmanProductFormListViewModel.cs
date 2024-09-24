@@ -41,8 +41,7 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
     DateTime ficheDate = DateTime.Now;
 
 
-    [ObservableProperty]
-    DateTime transactionDate = DateTime.Now;
+   
 
     [ObservableProperty]
     string documentNumber = string.Empty;
@@ -100,7 +99,7 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
                 Description = Description,
                 DoCode = DocumentNumber,
                 DocTrackingNumber = DocumentTrackingNumber,
-                TransactionDate = TransactionDate,
+                TransactionDate = FicheDate,
                 FirmNumber = _httpClientService.FirmNumber,
                 SpeCode = SpecialCode,
                 WarehouseNumber = VirmanBasketModel.OutVirmanWarehouse.Number,
