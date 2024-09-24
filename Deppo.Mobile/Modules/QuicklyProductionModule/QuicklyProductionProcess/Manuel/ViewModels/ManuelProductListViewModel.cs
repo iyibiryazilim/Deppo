@@ -25,6 +25,8 @@ using Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.Vie
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.QuicklyModels;
 using Deppo.Core.BaseModels;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.Views;
+using Deppo.Mobile.Core.Models.QuicklyModels.BasketModels;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels;
 
@@ -40,6 +42,13 @@ public partial class ManuelProductListViewModel : BaseViewModel
 
     [ObservableProperty]
     private QuicklyBOMProductModel? selectedProduct;
+
+
+
+    [ObservableProperty]
+    private QuicklyBomProductBasketModel? basketModel;
+
+
 
     public Page CurrentPage { get; set; }
 
@@ -75,10 +84,14 @@ public partial class ManuelProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            await Shell.Current.GoToAsync($"{nameof(VirmanProductInWarehouseListView)}", new Dictionary<string, object>
+
+            BasketModel.QuicklyBomProduct = selectedProduct;
+
+
+            await Shell.Current.GoToAsync($"{nameof(ManuelCalcView)}", new Dictionary<string, object>
             {
 
-                [nameof(QuicklyBOMProductModel)] = SelectedProduct
+                [nameof(QuicklyBomProductBasketModel)] = BasketModel
             });
         }
         catch (System.Exception ex)
