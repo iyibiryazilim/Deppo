@@ -123,6 +123,9 @@
                                        Text="İş Emrine Bağlı Hızlı Üretim"
                                        TextColor="{StaticResource Gray500}"
                                        VerticalOptions="Center" />
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding QuicklyProductionWorkOrderCommand}" />
+                                </Grid.GestureRecognizers>
                             </Grid>
 
                             <Border Grid.Column="1"

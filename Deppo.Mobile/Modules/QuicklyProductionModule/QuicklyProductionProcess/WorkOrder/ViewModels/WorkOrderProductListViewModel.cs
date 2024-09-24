@@ -27,6 +27,7 @@ using Deppo.Mobile.Core.Models.QuicklyModels;
 using Deppo.Core.BaseModels;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.Views;
 using Deppo.Mobile.Core.Models.QuicklyModels.BasketModels;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrder.Views;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrder.ViewModels;
 
@@ -36,18 +37,13 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
     private readonly IUserDialogs _userDialogs;
     private readonly IQuicklyBomService _quicklyBomService;
 
-
     public ObservableCollection<QuicklyBOMProductModel> Items { get; } = new();
 
     [ObservableProperty]
     private QuicklyBOMProductModel? selectedProduct;
 
-
-
     [ObservableProperty]
     private QuicklyBomProductBasketModel? basketModel;
-
-
 
     public Page CurrentPage { get; set; }
 
@@ -83,9 +79,8 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
             IsBusy = true;
 
             BasketModel.QuicklyBomProduct = selectedProduct;
-            await Shell.Current.GoToAsync($"{nameof(ManuelCalcView)}", new Dictionary<string, object>
+            await Shell.Current.GoToAsync($"{nameof(WorkOrderCalcView)}", new Dictionary<string, object>
             {
-
                 [nameof(QuicklyBomProductBasketModel)] = BasketModel
             });
         }
