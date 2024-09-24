@@ -8,6 +8,7 @@ using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.LoginModels;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
+using Deppo.Mobile.Core.Models.QuicklyModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.ShipAddressModels;
@@ -63,8 +64,10 @@ public class MappingProfile : Profile
         CreateMap<PurchaseProductReferenceAnalysis, dynamic>();
         CreateMap<Outsource, dynamic>();
         CreateMap<NegativeProductModel, dynamic>();
-		    CreateMap<NegativeWarehouseModel, dynamic>();
-		    CreateMap<NegativeLocationModel, dynamic>();
-	}
+		CreateMap<NegativeWarehouseModel, dynamic>();
+		CreateMap<NegativeLocationModel, dynamic>();
+        CreateMap<QuicklyBOMProductModel, dynamic>();
+
+    }
 
 }
