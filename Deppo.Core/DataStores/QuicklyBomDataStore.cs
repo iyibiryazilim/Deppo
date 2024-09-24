@@ -67,7 +67,7 @@ namespace Deppo.Core.DataStores
 
         public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsWorkOrder(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
         {
-            var content = new StringContent(JsonConvert.SerializeObject(ProductQuery(firmNumber, periodNumber, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(ProductQueryWorkOrder(firmNumber, periodNumber, search, skip, take)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -163,7 +163,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
         private string ProductQueryWorkOrder(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
         {
-            string baseQuery = $@"SELECT
+            string baseQuery = $@"Select
 [ReferenceId] = ITEMS.LOGICALREF,
 [Code] = ITEMS.CODE,
 [Name] = ITEMS.NAME,
@@ -181,13 +181,16 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 [BrandReferenceId] = ISNULL(BRAND.LOGICALREF,0),
 [BrandCode] = ISNULL(BRAND.CODE,''),
 [BrandName] = ISNULL(BRAND.DESCR,''),
-[StockQuantity] = ISNULL((SELECT SUM(ONHAND) FROM LV_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STINVTOT AS STINVTOT WITH(NOLOCK) WHERE STINVTOT.STOCKREF = ITEMS.LOGICALREF),0)
-
-FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS WITH(NOLOCK)
-LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON ITEMS.UNITSETREF = UNITSETF.LOGICALREF
-LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(NOLOCK) ON UNITSETF.LOGICALREF = UNITSETL.UNITSETREF AND UNITSETL.MAINUNIT = 1
+[WarehouseNumber] = ISNULL(WAREHOUSE.NR, 0),
+[WarehouseName] = ISNULL(WAREHOUSE.NAME , ''),
+[StockQuantity] = 0 
+from LG_{firmNumber.ToString().PadLeft(3, '0')}_STCOMPLN as STCOMPLN WITH(NOLOCK)
+LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS as ITEMS WITH(NOLOCK) ON STCOMPLN.MAINCREF = ITEMS.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_MARK AS BRAND WITH(NOLOCK) ON ITEMS.MARKREF = BRAND.LOGICALREF
-WHERE ITEMS.ACTIVE = 0 AND ITEMS.MOLD = 0 AND  TOOL = 0 AND ITEMS.CARDTYPE  IN(11,12) AND ITEMS.UNITSETREF <> 0";
+LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(NOLOCK) ON STCOMPLN.UOMREF = UNITSETL.LOGICALREF
+LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON UNITSETL.UNITSETREF = UNITSETF.LOGICALREF
+LEFT JOIN L_CAPIWHOUSE AS WAREHOUSE WITH(NOLOCK) ON STCOMPLN.SOURCEINDEX = WAREHOUSE.NR AND WAREHOUSE.FIRMNR = {firmNumber}
+WHERE STCOMPLN.LINENO_ = 1";
 
             if (!string.IsNullOrEmpty(search))
                 baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";
