@@ -59,7 +59,7 @@
                         RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="countingModel:NegativeProductModel">
-                    <SwipeView Threshold="100">
+                    <!--<SwipeView Threshold="100">
                         <SwipeView.RightItems>
                             <SwipeItemView BackgroundColor="Red">
                                 <Label HorizontalOptions="Center"
@@ -68,12 +68,12 @@
 
                                     <Label.FormattedText>
                                         <FormattedString>
-                                            <!--<Span FontAttributes="Bold"
+                                            --><!--<Span FontAttributes="Bold"
                                                       FontFamily="FAS"
                                                       FontSize="Medium"
                                                       Text="{x:Static fontAwesome:FontAwesomeIcons.Trash}"
                                                       TextColor="White" />
-                                            <Span Text=" " />-->
+                                            <Span Text=" " />--><!--
                                             <Span FontSize="Medium"
                                                   Text="Sıfırla"
                                                   TextColor="White" />
@@ -81,7 +81,7 @@
                                     </Label.FormattedText>
                                 </Label>
                             </SwipeItemView>
-                        </SwipeView.RightItems>
+                        </SwipeView.RightItems>-->
                         <Border Grid.Row="1"
                                 Padding="10"
                                 BackgroundColor="Transparent"
@@ -152,7 +152,7 @@
                             </Grid>
                         </Border>
 
-                    </SwipeView>
+                    <!--</SwipeView>-->
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>

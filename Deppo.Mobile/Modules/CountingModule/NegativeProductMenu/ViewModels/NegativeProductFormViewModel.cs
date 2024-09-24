@@ -55,12 +55,16 @@ public partial class NegativeProductFormViewModel : BaseViewModel
 
 		ItemTappedCommand = new Command<NegativeProductBasketModel>(async (item) => await ItemTappedAsync(item));
         SaveCommand = new Command(async () => await SaveAsync());
+		BottomSheetCloseCommand = new Command(async () => await BottomSheetCloseAsync());
+		BackCommand = new Command(async () => await BackAsync());
 	}
 
 	public Page CurrentPage { get; set; } = null!;
 
     public Command<NegativeProductBasketModel> ItemTappedCommand { get; }
     public Command SaveCommand { get; }
+	public Command BottomSheetCloseCommand { get; }
+	public Command BackCommand { get; }
 
     private async Task ItemTappedAsync(NegativeProductBasketModel basketModel)
     {
@@ -181,6 +185,8 @@ public partial class NegativeProductFormViewModel : BaseViewModel
 					resultModel.PageTitle = "Ambar Sayım fişi";
 					resultModel.PageCountToBack = 3;
 
+					await ClearFormAsync();
+
 					if (_userDialogs.IsHudShowing)
 						_userDialogs.HideHud();
 
@@ -219,4 +225,61 @@ public partial class NegativeProductFormViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+    private async Task BottomSheetCloseAsync()
+    {
+		await MainThread.InvokeOnMainThreadAsync(() =>
+		{
+			CurrentPage.FindByName<BottomSheet>("productList").State = BottomSheetState.Hidden;
+		});
+	}
+
+	private async Task ClearFormAsync()
+	{
+		try
+		{
+			SpecialCode = string.Empty;
+			DocumentNumber = string.Empty;
+			DocumentTrackingNumber = string.Empty;
+			Description = string.Empty;
+			TransactionDate = DateTime.Now;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+			
+		}
+	}
+
+	private async Task BackAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var confirm = await _userDialogs.ConfirmAsync("Form verileri silinecektir. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+			if (!confirm)
+				return;
+
+			await ClearFormAsync();
+
+			await Shell.Current.GoToAsync("..");
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 }
