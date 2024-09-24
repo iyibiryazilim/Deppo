@@ -12,6 +12,10 @@ using Deppo.Mobile.Core.Models.CountingModels;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using DevExpress.Maui.Controls;
+using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
+using Deppo.Mobile.Core.Models.TransferModels;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.TransferProductProcess.Views;
+using Deppo.Mobile.Modules.CountingModule.NegativeProductMenu.Views;
 
 namespace Deppo.Mobile.Modules.CountingModule.NegativeProductMenu.ViewModels;
 
@@ -24,15 +28,21 @@ public partial class NegativeProductListViewModel : BaseViewModel
 	#region Collections
 	public ObservableCollection<NegativeProductModel> Items { get; } = new();
 
-	public ObservableCollection<NegativeWarehouseModel> NegativeWarehouses { get; } = new();
-	#endregion
+    public ObservableCollection<NegativeProductModel> SelectedNegativeProducts { get; } = new();
 
-	#region Properties
-	[ObservableProperty]
+    public ObservableCollection<NegativeWarehouseModel> NegativeWarehouses { get; } = new();
+
+    public ObservableCollection<NegativeWarehouseModel> SelectedNegativeWarehouses { get;} = new();
+
+    public ObservableCollection<NegativeProductBasketModel> NegativeBasketModels { get; set; } = new();
+    #endregion
+
+    #region Properties
+    [ObservableProperty]
 	string searchText = string.Empty;
 
     [ObservableProperty]
-    NegativeProductModel selectedItem;
+    NegativeProductModel selectedItem = new();
 	#endregion
 	public NegativeProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IWarehouseCountingService warehouseCountingService)
     {
@@ -47,6 +57,7 @@ public partial class NegativeProductListViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         RefreshPageCommand = new Command(async () => await RefreshPageAsync());
         ItemTappedCommand = new Command<NegativeProductModel>(ItemTappedAsync);
+        NextViewCommand = new Command(async () => await NextViewAsync());
 
     }
     public Page CurrentPage { get; set; } = null!;
@@ -58,9 +69,12 @@ public partial class NegativeProductListViewModel : BaseViewModel
     public Command<SearchBar> PerformSearchCommand { get; }
     public Command RefreshPageCommand { get; }
     public Command ItemTappedCommand { get; }
+
+    public Command NextViewCommand { get; }
+
     #endregion
 
-   
+
 
     public async Task LoadItemsAsync()
     {
@@ -213,11 +227,44 @@ public partial class NegativeProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
+
             SelectedItem = negativeProductModel;
+            SelectedItem.NegativeWarehouses = new();
 
-            await LoadNegativeWarehousesAsync();
 
-            CurrentPage.FindByName<BottomSheet>("negativeWarehouseBottomSheet").State = BottomSheetState.HalfExpanded;
+
+            if (SelectedItem is not null)
+            {
+                if (SelectedItem.IsSelected)
+                {
+                    Items.FirstOrDefault(x => x.ProductReferenceId == negativeProductModel.ProductReferenceId).IsSelected = false;
+                    SelectedNegativeProducts.Remove(SelectedNegativeProducts.FirstOrDefault(x => x.ProductReferenceId == SelectedItem.ProductReferenceId));
+                    foreach (var warehouse in NegativeWarehouses)
+                    {
+                        warehouse.IsSelected = false;
+                        SelectedNegativeWarehouses.Remove(SelectedNegativeWarehouses.FirstOrDefault(x=>x.WarehouseReferenceId == warehouse.WarehouseReferenceId));
+                        SelectedItem.NegativeWarehouses.Remove(warehouse);
+                    }
+                }
+                else
+                {
+                    Items.FirstOrDefault(x => x.ProductReferenceId == negativeProductModel.ProductReferenceId).IsSelected = true;
+
+                    await LoadNegativeWarehousesAsync();
+
+
+                    foreach (var warehouse in NegativeWarehouses)
+                    {
+                        warehouse.IsSelected = true;
+                        SelectedNegativeWarehouses.Add(warehouse);
+                        SelectedItem.NegativeWarehouses.Add(warehouse);
+                    }
+
+                    SelectedNegativeProducts.Add(SelectedItem);
+                }
+            }
+
+            
 
         }
         catch (Exception ex)
@@ -242,20 +289,10 @@ public partial class NegativeProductListViewModel : BaseViewModel
 
             SelectedItem = negativeProductModel;
 
-            // Sadece Raf takipli olma durumu
-            if(SelectedItem.LocTracking == 1 && (SelectedItem.TrackingType == 0))
-            {
+            await LoadNegativeWarehousesAsync();
 
-            }
-            else if(SelectedItem.LocTracking == 1 && (SelectedItem.TrackingType == 1))
-            {
-                //todo:Raf ve Seri takipli olma durumu
-            }
-            // Ne Raf takipli ne de Seri,Lot takipli olma durumu
-            else if(SelectedItem.LocTracking == 0 && (SelectedItem.TrackingType == 0))
-            {
-
-            }
+            CurrentPage.FindByName<BottomSheet>("negativeWarehouseBottomSheet").State = BottomSheetState.HalfExpanded;
+           
 
         }
         catch (Exception ex) 
@@ -276,9 +313,6 @@ public partial class NegativeProductListViewModel : BaseViewModel
         try
         {
             NegativeWarehouses.Clear();
-
-            _userDialogs.ShowLoading("Loading Negative Warehouses...");
-            await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _warehouseCountingService.GetNegativeWarehousesByProductReferenceId(
@@ -307,6 +341,65 @@ public partial class NegativeProductListViewModel : BaseViewModel
             if(_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
             _userDialogs.Alert(ex.Message, "Hata");
+        }
+    }
+
+
+    private async Task NextViewAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            var warehouseProductDictionary = new Dictionary<int, NegativeProductBasketModel>();
+
+            foreach (var selectedNegativeProduct in SelectedNegativeProducts)
+            {
+                foreach (var warehouse in selectedNegativeProduct.NegativeWarehouses)
+                {
+                    if (warehouseProductDictionary.TryGetValue(warehouse.WarehouseReferenceId, out var basket))
+                    {
+                        basket.NegativeProducts.Add(selectedNegativeProduct);
+                    }
+                    else
+                    {
+                        var newBasket = new NegativeProductBasketModel
+                        {
+                            NegativeWarehouseModel = warehouse,
+                            NegativeProducts = new ObservableCollection<NegativeProductModel>{ selectedNegativeProduct }
+                        };
+
+                        warehouseProductDictionary[warehouse.WarehouseReferenceId] = newBasket;
+                    }
+                }
+            }
+
+            NegativeBasketModels = new ObservableCollection<NegativeProductBasketModel>(warehouseProductDictionary.Values.ToList());
+
+
+
+
+            if (SelectedNegativeProducts.Count == 0)
+            {
+                await _userDialogs.AlertAsync("Lütfen en az bir ürün seçiniz.", "Hata", "Tamam");
+                return;
+            }
+
+            await Shell.Current.GoToAsync($"{nameof(NegativeProductFormView)}", new Dictionary<string, object>
+            {
+                [nameof(NegativeProductBasketModel)] = NegativeBasketModels,
+            });
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Core.Models.CountingModels;
 
 public partial class NegativeProductModel : ObservableObject
 {
+
     [ObservableProperty]
     int productReferenceId;
 
@@ -57,5 +59,11 @@ public partial class NegativeProductModel : ObservableObject
 	string trackingTypeIcon = "box-archive";
 
 	public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
+
+    [ObservableProperty]
+    bool isSelected;
+
+    [ObservableProperty]
+    ObservableCollection<NegativeWarehouseModel> negativeWarehouses = new();
 
 }

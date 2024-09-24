@@ -109,6 +109,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Modules\CountingModule\NegativeProductMenu\Views\NegativeProductFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\LoginModule\Views\CompanyListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
