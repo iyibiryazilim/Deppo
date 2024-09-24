@@ -75,7 +75,7 @@ public partial class ManuelCalcWarehouseProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            await Shell.Current.GoToAsync($"{nameof(VirmanProductInWarehouseListView)}", new Dictionary<string, object>
+            await Shell.Current.GoToAsync($"{nameof(ManuelCalcSubProductWarehouseViewModel)}", new Dictionary<string, object>
             {
                 
                 [nameof(QuicklyBOMProductModel)] = SelectedProduct
