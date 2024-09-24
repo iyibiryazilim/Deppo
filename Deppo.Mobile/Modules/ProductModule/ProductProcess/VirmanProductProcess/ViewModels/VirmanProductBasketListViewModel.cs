@@ -13,6 +13,7 @@ using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseD
 using DevExpress.Maui.Controls;
 using DevExpress.Utils.Filtering.Internal;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.ViewModels;
 
@@ -498,7 +499,7 @@ ILocationService locationService, ILocationTransactionService locationTransactio
         {
             IsBusy = true;
 
-            if (VirmanBasketModel.InVirmanQuantity > 0)
+            if (VirmanBasketModel.OutVirmanQuantity > 0)
             {
                 if (VirmanBasketModel.InVirmanProduct.LocTracking == 1)
                 {
@@ -512,11 +513,9 @@ ILocationService locationService, ILocationTransactionService locationTransactio
                 }
             }
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-            await _userDialogs.AlertAsync(e.Message, "Hata", "Tamam");
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
@@ -543,11 +542,9 @@ ILocationService locationService, ILocationTransactionService locationTransactio
                 VirmanBasketModel.InVirmanQuantity = VirmanBasketModel.OutVirmanQuantity;
             }
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-            await _userDialogs.AlertAsync(e.Message, "Hata", "Tamam");
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
@@ -610,6 +607,15 @@ ILocationService locationService, ILocationTransactionService locationTransactio
 
                 foreach (var item in result.Data)
                     Locations.Add(Mapping.Mapper.Map<LocationModel>(item));
+                foreach (var location in Locations)
+                {
+                    var matchingItem = VirmanBasketModel.InVirmanProduct.Locations.FirstOrDefault(item => item.ReferenceId == location.ReferenceId);
+                    Console.WriteLine(virmanBasketModel.InVirmanProduct.Locations);
+                    if (matchingItem != null)
+                    {
+                        location.InputQuantity = matchingItem.InputQuantity;
+                    }
+                }
             }
         }
         catch (Exception ex)
@@ -672,26 +678,32 @@ ILocationService locationService, ILocationTransactionService locationTransactio
         try
         {
             IsBusy = true;
-            if (Locations.Count > 0 && SelectedLocations.Count > 0)
+            if (Locations.Count > 0 )
             {
-                double counts = 0;
-                foreach (var i in VirmanBasketModel.InVirmanProduct.Locations)
-                {
-                    counts += i.InputQuantity;
-                }
                 
+                double count = (double)Locations.Where(x => x.InputQuantity > 0).Sum(x => x.InputQuantity);
 
-
-                if (counts != VirmanBasketModel.OutVirmanQuantity)
+                if(count != VirmanBasketModel.OutVirmanQuantity)
                 {
-                    _userDialogs.Alert("Miktarlar eşit olmalıdır.", "Hata", "Tamam");
+                    _userDialogs.Alert("Miktar Eşit Değil.", "Hata", "Tamam");
                     return;
                 }
+                
                 else
                 {
-                    foreach (var i in SelectedLocations)
+                    foreach (var i in Locations.Where(x=>x.InputQuantity > 0))
                     {
-                        VirmanBasketModel.InVirmanProduct.Locations.Add(i);
+
+                        if(VirmanBasketModel.InVirmanProduct.Locations.Any(x=>x.ReferenceId == i.ReferenceId))
+                        {
+                            var location = VirmanBasketModel.InVirmanProduct.Locations.FirstOrDefault(x => x.ReferenceId == i.ReferenceId);
+                            location.InputQuantity = i.InputQuantity;
+                        }
+                        else
+                        {
+                            VirmanBasketModel.InVirmanProduct.Locations.Add(i);
+                        }
+
                     }
                     CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
                 }
@@ -716,42 +728,32 @@ ILocationService locationService, ILocationTransactionService locationTransactio
     private async Task LocationIncreaseAsync(LocationModel locationModel)
     {
 
-        if (IsBusy) return;
+        if (IsBusy)
+            return;
+
         try
         {
             IsBusy = true;
-            if (SelectedLocations.Count == 0)
+            
+                double count = (double)Locations.Where(x => x.InputQuantity > 0).Sum(x=>x.InputQuantity);
+            
+            if(count >= VirmanBasketModel.OutVirmanQuantity)
             {
-                TotalQuantity = 0;
+                                _userDialogs.Alert("Miktar Daha Fazla Arttırılamaz.", "Hata", "Tamam");
+                return;
             }
-
-            if (!SelectedLocations.Any(x => x.ReferenceId == locationModel.ReferenceId))
+           
+            else if (locationModel is not null)
             {
-                SelectedLocations.Add(locationModel);
-              
+                    locationModel.InputQuantity++;
             }
-
-            if (locationModel.InputQuantity >= virmanBasketModel.InVirmanQuantity)
-            {
-                await _userDialogs.AlertAsync("Çıkış Ürün Miktarından Fazla Giriş Ürünü Olamaz", "Hata", "Tamam");
-            }
-            else if ( TotalQuantity < VirmanBasketModel.OutVirmanQuantity)
-            {
-                TotalQuantity = TotalQuantity + 1;
-                locationModel.InputQuantity = locationModel.InputQuantity + 1;
-
-            }
-            else if (totalQuantity >= VirmanBasketModel.OutVirmanQuantity)
-            {
-                await _userDialogs.AlertAsync("Çıkış Ürün Miktarından Fazla Giriş Ürünü Olamaz", "Hata", "Tamam");
-            }
-
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
-            await _userDialogs.AlertAsync(e.Message, "Hata", "Tamam");
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
         finally
         {
@@ -761,34 +763,31 @@ ILocationService locationService, ILocationTransactionService locationTransactio
 
     private async Task LocationDecraseAsync(LocationModel locationModel)
     {
-        if (IsBusy) return;
+        if (IsBusy)
+            return;
+
+
+
         try
         {
             IsBusy = true;
 
-            if (SelectedLocations.Count == 0)
+            if (locationModel is not null)
             {
-                TotalQuantity = 0;
-            }
+                if (locationModel.InputQuantity > 0)
+                    locationModel.InputQuantity--;
 
+                if (locationModel.InputQuantity == 0)
+                    locationModel.IsSelected = false;
 
-            if (locationModel.InputQuantity > 0)
-            {
-                TotalQuantity = TotalQuantity - 1;
-                locationModel.InputQuantity = locationModel.InputQuantity - 1;
             }
-            else
-            {
-                SelectedLocations.Remove(locationModel);
-                VirmanBasketModel.InVirmanProduct.Locations.Remove(locationModel);
-            }
-
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
-            await _userDialogs.AlertAsync(e.Message, "Hata", "Tamam");
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
         finally
         {
