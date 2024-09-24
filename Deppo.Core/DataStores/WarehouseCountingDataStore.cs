@@ -233,7 +233,7 @@ FETCH NEXT {take} ROWS ONLY;";
 
             baseQuery += @$"
 ORDER BY 
-    LGMAIN.NR DESC
+    LGMAIN.NR ASC
 OFFSET {skip} ROWS 
 FETCH NEXT {take} ROWS ONLY;";
 
