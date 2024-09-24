@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Core.Models.CountingModels
 {
@@ -42,5 +43,9 @@ namespace Deppo.Mobile.Core.Models.CountingModels
 
         [ObservableProperty]
         double stockQuantity;
+
+        [ObservableProperty]
+        bool isSelected;
+
     }
 }
