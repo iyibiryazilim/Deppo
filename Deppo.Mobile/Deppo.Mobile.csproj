@@ -257,6 +257,21 @@
 	  <MauiXaml Update="Modules\PurchaseModule\SupplierMenu\Views\SupplierOutputTransactionView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\Manuel\Views\ManuelCalcView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\Manuel\Views\ManuelCalcWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\Manuel\Views\ManuelCalcWarehouseProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\Manuel\Views\ManuelFormListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\Manuel\Views\ManuelProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\ResultModule\Views\InsertFailurePageView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -357,6 +372,8 @@
 	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/OutputOutsourceProcess/OutputOutsourceWorkOrder/" />
 	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/OutputOutsourceProcess/OutputOutsourceWorkOrder/ViewModels/" />
 	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/OutputOutsourceProcess/OutputOutsourceWorkOrder/Views/" />
+	  <Folder Include="Modules\QuicklyProductionModule\QuicklyProductionProcess\WorkOrder\ViewModels\" />
+	  <Folder Include="Modules\QuicklyProductionModule\QuicklyProductionProcess\WorkOrder\Views\" />
 	</ItemGroup>
 
 </Project>

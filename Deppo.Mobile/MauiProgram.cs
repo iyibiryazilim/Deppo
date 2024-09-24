@@ -74,6 +74,8 @@ using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionBOMMenu.View
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionBOMMenu.Views;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionPanel.ViewModels;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionPanel.Views;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.Views;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.ViewModels;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Views;
 using Deppo.Mobile.Modules.ResultModule.ViewModels;
@@ -470,6 +472,16 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddSingletonWithShellRoute<QuicklyProductionPanelView, QuicklyProductionPanelViewModel>(nameof(QuicklyProductionPanelView));
         builder.Services.AddSingletonWithShellRoute<QuicklyProductionBOMMenuView, QuicklyProductionBOMMenuViewModel>(nameof(QuicklyProductionBOMMenuView));
         builder.Services.AddSingletonWithShellRoute<QuicklyProductionProcessView, QuicklyProductionProcessViewModel>(nameof(QuicklyProductionProcessView));
+
+        #region Quickly Production Manuel
+
+        builder.Services.AddSingletonWithShellRoute<ManuelProductListView, ManuelProductListViewModel>(nameof(ManuelProductListView));
+        builder.Services.AddScopedWithShellRoute<ManuelCalcView, ManuelCalcViewModel>(nameof(ManuelCalcView));
+        builder.Services.AddTransientWithShellRoute<ManuelCalcWarehouseListView, ManuelCalcWarehouseListViewModel>(nameof(ManuelCalcWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<ManuelCalcWarehouseProductListView, ManuelCalcWarehouseProductListViewModel>(nameof(ManuelCalcWarehouseProductListView));
+        builder.Services.AddTransientWithShellRoute<ManuelFormListView, ManuelFormListViewModel>(nameof(ManuelFormListView));
+
+        #endregion Quickly Production Manuel
 
         #endregion Quickly Production Modules
 
