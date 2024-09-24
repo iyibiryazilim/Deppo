@@ -109,6 +109,21 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Modules\CountingModule\CountingProcess\WarehouseCountingProcess\Views\WarehouseCountingBasketView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\CountingProcess\WarehouseCountingProcess\Views\WarehouseCountingFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\CountingProcess\WarehouseCountingProcess\Views\WarehouseCountingLocationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\CountingProcess\WarehouseCountingProcess\Views\WarehouseCountingProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\CountingProcess\WarehouseCountingProcess\Views\WarehouseCountingWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\CountingModule\NegativeProductMenu\Views\NegativeProductFormView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
