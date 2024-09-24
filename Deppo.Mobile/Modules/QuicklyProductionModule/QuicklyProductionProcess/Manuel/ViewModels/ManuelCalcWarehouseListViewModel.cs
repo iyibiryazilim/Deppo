@@ -205,6 +205,10 @@ public partial class ManuelCalcWarehouseListViewModel : BaseViewModel
                 QuicklyBasket.WarehouseName = SelectedWarehouseModel.Name;
                 QuicklyBasket.WarehouseNumber = SelectedWarehouseModel.Number;
 
+                QuicklyBasket.QuicklyBomProduct.WarehouseName = SelectedWarehouseModel.Name;
+                QuicklyBasket.QuicklyBomProduct.WarehouseNumber = SelectedWarehouseModel.Number;
+
+
                 await Shell.Current.GoToAsync($"{nameof(ManuelCalcView)}", new Dictionary<string, object>
                 {
                     [nameof(ManuelCalcViewModel)] = QuicklyBasket
