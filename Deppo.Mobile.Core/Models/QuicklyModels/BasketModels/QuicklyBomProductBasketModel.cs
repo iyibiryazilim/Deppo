@@ -19,5 +19,5 @@ public partial class QuicklyBomProductBasketModel : ObservableObject
 
 
     [ObservableProperty]
-    public ObservableCollection<QuicklyBomSubProductModel> lastTransactions  = new();
+    public ObservableCollection<QuicklyBomSubProductModel> subProducts  = new();
 }
