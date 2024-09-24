@@ -21,8 +21,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.ViewModels;
-[QueryProperty(name: nameof(VirmanBasketModel), queryId: nameof(VirmanBasketModel))]
 
+[QueryProperty(name: nameof(VirmanBasketModel), queryId: nameof(VirmanBasketModel))]
 public partial class VirmanProductFormListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -32,35 +32,28 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
 
     private readonly IConsumableTransactionService _consumableTransactionService;
 
-
     private readonly IUserDialogs _userDialogs;
 
+    [ObservableProperty]
+    private VirmanBasketModel virmanBasketModel = null!;
 
     [ObservableProperty]
-    VirmanBasketModel virmanBasketModel = null!;
+    private DateTime ficheDate = DateTime.Now;
 
     [ObservableProperty]
-    DateTime ficheDate = DateTime.Now;
-
-
-
+    private string documentNumber = string.Empty;
 
     [ObservableProperty]
-    string documentNumber = string.Empty;
+    private string documentTrackingNumber = string.Empty;
 
     [ObservableProperty]
-    string documentTrackingNumber = string.Empty;
+    private string specialCode = string.Empty;
 
     [ObservableProperty]
-    string specialCode = string.Empty;
+    private string description = string.Empty;
 
     [ObservableProperty]
-    string description = string.Empty;
-
-    [ObservableProperty]
-    string code = string.Empty;
-
-
+    private string code = string.Empty;
 
     public VirmanProductFormListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ITransferTransactionService transferTransactionService, IProductionTransactionService productionTransactionService, IConsumableTransactionService consumableTransactionService)
     {
@@ -80,9 +73,6 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
     public Command LoadPageCommand { get; }
     public Command BackCommand { get; }
     public Command SaveCommand { get; }
-
-
-
 
     private async Task SaveAsync()
     {
@@ -165,7 +155,6 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
         }
     }
 
-
     private async Task<DataResult<ResponseModel>> ConsumableInsert(HttpClient httpClient)
     {
         var consumableTransactionDto = new ConsumableTransactionInsert
@@ -179,7 +168,6 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
             FirmNumber = _httpClientService.FirmNumber,
             SpeCode = SpecialCode,
             WarehouseNumber = VirmanBasketModel.OutVirmanWarehouse.Number,
-
         };
 
         foreach (var item in VirmanBasketModel.OutVirmanProduct.LocationTransactionModels)
@@ -191,7 +179,7 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
                 Quantity = item.Quantity,
                 ConversionFactor = 1,
                 OtherConversionFactor = 1,
-                SubUnitsetCode = item.SubUnitsetCode,
+                SubUnitsetCode = VirmanBasketModel.OutVirmanProduct.SubUnitsetCode,
             };
 
             foreach (var detail in VirmanBasketModel.OutVirmanProduct.LocationTransactionModels)
@@ -201,15 +189,17 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
                     var seriLotTransactionDto = new SeriLotTransactionDto
                     {
                         StockLocationCode = detail.LocationCode,
-                        Quantity = detail.OutputQuantity,
+                        Quantity = detail.Quantity,
                         ConversionFactor = 1,
                         OtherConversionFactor = 1,
                         DestinationStockLocationCode = string.Empty,
+                        SubUnitsetCode = VirmanBasketModel.OutVirmanProduct.SubUnitsetCode,
+                        InProductTransactionLineReferenceId = detail.TransactionReferenceId,
+                        OutProductTransactionLineReferenceId = detail.ReferenceId,
                     };
 
                     consumableTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
                 }
-
             }
             consumableTransactionDto.Lines.Add(consumableTransactionLineDto);
         }
@@ -222,7 +212,6 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
     {
         var productionTransactionDto = new ProductionTransactionInsert
         {
-
             SpeCode = SpecialCode,
             CurrentCode = string.Empty,
             Code = string.Empty,
@@ -244,7 +233,6 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
                 ConversionFactor = 1,
                 OtherConversionFactor = 1,
                 SubUnitsetCode = VirmanBasketModel.InVirmanProduct.SubUnitsetCode,
-
             };
 
             foreach (var detail in VirmanBasketModel.InVirmanProduct.Locations)
@@ -262,7 +250,6 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
 
                     productionTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
                 }
-
             }
 
             productionTransactionDto.Lines.Add(productionTransactionLineDto);
@@ -271,8 +258,6 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
         var result2 = await _productionTransactionService.InsertProductionTransaction(httpClient, productionTransactionDto, _httpClientService.FirmNumber);
         return result2;
     }
-
-
 
     private async Task BackAsync()
     {
@@ -303,7 +288,6 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
         }
     }
 
-
     private async Task ClearFormAsync()
     {
         try
@@ -315,9 +299,7 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
     }
-
 }
