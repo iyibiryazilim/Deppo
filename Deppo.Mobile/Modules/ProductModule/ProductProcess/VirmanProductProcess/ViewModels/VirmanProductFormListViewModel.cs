@@ -1,9 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.DataResultModel;
 using Deppo.Core.DTOs.ConsumableTransaction;
 using Deppo.Core.DTOs.ProductionTransaction;
 using Deppo.Core.DTOs.SeriLotTransactionDto;
 using Deppo.Core.DTOs.TransferTransaction;
+using Deppo.Core.ResponseResultModels;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.TransferModels;
 using Deppo.Mobile.Core.Models.VirmanModels;
@@ -35,13 +37,13 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
 
 
     [ObservableProperty]
-    VirmanBasketModel virmanBasketModel= null!;
+    VirmanBasketModel virmanBasketModel = null!;
 
     [ObservableProperty]
     DateTime ficheDate = DateTime.Now;
 
 
-   
+
 
     [ObservableProperty]
     string documentNumber = string.Empty;
@@ -55,6 +57,9 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
     [ObservableProperty]
     string description = string.Empty;
 
+    [ObservableProperty]
+    string code = string.Empty;
+
 
 
     public VirmanProductFormListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ITransferTransactionService transferTransactionService, IProductionTransactionService productionTransactionService, IConsumableTransactionService consumableTransactionService)
@@ -65,6 +70,7 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
 
         Title = "Virman Formu";
         SaveCommand = new Command(async () => await SaveAsync());
+        BackCommand = new Command(async () => await BackAsync());
         _productionTransactionService = productionTransactionService;
         _consumableTransactionService = consumableTransactionService;
     }
@@ -74,9 +80,8 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
     public Command LoadPageCommand { get; }
     public Command BackCommand { get; }
     public Command SaveCommand { get; }
-    public Command ShowBasketItemCommand { get; }
 
-    
+
 
 
     private async Task SaveAsync()
@@ -88,179 +93,59 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
             IsBusy = true;
             _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
             await Task.Delay(1000);
+            ResultModel resultModel = new();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
+            DataResult<ResponseModel> result = await ConsumableInsert(httpClient);
 
-
-            var consumableTransactionDto = new ConsumableTransactionInsert
-            {
-                Code = "",
-                CurrentCode = "",
-                Description = Description,
-                DoCode = DocumentNumber,
-                DocTrackingNumber = DocumentTrackingNumber,
-                TransactionDate = FicheDate,
-                FirmNumber = _httpClientService.FirmNumber,
-                SpeCode = SpecialCode,
-                WarehouseNumber = VirmanBasketModel.OutVirmanWarehouse.Number,
-
-            };
-
-            foreach (var item in VirmanBasketModel.OutVirmanProduct.LocationTransactionModels)
-            {
-                var consumableTransactionLineDto = new ConsumableTransactionLineDto
-                {
-                    ProductCode = item.ItemCode,
-                    WarehouseNumber = VirmanBasketModel.OutVirmanWarehouse.Number,
-                    Quantity = item.Quantity,
-                    ConversionFactor = 1,
-                    OtherConversionFactor = 1,
-                    SubUnitsetCode = item.SubUnitsetCode,
-                };
-
-                foreach (var detail in VirmanBasketModel.OutVirmanProduct.LocationTransactionModels)
-                {
-                    if (item.ReferenceId == detail.ReferenceId)
-                    {
-                        var seriLotTransactionDto = new SeriLotTransactionDto
-                        {
-                            StockLocationCode = detail.LocationCode,
-                            Quantity = detail.OutputQuantity,
-                            ConversionFactor = 1,
-                            OtherConversionFactor = 1,
-                            DestinationStockLocationCode = string.Empty,
-                        };
-
-                        consumableTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
-                    }
-
-                }
-                consumableTransactionDto.Lines.Add(consumableTransactionLineDto);
-            }
-
-            var result = await _consumableTransactionService.InsertConsumableTransaction(httpClient, consumableTransactionDto, _httpClientService.FirmNumber);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            var productionTransactionDto = new ProductionTransactionInsert
-            {
-                SpeCode = SpecialCode,
-                CurrentCode = string.Empty,
-                Code = string.Empty,
-                DocTrackingNumber = DocumentTrackingNumber,
-                DoCode = DocumentNumber,
-                TransactionDate = FicheDate,
-                FirmNumber = _httpClientService.FirmNumber,
-                WarehouseNumber = VirmanBasketModel.InVirmanWarehouse.Number,
-                Description = Description,
-            };
-
-            foreach (var item in VirmanBasketModel.InVirmanProduct.Locations)
-            {
-                var productionTransactionLineDto = new ProductionTransactionLineDto
-                {
-                    ProductCode = VirmanBasketModel.InVirmanProduct.Code,
-                    WarehouseNumber = VirmanBasketModel.InVirmanWarehouse.Number,
-                    Quantity = item.InputQuantity,
-                    ConversionFactor = 1,
-                    OtherConversionFactor = 1,
-                    SubUnitsetCode = VirmanBasketModel.InVirmanProduct.SubUnitsetCode,
-                };
-
-                foreach (var detail in VirmanBasketModel.InVirmanProduct.Locations)
-                {
-                    if(item.Code == detail.Code)
-                    {
-                        var seriLotTransactionDto = new SeriLotTransactionDto
-                        {
-                            StockLocationCode = detail.Code,
-                            Quantity = detail.InputQuantity,
-                            ConversionFactor = 1,
-                            OtherConversionFactor = 1,
-                            DestinationStockLocationCode = string.Empty,
-                        };
-
-                        productionTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
-                    }
-                    
-                }
-
-                productionTransactionDto.Lines.Add(productionTransactionLineDto);
-            }
-
-            var result2 = await _productionTransactionService.InsertProductionTransaction(httpClient, productionTransactionDto, _httpClientService.FirmNumber);
-
-
-            ResultModel resultModel = new();
             if (result.IsSuccess)
             {
-                resultModel.Message = "Sarf Başarılı";
-                resultModel.Code = result.Data.Code;
-                resultModel.PageTitle = Title;
-                resultModel.PageCountToBack = 1;
+                code += result.Data.Code;
+                resultModel.Code += "Sarf Numarası :" + code;
 
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.HideHud();
+                DataResult<ResponseModel> result2 = await ProductionInsert(httpClient);
 
-                await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
+                if (result2.IsSuccess && result.IsSuccess)
                 {
-                    [nameof(ResultModel)] = resultModel
-                });
+                    code = code + " " + result2.Data.Code;
+                    resultModel.Message = "Virman için Üretimden Giriş Ve Sarf Başarılı";
+                    resultModel.Code = resultModel.Code + " Üretimden Giriş Numarası" + result2.Data.Code;
+                    resultModel.PageTitle = Title;
+                    resultModel.PageCountToBack = 7;
+
+                    if (_userDialogs.IsHudShowing)
+                        _userDialogs.HideHud();
+
+                    await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
+                    {
+                        [nameof(ResultModel)] = resultModel
+                    });
+                }
+                else if (result.IsSuccess && !result2.IsSuccess)
+                {
+                    if (_userDialogs.IsHudShowing)
+                        _userDialogs.HideHud();
+
+                    resultModel.Message = "Virman Için Sarf Başarılı Üretimden Giriş Başarısız";
+                    resultModel.Code = resultModel.Code;
+                    resultModel.PageTitle = Title;
+                    resultModel.PageCountToBack = 7;
+                    await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+                    {
+                        [nameof(ResultModel)] = resultModel
+                    });
+                }
             }
             else
             {
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();
 
-                resultModel.Message = "Sarf Başarısız";
-                resultModel.PageTitle = Title;
+                resultModel.Message = "Virman Başarısız";
+                resultModel.PageTitle = "Virman İşlemi";
                 resultModel.PageCountToBack = 1;
-                await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
-                {
-                    [nameof(ResultModel)] = resultModel
-                });
-            }
+                resultModel.ErrorMessage = result.Message;
 
-
-            if (result2.IsSuccess)
-            {
-                resultModel.Message = "Üretimden Giriş Başarılı";
-                resultModel.Code = result2.Data.Code;
-                resultModel.PageTitle = Title;
-                resultModel.PageCountToBack = 7;
-
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.HideHud();
-
-                await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
-                {
-                    [nameof(ResultModel)] = resultModel
-                });
-            }
-            else
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.HideHud();
-
-                resultModel.Message = "Üretimden Giriş Başarısız";
-                resultModel.PageTitle = Title;
-                resultModel.PageCountToBack = 7;
                 await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
                 {
                     [nameof(ResultModel)] = resultModel
@@ -281,5 +166,158 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
     }
 
 
+    private async Task<DataResult<ResponseModel>> ConsumableInsert(HttpClient httpClient)
+    {
+        var consumableTransactionDto = new ConsumableTransactionInsert
+        {
+            Code = "",
+            CurrentCode = "",
+            Description = Description,
+            DoCode = DocumentNumber,
+            DocTrackingNumber = DocumentTrackingNumber,
+            TransactionDate = FicheDate,
+            FirmNumber = _httpClientService.FirmNumber,
+            SpeCode = SpecialCode,
+            WarehouseNumber = VirmanBasketModel.OutVirmanWarehouse.Number,
+
+        };
+
+        foreach (var item in VirmanBasketModel.OutVirmanProduct.LocationTransactionModels)
+        {
+            var consumableTransactionLineDto = new ConsumableTransactionLineDto
+            {
+                ProductCode = item.ItemCode,
+                WarehouseNumber = VirmanBasketModel.OutVirmanWarehouse.Number,
+                Quantity = item.Quantity,
+                ConversionFactor = 1,
+                OtherConversionFactor = 1,
+                SubUnitsetCode = item.SubUnitsetCode,
+            };
+
+            foreach (var detail in VirmanBasketModel.OutVirmanProduct.LocationTransactionModels)
+            {
+                if (item.ReferenceId == detail.ReferenceId)
+                {
+                    var seriLotTransactionDto = new SeriLotTransactionDto
+                    {
+                        StockLocationCode = detail.LocationCode,
+                        Quantity = detail.OutputQuantity,
+                        ConversionFactor = 1,
+                        OtherConversionFactor = 1,
+                        DestinationStockLocationCode = string.Empty,
+                    };
+
+                    consumableTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
+                }
+
+            }
+            consumableTransactionDto.Lines.Add(consumableTransactionLineDto);
+        }
+
+        var result = await _consumableTransactionService.InsertConsumableTransaction(httpClient, consumableTransactionDto, _httpClientService.FirmNumber);
+        return result;
+    }
+
+    private async Task<DataResult<ResponseModel>> ProductionInsert(HttpClient httpClient)
+    {
+        var productionTransactionDto = new ProductionTransactionInsert
+        {
+
+            SpeCode = SpecialCode,
+            CurrentCode = string.Empty,
+            Code = string.Empty,
+            DocTrackingNumber = DocumentTrackingNumber,
+            DoCode = DocumentNumber,
+            TransactionDate = FicheDate,
+            FirmNumber = _httpClientService.FirmNumber,
+            WarehouseNumber = VirmanBasketModel.InVirmanWarehouse.Number,
+            Description = Description,
+        };
+
+        foreach (var item in VirmanBasketModel.InVirmanProduct.Locations)
+        {
+            var productionTransactionLineDto = new ProductionTransactionLineDto
+            {
+                ProductCode = VirmanBasketModel.InVirmanProduct.Code,
+                WarehouseNumber = VirmanBasketModel.InVirmanWarehouse.Number,
+                Quantity = item.InputQuantity,
+                ConversionFactor = 1,
+                OtherConversionFactor = 1,
+                SubUnitsetCode = VirmanBasketModel.InVirmanProduct.SubUnitsetCode,
+
+            };
+
+            foreach (var detail in VirmanBasketModel.InVirmanProduct.Locations)
+            {
+                if (item.Code == detail.Code)
+                {
+                    var seriLotTransactionDto = new SeriLotTransactionDto
+                    {
+                        StockLocationCode = detail.Code,
+                        Quantity = detail.InputQuantity,
+                        ConversionFactor = 1,
+                        OtherConversionFactor = 1,
+                        DestinationStockLocationCode = string.Empty,
+                    };
+
+                    productionTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
+                }
+
+            }
+
+            productionTransactionDto.Lines.Add(productionTransactionLineDto);
+        }
+
+        var result2 = await _productionTransactionService.InsertProductionTransaction(httpClient, productionTransactionDto, _httpClientService.FirmNumber);
+        return result2;
+    }
+
+
+
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            var result = await _userDialogs.ConfirmAsync("Form verileri silinecektir. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+            if (!result)
+                return;
+
+            await ClearFormAsync();
+
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+
+    private async Task ClearFormAsync()
+    {
+        try
+        {
+            DocumentNumber = string.Empty;
+            SpecialCode = string.Empty;
+            DocumentTrackingNumber = string.Empty;
+            Description = string.Empty;
+        }
+        catch (Exception ex)
+        {
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+    }
 
 }
