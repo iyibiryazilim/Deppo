@@ -10,7 +10,7 @@
              Title="{Binding Title}"
              x:DataType="viewModel:WarehouseCountingWarehouseListViewModel">
     <ContentPage.Behaviors>
-        <!--<toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />-->
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
@@ -28,7 +28,7 @@
 
 
     <Grid RowDefinitions="*,Auto" RowSpacing="10">
-        <CollectionView ItemsSource="{Binding Items}">
+        <CollectionView ItemsSource="{Binding Items}" RemainingItemsThreshold="2" RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="countingModel:WarehouseCountingWarehouseModel">
                     <Border Padding="10"
