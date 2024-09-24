@@ -2,7 +2,7 @@ using Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProce
 
 namespace Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProcess.Views;
 
-public partial class WarehouseCountingWarehouseListView : ContentView
+public partial class WarehouseCountingWarehouseListView : ContentPage
 {
 	private readonly WarehouseCountingWarehouseListViewModel _viewModel;
 	public WarehouseCountingWarehouseListView(WarehouseCountingWarehouseListViewModel viewModel)
