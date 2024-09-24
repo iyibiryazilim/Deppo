@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Core.Models.QuicklyModels
 {
-    public  class QuicklyBOMProductModel : QuicklyBOMProduct
+    public class QuicklyBOMProductModel : QuicklyBOMProduct
     {
-        private int _referenceId;
+        private int _referenceId2;
         private bool _isSelected;
         private string _locTrackingIcon;
         private string _locTrackingIconColor;
@@ -20,16 +20,15 @@ namespace Deppo.Mobile.Core.Models.QuicklyModels
 
         public QuicklyBOMProductModel()
         {
-
         }
 
-        public int ReferenceId
+        public int ReferenceId2
         {
-            get => _referenceId;
+            get => _referenceId2;
             set
             {
-                if (_referenceId == value) return;
-                _referenceId = value;
+                if (_referenceId2 == value) return;
+                _referenceId2 = value;
                 NotifyPropertyChanged();
             }
         }
