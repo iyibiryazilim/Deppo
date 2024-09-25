@@ -500,6 +500,12 @@ public partial class TransferOutProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
+            if(TransferBasketModel.OutProducts.Count == 0)
+            {
+                await _userDialogs.AlertAsync("Lütfen en az bir ürün seçiniz.", "Uyarı", "Tamam");
+                return;
+            }
+
             TransferBasketModel.OutWarehouse = WarehouseModel;
 
             await Shell.Current.GoToAsync($"{nameof(TransferOutBasketView)}", new Dictionary<string, object>

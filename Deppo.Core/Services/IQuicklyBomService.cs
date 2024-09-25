@@ -11,5 +11,7 @@ namespace Deppo.Core.Services
     {
         Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20);
         Task<DataResult<IEnumerable<dynamic>>> GetObjectsWorkOrder(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20);
+
+        Task<DataResult<IEnumerable<dynamic>>> GetObjectsWorkSubProducts(HttpClient httpClient, int firmNumber, int mainProductReferenceId, int periodNumber, string search = "", int skip = 0, int take = 20);
     }
 }

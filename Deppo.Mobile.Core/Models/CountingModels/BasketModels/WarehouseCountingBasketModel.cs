@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Deppo.Mobile.Core.Models.LocationModels;
 using System.Collections.ObjectModel;
 
@@ -51,21 +51,13 @@ public partial class WarehouseCountingBasketModel : ObservableObject
 
 	[ObservableProperty]
 	ObservableCollection<LocationTransactionModel> locationTransactions = new();
+  
+  [ObservableProperty]
+	bool isCompleted;
 
-	[ObservableProperty]
-	bool isSelected;
+	public string CountingText => IsCompleted ? "Sayıldı" : "Bekliyor";
+
+   public string CountingTextColor => IsCompleted ? "#008000" : "#fcf58c";
 
 
-	public string LocTrackingIcon => "location-dot";
-
-	public string LocTrackingIconColor => LocTracking == 1 ? "#F5004F" : "#C8C8C8";
-
-	
-	public string VariantIcon => "bookmark";
-
-	public string VariantIconColor => IsVariant ? "#F5004F" : "#C8C8C8";
-
-	public string TrackingTypeIcon => "box-archive";
-
-	public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 }
