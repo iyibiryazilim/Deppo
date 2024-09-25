@@ -51,16 +51,38 @@ public partial class WarehouseCountingBasketModel : ObservableObject
 
 	[ObservableProperty]
 	ObservableCollection<LocationTransactionModel> locationTransactions = new();
-  
-	[ObservableProperty]
-	bool isCompleted;
 
 	[ObservableProperty]
 	double differenceQuantity = 0;
 
-	public string CountingText => IsCompleted ? "Sayıldı" : "Bekliyor";
+	private bool isCompleted;
+	public bool IsCompleted
+	{
+		get => isCompleted;
+		set
+		{
+			if (SetProperty(ref isCompleted, value))
+			{
+				OnPropertyChanged(nameof(CountingText));
+				OnPropertyChanged(nameof(CountingTextColor));
+			}
+		}
+	}
 
-   public string CountingTextColor => IsCompleted ? "#008000" : "#E6BE0C";
+	private string countingText;
+	public string CountingText
+	{
+		get => IsCompleted ? "Sayıldı" : "Bekliyor";
+		set => SetProperty(ref countingText, value);
+	}
+
+	private string countingTextColor;
+
+	public string CountingTextColor
+	{
+		get => IsCompleted ? "#008000" : "#E6BE0C";
+		set => SetProperty(ref countingTextColor, value);
+	}
 
 
 }

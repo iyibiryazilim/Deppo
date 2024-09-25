@@ -55,19 +55,22 @@
                 <DataTemplate x:DataType="countingBasketModel:WarehouseCountingBasketModel">
                     <SwipeView Threshold="100">
                         <SwipeView.LeftItems>
-                            <SwipeItemView BackgroundColor="{StaticResource Secondary}"
-                                           Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WarehouseCountingProductListViewModel}}, Path=SwipeItemCommand}"
-                                           CommandParameter="{Binding .}">
-                                <Label HorizontalOptions="Center"
-                                       TextColor="White"
-                                       VerticalOptions="Center">
-                                    <Label.FormattedText>
-                                        <FormattedString>
-                                            <Span Text="Durum Değiştir" TextColor="White" />
-                                        </FormattedString>
-                                    </Label.FormattedText>
-                                </Label>
-                            </SwipeItemView>
+                            <SwipeItems Mode="Execute">
+                                <SwipeItemView BackgroundColor="{StaticResource Secondary}"
+                                               Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WarehouseCountingProductListViewModel}}, Path=SwipeItemCommand}"
+                                               CommandParameter="{Binding .}">
+                                    <Label HorizontalOptions="Center"
+                                           TextColor="White"
+                                           VerticalOptions="Center">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="Durum Değiştir" TextColor="White" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </SwipeItemView>
+                            </SwipeItems>
+
                         </SwipeView.LeftItems>
                         <Border Padding="10"
                                 BackgroundColor="Transparent"
