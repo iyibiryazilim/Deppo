@@ -4,6 +4,7 @@ using Deppo.Core.Models;
 using Deppo.Mobile.Core.Models.AnalysisModels;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.CountingModels;
+using Deppo.Mobile.Core.Models.CountingModels.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.LoginModels;
 using Deppo.Mobile.Core.Models.ProductModels;
@@ -68,7 +69,8 @@ public class MappingProfile : Profile
 		CreateMap<NegativeLocationModel, dynamic>();
         CreateMap<QuicklyBOMProductModel, dynamic>();
         CreateMap<WarehouseCountingWarehouseModel, dynamic>();
-        CreateMap<BOMSubProductModel, dynamic>();
+        CreateMap<WarehouseCountingBasketModel, dynamic>();
+		CreateMap<BOMSubProductModel, dynamic>();
 
 
     }

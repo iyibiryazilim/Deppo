@@ -57,7 +57,7 @@ public partial class WarehouseCountingBasketModel : ObservableObject
 
 	public string CountingText => IsCompleted ? "Sayıldı" : "Bekliyor";
 
-   public string CountingTextColor => IsCompleted ? "#008000" : "#fcf58c";
+   public string CountingTextColor => IsCompleted ? "#008000" : "#E6BE0C";
 
 
 }
