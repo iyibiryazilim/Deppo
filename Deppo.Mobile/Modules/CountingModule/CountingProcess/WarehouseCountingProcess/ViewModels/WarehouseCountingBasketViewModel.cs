@@ -48,7 +48,8 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         IncreaseCommand = new Command<WarehouseCountingBasketModel>(async (item) => await IncreaseAsync(item));
         DecreaseCommand = new Command<WarehouseCountingBasketModel>(async (item) => await DecreaseAsync(item));
-        SwipeItemCommand = new Command<WarehouseCountingBasketModel>((item) => SwipeItemAsync(item));
+        SwipeItemCommand = new Command<WarehouseCountingBasketModel>(async (item) => await SwipeItemAsync(item));
+        NextViewCommand = new Command(async () => await NextViewAsync());
 
     }
 
@@ -67,6 +68,8 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
     public Command IncreaseCommand { get; }
     public Command DecreaseCommand { get; }
     public Command SwipeItemCommand { get; }
+    public Command BackCommand { get; }
+    
 
 
 
@@ -166,6 +169,7 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
                 SelectedItem = item;
 
                 item.OutputQuantity++;
+                item.DifferenceQuantity++;
 
             }
         }
@@ -190,10 +194,11 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
 
             if (item is not null)
             {
-                if (item.OutputQuantity > 1 && (item.OutputQuantity - item.StockQuantity) < 0)
+                if (item.OutputQuantity > 1 && (item.OutputQuantity - item.StockQuantity) <= 0)
                 {
                     if (item.LocTracking == 1)
                     {
+                        
                         await LoadLocationTransactionsAsync();
 
                     }
@@ -207,12 +212,14 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
                     else
                     {
                         item.OutputQuantity--;
-                    }
+						item.DifferenceQuantity--;
+					}
                 }
                 else if (item.OutputQuantity > 1 && (item.OutputQuantity - item.StockQuantity) > 0)
                 {
                     item.OutputQuantity--;
-                }
+					item.DifferenceQuantity--;
+				}
 
             }
         }
@@ -231,16 +238,17 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
         try
         {
             LocationTransactions.Clear();
-            _userDialogs.ShowLoading("Load Location Items...");
-            await Task.Delay(1000);
+			
 
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _locationTransactionService.GetInputObjectsAsync(
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 productReferenceId: SelectedItem.ProductReferenceId,
-                warehouseNumber: WarehouseCountingWarehouseModel.Number
+                warehouseNumber: WarehouseCountingWarehouseModel.Number,
+                skip:0,
+                take: 9999999
             );
 
             if (result.IsSuccess)
@@ -252,24 +260,47 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
                     LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
                 }
 
-                if ((SelectedItem.OutputQuantity - SelectedItem.StockQuantity) * -1 > LocationTransactions.Sum(x => x.RemainingQuantity))
+				SelectedItem.DifferenceQuantity--;
+
+
+				if (LocationTransactions.Sum(x => x.RemainingQuantity) > 0)
                 {
-                    await _userDialogs.AlertAsync("Girilen miktarı karşılayacak giriş hareketi bulunamadı", "Uyarı", "Tamam");
-                    return;
-                }
-
-
-                var orderedLocationTransactions = LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
-
-                foreach (var item in orderedLocationTransactions)
-                {
-                    if (item.RemainingQuantity > 0)
+                    SelectedItem.DifferenceQuantity--;
+                    if((SelectedItem.DifferenceQuantity * -1) > LocationTransactions.Sum(x => x.RemainingQuantity))
                     {
-                        item.OutputQuantity = SelectedItem.OutputQuantity > item.RemainingQuantity ? item.RemainingQuantity : SelectedItem.OutputQuantity;
-                        SelectedItem.OutputQuantity -= item.OutputQuantity;
-                        SelectedItem.LocationTransactions.Add(item);
-                    }
+						await _userDialogs.AlertAsync("Girilen miktarı karşılayacak giriş hareketi bulunamadı", "Uyarı", "Tamam");
+						return;
+					}
+					else
+					{
+						SelectedItem.OutputQuantity--;
+
+
+						SelectedItem.LocationTransactions = new();
+
+						var orderedLocationTransactions = LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
+
+						var tempQuantity = SelectedItem.StockQuantity - SelectedItem.OutputQuantity;
+						foreach (var item in orderedLocationTransactions)
+						{
+							if (item.RemainingQuantity > 0 && tempQuantity > 0)
+							{
+								item.OutputQuantity = (tempQuantity) >= item.RemainingQuantity ? item.RemainingQuantity : tempQuantity;
+								//SelectedItem.OutputQuantity--;
+								tempQuantity -= item.OutputQuantity;
+								SelectedItem.LocationTransactions.Add(item);
+							}
+						}
+					}
+
                 }
+                else
+                {
+					await _userDialogs.AlertAsync("Giriş miktarı bulunamadı", "Uyarı", "Tamam");
+					return;
+				}
+                
+                
 
             }
 
@@ -286,7 +317,7 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
     }
 
 
-    private void SwipeItemAsync(WarehouseCountingBasketModel item)
+    private async Task SwipeItemAsync(WarehouseCountingBasketModel item)
     {
         if (IsBusy)
             return;
@@ -306,7 +337,7 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            _userDialogs.Alert(ex.Message);
+            await _userDialogs.AlertAsync(ex.Message);
         }
         finally
         {
