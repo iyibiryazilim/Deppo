@@ -52,8 +52,11 @@ public partial class WarehouseCountingBasketModel : ObservableObject
 	[ObservableProperty]
 	ObservableCollection<LocationTransactionModel> locationTransactions = new();
   
-  [ObservableProperty]
+	[ObservableProperty]
 	bool isCompleted;
+
+	[ObservableProperty]
+	double differenceQuantity = 0;
 
 	public string CountingText => IsCompleted ? "Sayıldı" : "Bekliyor";
 

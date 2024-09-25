@@ -1,184 +1,191 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentPage x:Class="Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProcess.Views.WarehouseCountingBasketView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProcess.Views.WarehouseCountingBasketView"
-             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProcess.ViewModels"
-             x:DataType="viewModel:WarehouseCountingBasketViewModel"
-             Title="WarehouseCountingBasketView"
-             Shell.TabBarIsVisible="False"
-             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:basketModel="clr-namespace:Deppo.Mobile.Core.Models.CountingModels.BasketModels;assembly=Deppo.Mobile.Core"
-             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit">
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProcess.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:WarehouseCountingBasketViewModel"
+             Shell.TabBarIsVisible="False">
 
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
-                                        EventName="Loaded" />
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
-                                   StatusBarStyle="Default" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
-    
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android"
-                Value="artboard.png" />
+            <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
-    <Grid RowDefinitions="*,Auto">
-        <Grid RowDefinitions="*,Auto">
-            <Grid RowDefinitions="Auto,*,Auto"
-                  RowSpacing="10">
-                <Border Grid.Row="0"
-                        Margin="5,0,5,0"
-                        Padding="0"
-                        BackgroundColor="{StaticResource PrimaryLight}"
-                        HeightRequest="35"
-                        Stroke="{StaticResource Primary}"
-                        StrokeShape="RoundRectangle 5"
-                        StrokeThickness="0.5">
-                    <SearchBar x:Name="searchBar"
-                               Placeholder="Ara..."
-                               PlaceholderColor="{StaticResource OffBlack}"
-                               TextColor="{StaticResource OffBlack}">
-                        <!-- <SearchBar.Behaviors>
-         <toolkit:EventToCommandBehavior
-             Command="{Binding PerformSearchCommand}"
-             CommandParameter="{Binding Text, Source={x:Reference searchBar}}"
-             EventName="SearchButtonPressed" />
-     </SearchBar.Behaviors>-->
-                    </SearchBar>
-                </Border>
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding BackCommand}" />
+    </Shell.BackButtonBehavior>
 
-                <CollectionView Grid.Row="1"
-                                ItemsSource="{Binding Items}"
-                                RemainingItemsThreshold="2"
-                                RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="basketModel:WarehouseCountingBasketModel">
-                            <SwipeView Threshold="100">
-                                <SwipeView.LeftItems>
-                                    <SwipeItems Mode="Execute">
-                                        <SwipeItemView BackgroundColor="Red"
-                                                       Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WarehouseCountingBasketViewModel}}, Path=SwipeItemCommand}"
-                                                       CommandParameter="{Binding .}">
-                                            <Label HorizontalOptions="Center"
-                                                   TextColor="White"
-                                                   VerticalOptions="Center">
+    <Grid RowDefinitions="Auto, *, Auto">
+        <Border Grid.Row="0"
+                Margin="5,0,5,0"
+                Padding="0"
+                BackgroundColor="{StaticResource PrimaryLight}"
+                HeightRequest="35"
+                Stroke="{StaticResource Primary}"
+                StrokeShape="RoundRectangle 5"
+                StrokeThickness="0.5">
+            <SearchBar x:Name="searchBar"
+                       Placeholder="Ara..."
+                       PlaceholderColor="{StaticResource OffBlack}"
+                       TextColor="{StaticResource OffBlack}" />
+        </Border>
 
-                                                <Label.FormattedText>
-                                                    <FormattedString>
-                                                        <Span FontAttributes="Bold"
-                                                              FontFamily="FAS"
-                                                              FontSize="Medium"
-                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Tick}"
-                                                              TextColor="White" />
-                                                        <Span Text=" " />
-                                                        <Span FontSize="Medium"
-                                                              Text="Sayıldı"
-                                                              TextColor="White" />
-                                                    </FormattedString>
-                                                </Label.FormattedText>
-                                            </Label>
-                                        </SwipeItemView>
-                                       
-                                    </SwipeItems>
-                                    
-                                </SwipeView.LeftItems>
-                                <Border Padding="10"
-                                        BackgroundColor="Transparent"
-                                        StrokeThickness="0.1">
-                                    <Grid ColumnDefinitions=".20*,.80*"
-                                          ColumnSpacing="10">
-                                        <Border Grid.Column="0"
-                                                BackgroundColor="{StaticResource PrimaryLight}"
-                                                Stroke="{StaticResource Primary}"
-                                                StrokeShape="RoundRectangle 5"
-                                                StrokeThickness="0.5">
-                                            <Image Grid.Column="0"
-                                                   HeightRequest="50"
-                                                   Source="dotnet_bot.png"
-                                                   WidthRequest="50" />
-                                        </Border>
 
-                                        <VerticalStackLayout Grid.Column="1">
-                                            <Label FontAttributes="Bold"
-                                                   LineBreakMode="TailTruncation"
-                                                   Text="{Binding ProductCode}" />
-                                            <Label LineBreakMode="TailTruncation"
-                                                   Text="{Binding ProductName}"
-                                                   TextColor="{StaticResource Gray600}" />
-
-                                            <Label>
-                                                <Label.FormattedText>
-                                                    <FormattedString>
-                                                        <Span FontAttributes="Bold"
-                                                              FontFamily="FAS"
-                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                                                              TextColor="{StaticResource Primary}" />
-                                                        <Span Text=" " />
-                                                        <Span FontAttributes="Bold"
-                                                              Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
-                                                              TextColor="{StaticResource Primary}" />
-                                                    </FormattedString>
-                                                </Label.FormattedText>
-                                            </Label>
-
-                                            <Grid ColumnDefinitions="Auto,Auto,Auto"
-                                                  ColumnSpacing="10"
-                                                  HorizontalOptions="EndAndExpand">
-                                                <Border Grid.Column="0"
-                                                        Padding="5"
-                                                        BackgroundColor="Transparent"
-                                                        Stroke="{StaticResource Secondary}"
-                                                        StrokeShape="RoundRectangle 2">
-                                                    <Label FontFamily="FAS"
-                                                           FontSize="Medium"
-                                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
-                                                           TextColor="{StaticResource Secondary}" />
-
-                                                    <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WarehouseCountingBasketViewModel}}, Path=DecreaseCommand}"
-                                                                              CommandParameter="{Binding .}" />
-                                                    </Border.GestureRecognizers>
-                                                </Border>
-                                                <Label Grid.Column="1"
-                                                       FontAttributes="Bold"
-                                                       FontSize="Large"
-                                                       Text="{Binding OutputQuantity, StringFormat='{0:N2}'}"
-                                                       TextColor="{StaticResource OffBlack}"
-                                                       VerticalOptions="Center" />
-                                                <Border Grid.Column="2"
-                                                        Padding="5"
-                                                        BackgroundColor="{StaticResource Secondary}"
-                                                        Stroke="{StaticResource Secondary}"
-                                                        StrokeShape="RoundRectangle 2">
-                                                    <Label FontFamily="FAS"
-                                                           FontSize="Medium"
-                                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
-                                                           TextColor="{StaticResource White}" />
-
-                                                    <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WarehouseCountingBasketViewModel}}, Path=IncreaseCommand}"
-                                                                              CommandParameter="{Binding .}" />
-                                                    </Border.GestureRecognizers>
-                                                </Border>
-                                            </Grid>
-                                        </VerticalStackLayout>
-                                    </Grid>
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Items}"
+                        RemainingItemsThreshold="2"
+                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="basketModel:WarehouseCountingBasketModel">
+                    <SwipeView Threshold="100">
+                        <SwipeView.LeftItems>
+                            <SwipeItemView BackgroundColor="{StaticResource Secondary}"
+                                           Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WarehouseCountingBasketViewModel}}, Path=SwipeItemCommand}"
+                                           CommandParameter="{Binding .}">
+                                <Label HorizontalOptions="Center"
+                                       TextColor="White"
+                                       VerticalOptions="Center">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="Durum Değiştir" TextColor="White" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </SwipeItemView>
+                        </SwipeView.LeftItems>
+                        <Border Padding="10"
+                                BackgroundColor="Transparent"
+                                StrokeShape="RoundRectangle 10"
+                                StrokeThickness="0.1">
+                            <Grid ColumnDefinitions=".20*, .80*" ColumnSpacing="10">
+                                <Border Grid.Column="0"
+                                        BackgroundColor="{StaticResource Secondary}"
+                                        StrokeShape="RoundRectangle 5"
+                                        StrokeThickness="0.5">
+                                    <Image Grid.Column="0"
+                                           HeightRequest="50"
+                                           Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                           WidthRequest="50" />
                                 </Border>
-                            </SwipeView>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
 
-                <Button Grid.Row="2"
-                        Text="İleri"
-                        Command="{Binding NextViewCommand}" />
+                                <VerticalStackLayout Grid.Column="1">
+                                    <Label FontAttributes="Bold"
+                                           LineBreakMode="TailTruncation"
+                                           Text="{Binding ProductCode}" />
+                                    <Label LineBreakMode="TailTruncation"
+                                           Text="{Binding ProductName}"
+                                           TextColor="{StaticResource Gray600}" />
 
-            </Grid>
+                                    <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span FontAttributes="Bold"
+                                                      FontFamily="FAS"
+                                                      Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                      TextColor="{StaticResource Primary}" />
+                                                <Span Text=" " />
+                                                <Span FontAttributes="Bold"
+                                                      Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                                      TextColor="{StaticResource Primary}" />
+                                                <Span Text=" " />
+                                                <Span FontAttributes="Bold"
+                                                      Text="{Binding SubUnitsetCode}"
+                                                      TextColor="{StaticResource Primary}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
 
-           
-        </Grid>
+                                    <Grid ColumnDefinitions="Auto, *">
+                                        <!--#region Counting Status Border-->
+                                        <Border Grid.Column="0"
+                                                Padding="10,0"
+                                                BackgroundColor="{Binding CountingTextColor}"
+                                                HeightRequest="24"
+                                                MinimumHeightRequest="24"
+                                                StrokeShape="RoundRectangle 10"
+                                                StrokeThickness="0">
+                                            <Label FontSize="12"
+                                                   HorizontalOptions="Center"
+                                                   Text="{Binding CountingText}"
+                                                   TextColor="{StaticResource White}"
+                                                   VerticalOptions="Center" />
+                                        </Border>
+                                        <!--#endregion-->
+                                        <!--#region Increase Decrease Button-->
+                                        <Grid Grid.Column="1"
+                                              ColumnDefinitions="Auto,Auto,Auto"
+                                              ColumnSpacing="10"
+                                              HorizontalOptions="EndAndExpand">
+                                            <Border Grid.Column="0"
+                                                    Padding="5"
+                                                    BackgroundColor="Transparent"
+                                                    Stroke="{StaticResource Secondary}"
+                                                    StrokeShape="RoundRectangle 2">
+                                                <Label FontFamily="FAS"
+                                                       FontSize="Medium"
+                                                       Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                                       TextColor="{StaticResource Secondary}" />
+
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WarehouseCountingBasketViewModel}}, Path=DecreaseCommand}" CommandParameter="{Binding .}" />
+                                                </Border.GestureRecognizers>
+                                            </Border>
+                                            <Label Grid.Column="1"
+                                                   FontAttributes="Bold"
+                                                   FontSize="Large"
+                                                   Text="{Binding OutputQuantity, StringFormat='{0:N2}'}"
+                                                   TextColor="{StaticResource OffBlack}"
+                                                   VerticalOptions="Center" />
+                                            <Border Grid.Column="2"
+                                                    Padding="5"
+                                                    BackgroundColor="{StaticResource Secondary}"
+                                                    Stroke="{StaticResource Secondary}"
+                                                    StrokeShape="RoundRectangle 2">
+                                                <Label FontFamily="FAS"
+                                                       FontSize="Medium"
+                                                       Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                                       TextColor="{StaticResource White}" />
+
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WarehouseCountingBasketViewModel}}, Path=IncreaseCommand}" CommandParameter="{Binding .}" />
+                                                </Border.GestureRecognizers>
+                                            </Border>
+                                        </Grid>
+                                        <!--#endregion-->
+
+                                    </Grid>
+                                    <Label Text="{Binding DifferenceQuantity}" />
+
+                                </VerticalStackLayout>
+
+
+                            </Grid>
+                        </Border>
+                    </SwipeView>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Grid.Row="2"
+                Margin="5,10,5,20"
+                Command="{Binding NextViewCommand}"
+                Text="İleri" />
     </Grid>
 </ContentPage>
