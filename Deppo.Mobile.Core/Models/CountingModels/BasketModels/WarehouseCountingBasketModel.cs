@@ -55,18 +55,17 @@ public partial class WarehouseCountingBasketModel : ObservableObject
 	[ObservableProperty]
 	bool isSelected;
 
-	[ObservableProperty]
-	string locTrackingIcon = "location-dot";
+
+	public string LocTrackingIcon => "location-dot";
 
 	public string LocTrackingIconColor => LocTracking == 1 ? "#F5004F" : "#C8C8C8";
 
-	[ObservableProperty]
-	string variantIcon = "bookmark";
+	
+	public string VariantIcon => "bookmark";
 
 	public string VariantIconColor => IsVariant ? "#F5004F" : "#C8C8C8";
 
-	[ObservableProperty]
-	string trackingTypeIcon = "box-archive";
+	public string TrackingTypeIcon => "box-archive";
 
 	public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 }
