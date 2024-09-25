@@ -19,6 +19,8 @@ using static Java.Text.Normalizer;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrder.ViewModels;
 
+
+[QueryProperty(name: nameof(QuicklyBomProductBasketModel), queryId: nameof(QuicklyBomProductBasketModel))]
 public partial class WorkOrderCalcViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
