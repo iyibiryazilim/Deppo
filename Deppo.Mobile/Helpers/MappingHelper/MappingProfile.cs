@@ -68,6 +68,8 @@ public class MappingProfile : Profile
 		CreateMap<NegativeLocationModel, dynamic>();
         CreateMap<QuicklyBOMProductModel, dynamic>();
         CreateMap<WarehouseCountingWarehouseModel, dynamic>();
+        CreateMap<BOMSubProductModel, dynamic>();
+
 
     }
 
