@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using AndroidX.AppCompat.View.Menu;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
@@ -56,6 +57,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
         LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
         LocationTransactionConfirmCommand = new Command(async () => await LocationTransactionConfirmAsync());
         LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
+        ConfirmLocationTransactionCommand = new Command(async () => await ConfirmLocationTransactionAsync());
     }
 
     public ContentPage CurrentPage { get; set; } = null!;
@@ -78,6 +80,8 @@ public partial class ManuelCalcViewModel : BaseViewModel
     public Command<LocationTransactionModel> LocationTransactionDecreaseCommand { get; }
     public Command LocationTransactionConfirmCommand { get; }
     public Command LocationTransactionCloseCommand { get; }
+
+    public Command ConfirmLocationTransactionCommand { get; }
 
     //SubProduct Increase Decrease
     public Command SubIncreaseCommand { get; }
@@ -255,6 +259,10 @@ public partial class ManuelCalcViewModel : BaseViewModel
     }
 
     public async Task LocationTransactionCloseAsync()
+    {
+    }
+
+    public async Task ConfirmLocationTransactionAsync()
     {
     }
 }
