@@ -63,7 +63,7 @@ public partial class WarehouseCountingProductListViewModel : BaseViewModel
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
-				warehouseNumber: 1, // WarehouseCountingWarehouseModel.Number
+				warehouseNumber: WarehouseCountingWarehouseModel.Number, // WarehouseCountingWarehouseModel.Number
 				search: string.Empty,
 				skip: 0,
 				take: 20
@@ -114,7 +114,7 @@ public partial class WarehouseCountingProductListViewModel : BaseViewModel
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
-				warehouseNumber: 1, // WarehouseCountingWarehouseModel.Number
+				warehouseNumber: WarehouseCountingWarehouseModel.Number, // WarehouseCountingWarehouseModel.Number
 				search: string.Empty,
 				skip: Items.Count,
 				take: 20
