@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 using Deppo.Core.Models;
@@ -53,7 +52,7 @@ public partial class ManuelProductListViewModel : BaseViewModel
         _serilotTransactionService = serilotTransactionService;
         _userDialogs = userDialogs;
 
-        Title = "Reçete Ürün Listesi";
+        Title = "Ürün Listesi";
 
         BackCommand = new Command(async () => await BackAsync());
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
@@ -87,7 +86,7 @@ public partial class ManuelProductListViewModel : BaseViewModel
             BasketModel.QuicklyBomProduct = SelectedProduct;
             BasketModel.WarehouseNumber = SelectedProduct.WarehouseNumber;
             BasketModel.WarehouseName = SelectedProduct.WarehouseName;
-            await Shell.Current.GoToAsync($"{nameof(ManuelCalcWarehouseListView)}", new Dictionary<string, object>
+            await Shell.Current.GoToAsync($"{nameof(ManuelCalcInWarehouseListView)}", new Dictionary<string, object>
             {
                 [nameof(QuicklyBomProductBasketModel)] = BasketModel
             });

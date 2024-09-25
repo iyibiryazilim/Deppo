@@ -82,6 +82,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Modules/QuicklyProductionModule/QuicklyProductionProcess/Manuel/Views/ManuelCalcInWarehouseListView.xaml.cs">
+	    <DependentUpon>ManuelCalcInWarehouseListView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Modules/QuicklyProductionModule/QuicklyProductionProcess/Manuel/Views/ManuelCalcOutWarehouseListView.xaml.cs">
+	    <DependentUpon>ManuelCalcOutWarehouseListView.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseProcess\Views\InputProductPurchaseProcessProductListView.xaml.cs">
 	    <DependentUpon>InputProductPurchaseProcessProductListView.xaml</DependentUpon>
 	  </Compile>
@@ -284,10 +290,10 @@
 	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\Manuel\Views\ManuelCalcView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\Manuel\Views\ManuelCalcWarehouseListView.xaml">
+	  <MauiXaml Update="Modules/QuicklyProductionModule/QuicklyProductionProcess/Manuel/Views/ManuelCalcInWarehouseListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\Manuel\Views\ManuelCalcWarehouseProductListView.xaml">
+	  <MauiXaml Update="Modules/QuicklyProductionModule/QuicklyProductionProcess/Manuel/Views/ManuelCalcOutWarehouseListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\Manuel\Views\ManuelFormListView.xaml">

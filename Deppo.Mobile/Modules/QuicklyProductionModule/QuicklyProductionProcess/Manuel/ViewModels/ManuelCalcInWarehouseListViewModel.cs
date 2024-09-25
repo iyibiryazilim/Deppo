@@ -9,42 +9,35 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
-
 using System;
 using System.Collections.Generic;
-
 using System.Collections.ObjectModel;
-
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-
-using Deppo.Core.Models;
-using Deppo.Mobile.Helpers.MappingHelper;
-using Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.Views;
-using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.QuicklyModels;
-using Deppo.Core.BaseModels;
 using Deppo.Mobile.Core.Models.QuicklyModels.BasketModels;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.Views;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.Views;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels;
 
-public partial class ManuelCalcWarehouseProductListViewModel : BaseViewModel
+[QueryProperty(name: nameof(QuicklyBomProductBasketModel), queryId: nameof(QuicklyBomProductBasketModel))]
+public partial class ManuelCalcInWarehouseListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
     private readonly IWarehouseService _warehouseService;
     private readonly IUserDialogs _userDialogs;
 
+
     [ObservableProperty]
-    private QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
+    QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
 
     [ObservableProperty]
     private WarehouseModel selectedWarehouseModel = null!;
 
     public ObservableCollection<WarehouseModel> Items { get; } = new();
 
-    public ManuelCalcWarehouseProductListViewModel(IHttpClientService httpClientService,
+    public ManuelCalcInWarehouseListViewModel(IHttpClientService httpClientService,
     IWarehouseService warehouseService,
     IUserDialogs userDialogs)
     {
@@ -52,7 +45,7 @@ public partial class ManuelCalcWarehouseProductListViewModel : BaseViewModel
         _warehouseService = warehouseService;
         _userDialogs = userDialogs;
 
-        Title = "Çıkış Ambarları";
+        Title = "Giriş Ambarı Seçiniz..";
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
@@ -61,14 +54,6 @@ public partial class ManuelCalcWarehouseProductListViewModel : BaseViewModel
     }
 
     public Page CurrentPage { get; set; }
-
-    public ManuelCalcWarehouseProductListViewModel()
-    {
-        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
-        LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-        //ItemTappedCommand = new Command<WarehouseModel>(ItemTappedAsync);
-        NextViewCommand = new Command(async () => await NextViewAsync());
-    }
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
@@ -211,10 +196,16 @@ public partial class ManuelCalcWarehouseProductListViewModel : BaseViewModel
 
             if (SelectedWarehouseModel is not null)
             {
-                await Shell.Current.GoToAsync($"{nameof(ManuelCalcSubProductListView)}", new Dictionary<string, object>
+                QuicklyBomProductBasketModel.WarehouseName = SelectedWarehouseModel.Name;
+                QuicklyBomProductBasketModel.WarehouseNumber = SelectedWarehouseModel.Number;
+
+                QuicklyBomProductBasketModel.QuicklyBomProduct.WarehouseName = SelectedWarehouseModel.Name;
+                QuicklyBomProductBasketModel.QuicklyBomProduct.WarehouseNumber = SelectedWarehouseModel.Number;
+
+
+                await Shell.Current.GoToAsync($"{nameof(ManuelCalcView)}", new Dictionary<string, object>
                 {
-                    [nameof(Mobile.Core.Models.QuicklyModels.BasketModels.QuicklyBomProductBasketModel)] = QuicklyBomProductBasketModel,
-                    [nameof(WarehouseModel)] = SelectedWarehouseModel
+                    [nameof(QuicklyBomProductBasketModel)] = QuicklyBomProductBasketModel
                 });
             }
         }

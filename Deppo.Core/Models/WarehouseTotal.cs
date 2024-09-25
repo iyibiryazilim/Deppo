@@ -16,16 +16,20 @@ public class WarehouseTotal : INotifyPropertyChanged, IDisposable
     private int _subUnitsetReferenceId;
     private string _subUnitsetCode = string.Empty;
     private string _subUnitsetName = string.Empty;
-	private bool _isVariant;
-	private int _trackingType;
-	private int _locTracking;
-	private int _warehouseReferenceId;
+    private bool _isVariant;
+    private int _trackingType;
+    private int _locTracking;
+    private int _warehouseReferenceId;
     private int _warehouseNumber;
     private string _warehouseName = string.Empty;
     private double _stockQuantity;
-	private string? _image;
+    private int _brandReferenceId = default;
+    private string _brandCode = string.Empty;
+    private string _brandName = string.Empty;
+    private string _groupCode = string.Empty;
+    private string? _image;
 
-	public WarehouseTotal()
+    public WarehouseTotal()
     {
 
     }
@@ -109,8 +113,8 @@ public class WarehouseTotal : INotifyPropertyChanged, IDisposable
         }
     }
 
-	[Browsable(false)]
-	public int SubUnitsetReferenceId
+    [Browsable(false)]
+    public int SubUnitsetReferenceId
     {
         get => _subUnitsetReferenceId;
         set
@@ -154,30 +158,30 @@ public class WarehouseTotal : INotifyPropertyChanged, IDisposable
         }
     }
 
-	public int TrackingType
-	{
-		get => _trackingType;
-		set
-		{
-			if (_trackingType == value) return;
-			_trackingType = value;
-			NotifyPropertyChanged();
-		}
-	}
+    public int TrackingType
+    {
+        get => _trackingType;
+        set
+        {
+            if (_trackingType == value) return;
+            _trackingType = value;
+            NotifyPropertyChanged();
+        }
+    }
 
-	public int LocTracking
-	{
-		get => _locTracking;
-		set
-		{
-			if (_locTracking == value) return;
-			_locTracking = value;
-			NotifyPropertyChanged();
-		}
-	}
+    public int LocTracking
+    {
+        get => _locTracking;
+        set
+        {
+            if (_locTracking == value) return;
+            _locTracking = value;
+            NotifyPropertyChanged();
+        }
+    }
 
-	[Browsable(false)]
-	public int WarehouseReferenceId
+    [Browsable(false)]
+    public int WarehouseReferenceId
     {
         get => _warehouseReferenceId;
         set
@@ -221,18 +225,63 @@ public class WarehouseTotal : INotifyPropertyChanged, IDisposable
         }
     }
 
-	public string? Image
-	{
-		get => _image;
-		set
-		{
-			if (_image == value) return;
-			_image = value;
-			NotifyPropertyChanged();
-		}
-	}
+    public string? Image
+    {
+        get => _image;
+        set
+        {
+            if (_image == value) return;
+            _image = value;
+            NotifyPropertyChanged();
+        }
+    }
 
-	public event PropertyChangedEventHandler? PropertyChanged;
+    [Browsable(false)]
+    public int BrandReferenceId
+    {
+        get => _brandReferenceId;
+        set
+        {
+            if (_brandReferenceId == value) return;
+            _brandReferenceId = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public string BrandCode
+    {
+        get => _brandCode;
+        set
+        {
+            if (_brandCode == value) return;
+            _brandCode = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public string BrandName
+    {
+        get => _brandName;
+        set
+        {
+            if (_brandName == value) return;
+            _brandName = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public string GroupCode
+    {
+        get => _groupCode;
+        set
+        {
+            if (_groupCode == value) return;
+            _groupCode = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
     {

@@ -70,6 +70,7 @@ public class MappingProfile : Profile
         CreateMap<QuicklyBOMProductModel, dynamic>();
         CreateMap<WarehouseCountingWarehouseModel, dynamic>();
         CreateMap<BOMSubProductModel, dynamic>();
+        CreateMap<BOMSubProductModel,WarehouseTotalModel>().ReverseMap();
         CreateMap<WarehouseCountingBasketModel, dynamic>();
 
 

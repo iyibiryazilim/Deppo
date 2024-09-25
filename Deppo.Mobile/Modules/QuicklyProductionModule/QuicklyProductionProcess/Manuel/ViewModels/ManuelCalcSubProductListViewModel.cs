@@ -4,15 +4,13 @@ using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.ProductModels;
-using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
+using Deppo.Mobile.Core.Models.QuicklyModels;
 using Deppo.Mobile.Core.Models.VirmanModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
-using Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.Views;
-using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.ViewModels;
 using DevExpress.Maui.Controls;
 using System;
 using System.Collections.Generic;
@@ -24,56 +22,48 @@ using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels
 {
+    [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
     public partial class ManuelCalcSubProductListViewModel : BaseViewModel
     {
         private readonly IHttpClientService _httpClientService;
         private readonly IUserDialogs _userDialogs;
         private readonly IServiceProvider _serviceProvider;
-        private readonly IPurchaseSupplierProductService _purchaseSupplierProductService;
-        private readonly IProductService _productService;
+        private readonly IWarehouseTotalService _warehouseTotalService;
 
         [ObservableProperty]
         private WarehouseModel warehouseModel = null!;
 
-        [ObservableProperty]
-        private ProductModel? selectedProduct;
-
-        [ObservableProperty]
-        private ObservableCollection<InputPurchaseBasketModel> selectedProducts = new();
-
-        [ObservableProperty]
-        private int targetViewType = default;
-
-        public Page CurrentPage { get; set; }
-
-        public ManuelCalcSubProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs,
+        public ManuelCalcSubProductListViewModel(
+            IHttpClientService httpClientService,
+            IUserDialogs userDialogs,
             IServiceProvider serviceProvider,
-            IPurchaseSupplierProductService purchaseSupplierProductService, IProductService productService)
+            IWarehouseTotalService warehouseTotalService)
         {
             _httpClientService = httpClientService;
             _userDialogs = userDialogs;
             _serviceProvider = serviceProvider;
-            _purchaseSupplierProductService = purchaseSupplierProductService;
-            _productService = productService;
+            _warehouseTotalService = warehouseTotalService;
 
             Title = "Ürün Listesi";
 
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
             LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-            ItemTappedCommand = new Command<ProductModel>(async (x) => await ItemTappedAsync(x));
+            ItemTappedCommand = new Command<WarehouseTotalModel>(async (item) => await ItemTappedAsync(item));
             ConfirmCommand = new Command(async () => await ConfirmAsync());
+
         }
 
+        public Page CurrentPage { get; set; }
+
         public Command LoadItemsCommand { get; }
-
         public Command LoadMoreItemsCommand { get; }
-
         public Command NextViewCommand { get; }
-
-        public Command ItemTappedCommand { get; }
+        public Command<WarehouseTotalModel> ItemTappedCommand { get; }
         public Command ConfirmCommand { get; }
 
-        public ObservableCollection<ProductModel> Items { get; } = new();
+        public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
+        public ObservableCollection<WarehouseTotalModel> SelectedItems { get; } = new();
+
 
         private async Task LoadItemsAsync()
         {
@@ -84,12 +74,22 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
             {
                 IsBusy = true;
                 Items.Clear();
-                SelectedProducts.Clear();
+                SelectedItems.Clear();
 
                 _userDialogs.Loading("Loading Items...");
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
                 await Task.Delay(1000);
-                var result = await _productService.GetObjectsPurchaseProduct(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 20);
+
+                var result = await _warehouseTotalService.GetObjects(
+                    httpClient: httpClient,
+                    firmNumber: _httpClientService.FirmNumber,
+                    periodNumber: _httpClientService.PeriodNumber,
+                    warehouseNumber: WarehouseModel.Number,
+                    search: string.Empty,
+                    skip: 0,
+                    take: 20);
+
+
                 if (result.IsSuccess)
                 {
                     if (result.Data == null)
@@ -97,29 +97,14 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
 
                     foreach (var product in result.Data)
                     {
-                        var item = Mapping.Mapper.Map<Product>(product);
-
-                        Items.Add(new ProductModel
-                        {
-                            ReferenceId = item.ReferenceId,
-                            Code = item.Code,
-                            Name = item.Name,
-                            UnitsetReferenceId = item.UnitsetReferenceId,
-                            UnitsetCode = item.UnitsetCode,
-                            UnitsetName = item.UnitsetName,
-                            SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                            SubUnitsetCode = item.SubUnitsetCode,
-                            SubUnitsetName = item.SubUnitsetName,
-                            StockQuantity = item.StockQuantity,
-                            TrackingType = item.TrackingType,
-                            LocTracking = item.LocTracking,
-                            IsVariant = item.IsVariant,
-                            IsSelected = false
-                        });
+                        var item = Mapping.Mapper.Map<WarehouseTotalModel>(product);
+                        Items.Add(item);
                     }
                 }
 
-                _userDialogs.Loading().Hide();
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.Loading().Hide();
+
             }
             catch (Exception ex)
             {
@@ -131,7 +116,6 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
             finally
             {
                 IsBusy = false;
-                _userDialogs.Loading().Dispose();
             }
         }
 
@@ -143,10 +127,23 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
             try
             {
                 IsBusy = true;
+                Items.Clear();
+                SelectedItems.Clear();
 
-                _userDialogs.Loading("Loading More Items...");
+                _userDialogs.Loading("Loading Items...");
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _productService.GetObjectsPurchaseProduct(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, Items.Count, 20);
+                await Task.Delay(500);
+
+                var result = await _warehouseTotalService.GetObjects(
+                    httpClient: httpClient,
+                    firmNumber: _httpClientService.FirmNumber,
+                    periodNumber: _httpClientService.PeriodNumber,
+                    warehouseNumber: WarehouseModel.Number,
+                    search: string.Empty,
+                    skip: Items.Count,
+                    take: 20);
+
+
                 if (result.IsSuccess)
                 {
                     if (result.Data == null)
@@ -154,29 +151,14 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
 
                     foreach (var product in result.Data)
                     {
-                        var item = Mapping.Mapper.Map<Product>(product);
-
-                        Items.Add(new ProductModel
-                        {
-                            ReferenceId = item.ReferenceId,
-                            Code = item.Code,
-                            Name = item.Name,
-                            UnitsetReferenceId = item.UnitsetReferenceId,
-                            UnitsetCode = item.UnitsetCode,
-                            UnitsetName = item.UnitsetName,
-                            SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                            SubUnitsetCode = item.SubUnitsetCode,
-                            SubUnitsetName = item.SubUnitsetName,
-                            StockQuantity = item.StockQuantity,
-                            TrackingType = item.TrackingType,
-                            LocTracking = item.LocTracking,
-                            IsVariant = item.IsVariant,
-                            IsSelected = false
-                        });
+                        var item = Mapping.Mapper.Map<WarehouseTotalModel>(product);
+                        Items.Add(item);
                     }
                 }
 
-                _userDialogs.Loading().Hide();
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.Loading().Hide();
+
             }
             catch (Exception ex)
             {
@@ -188,11 +170,10 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
             finally
             {
                 IsBusy = false;
-                _userDialogs.Loading().Dispose();
             }
         }
 
-        private async Task ItemTappedAsync(ProductModel item)
+        private async Task ItemTappedAsync(WarehouseTotalModel item)
         {
             if (IsBusy)
                 return;
@@ -201,55 +182,26 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
             {
                 IsBusy = true;
 
-                if (item is not null)
+                if (item.IsSelected)
+                {
+                    Items.FirstOrDefault(x => x.ProductCode == item.ProductCode).IsSelected = false;
+                    SelectedItems.Remove(item);
+                }
+                else
+                {
                     if (item.IsVariant)
                     {
-                        CurrentPage.FindByName<BottomSheet>("").State = BottomSheetState.HalfExpanded;
+                        await _userDialogs.AlertAsync("Bu ürün varyant üründür. Lütfen varyant ürünlerinizi seçiniz.", "Uyarı", "Tamam");
+                        return;
                     }
                     else
                     {
-                        if (!item.IsSelected)
-                        {
-                            Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = true;
-
-                            SelectedProduct = item;
-
-                            var basketItem = new InputPurchaseBasketModel
-                            {
-                                ItemReferenceId = item.ReferenceId,
-                                ItemCode = item.Code,
-                                ItemName = item.Name,
-                                UnitsetReferenceId = item.UnitsetReferenceId,
-                                UnitsetCode = item.UnitsetCode,
-                                UnitsetName = item.UnitsetName,
-                                SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                                SubUnitsetCode = item.SubUnitsetCode,
-                                SubUnitsetName = item.SubUnitsetName,
-                                IsSelected = false,
-                                MainItemCode = string.Empty,
-                                MainItemName = string.Empty,
-                                MainItemReferenceId = default,
-                                StockQuantity = item.StockQuantity,
-                                Quantity = item.LocTracking == 0 ? 1 : 0,
-                                InputQuantity = item.LocTracking == 0 ? 1 : 0,
-                                LocTracking = item.LocTracking,
-                                TrackingType = item.TrackingType,
-                                IsVariant = item.IsVariant
-                            };
-
-                            SelectedProducts.Add(basketItem);
-                        }
-                        else
-                        {
-                            SelectedProduct = null;
-                            var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ReferenceId);
-                            if (selectedItem != null)
-                            {
-                                SelectedProducts.Remove(selectedItem);
-                                Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = false;
-                            }
-                        }
+                        Items.FirstOrDefault(x => x.ProductCode == item.ProductCode).IsSelected = true;
+                        SelectedItems.Add(item);
                     }
+
+                }
+
             }
             catch (Exception ex)
             {
@@ -270,15 +222,58 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
             {
                 IsBusy = true;
 
-                var previouseViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseOrderProcessBasketListViewModel>();
-                if (previouseViewModel is not null)
+                var manuelCalcViewModel = _serviceProvider.GetRequiredService<ManuelCalcViewModel>();
+                if (manuelCalcViewModel is not null)
                 {
-                    foreach (var item in SelectedProducts)
-                        if (!previouseViewModel.Items.Any(x => x.ItemCode == item.ItemCode))
-                            previouseViewModel.Items.Add(item);
-
-                    await Shell.Current.GoToAsync($"..");
+                    foreach (var item in SelectedItems)
+                    {
+                        if (!manuelCalcViewModel.QuicklyBomProductBasketModel.SubProducts.Any(x => x.ProductModel.Code == item.ProductCode))
+                        {
+                            manuelCalcViewModel.QuicklyBomProductBasketModel.SubProducts.Add(new QuicklyBomSubProductModel
+                            {
+                                WarehouseModel = WarehouseModel,
+                                SubBOMQuantity = 0,
+                                SubOutputQuantity = 0,
+                                ProductModel = new BOMSubProductModel
+                                {
+                                    ReferenceId = item.ProductReferenceId,
+                                    Code = item.ProductCode,
+                                    Name = item.ProductName,
+                                    UnitsetReferenceId = item.UnitsetReferenceId,
+                                    UnitsetCode = item.UnitsetCode,
+                                    UnitsetName = item.UnitsetName,
+                                    SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                                    SubUnitsetCode = item.SubUnitsetCode,
+                                    SubUnitsetName = item.SubUnitsetName,
+                                    Amount = default,
+                                    BrandCode = item.BrandCode,
+                                    BrandName = item.BrandName,
+                                    GroupCode = item.GroupCode,
+                                    Image = item.Image,
+                                    BrandReferenceId = item.BrandReferenceId,
+                                    IsSelected = false,
+                                    LocTracking = item.LocTracking,
+                                    LocTrackingIcon = item.LocTrackingIcon,
+                                    MainProductCode = item.ProductCode,
+                                    MainProductReferenceId = item.ProductReferenceId,
+                                    StockQuantity = item.StockQuantity,
+                                    TrackingType = item.TrackingType,
+                                    VariantIcon = item.VariantIcon,
+                                    TrackingTypeIcon = item.TrackingTypeIcon,
+                                    VatRate = default,
+                                    WarehouseName = WarehouseModel.Name,
+                                    WarehouseNumber = WarehouseModel.Number,
+                                    IsVariant = item.IsVariant
+                                },
+                                LocationTransactions = new()
+                            });
+                        }
+                    }
                 }
+
+                await Shell.Current.GoToAsync("../..");
+
+
             }
             catch (Exception ex)
             {

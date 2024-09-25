@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.Views.ManuelCalcWarehouseListView"
+             x:Class="Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.Views.ManuelCalcInWarehouseListView"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels"
              xmlns:warehouseModel="clr-namespace:Deppo.Mobile.Core.Models.WarehouseModels;assembly=Deppo.Mobile.Core"
              Title="{Binding Title}"
-             x:DataType="viewModel:ManuelCalcWarehouseListViewModel"
+             x:DataType="viewModel:ManuelCalcInWarehouseListViewModel"
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
@@ -40,7 +40,7 @@
                             StrokeShape="RoundRectangle 10"
                             StrokeThickness="0.1">
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ManuelCalcWarehouseListViewModel}}, Path=ItemTappedCommand}"
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ManuelCalcInWarehouseListViewModel}}, Path=ItemTappedCommand}"
                                                   CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="Auto, *">
