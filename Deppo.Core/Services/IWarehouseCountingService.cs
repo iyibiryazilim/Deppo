@@ -10,5 +10,9 @@ namespace Deppo.Core.Services
 
         Task<DataResult<IEnumerable<dynamic>>> GetWarehouses(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20);
 
+        Task<DataResult<IEnumerable<dynamic>>> GetProductsByWarehouseAndLocation(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int locationReferenceId, string search = "", int skip = 0, int take = 20);
+
+        Task<DataResult<IEnumerable<dynamic>>> GetProductsByWarehouse(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20);
+
     }
 }
