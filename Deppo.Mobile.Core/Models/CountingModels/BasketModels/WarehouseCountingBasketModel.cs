@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Deppo.Mobile.Core.Models.LocationModels;
 using System.Collections.ObjectModel;
 
@@ -50,13 +50,14 @@ public partial class WarehouseCountingBasketModel : ObservableObject
 	int locTracking;
 
 	[ObservableProperty]
-	bool isCompleted;
-
-    [ObservableProperty]
 	ObservableCollection<LocationTransactionModel> locationTransactions = new();
+  
+  [ObservableProperty]
+	bool isCompleted;
 
 	public string CountingText => IsCompleted ? "Sayıldı" : "Bekliyor";
 
-    public string CountingTextColor => IsCompleted ? "#008000" : "#fcf58c";
+   public string CountingTextColor => IsCompleted ? "#008000" : "#fcf58c";
+
 
 }
