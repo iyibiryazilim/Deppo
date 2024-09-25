@@ -69,7 +69,7 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
     public Command DecreaseCommand { get; }
     public Command SwipeItemCommand { get; }
     public Command BackCommand { get; }
-    
+
 
 
 
@@ -198,7 +198,7 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
                 {
                     if (item.LocTracking == 1)
                     {
-                        
+
                         await LoadLocationTransactionsAsync();
 
                     }
@@ -212,14 +212,14 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
                     else
                     {
                         item.OutputQuantity--;
-						item.DifferenceQuantity--;
-					}
+                        item.DifferenceQuantity--;
+                    }
                 }
                 else if (item.OutputQuantity > 1 && (item.OutputQuantity - item.StockQuantity) > 0)
                 {
                     item.OutputQuantity--;
-					item.DifferenceQuantity--;
-				}
+                    item.DifferenceQuantity--;
+                }
 
             }
         }
@@ -238,16 +238,16 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
         try
         {
             LocationTransactions.Clear();
-			
 
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _locationTransactionService.GetInputObjectsAsync(
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 productReferenceId: SelectedItem.ProductReferenceId,
                 warehouseNumber: WarehouseCountingWarehouseModel.Number,
-                skip:0,
+                skip: 0,
                 take: 9999999
             );
 
@@ -260,47 +260,47 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
                     LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
                 }
 
-				SelectedItem.DifferenceQuantity--;
+                SelectedItem.DifferenceQuantity--;
 
 
-				if (LocationTransactions.Sum(x => x.RemainingQuantity) > 0)
+                if (LocationTransactions.Sum(x => x.RemainingQuantity) > 0)
                 {
                     SelectedItem.DifferenceQuantity--;
-                    if((SelectedItem.DifferenceQuantity * -1) > LocationTransactions.Sum(x => x.RemainingQuantity))
+                    if ((SelectedItem.DifferenceQuantity * -1) > LocationTransactions.Sum(x => x.RemainingQuantity))
                     {
-						await _userDialogs.AlertAsync("Girilen miktarı karşılayacak giriş hareketi bulunamadı", "Uyarı", "Tamam");
-						return;
-					}
-					else
-					{
-						SelectedItem.OutputQuantity--;
+                        await _userDialogs.AlertAsync("Girilen miktarı karşılayacak giriş hareketi bulunamadı", "Uyarı", "Tamam");
+                        return;
+                    }
+                    else
+                    {
+                        SelectedItem.OutputQuantity--;
 
 
-						SelectedItem.LocationTransactions = new();
+                        SelectedItem.LocationTransactions = new();
 
-						var orderedLocationTransactions = LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
+                        var orderedLocationTransactions = LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
 
-						var tempQuantity = SelectedItem.StockQuantity - SelectedItem.OutputQuantity;
-						foreach (var item in orderedLocationTransactions)
-						{
-							if (item.RemainingQuantity > 0 && tempQuantity > 0)
-							{
-								item.OutputQuantity = (tempQuantity) >= item.RemainingQuantity ? item.RemainingQuantity : tempQuantity;
-								//SelectedItem.OutputQuantity--;
-								tempQuantity -= item.OutputQuantity;
-								SelectedItem.LocationTransactions.Add(item);
-							}
-						}
-					}
+                        var tempQuantity = SelectedItem.StockQuantity - SelectedItem.OutputQuantity;
+                        foreach (var item in orderedLocationTransactions)
+                        {
+                            if (item.RemainingQuantity > 0 && tempQuantity > 0)
+                            {
+                                item.OutputQuantity = (tempQuantity) >= item.RemainingQuantity ? item.RemainingQuantity : tempQuantity;
+                                //SelectedItem.OutputQuantity--;
+                                tempQuantity -= item.OutputQuantity;
+                                SelectedItem.LocationTransactions.Add(item);
+                            }
+                        }
+                    }
 
                 }
                 else
                 {
-					await _userDialogs.AlertAsync("Giriş miktarı bulunamadı", "Uyarı", "Tamam");
-					return;
-				}
-                
-                
+                    await _userDialogs.AlertAsync("Giriş miktarı bulunamadı", "Uyarı", "Tamam");
+                    return;
+                }
+
+
 
             }
 
@@ -354,27 +354,30 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            if(Items.All(x => x.IsCompleted == false))
-            {
-                await _userDialogs.AlertAsync("Hiç ürün sayımı yapılmadı", "Uyarı", "Tamam");
-                return;
-            }
-            else
-            {
-                foreach (var item in Items.Where(x=>x.IsCompleted).ToList())
-                {
-                   SelectedItems.Add(item);
-                }
+            //if(Items.All(x => x.IsCompleted == false))
+            //{
+            //    await _userDialogs.AlertAsync("Hiç ürün sayımı yapılmadı", "Uyarı", "Tamam");
+            //    return;
+            //}
+            //else
+            //{
+            //    foreach (var item in Items.Where(x=>x.IsCompleted).ToList())
+            //    {
+            //       SelectedItems.Add(item);
+            //    }
 
-                await Shell.Current.GoToAsync($"{nameof(WarehouseCountingFormView)}", new Dictionary<string, object>
-                {
-                    [nameof(LocationModel)] = LocationModel,
-                    [nameof(WarehouseCountingWarehouseModel)] = WarehouseCountingWarehouseModel,
-                    [nameof(WarehouseCountingBasketModel)] = SelectedItems
-                });
+            foreach (var item in Items.Where(x => (x.OutputQuantity - x.StockQuantity) != 0)){
+                SelectedItems.Add(item);
             }
+            await Shell.Current.GoToAsync($"{nameof(WarehouseCountingFormView)}", new Dictionary<string, object>
+            {
+                [nameof(LocationModel)] = LocationModel,
+                [nameof(WarehouseCountingWarehouseModel)] = WarehouseCountingWarehouseModel,
+                [nameof(WarehouseCountingBasketModel)] = SelectedItems
+            });
+            // }
 
-           
+
         }
         catch (Exception ex)
         {
