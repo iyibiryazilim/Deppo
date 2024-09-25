@@ -31,6 +31,9 @@ public partial class WarehouseCountingProductListViewModel : BaseViewModel
 
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+		IncreaseCommand = new Command<WarehouseCountingBasketModel>(async (item) => await IncreaseAsync(item));
+		DecreaseCommand = new Command<WarehouseCountingBasketModel>(async (item) => await DecreaseAsync(item));
+		SwipeItemCommand = new Command<WarehouseCountingBasketModel>(async (item) => await SwipeItemAsync(item));
 		BackCommand = new Command(async () => await BackAsync());
 	}
 
@@ -40,6 +43,7 @@ public partial class WarehouseCountingProductListViewModel : BaseViewModel
 	public Command NextCommand { get; }
 	public Command IncreaseCommand { get; }
 	public Command DecreaseCommand { get; }
+	public Command SwipeItemCommand { get; }
 
 
 	private async Task LoadItemsAsync()
@@ -145,6 +149,81 @@ public partial class WarehouseCountingProductListViewModel : BaseViewModel
 		}
 	}
 
+	private async Task IncreaseAsync(WarehouseCountingBasketModel item)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			item.OutputQuantity++;
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task DecreaseAsync(WarehouseCountingBasketModel item)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			if(item.OutputQuantity > 0) 
+				item.OutputQuantity--;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task SwipeItemAsync(WarehouseCountingBasketModel item)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			if(item.IsCompleted)
+			{
+				item.IsCompleted = false;
+			} else
+			{
+				item.IsCompleted = true;
+			}
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 	private async Task BackAsync()
 	{
 		if (IsBusy)
