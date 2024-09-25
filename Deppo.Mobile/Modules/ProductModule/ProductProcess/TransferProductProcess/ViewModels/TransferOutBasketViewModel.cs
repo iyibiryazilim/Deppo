@@ -731,12 +731,20 @@ public partial class TransferOutBasketViewModel : BaseViewModel
 
                 SelectedLocationTransactions.Clear();
                 SelectedSeriLotTransactions.Clear();
+
+                var viewModel = _serviceProvider.GetRequiredService<TransferOutProductListViewModel>();
+
+                foreach (var item in viewModel.Items)
+                {
+                    item.IsSelected = false;
+                }
+
+                foreach (var item in TransferBasketModel.OutProducts)
+                {
+                    item.IsSelected = false;
+                }
 				TransferBasketModel.OutProducts.Clear();
 
-                var inProductBasketViewModel = _serviceProvider.GetRequiredService<TransferInBasketViewModel>();
-
-                inProductBasketViewModel.TransferBasketModel.InProducts.Clear();
-                inProductBasketViewModel.TransferBasketModel.InWarehouse = null;
 
 
                 await Shell.Current.GoToAsync("..");

@@ -1,9 +1,15 @@
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels;
+
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.Views;
 
 public partial class ManuelCalcSubProductListView : ContentPage
 {
-	public ManuelCalcSubProductListView()
-	{
-		InitializeComponent();
-	}
+    private readonly ManuelCalcSubProductListViewModel _viewModel;
+
+    public ManuelCalcSubProductListView(ManuelCalcSubProductListViewModel viewModel)
+    {
+        InitializeComponent();
+        _viewModel = viewModel;
+        BindingContext = _viewModel;
+    }
 }

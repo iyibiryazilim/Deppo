@@ -28,6 +28,7 @@ public partial class TransferInWarehouseViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<WarehouseModel>(ItemTappedAsync);
         NextViewCommand = new Command(async () => await NextViewAsync());
+        BackCommand = new Command(async () => await BackAsync());
     }
 
     #region Commands
@@ -35,6 +36,8 @@ public partial class TransferInWarehouseViewModel : BaseViewModel
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
+
+    public Command BackCommand { get; }
     #endregion
 
     #region Collections
@@ -233,6 +236,35 @@ public partial class TransferInWarehouseViewModel : BaseViewModel
                 _userDialogs.HideHud();
 
             _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+            
+            if(TransferBasketModel.InWarehouse != null)
+            {
+                TransferBasketModel.InWarehouse.IsSelected = false;
+
+                TransferBasketModel.InWarehouse = null;
+            }
+
+            await Shell.Current.GoToAsync("..");
+
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
