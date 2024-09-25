@@ -343,17 +343,17 @@ FETCH NEXT {take} ROWS ONLY;";
         private string GetProductsByWarehouseAndLocation(int firmNumber, int periodNumber,int warehouseNumber,int locationReferenceId, string search = "", int skip = 0, int take = 20)
         {
             var baseQuery = @$"SELECT 
-	[ProductReferenceId] = ITEMS.LOGICALREF,
-	[ProductCode] = ITEMS.CODE,
-	[ProductName] = ITEMS.NAME,
-	[UnitsetReferenceId] = UNITSETF.LOGICALREF,
-    [UnitsetCode] = UNITSETF.CODE,
-    [UnitsetName] = UNITSETF.NAME,
-    [SubUnitsetReferenceId] = UNITSETL.LOGICALREF,
-    [SubUnitsetCode] = UNITSETL.CODE,
-    [SubUnitsetName] = UNITSETL.NAME,
-	[LocTracking] = ITEMS.LOCTRACKING,
-    [StockQuantity] = SUM(LGMAIN.REMAMOUNT)
+	[ProductReferenceId] = ISNULL(ITEMS.LOGICALREF,0),
+	[ProductCode] = ISNULL(ITEMS.CODE,''),
+	[ProductName] = ISNULL(ITEMS.NAME,''),
+	[UnitsetReferenceId] = ISNULL(UNITSETF.LOGICALREF,0),
+    [UnitsetCode] = ISNULL(UNITSETF.CODE,''),
+    [UnitsetName] = ISNULL(UNITSETF.NAME,''),
+    [SubUnitsetReferenceId] = ISNULL(UNITSETL.LOGICALREF,0),
+    [SubUnitsetCode] = ISNULL(UNITSETL.CODE,''),
+    [SubUnitsetName] = ISNULL(UNITSETL.NAME,''),
+	[LocTracking] = ISNULL(ITEMS.LOCTRACKING,0),
+    [StockQuantity] = ISNULL(SUM(LGMAIN.REMAMOUNT),0)
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_SLTRANS LGMAIN WITH(NOLOCK)
 LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_LOCATION INVLOC WITH(NOLOCK) ON (LGMAIN.LOCREF = INVLOC.LOGICALREF)
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON LGMAIN.ITEMREF = ITEMS.LOGICALREF
