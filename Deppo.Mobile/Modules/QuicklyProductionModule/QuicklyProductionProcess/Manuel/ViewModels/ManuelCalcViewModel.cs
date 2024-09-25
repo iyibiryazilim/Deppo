@@ -191,6 +191,8 @@ public partial class ManuelCalcViewModel : BaseViewModel
         }
     }
 
+
+    // + işareti tıklanınca çalışacak olan fonksiyon
     private async Task WarehousePages()
     {
         if (IsBusy)
@@ -200,7 +202,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
             IsBusy = true;
 
             if(QuicklyBomProductBasketModel.QuicklyBomProduct != null)
-            await Shell.Current.GoToAsync($"{nameof(ManuelCalcWarehouseListView)}", new Dictionary<string, object>
+            await Shell.Current.GoToAsync($"{nameof(ManuelCalcWarehouseProductListView)}", new Dictionary<string, object>
             {
                 [nameof(QuicklyBomProductBasketModel)] = QuicklyBomProductBasketModel
             });
