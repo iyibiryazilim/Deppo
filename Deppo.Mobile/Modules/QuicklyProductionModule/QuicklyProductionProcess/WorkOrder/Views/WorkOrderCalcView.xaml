@@ -116,7 +116,7 @@
             <Grid ColumnDefinitions="Auto,.10*">
                 <Label Grid.Column="0"
                        FontAttributes="Bold"
-                       FontSize="Title"
+                       FontSize="18"
                        Text="Sarf Malzemeleri"
                        TextColor="{StaticResource OffBlack}" />
             </Grid>
@@ -133,14 +133,16 @@
 
                             <Grid ColumnDefinitions="Auto,*, Auto"
                                   ColumnSpacing="10">
-                                <Border BackgroundColor="{StaticResource Secondary}"
+                                <Border Grid.Column="0"
+                                        BackgroundColor="{StaticResource Secondary}"
                                         StrokeShape="RoundRectangle 5"
                                         StrokeThickness="0.5">
                                     <Image Grid.Column="0"
                                            HeightRequest="50"
-                                           Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                           Source="dotnet_bot.png"
                                            WidthRequest="50" />
                                 </Border>
+
 
                                 <VerticalStackLayout Grid.Column="1"
                                                      Spacing="2">
@@ -217,7 +219,7 @@
                                         <Label Grid.Column="1"
                                                FontAttributes="Bold"
                                                FontSize="Large"
-                                               Text="1"
+                                               Text="{Binding SubBOMQuantity}"
                                                TextColor="{StaticResource OffBlack}"
                                                VerticalOptions="Center" />
                                         <Border Grid.Column="2"

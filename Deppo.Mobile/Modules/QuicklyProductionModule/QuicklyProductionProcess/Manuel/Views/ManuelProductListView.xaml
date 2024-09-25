@@ -19,9 +19,11 @@
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
+
+
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
@@ -140,6 +142,7 @@
 
         <Button Grid.Row="2"
                 Margin="10,10,10,20"
+                IsEnabled="{Binding SelectedProduct, Converter={StaticResource IsNotNullConverter}}"
                 Command="{Binding NextViewCommand}"
                 Text="İleri" />
     </Grid>
