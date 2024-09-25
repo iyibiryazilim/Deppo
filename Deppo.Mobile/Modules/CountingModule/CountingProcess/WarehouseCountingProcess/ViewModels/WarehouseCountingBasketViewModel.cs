@@ -329,7 +329,7 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
             if (item.IsCompleted)
             {
                 item.IsCompleted = false;
-            }
+			}
             else
             {
                 item.IsCompleted = true;
