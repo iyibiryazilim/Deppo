@@ -19,7 +19,7 @@ namespace Deppo.Mobile.Core.Models.QuicklyModels
          WarehouseModel warehouseModel = null!;
 
         [ObservableProperty]
-        ProductModel productModel = null!;
+        BOMSubProductModel productModel = null!;
 
         [ObservableProperty]
          double bOMQuantity = default;

@@ -4,6 +4,7 @@ using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.Models.QuicklyModels;
 using Deppo.Mobile.Core.Models.QuicklyModels.BasketModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
@@ -27,9 +28,12 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
     private readonly ILocationTransactionService _locationTransactionService;
     private readonly IUserDialogs _userDialogs;
     private readonly IWarehouseService _warehouseService;
+    private readonly IQuicklyBomService _quicklyBomService;
 
     [ObservableProperty]
     QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
+
+    public ObservableCollection<BOMSubProductModel> Items { get; } = new();
 
 
     [ObservableProperty]
@@ -40,7 +44,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
 
 
 
-    public WorkOrderCalcViewModel(IHttpClientService httpClientService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs, IWarehouseService warehouseService)
+    public WorkOrderCalcViewModel(IHttpClientService httpClientService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs, IWarehouseService warehouseService, IQuicklyBomService quicklyBomService)
     {
         _httpClientService = httpClientService;
         _locationTransactionService = locationTransactionService;
@@ -61,7 +65,8 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
         BackCommand = new Command(async () => await BackAsync());
 
 
-       
+        LoadItemsSubCommand = new Command(async () => await LoadItemsSubAsync());
+        _quicklyBomService = quicklyBomService;
     }
 
 
@@ -75,6 +80,11 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
     public Command DeleteItemCommand { get; }
     public Command NextViewCommand { get; }
     public Command BackCommand { get; }
+
+
+
+
+    public Command LoadItemsSubCommand { get; }
     #endregion
 
 
@@ -198,5 +208,59 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
         }
     }
 
-    
+    private async Task LoadItemsSubAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            _userDialogs.Loading("Loading Items...");
+            Items.Clear();
+            await Task.Delay(1000);
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _quicklyBomService.GetObjectsWorkSubProducts(httpClient, firmNumber: _httpClientService.FirmNumber, mainProductReferenceId: QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId, periodNumber: _httpClientService.PeriodNumber , take: 1000);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var product in result.Data)
+                {
+                    var item = Mapping.Mapper.Map<BOMSubProductModel>(product);
+
+                    if(item is not null)
+                    {
+                        QuicklyBomSubProductModel subproducts = new QuicklyBomSubProductModel();
+                        subproducts.ProductModel = item;
+                        QuicklyBomProductBasketModel.SubProducts.Add(subproducts);
+                    }
+                }
+               
+            }
+
+            _userDialogs.Loading().Hide();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+   
+
+
+
+
+
+
+
 }

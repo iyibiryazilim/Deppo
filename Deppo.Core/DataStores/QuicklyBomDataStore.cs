@@ -117,9 +117,9 @@ namespace Deppo.Core.DataStores
 
 
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsWorkSubProducts(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsWorkSubProducts(HttpClient httpClient, int firmNumber,int mainProductReferenceId, int periodNumber, string search = "", int skip = 0, int take = 20)
         {
-            var content = new StringContent(JsonConvert.SerializeObject(ProductQueryWorkOrder(firmNumber, periodNumber, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(ProductQueryWorkSubProducts(firmNumber, periodNumber, mainProductReferenceId,search, skip, take)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -218,34 +218,35 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
         private string ProductQueryWorkOrder(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
         {
-            string baseQuery = $@"Select
-[ReferenceId] = ITEMS.LOGICALREF,
-[Code] = ITEMS.CODE,
-[Name] = ITEMS.NAME,
-[VatRate] = ITEMS.VAT,
-[UnitsetReferenceId] = UNITSETF.LOGICALREF,
-[UnitsetCode] = UNITSETF.CODE,
-[UnitsetName] = UNITSETF.NAME,
-[SubUnitsetReferenceId] = UNITSETL.LOGICALREF,
-[SubUnitsetCode] = UNITSETL.CODE,
-[SubUnitsetName] = UNITSETL.NAME,
-[IsVariant] = ITEMS.CANCONFIGURE,
-[TrackingType] = ITEMS.TRACKTYPE,
-[LocTracking] = ITEMS.LOCTRACKING,
-[GroupCode] = ISNULL(ITEMS.STGRPCODE,''),
-[BrandReferenceId] = ISNULL(BRAND.LOGICALREF,0),
-[BrandCode] = ISNULL(BRAND.CODE,''),
-[BrandName] = ISNULL(BRAND.DESCR,''),
-[WarehouseNumber] = ISNULL(WAREHOUSE.NR, 0),
-[WarehouseName] = ISNULL(WAREHOUSE.NAME , ''),
-[StockQuantity] = 0 
-from LG_{firmNumber.ToString().PadLeft(3, '0')}_STCOMPLN as STCOMPLN WITH(NOLOCK)
-LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS as ITEMS WITH(NOLOCK) ON STCOMPLN.MAINCREF = ITEMS.LOGICALREF
+            string baseQuery = $@"SELECT
+    [ReferenceId] = ITEMS.LOGICALREF,
+    [Code] = ITEMS.CODE,
+    [Name] = ITEMS.NAME,
+    [VatRate] = ITEMS.VAT,
+    [UnitsetReferenceId] = UNITSETF.LOGICALREF,
+    [UnitsetCode] = UNITSETF.CODE,
+    [UnitsetName] = UNITSETF.NAME,
+    [SubUnitsetReferenceId] = UNITSETL.LOGICALREF,
+    [SubUnitsetCode] = UNITSETL.CODE,
+    [SubUnitsetName] = UNITSETL.NAME,
+    [IsVariant] = ITEMS.CANCONFIGURE,
+    [TrackingType] = ITEMS.TRACKTYPE,
+    [LocTracking] = ITEMS.LOCTRACKING,
+    [GroupCode] = ISNULL(ITEMS.STGRPCODE, ''),
+    [BrandReferenceId] = ISNULL(BRAND.LOGICALREF, 0),
+    [BrandCode] = ISNULL(BRAND.CODE, ''),
+    [BrandName] = ISNULL(BRAND.DESCR, ''),
+    [WarehouseNumber] = ISNULL(WAREHOUSE.NR, 0),
+    [WarehouseName] = ISNULL(WAREHOUSE.NAME, ''),
+	[Amount] = ISNULL(ITEMS.QPRODAMNT,0), 
+    [StockQuantity] = 0
+FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_STCOMPLN AS STCOMPLN WITH(NOLOCK)
+LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS WITH(NOLOCK) ON STCOMPLN.MAINCREF = ITEMS.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_MARK AS BRAND WITH(NOLOCK) ON ITEMS.MARKREF = BRAND.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(NOLOCK) ON STCOMPLN.UOMREF = UNITSETL.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON UNITSETL.UNITSETREF = UNITSETF.LOGICALREF
 LEFT JOIN L_CAPIWHOUSE AS WAREHOUSE WITH(NOLOCK) ON STCOMPLN.SOURCEINDEX = WAREHOUSE.NR AND WAREHOUSE.FIRMNR = {firmNumber}
-WHERE STCOMPLN.LINENO_ = 1";
+WHERE  ITEMS.CARDTYPE  IN(11,12)";
 
             if (!string.IsNullOrEmpty(search))
                 baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";
@@ -263,7 +264,6 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
         private string ProductQueryWorkSubProducts(int firmNumber, int periodNumber,int mainProductReferenceId ,string search = "", int skip = 0, int take = 20)
         {
             string baseQuery = $@"SELECT
-
 	[MainProductReferenceId] = ISNULL(ITEMS2.LOGICALREF, 0),
 	[MainProductCode] = ISNULL(ITEMS2.CODE, ''), 
 	[Amount] = ISNULL(STCOMPLN.AMNT,0),
@@ -294,7 +294,7 @@ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(N
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON UNITSETL.UNITSETREF = UNITSETF.LOGICALREF
 LEFT JOIN L_CAPIWHOUSE AS WAREHOUSE WITH(NOLOCK) ON STCOMPLN.SOURCEINDEX = WAREHOUSE.NR AND WAREHOUSE.FIRMNR = {firmNumber}
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS2 WITH(NOLOCK) ON STCOMPLN.MAINCREF = ITEMS2.LOGICALREF 
-WHERE STCOMPLN.LINENO_ <> 1 and ITEMS2.LOGICALREF = {mainProductReferenceId}";
+WHERE  ITEMS2.LOGICALREF = {mainProductReferenceId}";
 
             if (!string.IsNullOrEmpty(search))
                 baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";

@@ -20,10 +20,23 @@ namespace Deppo.Mobile.Core.Models.QuicklyModels
 
         private int _warehouseNumber = default;
         private string _warehouseName = string.Empty;
-
+        private double _amount = default;
 
         public QuicklyBOMProductModel()
         {
+        }
+
+
+
+        public double Amount 
+        {
+            get => _amount;
+            set
+            {
+                if (_amount == value) return;
+                _amount = value;
+                NotifyPropertyChanged();
+            }
         }
 
         public int WarehouseNumber
