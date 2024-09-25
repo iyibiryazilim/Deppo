@@ -9,41 +9,34 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
-
 using System;
 using System.Collections.Generic;
-
 using System.Collections.ObjectModel;
-
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Deppo.Mobile.Core.Models.QuicklyModels;
-using Deppo.Mobile.Core.Models.QuicklyModels.BasketModels;
+using Deppo.Core.Models;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.Views;
+using Deppo.Mobile.Core.Models.ProductModels;
+using Deppo.Mobile.Core.Models.QuicklyModels;
+using Deppo.Core.BaseModels;
+using Deppo.Mobile.Core.Models.QuicklyModels.BasketModels;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.Views;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels;
 
-[QueryProperty(name: nameof(QuicklyBomProductBasketModel), queryId: nameof(QuicklyBomProductBasketModel))]
-
-
-public partial class ManuelCalcWarehouseListViewModel : BaseViewModel
+public partial class ManuelCalcOutWarehouseListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
     private readonly IWarehouseService _warehouseService;
     private readonly IUserDialogs _userDialogs;
-
-
-    [ObservableProperty]
-    QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
 
     [ObservableProperty]
     private WarehouseModel selectedWarehouseModel = null!;
 
     public ObservableCollection<WarehouseModel> Items { get; } = new();
 
-    public ManuelCalcWarehouseListViewModel(IHttpClientService httpClientService,
+    public ManuelCalcOutWarehouseListViewModel(IHttpClientService httpClientService,
     IWarehouseService warehouseService,
     IUserDialogs userDialogs)
     {
@@ -60,7 +53,6 @@ public partial class ManuelCalcWarehouseListViewModel : BaseViewModel
     }
 
     public Page CurrentPage { get; set; }
-
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
@@ -169,16 +161,19 @@ public partial class ManuelCalcWarehouseListViewModel : BaseViewModel
             {
                 SelectedWarehouseModel.IsSelected = false;
                 SelectedWarehouseModel = null;
+                //Items.FirstOrDefault(x => x.Number == item.Number).IsSelected = false;
             }
             else
             {
                 if (SelectedWarehouseModel != null)
                 {
                     SelectedWarehouseModel.IsSelected = false;
+                    //Items.FirstOrDefault(x => x.Number == SelectedWarehouseModel.Number).IsSelected = false;
                 }
 
                 SelectedWarehouseModel = item;
                 SelectedWarehouseModel.IsSelected = true;
+                //Items.FirstOrDefault(x => x.Number == item.Number).IsSelected = true;
             }
         }
         catch (Exception ex)
@@ -202,16 +197,9 @@ public partial class ManuelCalcWarehouseListViewModel : BaseViewModel
 
             if (SelectedWarehouseModel is not null)
             {
-                QuicklyBomProductBasketModel.WarehouseName = SelectedWarehouseModel.Name;
-                QuicklyBomProductBasketModel.WarehouseNumber = SelectedWarehouseModel.Number;
-
-                QuicklyBomProductBasketModel.QuicklyBomProduct.WarehouseName = SelectedWarehouseModel.Name;
-                QuicklyBomProductBasketModel.QuicklyBomProduct.WarehouseNumber = SelectedWarehouseModel.Number;
-
-
-                await Shell.Current.GoToAsync($"{nameof(ManuelCalcView)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"{nameof(ManuelCalcSubProductListView)}", new Dictionary<string, object>
                 {
-                    [nameof(Mobile.Core.Models.QuicklyModels.BasketModels.QuicklyBomProductBasketModel)] = QuicklyBomProductBasketModel
+                    [nameof(WarehouseModel)] = SelectedWarehouseModel
                 });
             }
         }

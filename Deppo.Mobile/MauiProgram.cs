@@ -497,8 +497,8 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
 
         builder.Services.AddSingletonWithShellRoute<ManuelProductListView, ManuelProductListViewModel>(nameof(ManuelProductListView));
         builder.Services.AddScopedWithShellRoute<ManuelCalcView, ManuelCalcViewModel>(nameof(ManuelCalcView));
-        builder.Services.AddTransientWithShellRoute<ManuelCalcWarehouseListView, ManuelCalcWarehouseListViewModel>(nameof(ManuelCalcWarehouseListView));
-        builder.Services.AddScopedWithShellRoute<ManuelCalcWarehouseProductListView, ManuelCalcWarehouseProductListViewModel>(nameof(ManuelCalcWarehouseProductListView));
+        builder.Services.AddTransientWithShellRoute<ManuelCalcInWarehouseListView, ManuelCalcInWarehouseListViewModel>(nameof(ManuelCalcInWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<ManuelCalcOutWarehouseListView, ManuelCalcOutWarehouseListViewModel>(nameof(ManuelCalcOutWarehouseListView));
         builder.Services.AddScopedWithShellRoute<ManuelCalcSubProductListView, ManuelCalcSubProductListViewModel>(nameof(ManuelCalcSubProductListView));
         builder.Services.AddTransientWithShellRoute<ManuelFormListView, ManuelFormListViewModel>(nameof(ManuelFormListView));
 

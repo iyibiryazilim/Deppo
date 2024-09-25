@@ -2,11 +2,11 @@ using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manu
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.Views;
 
-public partial class ManuelCalcWarehouseProductListView : ContentPage
+public partial class ManuelCalcInWarehouseListView : ContentPage
 {
-    private readonly ManuelCalcWarehouseProductListViewModel _viewModel;
+    private readonly ManuelCalcInWarehouseListViewModel _viewModel;
 
-    public ManuelCalcWarehouseProductListView(ManuelCalcWarehouseProductListViewModel viewModel)
+    public ManuelCalcInWarehouseListView(ManuelCalcInWarehouseListViewModel viewModel)
     {
         InitializeComponent();
         _viewModel = viewModel;

@@ -30,14 +30,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
     QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
 
 
-    [ObservableProperty]
-    SeriLotTransactionModel? selectedSeriLotTransaction;
-    [ObservableProperty]
-    public ObservableCollection<LocationTransactionModel> selectedLocationTransactions = new();
-    public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
-
-
-
     public ManuelCalcViewModel(IHttpClientService httpClientService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs, IWarehouseService warehouseService)
     {
         _httpClientService = httpClientService;
@@ -59,7 +51,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
         BackCommand = new Command(async () => await BackAsync());
 
 
-        NextViewCommand = new Command(async () => await WarehousePages());
+        AddConsumableItemCommand = new Command(async () => await AddConsumableItemAsync());
     }
 
     public ContentPage CurrentPage { get; set; } = null!;
@@ -70,7 +62,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
     public Command DeleteItemCommand { get; }
     public Command NextViewCommand { get; }
     public Command BackCommand { get; }
-    public Command WarehousePage { get; }
+    public Command AddConsumableItemCommand { get; }
     #endregion
     private async Task IncreaseAsync(QuicklyBomProductBasketModel item)
     {
@@ -193,7 +185,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
 
 
     // + işareti tıklanınca çalışacak olan fonksiyon
-    private async Task WarehousePages()
+    private async Task AddConsumableItemAsync()
     {
         if (IsBusy)
             return;
@@ -202,10 +194,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
             IsBusy = true;
 
             if(QuicklyBomProductBasketModel.QuicklyBomProduct != null)
-            await Shell.Current.GoToAsync($"{nameof(ManuelCalcWarehouseProductListView)}", new Dictionary<string, object>
-            {
-                [nameof(QuicklyBomProductBasketModel)] = QuicklyBomProductBasketModel
-            });
+            await Shell.Current.GoToAsync($"{nameof(ManuelCalcOutWarehouseListView)}");
         }
         catch (Exception ex)
         {
