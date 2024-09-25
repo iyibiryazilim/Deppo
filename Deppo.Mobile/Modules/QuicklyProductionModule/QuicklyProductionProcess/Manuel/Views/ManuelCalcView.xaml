@@ -112,10 +112,33 @@
         <Grid Grid.Row="1"
               RowDefinitions="Auto, *"
               RowSpacing="10">
-            <Label FontAttributes="Bold"
-                   FontSize="Title"
-                   Text="Sarf Malzemeleri"
-                   TextColor="{StaticResource OffBlack}" />
+            <Grid ColumnDefinitions="Auto,.10*">
+                <Label Grid.Column="0" FontAttributes="Bold" 
+                       FontSize="Title"
+                       Text="Sarf Malzemeleri"
+                       TextColor="{StaticResource OffBlack}" />
+                <Border Grid.Column="1"  Padding="5" 
+                        HorizontalOptions="End"
+                        BackgroundColor="{StaticResource White}"
+                        Stroke="{StaticResource Secondary}"
+                        StrokeShape="RoundRectangle">
+                    <Label FontFamily="FAS"
+                           FontSize="Medium"
+                           Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                           TextColor="{StaticResource Secondary}" />
+
+                    <!--<Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ManuelCalcViewModel}}, Path=IncreaseCommand}"
+                                              CommandParameter="{Binding .}" />
+                    </Border.GestureRecognizers>-->
+                </Border>
+
+            </Grid>
+            <HorizontalStackLayout >
+                
+               
+
+            </HorizontalStackLayout>
 
             <!--<CollectionView Grid.Row="1"
                          ItemsSource="{Binding ProductDetailModel.LastTransactions}">
