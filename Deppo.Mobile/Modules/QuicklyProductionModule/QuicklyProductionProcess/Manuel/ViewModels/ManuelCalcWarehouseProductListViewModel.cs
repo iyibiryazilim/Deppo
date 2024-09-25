@@ -32,14 +32,12 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
 
 public partial class ManuelCalcWarehouseProductListViewModel : BaseViewModel
 {
-
     private readonly IHttpClientService _httpClientService;
     private readonly IWarehouseService _warehouseService;
     private readonly IUserDialogs _userDialogs;
 
-
     [ObservableProperty]
-    QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
+    private QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
 
     [ObservableProperty]
     private WarehouseModel selectedWarehouseModel = null!;
@@ -76,7 +74,6 @@ public partial class ManuelCalcWarehouseProductListViewModel : BaseViewModel
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
-
 
     private async Task LoadItemsAsync()
     {
@@ -214,14 +211,10 @@ public partial class ManuelCalcWarehouseProductListViewModel : BaseViewModel
 
             if (SelectedWarehouseModel is not null)
             {
-               
-
-
                 await Shell.Current.GoToAsync($"{nameof(ManuelCalcSubProductListView)}", new Dictionary<string, object>
                 {
                     [nameof(Mobile.Core.Models.QuicklyModels.BasketModels.QuicklyBomProductBasketModel)] = QuicklyBomProductBasketModel,
                     [nameof(WarehouseModel)] = SelectedWarehouseModel
-
                 });
             }
         }
@@ -233,5 +226,5 @@ public partial class ManuelCalcWarehouseProductListViewModel : BaseViewModel
         {
             IsBusy = false;
         }
-
+    }
 }

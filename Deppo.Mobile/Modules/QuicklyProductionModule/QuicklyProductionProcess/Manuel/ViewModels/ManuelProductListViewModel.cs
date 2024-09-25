@@ -28,7 +28,6 @@ using Deppo.Core.BaseModels;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.Views;
 using Deppo.Mobile.Core.Models.QuicklyModels.BasketModels;
 
-
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels;
 
 public partial class ManuelProductListViewModel : BaseViewModel
@@ -38,18 +37,13 @@ public partial class ManuelProductListViewModel : BaseViewModel
     private readonly IUserDialogs _userDialogs;
     private readonly IQuicklyBomService _quicklyBomService;
 
-
     public ObservableCollection<QuicklyBOMProductModel> Items { get; } = new();
 
     [ObservableProperty]
     private QuicklyBOMProductModel? selectedProduct;
 
-
-
     [ObservableProperty]
     private QuicklyBomProductBasketModel? basketModel = new();
-
-
 
     public Page CurrentPage { get; set; }
 
@@ -84,18 +78,17 @@ public partial class ManuelProductListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            
-            if(SelectedProduct is null)
+
+            if (SelectedProduct is null)
             {
                 await _userDialogs.AlertAsync("Lütfen bir ürün seçiniz.", "Hata", "Tamam");
                 return;
             }
             BasketModel.QuicklyBomProduct = SelectedProduct;
             BasketModel.WarehouseNumber = SelectedProduct.WarehouseNumber;
-            BasketModel.WarehouseName = SelectedProduct.WarehouseName;  
+            BasketModel.WarehouseName = SelectedProduct.WarehouseName;
             await Shell.Current.GoToAsync($"{nameof(ManuelCalcWarehouseListView)}", new Dictionary<string, object>
             {
-
                 [nameof(QuicklyBomProductBasketModel)] = BasketModel
             });
         }
@@ -160,7 +153,7 @@ public partial class ManuelProductListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-
+            _userDialogs.ShowLoading("Loading...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _quicklyBomService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, skip: Items.Count, take: 20);
 
