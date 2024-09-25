@@ -211,7 +211,7 @@ public partial class ManuelCalcWarehouseListViewModel : BaseViewModel
 
                 await Shell.Current.GoToAsync($"{nameof(ManuelCalcView)}", new Dictionary<string, object>
                 {
-                    [nameof(ManuelCalcViewModel)] = QuicklyBomProductBasketModel
+                    [nameof(Mobile.Core.Models.QuicklyModels.BasketModels.QuicklyBomProductBasketModel)] = QuicklyBomProductBasketModel
                 });
             }
         }
