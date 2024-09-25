@@ -22,10 +22,10 @@ namespace Deppo.Mobile.Core.Models.QuicklyModels
         BOMSubProductModel productModel = null!;
 
         [ObservableProperty]
-         double bOMQuantity = default;
+         double subBOMQuantity = default;
 
         [ObservableProperty]
-        double outputQuantity = default;
+        double subOutputQuantity = default;
 
         [ObservableProperty]
         ObservableCollection<LocationTransactionModel> locationTransactions = new();
