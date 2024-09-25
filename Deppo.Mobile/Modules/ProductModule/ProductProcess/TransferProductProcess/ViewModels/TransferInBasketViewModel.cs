@@ -536,7 +536,11 @@ public partial class TransferInBasketViewModel : BaseViewModel
 				item.Locations.Clear();
 			}
 
-			await Shell.Current.GoToAsync("..");
+			TransferBasketModel.InProducts.Clear();
+
+
+
+            await Shell.Current.GoToAsync("..");
 
 		}
 		catch (Exception ex)

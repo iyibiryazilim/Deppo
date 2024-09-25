@@ -50,23 +50,13 @@ public partial class WarehouseCountingBasketModel : ObservableObject
 	int locTracking;
 
 	[ObservableProperty]
+	bool isCompleted;
+
+    [ObservableProperty]
 	ObservableCollection<LocationTransactionModel> locationTransactions = new();
 
-	[ObservableProperty]
-	bool isSelected;
+	public string CountingText => IsCompleted ? "Sayıldı" : "Bekliyor";
 
-	[ObservableProperty]
-	string locTrackingIcon = "location-dot";
+    public string CountingTextColor => IsCompleted ? "#008000" : "#fcf58c";
 
-	public string LocTrackingIconColor => LocTracking == 1 ? "#F5004F" : "#C8C8C8";
-
-	[ObservableProperty]
-	string variantIcon = "bookmark";
-
-	public string VariantIconColor => IsVariant ? "#F5004F" : "#C8C8C8";
-
-	[ObservableProperty]
-	string trackingTypeIcon = "box-archive";
-
-	public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 }
