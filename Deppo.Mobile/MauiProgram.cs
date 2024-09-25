@@ -16,6 +16,8 @@ using Deppo.Mobile.Modules.AnalysisModule.SalesAnalysis.ViewModels;
 using Deppo.Mobile.Modules.AnalysisModule.SalesAnalysis.Views;
 using Deppo.Mobile.Modules.CountingModule.CountingPanel.ViewModels;
 using Deppo.Mobile.Modules.CountingModule.CountingPanel.Views;
+using Deppo.Mobile.Modules.CountingModule.CountingProcess.ProductCountingProcess.ViewModels;
+using Deppo.Mobile.Modules.CountingModule.CountingProcess.ProductCountingProcess.Views;
 using Deppo.Mobile.Modules.CountingModule.CountingProcess.ViewModels;
 using Deppo.Mobile.Modules.CountingModule.CountingProcess.Views;
 using Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProcess.ViewModels;
@@ -481,13 +483,22 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddScopedWithShellRoute<WarehouseCountingProductListView, WarehouseCountingProductListViewModel>(nameof(WarehouseCountingProductListView));
         builder.Services.AddScopedWithShellRoute<WarehouseCountingFormView, WarehouseCountingFormViewModel>(nameof(WarehouseCountingFormView));
 
-        #endregion Ambara Gore Sayim
+		#endregion Ambara Gore Sayim
 
-        #endregion Counting Modules
+		#region Urune Gore Sayim
+		builder.Services.AddScopedWithShellRoute<ProductCountingProductListView, ProductCountingProductListViewModel>(nameof(ProductCountingProductListView));
+		builder.Services.AddScopedWithShellRoute<ProductCountingWarehouseTotalListView, ProductCountingWarehouseTotalListViewModel>(nameof(ProductCountingWarehouseTotalListView));
+		builder.Services.AddScopedWithShellRoute<ProductCountingLocationListView, ProductCountingLocationListViewModel>(nameof(ProductCountingLocationListView));
+		builder.Services.AddScopedWithShellRoute<ProductCountingBasketView, ProductCountingBasketViewModel>(nameof(ProductCountingBasketView));
+		builder.Services.AddScopedWithShellRoute<ProductCountingFormView, ProductCountingFormViewModel>(nameof(ProductCountingFormView));
 
-        #region Quickly Production Modules
+		#endregion
 
-        builder.Services.AddSingletonWithShellRoute<QuicklyProductionPanelView, QuicklyProductionPanelViewModel>(nameof(QuicklyProductionPanelView));
+		#endregion Counting Modules
+
+		#region Quickly Production Modules
+
+		builder.Services.AddSingletonWithShellRoute<QuicklyProductionPanelView, QuicklyProductionPanelViewModel>(nameof(QuicklyProductionPanelView));
         builder.Services.AddSingletonWithShellRoute<QuicklyProductionBOMMenuView, QuicklyProductionBOMMenuViewModel>(nameof(QuicklyProductionBOMMenuView));
         builder.Services.AddSingletonWithShellRoute<QuicklyProductionProcessView, QuicklyProductionProcessViewModel>(nameof(QuicklyProductionProcessView));
 
