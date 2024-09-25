@@ -85,7 +85,14 @@ public partial class ManuelProductListViewModel : BaseViewModel
         {
             IsBusy = true;
             
+            if(SelectedProduct is null)
+            {
+                await _userDialogs.AlertAsync("Lütfen bir ürün seçiniz.", "Hata", "Tamam");
+                return;
+            }
             BasketModel.QuicklyBomProduct = SelectedProduct;
+            basketModel.WarehouseNumber = SelectedProduct.WarehouseNumber;
+            basketModel.WarehouseName = SelectedProduct.WarehouseName;  
             await Shell.Current.GoToAsync($"{nameof(ManuelCalcWarehouseListView)}", new Dictionary<string, object>
             {
 
