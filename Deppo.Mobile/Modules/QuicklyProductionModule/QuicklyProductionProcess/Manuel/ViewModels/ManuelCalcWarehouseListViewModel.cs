@@ -25,7 +25,7 @@ using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manu
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels;
 
-[QueryProperty(name: nameof(QuicklyBomProductBasketModel), queryId: nameof(QuicklyBasket))]
+[QueryProperty(name: nameof(QuicklyBomProductBasketModel), queryId: nameof(QuicklyBomProductBasketModel))]
 
 
 public partial class ManuelCalcWarehouseListViewModel : BaseViewModel
@@ -36,7 +36,7 @@ public partial class ManuelCalcWarehouseListViewModel : BaseViewModel
 
 
     [ObservableProperty]
-    QuicklyBomProductBasketModel quicklyBasket = null!;
+    QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
 
     [ObservableProperty]
     private WarehouseModel selectedWarehouseModel = null!;
@@ -202,16 +202,16 @@ public partial class ManuelCalcWarehouseListViewModel : BaseViewModel
 
             if (SelectedWarehouseModel is not null)
             {
-                QuicklyBasket.WarehouseName = SelectedWarehouseModel.Name;
-                QuicklyBasket.WarehouseNumber = SelectedWarehouseModel.Number;
+                QuicklyBomProductBasketModel.WarehouseName = SelectedWarehouseModel.Name;
+                QuicklyBomProductBasketModel.WarehouseNumber = SelectedWarehouseModel.Number;
 
-                QuicklyBasket.QuicklyBomProduct.WarehouseName = SelectedWarehouseModel.Name;
-                QuicklyBasket.QuicklyBomProduct.WarehouseNumber = SelectedWarehouseModel.Number;
+                QuicklyBomProductBasketModel.QuicklyBomProduct.WarehouseName = SelectedWarehouseModel.Name;
+                QuicklyBomProductBasketModel.QuicklyBomProduct.WarehouseNumber = SelectedWarehouseModel.Number;
 
 
                 await Shell.Current.GoToAsync($"{nameof(ManuelCalcView)}", new Dictionary<string, object>
                 {
-                    [nameof(ManuelCalcViewModel)] = QuicklyBasket
+                    [nameof(ManuelCalcViewModel)] = QuicklyBomProductBasketModel
                 });
             }
         }

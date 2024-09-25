@@ -81,10 +81,6 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
             BasketModel.QuicklyBomProduct = SelectedProduct;
             BasketModel.WarehouseName = SelectedProduct.WarehouseName;
             BasketModel.WarehouseNumber = SelectedProduct.WarehouseNumber;
-
-
-
-
             await Shell.Current.GoToAsync($"{nameof(WorkOrderCalcView)}", new Dictionary<string, object>
             {
                 [nameof(QuicklyBomProductBasketModel)] = BasketModel
