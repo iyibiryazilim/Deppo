@@ -1,9 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Android.App;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.Models.QuicklyModels;
 using Deppo.Mobile.Core.Models.QuicklyModels.BasketModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
@@ -18,6 +20,7 @@ using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 using static Java.Text.Normalizer;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels;
+
 [QueryProperty(name: nameof(QuicklyBomProductBasketModel), queryId: nameof(QuicklyBomProductBasketModel))]
 public partial class ManuelCalcViewModel : BaseViewModel
 {
@@ -27,8 +30,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
     private readonly IWarehouseService _warehouseService;
 
     [ObservableProperty]
-    QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
-
+    private QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
 
     public ManuelCalcViewModel(IHttpClientService httpClientService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs, IWarehouseService warehouseService)
     {
@@ -38,24 +40,28 @@ public partial class ManuelCalcViewModel : BaseViewModel
         _warehouseService = warehouseService;
         Title = "Ürün Detayı";
 
+        IncreaseCommand = new Command(async () => await IncreaseAsync());
 
-        IncreaseCommand = new Command<QuicklyBomProductBasketModel>(async (item) => await IncreaseAsync(item));
-
-
-        DecreaseCommand = new Command<QuicklyBomProductBasketModel>(async (item) => await DecreaseAsync(item));
-
+        DecreaseCommand = new Command(async () => await DecreaseAsync());
 
         NextViewCommand = new Command(async () => await NextViewAsync());
 
-
         BackCommand = new Command(async () => await BackAsync());
 
-
         AddConsumableItemCommand = new Command(async () => await AddConsumableItemAsync());
+
+        LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
+        LoadLocationTransactionsCommand = new Command(async () => await LoadLocationTransactionsAsync());
+        LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
+        LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
+        LocationTransactionConfirmCommand = new Command(async () => await LocationTransactionConfirmAsync());
+        LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
     }
 
     public ContentPage CurrentPage { get; set; } = null!;
+
     #region Commands
+
     public Command ShowProductViewCommand { get; }
     public Command IncreaseCommand { get; }
     public Command DecreaseCommand { get; }
@@ -63,19 +69,35 @@ public partial class ManuelCalcViewModel : BaseViewModel
     public Command NextViewCommand { get; }
     public Command BackCommand { get; }
     public Command AddConsumableItemCommand { get; }
-    #endregion
-    private async Task IncreaseAsync(QuicklyBomProductBasketModel item)
+
+    //LocationTransaction
+    public Command LoadLocationTransactionsCommand { get; }
+
+    public Command LoadMoreLocationTransactionsCommand { get; }
+    public Command<LocationTransactionModel> LocationTransactionIncreaseCommand { get; }
+    public Command<LocationTransactionModel> LocationTransactionDecreaseCommand { get; }
+    public Command LocationTransactionConfirmCommand { get; }
+    public Command LocationTransactionCloseCommand { get; }
+
+    //SubProduct Increase Decrease
+    public Command SubIncreaseCommand { get; }
+
+    public Command SubDecreaseCommand { get; }
+
+    #endregion Commands
+
+    private async Task IncreaseAsync()
     {
         if (IsBusy)
             return;
-        
+
         try
         {
             IsBusy = true;
 
-            if (item is not null)
+            if (QuicklyBomProductBasketModel is not null)
             {
-                item.BOMQuantity += 1;
+                QuicklyBomProductBasketModel.BOMQuantity += 1;
             }
         }
         catch (Exception ex)
@@ -91,7 +113,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
         }
     }
 
-    private async Task DecreaseAsync(QuicklyBomProductBasketModel item)
+    private async Task DecreaseAsync()
     {
         if (IsBusy)
             return;
@@ -100,12 +122,9 @@ public partial class ManuelCalcViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            if (item is not null)
+            if (QuicklyBomProductBasketModel is not null && QuicklyBomProductBasketModel.BOMQuantity > 0)
             {
-                if(item.BOMQuantity > 0)
-                {
-                    item.BOMQuantity -= 1;
-                }
+                QuicklyBomProductBasketModel.BOMQuantity -= 1;
             }
         }
         catch (Exception ex)
@@ -156,7 +175,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
         }
     }
 
-
     private async Task NextViewAsync()
     {
         if (IsBusy)
@@ -183,7 +201,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
         }
     }
 
-
     // + işareti tıklanınca çalışacak olan fonksiyon
     private async Task AddConsumableItemAsync()
     {
@@ -193,8 +210,8 @@ public partial class ManuelCalcViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            if(QuicklyBomProductBasketModel.QuicklyBomProduct != null)
-            await Shell.Current.GoToAsync($"{nameof(ManuelCalcOutWarehouseListView)}");
+            if (QuicklyBomProductBasketModel.QuicklyBomProduct != null)
+                await Shell.Current.GoToAsync($"{nameof(ManuelCalcOutWarehouseListView)}");
         }
         catch (Exception ex)
         {
@@ -209,9 +226,35 @@ public partial class ManuelCalcViewModel : BaseViewModel
         }
     }
 
+    public async Task SubIncreaseAsync(BOMSubProductModel item)
+    {
+    }
 
+    public async Task SubDecreaseAsync(BOMSubProductModel item)
+    {
+    }
 
+    public async Task LoadLocationTransactionsAsync()
+    {
+    }
 
+    public async Task LoadMoreLocationTransactionsAsync()
+    {
+    }
 
+    public async Task LocationTransactionIncreaseAsync(LocationTransactionModel item)
+    {
+    }
 
+    public async Task LocationTransactionDecreaseAsync(LocationTransactionModel item)
+    {
+    }
+
+    public async Task LocationTransactionConfirmAsync()
+    {
+    }
+
+    public async Task LocationTransactionCloseAsync()
+    {
+    }
 }
