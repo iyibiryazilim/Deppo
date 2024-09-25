@@ -32,6 +32,17 @@ public partial class ManuelCalcViewModel : BaseViewModel
     [ObservableProperty]
     private QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
 
+
+    [ObservableProperty]
+    public ObservableCollection<LocationTransactionModel> selectedLocationTransactions = new();
+    public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
+
+    [ObservableProperty]
+    public QuicklyBomSubProductModel selectedItem = new();
+
+
+
+
     public ManuelCalcViewModel(IHttpClientService httpClientService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs, IWarehouseService warehouseService)
     {
         _httpClientService = httpClientService;
@@ -51,11 +62,13 @@ public partial class ManuelCalcViewModel : BaseViewModel
         AddConsumableItemCommand = new Command(async () => await AddConsumableItemAsync());
 
         LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
-        LoadLocationTransactionsCommand = new Command(async () => await LoadLocationTransactionsAsync());
         LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
         LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
         LocationTransactionConfirmCommand = new Command(async () => await LocationTransactionConfirmAsync());
         LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
+
+        SubIncreaseCommand = new Command<QuicklyBomSubProductModel>(async (item) => await SubIncreaseAsync(item));
+        SubDecreaseCommand = new Command<QuicklyBomSubProductModel>(async (item) => await SubDecreaseAsync(item));
     }
 
     public ContentPage CurrentPage { get; set; } = null!;
@@ -71,8 +84,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
     public Command AddConsumableItemCommand { get; }
 
     //LocationTransaction
-    public Command LoadLocationTransactionsCommand { get; }
-
     public Command LoadMoreLocationTransactionsCommand { get; }
     public Command<LocationTransactionModel> LocationTransactionIncreaseCommand { get; }
     public Command<LocationTransactionModel> LocationTransactionDecreaseCommand { get; }
@@ -80,9 +91,9 @@ public partial class ManuelCalcViewModel : BaseViewModel
     public Command LocationTransactionCloseCommand { get; }
 
     //SubProduct Increase Decrease
-    public Command SubIncreaseCommand { get; }
+    public Command<QuicklyBomSubProductModel> SubIncreaseCommand { get; }
 
-    public Command SubDecreaseCommand { get; }
+    public Command<QuicklyBomSubProductModel> SubDecreaseCommand { get; }
 
     #endregion Commands
 
@@ -126,6 +137,11 @@ public partial class ManuelCalcViewModel : BaseViewModel
             {
                 QuicklyBomProductBasketModel.BOMQuantity -= 1;
             }
+            else
+            {
+                _userDialogs.Alert("Ürün Miktarı 0'dan büyük olmalıdır. Daha Fazla Azaltamazsınız", "Uyarı", "Tamam");
+                return;
+            }
         }
         catch (Exception ex)
         {
@@ -155,6 +171,9 @@ public partial class ManuelCalcViewModel : BaseViewModel
                     return;
 
                 QuicklyBomProductBasketModel = null;
+                SelectedLocationTransactions.Clear();
+                LocationTransactions.Clear();
+                selectedItem = null;
                 await Shell.Current.GoToAsync("..");
             }
             else
@@ -226,35 +245,288 @@ public partial class ManuelCalcViewModel : BaseViewModel
         }
     }
 
-    public async Task SubIncreaseAsync(BOMSubProductModel item)
+    public async Task SubIncreaseAsync(QuicklyBomSubProductModel item)
     {
+        if (IsBusy)
+            return;
+        try
+        {
+
+            if (item is not null)
+            {
+                SelectedItem = item;
+                if (item.ProductModel.LocTracking == 1)
+                {
+                    await LoadLocationTransactionsAsync();
+                    CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.FullExpanded;
+                }
+                else
+                {
+                    if (item.SubBOMQuantity < item.ProductModel.StockQuantity)
+                        item.SubBOMQuantity = item.SubBOMQuantity + 1;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
-    public async Task SubDecreaseAsync(BOMSubProductModel item)
+    public async Task SubDecreaseAsync(QuicklyBomSubProductModel item)
     {
+        if (IsBusy)
+            return;
+        try
+        {
+
+            if (item is not null)
+            {
+                SelectedItem = item;
+                if (item.ProductModel.LocTracking == 1)
+                {
+                    await LoadLocationTransactionsAsync();
+                    CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.FullExpanded;
+                }
+                else
+                {
+                    if (item.SubBOMQuantity < item.ProductModel.StockQuantity)
+                        item.SubBOMQuantity = item.SubBOMQuantity - 1;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     public async Task LoadLocationTransactionsAsync()
     {
+        try
+        {
+            _userDialogs.ShowLoading("Load Location Items...");
+            await Task.Delay(1000);
+            LocationTransactions.Clear();
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _locationTransactionService.GetInputObjectsAsync(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                productReferenceId: SelectedItem.ProductModel.ReferenceId,
+                warehouseNumber: SelectedItem.WarehouseModel.Number,
+                skip: 0,
+                take: 20
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+                foreach (var item in result.Data)
+                {
+                    LocationTransactionModel model = Mapping.Mapper.Map<LocationTransactionModel>(item);
+                    if(model != null)
+                    {
+                        if(selectedItem.LocationTransactions.Any(x=>x.LocationCode == model.LocationCode))
+                        {
+                            model.OutputQuantity = SelectedItem.LocationTransactions.FirstOrDefault(x=>x.ReferenceId == model.ReferenceId).OutputQuantity;
+                        }
+                    }
+                    LocationTransactions.Add(model);
+                }
+            }
+
+            _userDialogs.Loading().Hide();
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     public async Task LoadMoreLocationTransactionsAsync()
     {
+        try
+        {
+            _userDialogs.ShowLoading("Load Location Items...");
+            await Task.Delay(1000);
+            LocationTransactions.Clear();
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _locationTransactionService.GetInputObjectsAsync(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                productReferenceId: SelectedItem.ProductModel.ReferenceId,
+                warehouseNumber: SelectedItem.WarehouseModel.Number,
+                skip: LocationTransactions.Count,
+                take: 20
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+                foreach (var item in result.Data)
+                {
+                    LocationTransactionModel model = Mapping.Mapper.Map<LocationTransactionModel>(item);
+                    if (model != null)
+                    {
+                        if (selectedItem.LocationTransactions.Any(x => x.LocationCode == model.LocationCode))
+                        {
+                            model.OutputQuantity = SelectedItem.LocationTransactions.FirstOrDefault(x => x.LocationCode == model.LocationCode).OutputQuantity;
+                        }
+                    }
+                    LocationTransactions.Add(model);
+                }
+            }
+
+            _userDialogs.Loading().Hide();
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     public async Task LocationTransactionIncreaseAsync(LocationTransactionModel item)
     {
+        if (IsBusy)
+            return;
+
+        try
+            {
+            IsBusy = true;
+
+            if (item is not null)
+            {
+                var totalQuantity =  LocationTransactions.Sum(x => x.OutputQuantity);
+                if (totalQuantity >= SelectedItem.ProductModel.StockQuantity)
+                {
+                    _userDialogs.Alert("Stok miktarından fazla ürün girişi yapamazsınız.", "Uyarı", "Tamam");
+                    return;
+                }
+                else
+                {
+                    if (item.OutputQuantity < item.Quantity)
+                    {
+                        item.OutputQuantity += 1;
+                        SelectedItem.SubBOMQuantity = item.OutputQuantity;
+                    }
+                       
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     public async Task LocationTransactionDecreaseAsync(LocationTransactionModel item)
     {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            if (item is not null)
+            {
+                if (item.OutputQuantity > 0)
+                {
+                    item.OutputQuantity -= 1;
+                    SelectedItem.SubBOMQuantity = item.OutputQuantity;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     public async Task LocationTransactionConfirmAsync()
     {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            if (LocationTransactions.Count > 0)
+            {
+                SelectedLocationTransactions.Clear();
+                foreach (var item in LocationTransactions.Where(x => x.OutputQuantity > 0))
+                {
+                    SelectedItem.LocationTransactions.Add(item);
+                }
+                SelectedItem.SubBOMQuantity = SelectedItem.LocationTransactions.Where(x => x.OutputQuantity > 0).Sum(x => (double)x.OutputQuantity);
+                CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.Hidden;
+            }
+            else
+            {
+                CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.Hidden;
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     public async Task LocationTransactionCloseAsync()
     {
+        await MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.Hidden;
+        });
     }
 }
