@@ -234,6 +234,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                     if(item is not null)
                     {
                         QuicklyBomSubProductModel subproducts = new QuicklyBomSubProductModel();
+                        subproducts.SubBOMQuantity = item.Amount;
                         subproducts.ProductModel = item;
                         QuicklyBomProductBasketModel.SubProducts.Add(subproducts);
                     }
