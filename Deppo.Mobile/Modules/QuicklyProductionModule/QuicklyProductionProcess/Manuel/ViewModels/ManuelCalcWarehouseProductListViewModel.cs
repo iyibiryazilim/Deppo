@@ -32,6 +32,7 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
 
 public partial class ManuelCalcWarehouseProductListViewModel : BaseViewModel
 {
+
     private readonly IHttpClientService _httpClientService;
     private readonly IWarehouseService _warehouseService;
     private readonly IUserDialogs _userDialogs;
@@ -63,10 +64,19 @@ public partial class ManuelCalcWarehouseProductListViewModel : BaseViewModel
 
     public Page CurrentPage { get; set; }
 
+    public ManuelCalcWarehouseProductListViewModel()
+    {
+        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+        LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+        //ItemTappedCommand = new Command<WarehouseModel>(ItemTappedAsync);
+        NextViewCommand = new Command(async () => await NextViewAsync());
+    }
+
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
+
 
     private async Task LoadItemsAsync()
     {
@@ -223,5 +233,5 @@ public partial class ManuelCalcWarehouseProductListViewModel : BaseViewModel
         {
             IsBusy = false;
         }
-    }
+
 }
