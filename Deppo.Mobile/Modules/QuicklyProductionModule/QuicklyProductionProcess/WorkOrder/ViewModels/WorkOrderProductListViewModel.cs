@@ -79,8 +79,9 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
             IsBusy = true;
 
             BasketModel.QuicklyBomProduct = SelectedProduct;
+            BasketModel.WarehouseName = SelectedProduct.WarehouseName;
             BasketModel.WarehouseNumber = SelectedProduct.WarehouseNumber;
-            BasketModel.WarehouseName = SelectedProduct.Name;
+
 
 
 
@@ -152,7 +153,7 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _quicklyBomService.GetObjectsWorkOrder(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, skip: Items.Count, take: 20);
+            var result = await _quicklyBomService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, skip: Items.Count, take: 20);
 
             if (result.IsSuccess)
             {

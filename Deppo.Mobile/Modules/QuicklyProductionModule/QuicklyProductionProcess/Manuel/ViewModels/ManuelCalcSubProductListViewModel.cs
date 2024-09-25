@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels
 {
-    public partial class ManuelCalcSubProductWarehouseViewModel : BaseViewModel
+    public partial class ManuelCalcSubProductListViewModel : BaseViewModel
     {
     }
 }
