@@ -6,13 +6,13 @@
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionBOMMenu.ViewModels"
-             xmlns:productModel="clr-namespace:Deppo.Mobile.Core.Models.ProductModels;assembly=Deppo.Mobile.Core"
+             xmlns:bomProductModel="clr-namespace:Deppo.Mobile.Core.Models.QuicklyModels;assembly=Deppo.Mobile.Core"
              Title="{Binding Title}"
              x:DataType="viewModels:QuicklyProductionBOMMenuViewModel"
              Shell.TabBarIsVisible="False">
 
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding .}"
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
                                         EventName="Loaded" />
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
                                    StatusBarStyle="Default" />
@@ -48,21 +48,21 @@
         </Border>
 
         <CollectionView Grid.Row="1"
-                        ItemsSource="{Binding .}"
+                        ItemsSource="{Binding Items}"
                         RemainingItemsThreshold="2"
-                        RemainingItemsThresholdReachedCommand="{Binding .}">
+                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout ItemSpacing="0"
                                    Orientation="Vertical" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="productModel:ProductModel">
+                <DataTemplate x:DataType="bomProductModel:QuicklyBOMProductModel">
                     <Border Padding="10"
                             BackgroundColor="Transparent"
                             StrokeShape="RoundRectangle 10"
                             StrokeThickness="0.1">
                         <!--<Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:VirmanProductInListViewModel}}, Path=ItemTappedCommand}"
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WorkOrderProductListViewModel}}, Path=ItemTappedCommand}"
                                                   CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>-->
                         <Border.Triggers>
@@ -139,9 +139,5 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
-
-        <Button Grid.Row="2"
-                Margin="10,10,10,20"
-                Text="İleri" />
     </Grid>
 </ContentPage>

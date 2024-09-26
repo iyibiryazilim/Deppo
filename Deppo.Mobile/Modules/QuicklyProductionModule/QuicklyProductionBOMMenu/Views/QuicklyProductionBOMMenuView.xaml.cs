@@ -4,11 +4,13 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionBOMMenu.
 
 public partial class QuicklyProductionBOMMenuView : ContentPage
 {
-	private readonly QuicklyProductionBOMMenuViewModel _viewModel;
-	public QuicklyProductionBOMMenuView(QuicklyProductionBOMMenuViewModel viewModel)
-	{
-		InitializeComponent();
-		_viewModel = viewModel;
-		BindingContext = _viewModel;
-	}
+    private readonly QuicklyProductionBOMMenuViewModel _viewModel;
+
+    public QuicklyProductionBOMMenuView(QuicklyProductionBOMMenuViewModel viewModel)
+    {
+        InitializeComponent();
+        _viewModel = viewModel;
+        BindingContext = _viewModel;
+        _viewModel.CurrentPage = this;
+    }
 }
