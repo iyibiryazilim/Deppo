@@ -125,7 +125,7 @@
                                      Spacing="5">
                     <Label FontAttributes="Bold"
                            FontSize="Subtitle"
-                           Text="Malzeme Listesi" />
+                           Text="Alt Ürünler" />
                     <BoxView HeightRequest="2"
                              Color="{StaticResource OffBlack}" />
                 </VerticalStackLayout>
