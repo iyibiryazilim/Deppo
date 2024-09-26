@@ -34,8 +34,6 @@
         </ToolbarItem>
     </ContentPage.ToolbarItems>
 
-  
-
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
@@ -133,7 +131,7 @@
                 </VerticalStackLayout>
 
                 <CollectionView Grid.Row="1"
-                                ItemsSource="{Binding .}">
+                                ItemsSource="{Binding QuicklyBomProductBasketModel.SubProducts}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="subBomProductModel:QuicklyBomSubProductModel">
                             <Border Padding="10"
