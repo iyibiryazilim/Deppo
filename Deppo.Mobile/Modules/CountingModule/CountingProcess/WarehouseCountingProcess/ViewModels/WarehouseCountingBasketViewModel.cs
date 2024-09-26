@@ -214,7 +214,7 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
 
             if (item is not null)
             {
-                if (item.OutputQuantity > 1 && (item.OutputQuantity - item.StockQuantity) <= 0)
+                if (item.OutputQuantity > 0 && (item.OutputQuantity - item.StockQuantity) <= 0)
                 {
                     if (item.LocTracking == 1)
                     {
@@ -235,7 +235,7 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
                         item.DifferenceQuantity--;
                     }
                 }
-                else if (item.OutputQuantity > 1 && (item.OutputQuantity - item.StockQuantity) > 0)
+                else if (item.OutputQuantity > 0 && (item.OutputQuantity - item.StockQuantity) > 0)
                 {
                     item.OutputQuantity--;
                     item.DifferenceQuantity--;

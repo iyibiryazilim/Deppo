@@ -22,7 +22,7 @@ using System.Reflection;
 
 namespace Deppo.Mobile.Modules.CountingModule.CountingProcess.ProductCountingProcess.ViewModels;
 
-[QueryProperty(nameof(ProductCountingWarehouseTotalModel), nameof(ProductCountingWarehouseTotalModel))]
+[QueryProperty(nameof(ProductCountingWarehouseModel), nameof(ProductCountingWarehouseModel))]
 [QueryProperty(nameof(LocationModel), nameof(LocationModel))]
 [QueryProperty(nameof(ProductCountingBasketModel), nameof(ProductCountingBasketModel))]
 public partial class ProductCountingFormViewModel : BaseViewModel
@@ -34,7 +34,7 @@ public partial class ProductCountingFormViewModel : BaseViewModel
 
 
     [ObservableProperty]
-    private ProductCountingWarehouseTotalModel productCountingWarehouseTotalModel = null!;
+    private ProductCountingWarehouseModel productCountingWarehouseModel = null!;
 
     [ObservableProperty]
     private LocationModel? locationModel;
@@ -197,7 +197,7 @@ public partial class ProductCountingFormViewModel : BaseViewModel
             TransactionDate = TransactionDate,
             FirmNumber = _httpClientService.FirmNumber,
             SpeCode = SpecialCode,
-            WarehouseNumber = ProductCountingWarehouseTotalModel.WarehouseNumber,
+            WarehouseNumber = ProductCountingWarehouseModel.Number,
 
         };
 
@@ -205,7 +205,7 @@ public partial class ProductCountingFormViewModel : BaseViewModel
         var outCountingTransactionLineDto = new OutCountingTransactionLineDto
         {
             ProductCode = ProductCountingBasketModel.ProductCode,
-            WarehouseNumber = ProductCountingWarehouseTotalModel.WarehouseNumber,
+            WarehouseNumber = ProductCountingWarehouseModel.Number,
             Quantity = ProductCountingBasketModel.StockQuantity - ProductCountingBasketModel.OutputQuantity,
             ConversionFactor = 1,
             OtherConversionFactor = 1,
@@ -285,7 +285,7 @@ public partial class ProductCountingFormViewModel : BaseViewModel
             TransactionDate = TransactionDate,
             FirmNumber = _httpClientService.FirmNumber,
             SpeCode = SpecialCode,
-            WarehouseNumber = ProductCountingWarehouseTotalModel.WarehouseNumber,
+            WarehouseNumber = ProductCountingWarehouseModel.Number,
 
         };
 
@@ -293,7 +293,7 @@ public partial class ProductCountingFormViewModel : BaseViewModel
         var inCountingTransactionLineDto = new InCountingTransactionLineDto
         {
             ProductCode = ProductCountingBasketModel.ProductCode,
-            WarehouseNumber = ProductCountingWarehouseTotalModel.WarehouseNumber,
+            WarehouseNumber = ProductCountingWarehouseModel.Number,
             Quantity = ProductCountingBasketModel.OutputQuantity - ProductCountingBasketModel.StockQuantity,
             ConversionFactor = 1,
             OtherConversionFactor = 1,

@@ -18,7 +18,7 @@ using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.CountingModule.CountingProcess.ProductCountingProcess.ViewModels;
 
-[QueryProperty(nameof(ProductCountingWarehouseTotalModel), nameof(ProductCountingWarehouseTotalModel))]
+[QueryProperty(nameof(ProductCountingWarehouseModel), nameof(ProductCountingWarehouseModel))]
 [QueryProperty(nameof(LocationModel), nameof(LocationModel))]
 [QueryProperty(nameof(ProductCountingBasketModel), nameof(ProductCountingBasketModel))]
 public partial class ProductCountingBasketViewModel : BaseViewModel
@@ -29,7 +29,7 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
     private readonly ILocationTransactionService _locationTransactionService;
 
     [ObservableProperty]
-    private ProductCountingWarehouseTotalModel productCountingWarehouseTotalModel = null!;
+    private ProductCountingWarehouseModel productCountingWarehouseModel = null!;
 
     [ObservableProperty]
     private LocationModel? locationModel;
@@ -169,7 +169,7 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 productReferenceId: ProductCountingBasketModel.ProductReferenceId,
-                warehouseNumber: ProductCountingWarehouseTotalModel.WarehouseNumber,
+                warehouseNumber: ProductCountingWarehouseModel.Number,
                 locationRef: LocationModel.ReferenceId,
                 skip: 0,
                 take: 9999999
@@ -257,7 +257,7 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
             {
                 [nameof(LocationModel)] = LocationModel,
                 [nameof(ProductCountingBasketModel)] = ProductCountingBasketModel,
-                [nameof(ProductCountingWarehouseTotalModel)] = ProductCountingWarehouseTotalModel
+                [nameof(ProductCountingWarehouseModel)] = ProductCountingWarehouseModel
             });
 
 
