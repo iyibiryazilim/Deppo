@@ -243,7 +243,8 @@
                                                        TextColor="{StaticResource Secondary}" />
 
                                                 <Border.GestureRecognizers>
-                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ManuelCalcViewModel}}, Path=SubDecreaseCommand}" />
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ManuelCalcViewModel}}, Path=SubDecreaseCommand}"
+                                                                          CommandParameter="{Binding .}" />
                                                 </Border.GestureRecognizers>
                                             </Border>
                                             <Label Grid.Column="1"
@@ -359,7 +360,7 @@
                         <CollectionView Grid.Row="1"
                                         ItemsSource="{Binding LocationTransactions}"
                                         RemainingItemsThreshold="2"
-                                       >
+                                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreLocationTransactionsCommand}">
                             <CollectionView.ItemsLayout>
                                 <LinearItemsLayout ItemSpacing="5"
                                                    Orientation="Vertical" />
@@ -450,6 +451,7 @@
 
                 <!--#endregion-->
             </dx:BottomSheet>
+
             <!--#endregion-->
         </VerticalStackLayout>
     </Grid>
