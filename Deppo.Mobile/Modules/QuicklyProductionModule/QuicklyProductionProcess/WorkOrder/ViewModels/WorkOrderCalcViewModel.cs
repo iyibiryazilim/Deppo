@@ -63,13 +63,13 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
         NextViewCommand = new Command(async () => await NextViewAsync());
         BackCommand = new Command(async () => await BackAsync());
         LoadItemsSubCommand = new Command(async () => await LoadItemsSubAsync());
-        
+
         LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
         LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
         LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
         LocationTransactionConfirmCommand = new Command(async () => await LocationTransactionConfirmAsync());
         LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
-       
+
         SubIncreaseCommand = new Command<QuicklyBomSubProductModel>(async (item) => await SubIncreaseAsync(item));
         SubDecreaseCommand = new Command<QuicklyBomSubProductModel>(async (item) => await SubDecreaseAsync(item));
 
@@ -606,35 +606,6 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     //Locations Kısmı Düzenlenecek
     private async Task LoadWarehouseLocationsAsync()
     {
@@ -821,22 +792,31 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
             IsBusy = true;
             if (Locations.Count > 0)
             {
-
-
-                
                 double mainCount = (double)Locations.Where(x => x.InputQuantity > 0).Sum(x => x.InputQuantity);
-                if(mainCount is not  0)
+
+                if(mainCount != QuicklyBomProductBasketModel.QuicklyBomProduct.Amount)
                 {
-                        double rate = mainCount / QuicklyBomProductBasketModel.QuicklyBomProduct.Amount;
+                    foreach(var subbom in QuicklyBomProductBasketModel.SubProducts)
+                    {
+                        subbom.LocationTransactions.Clear();
+                        subbom.SubBOMQuantity = 0;
+                    }
 
-                        QuicklyBomProductBasketModel.QuicklyBomProduct.Amount = mainCount;
+                }
 
-                        foreach(var i in QuicklyBomProductBasketModel.SubProducts)
-                        {
-                            i.ProductModel.Amount = (double)( i.ProductModel.Amount * rate);
-                        }
-                        foreach(var item in  Locations.Where(x => x.InputQuantity > 0))
-                        {
+
+                if (mainCount != 0)
+                {
+                    double rate = mainCount / QuicklyBomProductBasketModel.QuicklyBomProduct.Amount;
+
+                    QuicklyBomProductBasketModel.QuicklyBomProduct.Amount = mainCount;
+
+                    foreach (var i in QuicklyBomProductBasketModel.SubProducts)
+                    {
+                        i.ProductModel.Amount = (double)(i.ProductModel.Amount * rate);
+                    }
+                    foreach (var item in Locations.Where(x => x.InputQuantity > 0))
+                    {
                         if (QuicklyBomProductBasketModel.MainLocations.Any(x => x.ReferenceId == item.ReferenceId))
                         {
                             QuicklyBomProductBasketModel.MainLocations.FirstOrDefault(x => x.ReferenceId == item.ReferenceId).InputQuantity = item.InputQuantity;
@@ -846,12 +826,13 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                         {
                             QuicklyBomProductBasketModel.MainLocations.Add(item);
                         }
-                        }
+                    }
+             
                 }
                 else
                 {
                     QuicklyBomProductBasketModel.QuicklyBomProduct.Amount = QuicklyBomProductBasketModel.MainAmount;
-                    foreach(var i in QuicklyBomProductBasketModel.SubProducts)
+                    foreach (var i in QuicklyBomProductBasketModel.SubProducts)
                     {
                         i.ProductModel.Amount = i.SubAmount;
                     }
