@@ -28,6 +28,9 @@ namespace Deppo.Mobile.Core.Models.QuicklyModels
         double subOutputQuantity = default;
 
         [ObservableProperty]
+        double subAmount = default;
+
+        [ObservableProperty]
         ObservableCollection<LocationTransactionModel> locationTransactions = new();
     }
 }

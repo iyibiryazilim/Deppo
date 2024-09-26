@@ -29,5 +29,9 @@ public partial class QuicklyBomProductBasketModel : ObservableObject
 
 
     [ObservableProperty]
+    double mainAmount= default;
+
+
+    [ObservableProperty]
     ObservableCollection<QuicklyBomSubProductModel> subProducts  = new();
 }
