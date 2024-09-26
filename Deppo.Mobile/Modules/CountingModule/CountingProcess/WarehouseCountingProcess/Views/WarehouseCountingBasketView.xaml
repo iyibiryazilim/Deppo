@@ -19,6 +19,7 @@
         <ResourceDictionary>
             <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
             <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -138,6 +139,7 @@
                                               HorizontalOptions="EndAndExpand">
                                             <Border Grid.Column="0"
                                                     Padding="5"
+                                                    IsEnabled="{Binding IsCompleted, Converter={StaticResource InvertedBoolConverter}}"
                                                     BackgroundColor="Transparent"
                                                     Stroke="{StaticResource Secondary}"
                                                     StrokeShape="RoundRectangle 2">
@@ -158,6 +160,7 @@
                                                    VerticalOptions="Center" />
                                             <Border Grid.Column="2"
                                                     Padding="5"
+                                                     IsEnabled="{Binding IsCompleted, Converter={StaticResource InvertedBoolConverter}}"
                                                     BackgroundColor="{StaticResource Secondary}"
                                                     Stroke="{StaticResource Secondary}"
                                                     StrokeShape="RoundRectangle 2">

@@ -39,8 +39,7 @@
             <SearchBar x:Name="searchBar"
                        Placeholder="Ara..."
                        PlaceholderColor="{StaticResource OffBlack}"
-                       TextColor="{StaticResource OffBlack}">
-            </SearchBar>
+                       TextColor="{StaticResource OffBlack}" />
         </Border>
 
         <CollectionView Grid.Row="1"
@@ -67,29 +66,46 @@
                             </DataTrigger>
                         </Border.Triggers>
 
-                        <VerticalStackLayout Grid.Column="0">
-                            <Label FontAttributes="Bold"
-                                   LineBreakMode="TailTruncation"
-                                   Text="{Binding Code}" />
-                            <Label LineBreakMode="TailTruncation"
-                                   Text="{Binding Name}"
-                                   TextColor="{StaticResource Gray600}" />
+                        <Grid ColumnDefinitions="Auto, *">
+                            <Border Grid.Column="0"
+                                    Padding="0,0,10,0"
+                                    BackgroundColor="Transparent"
+                                    StrokeThickness="0">
+                                <toolkit:AvatarView BackgroundColor="{StaticResource Primary}"
+                                                    BorderWidth="0.1"
+                                                    CornerRadius="50"
+                                                    FontAttributes="Bold"
+                                                    HorizontalOptions="Start"
+                                                    Text="{Binding WarehouseNumber}"
+                                                    TextColor="{StaticResource White}" />
+                            </Border>
 
-                            <Label>
-                                <Label.FormattedText>
-                                    <FormattedString>
-                                        <Span FontAttributes="Bold"
-                                              FontFamily="FAS"
-                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                                              TextColor="{StaticResource Primary}" />
-                                        <Span Text=" " />
-                                        <Span FontAttributes="Bold"
-                                              Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
-                                              TextColor="{StaticResource Primary}" />
-                                    </FormattedString>
-                                </Label.FormattedText>
-                            </Label>
-                        </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation"
+                                       Text="{Binding Code}" />
+                                <Label LineBreakMode="TailTruncation"
+                                       Text="{Binding Name}"
+                                       TextColor="{StaticResource Gray600}" />
+
+                                <Label>
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span FontAttributes="Bold"
+                                                  FontFamily="FAS"
+                                                  Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                  TextColor="{StaticResource Primary}" />
+                                            <Span Text=" " />
+                                            <Span FontAttributes="Bold"
+                                                  Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                                  TextColor="{StaticResource Primary}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </VerticalStackLayout>
+                        </Grid>
+
+
 
                     </Border>
                 </DataTemplate>
