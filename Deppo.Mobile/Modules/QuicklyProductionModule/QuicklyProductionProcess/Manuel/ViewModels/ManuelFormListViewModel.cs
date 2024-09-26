@@ -18,6 +18,7 @@ using Deppo.Core.DTOs.ConsumableTransaction;
 using Deppo.Core.DTOs.ProductionTransaction;
 using Deppo.Core.DTOs.SeriLotTransactionDto;
 using Deppo.Mobile.Core.Models.QuicklyModels;
+using DevExpress.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels;
 
@@ -80,8 +81,28 @@ public partial class ManuelFormListViewModel : BaseViewModel
     public Command SaveCommand { get; }
     public Command ShowBasketItemCommand { get; }
 
-    public async Task ShowBasketItemAsync()
+    private async Task ShowBasketItemAsync()
     {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     private async Task LoadPageAsync()
