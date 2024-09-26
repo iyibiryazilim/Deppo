@@ -167,26 +167,7 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
                     var item = Mapping.Mapper.Map<QuicklyBOMProductModel>(product);
 
                     Items.Add(item);
-                    /* Items.Add(new QuicklyBOMProductModel
-                     {
-                         ReferenceId = item.ProductReferenceId,
-                         Code = item.ProductCode,
-                         Name = item.ProductName,
-                         UnitsetReferenceId = item.UnitsetReferenceId,
-                         UnitsetCode = item.UnitsetCode,
-                         UnitsetName = item.UnitsetName,
-                         SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                         SubUnitsetCode = item.SubUnitsetCode,
-                         SubUnitsetName = item.SubUnitsetName,
-                         StockQuantity = item.StockQuantity,
-                         LocTracking = item.LocTracking,
-                         IsVariant = item.IsVariant,
-                         TrackingType = item.TrackingType,
-                         IsSelected = false,
-                         LocTrackingIcon = product.LocTrackingIcon,
-                         VariantIcon = product.VariantIcon,
-                         TrackingTypeIcon = product.TrackingTypeIcon,
-                     });*/
+                
                 }
             }
 
@@ -257,26 +238,6 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
                     var item = Mapping.Mapper.Map<QuicklyBOMProductModel>(product);
 
                     Items.Add(item);
-                    /* Items.Add(new QuicklyBOMProductModel
-                     {
-                         ReferenceId = (int)item.ProductReferenceId,
-                         Code = item.ProductCode,
-                         Name = item.ProductName,
-                         UnitsetReferenceId = item.UnitsetReferenceId,
-                         UnitsetCode = item.UnitsetCode,
-                         UnitsetName = item.UnitsetName,
-                         SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                         SubUnitsetCode = item.SubUnitsetCode,
-                         SubUnitsetName = item.SubUnitsetName,
-                         StockQuantity = item.StockQuantity,
-                         LocTracking = item.LocTracking,
-                         IsVariant = item.IsVariant,
-                         TrackingType = item.TrackingType,
-                         IsSelected = false,
-                         LocTrackingIcon = product.LocTrackingIcon,
-                         VariantIcon = product.VariantIcon,
-                         TrackingTypeIcon = product.TrackingTypeIcon,
-                     });*/
                 }
             }
 

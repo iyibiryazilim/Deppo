@@ -795,8 +795,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
 
                         if (QuicklyBomProductBasketModel.MainLocations.Any(x => x.ReferenceId == i.ReferenceId))
                         {
-                            var location = QuicklyBomProductBasketModel.MainLocations.FirstOrDefault(x => x.ReferenceId == i.ReferenceId);
-                            location.InputQuantity = i.InputQuantity;
+                           QuicklyBomProductBasketModel.MainLocations.FirstOrDefault(x => x.ReferenceId == i.ReferenceId).InputQuantity = i.InputQuantity;
                         }
                         else
                         {

@@ -266,7 +266,6 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
     {
     }
 
-    //LocationTransaction
     public async Task LoadLocationTransactionsAsync()
     {
     }
