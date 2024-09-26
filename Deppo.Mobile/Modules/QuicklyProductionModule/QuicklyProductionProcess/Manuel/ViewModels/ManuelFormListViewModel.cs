@@ -21,7 +21,6 @@ using Deppo.Mobile.Core.Models.QuicklyModels;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels;
 
-
 [QueryProperty(name: nameof(QuicklyBomProductBasketModel), queryId: nameof(QuicklyBomProductBasketModel))]
 public partial class ManuelFormListViewModel : BaseViewModel
 {
@@ -33,7 +32,6 @@ public partial class ManuelFormListViewModel : BaseViewModel
     private readonly IConsumableTransactionService _consumableTransactionService;
 
     private readonly IUserDialogs _userDialogs;
-
 
     [ObservableProperty]
     private QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
@@ -52,10 +50,6 @@ public partial class ManuelFormListViewModel : BaseViewModel
 
     [ObservableProperty]
     private string description = string.Empty;
-
- 
-
-
 
     public ManuelFormListViewModel(IHttpClientService httpClientService, ITransferTransactionService transferTransactionService, IProductionTransactionService productionTransactionService, IConsumableTransactionService consumableTransactionService, IUserDialogs userDialogs)
     {
@@ -105,18 +99,18 @@ public partial class ManuelFormListViewModel : BaseViewModel
                             .GroupBy(x => x.WarehouseModel.Number)
                             .ToList();
 
-            int count  = groupList.Count;
-            int Sayac = 0; 
+            int count = groupList.Count;
+            int Sayac = 0;
             resultModel.Code = "Sarf Numaraları:";
             foreach (var group in groupList)
             {
                 // Grubu listeye dönüştürüp metot çağrısı yapıyoruz
-                
+
                 result = await ConsumableInsert(httpClient, group.ToList());
-                if(result.IsSuccess)
+                if (result.IsSuccess)
                 {
                     Sayac = Sayac + 1;
-                    resultModel.Code += " " +  result.Data.Code + " ,";
+                    resultModel.Code += " " + result.Data.Code + " ,";
                 }
                 else
                 {
@@ -126,7 +120,6 @@ public partial class ManuelFormListViewModel : BaseViewModel
 
             if (result.IsSuccess && Sayac == count)
             {
-
                 DataResult<ResponseModel> result2 = await ProductionInsert(httpClient);
 
                 if (result2.IsSuccess)
@@ -188,7 +181,7 @@ public partial class ManuelFormListViewModel : BaseViewModel
         }
     }
 
-    private async Task<DataResult<ResponseModel>> ConsumableInsert(HttpClient httpClient ,List<QuicklyBomSubProductModel> quicklyBomSubProductModel)
+    private async Task<DataResult<ResponseModel>> ConsumableInsert(HttpClient httpClient, List<QuicklyBomSubProductModel> quicklyBomSubProductModel)
     {
         var consumableTransactionDto = new ConsumableTransactionInsert
         {
@@ -212,26 +205,24 @@ public partial class ManuelFormListViewModel : BaseViewModel
                 Quantity = item.SubBOMQuantity,
                 ConversionFactor = 1,
                 OtherConversionFactor = 1,
-                SubUnitsetCode = item.ProductModel.SubUnitsetCode, 
+                SubUnitsetCode = item.ProductModel.SubUnitsetCode,
             };
 
             foreach (var detail in item.LocationTransactions)
             {
-                
-                    var serilotTransactionDto = new SeriLotTransactionDto
-                    {
-                        StockLocationCode = detail.LocationCode,
-                        InProductTransactionLineReferenceId = detail.TransactionReferenceId,
-                        OutProductTransactionLineReferenceId = detail.ReferenceId,
-                        Quantity = detail.RemainingQuantity,
-                        SubUnitsetCode = item.ProductModel.SubUnitsetCode,
-                        DestinationStockLocationCode = string.Empty,
-                        ConversionFactor = 1,
-                        OtherConversionFactor = 1,
-                    };
+                var serilotTransactionDto = new SeriLotTransactionDto
+                {
+                    StockLocationCode = detail.LocationCode,
+                    InProductTransactionLineReferenceId = detail.TransactionReferenceId,
+                    OutProductTransactionLineReferenceId = detail.ReferenceId,
+                    Quantity = detail.OutputQuantity,
+                    SubUnitsetCode = item.ProductModel.SubUnitsetCode,
+                    DestinationStockLocationCode = string.Empty,
+                    ConversionFactor = 1,
+                    OtherConversionFactor = 1,
+                };
 
-                    consumableTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
-                
+                consumableTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
             }
             consumableTransactionDto.Lines.Add(consumableTransactionLineDto);
         }
@@ -255,42 +246,38 @@ public partial class ManuelFormListViewModel : BaseViewModel
             Description = Description,
         };
 
-        
-            var productionTransactionLineDto = new ProductionTransactionLineDto
-            {
-                ProductCode = QuicklyBomProductBasketModel.QuicklyBomProduct.Code,
-                WarehouseNumber = QuicklyBomProductBasketModel.WarehouseNumber,
-                Quantity = QuicklyBomProductBasketModel.BOMQuantity,
-                ConversionFactor = 1,
-                OtherConversionFactor = 1,
-                SubUnitsetCode = QuicklyBomProductBasketModel.QuicklyBomProduct.SubUnitsetCode,
-            };
+        var productionTransactionLineDto = new ProductionTransactionLineDto
+        {
+            ProductCode = QuicklyBomProductBasketModel.QuicklyBomProduct.Code,
+            WarehouseNumber = QuicklyBomProductBasketModel.WarehouseNumber,
+            Quantity = QuicklyBomProductBasketModel.BOMQuantity,
+            ConversionFactor = 1,
+            OtherConversionFactor = 1,
+            SubUnitsetCode = QuicklyBomProductBasketModel.QuicklyBomProduct.SubUnitsetCode,
+        };
 
-           // foreach (var detail in QuicklyBomProductBasketModel.QuicklyBomProduct)
-           // {
-               // if (item.Code == detail.Code)
-               // {
-               //     var seriLotTransactionDto = new SeriLotTransactionDto
-                //    {
-                        //StockLocationCode = QuicklyBomProductBasketModel.QuicklyBomProduct.,
-                   //     Quantity = QuicklyBomProductBasketModel.BOMQuantity,
-                   //     ConversionFactor = 1,
-                  //      OtherConversionFactor = 1,
-                  //      DestinationStockLocationCode = string.Empty,
-                //    };
+        // foreach (var detail in QuicklyBomProductBasketModel.QuicklyBomProduct)
+        // {
+        // if (item.Code == detail.Code)
+        // {
+        //     var seriLotTransactionDto = new SeriLotTransactionDto
+        //    {
+        //StockLocationCode = QuicklyBomProductBasketModel.QuicklyBomProduct.,
+        //     Quantity = QuicklyBomProductBasketModel.BOMQuantity,
+        //     ConversionFactor = 1,
+        //      OtherConversionFactor = 1,
+        //      DestinationStockLocationCode = string.Empty,
+        //    };
 
-                //    productionTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
-              //  }
-           // }
+        //    productionTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
+        //  }
+        // }
 
-            productionTransactionDto.Lines.Add(productionTransactionLineDto);
-        
+        productionTransactionDto.Lines.Add(productionTransactionLineDto);
 
         var result2 = await _productionTransactionService.InsertProductionTransaction(httpClient, productionTransactionDto, _httpClientService.FirmNumber);
         return result2;
     }
-
-
 
     private async Task BackAsync()
     {
@@ -320,6 +307,7 @@ public partial class ManuelFormListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
     private async Task ClearFormAsync()
     {
         try
@@ -334,5 +322,4 @@ public partial class ManuelFormListViewModel : BaseViewModel
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
     }
-
 }

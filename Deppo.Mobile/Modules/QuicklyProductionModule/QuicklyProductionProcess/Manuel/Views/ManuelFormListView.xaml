@@ -61,7 +61,7 @@
                             <VerticalStackLayout Spacing="5">
                                 <dx:DateEdit Grid.Column="0"
                                              BorderColor="{StaticResource PrimaryLight}"
-                                             Date="{Binding .}"
+                                             Date="{Binding FicheDate}"
                                              FocusedBorderColor="{StaticResource Primary}"
                                              LabelText="Fiş Tarihi"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.CalendarDay}" />
@@ -69,33 +69,33 @@
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
                                              IsReadOnly="True"
-                                             LabelText="Ambar"
+                                             LabelText="Giriş Ambarı"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding .}" />
+                                             Text="{Binding QuicklyBomProductBasketModel.WarehouseName}" />
 
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
                                              LabelText="Belge Numarası"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding .}" />
+                                             Text="{Binding DocumentNumber}" />
 
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
                                              LabelText="Doküman İzleme Numarası"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding .}" />
+                                             Text="{Binding DocumentTrackingNumber}" />
 
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
                                              LabelText="Özel Kod"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding .}" />
+                                             Text="{Binding SpecialCode}" />
 
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
                                              LabelText="Açıklama"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding .}" />
+                                             Text="{Binding Description}" />
                             </VerticalStackLayout>
                         </DataTemplate>
                     </dx:FormItem.ContentTemplate>
@@ -117,7 +117,7 @@
                         IsModal="True"
                         ShowGrabber="True">
             <!--#region BottomSheetContent-->
-            <!--<Grid RowDefinitions="Auto,*"
+            <Grid RowDefinitions="Auto,*"
                   RowSpacing="20"
                   Padding="10">
 
@@ -145,7 +145,7 @@
                                             StrokeThickness="0.5">
                                         <Image Grid.Column="0"
                                                HeightRequest="50"
-                                               Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                               Source="dotnet_bot.png"
                                                WidthRequest="50" />
                                     </Border>
 
@@ -154,9 +154,9 @@
 
                                         <Label FontAttributes="Bold"
                                                LineBreakMode="TailTruncation"
-                                               Text="{Binding ItemCode}" />
+                                               Text="{Binding ProductModel.Code}" />
                                         <Label LineBreakMode="TailTruncation"
-                                               Text="{Binding ItemName}"
+                                               Text="{Binding ProductModel.Name}"
                                                TextColor="{StaticResource Gray600}" />
 
                                         <Label TextColor="{StaticResource Gray600}"
@@ -169,11 +169,11 @@
                                                           TextColor="{StaticResource Primary}" />
                                                     <Span Text=" " />
                                                     <Span FontAttributes="Bold"
-                                                          Text="{Binding Quantity, StringFormat='{0:N2}'}"
+                                                          Text="{Binding SubBOMQuantity, StringFormat='{0:N2}'}"
                                                           TextColor="{StaticResource Primary}" />
                                                     <Span Text=" " />
                                                     <Span FontAttributes="Bold"
-                                                          Text="{Binding SubUnitsetCode}"
+                                                          Text="{Binding ProductModel.SubUnitsetCode}"
                                                           TextColor="{StaticResource Primary}" />
                                                 </FormattedString>
                                             </Label.FormattedText>
@@ -188,25 +188,25 @@
                                         <Label Grid.Column="0"
                                                FontFamily="FAS"
                                                FontSize="10"
-                                               Text="{Binding VariantIcon}"
-                                               TextColor="{Binding VariantIconColor}" />
+                                               Text="{Binding ProductModel.VariantIcon}"
+                                               TextColor="{Binding ProductModel.VariantIconColor}" />
                                         <Label Grid.Column="1"
                                                FontFamily="FAS"
                                                FontSize="10"
-                                               Text="{Binding LocTrackingIcon}"
-                                               TextColor="{Binding LocTrackingIconColor}" />
+                                               Text="{Binding ProductModel.LocTrackingIcon}"
+                                               TextColor="{Binding ProductModel.LocTrackingIconColor}" />
                                         <Label Grid.Column="2"
                                                FontFamily="FAS"
                                                FontSize="10"
-                                               Text="{Binding TrackingTypeIcon}"
-                                               TextColor="{Binding TrackingTypeIconColor}" />
+                                               Text="{Binding ProductModel.TrackingTypeIcon}"
+                                               TextColor="{Binding ProductModel.TrackingTypeIconColor}" />
                                     </Grid>
                                 </Grid>
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-            </Grid>-->
+            </Grid>
             <!--#endregion-->
         </dx:BottomSheet>
     </Grid>
