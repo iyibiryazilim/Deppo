@@ -26,6 +26,7 @@ namespace Deppo.Core.DataStores
             var result = new DataResult<ResponseModel>();
             try
             {
+                var json = JsonConvert.SerializeObject(dto);
                 var content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json");
 
                 var responseMessage = await httpClient.PostAsync($"{postUrl}", content);

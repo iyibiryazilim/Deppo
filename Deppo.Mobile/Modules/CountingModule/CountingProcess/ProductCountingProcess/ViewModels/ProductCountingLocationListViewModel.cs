@@ -2,7 +2,9 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.CountingModels;
+using Deppo.Mobile.Core.Models.CountingModels.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
@@ -14,7 +16,8 @@ using System.Collections.ObjectModel;
 namespace Deppo.Mobile.Modules.CountingModule.CountingProcess.ProductCountingProcess.ViewModels;
 
 
-[QueryProperty(name: nameof(WarehouseTotalModel), queryId: nameof(WarehouseTotalModel))]
+[QueryProperty(name: nameof(ProductCountingWarehouseTotalModel), queryId: nameof(ProductCountingWarehouseTotalModel))]
+[QueryProperty(name: nameof(ProductCountingBasketModel), queryId: nameof(ProductCountingBasketModel))]
 public partial class ProductCountingLocationListViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
@@ -25,7 +28,10 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 	LocationModel selectedLocation = null!;
 
 	[ObservableProperty]
-	WarehouseTotalModel warehouseTotalModel = null!;
+    ProductCountingBasketModel productCountingBasketModel = null!;
+
+    [ObservableProperty]
+    ProductCountingWarehouseTotalModel productCountingWarehouseTotalModel = null!;
 
 	public ObservableCollection<LocationModel> Items { get; } = new();
 	public ProductCountingLocationListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ILocationService locationService)
@@ -67,7 +73,8 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
-				warehouseNumber: WarehouseTotalModel.WarehouseNumber,
+				warehouseNumber: ProductCountingWarehouseTotalModel.WarehouseNumber,
+				productReferenceId: ProductCountingBasketModel.ProductReferenceId,
 				skip: 0,
 				take: 20
 			);
@@ -111,8 +118,9 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
-				warehouseNumber: WarehouseTotalModel.WarehouseNumber,
-				skip: Items.Count,
+				warehouseNumber: ProductCountingWarehouseTotalModel.WarehouseNumber,
+                productReferenceId: ProductCountingBasketModel.ProductReferenceId,
+                skip: Items.Count,
 				take: 20
 			);
 
@@ -192,8 +200,9 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 				await Shell.Current.GoToAsync($"{nameof(ProductCountingBasketView)}", new Dictionary<string, object>
 				{
 					[nameof(LocationModel)] = SelectedLocation,
-					[nameof(WarehouseTotalModel)] = WarehouseTotalModel
-				});
+					[nameof(ProductCountingWarehouseTotalModel)] = ProductCountingWarehouseTotalModel,
+					[nameof(ProductCountingBasketModel)] = ProductCountingBasketModel
+                });
 
 			}
 		}

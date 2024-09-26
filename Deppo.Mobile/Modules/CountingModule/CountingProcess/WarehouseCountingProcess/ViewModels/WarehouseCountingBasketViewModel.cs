@@ -29,7 +29,7 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
     private WarehouseCountingWarehouseModel warehouseCountingWarehouseModel = null!;
 
     [ObservableProperty]
-    private LocationModel locationModel = null!;
+    private LocationModel? locationModel;
 
     [ObservableProperty]
     private WarehouseCountingBasketModel selectedItem = null!;
@@ -52,6 +52,10 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
         NextViewCommand = new Command(async () => await NextViewAsync());
 
     }
+
+
+    [ObservableProperty]
+    bool isIncrease;
 
     public Page CurrentPage { get; set; } = null!;
 
@@ -164,14 +168,29 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            if (item is not null)
-            {
-                SelectedItem = item;
+            IsIncrease = true;
 
-                item.OutputQuantity++;
-                item.DifferenceQuantity++;
+
+            SelectedItem = item;
+            if (SelectedItem is not null)
+            {
+                if (SelectedItem.OutputQuantity - SelectedItem.StockQuantity < 0)
+                {
+
+                    SelectedItem.OutputQuantity++;
+                    SelectedItem.DifferenceQuantity++;
+                    await LoadLocationTransactionsAsync();
+
+                }
+                else
+                {
+                    SelectedItem.OutputQuantity++;
+                    SelectedItem.DifferenceQuantity++;
+                }
+
 
             }
+
         }
         catch (Exception ex)
         {
@@ -190,6 +209,7 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            IsIncrease = false;
             SelectedItem = item;
 
             if (item is not null)
@@ -247,6 +267,7 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
                 periodNumber: _httpClientService.PeriodNumber,
                 productReferenceId: SelectedItem.ProductReferenceId,
                 warehouseNumber: WarehouseCountingWarehouseModel.Number,
+                locationRef: LocationModel.ReferenceId,
                 skip: 0,
                 take: 9999999
             );
@@ -260,12 +281,10 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
                     LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
                 }
 
-                SelectedItem.DifferenceQuantity--;
 
 
                 if (LocationTransactions.Sum(x => x.RemainingQuantity) > 0)
                 {
-                    SelectedItem.DifferenceQuantity--;
                     if ((SelectedItem.DifferenceQuantity * -1) > LocationTransactions.Sum(x => x.RemainingQuantity))
                     {
                         await _userDialogs.AlertAsync("Girilen miktarı karşılayacak giriş hareketi bulunamadı", "Uyarı", "Tamam");
@@ -273,8 +292,12 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
                     }
                     else
                     {
-                        SelectedItem.OutputQuantity--;
+                        if (!IsIncrease)
+                        {
+                            SelectedItem.DifferenceQuantity--;
+                            SelectedItem.OutputQuantity--;
 
+                        }
 
                         SelectedItem.LocationTransactions = new();
 
@@ -329,7 +352,7 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
             if (item.IsCompleted)
             {
                 item.IsCompleted = false;
-			}
+            }
             else
             {
                 item.IsCompleted = true;
@@ -353,29 +376,28 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-
-            //if(Items.All(x => x.IsCompleted == false))
-            //{
-            //    await _userDialogs.AlertAsync("Hiç ürün sayımı yapılmadı", "Uyarı", "Tamam");
-            //    return;
-            //}
-            //else
-            //{
-            //    foreach (var item in Items.Where(x=>x.IsCompleted).ToList())
-            //    {
-            //       SelectedItems.Add(item);
-            //    }
-
-            foreach (var item in Items.Where(x => (x.OutputQuantity - x.StockQuantity) != 0)){
+            SelectedItems.Clear();
+            foreach (var item in Items.Where(x => (x.OutputQuantity - x.StockQuantity) != 0))
+            {
                 SelectedItems.Add(item);
             }
+
+            if(SelectedItems.Count == 0)
+            {
+               await _userDialogs.AlertAsync("Sayım yapılacak ürün bulunamadı", "Uyarı", "Tamam");
+                return;
+            }
+
+            var confirm = await _userDialogs.ConfirmAsync("Miktarı sayılan ürünlerle sayım işlemine devam etmek istiyor musunuz?", "Onay", "Evet", "Hayır");
+            if (!confirm)
+                return;
+
             await Shell.Current.GoToAsync($"{nameof(WarehouseCountingFormView)}", new Dictionary<string, object>
             {
                 [nameof(LocationModel)] = LocationModel,
                 [nameof(WarehouseCountingWarehouseModel)] = WarehouseCountingWarehouseModel,
                 [nameof(WarehouseCountingBasketModel)] = SelectedItems
             });
-            // }
 
 
         }

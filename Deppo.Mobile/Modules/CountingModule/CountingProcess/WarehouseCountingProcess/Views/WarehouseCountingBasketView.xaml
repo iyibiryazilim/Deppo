@@ -32,7 +32,7 @@
         <BackButtonBehavior Command="{Binding BackCommand}" />
     </Shell.BackButtonBehavior>
 
-    <Grid RowDefinitions="Auto, *, Auto">
+    <Grid RowDefinitions="Auto, *, Auto" RowSpacing="10">
         <Border Grid.Row="0"
                 Margin="5,0,5,0"
                 Padding="0"
@@ -114,7 +114,7 @@
                                             </FormattedString>
                                         </Label.FormattedText>
                                     </Label>
-
+                                 
                                     <Grid ColumnDefinitions="Auto, *">
                                         <!--#region Counting Status Border-->
                                         <Border Grid.Column="0"

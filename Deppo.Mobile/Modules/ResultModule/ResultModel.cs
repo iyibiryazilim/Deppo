@@ -19,4 +19,7 @@ public partial class ResultModel : ObservableObject
 	[ObservableProperty]
 	int pageCountToBack = 0;
 
+	[ObservableProperty]
+    bool isSuccess = false;
+
 }
