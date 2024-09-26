@@ -14,6 +14,10 @@ public partial class QuicklyBomProductBasketModel : ObservableObject
     [ObservableProperty]
      QuicklyBOMProductModel quicklyBomProduct = null!;
 
+
+    public ObservableCollection<LocationModel> MainLocations { get; set; } = new ObservableCollection<LocationModel>();
+
+
     [ObservableProperty]
     int warehouseNumber = default;
 

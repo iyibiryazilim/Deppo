@@ -101,6 +101,26 @@ public partial class ManuelFormListViewModel : BaseViewModel
 
     private async Task LoadPageAsync()
     {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
+
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     private async Task SaveAsync()
@@ -265,6 +285,7 @@ public partial class ManuelFormListViewModel : BaseViewModel
             FirmNumber = _httpClientService.FirmNumber,
             WarehouseNumber = QuicklyBomProductBasketModel.WarehouseNumber,
             Description = Description,
+             
         };
 
         var productionTransactionLineDto = new ProductionTransactionLineDto
@@ -276,23 +297,21 @@ public partial class ManuelFormListViewModel : BaseViewModel
             OtherConversionFactor = 1,
             SubUnitsetCode = QuicklyBomProductBasketModel.QuicklyBomProduct.SubUnitsetCode,
         };
+        
+        /*    var serilotTransactionDto = new SeriLotTransactionDto
+                {
+                    StockLocationCode = detail.LocationCode,
+                    InProductTransactionLineReferenceId = detail.TransactionReferenceId,
+                    OutProductTransactionLineReferenceId = detail.ReferenceId,
+                    Quantity = detail.RemainingQuantity,
+                    SubUnitsetCode = item.SubUnitsetCode,
+                    DestinationStockLocationCode = string.Empty,
+                    ConversionFactor = 1,
+                    OtherConversionFactor = 1,
+                };*/
 
-        // foreach (var detail in QuicklyBomProductBasketModel.QuicklyBomProduct)
-        // {
-        // if (item.Code == detail.Code)
-        // {
-        //     var seriLotTransactionDto = new SeriLotTransactionDto
-        //    {
-        //StockLocationCode = QuicklyBomProductBasketModel.QuicklyBomProduct.,
-        //     Quantity = QuicklyBomProductBasketModel.BOMQuantity,
-        //     ConversionFactor = 1,
-        //      OtherConversionFactor = 1,
-        //      DestinationStockLocationCode = string.Empty,
-        //    };
-
-        //    productionTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
-        //  }
-        // }
+          //  productionTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
+          
 
         productionTransactionDto.Lines.Add(productionTransactionLineDto);
 
