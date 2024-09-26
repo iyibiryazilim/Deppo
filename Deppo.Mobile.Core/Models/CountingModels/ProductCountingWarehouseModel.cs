@@ -2,7 +2,7 @@
 
 namespace Deppo.Mobile.Core.Models.CountingModels
 {
-    public class ProductCountingWarehouseTotalModel : WarehouseTotalModel
+    public class ProductCountingWarehouseModel : WarehouseModel
     {
         private int _locationCount;
         public int LocationCount

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.CountingModels;
 using Deppo.Mobile.Core.Models.CountingModels.BasketModels;
@@ -17,35 +18,36 @@ namespace Deppo.Mobile.Modules.CountingModule.CountingProcess.ProductCountingPro
 [QueryProperty(nameof(ProductModel), nameof(ProductModel))]
 public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
 {
-    private readonly IWarehouseTotalService _warehouseTotalService;
     private readonly IUserDialogs _userDialogs;
     private readonly IHttpClientService _httpClientService;
+    private readonly IProductCountingService _productCountingService;
 
-    public ProductCountingWarehouseTotalListViewModel(IWarehouseTotalService warehouseTotalService, IUserDialogs userDialogs, IHttpClientService httpClientService)
+    public ProductCountingWarehouseTotalListViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, IProductCountingService productCountingService)
     {
-        _warehouseTotalService = warehouseTotalService;
         _userDialogs = userDialogs;
         _httpClientService = httpClientService;
+        _productCountingService = productCountingService;
 
         Title = "Ambar Toplamları";
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-        ItemTappedCommand = new Command<ProductCountingWarehouseTotalModel>(ItemTappedAsync);
+        ItemTappedCommand = new Command<ProductCountingWarehouseModel>(ItemTappedAsync);
         NextViewCommand = new Command(async () => await NextViewAsync());
     }
 
     [ObservableProperty]
-    public ProductCountingWarehouseTotalModel selectedWarehouse;
+    public ProductCountingWarehouseModel selectedWarehouse;
 
     [ObservableProperty]
     public ProductModel productModel;
 
-    public ObservableCollection<ProductCountingWarehouseTotalModel> Items { get; } = new();
+
+    public ObservableCollection<ProductCountingWarehouseModel> Items { get; } = new();
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
-    public Command<ProductCountingWarehouseTotalModel> ItemTappedCommand { get; }
+    public Command<ProductCountingWarehouseModel> ItemTappedCommand { get; }
 
     public Command NextViewCommand { get; }
 
@@ -61,16 +63,23 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
 
             _userDialogs.Loading("Loading Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
+          
             await Task.Delay(1000);
-            var result = await _warehouseTotalService.GetObjectsByProduct(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber,ProductModel.ReferenceId, string.Empty, 0, 20);
+
+           
+
+            var result = await _productCountingService.GetWarehouses(httpClient, _httpClientService.FirmNumber,_httpClientService.PeriodNumber,ProductModel.ReferenceId,string.Empty,0,20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
                     return;
 
                 foreach (var item in result.Data)
-                    Items.Add(Mapping.Mapper.Map<ProductCountingWarehouseTotalModel>(item));
+                {
+                    
+                    Items.Add(Mapping.Mapper.Map<ProductCountingWarehouseModel>(item));
 
+                }
                 _userDialogs.Loading().Hide();
             }
             else
@@ -106,17 +115,19 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
             IsBusy = true;
             _userDialogs.Loading("Refreshing Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseTotalService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, ProductModel.ReferenceId, string.Empty, Items.Count, 20);
+            var result = await _productCountingService.GetWarehouses(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, ProductModel.ReferenceId, string.Empty, Items.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
                     return;
 
                 foreach (var item in result.Data)
-                    Items.Add(Mapping.Mapper.Map<ProductCountingWarehouseTotalModel>(item));
+                {
 
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
+                    Items.Add(Mapping.Mapper.Map<ProductCountingWarehouseModel>(item));
+
+                }
+                _userDialogs.Loading().Hide();
             }
             else
             {
@@ -140,7 +151,7 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
         }
     }
 
-    private void ItemTappedAsync(ProductCountingWarehouseTotalModel item)
+    private void ItemTappedAsync(ProductCountingWarehouseModel item)
     {
         if (IsBusy)
             return;
@@ -187,7 +198,8 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
             if (SelectedWarehouse is not null)
             {
 
-                var productCountingBasketModel = new ProductCountingBasketModel{
+                var productCountingBasketModel = new ProductCountingBasketModel
+                {
                     ProductReferenceId = ProductModel.ReferenceId,
                     ProductCode = ProductModel.Code,
                     ProductName = ProductModel.Name,
@@ -207,11 +219,11 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
                 };
 
 
-                if(SelectedWarehouse.LocationCount > 0)
+                if (SelectedWarehouse.LocationCount > 0)
                 {
                     await Shell.Current.GoToAsync($"{nameof(ProductCountingLocationListView)}", new Dictionary<string, object>
                     {
-                        [nameof(ProductCountingWarehouseTotalModel)] = SelectedWarehouse,
+                        [nameof(ProductCountingWarehouseModel)] = SelectedWarehouse,
                         [nameof(ProductCountingBasketModel)] = productCountingBasketModel
                     });
                 }
@@ -219,12 +231,12 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
                 {
                     await Shell.Current.GoToAsync($"{nameof(ProductCountingBasketView)}", new Dictionary<string, object>
                     {
-                        [nameof(ProductCountingWarehouseTotalModel)] = SelectedWarehouse,
+                        [nameof(ProductCountingWarehouseModel)] = SelectedWarehouse,
                         [nameof(ProductModel)] = ProductModel
 
                     });
                 }
-               
+
             }
             else
             {

@@ -16,7 +16,7 @@ using System.Collections.ObjectModel;
 namespace Deppo.Mobile.Modules.CountingModule.CountingProcess.ProductCountingProcess.ViewModels;
 
 
-[QueryProperty(name: nameof(ProductCountingWarehouseTotalModel), queryId: nameof(ProductCountingWarehouseTotalModel))]
+[QueryProperty(name: nameof(ProductCountingWarehouseModel), queryId: nameof(ProductCountingWarehouseModel))]
 [QueryProperty(name: nameof(ProductCountingBasketModel), queryId: nameof(ProductCountingBasketModel))]
 public partial class ProductCountingLocationListViewModel : BaseViewModel
 {
@@ -31,7 +31,7 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
     ProductCountingBasketModel productCountingBasketModel = null!;
 
     [ObservableProperty]
-    ProductCountingWarehouseTotalModel productCountingWarehouseTotalModel = null!;
+    ProductCountingWarehouseModel productCountingWarehouseModel = null!;
 
 	public ObservableCollection<LocationModel> Items { get; } = new();
 	public ProductCountingLocationListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ILocationService locationService)
@@ -73,7 +73,7 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
-				warehouseNumber: ProductCountingWarehouseTotalModel.WarehouseNumber,
+				warehouseNumber: ProductCountingWarehouseModel.Number,
 				productReferenceId: ProductCountingBasketModel.ProductReferenceId,
 				skip: 0,
 				take: 20
@@ -118,7 +118,7 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
-				warehouseNumber: ProductCountingWarehouseTotalModel.WarehouseNumber,
+				warehouseNumber: ProductCountingWarehouseModel.Number,
                 productReferenceId: ProductCountingBasketModel.ProductReferenceId,
                 skip: Items.Count,
 				take: 20
@@ -196,12 +196,31 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 
 			if (SelectedLocation is not null)
 			{
+                var productCountingBasketModel = new ProductCountingBasketModel
+                {
+                    ProductReferenceId = ProductCountingBasketModel.ProductReferenceId,
+                    ProductCode = ProductCountingBasketModel.ProductCode,
+                    ProductName = ProductCountingBasketModel.ProductName,
+                    Image = ProductCountingBasketModel.Image,
+                    StockQuantity = SelectedLocation.StockQuantity,
+                    OutputQuantity = SelectedLocation.StockQuantity,
+                    SubUnitsetReferenceId = ProductCountingBasketModel.SubUnitsetReferenceId,
+                    SubUnitsetName = ProductCountingBasketModel.SubUnitsetName,
+                    SubUnitsetCode = ProductCountingBasketModel.SubUnitsetCode,
+                    UnitsetReferenceId = ProductCountingBasketModel.UnitsetReferenceId,
+                    UnitsetName = ProductCountingBasketModel.UnitsetName,
+                    UnitsetCode = ProductCountingBasketModel.UnitsetCode,
+                    LocTracking = ProductCountingBasketModel.LocTracking,
+                    IsVariant = ProductCountingBasketModel.IsVariant,
+                    TrackingType = ProductCountingBasketModel.TrackingType,
+                    DifferenceQuantity = 0,
+                };
 
-				await Shell.Current.GoToAsync($"{nameof(ProductCountingBasketView)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"{nameof(ProductCountingBasketView)}", new Dictionary<string, object>
 				{
 					[nameof(LocationModel)] = SelectedLocation,
-					[nameof(ProductCountingWarehouseTotalModel)] = ProductCountingWarehouseTotalModel,
-					[nameof(ProductCountingBasketModel)] = ProductCountingBasketModel
+					[nameof(ProductCountingWarehouseModel)] = ProductCountingWarehouseModel,
+					[nameof(ProductCountingBasketModel)] = productCountingBasketModel
                 });
 
 			}

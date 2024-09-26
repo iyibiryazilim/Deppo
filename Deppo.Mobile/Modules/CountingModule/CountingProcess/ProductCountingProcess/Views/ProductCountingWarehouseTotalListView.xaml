@@ -5,7 +5,7 @@
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.CountingModule.CountingProcess.ProductCountingProcess.ViewModels"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
-             xmlns:model="clr-namespace:Deppo.Mobile.Core.Models.WarehouseModels;assembly=Deppo.Mobile.Core"
+             xmlns:model="clr-namespace:Deppo.Mobile.Core.Models.CountingModels;assembly=Deppo.Mobile.Core"
              x:DataType="viewModel:ProductCountingWarehouseTotalListViewModel"
              Title="{Binding Title}"
              Shell.TabBarIsVisible="False">
@@ -37,7 +37,7 @@
                         RemainingItemsThreshold="2"
                         RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="model:WarehouseTotalModel">
+                <DataTemplate x:DataType="model:ProductCountingWarehouseModel">
                     <Border Padding="10"
                             BackgroundColor="Transparent"
                             StrokeShape="RoundRectangle 10"
@@ -56,7 +56,7 @@
                                                     CornerRadius="50"
                                                     FontAttributes="Bold"
                                                     HorizontalOptions="Start"
-                                                    Text="{Binding WarehouseNumber}"
+                                                    Text="{Binding Number}"
                                                     TextColor="{StaticResource White}" />
                             </Border>
 
@@ -67,7 +67,7 @@
                                 <Label FontAttributes="Bold"
                                        LineBreakMode="TailTruncation"
                                        MaxLines="1"
-                                       Text="{Binding WarehouseName}"
+                                       Text="{Binding Name}"
                                        VerticalOptions="Center" />
                                 <HorizontalStackLayout Spacing="5"
                                                        VerticalOptions="Center">
@@ -82,7 +82,7 @@
                                                              Color="{StaticResource Primary}" />
                                         </Image.Source>
                                     </Image>
-                                    <Label Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                    <Label Text="{Binding Quantity, StringFormat='{0:N2}'}"
                                            TextColor="{StaticResource Gray600}"
                                            VerticalOptions="Center" />
                                 </HorizontalStackLayout>

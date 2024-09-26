@@ -51,7 +51,7 @@
                                              IsReadOnly="True"
                                              LabelText="Ambar"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding ProductCountingWarehouseTotalModel.WarehouseName}" />
+                                             Text="{Binding ProductCountingWarehouseModel.Name}" />
 
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
