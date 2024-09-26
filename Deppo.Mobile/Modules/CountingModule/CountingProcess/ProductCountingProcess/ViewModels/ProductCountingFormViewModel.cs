@@ -67,6 +67,9 @@ public partial class ProductCountingFormViewModel : BaseViewModel
         _outCountingTransactionService = outCountingTransactionService;
         _userDialogs = userDialogs;
 
+
+        Title = "Ambar Sayım Formu";
+
         SaveCommand = new Command(async () => await SaveAsync());
         LoadPageCommand = new Command(async () => await LoadPageAsync());
         ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
