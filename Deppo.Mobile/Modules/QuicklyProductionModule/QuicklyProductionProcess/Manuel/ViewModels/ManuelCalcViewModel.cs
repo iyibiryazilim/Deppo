@@ -324,7 +324,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
         try
         {
             _userDialogs.ShowLoading("Load Location Items...");
-            await Task.Delay(1000);
+          //  await Task.Delay(1000);
             LocationTransactions.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
@@ -373,7 +373,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
         try
         {
             _userDialogs.ShowLoading("Load Location Items...");
-            await Task.Delay(1000);
+          //  await Task.Delay(1000);
             LocationTransactions.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();

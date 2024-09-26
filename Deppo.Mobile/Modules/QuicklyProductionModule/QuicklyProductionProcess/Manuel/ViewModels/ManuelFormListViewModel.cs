@@ -53,8 +53,7 @@ public partial class ManuelFormListViewModel : BaseViewModel
     [ObservableProperty]
     private string description = string.Empty;
 
-    [ObservableProperty]
-    private string code = string.Empty;
+ 
 
 
 
@@ -95,29 +94,45 @@ public partial class ManuelFormListViewModel : BaseViewModel
             return;
         try
         {
-          /*  IsBusy = true;
+            IsBusy = true;
             _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
             await Task.Delay(1000);
             ResultModel resultModel = new();
-
+            var result = new DataResult<ResponseModel>();
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            foreach (var item in QuicklyBomProductBasketModel.SubProducts)
+
+            var groupList = QuicklyBomProductBasketModel.SubProducts
+                            .GroupBy(x => x.WarehouseModel.Number)
+                            .ToList();
+
+            int count  = groupList.Count;
+            int Sayac = 0; 
+            resultModel.Code = "Sarf Numaraları:";
+            foreach (var group in groupList)
             {
-                DataResult<ResponseModel> result = await ConsumableInsert(httpClient, item);
+                // Grubu listeye dönüştürüp metot çağrısı yapıyoruz
+                
+                result = await ConsumableInsert(httpClient, group.ToList());
+                if(result.IsSuccess)
+                {
+                    Sayac = Sayac + 1;
+                    resultModel.Code += " " +  result.Data.Code + " ,";
+                }
+                else
+                {
+                    break;
+                }
             }
 
-            if (result.IsSuccess)
+            if (result.IsSuccess && Sayac == count)
             {
-                code += result.Data.Code;
-                resultModel.Code += "Sarf Numarası :" + code;
 
                 DataResult<ResponseModel> result2 = await ProductionInsert(httpClient);
 
-                if (result2.IsSuccess && result.IsSuccess)
+                if (result2.IsSuccess)
                 {
-                    code = code + " " + result2.Data.Code;
+                    resultModel.Code += " Üretimden Giriş Numarası: " + result2.Data.Code;
                     resultModel.Message = "Hızlı üretim için Üretimden Giriş Ve Sarf Başarılı";
-                    resultModel.Code = resultModel.Code + " Üretimden Giriş Numarası" + result2.Data.Code;
                     resultModel.PageTitle = Title;
                     resultModel.PageCountToBack = 7;
 
@@ -129,7 +144,7 @@ public partial class ManuelFormListViewModel : BaseViewModel
                         [nameof(ResultModel)] = resultModel
                     });
                 }
-                else if (result.IsSuccess && !result2.IsSuccess)
+                else if (Sayac == count && !result2.IsSuccess)
                 {
                     if (_userDialogs.IsHudShowing)
                         _userDialogs.HideHud();
@@ -158,7 +173,7 @@ public partial class ManuelFormListViewModel : BaseViewModel
                 {
                     [nameof(ResultModel)] = resultModel
                 });
-            }*/
+            }
         }
         catch (Exception ex)
         {
@@ -172,8 +187,8 @@ public partial class ManuelFormListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-/*
-    private async Task<DataResult<ResponseModel>> ConsumableInsert(HttpClient httpClient , QuicklyBomSubProductModel quicklyBomSubProductModel)
+
+    private async Task<DataResult<ResponseModel>> ConsumableInsert(HttpClient httpClient ,List<QuicklyBomSubProductModel> quicklyBomSubProductModel)
     {
         var consumableTransactionDto = new ConsumableTransactionInsert
         {
@@ -185,41 +200,38 @@ public partial class ManuelFormListViewModel : BaseViewModel
             TransactionDate = FicheDate,
             FirmNumber = _httpClientService.FirmNumber,
             SpeCode = SpecialCode,
-            WarehouseNumber = quicklyBomSubProductModel.WarehouseModel.Number,
+            WarehouseNumber = quicklyBomSubProductModel.FirstOrDefault().WarehouseModel.Number,
         };
 
-        foreach (var item in quicklyBomSubProductModel.LocationTransactions)
+        foreach (var item in quicklyBomSubProductModel)
         {
             var consumableTransactionLineDto = new ConsumableTransactionLineDto
             {
-                ProductCode = item.ItemCode,
-                WarehouseNumber = quicklyBomSubProductModel.WarehouseModel.Number,
-                Quantity = item.Quantity,
+                ProductCode = item.ProductModel.Code,  // Doğru alanı ekledim
+                WarehouseNumber = quicklyBomSubProductModel.FirstOrDefault()?.WarehouseModel.Number,
+                Quantity = item.SubBOMQuantity,
                 ConversionFactor = 1,
                 OtherConversionFactor = 1,
-                SubUnitsetCode = quicklyBomSubProductModel.ProductModel.SubUnitsetCode,
-                 
+                SubUnitsetCode = item.ProductModel.SubUnitsetCode, 
             };
 
-            foreach (var detail in quicklyBomSubProductModel.LocationTransactionModels)
+            foreach (var detail in item.LocationTransactions)
             {
-                if (item.ReferenceId == detail.ReferenceId)
-                {
-                    var seriLotTransactionDto = new SeriLotTransactionDto
+                
+                    var serilotTransactionDto = new SeriLotTransactionDto
                     {
                         StockLocationCode = detail.LocationCode,
-                        Quantity = detail.Quantity,
-                        ConversionFactor = 1,
-                        OtherConversionFactor = 1,
-                        DestinationStockLocationCode = string.Empty,
-                        SubUnitsetCode = VirmanBasketModel.OutVirmanProduct.SubUnitsetCode,
                         InProductTransactionLineReferenceId = detail.TransactionReferenceId,
                         OutProductTransactionLineReferenceId = detail.ReferenceId,
-                        
+                        Quantity = detail.RemainingQuantity,
+                        SubUnitsetCode = item.ProductModel.SubUnitsetCode,
+                        DestinationStockLocationCode = string.Empty,
+                        ConversionFactor = 1,
+                        OtherConversionFactor = 1,
                     };
 
-                    consumableTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
-                }
+                    consumableTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+                
             }
             consumableTransactionDto.Lines.Add(consumableTransactionLineDto);
         }
@@ -239,45 +251,44 @@ public partial class ManuelFormListViewModel : BaseViewModel
             DoCode = DocumentNumber,
             TransactionDate = FicheDate,
             FirmNumber = _httpClientService.FirmNumber,
-            WarehouseNumber = VirmanBasketModel.InVirmanWarehouse.Number,
+            WarehouseNumber = QuicklyBomProductBasketModel.WarehouseNumber,
             Description = Description,
         };
 
-        foreach (var item in VirmanBasketModel.InVirmanProduct.Locations)
-        {
+        
             var productionTransactionLineDto = new ProductionTransactionLineDto
             {
-                ProductCode = VirmanBasketModel.InVirmanProduct.Code,
-                WarehouseNumber = VirmanBasketModel.InVirmanWarehouse.Number,
-                Quantity = item.InputQuantity,
+                ProductCode = QuicklyBomProductBasketModel.QuicklyBomProduct.Code,
+                WarehouseNumber = QuicklyBomProductBasketModel.WarehouseNumber,
+                Quantity = QuicklyBomProductBasketModel.BOMQuantity,
                 ConversionFactor = 1,
                 OtherConversionFactor = 1,
-                SubUnitsetCode = VirmanBasketModel.InVirmanProduct.SubUnitsetCode,
+                SubUnitsetCode = QuicklyBomProductBasketModel.QuicklyBomProduct.SubUnitsetCode,
             };
 
-            foreach (var detail in VirmanBasketModel.InVirmanProduct.Locations)
-            {
-                if (item.Code == detail.Code)
-                {
-                    var seriLotTransactionDto = new SeriLotTransactionDto
-                    {
-                        StockLocationCode = detail.Code,
-                        Quantity = detail.InputQuantity,
-                        ConversionFactor = 1,
-                        OtherConversionFactor = 1,
-                        DestinationStockLocationCode = string.Empty,
-                    };
+           // foreach (var detail in QuicklyBomProductBasketModel.QuicklyBomProduct)
+           // {
+               // if (item.Code == detail.Code)
+               // {
+               //     var seriLotTransactionDto = new SeriLotTransactionDto
+                //    {
+                        //StockLocationCode = QuicklyBomProductBasketModel.QuicklyBomProduct.,
+                   //     Quantity = QuicklyBomProductBasketModel.BOMQuantity,
+                   //     ConversionFactor = 1,
+                  //      OtherConversionFactor = 1,
+                  //      DestinationStockLocationCode = string.Empty,
+                //    };
 
-                    productionTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
-                }
-            }
+                //    productionTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
+              //  }
+           // }
 
             productionTransactionDto.Lines.Add(productionTransactionLineDto);
-        }
+        
 
         var result2 = await _productionTransactionService.InsertProductionTransaction(httpClient, productionTransactionDto, _httpClientService.FirmNumber);
         return result2;
-    }*/
+    }
 
 
 
