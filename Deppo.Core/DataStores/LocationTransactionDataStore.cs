@@ -162,6 +162,11 @@ public class LocationTransactionDataStore : ILocationTransactionService
 			baseQuery += $@" AND (INVLOC.CODE LIKE '{search}%' OR INVLOC.NAME LIKE '%{search}%')";
 		}
 
+		if(locationRef != 0)
+		{
+            baseQuery += $@" AND INVLOC.LOGICALREF = {locationRef}";
+        }
+
 		baseQuery += $@" ORDER BY INVLOC.CODE OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
 		return baseQuery;

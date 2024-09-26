@@ -290,7 +290,8 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 [BrandReferenceId] = ISNULL(BRAND.LOGICALREF,0),
 [BrandCode] = ISNULL(BRAND.CODE,''),
 [BrandName] = ISNULL(BRAND.DESCR,''),
-[StockQuantity] = ISNULL(SUM(STINVTOT.ONHAND),0)
+[StockQuantity] = ISNULL(SUM(STINVTOT.ONHAND),0),
+[LocationCount] = (SELECT ISNULL(COUNT(*),0) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_LOCATION INVLOC WHERE INVLOC.INVENNR = STINVTOT.INVENNO)
 
 FROM LV_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STINVTOT AS STINVTOT WITH(NOLOCK)
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS WITH(NOLOCK) ON STINVTOT.STOCKREF = ITEMS.LOGICALREF

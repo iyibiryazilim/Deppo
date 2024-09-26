@@ -177,15 +177,38 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-
+            var codeString = string.Empty;
             if (OutputItems.Count > 0)
             {
-                await OutCountingTransactionInsert(httpClient);
-            }
+                var result = await OutCountingTransactionInsert(httpClient);
+                if (result.IsSuccess && InputItems.Count > 0)
+                {
+                    codeString = result.Code;
+                    var inputResult = await InCountingTransactionInsert(httpClient);
+                    if (inputResult.IsSuccess)
+                    {
+                        codeString += " - " + inputResult.Code;
+                        result.Code = codeString;
 
-            if (InputItems.Count > 0)
+                        await NavigateToSuccessPage(result);
+                    }
+                }
+                if (result.IsSuccess && InputItems.Count == 0)
+                {
+                    await NavigateToSuccessPage(result);
+                }
+                if (!result.IsSuccess)
+                {
+                    await NavigateToFailurePage(result);
+                }
+            }
+            else
             {
-                await InCountingTransactionInsert(httpClient);
+                var inputResult = await InCountingTransactionInsert(httpClient);
+                if (inputResult.IsSuccess)
+                {
+                    await NavigateToSuccessPage(inputResult);
+                }
             }
 
         }
@@ -202,8 +225,24 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
         }
     }
 
+    private async Task NavigateToSuccessPage(ResultModel result)
+    {
+        await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
+        {
+            [nameof(ResultModel)] = result
+        });
+    }
 
-    private async Task OutCountingTransactionInsert(HttpClient httpClient)
+    private async Task NavigateToFailurePage(ResultModel result)
+    {
+        await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+        {
+            [nameof(ResultModel)] = result
+        });
+    }
+
+
+    private async Task<ResultModel> OutCountingTransactionInsert(HttpClient httpClient)
     {
         var outCountingTransactionDto = new OutCountingTransactionInsert
         {
@@ -263,15 +302,13 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
             resultModel.Message = "Başarılı";
             resultModel.Code = result.Data.Code;
             resultModel.PageTitle = Title;
-            resultModel.PageCountToBack = 4;
+            resultModel.IsSuccess = true;
+            resultModel.PageCountToBack = LocationModel == null ? 4 : 5;
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
 
-            await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
-            {
-                [nameof(ResultModel)] = resultModel
-            });
+            return resultModel;
         }
         else
         {
@@ -281,14 +318,16 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
             resultModel.Message = "Başarısız";
             resultModel.PageTitle = Title;
             resultModel.PageCountToBack = 1;
-            await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
-            {
-                [nameof(ResultModel)] = resultModel
-            });
+            resultModel.IsSuccess = false;
+            resultModel.ErrorMessage = result.Message;
+
+            return resultModel;
+
+
         }
     }
 
-    private async Task InCountingTransactionInsert(HttpClient httpClient)
+    private async Task<ResultModel> InCountingTransactionInsert(HttpClient httpClient)
     {
         var inCountingTransactionDto = new InCountingTransactionInsert
         {
@@ -327,10 +366,12 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
             resultModel.Message = "Başarılı";
             resultModel.Code = result.Data.Code;
             resultModel.PageTitle = Title;
-            resultModel.PageCountToBack = 4;
-
+            resultModel.IsSuccess = true;
+            resultModel.PageCountToBack = LocationModel == null ? 4 : 5;
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
+
+            return resultModel;
 
             await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
             {
@@ -345,6 +386,10 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
             resultModel.Message = "Başarısız";
             resultModel.PageTitle = Title;
             resultModel.PageCountToBack = 1;
+            resultModel.IsSuccess = false;
+            resultModel.ErrorMessage = result.Message;
+
+            return resultModel;
             await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
             {
                 [nameof(ResultModel)] = resultModel

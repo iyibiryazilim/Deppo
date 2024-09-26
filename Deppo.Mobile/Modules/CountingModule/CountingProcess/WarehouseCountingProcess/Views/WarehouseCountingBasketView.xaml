@@ -114,6 +114,9 @@
                                             </FormattedString>
                                         </Label.FormattedText>
                                     </Label>
+                                    <Label LineBreakMode="TailTruncation"
+                                           Text="{Binding DifferenceQuantity}"
+                                           TextColor="{StaticResource Gray600}" />
 
                                     <Grid ColumnDefinitions="Auto, *">
                                         <!--#region Counting Status Border-->

@@ -60,32 +60,4 @@ public partial class ProductCountingBasketModel : ObservableObject
 	[ObservableProperty]
 	double differenceQuantity = 0;
 
-	private bool isCompleted;
-	public bool IsCompleted
-	{
-		get => isCompleted;
-		set
-		{
-			if (SetProperty(ref isCompleted, value))
-			{
-				OnPropertyChanged(nameof(CountingText));
-				OnPropertyChanged(nameof(CountingTextColor));
-			}
-		}
-	}
-
-	private string countingText;
-	public string CountingText
-	{
-		get => IsCompleted ? "Sayıldı" : "Bekliyor";
-		set => SetProperty(ref countingText, value);
-	}
-
-	private string countingTextColor;
-
-	public string CountingTextColor
-	{
-		get => IsCompleted ? "#008000" : "#E6BE0C";
-		set => SetProperty(ref countingTextColor, value);
-	}
 }
