@@ -11,5 +11,6 @@ public partial class ManuelFormListView : ContentPage
         InitializeComponent();
         _viewModel = viewModel;
         BindingContext = viewModel;
+        _viewModel.CurrentPage= this;
     }
 }
