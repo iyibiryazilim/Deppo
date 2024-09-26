@@ -20,7 +20,6 @@ using static Java.Text.Normalizer;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrder.ViewModels;
 
-
 [QueryProperty(name: nameof(QuicklyBomProductBasketModel), queryId: nameof(QuicklyBomProductBasketModel))]
 public partial class WorkOrderCalcViewModel : BaseViewModel
 {
@@ -31,18 +30,17 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
     private readonly IQuicklyBomService _quicklyBomService;
 
     [ObservableProperty]
-    QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
+    private QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
 
     public ObservableCollection<BOMSubProductModel> Items { get; } = new();
 
-
     [ObservableProperty]
-    SeriLotTransactionModel? selectedSeriLotTransaction;
+    private SeriLotTransactionModel? selectedSeriLotTransaction;
+
     [ObservableProperty]
     public ObservableCollection<LocationTransactionModel> selectedLocationTransactions = new();
+
     public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
-
-
 
     public WorkOrderCalcViewModel(IHttpClientService httpClientService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs, IWarehouseService warehouseService, IQuicklyBomService quicklyBomService)
     {
@@ -50,29 +48,23 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
         _locationTransactionService = locationTransactionService;
         _userDialogs = userDialogs;
         _warehouseService = warehouseService;
+
+        _quicklyBomService = quicklyBomService;
+
         Title = "Ürün Detayı";
 
-
         IncreaseCommand = new Command<QuicklyBomProductBasketModel>(async (item) => await IncreaseAsync(item));
-
-
         DecreaseCommand = new Command<QuicklyBomProductBasketModel>(async (item) => await DecreaseAsync(item));
-
-
         NextViewCommand = new Command(async () => await NextViewAsync());
-
-
         BackCommand = new Command(async () => await BackAsync());
 
-
         LoadItemsSubCommand = new Command(async () => await LoadItemsSubAsync());
-        _quicklyBomService = quicklyBomService;
+        SubIncreaseCommand = new Command<QuicklyBomSubProductModel>(async (item) => await SubIncreaseAsync(item));
+        SubDecreaseCommand = new Command<QuicklyBomSubProductModel>(async (item) => await SubDecreaseAsync(item));
     }
 
-
-
-
     #region Commands
+
     public ContentPage CurrentPage { get; set; } = null!;
     public Command ShowProductViewCommand { get; }
     public Command IncreaseCommand { get; }
@@ -81,13 +73,24 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
     public Command NextViewCommand { get; }
     public Command BackCommand { get; }
 
-
-
-
     public Command LoadItemsSubCommand { get; }
-    #endregion
 
+    //SubProduct Increase Decrease
+    public Command<QuicklyBomSubProductModel> SubIncreaseCommand { get; }
 
+    public Command<QuicklyBomSubProductModel> SubDecreaseCommand { get; }
+
+    //LocationTransaction
+    public Command LoadMoreLocationTransactionsCommand { get; }
+
+    public Command<LocationTransactionModel> LocationTransactionIncreaseCommand { get; }
+    public Command<LocationTransactionModel> LocationTransactionDecreaseCommand { get; }
+    public Command LocationTransactionConfirmCommand { get; }
+    public Command LocationTransactionCloseCommand { get; }
+
+    public Command ConfirmLocationTransactionCommand { get; }
+
+    #endregion Commands
 
     private async Task IncreaseAsync(QuicklyBomProductBasketModel item)
     {
@@ -181,7 +184,6 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
         }
     }
 
-
     private async Task NextViewAsync()
     {
         if (IsBusy)
@@ -220,7 +222,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
             Items.Clear();
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _quicklyBomService.GetObjectsWorkSubProducts(httpClient, firmNumber: _httpClientService.FirmNumber, mainProductReferenceId: QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId, periodNumber: _httpClientService.PeriodNumber , take: 1000);
+            var result = await _quicklyBomService.GetObjectsWorkSubProducts(httpClient, firmNumber: _httpClientService.FirmNumber, mainProductReferenceId: QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId, periodNumber: _httpClientService.PeriodNumber, take: 1000);
 
             if (result.IsSuccess)
             {
@@ -231,7 +233,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                 {
                     var item = Mapping.Mapper.Map<BOMSubProductModel>(product);
 
-                    if(item is not null)
+                    if (item is not null)
                     {
                         QuicklyBomSubProductModel subproducts = new QuicklyBomSubProductModel();
                         subproducts.SubBOMQuantity = item.Amount;
@@ -239,7 +241,6 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                         QuicklyBomProductBasketModel.SubProducts.Add(subproducts);
                     }
                 }
-               
             }
 
             _userDialogs.Loading().Hide();
@@ -256,12 +257,41 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-   
 
+    public async Task SubIncreaseAsync(QuicklyBomSubProductModel item)
+    {
+    }
 
+    public async Task SubDecreaseAsync(QuicklyBomSubProductModel item)
+    {
+    }
 
+    //LocationTransaction
+    public async Task LoadLocationTransactionsAsync()
+    {
+    }
 
+    public async Task LoadMoreLocationTransactionsAsync()
+    {
+    }
 
+    public async Task LocationTransactionIncreaseAsync(LocationTransactionModel item)
+    {
+    }
 
+    public async Task LocationTransactionDecreaseAsync(LocationTransactionModel item)
+    {
+    }
 
+    public async Task LocationTransactionConfirmAsync()
+    {
+    }
+
+    public async Task LocationTransactionCloseAsync()
+    {
+    }
+
+    public async Task ConfirmLocationTransactionAsync()
+    {
+    }
 }

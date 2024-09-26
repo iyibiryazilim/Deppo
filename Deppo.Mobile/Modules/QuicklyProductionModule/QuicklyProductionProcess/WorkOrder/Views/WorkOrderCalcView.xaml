@@ -111,7 +111,7 @@
         </VerticalStackLayout>
 
         <Grid Grid.Row="1"
-              RowDefinitions="Auto, *"
+              RowDefinitions="Auto, *,.10*"
               RowSpacing="10">
             <Grid ColumnDefinitions="Auto,.10*">
                 <Label Grid.Column="0"
@@ -253,6 +253,13 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
+            <Button Grid.Row="2" 
+                    Text="İleri"
+                    
+                    Command="{Binding NextViewCommand}"
+                    >
+               
+            </Button>
         </Grid>
     </Grid>
 </ContentPage>
