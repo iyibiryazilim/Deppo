@@ -135,28 +135,54 @@
                                                Text="{Binding ProductName}"
                                                TextColor="{StaticResource Gray600}" />
 
-                                        <Label TextColor="{StaticResource Gray600}"
-                                               VerticalOptions="Center">
-                                            <Label.FormattedText>
-                                                <FormattedString>
-                                                    <Span FontAttributes="Bold"
-                                                          FontFamily="FAS"
-                                                          Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                                                          TextColor="{StaticResource Primary}" />
-                                                    <Span Text=" " />
-                                                    <Span FontAttributes="Bold"
-                                                          Text="{Binding OutputQuantity, StringFormat='{0:N2}'}"
-                                                          TextColor="{StaticResource Primary}" />
-                                                    <Span Text=" " />
-                                                    <Span FontAttributes="Bold"
-                                                          Text="{Binding SubUnitsetCode}"
-                                                          TextColor="{StaticResource Primary}" />
-                                                </FormattedString>
-                                            </Label.FormattedText>
-                                        </Label>
+                                        <Grid ColumnDefinitions="Auto, Auto"
+                                              ColumnSpacing="15">
+                                            <Label TextColor="{StaticResource Gray600}"
+                                                   VerticalOptions="Center"
+                                                   Grid.Column="0">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span FontAttributes="Bold"
+                                                              FontFamily="FAS"
+                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding SubUnitsetCode}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+
+                                            <Label TextColor="{StaticResource Gray600}"
+                                                   Grid.Column="1"
+                                                   VerticalOptions="Center">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span FontAttributes="Bold"
+                                                              FontFamily="FAS"
+                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding OutputQuantity, StringFormat='{0:N2}'}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding SubUnitsetCode}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                        </Grid>
+
                                     </VerticalStackLayout>
 
-                                  
+
                                 </Grid>
                             </Border>
                         </DataTemplate>

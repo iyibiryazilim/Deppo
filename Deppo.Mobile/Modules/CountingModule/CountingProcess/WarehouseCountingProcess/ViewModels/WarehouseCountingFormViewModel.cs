@@ -19,7 +19,6 @@ using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
-using static Android.Util.EventLogTags;
 using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
 namespace Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProcess.ViewModels;
@@ -37,7 +36,7 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
 
 
     [ObservableProperty]
-    LocationModel locationModel = null!;
+    LocationModel? locationModel;
 
     [ObservableProperty]
     WarehouseCountingWarehouseModel warehouseCountingWarehouseModel = null!;
@@ -95,7 +94,6 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            //Title = GetEnumDescription(OutputProductProcessType);
             CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
         }
         catch (Exception ex)
@@ -135,27 +133,11 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
         }
     }
 
-
-
-    public static string GetEnumDescription(Enum value)
-    {
-        FieldInfo fi = value.GetType().GetField(value.ToString());
-
-        DescriptionAttribute[] attributes = fi.GetCustomAttributes(typeof(DescriptionAttribute), false) as DescriptionAttribute[];
-
-        if (attributes != null && attributes.Any())
-        {
-            return attributes.First().Description;
-        }
-
-        return value.ToString();
-    }
-
-
     private async Task SaveAsync()
     {
         if (IsBusy)
             return;
+
         try
         {
             IsBusy = true;
@@ -164,64 +146,83 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
             if (!confirm)
                 return;
 
-            foreach (var item in WarehouseCountingBasketModel)
-            {
-                if (item.OutputQuantity - item.StockQuantity > 0)
-                    InputItems.Add(item);
-                else
-                    OutputItems.Add(item);
-
-            }
+            CategorizeItems();
 
             _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var codeString = string.Empty;
-            if (OutputItems.Count > 0)
-            {
-                var result = await OutCountingTransactionInsert(httpClient);
-                if (result.IsSuccess && InputItems.Count > 0)
-                {
-                    codeString = result.Code;
-                    var inputResult = await InCountingTransactionInsert(httpClient);
-                    if (inputResult.IsSuccess)
-                    {
-                        codeString += " - " + inputResult.Code;
-                        result.Code = codeString;
 
-                        await NavigateToSuccessPage(result);
-                    }
-                }
-                if (result.IsSuccess && InputItems.Count == 0)
-                {
-                    await NavigateToSuccessPage(result);
-                }
-                if (!result.IsSuccess)
-                {
-                    await NavigateToFailurePage(result);
-                }
+            if (OutputItems.Any())
+            {
+                await ProcessOutItems(httpClient);
             }
             else
             {
-                var inputResult = await InCountingTransactionInsert(httpClient);
-                if (inputResult.IsSuccess)
-                {
-                    await NavigateToSuccessPage(inputResult);
-                }
+                await ProcessInputItems(httpClient);
             }
 
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
-            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+            HandleError(ex);
         }
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    private void CategorizeItems()
+    {
+        InputItems.Clear();
+        OutputItems.Clear();
+
+        foreach (var item in WarehouseCountingBasketModel)
+        {
+            if (item.OutputQuantity > item.StockQuantity)
+                InputItems.Add(item);
+            else
+                OutputItems.Add(item);
+        }
+    }
+
+    private async Task ProcessOutItems(HttpClient httpClient)
+    {
+        var result = await OutCountingTransactionInsert(httpClient);
+        if (!result.IsSuccess)
+        {
+            await NavigateToFailurePage(result);
+        }
+        else
+        {
+            string codeString = result.Code;
+
+            if (InputItems.Any())
+            {
+                var inputResult = await InCountingTransactionInsert(httpClient);
+                if (inputResult.IsSuccess)
+                {
+                    codeString += " - " + inputResult.Code;
+                    result.Code = codeString;
+                    await NavigateToSuccessPage(result);
+                }
+            }
+            else
+            {
+                await NavigateToSuccessPage(result);
+            }
+        }
+    }
+
+    private async Task ProcessInputItems(HttpClient httpClient)
+    {
+        var inputResult = await InCountingTransactionInsert(httpClient);
+        if (inputResult.IsSuccess)
+        {
+            await NavigateToSuccessPage(inputResult);
         }
     }
 
@@ -239,6 +240,14 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
         {
             [nameof(ResultModel)] = result
         });
+    }
+
+    private void HandleError(Exception ex)
+    {
+        if (_userDialogs.IsHudShowing)
+            _userDialogs.HideHud();
+
+        _userDialogs.Alert(ex.Message, "Hata", "Tamam");
     }
 
 
@@ -355,7 +364,26 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
                 SubUnitsetCode = item.SubUnitsetCode,
             };
 
+            if (item.LocTracking == 1)
+            {
+
+                var serilotTransactionDto = new SeriLotTransactionDto
+                {
+                    StockLocationCode = LocationModel.Code,
+                    InProductTransactionLineReferenceId = 0,
+                    OutProductTransactionLineReferenceId = 0,
+                    Quantity = item.OutputQuantity - item.StockQuantity,
+                    SubUnitsetCode = item.SubUnitsetCode,
+                    DestinationStockLocationCode = string.Empty,
+                    ConversionFactor = 1,
+                    OtherConversionFactor = 1,
+                };
+                inCountingTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+            }
+
+
             inCountingTransactionDto.Lines.Add(inCountingTransactionLineDto);
+
         }
 
         var result = await _inCountingTransactionService.InsertInCountingTransaction(httpClient, inCountingTransactionDto, _httpClientService.FirmNumber);
@@ -373,10 +401,7 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
 
             return resultModel;
 
-            await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
-            {
-                [nameof(ResultModel)] = resultModel
-            });
+
         }
         else
         {
@@ -390,10 +415,7 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
             resultModel.ErrorMessage = result.Message;
 
             return resultModel;
-            await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
-            {
-                [nameof(ResultModel)] = resultModel
-            });
+
         }
     }
 }
