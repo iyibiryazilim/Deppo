@@ -519,6 +519,12 @@ public partial class ManuelCalcViewModel : BaseViewModel
                 {
                     item.OutputQuantity -= 1;
                 }
+                if(item.OutputQuantity == 0)
+                {
+                    LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId).OutputQuantity = 0;
+                    var Remove = SelectedItem.LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
+                    SelectedItem.LocationTransactions.Remove(Remove);
+                }
             }
         }
         catch (Exception ex)
@@ -545,16 +551,26 @@ public partial class ManuelCalcViewModel : BaseViewModel
 
             if (LocationTransactions.Count > 0)
             {
+
+                var count = LocationTransactions.Where(x => x.OutputQuantity > 0).Sum(x => (double)x.OutputQuantity);
                 SelectedLocationTransactions.Clear();
-                foreach (var item in LocationTransactions.Where(x => x.OutputQuantity > 0))
+                if(count > 0)
                 {
-                    if(SelectedItem.LocationTransactions.Any(x => x.ReferenceId == item.ReferenceId))
+                    foreach (var item in LocationTransactions.Where(x => x.OutputQuantity > 0))
                     {
-                        SelectedItem.LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId).OutputQuantity = item.OutputQuantity;
+                        if (SelectedItem.LocationTransactions.Any(x => x.ReferenceId == item.ReferenceId))
+                        {
+                            SelectedItem.LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId).OutputQuantity = item.OutputQuantity;
+                        }
+                        else
+                            SelectedItem.LocationTransactions.Add(item);
                     }
-                    else
-                    SelectedItem.LocationTransactions.Add(item);
                 }
+                else
+                {
+                   SelectedItem.LocationTransactions.Clear();
+                }
+                
                 SelectedItem.SubBOMQuantity = SelectedItem.LocationTransactions.Where(x => x.OutputQuantity > 0).Sum(x => (double)x.OutputQuantity);
                 CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.Hidden;
             }
@@ -609,7 +625,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
         try
         {
             _userDialogs.ShowLoading("Yükleniyor...");
-            await Task.Delay(1000);
             Locations.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
@@ -644,7 +659,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
         try
         {
             _userDialogs.ShowLoading("Yükleniyor...");
-            await Task.Delay(1000);
             Locations.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
@@ -760,7 +774,13 @@ public partial class ManuelCalcViewModel : BaseViewModel
                     locationModel.InputQuantity--;
 
                 if (locationModel.InputQuantity == 0)
+                {
+                    Locations.FirstOrDefault(x => x.Code == locationModel.Code).InputQuantity = 0;
+                    var Remove = QuicklyBomProductBasketModel.MainLocations.FirstOrDefault(x => x.ReferenceId == locationModel.ReferenceId);
+                    QuicklyBomProductBasketModel.MainLocations.Remove(Remove);
                     locationModel.IsSelected = false;
+                }
+                    
 
             }
         }
@@ -790,19 +810,27 @@ public partial class ManuelCalcViewModel : BaseViewModel
 
                 if (QuicklyBomProductBasketModel is not null)
                 {
-                    foreach (var i in Locations.Where(x => x.InputQuantity > 0))
+                    if (count > 0)
                     {
-
-                        if (QuicklyBomProductBasketModel.MainLocations.Any(x => x.ReferenceId == i.ReferenceId))
+                        foreach (var i in Locations.Where(x => x.InputQuantity > 0)) // Büyük olanları al
                         {
-                           QuicklyBomProductBasketModel.MainLocations.FirstOrDefault(x => x.ReferenceId == i.ReferenceId).InputQuantity = i.InputQuantity;
-                        }
-                        else
-                        {
-                            QuicklyBomProductBasketModel.MainLocations.Add(i);
-                        }
 
+                            if (QuicklyBomProductBasketModel.MainLocations.Any(x => x.ReferenceId == i.ReferenceId))
+                            {
+                                QuicklyBomProductBasketModel.MainLocations.FirstOrDefault(x => x.ReferenceId == i.ReferenceId).InputQuantity = i.InputQuantity;
+                                
+                            }
+                            else
+                            {
+                                QuicklyBomProductBasketModel.MainLocations.Add(i);
+                            }                                         
+                        }
                     }
+                    else
+                    {
+                        QuicklyBomProductBasketModel.MainLocations.Clear();
+                    }
+                    
                     QuicklyBomProductBasketModel.BOMQuantity = (double)QuicklyBomProductBasketModel.MainLocations.Sum(x => x.InputQuantity);
 
                     CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
