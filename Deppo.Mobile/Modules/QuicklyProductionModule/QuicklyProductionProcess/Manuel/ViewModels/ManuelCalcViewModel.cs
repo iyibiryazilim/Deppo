@@ -174,9 +174,12 @@ public partial class ManuelCalcViewModel : BaseViewModel
                 if (!result)
                     return;
 
-                QuicklyBomProductBasketModel = null;
-                SelectedLocationTransactions.Clear();
+
+
+                QuicklyBomProductBasketModel.SubProducts.Clear();
                 LocationTransactions.Clear();
+                SelectedLocationTransactions.Clear();
+
                 selectedItem = null;
                 await Shell.Current.GoToAsync("..");
             }
@@ -439,7 +442,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
                     if (item.OutputQuantity < item.Quantity)
                     {
                         item.OutputQuantity += 1;
-                        SelectedItem.SubBOMQuantity = item.OutputQuantity;
                     }
                        
                 }
@@ -472,7 +474,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
                 if (item.OutputQuantity > 0)
                 {
                     item.OutputQuantity -= 1;
-                    SelectedItem.SubBOMQuantity = item.OutputQuantity;
                 }
             }
         }
@@ -503,6 +504,11 @@ public partial class ManuelCalcViewModel : BaseViewModel
                 SelectedLocationTransactions.Clear();
                 foreach (var item in LocationTransactions.Where(x => x.OutputQuantity > 0))
                 {
+                    if(SelectedItem.LocationTransactions.Any(x => x.ReferenceId == item.ReferenceId))
+                    {
+                        SelectedItem.LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId).OutputQuantity = item.OutputQuantity;
+                    }
+                    else
                     SelectedItem.LocationTransactions.Add(item);
                 }
                 SelectedItem.SubBOMQuantity = SelectedItem.LocationTransactions.Where(x => x.OutputQuantity > 0).Sum(x => (double)x.OutputQuantity);
