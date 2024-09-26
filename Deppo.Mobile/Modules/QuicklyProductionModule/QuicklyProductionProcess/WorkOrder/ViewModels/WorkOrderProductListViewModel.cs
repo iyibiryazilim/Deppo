@@ -86,7 +86,8 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
             BasketModel.WarehouseName = SelectedProduct.WarehouseName;
             BasketModel.WarehouseNumber = SelectedProduct.WarehouseNumber;
             BasketModel.QuicklyBomProduct.Amount = SelectedProduct.Amount;
-            BasketModel.BOMQuantity = SelectedProduct.Amount;
+           // BasketModel.BOMQuantity = SelectedProduct.Amount;
+            BasketModel.MainAmount = SelectedProduct.Amount;
             await Shell.Current.GoToAsync($"{nameof(WorkOrderCalcView)}", new Dictionary<string, object>
             {
                 [nameof(QuicklyBomProductBasketModel)] = BasketModel
@@ -236,7 +237,6 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
                 foreach (var product in result.Data)
                 {
                     var item = Mapping.Mapper.Map<QuicklyBOMProductModel>(product);
-
                     Items.Add(item);
                 }
             }
