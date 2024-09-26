@@ -21,6 +21,13 @@
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <Grid RowDefinitions="*,Auto"
           RowSpacing="10">
         <VerticalStackLayout Grid.Row="0"
