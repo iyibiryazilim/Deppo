@@ -24,6 +24,6 @@ public partial class OutsourcePanelModel : ObservableObject
     ObservableCollection<OutsourceFiche> lastOutsourceFiche = new();
 
     [ObservableProperty]
-    ObservableCollection<SupplierTransaction> lastSupplierTransaction = new();
+    ObservableCollection<OutsourceTransaction> lastOutsourceTransaction = new();
 
 }

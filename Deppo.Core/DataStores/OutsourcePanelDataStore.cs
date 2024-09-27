@@ -313,7 +313,7 @@ public class OutsourcePanelDataStore : IOutsourcePanelService
     private string GetOutsourceTotalProductCountQuery(int firmNumber, int periodNumber)
     {
         string baseQuery = $@"SELECT 
-[OutsourceTotalProductCount] = ISNULL(COUNT(DISTINCT STLINE.STOCKREF),0) 
+[TotalProductCount] = ISNULL(COUNT(DISTINCT STLINE.STOCKREF),0) 
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS OUTSOURCE WITH(NOLOCK) ON STLINE.CLIENTREF = OUTSOURCE.LOGICALREF
 WHERE STLINE.TRCODE = 25 AND STLINE.IOCODE IN(2,4) AND STLINE.LPRODSTAT = 0 AND OUTSOURCE.SUBCONT = 1";
@@ -324,9 +324,10 @@ WHERE STLINE.TRCODE = 25 AND STLINE.IOCODE IN(2,4) AND STLINE.LPRODSTAT = 0 AND 
     private string GetOutsourceOutProductCountQuery(int firmNumber, int periodNumber)
     {
         string baseQuery = $@"SELECT
-        [OutsourceOutProductCount] = COUNT(DISTINCT STLINE.STOCKREF)
+        [OutProductCount] = ISNULL(COUNT(DISTINCT STLINE.STOCKREF),0)
         FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
-        WHERE STLINE.TRCODE = 25 AND STLINE.IOCODE = 4 AND STLINE.LPRODSTAT = 0";
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD WITH(NOLOCK) ON STLINE.CLIENTREF = CLCARD.LOGICALREF
+        WHERE CLCARD.SUBCONT = 1 AND STLINE.TRCODE = 25 AND STLINE.IOCODE = 4 AND STLINE.LPRODSTAT = 0";
 
         return baseQuery;
     }
@@ -334,9 +335,10 @@ WHERE STLINE.TRCODE = 25 AND STLINE.IOCODE IN(2,4) AND STLINE.LPRODSTAT = 0 AND 
     private string GetOutsourceInProductCountQuery(int firmNumber, int periodNumber)
     {
         string baseQuery = $@"SELECT
-        [OutsourceInProductCount] = COUNT(DISTINCT STLINE.STOCKREF)
+        [InProductCount] = ISNULL(COUNT(DISTINCT STLINE.STOCKREF),0)
         FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
-        WHERE STLINE.TRCODE = 25 AND STLINE.IOCODE = 2 AND STLINE.LPRODSTAT = 0";
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD WITH(NOLOCK) ON STLINE.CLIENTREF = CLCARD.LOGICALREF
+        WHERE CLCARD.SUBCONT = 1 AND STLINE.TRCODE = 25 AND STLINE.IOCODE = 2 AND STLINE.LPRODSTAT = 0";
 
         return baseQuery;
     }
@@ -360,7 +362,7 @@ WHERE STLINE.TRCODE = 25 AND STLINE.IOCODE IN(2,4) AND STLINE.LPRODSTAT = 0 AND 
 			From LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
 			left join LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
 			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
-			WHERE STFICHE.TRCODE = 25 AND STFICHE.PRODSTAT = 0 AND STFICHE.CLIENTREF > 0
+			WHERE STFICHE.TRCODE = 25 AND STFICHE.PRODSTAT = 0 AND STFICHE.CLIENTREF > 0 AND CLCARD.SUBCONT = 1
 			ORDER BY STFICHE.DATE_ DESC;";
 
         return baseQuery;
@@ -394,7 +396,7 @@ WHERE STLINE.TRCODE = 25 AND STLINE.IOCODE IN(2,4) AND STLINE.LPRODSTAT = 0 AND 
 END
 			From LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
 			left join LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS OUTSOURCE ON OUTSOURCE.LOGICALREF = STFICHE.CLIENTREF
-			WHERE STFICHE.TRCODE = 25 AND STFICHE.PRODSTAT = 0 AND STFICHE.CLIENTREF > 0
+			WHERE STFICHE.TRCODE = 25 AND STFICHE.PRODSTAT = 0 AND STFICHE.CLIENTREF > 0 AND OUTSOURCE.SUBCONT = 1
 			ORDER BY STFICHE.DATE_ DESC;";
 
         return baseQuery;
