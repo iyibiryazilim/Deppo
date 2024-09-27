@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.TransferModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -198,4 +199,6 @@ public partial class TransferOutWarehouseListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+   
 }
