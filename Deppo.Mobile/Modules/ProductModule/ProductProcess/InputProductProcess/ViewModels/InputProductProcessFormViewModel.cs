@@ -69,6 +69,7 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
 		LoadPageCommand = new Command(async () => await LoadPageAsync());
 		ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
 		SaveCommand = new Command(async () => await SaveAsync());
+		BackCommand = new Command(async () => await BackAsync());
 	}
 
 	public Page CurrentPage { get; set; }
@@ -346,4 +347,36 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
 			});
 		}
 	}
+
+	private async Task BackAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var confirm = await _userDialogs.ConfirmAsync("Form verileriniz silinecektir. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+			if (!confirm)
+				return;
+
+			DocumentNumber = string.Empty;
+			DocumentTrackingNumber = string.Empty;
+			Description = string.Empty;
+			SpecialCode = string.Empty;
+			FicheDate = DateTime.Now;
+
+			await Shell.Current.GoToAsync("..");
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
 }
