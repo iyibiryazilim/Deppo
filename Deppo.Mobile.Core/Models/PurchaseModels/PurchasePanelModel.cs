@@ -17,11 +17,18 @@ namespace Deppo.Mobile.Core.Models.PurchaseModels
         }
 
         double waitingOrderCount;
+        [ObservableProperty]
+        double waitingOrderCountRate = default;
+
 
         [ObservableProperty]
         int amountTotal;
         [ObservableProperty]
         int shippedQuantityTotal;
+
+        [ObservableProperty]
+        double shippedQuantityTotalRate = default;
+
 
         public double WaitingOrderCount
         {

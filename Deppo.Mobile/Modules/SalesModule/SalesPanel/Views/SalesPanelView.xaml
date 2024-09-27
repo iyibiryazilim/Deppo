@@ -96,7 +96,7 @@
 
                         <ProgressBar
                             HeightRequest="5"
-                            Progress="0.5"
+                            Progress="{Binding SalesPanelModel.WaitingOrderCountRate}"
                             ProgressColor="{StaticResource Secondary}" />
                     </VerticalStackLayout>
                 </Border>
@@ -119,8 +119,8 @@
 
                         <ProgressBar
                             HeightRequest="5"
-                            Progress="0.5"
-                            ProgressColor="{StaticResource Secondary}" />
+                            Progress="{Binding SalesPanelModel.ShippedQuantityTotalRate}"
+                            ProgressColor="{StaticResource Secondary}" />   
                     </VerticalStackLayout>
                 </Border>
 

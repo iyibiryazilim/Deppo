@@ -17,11 +17,19 @@ public partial class SalesPanelModel :ObservableObject
     }
     [ObservableProperty]
      int waitingOrderCount;
+
+
+    [ObservableProperty]
+    double waitingOrderCountRate = default;
+
     [ObservableProperty]
      int amountTotal;
     [ObservableProperty]
-     int shippedQuantityTotal;
-     public ObservableCollection<Customer> LastCustomer { get; } = new();
+    int shippedQuantityTotal;
+    [ObservableProperty]
+    double shippedQuantityTotalRate = default;
+
+    public ObservableCollection<Customer> LastCustomer { get; } = new();
      public ObservableCollection<CustomerTransaction> LastCustomerTransaction { get; }  = new();
 
     public ObservableCollection<SalesFiche> LastSalesFiche { get; } = new();

@@ -95,9 +95,9 @@
                         <Label Text="Bekleyen Referans" TextColor="{StaticResource White}" />
 
                         <ProgressBar
-                            HeightRequest="5"
-                            Progress="0.5"
-                            ProgressColor="{StaticResource Secondary}" />
+                        HeightRequest="5"
+                        Progress="{Binding PurchasePanelModel.WaitingOrderCountRate}"
+                        ProgressColor="{StaticResource Secondary}" />
                     </VerticalStackLayout>
                 </Border>
 
@@ -118,9 +118,9 @@
                         <Label Text="Kabul Edilen Referans" TextColor="{StaticResource White}" />
 
                         <ProgressBar
-                            HeightRequest="5"
-                            Progress="0.5"
-                            ProgressColor="{StaticResource Secondary}" />
+                             HeightRequest="5"
+                             Progress="{Binding PurchasePanelModel.ShippedQuantityTotalRate}"
+                             ProgressColor="{StaticResource Secondary}" />
                     </VerticalStackLayout>
                 </Border>
 

@@ -23,7 +23,7 @@ public partial class SalesPanelViewModel : BaseViewModel
 
     [ObservableProperty]
     SalesPanelModel salesPanelModel = new();
-    public SalesPanelViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService , ISalesPanelService salesPanelService)
+    public SalesPanelViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, ISalesPanelService salesPanelService)
     {
         _salesPanelService = salesPanelService;
         _userDialogs = userDialogs;
@@ -48,17 +48,19 @@ public partial class SalesPanelViewModel : BaseViewModel
 
             _userDialogs.ShowLoading("Yükleniyor...");
             await Task.Delay(500);
-            
+
             await Task.WhenAll(TotalOrderCountsAsync(), ShippedOrderCountsAsync()).ContinueWith((task) =>
             {
-               SalesPanelModel.WaitingOrderCount = SalesPanelModel.AmountTotal - SalesPanelModel.ShippedQuantityTotal;
-            });            
+                SalesPanelModel.WaitingOrderCount = SalesPanelModel.AmountTotal - SalesPanelModel.ShippedQuantityTotal;
+                SalesPanelModel.WaitingOrderCountRate = (double)((double)SalesPanelModel.WaitingOrderCount / (double)SalesPanelModel.AmountTotal);
+                SalesPanelModel.ShippedQuantityTotalRate = (double)((double)SalesPanelModel.ShippedQuantityTotal / (double)SalesPanelModel.AmountTotal);
+            });
 
             await Task.WhenAll(GetLastTransactionByCustomerAsync(), GetLastFicheAsync());
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
-           
+
         }
         catch (Exception ex)
         {
@@ -106,7 +108,7 @@ public partial class SalesPanelViewModel : BaseViewModel
     private async Task GetLastTransactionByCustomerAsync()
     {
 
-       
+
         try
         {
 
@@ -131,18 +133,18 @@ public partial class SalesPanelViewModel : BaseViewModel
         }
         finally
         {
-            
+
         }
     }
     private async Task GetLastTransactionAsync(SalesFiche salesFiche)
     {
 
-       
+
         try
         {
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _salesPanelService.GetLastTransaction(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber,salesFiche.ReferenceId);
+            var result = await _salesPanelService.GetLastTransaction(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, salesFiche.ReferenceId);
 
             if (result.IsSuccess)
             {
@@ -163,13 +165,13 @@ public partial class SalesPanelViewModel : BaseViewModel
         }
         finally
         {
-  
+
         }
     }
     private async Task TotalOrderCountsAsync()
     {
 
-       
+
         try
         {
 
@@ -202,13 +204,13 @@ public partial class SalesPanelViewModel : BaseViewModel
 
         finally
         {
-      
+
         }
     }
     private async Task ShippedOrderCountsAsync()
     {
 
-       
+
         try
         {
 
@@ -239,7 +241,7 @@ public partial class SalesPanelViewModel : BaseViewModel
         }
         finally
         {
-           
+
         }
     }
 
