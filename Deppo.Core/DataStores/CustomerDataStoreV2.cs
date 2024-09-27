@@ -93,7 +93,7 @@ FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CUSTOMER
 WHERE CUSTOMER.CODE LIKE '12%' AND CUSTOMER.CODE <> 'ÿ' AND CUSTOMER.ACTIVE = 0";
 
             if (!string.IsNullOrEmpty(search))
-                baseQuery += $@" AND (CUSTOMER.CODE LIKE '{search}%' OR CUSTOMER.NAME LIKE '%{search}%')";
+                baseQuery += $@" AND (CUSTOMER.CODE LIKE '{search}%' OR CUSTOMER.DEFINITION_ LIKE '%{search}%')";
 
             baseQuery += $@" ORDER BY CUSTOMER.CODE DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 

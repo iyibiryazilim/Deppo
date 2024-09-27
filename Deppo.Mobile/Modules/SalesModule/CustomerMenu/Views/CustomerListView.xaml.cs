@@ -11,5 +11,6 @@ public partial class CustomerListView : ContentPage
         InitializeComponent();
         _viewModel = viewModel;
         BindingContext = _viewModel;
+        _viewModel.SearchText = searchBar;
     }
 }
