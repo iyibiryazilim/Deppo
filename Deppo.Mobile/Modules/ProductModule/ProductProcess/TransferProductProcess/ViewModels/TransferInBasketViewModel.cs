@@ -549,7 +549,8 @@ public partial class TransferInBasketViewModel : BaseViewModel
 
 			foreach (var item in TransferBasketModel.InProducts)
 			{
-				item.Locations.Clear();
+				item.IsSelected = false;
+                item.Locations.Clear();
 			}
 
 			TransferBasketModel.InProducts.Clear();
