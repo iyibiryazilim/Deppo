@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.BaseModels;
 using Deppo.Core.Services;
@@ -12,7 +13,7 @@ using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels;
 
-public class ProductListViewModel : BaseViewModel
+public partial class ProductListViewModel : BaseViewModel
 {
     private readonly IProductService _productService;
     private readonly IUserDialogs _userDialogs;
@@ -28,7 +29,7 @@ public class ProductListViewModel : BaseViewModel
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-        PerformSearchCommand = new Command<SearchBar>(async (searchBar) => await PerformSearchAsync(searchBar));
+        PerformSearchCommand = new Command(async () => await PerformSearchAsync());
         ItemTappedCommand = new Command<Product>(async (product) => await ItemTappedAsync(product));
     }
 
@@ -36,8 +37,11 @@ public class ProductListViewModel : BaseViewModel
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
-    public Command<SearchBar> PerformSearchCommand { get; }
+    public Command PerformSearchCommand { get; }
     public Command<Product> ItemTappedCommand { get; }
+
+    [ObservableProperty]
+    public SearchBar searchText;
 
     public async Task LoadItemsAsync()
     {
@@ -52,7 +56,7 @@ public class ProductListViewModel : BaseViewModel
             _userDialogs.Loading("Loading Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             await Task.Delay(1000);
-            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 20);
+            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, 0, 20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
@@ -96,7 +100,7 @@ public class ProductListViewModel : BaseViewModel
             IsBusy = true;
             _userDialogs.Loading("Refreshing Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _productService.GetObjects(httpClient,_httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, Items.Count, 20);
+            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, Items.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
@@ -130,38 +134,37 @@ public class ProductListViewModel : BaseViewModel
         }
     }
 
-    private async Task PerformSearchAsync(SearchBar searchBar)
+    private async Task PerformSearchAsync()
     {
         if (IsBusy)
             return;
 
         try
         {
-            if (string.IsNullOrWhiteSpace(searchBar.Text))
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
             {
                 await LoadItemsAsync();
-                searchBar.Unfocus();
+                SearchText.Unfocus();
                 return;
             }
             else
             {
-                if (searchBar.Text.Length >= 3)
+
+                IsBusy = true;
+
+                var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+                var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, 0, 20);
+                if (!result.IsSuccess)
                 {
-                    IsBusy = true;
-                    
-                    var httpClient = _httpClientService.GetOrCreateHttpClient();
-
-                    var result = await _productService.GetObjects(httpClient,_httpClientService.FirmNumber, _httpClientService.PeriodNumber, searchBar.Text, 0, 20);
-                    if (!result.IsSuccess)
-                    {
-                        _userDialogs.Alert(result.Message, "Hata");
-                        return;
-                    }
-
-                    Items.Clear();
-                    foreach (var item in result.Data)
-                        Items.Add(item);
+                    _userDialogs.Alert(result.Message, "Hata");
+                    return;
                 }
+
+                Items.Clear();
+                foreach (var item in result.Data)
+                    Items.Add(Mapping.Mapper.Map<Product>(item));
+
             }
 
         }
@@ -192,7 +195,7 @@ public class ProductListViewModel : BaseViewModel
 
 
 
-			await Shell.Current.GoToAsync($"{nameof(ProductDetailView)}", new Dictionary<string, object>
+            await Shell.Current.GoToAsync($"{nameof(ProductDetailView)}", new Dictionary<string, object>
             {
                 [nameof(ProductDetailModel)] = productDetailModel
             });
