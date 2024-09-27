@@ -277,6 +277,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<IProductCountingService,ProductCountingDataStore>();
 
         builder.Services.AddSingleton<IQuicklyBomService, QuicklyBomDataStore>();
+        builder.Services.AddSingleton<IOutsourcePanelService, OutsourcePanelDataStore>();
+        builder.Services.AddSingleton<ICountingPanelService, CountingPanelDataStore>();
 
         builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
         builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
