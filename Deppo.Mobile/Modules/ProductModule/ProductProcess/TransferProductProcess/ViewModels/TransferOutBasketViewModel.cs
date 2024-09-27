@@ -215,8 +215,17 @@ public partial class TransferOutBasketViewModel : BaseViewModel
 				SelectedItem.IsSelected = false;
 				SelectedItem = null;
 			}
+            var matchingItem = TransferBasketModel.OutProducts.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
+            if (matchingItem != null)
+                matchingItem.IsSelected = false;
 
-			TransferBasketModel.OutProducts.Remove(item);
+            var viewModel = _serviceProvider.GetRequiredService<TransferOutProductListViewModel>();
+            
+            var product = viewModel.Items.FirstOrDefault(x=>x.ProductReferenceId == item.ReferenceId);
+            if (product is not null)
+                product.IsSelected = false;
+
+            TransferBasketModel.OutProducts.Remove(item);
         }
         catch (Exception ex)
         {

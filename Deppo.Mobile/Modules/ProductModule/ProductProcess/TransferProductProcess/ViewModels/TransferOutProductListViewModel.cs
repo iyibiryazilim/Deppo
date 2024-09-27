@@ -612,6 +612,13 @@ public partial class TransferOutProductListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            foreach (var item in TransferBasketModel.OutProducts)
+            {
+                item.IsSelected = false;
+
+            }
+            TransferBasketModel.OutProducts.Clear();
+
             if (SelectedProducts.Count > 0)
             {
                 SelectedProducts.Clear();
