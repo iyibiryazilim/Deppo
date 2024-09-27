@@ -2,10 +2,12 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrder.Views.WorkOrderFormView"
-             xmlns:basketModel="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;assembly=Deppo.Mobile.Core"
+             xmlns:bomBasketModel="clr-namespace:Deppo.Mobile.Core.Models.QuicklyModels.BasketModels;assembly=Deppo.Mobile.Core"
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
+             xmlns:subBomProductModel="clr-namespace:Deppo.Mobile.Core.Models.QuicklyModels;assembly=Deppo.Mobile.Core"
              xmlns:viewModels="clr-namespace:Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrder.ViewModels"
              Title="{Binding Title}"
              x:DataType="viewModels:WorkOrderFormViewModel"
@@ -57,41 +59,40 @@
                             <VerticalStackLayout Spacing="5">
                                 <dx:DateEdit Grid.Column="0"
                                              BorderColor="{StaticResource PrimaryLight}"
-                                             Date="{Binding .}"
+                                             Date="{Binding FicheDate}"
                                              FocusedBorderColor="{StaticResource Primary}"
                                              LabelText="Fiş Tarihi"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.CalendarDay}" />
-
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
                                              IsReadOnly="True"
-                                             LabelText="Ambar"
+                                             LabelText="Giriş Ambarı"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding .}" />
+                                             Text="{Binding QuicklyBomProductBasketModel.WarehouseName}" />        
 
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
                                              LabelText="Belge Numarası"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding .}" />
+                                             Text="{Binding DocumentNumber}" />
 
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
                                              LabelText="Doküman İzleme Numarası"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding .}" />
+                                             Text="{Binding DocumentTrackingNumber}" />
 
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
                                              LabelText="Özel Kod"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding .}" />
+                                             Text="{Binding SpecialCode}" />
 
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
                                              LabelText="Açıklama"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding .}" />
+                                             Text="{Binding Description}" />
                             </VerticalStackLayout>
                         </DataTemplate>
                     </dx:FormItem.ContentTemplate>
@@ -101,107 +102,108 @@
 
         <Button Grid.Row="1"
                 Command="{Binding SaveCommand}"
+                 Margin="10,10,10,20"
                 Text="Kaydet"
                 VerticalOptions="End" />
 
         <dx:BottomSheet x:Name="basketItemBottomSheet"
-                        AllowDismiss="True"
-                        BackgroundColor="White"
-                        CornerRadius="15"
-                        HalfExpandedRatio="0.5"
-                        IsModal="True"
-                        ShowGrabber="True">
+                AllowDismiss="True"
+                BackgroundColor="White"
+                CornerRadius="15"
+                HalfExpandedRatio="0.5"
+                IsModal="True"
+                ShowGrabber="True">
             <!--#region BottomSheetContent-->
-            <!--<Grid RowDefinitions="Auto,*"
-               RowSpacing="20"
-               Padding="10">
+            <Grid RowDefinitions="Auto,*"
+          RowSpacing="20"
+          Padding="10">
 
-             <VerticalStackLayout Grid.Row="0"
-                                  Spacing="5">
-                 <Label FontAttributes="Bold"
-                        FontSize="Subtitle"
-                        Text="Malzeme Listesi" />
-                 <BoxView HeightRequest="2"
-                          Color="{StaticResource OffBlack}" />
-             </VerticalStackLayout>
+                <VerticalStackLayout Grid.Row="0"
+                             Spacing="5">
+                    <Label FontAttributes="Bold"
+                   FontSize="Subtitle"
+                   Text="Alt Ürünler" />
+                    <BoxView HeightRequest="2"
+                     Color="{StaticResource OffBlack}" />
+                </VerticalStackLayout>
 
-             <CollectionView Grid.Row="1"
-                             ItemsSource="{Binding .}">
-                 <CollectionView.ItemTemplate>
-                     <DataTemplate x:DataType="subBomProductModel:QuicklyBomSubProductModel">
-                         <Border Padding="10"
-                                 BackgroundColor="Transparent"
-                                 StrokeShape="RoundRectangle 10"
-                                 StrokeThickness="0.1">
-                             <Grid ColumnDefinitions="Auto,*, Auto"
-                                   ColumnSpacing="10">
-                                 <Border BackgroundColor="{StaticResource Secondary}"
-                                         StrokeShape="RoundRectangle 5"
-                                         StrokeThickness="0.5">
-                                     <Image Grid.Column="0"
-                                            HeightRequest="50"
-                                            Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
-                                            WidthRequest="50" />
-                                 </Border>
+                <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding QuicklyBomProductBasketModel.SubProducts}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="subBomProductModel:QuicklyBomSubProductModel">
+                            <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0.1">
+                                <Grid ColumnDefinitions="Auto,*, Auto"
+                              ColumnSpacing="10">
+                                    <Border BackgroundColor="{StaticResource Secondary}"
+                                    StrokeShape="RoundRectangle 5"
+                                    StrokeThickness="0.5">
+                                        <Image Grid.Column="0"
+                                       HeightRequest="50"
+                                       Source="dotnet_bot.png"
+                                       WidthRequest="50" />
+                                    </Border>
 
-                                 <VerticalStackLayout Grid.Column="1"
-                                                      Spacing="2">
+                                    <VerticalStackLayout Grid.Column="1"
+                                                 Spacing="2">
 
-                                     <Label FontAttributes="Bold"
-                                            LineBreakMode="TailTruncation"
-                                            Text="{Binding ItemCode}" />
-                                     <Label LineBreakMode="TailTruncation"
-                                            Text="{Binding ItemName}"
-                                            TextColor="{StaticResource Gray600}" />
+                                        <Label FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation"
+                                       Text="{Binding ProductModel.Code}" />
+                                        <Label LineBreakMode="TailTruncation"
+                                       Text="{Binding ProductModel.Name}"
+                                       TextColor="{StaticResource Gray600}" />
 
-                                     <Label TextColor="{StaticResource Gray600}"
-                                            VerticalOptions="Center">
-                                         <Label.FormattedText>
-                                             <FormattedString>
-                                                 <Span FontAttributes="Bold"
-                                                       FontFamily="FAS"
-                                                       Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                                                       TextColor="{StaticResource Primary}" />
-                                                 <Span Text=" " />
-                                                 <Span FontAttributes="Bold"
-                                                       Text="{Binding Quantity, StringFormat='{0:N2}'}"
-                                                       TextColor="{StaticResource Primary}" />
-                                                 <Span Text=" " />
-                                                 <Span FontAttributes="Bold"
-                                                       Text="{Binding SubUnitsetCode}"
-                                                       TextColor="{StaticResource Primary}" />
-                                             </FormattedString>
-                                         </Label.FormattedText>
-                                     </Label>
-                                 </VerticalStackLayout>
+                                        <Label TextColor="{StaticResource Gray600}"
+                                       VerticalOptions="Center">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span FontAttributes="Bold"
+                                                  FontFamily="FAS"
+                                                  Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                  TextColor="{StaticResource Primary}" />
+                                                    <Span Text=" " />
+                                                    <Span FontAttributes="Bold"
+                                                  Text="{Binding SubBOMQuantity, StringFormat='{0:N2}'}"
+                                                  TextColor="{StaticResource Primary}" />
+                                                    <Span Text=" " />
+                                                    <Span FontAttributes="Bold"
+                                                  Text="{Binding ProductModel.SubUnitsetCode}"
+                                                  TextColor="{StaticResource Primary}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </VerticalStackLayout>
 
-                                 <Grid Grid.Column="2"
-                                       ColumnDefinitions="Auto, Auto, Auto"
-                                       ColumnSpacing="3"
-                                       HorizontalOptions="End"
-                                       VerticalOptions="Start">
-                                     <Label Grid.Column="0"
-                                            FontFamily="FAS"
-                                            FontSize="10"
-                                            Text="{Binding VariantIcon}"
-                                            TextColor="{Binding VariantIconColor}" />
-                                     <Label Grid.Column="1"
-                                            FontFamily="FAS"
-                                            FontSize="10"
-                                            Text="{Binding LocTrackingIcon}"
-                                            TextColor="{Binding LocTrackingIconColor}" />
-                                     <Label Grid.Column="2"
-                                            FontFamily="FAS"
-                                            FontSize="10"
-                                            Text="{Binding TrackingTypeIcon}"
-                                            TextColor="{Binding TrackingTypeIconColor}" />
-                                 </Grid>
-                             </Grid>
-                         </Border>
-                     </DataTemplate>
-                 </CollectionView.ItemTemplate>
-             </CollectionView>
-         </Grid>-->
+                                    <Grid Grid.Column="2"
+                                  ColumnDefinitions="Auto, Auto, Auto"
+                                  ColumnSpacing="3"
+                                  HorizontalOptions="End"
+                                  VerticalOptions="Start">
+                                        <Label Grid.Column="0"
+                                       FontFamily="FAS"
+                                       FontSize="10"
+                                       Text="{Binding ProductModel.VariantIcon}"
+                                       TextColor="{Binding ProductModel.VariantIconColor}" />
+                                        <Label Grid.Column="1"
+                                       FontFamily="FAS"
+                                       FontSize="10"
+                                       Text="{Binding ProductModel.LocTrackingIcon}"
+                                       TextColor="{Binding ProductModel.LocTrackingIconColor}" />
+                                        <Label Grid.Column="2"
+                                       FontFamily="FAS"
+                                       FontSize="10"
+                                       Text="{Binding ProductModel.TrackingTypeIcon}"
+                                       TextColor="{Binding ProductModel.TrackingTypeIconColor}" />
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
             <!--#endregion-->
         </dx:BottomSheet>
     </Grid>

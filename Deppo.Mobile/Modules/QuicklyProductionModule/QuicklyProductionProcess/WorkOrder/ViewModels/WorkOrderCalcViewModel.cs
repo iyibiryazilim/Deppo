@@ -238,7 +238,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
             }
             if (QuicklyBomProductBasketModel.BOMQuantity == 0 || QuicklyBomProductBasketModel.QuicklyBomProduct.Amount != QuicklyBomProductBasketModel.BOMQuantity)
             {
-                _userDialogs.Alert("Ana Ürün miktarı 0 olamaz.", "Hata", "Tamam");
+                _userDialogs.Alert("Ana Ürün miktarı 0 olamaz veya Ürün Gerekli Miktarda Değil", "Hata", "Tamam");
                 return;
             }
 
@@ -267,7 +267,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-
+            QuicklyBomProductBasketModel.SubProducts.Clear();
             _userDialogs.Loading("Loading Items...");
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
@@ -423,13 +423,15 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
 
     public async Task LoadMoreLocationTransactionsAsync()
     {
+        if (LocationTransactions.Count < 18)
+            return;
         if (IsBusy)
             return;
         try
         {
             IsBusy = true;
-            _userDialogs.Loading("Load More Location Items");
 
+            _userDialogs.Loading("Load More Location Items");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _locationTransactionService.GetInputObjectsAsync(
                 httpClient: httpClient,
@@ -483,7 +485,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
             if (item is not null)
             {
                 var totalQuantity = LocationTransactions.Sum(x => x.OutputQuantity);
-                if (totalQuantity > SelectedItem.ProductModel.StockQuantity || SelectedItem.SubBOMQuantity >= SelectedItem.ProductModel.Amount)
+                if (SelectedItem.SubBOMQuantity >= SelectedItem.ProductModel.Amount)
                 {
                     _userDialogs.Alert("Stok miktarından veya Üretilebilirden fazla ürün girişi yapamazsınız.", "Uyarı", "Tamam");
                     return;
@@ -805,11 +807,11 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
 
                 if (mainCount != QuicklyBomProductBasketModel.QuicklyBomProduct.Amount)
                 {
-                    foreach (var subbom in QuicklyBomProductBasketModel.SubProducts)
+                  /*  foreach (var subbom in QuicklyBomProductBasketModel.SubProducts)
                     {
                         subbom.LocationTransactions.Clear();
                         subbom.SubBOMQuantity = 0;
-                    }
+                    }*/
                 }
 
                 if (mainCount != 0)
