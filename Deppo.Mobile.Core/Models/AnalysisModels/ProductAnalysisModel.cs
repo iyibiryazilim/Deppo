@@ -12,6 +12,15 @@ namespace Deppo.Mobile.Core.Models.AnalysisModels
         }
 
         [ObservableProperty]
+        int totalProductCount;
+
+        [ObservableProperty]
+        double inStockProductCount;
+
+        [ObservableProperty]
+        double outStockProductCount;
+
+        [ObservableProperty]
         private int inputTransactionCount;
 
         [ObservableProperty]
