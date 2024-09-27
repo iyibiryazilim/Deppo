@@ -23,154 +23,86 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <!-- <ContentPage.BackgroundImageSource>
+    <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
             <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
-    </ContentPage.BackgroundImageSource>-->
+    </ContentPage.BackgroundImageSource>
 
-    <Grid
-        Padding="10"
-        RowDefinitions="200,Auto,Auto"
-        RowSpacing="20">
-
-        <dx:PieChartView
-            Grid.Row="0"
-            Background="Transparent"
-            BackgroundColor="Transparent">
-            <dx:PieChartView.Series>
-                <dx:DonutSeries>
-                    <dx:DonutSeries.Data>
-                        <dx:PieSeriesDataAdapter
-                            DataSource="{Binding ProductAnalysisModel.IORates}"
-                            LabelDataMember="Label"
-                            ValueDataMember="Value" />
-                    </dx:DonutSeries.Data>
-                    <dx:DonutSeries.Label>
-                        <dx:PieSeriesLabel Position="Inside" TextPattern="{}{VP}%">
-                            <dx:PieSeriesLabel.Style>
-                                <dx:PieSeriesLabelStyle>
-                                    <dx:PieSeriesLabelStyle.TextStyle>
-                                        <dx:TextStyle Size="14" Color="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" />
-                                    </dx:PieSeriesLabelStyle.TextStyle>
-                                </dx:PieSeriesLabelStyle>
-                            </dx:PieSeriesLabel.Style>
-                        </dx:PieSeriesLabel>
-                    </dx:DonutSeries.Label>
-                </dx:DonutSeries>
-            </dx:PieChartView.Series>
-
-            <dx:PieChartView.Legend>
-                <dx:Legend
-                    HorizontalPosition="RightOutside"
-                    Orientation="TopToBottom"
-                    VerticalPosition="Center">
-                    <dx:Legend.Style>
-                        <dx:LegendStyle
-                            BackgroundColor="{AppThemeBinding Light={StaticResource White},
-                                                              Dark=Black}"
-                            IndentFromDiagram="20"
-                            ItemsVerticalIndent="20">
-                            <dx:LegendStyle.TextStyle>
-                                <dx:TextStyle Size="14" Color="{AppThemeBinding Light={StaticResource Gray950}, Dark={StaticResource White}}" />
-                            </dx:LegendStyle.TextStyle>
-                        </dx:LegendStyle>
-                    </dx:Legend.Style>
-                </dx:Legend>
-            </dx:PieChartView.Legend>
-            <!-- <dx:PieChartView.ChartStyle>
-                <dx:PieChartStyle BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark=Black}" Palette="{Binding IOColors}" />
-            </dx:PieChartView.ChartStyle> -->
-        </dx:PieChartView>
-
-        <Grid
-            Grid.Row="1"
-            ColumnDefinitions="*,*"
-            ColumnSpacing="5">
-            <Border
-                Grid.Column="0"
-                Padding="15"
-                Stroke="{StaticResource Primary}"
-                BackgroundColor="{StaticResource PrimaryLight}"
-                StrokeShape="RoundRectangle 10"
-                StrokeThickness="0.2">
-                <Grid
-                    ColumnDefinitions="Auto,*"
-                    RowDefinitions="Auto,Auto"
-                    VerticalOptions="Center">
-                    <Label
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        FontSize="14"
-                        Text="Giriş İşlem Sayısı"
-                        TextColor="{StaticResource White}" />
-                    <Label
-                        Grid.Row="1"
-                        Grid.Column="0"
-                        FontSize="Large"
-                        Text="4753"
-                        TextColor="{StaticResource White}" />
-                    <Label
-                        Grid.Row="0"
-                        Grid.RowSpan="2"
-                        Grid.Column="1"
-                        HorizontalOptions="End"
-                        VerticalOptions="Center">
-                        <Label.FormattedText>
-                            <FormattedString>
-                                <Span
-                                    FontFamily="FAS"
-                                    FontSize="48"
-                                    Text="{x:Static fontAwesome:FontAwesomeIcons.ArrowUp}"
-                                    TextColor="{StaticResource White}" />
-                            </FormattedString>
-                        </Label.FormattedText>
-                    </Label>
-                </Grid>
-            </Border>
-                        <Border
-                Grid.Column="1"
-                Padding="15"
-                Stroke="{StaticResource Primary}"
-                BackgroundColor="{StaticResource PrimaryLight}"
-                StrokeShape="RoundRectangle 10"
-                StrokeThickness="0.2">
-                <Grid
-                    ColumnDefinitions="Auto,*"
-                    RowDefinitions="Auto,Auto"
-                    VerticalOptions="Center">
-                    <Label
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        FontSize="14"
-                        Text="Çıkış İşlem Sayısı"
-                        TextColor="{StaticResource White}" />
-                    <Label
-                        Grid.Row="1"
-                        Grid.Column="0"
-                        FontSize="Large"
-                        Text="5235"
-                        TextColor="{StaticResource White}" />
-                    <Label
-                        Grid.Row="0"
-                        Grid.RowSpan="2"
-                        Grid.Column="1"
-                        HorizontalOptions="End"
-                        VerticalOptions="Center">
-                        <Label.FormattedText>
-                            <FormattedString>
-                                <Span
-                                    FontFamily="FAS"
-                                    FontSize="48"
-                                    Text="{x:Static fontAwesome:FontAwesomeIcons.ArrowDown}"
-                                    TextColor="{StaticResource White}" />
-                            </FormattedString>
-                        </Label.FormattedText>
-                    </Label>
-                </Grid>
-            </Border>
-        </Grid>
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10" Padding="10">
+        <VerticalStackLayout Grid.Row="0" Spacing="10">
+            <Label
+                FontSize="20"
+                Text="Özet"
+                TextColor="{StaticResource White}"
+                VerticalOptions="Center" />
+            <Grid
+                ColumnDefinitions="*,*"
+                ColumnSpacing="10"
+                RowDefinitions="Auto,Auto"
+                RowSpacing="10">
+                <Border
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="0"
+                    Padding="10"
+                    BackgroundColor="{StaticResource Primary}"
+                    Stroke="{StaticResource Primary}"
+                    StrokeShape="RoundRectangle 10">
+                    <VerticalStackLayout VerticalOptions="End">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="45"
+                            Text="{Binding ProductAnalysisModel.TotalProductCount,StringFormat='{0:N0}'}"
+                            TextColor="{StaticResource White}" />
+                        <Label
+                            FontSize="20"
+                            Text="Total Products"
+                            TextColor="{StaticResource WhiteSmoke}" />
+                    </VerticalStackLayout>
+                </Border>
+                 <Border
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Padding="10"
+                    BackgroundColor="{StaticResource Primary}"
+                    Stroke="{StaticResource Primary}"
+                    StrokeShape="RoundRectangle 10">
+                    <VerticalStackLayout VerticalOptions="End">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="45"
+                            Text="{Binding ProductAnalysisModel.InStockProductCount,StringFormat='{0:N0}'}"
+                            TextColor="{StaticResource White}" />
+                        <Label
+                            FontSize="16"
+                            Text="Stoktaki Ürünler"
+                            TextColor="{StaticResource WhiteSmoke}" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Padding="10"
+                    BackgroundColor="{StaticResource Primary}"
+                    Stroke="{StaticResource Primary}"
+                    StrokeShape="RoundRectangle 10">
+                    <VerticalStackLayout VerticalOptions="End">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="45"
+                            Text="{Binding ProductAnalysisModel.OutStockProductCount,StringFormat='{0:N0}'}"
+                            TextColor="{StaticResource White}" />
+                        <Label
+                            FontSize="16"
+                            Text="Stokta Olmayan Ürünler"
+                            TextColor="{StaticResource WhiteSmoke}" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+        </VerticalStackLayout>
 
     </Grid>
+
 
 </ContentPage>
