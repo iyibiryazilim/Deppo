@@ -155,16 +155,22 @@ public partial class InputProductProcessWarehouseListViewModel : BaseViewModel
         {
             IsBusy = true;
 
+			if (item == SelectedWarehouseModel)
+			{
+				SelectedWarehouseModel.IsSelected = false;
+				SelectedWarehouseModel = null;
+			}
+			else
+			{
+				if (SelectedWarehouseModel != null)
+				{
+					SelectedWarehouseModel.IsSelected = false;
+				}
 
-            Items.ToList().ForEach(x => x.IsSelected = false);
-
-            var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-            if (selectedItem != null)
-                selectedItem.IsSelected = true;
-
-            SelectedWarehouseModel = item;
-
-        }
+				SelectedWarehouseModel = item;
+				SelectedWarehouseModel.IsSelected = true;
+			}
+		}
         catch (Exception ex)
         {
             _userDialogs.Alert(ex.Message);
@@ -204,4 +210,25 @@ public partial class InputProductProcessWarehouseListViewModel : BaseViewModel
         }
     }
 
+
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+        }
+        catch (Exception ex)
+        {
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 }
