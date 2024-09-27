@@ -4,9 +4,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:locationModel="clr-namespace:Deppo.Mobile.Core.Models.LocationModels;assembly=Deppo.Mobile.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:transferModel="clr-namespace:Deppo.Mobile.Core.Models.TransferModels;assembly=Deppo.Mobile.Core"
-             xmlns:locationModel="clr-namespace:Deppo.Mobile.Core.Models.LocationModels;assembly=Deppo.Mobile.Core"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.TransferProductProcess.ViewModels"
              Title="{Binding Title}"
              x:DataType="viewModel:TransferInBasketViewModel"
@@ -19,6 +19,7 @@
         <ResourceDictionary>
             <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
             <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -77,12 +78,28 @@
                                 </Border>
 
                                 <VerticalStackLayout Grid.Column="1">
-                                    <Label FontAttributes="Bold"
-                                           LineBreakMode="TailTruncation"
-                                           Text="{Binding Code}" />
-                                    <Label LineBreakMode="TailTruncation"
-                                           Text="{Binding Name}"
-                                           TextColor="{StaticResource Gray600}" />
+
+                                    <Grid ColumnDefinitions="*, Auto">
+                                        <VerticalStackLayout Grid.Column="0">
+                                            <Label FontAttributes="Bold"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="1"
+                                                   Text="{Binding Code}" />
+                                            <Label LineBreakMode="TailTruncation"
+                                                   MaxLines="1"
+                                                   Text="{Binding Name}"
+                                                   TextColor="{StaticResource Gray600}" />
+                                        </VerticalStackLayout>
+
+                                        <Label Grid.Column="1"
+                                               FontFamily="FAS"
+                                               HorizontalOptions="End"
+                                               IsVisible="{Binding IsCompleted, Converter={StaticResource InvertedBoolConverter}}"
+                                               Text="{x:Static fontAwesome:FontAwesomeIcons.CircleExclamation}"
+                                               TextColor="#F5004F"
+                                               VerticalOptions="Start" />
+
+                                    </Grid>
 
                                     <Label>
                                         <Label.FormattedText>
@@ -182,7 +199,7 @@
 
         <!--#region BottomSheets-->
         <VerticalStackLayout Grid.Row="1">
-            
+
             <dx:BottomSheet x:Name="locationBottomSheet"
                             Grid.Row="1"
                             Padding="10,30,10,10"
@@ -192,7 +209,7 @@
                             HalfExpandedRatio="0.5"
                             IsModal="True"
                             ShowGrabber="True">
-                
+
                 <Grid RowDefinitions="Auto, *" RowSpacing="20">
                     <VerticalStackLayout Grid.Row="0" Spacing="5">
                         <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
@@ -253,7 +270,7 @@
                                             StrokeShape="RoundRectangle 10"
                                             StrokeThickness="0.1">
                                         <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
-                                            
+
                                             <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                                                 <Label FontAttributes="Bold"
                                                        LineBreakMode="TailTruncation"
@@ -329,9 +346,9 @@
                                 Text="Tamam" />
                     </Grid>
                 </Grid>
-              
+
             </dx:BottomSheet>
-          
+
         </VerticalStackLayout>
         <!--#endregion-->
     </Grid>
