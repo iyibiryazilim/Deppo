@@ -30,6 +30,7 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
     private readonly IHttpClientService _httpClientService;
     private readonly IProductionTransactionService _productionTransactionService;
     private readonly IInCountingTransactionService _inCountingTransactionService;
+	private readonly IServiceProvider _serviceProvider;
     private readonly IUserDialogs _userDialogs;
 
 
@@ -58,12 +59,13 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
     ObservableCollection<InputProductBasketModel> items = null!;
 
 
-	public InputProductProcessFormViewModel(IHttpClientService httpClientService, IProductionTransactionService productionTransactionService, IUserDialogs userDialogs, IInCountingTransactionService inCountingTransactionService)
+	public InputProductProcessFormViewModel(IHttpClientService httpClientService, IProductionTransactionService productionTransactionService, IUserDialogs userDialogs, IInCountingTransactionService inCountingTransactionService, IServiceProvider serviceProvider)
 	{
 		_httpClientService = httpClientService;
 		_productionTransactionService = productionTransactionService;
 		_inCountingTransactionService = inCountingTransactionService;
 		_userDialogs = userDialogs;
+		_serviceProvider = serviceProvider;
 		Items = new();
 
 		LoadPageCommand = new Command(async () => await LoadPageAsync());
@@ -244,10 +246,13 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
+			var basketViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketListViewModel>();
+			basketViewModel.Items.Clear();
+
 			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
 			{
 				[nameof(ResultModel)] = resultModel
-			});
+			});	
 		}
 		else
 		{
