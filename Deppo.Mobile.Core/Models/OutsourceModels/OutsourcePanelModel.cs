@@ -18,6 +18,13 @@ public partial class OutsourcePanelModel : ObservableObject
     double outProductCount;
 
     [ObservableProperty]
+    double outProductCountTotalRate = default;
+
+    [ObservableProperty]
+    double inProductCountTotalRate = default;
+
+
+    [ObservableProperty]
     ObservableCollection<OutsourceModel> outsources = new();
 
     [ObservableProperty]
