@@ -390,7 +390,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 productReferenceId: SelectedItem.ProductModel.ReferenceId,
-                warehouseNumber: SelectedItem.WarehouseModel.Number,
+                warehouseNumber: SelectedItem.ProductModel.WarehouseNumber,
                 skip: 0,
                 take: 20
             );
@@ -436,7 +436,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 productReferenceId: SelectedItem.ProductModel.ReferenceId,
-                warehouseNumber: SelectedItem.WarehouseModel.Number,
+                warehouseNumber: SelectedItem.ProductModel.WarehouseNumber,
                 skip: LocationTransactions.Count,
                 take: 20
             );
@@ -483,7 +483,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
             if (item is not null)
             {
                 var totalQuantity = LocationTransactions.Sum(x => x.OutputQuantity);
-                if (totalQuantity >= SelectedItem.ProductModel.StockQuantity || SelectedItem.SubBOMQuantity >= SelectedItem.ProductModel.Amount)
+                if (totalQuantity > SelectedItem.ProductModel.StockQuantity || SelectedItem.SubBOMQuantity >= SelectedItem.ProductModel.Amount)
                 {
                     _userDialogs.Alert("Stok miktarından veya Üretilebilirden fazla ürün girişi yapamazsınız.", "Uyarı", "Tamam");
                     return;
@@ -562,21 +562,6 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
 
             if (LocationTransactions.Count > 0)
             {
-                var subItemCount = SelectedItem.LocationTransactions.Sum(x => x.OutputQuantity);
-                var transactionCount = SelectedItem.LocationTransactions.Sum(x => x.Quantity);
-
-                if (transactionCount < SelectedItem.ProductModel.Amount)
-                {
-                    _userDialogs.Alert("Ana Ürün Miktarı Size Gerekli Miktardan Düşük. Ürünü Çıkartın Ya Da Ana Malzemenin Değerini Değiştirin", "Uyarı", "Tamam");
-                    return;
-                }
-
-                if (subItemCount != SelectedItem.ProductModel.Amount)
-                {
-                    _userDialogs.Alert("Sarf Ürünlerinde Miktarları Doğru Giriniz.", "Uyarı", "Tamam");
-                    return;
-                }
-
                 var count = LocationTransactions.Where(x => x.OutputQuantity > 0).Sum(x => (double)x.OutputQuantity);
                 SelectedLocationTransactions.Clear();
 
