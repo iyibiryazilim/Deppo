@@ -460,10 +460,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
         {
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
-        finally
-        {
-            IsBusy = false;
-        }
+        
     }
 
     public async Task LoadMoreLocationTransactionsAsync()
@@ -674,11 +671,8 @@ public partial class ManuelCalcViewModel : BaseViewModel
 
     private async Task LoadWarehouseLocationsAsync()
     {
-        if (IsBusy)
-            return;
         try
         {
-            IsBusy = true;
             _userDialogs.ShowLoading("Yükleniyor...");
             await Task.Delay(1000);
             Locations.Clear();
@@ -709,10 +703,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
         {
             await _userDialogs.AlertAsync(ex.Message);
         }
-        finally
-        {
-            IsBusy = false;
-        }
+        
     }
     private async Task LoadMoreWarehouseLocationsAsync()
     {
