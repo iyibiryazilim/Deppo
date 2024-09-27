@@ -209,7 +209,7 @@
                                                    WidthRequest="16">
                                                 <Image.Source>
                                                     <FontImageSource FontFamily="FAS"
-                                                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.BusinessTime}"
+                                                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.Box}"
                                                                      Size="16"
                                                                      Color="{StaticResource Primary}" />
                                                 </Image.Source>
