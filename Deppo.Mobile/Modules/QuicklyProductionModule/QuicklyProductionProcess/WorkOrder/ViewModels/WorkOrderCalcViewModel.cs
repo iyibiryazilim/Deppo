@@ -365,6 +365,9 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+
+
     public async Task LoadLocationTransactionsAsync()
     {
         try
@@ -475,7 +478,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
             if (item is not null)
             {
                 var totalQuantity = LocationTransactions.Sum(x => x.OutputQuantity);
-                if (totalQuantity >= SelectedItem.ProductModel.StockQuantity)
+                if (totalQuantity >= SelectedItem.ProductModel.StockQuantity || SelectedItem.SubBOMQuantity >= SelectedItem.ProductModel.Amount)
                 {
                     _userDialogs.Alert("Stok miktarından fazla ürün girişi yapamazsınız.", "Uyarı", "Tamam");
                     return;
@@ -485,6 +488,11 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                     if (item.OutputQuantity < item.Quantity)
                     {
                         item.OutputQuantity += 1;
+                    }
+                    else
+                    {
+                        _userDialogs.Alert("Miktardan fazla ürün girişi yapamazsınız.", "Uyarı", "Tamam");
+                        return;
                     }
 
                 }
@@ -521,8 +529,12 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                 if (item.OutputQuantity == 0)
                 {
                     LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId).OutputQuantity = 0;
-                    var Remove = SelectedItem.LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-                    SelectedItem.LocationTransactions.Remove(Remove);
+                    if(SelectedItem.LocationTransactions.Any(x => x.ReferenceId == item.ReferenceId))
+                    {
+                        LocationTransactionModel Remove = SelectedItem.LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
+                        SelectedItem.LocationTransactions.Remove(Remove);
+                    }
+                    
                 }
             }
         }
@@ -550,9 +562,30 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
 
             if (LocationTransactions.Count > 0)
             {
+                var subItemCount = SelectedItem.LocationTransactions.Sum(x => x.OutputQuantity);
+                var transactionCount =SelectedItem.LocationTransactions.Sum(x => x.Quantity);
+
+
+                if(transactionCount < SelectedItem.ProductModel.Amount)
+                {
+                    _userDialogs.Alert("Ana Ürün Miktarı Size Gerekli Miktardan Düşük.", "Uyarı", "Tamam");
+                }
+                
+                if (subItemCount != SelectedItem.ProductModel.Amount)
+                {
+                    _userDialogs.Alert("Sarf Ürünlerinde Miktarları Doğru Giriniz.", "Uyarı", "Tamam");
+                    return;
+                }
+                
+
+                
+
 
                 var count = LocationTransactions.Where(x => x.OutputQuantity > 0).Sum(x => (double)x.OutputQuantity);
                 SelectedLocationTransactions.Clear();
+
+
+
                 if (count > 0)
                 {
                     foreach (var item in LocationTransactions.Where(x => x.OutputQuantity > 0))
