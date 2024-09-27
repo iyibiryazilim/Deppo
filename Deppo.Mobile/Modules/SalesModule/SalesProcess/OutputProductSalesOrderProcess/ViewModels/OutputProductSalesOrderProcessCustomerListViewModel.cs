@@ -173,6 +173,8 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 
 	private async Task ShowOrdersAsync(SalesCustomer selectedItem)
 	{
+		if (selectedItem is null)
+			return;
 		if (IsBusy)
 			return;
 		try
@@ -183,6 +185,11 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 			await Task.Delay(1000);
 
 			SwipedSalesCustomer = selectedItem;
+
+			if(selectedItem?.Products?.Count > 0)
+			{
+				selectedItem.Products.Clear();
+			}
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			var customerOrders = await _salesCustomerProductService.GetObjects(
@@ -200,38 +207,18 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 				if (customerOrders.Data is null)
 					return;
 
+
 				foreach (var item in customerOrders.Data)
 				{
 					var customer = Items.FirstOrDefault(x => x.ReferenceId == selectedItem.ReferenceId);
-					Console.WriteLine(customer);
+					if(customer?.Products is null)
+					{
+						customer.Products = new();
+					}
 					if(customer is not null)
 					{
 						customer.Products.Add(Mapping.Mapper.Map<SalesCustomerProduct>(item));
-
-						//customer.Products.Add(new SalesCustomerProduct
-						//{
-						//	ItemReferenceId = item.ItemReferenceId,
-						//	ItemCode = item.ItemCode,
-						//	ItemName = item.ItemName,
-						//	MainItemReferenceId = item.MainItemReferenceId,
-						//	MainItemCode = item.MainItemCode,
-						//	MainItemName = item.MainItemName,
-						//	IsVariant = item.IsVariant,
-						//	UnitsetReferenceId = item.UnitsetReferenceId,
-						//	UnitsetCode = item.UnitsetCode,
-						//	UnitsetName = item.UnitsetName,
-						//	SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-						//	SubUnitsetCode = item.SubUnitsetCode,
-						//	SubUnitsetName = item.SubUnitsetName,
-						//	LocTracking = item.LocTracking,
-						//	TrackingType = item.TrackingType,
-						//	Quantity = item.Quantity,
-						//	ShippedQuantity = item.ShippedQuantity,
-						//	WaitingQuantity = item.WaitingQuantity,
-						//});
 					}
-						
-
 				}
 			}
 
@@ -286,6 +273,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 		}
 	}
 
+	[Obsolete("Form sayfasına taşındı")]
 	private async Task LoadShipAddressesAsync(SalesCustomer  customer)
 	{
 		
@@ -326,6 +314,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 		}
 	}
 
+	[Obsolete("Form sayfasına taşındı")]
 	private async Task ShipAddressTappedAsync(ShipAddressModel shipAddressModel)
 	{
 		if (IsBusy)
@@ -353,6 +342,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 		}
 	}
 
+	[Obsolete("Form sayfasına taşındı")]
 	private async Task ConfirmShipAddressAsync() { 		
 		if (IsBusy)
 			return;
