@@ -161,6 +161,7 @@
 
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="subBomProductModel:QuicklyBomSubProductModel">
+
                             <SwipeView Threshold="100">
                                 <SwipeView.LeftItems>
                                     <SwipeItems Mode="Execute">
