@@ -100,7 +100,7 @@ WHERE
     AND SUPPLIER.CODE <> 'ÿ'";
 
             if (!string.IsNullOrEmpty(search))
-                baseQuery += $@" AND (SUPPLIER.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";
+                baseQuery += $@" AND (SUPPLIER.CODE LIKE '{search}%' OR SUPPLIER.DEFINITION_ LIKE '%{search}%')";
 
             baseQuery += $@" ORDER BY SUPPLIER.CODE DESC
 OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
