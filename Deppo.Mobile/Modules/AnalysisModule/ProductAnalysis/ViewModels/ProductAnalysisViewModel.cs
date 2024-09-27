@@ -31,10 +31,6 @@ public partial class ProductAnalysisViewModel : BaseViewModel
     [ObservableProperty]
     ProductAnalysisModel productAnalysisModel = new();
 
-    // public Color[] IOColors {
-    //         get;
-    //         set;
-    //     }
 
     public Command LoadItemsCommand { get; }
 
@@ -46,26 +42,13 @@ public partial class ProductAnalysisViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-
-            // IOColors = new Color[] { 
-            //     Color.FromArgb("#44B0C0"),
-            //     Color.FromArgb("#E6BE0C")
-            // };
+            _userDialogs.ShowLoading("Yükleniyor...");
             await Task.Delay(1000);
-            ProductAnalysisModel.IORates.Clear();
-            ProductAnalysisModel.IORates.Add(new IORateModel("Giriş İşlem Oranı", 52.5));
-            ProductAnalysisModel.IORates.Add(new IORateModel("Çıkış İşlem Oranı", 47.5));
-
-            //var tasks = new List<Task>
-            //{
-            //    GetInputTransactionCountAsync(),
-            //    GetOutputTransactionCountAsync(),
-            //    GetNegativeStockProductsCountAsync(),
-            //    GetLastWarehousesAsync()
-            //
+            await Task.WhenAll(GetTotalProductCountAsync(), GetInStockProductCountAsync(), GetOutStockProductCountAsync());
 
 
-            //await Task.WhenAll(GetInputTransactionCountAsync(), GetOutputTransactionCountAsync(),GetNegativeStockProductsCountAsync(), GetLastWarehousesAsync());
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
         }
         catch (Exception ex)
@@ -224,6 +207,101 @@ public partial class ProductAnalysisViewModel : BaseViewModel
         }
     }
 
+    private async Task GetTotalProductCountAsync()
+    {
 
+        try
+        {
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _productAnalysisService.GetTotalProductCountAsync(httpClient, _httpClientService.FirmNumber);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                {
+                    var obj = Mapping.Mapper.Map<ProductAnalysisModel>(item);
+                    ProductAnalysisModel.TotalProductCount = obj.TotalProductCount;
+                }
+
+                
+            }
+
+
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+
+    }
+
+    private async Task GetInStockProductCountAsync()
+    {
+
+        try
+        {
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _productAnalysisService.GetInStockProductCountAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                {
+                    var obj = Mapping.Mapper.Map<ProductAnalysisModel>(item);
+                    ProductAnalysisModel.InStockProductCount = obj.InStockProductCount;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+
+    }
+
+    private async Task GetOutStockProductCountAsync()
+    {
+
+        try
+        {
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _productAnalysisService.GetOutStockProductCountAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                {
+                    var obj = Mapping.Mapper.Map<ProductAnalysisModel>(item);
+                    ProductAnalysisModel.OutStockProductCount = obj.OutStockProductCount;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+
+    }
 
 }

@@ -34,6 +34,10 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 	[ObservableProperty]
 	private InputProductProcessType inputProductProcessType;
 
+	public ObservableCollection<InputProductBasketModel> Items { get; } = new();
+	public ObservableCollection<LocationModel> Locations { get; } = new();
+	public ObservableCollection<SeriLotModel> SeriLots { get; } = new();
+
 	public InputProductProcessBasketListViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider)
 	{
 		_userDialogs = userDialogs;
@@ -48,8 +52,6 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		IncreaseCommand = new Command<InputProductBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<InputProductBasketModel>(async (item) => await DecreaseAsync(item));
 
-	
-		
 		LoadMoreLocationsCommand = new Command(async () => await LoadMoreWarehouseLocationsAsync());
 		LocationCloseCommand = new Command(async () => await LocationCloseAsync());
 		LocationConfirmCommand = new Command<LocationModel>(async (locationModel) => await LocationConfirmAsync(locationModel));
@@ -62,6 +64,8 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 
 		Items.Clear();
 	}
+
+	public Page CurrentPage { get; set; } = null!;
 
 	public Command ShowProductViewCommand { get; }
 
@@ -83,12 +87,6 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 
 	public Command NextViewCommand { get; }
 	public Command BackCommand { get; }
-
-	public Page CurrentPage { get; set; } = null!;
-
-	public ObservableCollection<InputProductBasketModel> Items { get; } = new();
-	public ObservableCollection<LocationModel> Locations { get; } = new();
-	public ObservableCollection<SeriLotModel> SeriLots { get; } = new();
 
 	private async Task ShowProductViewAsync()
 	{
@@ -128,7 +126,11 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 			{
 				var nextViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketLocationListViewModel>();
 
-                await nextViewModel.LoadSelectedItemsAsync();
+				if(nextViewModel.InputProductBasketModel is null)
+				{
+					nextViewModel.InputProductBasketModel = inputProductBasketModel;
+				}
+				await nextViewModel.LoadSelectedItemsAsync();
 
                 await Shell.Current.GoToAsync($"{nameof(InputProductProcessBasketLocationListView)}", new Dictionary<string, object>
 				{
