@@ -229,6 +229,22 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
         {
             IsBusy = true;
 
+            foreach (var subProducts in QuicklyBomProductBasketModel.SubProducts)
+            {
+                if (subProducts.SubBOMQuantity == 0 || subProducts.ProductModel.Amount != subProducts.SubBOMQuantity)
+                {
+                    _userDialogs.Alert($"{subProducts.ProductModel.Code} kodlu Üründe Miktar Hatası Mevcut", "Hata", "Tamam");
+                    return;
+                }
+            }
+            if (QuicklyBomProductBasketModel.BOMQuantity == 0 || QuicklyBomProductBasketModel.QuicklyBomProduct.Amount != QuicklyBomProductBasketModel.BOMQuantity)
+            {
+                _userDialogs.Alert("Ana Ürün miktarı 0 olamaz.", "Hata", "Tamam");
+                return;
+            }
+
+
+
             await Shell.Current.GoToAsync($"{nameof(WorkOrderFormView)}", new Dictionary<string, object>
             {
                 [nameof(QuicklyBomProductBasketModel)] = QuicklyBomProductBasketModel
@@ -373,7 +389,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
         try
         {
             _userDialogs.ShowLoading("Load Location Items...");
-            //  await Task.Delay(1000);
+              await Task.Delay(1000);
             LocationTransactions.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
@@ -419,11 +435,12 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
 
     public async Task LoadMoreLocationTransactionsAsync()
     {
+        if (IsBusy)
+            return;
         try
         {
-            _userDialogs.ShowLoading("Load Location Items...");
-            //  await Task.Delay(1000);
-            LocationTransactions.Clear();
+            IsBusy = true;
+            _userDialogs.Loading("Load More Location Items");
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _locationTransactionService.GetInputObjectsAsync(
@@ -480,7 +497,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                 var totalQuantity = LocationTransactions.Sum(x => x.OutputQuantity);
                 if (totalQuantity >= SelectedItem.ProductModel.StockQuantity || SelectedItem.SubBOMQuantity >= SelectedItem.ProductModel.Amount)
                 {
-                    _userDialogs.Alert("Stok miktarından fazla ürün girişi yapamazsınız.", "Uyarı", "Tamam");
+                    _userDialogs.Alert("Stok miktarından veya Üretilebilirden fazla ürün girişi yapamazsınız.", "Uyarı", "Tamam");
                     return;
                 }
                 else
@@ -574,9 +591,6 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                     _userDialogs.Alert("Sarf Ürünlerinde Miktarları Doğru Giriniz.", "Uyarı", "Tamam");
                     return;
                 }
-                
-
-                
 
 
                 var count = LocationTransactions.Where(x => x.OutputQuantity > 0).Sum(x => (double)x.OutputQuantity);
@@ -640,8 +654,12 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
     //Locations Kısmı Düzenlenecek
     private async Task LoadWarehouseLocationsAsync()
     {
+        if (IsBusy)
+            return;
+
         try
         {
+            IsBusy = true;
             _userDialogs.ShowLoading("Yükleniyor...");
             Locations.Clear();
 
@@ -673,13 +691,19 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
         {
             await _userDialogs.AlertAsync(ex.Message);
         }
+        finally
+        {
+            IsBusy = false;
+        }
     }
     private async Task LoadMoreWarehouseLocationsAsync()
     {
+        if (IsBusy)
+            return;
         try
         {
+            IsBusy = true;
             _userDialogs.ShowLoading("Yükleniyor...");
-            Locations.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, QuicklyBomProductBasketModel.WarehouseNumber, QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId, string.Empty, LocationTransactions.Count, 20);
@@ -706,6 +730,10 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
         catch (System.Exception ex)
         {
             await _userDialogs.AlertAsync(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
     private async Task LocationCloseAsync()
