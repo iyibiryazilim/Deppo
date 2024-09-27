@@ -674,8 +674,11 @@ public partial class ManuelCalcViewModel : BaseViewModel
 
     private async Task LoadWarehouseLocationsAsync()
     {
+        if (IsBusy)
+            return;
         try
         {
+            IsBusy = true;
             _userDialogs.ShowLoading("Yükleniyor...");
             await Task.Delay(1000);
             Locations.Clear();
@@ -706,14 +709,19 @@ public partial class ManuelCalcViewModel : BaseViewModel
         {
             await _userDialogs.AlertAsync(ex.Message);
         }
+        finally
+        {
+            IsBusy = false;
+        }
     }
     private async Task LoadMoreWarehouseLocationsAsync()
     {
+        if(IsBusy)
+            return;
         try
         {
+            IsBusy = true;
             _userDialogs.ShowLoading("Yükleniyor...");
-            await Task.Delay(1000);
-            Locations.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, QuicklyBomProductBasketModel.WarehouseNumber, QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId, string.Empty, LocationTransactions.Count, 20);
@@ -740,6 +748,10 @@ public partial class ManuelCalcViewModel : BaseViewModel
         catch (System.Exception ex)
         {
             await _userDialogs.AlertAsync(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
     private async Task LocationCloseAsync()
