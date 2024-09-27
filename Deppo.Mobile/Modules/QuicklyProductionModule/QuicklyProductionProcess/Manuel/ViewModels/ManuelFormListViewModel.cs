@@ -107,8 +107,11 @@ public partial class ManuelFormListViewModel : BaseViewModel
         {
             IsBusy = true;
 
+            _userDialogs.Loading("Loading");
+            //await Task.Delay(750);
             CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
 
+            _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
@@ -287,7 +290,6 @@ public partial class ManuelFormListViewModel : BaseViewModel
             Description = Description,
         };
 
-
         var productionTransactionLineDto = new ProductionTransactionLineDto
         {
             ProductCode = QuicklyBomProductBasketModel.QuicklyBomProduct.Code,
@@ -296,29 +298,25 @@ public partial class ManuelFormListViewModel : BaseViewModel
             ConversionFactor = 1,
             OtherConversionFactor = 1,
             SubUnitsetCode = QuicklyBomProductBasketModel.QuicklyBomProduct.SubUnitsetCode,
-            UnitPrice = 0, 
-             VatRate = 0,
-              
+            UnitPrice = 0,
+            VatRate = 0,
         };
 
-            foreach (var detail in quicklyBomProductBasketModel.MainLocations)
+        foreach (var detail in quicklyBomProductBasketModel.MainLocations)
+        {
+            var seriLotTransactionDto = new SeriLotTransactionDto
             {
-                
-                    var seriLotTransactionDto = new SeriLotTransactionDto
-                    {
-                        StockLocationCode = detail.Code,
-                        Quantity = detail.InputQuantity,
-                        ConversionFactor = 1,
-                        OtherConversionFactor = 1,
-                        DestinationStockLocationCode = string.Empty,
-                    };
+                StockLocationCode = detail.Code,
+                Quantity = detail.InputQuantity,
+                ConversionFactor = 1,
+                OtherConversionFactor = 1,
+                DestinationStockLocationCode = string.Empty,
+            };
 
-                    productionTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
-                
-            }
+            productionTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
+        }
 
-            productionTransactionDto.Lines.Add(productionTransactionLineDto);
-        
+        productionTransactionDto.Lines.Add(productionTransactionLineDto);
 
         var result2 = await _productionTransactionService.InsertProductionTransaction(httpClient, productionTransactionDto, _httpClientService.FirmNumber);
         return result2;

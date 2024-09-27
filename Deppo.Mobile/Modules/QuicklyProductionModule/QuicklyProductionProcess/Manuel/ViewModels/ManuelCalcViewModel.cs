@@ -468,12 +468,14 @@ public partial class ManuelCalcViewModel : BaseViewModel
 
     public async Task LoadMoreLocationTransactionsAsync()
     {
+        if (IsBusy)
+            return;
         try
         {
-            _userDialogs.ShowLoading("Load Location Items...");
-            await Task.Delay(1000);
-            LocationTransactions.Clear();
+            IsBusy = true;
 
+
+            _userDialogs.Loading("Load More Location Items");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _locationTransactionService.GetInputObjectsAsync(
                 httpClient: httpClient,
