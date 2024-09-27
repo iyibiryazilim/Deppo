@@ -15,7 +15,6 @@ public partial class WaitingSalesOrderListViewModel : BaseViewModel
 	private readonly IWaitingSalesOrderService _waitingSalesOrderService;
 	private readonly ICustomerService _customerService;
 	private readonly IUserDialogs _userDialogs;
-	private HttpClient? httpClient;
 
 	[ObservableProperty]
 	Customer? selectedCustomer;
@@ -39,18 +38,20 @@ public partial class WaitingSalesOrderListViewModel : BaseViewModel
 
 		LoadCustomersCommand = new Command(async () => await LoadCustomersAsync());
 		LoadItemsCommand = new Command<Customer>(async (customer) => await LoadItemsAsync(customer));
-		
+		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+
 	}
 
 	#region Commands
 	public Command LoadCustomersCommand { get; }
 	public Command LoadItemsCommand { get; }
+	public Command LoadMoreItemsCommand { get; }
 	#endregion
 
 
 	partial void OnSelectedCustomerChanged(Customer? value)
 	{
-		if(value != null)
+		if (value != null)
 		{
 			LoadItemsCommand.Execute(value);
 		}
@@ -63,24 +64,26 @@ public partial class WaitingSalesOrderListViewModel : BaseViewModel
 		try
 		{
 			IsBusy = true;
+
+			SelectedCustomer = null;
 			Customers.Clear();
-			httpClient = _httpClientService.GetOrCreateHttpClient();
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			var result = await _customerService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, "", 0, 999999);
 
-			if(result.IsSuccess)
+			if (result.IsSuccess)
 			{
 				if (result.Data is null)
 					return;
 
-                foreach (var item in result.Data)
-                {
+				foreach (var item in result.Data)
+				{
 					Customers.Add(Mapping.Mapper.Map<Customer>(item));
-                }
-            }
+				}
+			}
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
@@ -102,7 +105,11 @@ public partial class WaitingSalesOrderListViewModel : BaseViewModel
 		try
 		{
 			IsBusy = true;
+
+			_userDialogs.Loading("Loading Items...");
+			await Task.Delay(1000);
 			Items.Clear();
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			var result = await _waitingSalesOrderService.GetObjectsByCustomer(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, customerReferenceId: customer.ReferenceId, "", 0, 20);
 
 			if (result.IsSuccess)
@@ -116,10 +123,54 @@ public partial class WaitingSalesOrderListViewModel : BaseViewModel
 
 				}
 			}
+
+			_userDialogs.HideHud();
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task LoadMoreItemsAsync()
+	{
+		if (SelectedCustomer is null)
+			return;
+		if (IsBusy)
+			return;
+
+		try
+		{
+			IsBusy = true;
+
+			_userDialogs.Loading("Loading More Items...");
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _waitingSalesOrderService.GetObjectsByCustomer(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, customerReferenceId: SelectedCustomer.ReferenceId, "", Items.Count, 20);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+				{
+					Items.Add(Mapping.Mapper.Map<WaitingSalesOrder>(item));
+				}
+			}
+
+			_userDialogs.HideHud();
+
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
