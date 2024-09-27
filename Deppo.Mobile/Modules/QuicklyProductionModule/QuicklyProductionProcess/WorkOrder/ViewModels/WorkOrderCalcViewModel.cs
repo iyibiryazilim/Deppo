@@ -33,13 +33,12 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
     private readonly ILocationTransactionService _locationTransactionService;
     private readonly ILocationService _locationService;
 
-
     [ObservableProperty]
     private QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
 
-
     [ObservableProperty]
     public ObservableCollection<LocationTransactionModel> selectedLocationTransactions = new();
+
     public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
 
     [ObservableProperty]
@@ -47,7 +46,6 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
 
     public ObservableCollection<LocationModel> SelectedLocations { get; } = new();
     public ObservableCollection<LocationModel> Locations { get; } = new();
-
 
     public WorkOrderCalcViewModel(IHttpClientService httpClientService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs, IWarehouseService warehouseService, IQuicklyBomService quicklyBomService, ILocationService locationService)
     {
@@ -96,6 +94,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
 
     //LocationTransaction
     public Command LoadMoreLocationTransactionsCommand { get; }
+
     public Command<LocationTransactionModel> LocationTransactionIncreaseCommand { get; }
     public Command<LocationTransactionModel> LocationTransactionDecreaseCommand { get; }
     public Command LocationTransactionConfirmCommand { get; }
@@ -105,17 +104,17 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
 
     //SubProduct Increase Decrease
     public Command<QuicklyBomSubProductModel> SubIncreaseCommand { get; }
+
     public Command<QuicklyBomSubProductModel> SubDecreaseCommand { get; }
 
     //Locations
     public Command LoadMoreLocationsCommand { get; }
+
     public Command<LocationModel> LocationDecreaseCommand { get; }
     public Command<LocationModel> LocationIncreaseCommand { get; }
     public Command LocationConfirmCommand { get; }
     public Command LocationCloseCommand { get; }
     public Command<LocationModel> LocationTappedCommand { get; }
-
-
 
     #endregion Commands
 
@@ -243,8 +242,6 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                 return;
             }
 
-
-
             await Shell.Current.GoToAsync($"{nameof(WorkOrderFormView)}", new Dictionary<string, object>
             {
                 [nameof(QuicklyBomProductBasketModel)] = QuicklyBomProductBasketModel
@@ -292,7 +289,6 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                         subproducts.ProductModel = item;
                         subproducts.SubAmount = item.Amount;
                         QuicklyBomProductBasketModel.SubProducts.Add(subproducts);
-
                     }
                 }
             }
@@ -318,7 +314,6 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
             return;
         try
         {
-
             if (item is not null)
             {
                 SelectedItem = item;
@@ -353,7 +348,6 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
             return;
         try
         {
-
             if (item is not null)
             {
                 SelectedItem = item;
@@ -382,14 +376,12 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
         }
     }
 
-
-
     public async Task LoadLocationTransactionsAsync()
     {
         try
         {
             _userDialogs.ShowLoading("Load Location Items...");
-              await Task.Delay(1000);
+            await Task.Delay(1000);
             LocationTransactions.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
@@ -427,7 +419,6 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
         {
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
-       
     }
 
     public async Task LoadMoreLocationTransactionsAsync()
@@ -508,7 +499,6 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                         _userDialogs.Alert("Miktardan fazla ürün girişi yapamazsınız.", "Uyarı", "Tamam");
                         return;
                     }
-
                 }
             }
         }
@@ -545,7 +535,6 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                     LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId).OutputQuantity = 0;
                     var Remove = SelectedItem.LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
                     SelectedItem.LocationTransactions.Remove(Remove);
-
                 }
             }
         }
@@ -574,26 +563,22 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
             if (LocationTransactions.Count > 0)
             {
                 var subItemCount = SelectedItem.LocationTransactions.Sum(x => x.OutputQuantity);
-                var transactionCount =SelectedItem.LocationTransactions.Sum(x => x.Quantity);
+                var transactionCount = SelectedItem.LocationTransactions.Sum(x => x.Quantity);
 
-
-                if(transactionCount < SelectedItem.ProductModel.Amount)
+                if (transactionCount < SelectedItem.ProductModel.Amount)
                 {
                     _userDialogs.Alert("Ana Ürün Miktarı Size Gerekli Miktardan Düşük. Ürünü Çıkartın Ya Da Ana Malzemenin Değerini Değiştirin", "Uyarı", "Tamam");
                     return;
                 }
-                
+
                 if (subItemCount != SelectedItem.ProductModel.Amount)
                 {
                     _userDialogs.Alert("Sarf Ürünlerinde Miktarları Doğru Giriniz.", "Uyarı", "Tamam");
                     return;
                 }
 
-
                 var count = LocationTransactions.Where(x => x.OutputQuantity > 0).Sum(x => (double)x.OutputQuantity);
                 SelectedLocationTransactions.Clear();
-
-
 
                 if (count > 0)
                 {
@@ -641,18 +626,9 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
         });
     }
 
-
-
-
-
-
-
-
     //Locations Kısmı Düzenlenecek
     private async Task LoadWarehouseLocationsAsync()
     {
-    
-
         try
         {
             _userDialogs.ShowLoading("Yükleniyor...");
@@ -679,17 +655,18 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                 }
             }
 
-
             _userDialogs.HideHud();
         }
         catch (System.Exception ex)
         {
             await _userDialogs.AlertAsync(ex.Message);
         }
-      
     }
+
     private async Task LoadMoreWarehouseLocationsAsync()
     {
+        if (Locations.Count < 18)
+            return;
         if (IsBusy)
             return;
         try
@@ -698,7 +675,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
             _userDialogs.ShowLoading("Yükleniyor...");
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, QuicklyBomProductBasketModel.WarehouseNumber, QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId, string.Empty, LocationTransactions.Count, 20);
+            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, QuicklyBomProductBasketModel.WarehouseNumber, QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId, string.Empty, Locations.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -716,7 +693,6 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                 }
             }
 
-
             _userDialogs.HideHud();
         }
         catch (System.Exception ex)
@@ -728,6 +704,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
     private async Task LocationCloseAsync()
     {
         await MainThread.InvokeOnMainThreadAsync(() =>
@@ -769,10 +746,8 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
         }
     }
 
-
     private async Task LocationIncreaseAsync(LocationModel locationModel)
     {
-
         if (IsBusy)
             return;
 
@@ -818,8 +793,6 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                     QuicklyBomProductBasketModel.MainLocations.Remove(Remove);
                     locationModel.IsSelected = false;
                 }
-
-
             }
         }
         catch (Exception ex)
@@ -845,16 +818,14 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
             {
                 double mainCount = (double)Locations.Where(x => x.InputQuantity > 0).Sum(x => x.InputQuantity);
 
-                if(mainCount != QuicklyBomProductBasketModel.QuicklyBomProduct.Amount)
+                if (mainCount != QuicklyBomProductBasketModel.QuicklyBomProduct.Amount)
                 {
-                    foreach(var subbom in QuicklyBomProductBasketModel.SubProducts)
+                    foreach (var subbom in QuicklyBomProductBasketModel.SubProducts)
                     {
                         subbom.LocationTransactions.Clear();
                         subbom.SubBOMQuantity = 0;
                     }
-
                 }
-
 
                 if (mainCount != 0)
                 {
@@ -871,14 +842,12 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                         if (QuicklyBomProductBasketModel.MainLocations.Any(x => x.ReferenceId == item.ReferenceId))
                         {
                             QuicklyBomProductBasketModel.MainLocations.FirstOrDefault(x => x.ReferenceId == item.ReferenceId).InputQuantity = item.InputQuantity;
-
                         }
                         else
                         {
                             QuicklyBomProductBasketModel.MainLocations.Add(item);
                         }
                     }
-             
                 }
                 else
                 {
@@ -893,7 +862,6 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                 QuicklyBomProductBasketModel.BOMQuantity = (double)QuicklyBomProductBasketModel.MainLocations.Sum(x => x.InputQuantity);
 
                 CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
-
             }
             else
             {

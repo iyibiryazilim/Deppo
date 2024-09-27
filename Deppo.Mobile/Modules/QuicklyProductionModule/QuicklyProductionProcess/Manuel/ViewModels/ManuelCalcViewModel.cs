@@ -35,21 +35,16 @@ public partial class ManuelCalcViewModel : BaseViewModel
     [ObservableProperty]
     private QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
 
-
     [ObservableProperty]
     public ObservableCollection<LocationTransactionModel> selectedLocationTransactions = new();
+
     public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
 
     [ObservableProperty]
     public QuicklyBomSubProductModel selectedItem = new();
 
-
-
-      public ObservableCollection<LocationModel> SelectedLocations { get; } = new();
+    public ObservableCollection<LocationModel> SelectedLocations { get; } = new();
     public ObservableCollection<LocationModel> Locations { get; } = new();
-
-
-
 
     public ManuelCalcViewModel(IHttpClientService httpClientService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs, IWarehouseService warehouseService, ILocationService locationService)
     {
@@ -66,7 +61,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
         NextViewCommand = new Command(async () => await NextViewAsync());
         _locationService = locationService;
 
-
         BackCommand = new Command(async () => await BackAsync());
 
         AddConsumableItemCommand = new Command(async () => await AddConsumableItemAsync());
@@ -80,9 +74,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
         SubIncreaseCommand = new Command<QuicklyBomSubProductModel>(async (item) => await SubIncreaseAsync(item));
         SubDecreaseCommand = new Command<QuicklyBomSubProductModel>(async (item) => await SubDecreaseAsync(item));
 
-
-
-
         //Locations
         LoadMoreLocationsCommand = new Command(async () => await LoadMoreWarehouseLocationsAsync());
         LocationCloseCommand = new Command(async () => await LocationCloseAsync());
@@ -90,11 +81,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
         LocationTappedCommand = new Command<LocationModel>(async (item) => await LocationTappedAsync(item));
         LocationIncreaseCommand = new Command<LocationModel>(async (item) => await LocationIncreaseAsync(item));
         LocationDecreaseCommand = new Command<LocationModel>(async (item) => await LocationDecraseAsync(item));
-
-
-
-
-
     }
 
     public ContentPage CurrentPage { get; set; } = null!;
@@ -111,6 +97,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
 
     //LocationTransaction
     public Command LoadMoreLocationTransactionsCommand { get; }
+
     public Command<LocationTransactionModel> LocationTransactionIncreaseCommand { get; }
     public Command<LocationTransactionModel> LocationTransactionDecreaseCommand { get; }
     public Command LocationTransactionConfirmCommand { get; }
@@ -123,20 +110,14 @@ public partial class ManuelCalcViewModel : BaseViewModel
 
     public Command<QuicklyBomSubProductModel> SubDecreaseCommand { get; }
 
-
-
-
-
     //Locations
     public Command LoadMoreLocationsCommand { get; }
+
     public Command<LocationModel> LocationDecreaseCommand { get; }
     public Command<LocationModel> LocationIncreaseCommand { get; }
     public Command LocationConfirmCommand { get; }
     public Command LocationCloseCommand { get; }
     public Command<LocationModel> LocationTappedCommand { get; }
-
-
-
 
     #endregion Commands
 
@@ -154,10 +135,10 @@ public partial class ManuelCalcViewModel : BaseViewModel
                 await LoadWarehouseLocationsAsync();
                 CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.FullExpanded;
             }
-            else if(QuicklyBomProductBasketModel is not null)
-                {
-                   QuicklyBomProductBasketModel.BOMQuantity += 1;
-                }
+            else if (QuicklyBomProductBasketModel is not null)
+            {
+                QuicklyBomProductBasketModel.BOMQuantity += 1;
+            }
         }
         catch (Exception ex)
         {
@@ -218,8 +199,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
                 if (!result)
                     return;
 
-
-
                 QuicklyBomProductBasketModel.SubProducts.Clear();
                 LocationTransactions.Clear();
                 SelectedLocationTransactions.Clear();
@@ -253,7 +232,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            foreach(var subProducts in QuicklyBomProductBasketModel.SubProducts)
+            foreach (var subProducts in QuicklyBomProductBasketModel.SubProducts)
             {
                 if (subProducts.SubBOMQuantity == 0)
                 {
@@ -266,7 +245,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
                 _userDialogs.Alert("Ana Ürün miktarı 0 olamaz.", "Hata", "Tamam");
                 return;
             }
-
 
             await Shell.Current.GoToAsync($"{nameof(ManuelFormListView)}", new Dictionary<string, object>
             {
@@ -285,7 +263,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
 
     private async Task DeleteItemAsync(QuicklyBomSubProductModel item)
     {
@@ -320,8 +297,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
         }
     }
 
-
-
     // + işareti tıklanınca çalışacak olan fonksiyon
     private async Task AddConsumableItemAsync()
     {
@@ -353,7 +328,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
             return;
         try
         {
-
             if (item is not null)
             {
                 SelectedItem = item;
@@ -388,7 +362,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
             return;
         try
         {
-
             if (item is not null)
             {
                 SelectedItem = item;
@@ -443,11 +416,11 @@ public partial class ManuelCalcViewModel : BaseViewModel
                 foreach (var item in result.Data)
                 {
                     LocationTransactionModel model = Mapping.Mapper.Map<LocationTransactionModel>(item);
-                    if(model != null)
+                    if (model != null)
                     {
-                        if(selectedItem.LocationTransactions.Any(x=>x.LocationCode == model.LocationCode))
+                        if (selectedItem.LocationTransactions.Any(x => x.LocationCode == model.LocationCode))
                         {
-                            model.OutputQuantity = SelectedItem.LocationTransactions.FirstOrDefault(x=>x.ReferenceId == model.ReferenceId).OutputQuantity;
+                            model.OutputQuantity = SelectedItem.LocationTransactions.FirstOrDefault(x => x.ReferenceId == model.ReferenceId).OutputQuantity;
                         }
                     }
                     LocationTransactions.Add(model);
@@ -460,17 +433,17 @@ public partial class ManuelCalcViewModel : BaseViewModel
         {
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
-        
     }
 
     public async Task LoadMoreLocationTransactionsAsync()
     {
+        if (LocationTransactions.Count < 18)
+            return;
         if (IsBusy)
             return;
         try
         {
             IsBusy = true;
-
 
             _userDialogs.Loading("Load More Location Items");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
@@ -520,12 +493,12 @@ public partial class ManuelCalcViewModel : BaseViewModel
             return;
 
         try
-            {
+        {
             IsBusy = true;
 
             if (item is not null)
             {
-                var totalQuantity =  LocationTransactions.Sum(x => x.OutputQuantity);
+                var totalQuantity = LocationTransactions.Sum(x => x.OutputQuantity);
                 if (totalQuantity >= SelectedItem.ProductModel.StockQuantity)
                 {
                     _userDialogs.Alert("Stok miktarından fazla ürün girişi yapamazsınız.", "Uyarı", "Tamam");
@@ -537,7 +510,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
                     {
                         item.OutputQuantity += 1;
                     }
-                       
                 }
             }
         }
@@ -569,7 +541,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
                 {
                     item.OutputQuantity -= 1;
                 }
-                if(item.OutputQuantity == 0)
+                if (item.OutputQuantity == 0)
                 {
                     LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId).OutputQuantity = 0;
                     var Remove = SelectedItem.LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
@@ -603,7 +575,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
             {
                 var count = LocationTransactions.Where(x => x.OutputQuantity > 0).Sum(x => (double)x.OutputQuantity);
                 SelectedLocationTransactions.Clear();
-                if(count > 0)
+                if (count > 0)
                 {
                     foreach (var item in LocationTransactions.Where(x => x.OutputQuantity > 0))
                     {
@@ -617,9 +589,9 @@ public partial class ManuelCalcViewModel : BaseViewModel
                 }
                 else
                 {
-                   SelectedItem.LocationTransactions.Clear();
+                    SelectedItem.LocationTransactions.Clear();
                 }
-                
+
                 SelectedItem.SubBOMQuantity = SelectedItem.LocationTransactions.Where(x => x.OutputQuantity > 0).Sum(x => (double)x.OutputQuantity);
                 CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.Hidden;
             }
@@ -649,26 +621,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
         });
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     private async Task LoadWarehouseLocationsAsync()
     {
         try
@@ -696,18 +648,19 @@ public partial class ManuelCalcViewModel : BaseViewModel
                 }
             }
 
-
             _userDialogs.HideHud();
         }
         catch (System.Exception ex)
         {
             await _userDialogs.AlertAsync(ex.Message);
         }
-        
     }
+
     private async Task LoadMoreWarehouseLocationsAsync()
     {
-        if(IsBusy)
+        if (Locations.Count < 18)
+            return;
+        if (IsBusy)
             return;
         try
         {
@@ -715,7 +668,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
             _userDialogs.ShowLoading("Yükleniyor...");
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, QuicklyBomProductBasketModel.WarehouseNumber, QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId, string.Empty, LocationTransactions.Count, 20);
+            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, QuicklyBomProductBasketModel.WarehouseNumber, QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId, string.Empty, Locations.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -733,7 +686,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
                 }
             }
 
-
             _userDialogs.HideHud();
         }
         catch (System.Exception ex)
@@ -745,6 +697,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
     private async Task LocationCloseAsync()
     {
         await MainThread.InvokeOnMainThreadAsync(() =>
@@ -786,10 +739,8 @@ public partial class ManuelCalcViewModel : BaseViewModel
         }
     }
 
-
     private async Task LocationIncreaseAsync(LocationModel locationModel)
     {
-
         if (IsBusy)
             return;
 
@@ -799,7 +750,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
 
             double count = (double)Locations.Where(x => x.InputQuantity > 0).Sum(x => x.InputQuantity);
 
-             if (locationModel is not null)
+            if (locationModel is not null)
             {
                 locationModel.InputQuantity++;
             }
@@ -837,8 +788,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
                     QuicklyBomProductBasketModel.MainLocations.Remove(Remove);
                     locationModel.IsSelected = false;
                 }
-                    
-
             }
         }
         catch (Exception ex)
@@ -862,7 +811,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
             IsBusy = true;
             if (Locations.Count > 0)
             {
-
                 double count = (double)Locations.Where(x => x.InputQuantity > 0).Sum(x => x.InputQuantity);
 
                 if (QuicklyBomProductBasketModel is not null)
@@ -871,29 +819,25 @@ public partial class ManuelCalcViewModel : BaseViewModel
                     {
                         foreach (var i in Locations.Where(x => x.InputQuantity > 0)) // Büyük olanları al
                         {
-
                             if (QuicklyBomProductBasketModel.MainLocations.Any(x => x.ReferenceId == i.ReferenceId))
                             {
                                 QuicklyBomProductBasketModel.MainLocations.FirstOrDefault(x => x.ReferenceId == i.ReferenceId).InputQuantity = i.InputQuantity;
-                                
                             }
                             else
                             {
                                 QuicklyBomProductBasketModel.MainLocations.Add(i);
-                            }                                         
+                            }
                         }
                     }
                     else
                     {
                         QuicklyBomProductBasketModel.MainLocations.Clear();
-                       
                     }
-                    
+
                     QuicklyBomProductBasketModel.BOMQuantity = (double)QuicklyBomProductBasketModel.MainLocations.Sum(x => x.InputQuantity);
 
                     CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
                 }
-               
             }
             else
             {
@@ -911,11 +855,4 @@ public partial class ManuelCalcViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
-
-
-
-
-
-
 }
