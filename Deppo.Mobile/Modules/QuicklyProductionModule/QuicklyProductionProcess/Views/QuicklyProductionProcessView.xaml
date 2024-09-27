@@ -32,8 +32,10 @@
               RowDefinitions="Auto,Auto"
               RowSpacing="20">
             <VerticalStackLayout Grid.Row="0"
+                                 Padding="5"
                                  Spacing="5">
                 <Label FontAttributes="Bold"
+                       Padding="5"
                        FontSize="20"
                        Text="Manuel Üretim İşlemleri"
                        TextColor="{StaticResource OffBlack}" />
@@ -99,6 +101,7 @@
                                  Padding="5"
                                  Spacing="5">
                 <Label FontAttributes="Bold"
+                       Padding="5"
                        FontSize="20"
                        Text="Ürün Sayım İşlemleri"
                        TextColor="{StaticResource OffBlack}" />

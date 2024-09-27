@@ -44,6 +44,7 @@
                       RowSpacing="0">
                     <Border Grid.Row="0"
                             Padding="5"
+                            HeightRequest="60"
                             StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.2">
                         <Grid ColumnDefinitions=".85*,.15*"
@@ -98,6 +99,7 @@
                                   ColumnDefinitions="Auto,*"
                                   ColumnSpacing="10">
                                 <Border Padding="5"
+                                        Stroke="{StaticResource Primary}"
                                         BackgroundColor="{StaticResource Primary}"
                                         StrokeShape="RoundRectangle 5">
                                     <Label FontFamily="FAS"
