@@ -8,8 +8,7 @@
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionBOMMenu.ViewModels"
              xmlns:bomProductModel="clr-namespace:Deppo.Mobile.Core.Models.QuicklyModels;assembly=Deppo.Mobile.Core"
              Title="{Binding Title}"
-             x:DataType="viewModels:QuicklyProductionBOMMenuViewModel"
-             Shell.TabBarIsVisible="False">
+             x:DataType="viewModels:QuicklyProductionBOMMenuViewModel">
 
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
