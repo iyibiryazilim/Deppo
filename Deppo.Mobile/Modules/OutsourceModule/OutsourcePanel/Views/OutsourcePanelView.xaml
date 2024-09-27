@@ -92,9 +92,9 @@
                         <Label Text="Alınan Referans" TextColor="{StaticResource White}" />
 
                         <ProgressBar
-                            HeightRequest="5"
-                            Progress="0.5"
-                            ProgressColor="{StaticResource Secondary}" />
+                        HeightRequest="5"
+                        Progress="{Binding OutsourcePanelModel.InProductCountTotalRate}"
+                        ProgressColor="{StaticResource Secondary}" />
                     </VerticalStackLayout>
                 </Border>
 
@@ -116,7 +116,7 @@
 
                         <ProgressBar
                             HeightRequest="5"
-                            Progress="0.5"
+                            Progress="{Binding OutsourcePanelModel.OutProductCountTotalRate}"
                             ProgressColor="{StaticResource Secondary}" />
                     </VerticalStackLayout>
                 </Border>

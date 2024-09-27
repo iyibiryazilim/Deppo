@@ -53,6 +53,8 @@ public partial class OutsourcePanelViewModel : BaseViewModel
             {
                 await GetLastOutsourcesAsync();
                 await GetLastOutsourceFichesAsync();
+                OutsourcePanelModel.InProductCountTotalRate = (double)((double)OutsourcePanelModel.InProductCount / (double)OutsourcePanelModel.TotalProductCount);
+                OutsourcePanelModel.OutProductCountTotalRate = (double)((double)OutsourcePanelModel.OutProductCount / (double)OutsourcePanelModel.TotalProductCount);
             });
 
             if (_userDialogs.IsHudShowing)
