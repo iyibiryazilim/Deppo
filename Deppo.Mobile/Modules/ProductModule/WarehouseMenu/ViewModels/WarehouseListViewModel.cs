@@ -19,7 +19,12 @@ public partial class WarehouseListViewModel : BaseViewModel
     private readonly IWarehouseService _warehouseService;
 	private readonly IUserDialogs _userDialogs;
 
-    public WarehouseListViewModel(IWarehouseService warehouseService, IUserDialogs userDialogs, IHttpClientService httpClientService)
+	public ObservableCollection<Warehouse> Items { get; } = new();
+
+	[ObservableProperty]
+	public SearchBar searchText;
+
+	public WarehouseListViewModel(IWarehouseService warehouseService, IUserDialogs userDialogs, IHttpClientService httpClientService)
     {
         _warehouseService = warehouseService;
         _userDialogs = userDialogs;
@@ -28,27 +33,20 @@ public partial class WarehouseListViewModel : BaseViewModel
         Title = "Ambar Listesi";
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-		RefreshPageCommand = new Command(async () => await RefreshPageAsync());
-		PerformSearchCommand = new Command<SearchBar>(async (searchBar) => await PerformSearchAsync(searchBar));
+		
+		PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+		PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
 		ItemTappedCommand = new Command<Warehouse>(async (warehouse) => await ItemTappedAsync(warehouse));
     }
 
 	#region Commands
 	public Command LoadItemsCommand { get; }
 	public Command LoadMoreItemsCommand { get; }
-	public Command<SearchBar> PerformSearchCommand { get; }
+	public Command PerformSearchCommand { get; }
+	public Command PerformEmptySearchCommand { get; }
 	public Command RefreshPageCommand { get; }
 	public Command ItemTappedCommand { get; }
-	#endregion
-
-	#region Collections
-	public ObservableCollection<Warehouse> Items { get; } = new();
-	#endregion
-
-	#region Properties
-	[ObservableProperty]
-	string searchText = string.Empty;
-	#endregion
+	#endregion	
 
 	public async Task LoadItemsAsync()
 	{
@@ -61,10 +59,11 @@ public partial class WarehouseListViewModel : BaseViewModel
 
 			Items.Clear();
 			_userDialogs.Loading("Loading Items...");
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			await Task.Delay(1000);
 
-			var result = await _warehouseService.GetObjects(httpClient,search: SearchText, orderBy: null, page: 0, pageSize: 20, firmNumber: _httpClientService.FirmNumber);
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			var result = await _warehouseService.GetObjects(httpClient,search: SearchText.Text, orderBy: null, page: 0, pageSize: 20, firmNumber: _httpClientService.FirmNumber);
 			if (result.IsSuccess)
 			{
 				if (result.Data == null)
@@ -108,7 +107,7 @@ public partial class WarehouseListViewModel : BaseViewModel
 			IsBusy = true;
 			_userDialogs.Loading("Load more Items...");
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, Items.Count, 20, _httpClientService.FirmNumber);
+			var result = await _warehouseService.GetObjects(httpClient, SearchText.Text, null, Items.Count, 20, _httpClientService.FirmNumber);
 			if (result.IsSuccess)
 			{
 				if (result.Data == null)
@@ -142,78 +141,34 @@ public partial class WarehouseListViewModel : BaseViewModel
 		}
 	}
 
-	public async Task RefreshPageAsync()
+
+	async Task PerformSearchAsync()
 	{
 		if (IsBusy)
 			return;
 		try
 		{
-			IsBusy = true;
-			IsRefreshing = true;
-			IsRefreshing = false;
-
-			Items.Clear();
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _warehouseService.GetObjects(httpClient, search: SearchText, null, 0, 20, _httpClientService.FirmNumber);
-
-			if (result.IsSuccess)
+			if(string.IsNullOrWhiteSpace(SearchText.Text))
 			{
-				if (result.Data == null)
-					return;
-
-				foreach (var item in result.Data)
-					Items.Add(item);
-			}
-			else
-			{
-				_userDialogs.Alert(message: result.Message, title: "Hata");
-			}
-            
-        }
-		catch (Exception ex)
-		{
-			_userDialogs.Alert(message: ex.Message, title: "Hata");
-		}
-		finally
-		{
-			IsBusy = false;
-			IsRefreshing = false;
-		}
-	}
-
-	async Task PerformSearchAsync(SearchBar searchBar)
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			if(string.IsNullOrWhiteSpace(searchBar.Text))
-			{
-				SearchText = string.Empty;
 				await LoadItemsAsync();
-				searchBar.Unfocus();
+				SearchText.Unfocus();
 				return;
 			}
-			else
-			{
-				if(searchBar.Text.Length >= 3)
-				{
-					IsBusy = true;
+				
+			IsBusy = true;
 					
-					var httpClient = _httpClientService.GetOrCreateHttpClient();
-					SearchText = searchBar.Text;
-					var result = await _warehouseService.GetObjects(httpClient, SearchText, null, 0, 20, _httpClientService.FirmNumber);
-					if (!result.IsSuccess)
-					{
-						_userDialogs.Alert(result.Message, "Hata");
-						return;
-					}
-
-					Items.Clear();
-					foreach (var item in result.Data)
-						Items.Add(item);
-				}
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _warehouseService.GetObjects(httpClient, SearchText.Text, null, 0, 20, _httpClientService.FirmNumber);
+			if (!result.IsSuccess)
+			{
+				_userDialogs.Alert(result.Message, "Hata");
+				return;
 			}
+
+			Items.Clear();
+			foreach (var item in result.Data)
+				Items.Add(item);
+				
 		}
 		catch(Exception ex)
 		{
@@ -222,6 +177,14 @@ public partial class WarehouseListViewModel : BaseViewModel
 		finally
 		{
 			IsBusy = false;
+		}
+	}
+
+	private async Task PerformEmptySearchAsync()
+	{
+		if (string.IsNullOrWhiteSpace(SearchText.Text))
+		{
+			await PerformSearchAsync();
 		}
 	}
 
