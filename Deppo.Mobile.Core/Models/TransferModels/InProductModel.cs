@@ -8,6 +8,7 @@ namespace Deppo.Mobile.Core.Models.TransferModels;
 public class InProductModel : ProductModel
 {
     private double _outputQuantity;
+	private bool _isCompleted;
     public ObservableCollection<LocationModel> Locations { get; set; } = new ObservableCollection<LocationModel>();
 
 	public double OutputQuantity
@@ -20,5 +21,18 @@ public class InProductModel : ProductModel
 			NotifyPropertyChanged();
 		}
 	}
+
+    public bool IsCompleted
+    {
+        get => _isCompleted;
+        set
+        {
+            if (_isCompleted == value) return;
+            _isCompleted = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+
 
 }

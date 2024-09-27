@@ -310,7 +310,12 @@ public partial class TransferInBasketViewModel : BaseViewModel
 					});
 				}
 
-				CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
+				if(SelectedInputProductModel.OutputQuantity == SelectedInputProductModel.Locations.Sum(x => x.InputQuantity))
+                {
+                    SelectedInputProductModel.IsCompleted = true;
+                }
+
+                CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
 			}
 			else
 			{
@@ -502,8 +507,19 @@ public partial class TransferInBasketViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
+            foreach (var item in TransferBasketModel.InProducts)
+            {
+                double totalInputQuantity = item.Locations.Sum(location => location.InputQuantity);
+                item.IsCompleted = totalInputQuantity == item.OutputQuantity;
+            }
 
-			await Shell.Current.GoToAsync($"{nameof(TransferFormView)}", new Dictionary<string, object>
+            if (TransferBasketModel.InProducts.Any(x => x.IsCompleted == false))
+            {
+                await _userDialogs.AlertAsync("Lütfen tüm ürünlerin raflarını belirtiniz.", "Hata", "Tamam");
+                return;
+            }
+
+            await Shell.Current.GoToAsync($"{nameof(TransferFormView)}", new Dictionary<string, object>
 			{
 				[nameof(TransferBasketModel)] = TransferBasketModel
 			});
