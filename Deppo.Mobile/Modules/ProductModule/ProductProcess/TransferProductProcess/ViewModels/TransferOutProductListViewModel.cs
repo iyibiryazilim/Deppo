@@ -251,6 +251,12 @@ public partial class TransferOutProductListViewModel : BaseViewModel
                 {
                     if (!item.IsSelected)
                     {
+                        if(item.StockQuantity < 0)
+                        {
+                            await _userDialogs.AlertAsync("Negatif stoğu bulunan malzeme transfer edilemez.", "Uyarı", "Tamam");
+                            return;
+                        }
+
                         Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
                         SelectedProduct = item;
 

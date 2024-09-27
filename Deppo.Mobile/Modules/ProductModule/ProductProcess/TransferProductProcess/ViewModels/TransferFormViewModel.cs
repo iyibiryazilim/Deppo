@@ -116,7 +116,7 @@ public partial class TransferFormViewModel : BaseViewModel
             return;
         try
         {
-            
+
 
             IsBusy = true;
             _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
@@ -144,14 +144,14 @@ public partial class TransferFormViewModel : BaseViewModel
 
                 foreach (var inProduct in TransferBasketModel.InProducts)
                 {
-                    if(item.ReferenceId == inProduct.ReferenceId)
+                    if (item.ReferenceId == inProduct.ReferenceId)
                     {
                         foreach (var location in inProduct.Locations)
                         {
                             Locations.Add(location);
                         }
                     }
-                   
+
                 }
 
                 var transferTransactionLineDto = new TransferTransactionLineDto
@@ -167,35 +167,34 @@ public partial class TransferFormViewModel : BaseViewModel
 
                 foreach (var locationTransaction in item.LocationTransactions)
                 {
-                    while (locationTransaction.Quantity > 0)
+
+                    foreach (var location in Locations)
                     {
-                        foreach (var location in Locations)
+                        if (location.InputQuantity <= 0)
+                            continue;
+
+                        var seriLotTransactionDto = new SeriLotTransactionDto
                         {
-                            if (location.InputQuantity <= 0)
-                                continue;
+                            StockLocationCode = locationTransaction.LocationCode,
+                            Quantity = location.InputQuantity < locationTransaction.Quantity
+                                       ? location.InputQuantity
+                                       : locationTransaction.Quantity,
+                            ConversionFactor = 1,
+                            OtherConversionFactor = 1,
+                            InProductTransactionLineReferenceId = locationTransaction.TransactionReferenceId,
+                            OutProductTransactionLineReferenceId = locationTransaction.ReferenceId,
+                            DestinationStockLocationCode = location.Code
+                        };
 
-                            var seriLotTransactionDto = new SeriLotTransactionDto
-                            {
-                                StockLocationCode = locationTransaction.LocationCode,
-                                Quantity = location.InputQuantity < locationTransaction.Quantity
-                                           ? location.InputQuantity
-                                           : locationTransaction.Quantity,
-                                ConversionFactor = 1,
-                                OtherConversionFactor = 1,
-                                InProductTransactionLineReferenceId = locationTransaction.TransactionReferenceId,
-                                OutProductTransactionLineReferenceId = locationTransaction.ReferenceId,
-                                DestinationStockLocationCode = location.Code
-                            };
+                        locationTransaction.Quantity -= (double)seriLotTransactionDto.Quantity;
+                        location.InputQuantity -= (double)seriLotTransactionDto.Quantity;
 
-                            locationTransaction.Quantity -= (double)seriLotTransactionDto.Quantity;
-                            location.InputQuantity -= (double)seriLotTransactionDto.Quantity;
+                        transferTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
 
-                            transferTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
-
-                            if (locationTransaction.Quantity <= 0)
-                                break;
-                        }
+                        if (locationTransaction.Quantity <= 0)
+                            break;
                     }
+
                 }
 
                 transferTransactionInsertDto.Lines.Add(transferTransactionLineDto);
@@ -244,7 +243,7 @@ public partial class TransferFormViewModel : BaseViewModel
 
 
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
