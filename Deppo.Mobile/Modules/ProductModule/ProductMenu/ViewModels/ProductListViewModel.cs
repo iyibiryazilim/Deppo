@@ -30,6 +30,7 @@ public partial class ProductListViewModel : BaseViewModel
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+        PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
         ItemTappedCommand = new Command<Product>(async (product) => await ItemTappedAsync(product));
     }
 
@@ -38,6 +39,7 @@ public partial class ProductListViewModel : BaseViewModel
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command PerformSearchCommand { get; }
+    public Command PerformEmptySearchCommand { get; }
     public Command<Product> ItemTappedCommand { get; }
 
     [ObservableProperty]
@@ -51,11 +53,13 @@ public partial class ProductListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            Items.Clear();
 
+            Items.Clear();
             _userDialogs.Loading("Loading Items...");
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
             await Task.Delay(1000);
+
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, 0, 20);
             if (result.IsSuccess)
             {
@@ -65,15 +69,14 @@ public partial class ProductListViewModel : BaseViewModel
                 foreach (var item in result.Data)
                     Items.Add(Mapping.Mapper.Map<Product>(item));
 
-                _userDialogs.Loading().Hide();
+                _userDialogs.HideHud();
             }
             else
             {
                 if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
+					_userDialogs.HideHud();
 
-                Debug.WriteLine(result.Message);
-                _userDialogs.Alert(message: result.Message, title: "Load Items");
+				_userDialogs.Alert(message: result.Message, title: "Load Items");
 
             }
         }
@@ -98,7 +101,7 @@ public partial class ProductListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            _userDialogs.Loading("Refreshing Items...");
+            _userDialogs.Loading("Loading More Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, Items.Count, 20);
             if (result.IsSuccess)
@@ -110,12 +113,12 @@ public partial class ProductListViewModel : BaseViewModel
                     Items.Add(Mapping.Mapper.Map<Product>(item));
 
                 if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
+                    _userDialogs.HideHud();
             }
             else
             {
                 if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
+                    _userDialogs.HideHud();
 
                 _userDialogs.Alert(message: result.Message, title: "Load Items");
             }
@@ -147,26 +150,20 @@ public partial class ProductListViewModel : BaseViewModel
                 SearchText.Unfocus();
                 return;
             }
-            else
+            IsBusy = true;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, 0, 20);
+            if (!result.IsSuccess)
             {
-
-                IsBusy = true;
-
-                var httpClient = _httpClientService.GetOrCreateHttpClient();
-
-                var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, 0, 20);
-                if (!result.IsSuccess)
-                {
-                    _userDialogs.Alert(result.Message, "Hata");
-                    return;
-                }
-
-                Items.Clear();
-                foreach (var item in result.Data)
-                    Items.Add(Mapping.Mapper.Map<Product>(item));
-
+                _userDialogs.Alert(result.Message, "Hata");
+                return;
             }
 
+            Items.Clear();
+            foreach (var item in result.Data)
+                Items.Add(Mapping.Mapper.Map<Product>(item));
         }
         catch (System.Exception ex)
         {
@@ -177,6 +174,15 @@ public partial class ProductListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+    private async Task PerformEmptySearchAsync()
+    {
+		if (string.IsNullOrWhiteSpace(SearchText.Text))
+		{
+			await PerformSearchAsync();
+		}
+	}
+
 
     private async Task ItemTappedAsync(Product product)
     {
