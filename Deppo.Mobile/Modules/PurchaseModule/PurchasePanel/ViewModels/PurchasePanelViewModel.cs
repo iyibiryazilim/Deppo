@@ -53,6 +53,8 @@ public partial class PurchasePanelViewModel : BaseViewModel
             await Task.WhenAll(TotalOrderCountsAsync(), ShippedOrderCountsAsync()).ContinueWith((task) =>
             {
                PurchasePanelModel.WaitingOrderCount = PurchasePanelModel.AmountTotal - PurchasePanelModel.ShippedQuantityTotal;
+                PurchasePanelModel.WaitingOrderCountRate = (double)((double)PurchasePanelModel.WaitingOrderCount / (double)PurchasePanelModel.AmountTotal);
+                PurchasePanelModel.ShippedQuantityTotalRate = (double)((double)PurchasePanelModel.ShippedQuantityTotal / (double)PurchasePanelModel.AmountTotal);
             });            
 
             await Task.WhenAll(GetLastTransactionBySupplierAsync(), GetLastFicheAsync());
