@@ -370,7 +370,7 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -379,4 +379,5 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
 		{
 			IsBusy = false;
 		}
+	}
 }
