@@ -39,8 +39,7 @@
 
     <Grid RowDefinitions="*,Auto">
         <Grid Grid.Row="0"
-              RowDefinitions="Auto,Auto,*"
-              >
+              RowDefinitions="Auto,Auto,*">
             <Grid Grid.Row="0"
                   ColumnDefinitions="*, Auto"
                   ColumnSpacing="10">
@@ -181,7 +180,7 @@
                                          Spacing="5">
                         <Label FontAttributes="Bold"
                                FontSize="Subtitle"
-                               Text="Ambar Seçiniz" />
+                               Text="Fason Ambarı Seçiniz" />
                         <BoxView HeightRequest="2"
                                  Color="{StaticResource OffBlack}" />
                     </VerticalStackLayout>
