@@ -18,399 +18,395 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderP
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseViewModel
 {
-	private readonly IHttpClientService _httpClientService;
-	private readonly ISalesCustomerService _salesCustomerService;
-	private readonly ISalesCustomerProductService _salesCustomerProductService;
-	private readonly IShipAddressService _shipAddressService;
-	private readonly IUserDialogs _userDialogs;
+    private readonly IHttpClientService _httpClientService;
+    private readonly ISalesCustomerService _salesCustomerService;
+    private readonly ISalesCustomerProductService _salesCustomerProductService;
+    private readonly IShipAddressService _shipAddressService;
+    private readonly IUserDialogs _userDialogs;
 
-	[ObservableProperty]
-	WarehouseModel warehouseModel = null!;
+    [ObservableProperty]
+    private WarehouseModel warehouseModel = null!;
 
-	[ObservableProperty]
-	SalesCustomer salesCustomer = null!;
+    [ObservableProperty]
+    private SalesCustomer salesCustomer = null!;
 
-	[ObservableProperty]
-	SalesCustomer? swipedSalesCustomer;  // Sipariş listesini göstermek için swipe edilen müşteriyi tutar.
+    [ObservableProperty]
+    private SalesCustomer? swipedSalesCustomer;  // Sipariş listesini göstermek için swipe edilen müşteriyi tutar.
 
-	#region Collections
-	public ObservableCollection<SalesCustomer> Items { get; } = new();
+    #region Collections
 
-	public ObservableCollection<ShipAddressModel> ShipAddresses { get; } = new();
-	#endregion
+    public ObservableCollection<SalesCustomer> Items { get; } = new();
 
-	public OutputProductSalesOrderProcessCustomerListViewModel(IHttpClientService httpClientService,
-	ISalesCustomerService salesCustomerService,
-	IShipAddressService shipAddressService,
-	IUserDialogs userDialogs,
-	ISalesCustomerProductService salesCustomerProductService)
-	{
-		_httpClientService = httpClientService;
-		_salesCustomerService = salesCustomerService;
-		_shipAddressService = shipAddressService;
-		_userDialogs = userDialogs;
-		_salesCustomerProductService = salesCustomerProductService;
+    public ObservableCollection<ShipAddressModel> ShipAddresses { get; } = new();
 
-		Title = "Müşteriler";
+    #endregion Collections
 
-		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
-		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-		ItemTappedCommand = new Command<SalesCustomer>(async (customer) => await ItemTappedAsync(customer));
-		NextViewCommand = new Command(async () => await NextViewAsync());
-		SwipeItemCommand = new Command<SalesCustomer>(async (customer) => await SwipeItemAsync(customer));
+    public OutputProductSalesOrderProcessCustomerListViewModel(IHttpClientService httpClientService,
+    ISalesCustomerService salesCustomerService,
+    IShipAddressService shipAddressService,
+    IUserDialogs userDialogs,
+    ISalesCustomerProductService salesCustomerProductService)
+    {
+        _httpClientService = httpClientService;
+        _salesCustomerService = salesCustomerService;
+        _shipAddressService = shipAddressService;
+        _userDialogs = userDialogs;
+        _salesCustomerProductService = salesCustomerProductService;
 
-		ShipAddressTappedCommand = new Command<ShipAddressModel>(async (shipAddress) => await ShipAddressTappedAsync(shipAddress));
-		ConfirmShipAddressCommand = new Command(async () => await ConfirmShipAddressAsync());
-	}
+        Title = "Müşteriler";
 
-	public Page CurrentPage { get; set; } = null!;
+        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+        LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+        ItemTappedCommand = new Command<SalesCustomer>(async (customer) => await ItemTappedAsync(customer));
+        NextViewCommand = new Command(async () => await NextViewAsync());
+        SwipeItemCommand = new Command<SalesCustomer>(async (customer) => await SwipeItemAsync(customer));
 
-	#region Commands
-	public Command LoadItemsCommand { get; }
-	public Command LoadMoreItemsCommand { get; }
-	public Command ItemTappedCommand { get; }
-	public Command SwipeItemCommand { get; }
-	public Command NextViewCommand { get; }
+        ShipAddressTappedCommand = new Command<ShipAddressModel>(async (shipAddress) => await ShipAddressTappedAsync(shipAddress));
+        ConfirmShipAddressCommand = new Command(async () => await ConfirmShipAddressAsync());
+    }
 
+    public Page CurrentPage { get; set; } = null!;
 
-	public Command ConfirmShipAddressCommand { get; }
-	public Command ShipAddressTappedCommand { get; }
-	#endregion
+    #region Commands
 
-	private async Task LoadItemsAsync()
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
+    public Command LoadItemsCommand { get; }
+    public Command LoadMoreItemsCommand { get; }
+    public Command ItemTappedCommand { get; }
+    public Command SwipeItemCommand { get; }
+    public Command NextViewCommand { get; }
 
-			_userDialogs.ShowLoading("Loading Items...");
-			Items.Clear();
-			await Task.Delay(1000);
+    public Command ConfirmShipAddressCommand { get; }
+    public Command ShipAddressTappedCommand { get; }
 
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _salesCustomerService.GetObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: 0, take: 20, search: "");
-			if (result.IsSuccess)
-			{
-				if (result.Data is null)
-					return;
+    #endregion Commands
 
-				foreach (var item in result.Data)
-					Items.Add(Mapping.Mapper.Map<SalesCustomer>(item));
-			}
+    private async Task LoadItemsAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
 
-			_userDialogs.HideHud();
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+            _userDialogs.ShowLoading("Loading Items...");
+            Items.Clear();
+            await Task.Delay(1000);
 
-			_userDialogs.Alert(ex.Message);
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _salesCustomerService.GetObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: 0, take: 20, search: "");
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
 
-	private async Task LoadMoreItemsAsync()
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
+                foreach (var item in result.Data)
+                    Items.Add(Mapping.Mapper.Map<SalesCustomer>(item));
+            }
 
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _salesCustomerService.GetObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: Items.Count, take: 20, search: "");
-			if (result.IsSuccess)
-			{
-				if (result.Data is null)
-					return;
+            _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-				foreach (var item in result.Data)
-					Items.Add(Mapping.Mapper.Map<SalesCustomer>(item));
-			}
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-			_userDialogs.HideHud();
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+    private async Task LoadMoreItemsAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
 
-			_userDialogs.Alert(ex.Message);
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _salesCustomerService.GetObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: Items.Count, take: 20, search: "");
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
 
-	private async Task SwipeItemAsync(SalesCustomer selectedItem)
-	{
-		if (IsBusy)
-			return;
-		try
-		{	
-			await ShowOrdersAsync(selectedItem);
-			CurrentPage.FindByName<BottomSheet>("customerProductsBottomSheet").State = BottomSheetState.HalfExpanded;
-		}
-		catch (Exception ex)
-		{
-			if(_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+                foreach (var item in result.Data)
+                    Items.Add(Mapping.Mapper.Map<SalesCustomer>(item));
+            }
 
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+            _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-	private async Task ShowOrdersAsync(SalesCustomer selectedItem)
-	{
-		if (selectedItem is null)
-			return;
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-			_userDialogs.ShowLoading("Loading Orders...");
-			await Task.Delay(1000);
+    private async Task SwipeItemAsync(SalesCustomer selectedItem)
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            await ShowOrdersAsync(selectedItem);
+            CurrentPage.FindByName<BottomSheet>("customerProductsBottomSheet").State = BottomSheetState.HalfExpanded;
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			SwipedSalesCustomer = selectedItem;
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-			if(selectedItem?.Products?.Count > 0)
-			{
-				selectedItem.Products.Clear();
-			}
+    private async Task ShowOrdersAsync(SalesCustomer selectedItem)
+    {
+        if (selectedItem is null)
+            return;
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
 
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var customerOrders = await _salesCustomerProductService.GetObjects(
-				httpClient: httpClient,
-				firmNumber: _httpClientService.FirmNumber,
-				periodNumber: _httpClientService.PeriodNumber,
-				customerReferenceId: selectedItem.ReferenceId,
-				warehouseNumber: WarehouseModel.Number,
-				skip: 0,
-				take: 9999999
-			);
+            _userDialogs.ShowLoading("Loading Orders...");
+            await Task.Delay(1000);
 
-			if (customerOrders.IsSuccess)
-			{
-				if (customerOrders.Data is null)
-					return;
+            SwipedSalesCustomer = selectedItem;
 
+            if (selectedItem?.Products?.Count > 0)
+            {
+                selectedItem.Products.Clear();
+            }
 
-				foreach (var item in customerOrders.Data)
-				{
-					var customer = Items.FirstOrDefault(x => x.ReferenceId == selectedItem.ReferenceId);
-					if(customer?.Products is null)
-					{
-						customer.Products = new();
-					}
-					if(customer is not null)
-					{
-						customer.Products.Add(Mapping.Mapper.Map<SalesCustomerProduct>(item));
-					}
-				}
-			}
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var customerOrders = await _salesCustomerProductService.GetObjects(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                customerReferenceId: selectedItem.ReferenceId,
+                warehouseNumber: WarehouseModel.Number,
+                skip: 0,
+                take: 9999999
+            );
 
-			_userDialogs.HideHud();
-		}
-		catch (Exception ex)
-		{
-			if(_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+            if (customerOrders.IsSuccess)
+            {
+                if (customerOrders.Data is null)
+                    return;
 
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+                foreach (var item in customerOrders.Data)
+                {
+                    var customer = Items.FirstOrDefault(x => x.ReferenceId == selectedItem.ReferenceId);
+                    if (customer?.Products is null)
+                    {
+                        customer.Products = new();
+                    }
+                    if (customer is not null)
+                    {
+                        customer.Products.Add(Mapping.Mapper.Map<SalesCustomerProduct>(item));
+                    }
+                }
+            }
 
-	private async Task ItemTappedAsync(SalesCustomer item)
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
+            _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			if (SalesCustomer == item)
-			{
-				SalesCustomer.IsSelected = false;
-				SalesCustomer = null;
-			}
-			else
-			{
-				if (SalesCustomer is not null)
-				{
-					SalesCustomer.IsSelected = false;
-				}
-				SalesCustomer = item;
-				SalesCustomer.IsSelected = true;
-			}
-		}
-		catch (Exception ex)
-		{
-			if(_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+    private async Task ItemTappedAsync(SalesCustomer item)
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
 
-	[Obsolete("Form sayfasına taşındı")]
-	private async Task LoadShipAddressesAsync(SalesCustomer  customer)
-	{
-		
-		try
-		{
-			ShipAddresses.Clear();
-			_userDialogs.Loading("Loading Ship Addresses...");
-			await Task.Delay(1000);
+            if (SalesCustomer == item)
+            {
+                await LoadShipAddressesAsync(item);
+                CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
+                SalesCustomer.IsSelected = false;
+                SalesCustomer = null;
+            }
+            else
+            {
+                if (SalesCustomer is not null)
+                {
+                    SalesCustomer.IsSelected = false;
+                }
+                SalesCustomer = item;
+                SalesCustomer.IsSelected = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _shipAddressService.GetObjects(
-				httpClient: httpClient,
-				firmNumber: _httpClientService.FirmNumber,
-				periodNumber: _httpClientService.PeriodNumber,
-				currentReferenceId: customer.ReferenceId,
-				search: "",
-				skip: 0,
-				take: 99999
-			);
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-			if (result.IsSuccess)
-			{
-				if (result.Data is null)
-					return;
+    private async Task LoadShipAddressesAsync(SalesCustomer customer)
+    {
+        try
+        {
+            ShipAddresses.Clear();
+            _userDialogs.Loading("Loading Ship Addresses...");
+            await Task.Delay(1000);
 
-				foreach (var item in result.Data)
-					ShipAddresses.Add(Mapping.Mapper.Map<ShipAddressModel>(item));
-			}
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _shipAddressService.GetObjects(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                currentReferenceId: customer.ReferenceId,
+                search: "",
+                skip: 0,
+                take: 99999
+            );
 
-			_userDialogs.HideHud();
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
 
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
-		}
-	}
+                foreach (var item in result.Data)
+                    ShipAddresses.Add(Mapping.Mapper.Map<ShipAddressModel>(item));
+            }
 
-	[Obsolete("Form sayfasına taşındı")]
-	private async Task ShipAddressTappedAsync(ShipAddressModel shipAddressModel)
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
+            _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			ShipAddresses.ToList().ForEach(x => x.IsSelected = false);
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+    }
 
-			var selectedItem = ShipAddresses.FirstOrDefault(x => x.ReferenceId == shipAddressModel.ReferenceId);
-			if (selectedItem != null)
-				selectedItem.IsSelected = true;
-		}
-		catch (Exception ex)
-		{
-			if(_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+    private async Task ShipAddressTappedAsync(ShipAddressModel shipAddressModel)
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
 
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+            ShipAddresses.ToList().ForEach(x => x.IsSelected = false);
 
-	[Obsolete("Form sayfasına taşındı")]
-	private async Task ConfirmShipAddressAsync() { 		
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
+            var selectedItem = ShipAddresses.FirstOrDefault(x => x.ReferenceId == shipAddressModel.ReferenceId);
+            if (selectedItem != null)
+                selectedItem.IsSelected = true;
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			var selectedShipAddress = ShipAddresses.FirstOrDefault(x => x.IsSelected);
-			if (selectedShipAddress is not null)
-			{
-				SalesCustomer.ShipAddressReferenceId = selectedShipAddress.ReferenceId;
-				SalesCustomer.ShipAddressCode = selectedShipAddress.Code;
-				CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.Hidden;
-			}
-			else
-			{
-				_userDialogs.Alert("Lütfen bir adres seçiniz.", "Hata", "Tamam");
-			}
-		}
-		catch (Exception ex)
-		{
-			if(_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+    private async Task ConfirmShipAddressAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
 
-	
+            var selectedShipAddress = ShipAddresses.FirstOrDefault(x => x.IsSelected);
+            if (selectedShipAddress is not null)
+            {
+                SalesCustomer.ShipAddressReferenceId = selectedShipAddress.ReferenceId;
+                SalesCustomer.ShipAddressCode = selectedShipAddress.Code;
+                CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.Hidden;
+            }
+            else
+            {
+                _userDialogs.Alert("Lütfen bir adres seçiniz.", "Hata", "Tamam");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-	private async Task NextViewAsync()
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-			if (SalesCustomer is not null)
-			{
-				await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessProductListView)}", new Dictionary<string, object>
-				{
-					[nameof(SalesCustomer)] = SalesCustomer,
-					[nameof(WarehouseModel)] = WarehouseModel,
-				});
-			}
-			else
-			{
-				_userDialogs.Alert("Lütfen bir müşteri seçiniz.", "Hata", "Tamam");
-			}
+    private async Task NextViewAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
 
+            if (SalesCustomer is not null)
+            {
+                await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessProductListView)}", new Dictionary<string, object>
+                {
+                    [nameof(SalesCustomer)] = SalesCustomer,
+                    [nameof(WarehouseModel)] = WarehouseModel,
+                });
+            }
+            else
+            {
+                _userDialogs.Alert("Lütfen bir müşteri seçiniz.", "Hata", "Tamam");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
-
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 }

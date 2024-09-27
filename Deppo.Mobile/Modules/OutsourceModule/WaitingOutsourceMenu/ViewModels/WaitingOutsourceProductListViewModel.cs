@@ -9,6 +9,7 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using DevExpress.Maui.Controls;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.WaitingOutsourceMenu.ViewModels;
 
@@ -136,6 +137,7 @@ public partial class WaitingOutsourceProductListViewModel : BaseViewModel
     {
         CurrentPage.FindByName<BottomSheet>("warehouseItemBottomSheet").State = BottomSheetState.Hidden;
 
+        Title = string.Format("{0} Fason Ambarı", WarehouseModel.Name);
         await LoadItemsAsync();
     }
 
