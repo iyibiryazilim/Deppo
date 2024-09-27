@@ -261,6 +261,11 @@ public partial class ManuelCalcViewModel : BaseViewModel
                     return;
                 }
             }
+            if (QuicklyBomProductBasketModel.BOMQuantity == 0)
+            {
+                _userDialogs.Alert("Ana Ürün miktarı 0 olamaz.", "Hata", "Tamam");
+                return;
+            }
 
 
             await Shell.Current.GoToAsync($"{nameof(ManuelFormListView)}", new Dictionary<string, object>
@@ -417,7 +422,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
         try
         {
             _userDialogs.ShowLoading("Load Location Items...");
-          //  await Task.Delay(1000);
+            await Task.Delay(1000);
             LocationTransactions.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
@@ -466,7 +471,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
         try
         {
             _userDialogs.ShowLoading("Load Location Items...");
-          //  await Task.Delay(1000);
+            await Task.Delay(1000);
             LocationTransactions.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
@@ -670,6 +675,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
         try
         {
             _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(1000);
             Locations.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
@@ -704,6 +710,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
         try
         {
             _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(1000);
             Locations.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
@@ -874,6 +881,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
                     else
                     {
                         QuicklyBomProductBasketModel.MainLocations.Clear();
+                       
                     }
                     
                     QuicklyBomProductBasketModel.BOMQuantity = (double)QuicklyBomProductBasketModel.MainLocations.Sum(x => x.InputQuantity);

@@ -529,12 +529,9 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                 if (item.OutputQuantity == 0)
                 {
                     LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId).OutputQuantity = 0;
-                    if(SelectedItem.LocationTransactions.Any(x => x.ReferenceId == item.ReferenceId))
-                    {
-                        LocationTransactionModel Remove = SelectedItem.LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-                        SelectedItem.LocationTransactions.Remove(Remove);
-                    }
-                    
+                    var Remove = SelectedItem.LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
+                    SelectedItem.LocationTransactions.Remove(Remove);
+
                 }
             }
         }
@@ -568,7 +565,8 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
 
                 if(transactionCount < SelectedItem.ProductModel.Amount)
                 {
-                    _userDialogs.Alert("Ana Ürün Miktarı Size Gerekli Miktardan Düşük.", "Uyarı", "Tamam");
+                    _userDialogs.Alert("Ana Ürün Miktarı Size Gerekli Miktardan Düşük. Ürünü Çıkartın Ya Da Ana Malzemenin Değerini Değiştirin", "Uyarı", "Tamam");
+                    return;
                 }
                 
                 if (subItemCount != SelectedItem.ProductModel.Amount)
