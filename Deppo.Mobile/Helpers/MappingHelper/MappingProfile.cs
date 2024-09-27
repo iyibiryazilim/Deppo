@@ -7,6 +7,7 @@ using Deppo.Mobile.Core.Models.CountingModels;
 using Deppo.Mobile.Core.Models.CountingModels.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.LoginModels;
+using Deppo.Mobile.Core.Models.OutsourceModels;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.QuicklyModels;
@@ -73,6 +74,8 @@ public class MappingProfile : Profile
         CreateMap<BOMSubProductModel,WarehouseTotalModel>().ReverseMap();
         CreateMap<WarehouseCountingBasketModel, dynamic>();
         CreateMap<ProductCountingWarehouseModel,dynamic>();
+        CreateMap<OutsourcePanelModel, dynamic>();
+        CreateMap<CountingPanelModel, dynamic>();
 
 
     }

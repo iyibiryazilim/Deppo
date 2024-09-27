@@ -1,6 +1,7 @@
 using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.OutsourceModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
@@ -16,7 +17,7 @@ public partial class OutsourcePanelViewModel : BaseViewModel
     private readonly IUserDialogs _userDialogs;
 
     [ObservableProperty]
-    OutsourcePanelModel _outsourcePanelModel = null!;
+    OutsourcePanelModel _outsourcePanelModel = new();
 
     public OutsourcePanelViewModel(IHttpClientService httpClientService, IOutsourcePanelService outsourcePanelService, IUserDialogs userDialogs)
     {
@@ -30,6 +31,7 @@ public partial class OutsourcePanelViewModel : BaseViewModel
     }
 
     public Command LoadItemsCommand { get; }
+    public Command ItemTappedCommand { get; }
 
     private async Task LoadItemsAsync()
     {
@@ -47,7 +49,11 @@ public partial class OutsourcePanelViewModel : BaseViewModel
                 GetOutsourceOutProductCountAsync(),
                 GetOutsourceInProductCountAsync(),
                 GetOutsourceTotalProductCountAsync()
-            );
+            ).ContinueWith(async _ =>
+            {
+                await GetLastOutsourcesAsync();
+                await GetLastOutsourceFichesAsync();
+            });
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
@@ -84,7 +90,7 @@ public partial class OutsourcePanelViewModel : BaseViewModel
                     foreach (var item in result.Data)
                     {
                         var obj = Mapping.Mapper.Map<OutsourcePanelModel>(item);
-                        OutsourcePanelModel.OutProductCount = obj.OutsourceOutProductCount;
+                        OutsourcePanelModel.OutProductCount = obj.OutProductCount;
                     }
                 }
             }
@@ -116,7 +122,7 @@ public partial class OutsourcePanelViewModel : BaseViewModel
                     foreach (var item in result.Data)
                     {
                         var obj = Mapping.Mapper.Map<OutsourcePanelModel>(item);
-                        OutsourcePanelModel.InProductCount = obj.OutsourceInProductCount;
+                        OutsourcePanelModel.InProductCount = Convert.ToInt32(obj.InProductCount);
                     }
                 }
             }
@@ -135,7 +141,7 @@ public partial class OutsourcePanelViewModel : BaseViewModel
         try
         {
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _outsourcePanelService.GetOutsourceInProductCount(
+            var result = await _outsourcePanelService.GetOutsourceTotalProductCount(
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber
@@ -148,7 +154,71 @@ public partial class OutsourcePanelViewModel : BaseViewModel
                     foreach (var item in result.Data)
                     {
                         var obj = Mapping.Mapper.Map<OutsourcePanelModel>(item);
-                        OutsourcePanelModel.TotalProductCount = obj.OutsourceTotalProductCount;
+                        OutsourcePanelModel.TotalProductCount = obj.TotalProductCount;
+                    }
+                }
+            }
+        }
+        catch (System.Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+    }
+
+    private async Task GetLastOutsourcesAsync()
+    {
+        try
+        {
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _outsourcePanelService.GetLastOutsources(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is not null)
+                {
+                    foreach (var item in result.Data)
+                    {
+                        var obj = Mapping.Mapper.Map<OutsourceModel>(item);
+                        OutsourcePanelModel.Outsources.Add(obj);
+                    }
+                }
+            }
+        }
+        catch (System.Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+    }
+
+    private async Task GetLastOutsourceFichesAsync()
+    {
+        try
+        {
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _outsourcePanelService.GetLastOutsourceFiches(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is not null)
+                {
+                    foreach (var item in result.Data)
+                    {
+                        var obj = Mapping.Mapper.Map<OutsourceFiche>(item);
+                        OutsourcePanelModel.LastOutsourceFiche.Add(obj);
                     }
                 }
             }
