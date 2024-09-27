@@ -254,7 +254,7 @@ WHERE  ITEMS.CARDTYPE  IN(11,12)";
             baseQuery += $@" ORDER BY ITEMS.CODE ASC
 OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
-            return baseQuery;
+            return baseQuery;//
         }
 
 
