@@ -38,17 +38,20 @@
                 HeightRequest="35"
                 Stroke="{StaticResource Primary}"
                 StrokeShape="RoundRectangle 5"
-                StrokeThickness="0.5">
+                StrokeThickness="0.5"
+                >
                 <SearchBar
                     x:Name="searchBar"
+                    TextChanged="searchBar_TextChanged"
                     Placeholder="Ara..."
                     PlaceholderColor="{StaticResource OffBlack}"
                     TextColor="{StaticResource OffBlack}">
                     <SearchBar.Behaviors>
                         <toolkit:EventToCommandBehavior
-                            Command="{Binding PerformSearchCommand}"
-                            CommandParameter="{Binding ., Source={x:Reference searchBar}}"
-                            EventName="TextChanged" />
+                            Command="{Binding PerformSearchCommand}" 
+                            EventName="SearchButtonPressed" 
+                            
+                            />
                     </SearchBar.Behaviors>
                 </SearchBar>
             </Border>

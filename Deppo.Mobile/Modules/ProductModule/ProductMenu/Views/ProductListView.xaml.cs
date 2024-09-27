@@ -10,5 +10,14 @@ public partial class ProductListView : ContentPage
 		InitializeComponent();
 		_viewModel = viewModel;
 		BindingContext = _viewModel;
+		_viewModel.SearchText = searchBar;
 	}
+
+    private void searchBar_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(e.NewTextValue))
+        {
+            _viewModel.PerformSearchCommand.Execute(null);
+        }
+    }
 }
