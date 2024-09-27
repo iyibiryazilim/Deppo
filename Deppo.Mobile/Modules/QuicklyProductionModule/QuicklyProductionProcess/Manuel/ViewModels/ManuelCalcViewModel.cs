@@ -76,7 +76,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
         LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
         LocationTransactionConfirmCommand = new Command(async () => await LocationTransactionConfirmAsync());
         LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
-
+        DeleteItemCommand = new Command<QuicklyBomSubProductModel>(async (item) => await DeleteItemAsync(item));
         SubIncreaseCommand = new Command<QuicklyBomSubProductModel>(async (item) => await SubIncreaseAsync(item));
         SubDecreaseCommand = new Command<QuicklyBomSubProductModel>(async (item) => await SubDecreaseAsync(item));
 
@@ -253,6 +253,16 @@ public partial class ManuelCalcViewModel : BaseViewModel
         {
             IsBusy = true;
 
+            foreach(var subProducts in QuicklyBomProductBasketModel.SubProducts)
+            {
+                if (subProducts.SubBOMQuantity == 0)
+                {
+                    _userDialogs.Alert("Alt Ürün miktarlarında 0 olamaz.", "Hata", "Tamam");
+                    return;
+                }
+            }
+
+
             await Shell.Current.GoToAsync($"{nameof(ManuelFormListView)}", new Dictionary<string, object>
             {
                 [nameof(QuicklyBomProductBasketModel)] = QuicklyBomProductBasketModel
@@ -270,6 +280,42 @@ public partial class ManuelCalcViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+
+    private async Task DeleteItemAsync(QuicklyBomSubProductModel item)
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+            var result = await _userDialogs.ConfirmAsync($"{item.ProductModel.Code}\n{item.ProductModel.Name}\nİlgili ürün sepetinizden çıkarılacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+
+            if (!result)
+                return;
+
+            if (SelectedItem == item)
+            {
+                SelectedItem.ProductModel.IsSelected = false;
+                SelectedItem = null;
+            }
+
+            QuicklyBomProductBasketModel.SubProducts.Remove(item);
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+
 
     // + işareti tıklanınca çalışacak olan fonksiyon
     private async Task AddConsumableItemAsync()
@@ -551,7 +597,6 @@ public partial class ManuelCalcViewModel : BaseViewModel
 
             if (LocationTransactions.Count > 0)
             {
-
                 var count = LocationTransactions.Where(x => x.OutputQuantity > 0).Sum(x => (double)x.OutputQuantity);
                 SelectedLocationTransactions.Clear();
                 if(count > 0)
