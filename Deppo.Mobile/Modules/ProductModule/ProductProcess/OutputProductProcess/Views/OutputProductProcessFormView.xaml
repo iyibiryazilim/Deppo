@@ -15,6 +15,12 @@
         <toolkit:EventToCommandBehavior Command="{Binding LoadPageCommand}" EventName="Loaded" />
     </ContentPage.Behaviors>
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
             <On Platform="Android" Value="artboard.png" />

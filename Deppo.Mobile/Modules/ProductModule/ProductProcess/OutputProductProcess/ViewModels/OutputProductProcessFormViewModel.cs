@@ -69,6 +69,7 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
         SaveCommand = new Command(async () => await SaveAsync());
         LoadPageCommand = new Command(async () => await LoadPageAsync());
         ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
+        BackCommand = new Command(async () => await BackAsync());
 
     }
     public Page CurrentPage { get; set; }
@@ -126,8 +127,6 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 			IsBusy = false;
 		}
 	}
-
-
 
 	public static string GetEnumDescription(Enum value)
 	{
@@ -431,5 +430,55 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
         }
     }
 
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
 
+			var confirm = await _userDialogs.ConfirmAsync("Form verileriniz silinecektir. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+			if (!confirm)
+				return;
+
+            DocumentNumber = string.Empty;
+            TransactionDate = DateTime.Now;
+            Description = string.Empty;
+            DocumentTrackingNumber = string.Empty;
+            SpecialCode = string.Empty;
+
+            await Shell.Current.GoToAsync("..");
+		}
+        catch (Exception ex)
+        {
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ClearFormAsync()
+    {
+        try
+        {
+			DocumentNumber = string.Empty;
+			TransactionDate = DateTime.Now;
+			Description = string.Empty;
+			DocumentTrackingNumber = string.Empty;
+			SpecialCode = string.Empty;
+		}
+        catch (Exception ex)
+        {
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+    }
 }

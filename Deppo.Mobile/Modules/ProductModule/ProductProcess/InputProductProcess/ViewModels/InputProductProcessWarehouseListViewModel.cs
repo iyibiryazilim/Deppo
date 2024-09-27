@@ -218,6 +218,8 @@ public partial class InputProductProcessWarehouseListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+
+            await Shell.Current.GoToAsync("..");
         }
         catch (Exception ex)
         {
