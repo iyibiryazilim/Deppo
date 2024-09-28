@@ -44,7 +44,6 @@
                     <Border Grid.Row="0"
                             Padding="5"
                             HeightRequest="60"
-                           
                             StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.2">
                         <Grid ColumnDefinitions=".85*,.15*"
@@ -62,7 +61,6 @@
                                         StrokeShape="RoundRectangle 5">
                                     <Label FontFamily="FAS"
                                            FontSize="25"
-                                          
                                            HorizontalOptions="Center"
                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
                                            TextColor="{StaticResource White}"
@@ -79,7 +77,6 @@
                                     <Label VerticalOptions="End"
                                            Text="Lorem Ipsum... "
                                            TextColor="{StaticResource Gray400}">
-
                                     </Label>
                                 </VerticalStackLayout>
                             </Grid>
@@ -124,9 +121,9 @@
                                            TextColor="{StaticResource White}"
                                            VerticalOptions="Center" />
                                 </Border>
-                                <VerticalStackLayout Grid.Column="1" Spacing="4">
-                                    <Label 
-                                           FontAttributes="Bold"
+                                <VerticalStackLayout Grid.Column="1"
+                                                     Spacing="4">
+                                    <Label FontAttributes="Bold"
                                            FontSize="Subtitle"
                                            Text="Siparişe Bağlı Sevk İşlemleri"
                                            TextColor="{StaticResource Gray500}"
@@ -134,10 +131,8 @@
                                     <Label VerticalOptions="End"
                                            Text="Lorem Ipsum... "
                                            TextColor="{StaticResource Gray400}">
-
                                     </Label>
                                 </VerticalStackLayout>
-                                
                             </Grid>
 
                             <Border Grid.Column="1"
@@ -166,7 +161,7 @@
                        TextColor="{StaticResource OffBlack}" />
 
                 <Grid RowDefinitions="Auto,Auto,Auto"
-                      RowSpacing="2sssss">
+                      RowSpacing="2">
                     <Border Grid.Row="0"
                             Padding="5"
                             HeightRequest="60"
@@ -192,9 +187,9 @@
                                            TextColor="{StaticResource White}"
                                            VerticalOptions="Center" />
                                 </Border>
-                                <VerticalStackLayout Grid.Column="1" Spacing="4">
-                                    <Label 
-                                           FontAttributes="Bold"
+                                <VerticalStackLayout Grid.Column="1"
+                                                     Spacing="4">
+                                    <Label FontAttributes="Bold"
                                            FontSize="Subtitle"
                                            Text="Satış İade İşlemleri"
                                            TextColor="{StaticResource Gray500}"
@@ -202,9 +197,7 @@
                                     <Label VerticalOptions="End"
                                            Text="Lorem Ipsum... "
                                            TextColor="{StaticResource Gray400}">
-
                                     </Label>
-
                                 </VerticalStackLayout>
                             </Grid>
 
@@ -249,8 +242,7 @@
                                            VerticalOptions="Center" />
                                 </Border>
                                 <VerticalStackLayout Grid.Column="1">
-                                    <Label 
-                                           FontAttributes="Bold"
+                                    <Label FontAttributes="Bold"
                                            FontSize="Subtitle"
                                            Text="İrsaliyeye Bağlı Satış İade İşlemleri"
                                            TextColor="{StaticResource Gray500}"
@@ -258,10 +250,7 @@
                                     <Label VerticalOptions="End"
                                            Text="Lorem Ipsum... "
                                            TextColor="{StaticResource Gray400}">
-
                                     </Label>
-
-
                                 </VerticalStackLayout>
                             </Grid>
 
