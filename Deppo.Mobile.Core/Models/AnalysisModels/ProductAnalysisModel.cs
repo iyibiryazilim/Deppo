@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Deppo.Mobile.Core.Models.WarehouseModels;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Core.Models.AnalysisModels
@@ -8,7 +7,7 @@ namespace Deppo.Mobile.Core.Models.AnalysisModels
     {
         public ProductAnalysisModel()
         {
-            
+
         }
 
         [ObservableProperty]
@@ -21,15 +20,9 @@ namespace Deppo.Mobile.Core.Models.AnalysisModels
         double outStockProductCount;
 
         [ObservableProperty]
-        private int inputTransactionCount;
-
-        [ObservableProperty]
-        private int outputTransactionCount;
-
-        [ObservableProperty]
         private int negativeStockProductQuantity;
 
-        public ObservableCollection<WarehouseModel> LastWarehouses { get; } = new();
-        public ObservableCollection<IORateModel> IORates { get; } = new();
+        [ObservableProperty]
+        ObservableCollection<IORateModel> iORates = new();
     }
 }

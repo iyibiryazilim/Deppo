@@ -66,16 +66,19 @@ public class MappingProfile : Profile
         CreateMap<PurchaseProductReferenceAnalysis, dynamic>();
         CreateMap<Outsource, dynamic>();
         CreateMap<NegativeProductModel, dynamic>();
-		    CreateMap<NegativeWarehouseModel, dynamic>();
-		    CreateMap<NegativeLocationModel, dynamic>();
+        CreateMap<NegativeWarehouseModel, dynamic>();
+        CreateMap<NegativeLocationModel, dynamic>();
         CreateMap<QuicklyBOMProductModel, dynamic>();
         CreateMap<WarehouseCountingWarehouseModel, dynamic>();
         CreateMap<BOMSubProductModel, dynamic>();
-        CreateMap<BOMSubProductModel,WarehouseTotalModel>().ReverseMap();
+        CreateMap<BOMSubProductModel, WarehouseTotalModel>().ReverseMap();
         CreateMap<WarehouseCountingBasketModel, dynamic>();
-        CreateMap<ProductCountingWarehouseModel,dynamic>();
+        CreateMap<ProductCountingWarehouseModel, dynamic>();
         CreateMap<OutsourcePanelModel, dynamic>();
         CreateMap<CountingPanelModel, dynamic>();
+        CreateMap<ProductionFiche, dynamic>();
+        CreateMap<CountingFiche, dynamic>();
+        CreateMap<ProductionTransaction, dynamic>();
 
 
     }

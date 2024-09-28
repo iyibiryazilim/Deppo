@@ -6,13 +6,113 @@ using Newtonsoft.Json;
 
 namespace Deppo.Core.DataStores;
 
-public class CountingPanelDataStore : ICountingPanelService
+public class QuicklyProductionPanelDataStore : IQuicklyProductionPanelService
 {
     private string postUrl = "/gateway/customQuery/CustomQuery";
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetLastCountingFiches(HttpClient httpClient, int firmNumber, int periodNumber)
+    public async Task<DataResult<dynamic>> GetInProductCount(HttpClient httpClient, int firmNumber, int periodNumber)
     {
-        var content = new StringContent(JsonConvert.SerializeObject(GetLastCountingFichesQuery(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(GetInProductCountQuery(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
+
+        HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+        DataResult<dynamic> dataResult = new DataResult<dynamic>();
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            var data = await responseMessage.Content.ReadAsStringAsync();
+            if (data != null)
+            {
+                if (!string.IsNullOrEmpty(data))
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<dynamic>>(data);
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "success";
+                    return dataResult;
+                }
+                else
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "empty";
+                    return dataResult;
+                }
+            }
+            else
+            {
+                var result = JsonConvert.DeserializeObject<DataResult<Dictionary<string, object>>>(data);
+
+                dataResult.Data = result.Data;
+                dataResult.IsSuccess = false;
+                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+                return dataResult;
+            }
+        }
+        else
+        {
+            dataResult.Data = Enumerable.Empty<dynamic>();
+            dataResult.IsSuccess = false;
+            dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+            return dataResult;
+        }
+    }
+
+    public async Task<DataResult<IEnumerable<dynamic>>> GetLastProductionFiches(HttpClient httpClient, int firmNumber, int periodNumber)
+    {
+        var content = new StringContent(JsonConvert.SerializeObject(GetLastProductionFichesQuery(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
+
+        HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+        DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            var data = await responseMessage.Content.ReadAsStringAsync();
+            if (data != null)
+            {
+                if (!string.IsNullOrEmpty(data))
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "success";
+                    return dataResult;
+                }
+                else
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "empty";
+                    return dataResult;
+                }
+            }
+            else
+            {
+                var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                dataResult.Data = Enumerable.Empty<dynamic>();
+                dataResult.IsSuccess = false;
+                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+                return dataResult;
+            }
+        }
+        else
+        {
+            dataResult.Data = Enumerable.Empty<dynamic>();
+            dataResult.IsSuccess = false;
+            dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+            return dataResult;
+        }
+    }
+
+    public async Task<DataResult<IEnumerable<dynamic>>> GetLastProductionTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId)
+    {
+        var content = new StringContent(JsonConvert.SerializeObject(GetLastProductionTransactionsQuery(firmNumber, periodNumber,ficheReferenceId)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -110,59 +210,9 @@ public class CountingPanelDataStore : ICountingPanelService
         }
     }
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetLastCountingTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId)
+    public async Task<DataResult<dynamic>> GetOutProductCount(HttpClient httpClient, int firmNumber, int periodNumber)
     {
-        var content = new StringContent(JsonConvert.SerializeObject(GetLastCountingTransactionsQuery(firmNumber, periodNumber, ficheReferenceId)), Encoding.UTF8, "application/json");
-
-        HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
-        DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
-        if (responseMessage.IsSuccessStatusCode)
-        {
-            var data = await responseMessage.Content.ReadAsStringAsync();
-            if (data != null)
-            {
-                if (!string.IsNullOrEmpty(data))
-                {
-                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
-
-                    dataResult.Data = result?.Data;
-                    dataResult.IsSuccess = true;
-                    dataResult.Message = "success";
-                    return dataResult;
-                }
-                else
-                {
-                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
-
-                    dataResult.Data = result?.Data;
-                    dataResult.IsSuccess = true;
-                    dataResult.Message = "empty";
-                    return dataResult;
-                }
-            }
-            else
-            {
-                var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
-
-                dataResult.Data = Enumerable.Empty<dynamic>();
-                dataResult.IsSuccess = false;
-                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
-
-                return dataResult;
-            }
-        }
-        else
-        {
-            dataResult.Data = Enumerable.Empty<dynamic>();
-            dataResult.IsSuccess = false;
-            dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
-            return dataResult;
-        }
-    }
-
-    public async Task<DataResult<dynamic>> GetCountingInProductCount(HttpClient httpClient, int firmNumber, int periodNumber)
-    {
-        var content = new StringContent(JsonConvert.SerializeObject(GetCountingInProductCountQuery(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(GetOutProductCountQuery(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<dynamic> dataResult = new DataResult<dynamic>();
@@ -210,137 +260,27 @@ public class CountingPanelDataStore : ICountingPanelService
         }
     }
 
-    public async Task<DataResult<dynamic>> GetCountingOutProductCount(HttpClient httpClient, int firmNumber, int periodNumber)
-    {
-        var content = new StringContent(JsonConvert.SerializeObject(GetCountingOutProductCountQuery(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
-
-        HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
-        DataResult<dynamic> dataResult = new DataResult<dynamic>();
-        if (responseMessage.IsSuccessStatusCode)
-        {
-            var data = await responseMessage.Content.ReadAsStringAsync();
-            if (data != null)
-            {
-                if (!string.IsNullOrEmpty(data))
-                {
-                    var result = JsonConvert.DeserializeObject<DataResult<dynamic>>(data);
-
-                    dataResult.Data = result?.Data;
-                    dataResult.IsSuccess = true;
-                    dataResult.Message = "success";
-                    return dataResult;
-                }
-                else
-                {
-                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
-
-                    dataResult.Data = result?.Data;
-                    dataResult.IsSuccess = true;
-                    dataResult.Message = "empty";
-                    return dataResult;
-                }
-            }
-            else
-            {
-                var result = JsonConvert.DeserializeObject<DataResult<Dictionary<string, object>>>(data);
-
-                dataResult.Data = result.Data;
-                dataResult.IsSuccess = false;
-                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
-
-                return dataResult;
-            }
-        }
-        else
-        {
-            dataResult.Data = Enumerable.Empty<dynamic>();
-            dataResult.IsSuccess = false;
-            dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
-            return dataResult;
-        }
-    }
-
-    public async Task<DataResult<dynamic>> GetCountingTotalProductCount(HttpClient httpClient, int firmNumber, int periodNumber)
-    {
-        var content = new StringContent(JsonConvert.SerializeObject(GetCountingTotalProductCountQuery(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
-
-        HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
-        DataResult<dynamic> dataResult = new DataResult<dynamic>();
-        if (responseMessage.IsSuccessStatusCode)
-        {
-            var data = await responseMessage.Content.ReadAsStringAsync();
-            if (data != null)
-            {
-                if (!string.IsNullOrEmpty(data))
-                {
-                    var result = JsonConvert.DeserializeObject<DataResult<dynamic>>(data);
-
-                    dataResult.Data = result?.Data;
-                    dataResult.IsSuccess = true;
-                    dataResult.Message = "success";
-                    return dataResult;
-                }
-                else
-                {
-                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
-
-                    dataResult.Data = result?.Data;
-                    dataResult.IsSuccess = true;
-                    dataResult.Message = "empty";
-                    return dataResult;
-                }
-            }
-            else
-            {
-                var result = JsonConvert.DeserializeObject<DataResult<Dictionary<string, object>>>(data);
-
-                dataResult.Data = result.Data;
-                dataResult.IsSuccess = false;
-                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
-
-                return dataResult;
-            }
-        }
-        else
-        {
-            dataResult.Data = Enumerable.Empty<dynamic>();
-            dataResult.IsSuccess = false;
-            dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
-            return dataResult;
-        }
-    }
-
-    private string GetCountingTotalProductCountQuery(int firmNumber, int periodNumber)
-    {
-        string baseQuery = $@"SELECT 
-[TotalProductCount] = ISNULL(COUNT(DISTINCT STLINE.STOCKREF),0) 
-FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
-WHERE STLINE.TRCODE IN(50,51) AND STLINE.LPRODSTAT = 0";
-
-        return baseQuery;
-    }
-
-    private string GetCountingOutProductCountQuery(int firmNumber, int periodNumber)
+    private string GetOutProductCountQuery(int firmNumber, int periodNumber)
     {
         string baseQuery = $@"SELECT
         [OutProductCount] = ISNULL(COUNT(DISTINCT STLINE.STOCKREF),0)
         FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
-        WHERE STLINE.TRCODE = 51 AND STLINE.LPRODSTAT = 0";
+        WHERE STLINE.TRCODE IN(12,11) AND STLINE.LPRODSTAT = 0";
 
         return baseQuery;
     }
 
-    private string GetCountingInProductCountQuery(int firmNumber, int periodNumber)
+    private string GetInProductCountQuery(int firmNumber, int periodNumber)
     {
         string baseQuery = $@"SELECT
         [InProductCount] = ISNULL(COUNT(DISTINCT STLINE.STOCKREF),0)
         FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
-        WHERE STLINE.TRCODE = 50 AND STLINE.LPRODSTAT = 0";
+        WHERE STLINE.TRCODE = 13 AND STLINE.LPRODSTAT = 0";
 
         return baseQuery;
     }
 
-    private string GetLastCountingFichesQuery(int firmNumber, int periodNumber)
+    private string GetLastProductionFichesQuery(int firmNumber, int periodNumber)
     {
         string baseQuery = $@"Select TOP 5
             [ReferenceId] = STFICHE.LOGICALREF,
@@ -359,7 +299,7 @@ WHERE STLINE.TRCODE IN(50,51) AND STLINE.LPRODSTAT = 0";
 			From LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
 			left join LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
 			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
-			WHERE STFICHE.TRCODE IN(50,51) AND STFICHE.PRODSTAT = 0
+			WHERE STFICHE.TRCODE = 13 AND STFICHE.PRODSTAT = 0
 			ORDER BY STFICHE.DATE_ DESC;";
 
         return baseQuery;
@@ -393,7 +333,7 @@ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT WITH(NOL
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(NOLOCK) ON STLINE.UOMREF = UNITSETL.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON STLINE.USREF = UNITSETF.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_MARK AS BRAND WITH(NOLOCK) ON ITEMS.MARKREF = BRAND.LOGICALREF
-WHERE STFICHE.GRPCODE = 3 AND STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0 AND STLINE.TRCODE IN(50,51)
+WHERE STFICHE.GRPCODE = 3 AND STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0 AND STLINE.TRCODE = 13
 GROUP BY 
     ITEMS.LOGICALREF,
     ITEMS.CODE,
@@ -417,7 +357,7 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
         return baseQuery;
     }
 
-    private string GetLastCountingTransactionsQuery(int firmNumber, int periodNumber, int ficheReferenceId)
+    private string GetLastProductionTransactionsQuery(int firmNumber, int periodNumber, int ficheReferenceId)
     {
         string baseQuery = $@"SELECT
         [ReferenceId] = STLINE.LOGICALREF,
@@ -448,9 +388,10 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
 		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
-		WHERE STFICHE.TRCODE IN(50,51) AND STFICHE.LOGICALREF = {ficheReferenceId} AND STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0
+		WHERE STFICHE.TRCODE = 13 AND STFICHE.LOGICALREF = {ficheReferenceId} AND STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0
 		ORDER BY STLINE.DATE_ DESC";
 
         return baseQuery;
     }
+
 }
