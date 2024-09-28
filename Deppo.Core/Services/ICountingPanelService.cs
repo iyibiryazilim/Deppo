@@ -14,4 +14,7 @@ public interface ICountingPanelService
     public Task<DataResult<dynamic>> GetCountingInProductCount(HttpClient httpClient, int firmNumber, int periodNumber);
 
     public Task<DataResult<dynamic>> GetCountingOutProductCount(HttpClient httpClient, int firmNumber, int periodNumber);
+
+    public Task<DataResult<dynamic>> GetCountingTotalProductCount(HttpClient httpClient, int firmNumber, int periodNumber);
+
 }

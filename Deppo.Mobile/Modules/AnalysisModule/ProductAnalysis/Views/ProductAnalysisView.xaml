@@ -17,90 +17,305 @@
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
             <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
-    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10" Padding="10">
-        <VerticalStackLayout Grid.Row="0" Spacing="10">
-            <Label
-                FontSize="20"
-                Text="Özet"
-                TextColor="{StaticResource White}"
-                VerticalOptions="Center" />
-            <Grid
-                ColumnDefinitions="*,*"
-                ColumnSpacing="10"
-                RowDefinitions="Auto,Auto"
-                RowSpacing="10">
-                <Border
-                    Grid.Row="0"
-                    Grid.RowSpan="2"
-                    Grid.Column="0"
-                    Padding="10"
-                    BackgroundColor="{StaticResource Primary}"
-                    Stroke="{StaticResource Primary}"
-                    StrokeShape="RoundRectangle 10">
+    <Grid
+        Padding="5"
+        RowDefinitions=".40*,.60*"
+        RowSpacing="5">
+
+        <Grid
+            Grid.Row="0"
+            ColumnDefinitions="*,*"
+            ColumnSpacing="5"
+            RowDefinitions="Auto,Auto"
+            RowSpacing="5">
+
+            <Border
+                Grid.Row="0"
+                Grid.Column="0"
+                Padding="10"
+                BackgroundColor="{StaticResource Primary}"
+                Stroke="{StaticResource Primary}"
+                StrokeShape="RoundRectangle 10">
+                <VerticalStackLayout Spacing="10">
+                    <Border
+                        Padding="5"
+                        BackgroundColor="{StaticResource Secondary}"
+                        HeightRequest="40"
+                        HorizontalOptions="Start"
+                        Stroke="{StaticResource Secondary}"
+                        StrokeShape="RoundRectangle 10"
+                        WidthRequest="40">
+                        <Label HorizontalOptions="Center" VerticalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span
+                                        FontFamily="FAS"
+                                        FontSize="20"
+                                        Text="{x:Static fontAwesome:FontAwesomeIcons.TruckFast}"
+                                        TextColor="{StaticResource SecondaryLight}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </Border>
+
+                    <VerticalStackLayout VerticalOptions="End">
+
+
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="30"
+                            Text="{Binding ProductAnalysisModel.TotalProductCount, StringFormat='{0:N0}'}"
+                            TextColor="{StaticResource White}"
+                            VerticalOptions="End" />
+                        <Label
+                            FontSize="12"
+                            Text="Toplam Malzeme Referansı"
+                            TextColor="{StaticResource WhiteSmoke}"
+                            VerticalOptions="End" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border
+                Grid.Row="0"
+                Grid.Column="1"
+                Padding="10"
+                BackgroundColor="{StaticResource Primary}"
+                Stroke="{StaticResource Primary}"
+                StrokeShape="RoundRectangle 10">
+                <VerticalStackLayout Spacing="10">
+                    <Border
+                        Padding="5"
+                        BackgroundColor="{StaticResource Secondary}"
+                        HeightRequest="40"
+                        HorizontalOptions="Start"
+                        Stroke="{StaticResource Secondary}"
+                        StrokeShape="RoundRectangle 10"
+                        WidthRequest="40">
+                        <Label HorizontalOptions="Center" VerticalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span
+                                        FontFamily="FAS"
+                                        FontSize="20"
+                                        Text="{x:Static fontAwesome:FontAwesomeIcons.RotateLeft}"
+                                        TextColor="{StaticResource SecondaryLight}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </Border>
+
+                    <VerticalStackLayout VerticalOptions="End">
+
+
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="30"
+                            Text="{Binding ProductAnalysisModel.NegativeStockProductQuantity, StringFormat='{0:N0}'}"
+                            TextColor="{StaticResource White}"
+                            VerticalOptions="End" />
+                        <Label
+                            FontSize="12"
+                            Text="Negatif Stok Referansı"
+                            TextColor="{StaticResource WhiteSmoke}"
+                            VerticalOptions="End" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border
+                Grid.Row="1"
+                Grid.Column="0"
+                Padding="10"
+                BackgroundColor="{StaticResource White}"
+                Stroke="{StaticResource White}"
+                StrokeShape="RoundRectangle 10">
+                <VerticalStackLayout Spacing="10">
+                    <Border
+                        Padding="5"
+                        BackgroundColor="{StaticResource Primary}"
+                        HeightRequest="40"
+                        HorizontalOptions="Start"
+                        Stroke="{StaticResource Primary}"
+                        StrokeShape="RoundRectangle 10"
+                        WidthRequest="40">
+                        <Label HorizontalOptions="Center" VerticalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span
+                                        FontFamily="FAS"
+                                        FontSize="20"
+                                        Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                        TextColor="{StaticResource White}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </Border>
+
                     <VerticalStackLayout VerticalOptions="End">
                         <Label
                             FontAttributes="Bold"
-                            FontSize="45"
-                            Text="{Binding ProductAnalysisModel.TotalProductCount,StringFormat='{0:N0}'}"
-                            TextColor="{StaticResource White}" />
+                            FontSize="30"
+                            Text="{Binding ProductAnalysisModel.InStockProductCount, StringFormat='{0:N0}'}"
+                            TextColor="{StaticResource Primary}"
+                            VerticalOptions="End" />
                         <Label
-                            FontSize="20"
-                            Text="Total Products"
-                            TextColor="{StaticResource WhiteSmoke}" />
+                            FontSize="12"
+                            Text="Sevkedilebilir Malzeme Referansı"
+                            TextColor="{StaticResource PrimaryLight}"
+                            VerticalOptions="End" />
                     </VerticalStackLayout>
-                </Border>
-                 <Border
-                    Grid.Row="0"
-                    Grid.Column="1"
-                    Padding="10"
-                    BackgroundColor="{StaticResource Primary}"
-                    Stroke="{StaticResource Primary}"
-                    StrokeShape="RoundRectangle 10">
+                </VerticalStackLayout>
+            </Border>
+
+            <Border
+                Grid.Row="1"
+                Grid.Column="1"
+                Padding="10"
+                BackgroundColor="{StaticResource White}"
+                Stroke="{StaticResource White}"
+                StrokeShape="RoundRectangle 10">
+                <VerticalStackLayout Spacing="10">
+                    <Border
+                        Padding="5"
+                        BackgroundColor="{StaticResource Primary}"
+                        HeightRequest="40"
+                        HorizontalOptions="Start"
+                        Stroke="{StaticResource Primary}"
+                        StrokeShape="RoundRectangle 10"
+                        WidthRequest="40">
+                        <Label HorizontalOptions="Center" VerticalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span
+                                        FontFamily="FAS"
+                                        FontSize="20"
+                                        Text="{x:Static fontAwesome:FontAwesomeIcons.User}"
+                                        TextColor="{StaticResource White}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </Border>
+
                     <VerticalStackLayout VerticalOptions="End">
+
+
                         <Label
                             FontAttributes="Bold"
-                            FontSize="45"
-                            Text="{Binding ProductAnalysisModel.InStockProductCount,StringFormat='{0:N0}'}"
-                            TextColor="{StaticResource White}" />
+                            FontSize="30"
+                            Text="{Binding ProductAnalysisModel.OutStockProductCount, StringFormat='{0:N0}'}"
+                            TextColor="{StaticResource Primary}"
+                            VerticalOptions="End" />
                         <Label
-                            FontSize="16"
-                            Text="Stoktaki Ürünler"
-                            TextColor="{StaticResource WhiteSmoke}" />
+                            FontSize="12"
+                            Text="Stokta Olmayan Malzeme Referansı"
+                            TextColor="{StaticResource PrimaryLight}"
+                            VerticalOptions="End" />
                     </VerticalStackLayout>
-                </Border>
-                <Border
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    Padding="10"
-                    BackgroundColor="{StaticResource Primary}"
-                    Stroke="{StaticResource Primary}"
-                    StrokeShape="RoundRectangle 10">
-                    <VerticalStackLayout VerticalOptions="End">
-                        <Label
-                            FontAttributes="Bold"
-                            FontSize="45"
-                            Text="{Binding ProductAnalysisModel.OutStockProductCount,StringFormat='{0:N0}'}"
-                            TextColor="{StaticResource White}" />
-                        <Label
-                            FontSize="16"
-                            Text="Stokta Olmayan Ürünler"
-                            TextColor="{StaticResource WhiteSmoke}" />
-                    </VerticalStackLayout>
-                </Border>
+                </VerticalStackLayout>
+            </Border>
+
+
+
+            
+
+        </Grid>
+
+        <Border
+            Grid.Row="1"
+            Padding="10"
+            BackgroundColor="{StaticResource White}"
+            Stroke="Transparent"
+            StrokeShape="RoundRectangle 10">
+            <Grid RowDefinitions=".20*,.80*" RowSpacing="10">
+                <VerticalStackLayout>
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="Subtitle"
+                        Text="Giriş / Çıkış Analizi"
+                        TextColor="{StaticResource Primary}" />
+                    <Label
+                        FontSize="Caption"
+                        Text="Malzeme Referans Sayısına Göre Giriş / Çıkış Sayıları"
+                        TextColor="{StaticResource Gray500}" />
+
+                </VerticalStackLayout>
+
+                <dx:ChartView Grid.Row="1">
+                    <dx:ChartView.Series>
+                        <dx:AreaSeries DisplayName="Satılan Malzeme Sayısı">
+                            <!--  Bind the series to the data source.  -->
+                            <!-- <dx:AreaSeries.Data>
+                                <dx:SeriesDataAdapter ArgumentDataMember="Argument" DataSource="{Binding ProductAnalysisModel.LastWarehouses}">
+                                    <dx:ValueDataMember Member="SalesReferenceCount" Type="Value" />
+                                </dx:SeriesDataAdapter>
+
+                            </dx:AreaSeries.Data>-->
+                            <dx:AreaSeries.Style>
+                                <dx:AreaSeriesStyle Fill="{StaticResource Secondary}">
+                                    <dx:AreaSeriesStyle.FillEffect>
+                                        <dx:TransparencyGradient BaselineAlpha="0" SeriesLineAlpha="0.6" />
+                                    </dx:AreaSeriesStyle.FillEffect>
+                                </dx:AreaSeriesStyle>
+                            </dx:AreaSeries.Style>
+                        </dx:AreaSeries>
+                        <dx:AreaSeries DisplayName="İade Malzeme Sayısı">
+                            <!--  Bind the series to the data source.  -->
+                            <!-- <dx:AreaSeries.Data>
+                                <dx:SeriesDataAdapter ArgumentDataMember="Argument" DataSource="{Binding SalesAnalysisModel.SalesProductReferenceAnalysis}">
+                                    <dx:ValueDataMember Member="ReturnReferenceCount" Type="Value" />
+                                </dx:SeriesDataAdapter>
+
+                            </dx:AreaSeries.Data>-->
+                            <dx:AreaSeries.Style>
+                                <dx:AreaSeriesStyle Fill="{StaticResource Primary}">
+                                    <dx:AreaSeriesStyle.FillEffect>
+                                        <dx:TransparencyGradient BaselineAlpha="0" SeriesLineAlpha="0.4" />
+                                    </dx:AreaSeriesStyle.FillEffect>
+                                </dx:AreaSeriesStyle>
+                            </dx:AreaSeries.Style>
+                        </dx:AreaSeries>
+                    </dx:ChartView.Series>
+
+                    <dx:ChartView.AxisY>
+                        <dx:NumericAxisY AlwaysShowZeroLevel="False" AutoRangeMode="VisibleValues">
+                            <dx:NumericAxisY.Label>
+                                <dx:AxisLabel>
+                                    <dx:AxisLabel.Style>
+                                        <dx:AxisLabelStyle>
+                                            <dx:AxisLabelStyle.TextStyle>
+                                                <dx:TextStyle Size="12" />
+                                            </dx:AxisLabelStyle.TextStyle>
+                                        </dx:AxisLabelStyle>
+                                    </dx:AxisLabel.Style>
+                                </dx:AxisLabel>
+                            </dx:NumericAxisY.Label>
+                        </dx:NumericAxisY>
+                    </dx:ChartView.AxisY>
+                    <!-- <dx:ChartView.AxisY>
+                            <dx:NumericAxisY>
+                                <dx:NumericAxisY.Title>
+                                    <dx:AxisTitle Text="Intensivity, %" />
+                                </dx:NumericAxisY.Title>
+                                <dx:NumericAxisY.Style>
+                                    <dx:AxisStyle InterlacedColor="#22DDDDDD" InterlacedVisible="True" />
+                                </dx:NumericAxisY.Style>
+                            </dx:NumericAxisY>
+                        </dx:ChartView.AxisY>-->
+                    <dx:ChartView.Legend>
+                        <dx:Legend />
+                    </dx:ChartView.Legend>
+                </dx:ChartView>
+
+
             </Grid>
-        </VerticalStackLayout>
+        </Border>
 
     </Grid>
 

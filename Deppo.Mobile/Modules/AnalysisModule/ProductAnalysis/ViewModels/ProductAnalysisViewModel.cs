@@ -15,22 +15,23 @@ public partial class ProductAnalysisViewModel : BaseViewModel
     private readonly IUserDialogs _userDialogs;
     private readonly IProductAnalysisService _productAnalysisService;
 
-    public ProductAnalysisViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, IProductAnalysisService productAnalysisService)
-    {
-        _userDialogs = userDialogs;
-        _httpClientService = httpClientService;
-
-        Title = "Ürün Analizi";
-        _productAnalysisService = productAnalysisService;
-
-        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
-
-
-    }
-
     [ObservableProperty]
     ProductAnalysisModel productAnalysisModel = new();
 
+    public ProductAnalysisViewModel(
+        IHttpClientService httpClientService, 
+        IProductAnalysisService productAnalysisService, 
+        IUserDialogs userDialogs)
+    {
+        _httpClientService = httpClientService;
+        _productAnalysisService = productAnalysisService;
+        _userDialogs = userDialogs;
+
+        Title = "Malzeme Analizi";
+
+        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+
+    }
 
     public Command LoadItemsCommand { get; }
 
@@ -44,7 +45,13 @@ public partial class ProductAnalysisViewModel : BaseViewModel
             IsBusy = true;
             _userDialogs.ShowLoading("Yükleniyor...");
             await Task.Delay(1000);
-            await Task.WhenAll(GetTotalProductCountAsync(), GetInStockProductCountAsync(), GetOutStockProductCountAsync());
+
+            await Task.WhenAll(
+                GetNegativeStockProductsCountAsync(),
+                GetTotalProductCountAsync(),
+                GetInStockProductCountAsync(),
+                GetOutStockProductCountAsync()
+            );
 
 
             if (_userDialogs.IsHudShowing)
@@ -65,78 +72,6 @@ public partial class ProductAnalysisViewModel : BaseViewModel
 
     }
 
-    private async Task GetInputTransactionCountAsync()
-    {
-        if (IsBusy)
-            return;
-        try
-        {
-            IsBusy = true;
-
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _productAnalysisService.GetInputTransactionCountAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber);
-
-            if (result.IsSuccess)
-            {
-                if (result.Data is null)
-                    return;
-
-                foreach (var item in result.Data)
-                {
-                    var obj = Mapping.Mapper.Map<ProductAnalysisModel>(item);
-                    ProductAnalysisModel.InputTransactionCount = obj.InputTransactionCount;
-                }
-
-            }
-        }
-        catch (Exception ex)
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
-            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
-    private async Task GetOutputTransactionCountAsync()
-    {
-        if (IsBusy)
-            return;
-        try
-        {
-            IsBusy = true;
-
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _productAnalysisService.GetOutputTransactionCountAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber);
-
-            if (result.IsSuccess)
-            {
-                if (result.Data is null)
-                    return;
-
-                foreach (var item in result.Data)
-                {
-                    var obj = Mapping.Mapper.Map<ProductAnalysisModel>(item);
-                    ProductAnalysisModel.OutputTransactionCount = obj.OutputTransactionCount;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
-            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
 
     private async Task GetNegativeStockProductsCountAsync()
     {
@@ -173,40 +108,6 @@ public partial class ProductAnalysisViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
-    private async Task GetLastWarehousesAsync()
-    {
-        if (IsBusy)
-            return;
-        try
-        {
-            IsBusy = true;
-
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _productAnalysisService.GetLastWarehousesAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber);
-
-            if (result.IsSuccess)
-            {
-                if (result.Data is null)
-                    return;
-
-                foreach (var item in result.Data)
-                    ProductAnalysisModel.LastWarehouses.Add(Mapping.Mapper.Map<WarehouseModel>(item));
-            }
-        }
-        catch (Exception ex)
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
-            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
     private async Task GetTotalProductCountAsync()
     {
 
@@ -227,7 +128,7 @@ public partial class ProductAnalysisViewModel : BaseViewModel
                     ProductAnalysisModel.TotalProductCount = obj.TotalProductCount;
                 }
 
-                
+
             }
 
 
@@ -241,7 +142,6 @@ public partial class ProductAnalysisViewModel : BaseViewModel
         }
 
     }
-
     private async Task GetInStockProductCountAsync()
     {
 
@@ -272,7 +172,6 @@ public partial class ProductAnalysisViewModel : BaseViewModel
         }
 
     }
-
     private async Task GetOutStockProductCountAsync()
     {
 

@@ -4,14 +4,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Deppo.Core.Models;
 using Deppo.Mobile.Core.Models.ProductModels;
 
-namespace Deppo.Mobile.Core.Models.CountingModels;
+namespace Deppo.Mobile.Core.Models.QuicklyModels;
 
-public partial class CountingPanelModel : ObservableObject
+public partial class QuicklyProductionPanelModel : ObservableObject
 {
-    [ObservableProperty]
-    int totalProductCount;
-
-    [ObservableProperty]
+[ObservableProperty]
     double inProductCount;
 
     [ObservableProperty]
@@ -27,8 +24,8 @@ public partial class CountingPanelModel : ObservableObject
     ObservableCollection<ProductModel> lastProducts = new();
 
     [ObservableProperty]
-    ObservableCollection<CountingFiche> lastCountingFiche = new();
+    ObservableCollection<ProductionFiche> lastProductionFiche = new();
 
     [ObservableProperty]
-    ObservableCollection<CountingTransaction> lastCountingTransaction = new();
+    ObservableCollection<ProductionTransaction> lastProductionTransaction = new();
 }

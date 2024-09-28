@@ -17,7 +17,11 @@
     </ContentPage.Behaviors>
 
 
-
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
 
     <Grid
         Padding="5"
@@ -32,7 +36,7 @@
             RowSpacing="5">
 
             <Border
-                Grid.Row="0"
+                Grid.Row="1"
                 Grid.Column="0"
                 Padding="10"
                 BackgroundColor="{StaticResource White}"
@@ -70,7 +74,7 @@
                         <Label
                             FontAttributes="Bold"
                             FontSize="30"
-                            Text="{Binding SalesAnalysisModel.DueDatePassedProductsCount,StringFormat='{0:N0}'}"
+                            Text="{Binding SalesAnalysisModel.DueDatePassedProductsCount, StringFormat='{0:N0}'}"
                             TextColor="{StaticResource Primary}"
                             VerticalOptions="End" />
                         <Label
@@ -83,7 +87,7 @@
             </Border>
 
             <Border
-                Grid.Row="0"
+                Grid.Row="1"
                 Grid.Column="1"
                 Padding="10"
                 BackgroundColor="{StaticResource White}"
@@ -121,7 +125,7 @@
                         <Label
                             FontAttributes="Bold"
                             FontSize="30"
-                            Text="{Binding SalesAnalysisModel.DueDatePassedCustomersCount,StringFormat='{0:N0}'}"
+                            Text="{Binding SalesAnalysisModel.DueDatePassedCustomersCount, StringFormat='{0:N0}'}"
                             TextColor="{StaticResource Primary}"
                             VerticalOptions="End" />
                         <Label
@@ -133,7 +137,7 @@
                 </VerticalStackLayout>
             </Border>
             <Border
-                Grid.Row="1"
+                Grid.Row="0"
                 Grid.Column="0"
                 Padding="10"
                 BackgroundColor="{StaticResource Primary}"
@@ -171,7 +175,7 @@
                         <Label
                             FontAttributes="Bold"
                             FontSize="30"
-                            Text="{Binding SalesAnalysisModel.SoldProductReferenceCount,StringFormat='{0:N0}'}"
+                            Text="{Binding SalesAnalysisModel.SoldProductReferenceCount, StringFormat='{0:N0}'}"
                             TextColor="{StaticResource White}"
                             VerticalOptions="End" />
                         <Label
@@ -183,7 +187,7 @@
                 </VerticalStackLayout>
             </Border>
             <Border
-                Grid.Row="1"
+                Grid.Row="0"
                 Grid.Column="1"
                 Padding="10"
                 BackgroundColor="{StaticResource Primary}"
@@ -221,7 +225,7 @@
                         <Label
                             FontAttributes="Bold"
                             FontSize="30"
-                            Text="{Binding SalesAnalysisModel.ReturnProductReferenceCount,StringFormat='{0:N0}'}"
+                            Text="{Binding SalesAnalysisModel.ReturnProductReferenceCount, StringFormat='{0:N0}'}"
                             TextColor="{StaticResource White}"
                             VerticalOptions="End" />
                         <Label
