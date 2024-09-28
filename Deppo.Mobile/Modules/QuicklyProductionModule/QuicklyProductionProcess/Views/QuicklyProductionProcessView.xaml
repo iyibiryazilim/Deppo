@@ -69,7 +69,7 @@
                                            FontAttributes="Bold"
                                            FontSize="Subtitle"
                                            Text="Manuel Hızlı Üretim"
-                                           TextColor="{StaticResource Gray600}"
+                                           TextColor="{StaticResource Gray500}"
                                             />
                                     <Label VerticalOptions="End" Text="Lorem Ipsum... " TextColor="{StaticResource Gray400}">
                                         
@@ -133,7 +133,7 @@
                                            Margin="0,3,0,0"
                                            FontSize="Subtitle"
                                            Text="İş Emrine Bağlı Hızlı Üretim"
-                                           TextColor="{StaticResource Gray600}"
+                                           TextColor="{StaticResource Gray500}"
                                            VerticalOptions="Center" />
                                     <Label VerticalOptions="End" Text="Lorem Ipsum..." TextColor="{StaticResource Gray400}" ></Label>
                                 </VerticalStackLayout>
