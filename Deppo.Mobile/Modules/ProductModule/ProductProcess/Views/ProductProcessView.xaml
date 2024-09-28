@@ -42,7 +42,7 @@
                            TextColor="{StaticResource OffBlack}" />
 
                     <Grid RowDefinitions="Auto,Auto"
-                          RowSpacing="0">
+                          RowSpacing="2">
                         <Border Grid.Row="0"
                                 Padding="5"
                                 HeightRequest="60"
@@ -71,7 +71,7 @@
                                                FontAttributes="Bold"
                                                FontSize="Subtitle"
                                                Text="Üretimden Giriş İşlemleri"
-                                               TextColor="{StaticResource Gray600}" />
+                                               TextColor="{StaticResource Gray500}" />
                                         <Label VerticalOptions="End"
                                                Text="Lorem Ipsum... "
                                                TextColor="{StaticResource Gray400}">
@@ -126,7 +126,7 @@
                                         <Label FontAttributes="Bold"
                                                FontSize="Subtitle"
                                                Text="Sayım Fazlası İşlemleri"
-                                               TextColor="{StaticResource Gray600}"
+                                               TextColor="{StaticResource Gray500}"
                                                VerticalOptions="Center" />
                                         <Label VerticalOptions="End"
                                                Text="Lorem Ipsum... "
@@ -167,7 +167,7 @@
                            TextColor="{StaticResource OffBlack}" />
 
                     <Grid RowDefinitions="Auto,Auto,Auto"
-                          RowSpacing="0">
+                          RowSpacing="2">
                         <!--#region Sarf Fişi-->
                         <Border Grid.Row="0"
                                 Padding="5"
@@ -199,7 +199,7 @@
                                         <Label FontAttributes="Bold"
                                                FontSize="Subtitle"
                                                Text="Sarf Fişi İşlemleri"
-                                               TextColor="{StaticResource Gray600}"
+                                               TextColor="{StaticResource Gray500}"
                                                VerticalOptions="Center" />
                                         <Label VerticalOptions="End"
                                                Text="Lorem Ipsum... "
@@ -258,7 +258,7 @@
                                                FontAttributes="Bold"
                                                FontSize="Subtitle"
                                                Text="Sayım Eksiği İşlemleri"
-                                               TextColor="{StaticResource Gray600}" />
+                                               TextColor="{StaticResource Gray500}" />
                                         <Label VerticalOptions="End"
                                                Text="Lorem Ipsum... "
                                                TextColor="{StaticResource Gray400}">
@@ -313,7 +313,7 @@
                                         <Label FontAttributes="Bold"
                                                FontSize="Subtitle"
                                                Text="Fire Fişi İşlemleri"
-                                               TextColor="{StaticResource Gray600}"
+                                               TextColor="{StaticResource Gray500}"
                                                VerticalOptions="Center" />
                                         <Label VerticalOptions="End"
                                                Text="Lorem Ipsum... "
@@ -351,7 +351,7 @@
                            TextColor="{StaticResource OffBlack}" />
 
                     <Grid RowDefinitions="Auto,Auto"
-                          RowSpacing="0">
+                          RowSpacing="2">
                         <Border Grid.Row="0"
                                 HeightRequest="60"
                                 Padding="5"
@@ -382,7 +382,7 @@
                                         <Label FontAttributes="Bold"
                                                FontSize="Subtitle"
                                                Text="Ambar Transferi İşlemleri"
-                                               TextColor="{StaticResource Gray600}"
+                                               TextColor="{StaticResource Gray500}"
                                                VerticalOptions="Center" />
                                         <Label VerticalOptions="End"
                                                Text="Lorem Ipsum... "
@@ -436,7 +436,7 @@
                                                FontAttributes="Bold"
                                                FontSize="Subtitle"
                                                Text="Malzeme Virmanı İşlemleri"
-                                               TextColor="{StaticResource Gray600}"
+                                               TextColor="{StaticResource Gray500}"
                                                VerticalOptions="Center" />
                                         <Label VerticalOptions="End"
                                                Text="Lorem Ipsum... "

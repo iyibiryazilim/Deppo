@@ -137,7 +137,7 @@ public partial class WaitingOutsourceProductListViewModel : BaseViewModel
     {
         CurrentPage.FindByName<BottomSheet>("warehouseItemBottomSheet").State = BottomSheetState.Hidden;
 
-        Title = string.Format("{0} Fason Ambarı", WarehouseModel.Name);
+        Title = string.Format("{0} Fason Ambarı", SelectedWarehouseModel.Name);
         await LoadItemsAsync();
     }
 
@@ -211,7 +211,7 @@ public partial class WaitingOutsourceProductListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-
+            _userDialogs.Loading("Loading Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: SelectedWarehouseModel.Number, skip: ItemsProduct.Count, take: 20);
 
