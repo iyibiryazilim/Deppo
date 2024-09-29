@@ -9,7 +9,8 @@
              Title="{Binding Title}"
              x:DataType="viewModel:PurchaseProcessViewModel">
     <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -20,7 +21,8 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android" Value="artboard.png" />
+            <On Platform="Android"
+                Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
     <Grid RowDefinitions=".30*,.70*">
@@ -36,13 +38,15 @@
                        Text="Giriş İşlemleri"
                        TextColor="{StaticResource OffBlack}" />
 
-                <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="2">
+                <Grid RowDefinitions="Auto,Auto,Auto"
+                      RowSpacing="2">
                     <Border Grid.Row="0"
                             Padding="5"
                             HeightRequest="60"
                             StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
+                        <Grid ColumnDefinitions=".85*,.15*"
+                              ColumnSpacing="0">
                             <Grid Grid.Column="0"
                                   ColumnDefinitions="Auto,*"
                                   ColumnSpacing="10">
@@ -58,9 +62,9 @@
                                            TextColor="{StaticResource White}"
                                            VerticalOptions="Center" />
                                 </Border>
-                                <VerticalStackLayout Grid.Column="1" Spacing="4">
-                                    <Label 
-                                           FontAttributes="Bold"
+                                <VerticalStackLayout Grid.Column="1"
+                                                     Spacing="4">
+                                    <Label FontAttributes="Bold"
                                            FontSize="Subtitle"
                                            Text="Mal Kabul İşlemleri"
                                            TextColor="{StaticResource Gray500}"
@@ -68,7 +72,6 @@
                                     <Label VerticalOptions="End"
                                            Text="Lorem Ipsum... "
                                            TextColor="{StaticResource Gray400}">
-
                                     </Label>
                                 </VerticalStackLayout>
                                 <Grid.GestureRecognizers>
@@ -76,7 +79,8 @@
                                 </Grid.GestureRecognizers>
                             </Grid>
 
-                            <Border Grid.Column="1" StrokeThickness="0">
+                            <Border Grid.Column="1"
+                                    StrokeThickness="0">
                                 <toolkit:AvatarView Padding="2"
                                                     BorderColor="{StaticResource Primary}"
                                                     CornerRadius="15"
@@ -95,7 +99,8 @@
                             HeightRequest="60"
                             StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
+                        <Grid ColumnDefinitions=".85*,.15*"
+                              ColumnSpacing="0">
                             <Grid Grid.Column="0"
                                   ColumnDefinitions="Auto,*"
                                   ColumnSpacing="10">
@@ -111,17 +116,16 @@
                                            TextColor="{StaticResource White}"
                                            VerticalOptions="Center" />
                                 </Border>
-                                <VerticalStackLayout Grid.Column="1" Spacing="4">
-                                    <Label 
-                                           FontAttributes="Bold"
+                                <VerticalStackLayout Grid.Column="1"
+                                                     Spacing="4">
+                                    <Label FontAttributes="Bold"
                                            FontSize="Subtitle"
-                                           Text="Siparişe bağlı Mal kabul İşlemleri"
+                                           Text="Siparişe Bağlı Mal Kabul İşlemleri"
                                            TextColor="{StaticResource Gray500}"
                                            VerticalOptions="Center" />
                                     <Label VerticalOptions="End"
                                            Text="Lorem Ipsum... "
                                            TextColor="{StaticResource Gray400}">
-
                                     </Label>
                                 </VerticalStackLayout>
                                 <Grid.GestureRecognizers>
@@ -129,7 +133,8 @@
                                 </Grid.GestureRecognizers>
                             </Grid>
 
-                            <Border Grid.Column="1" StrokeThickness="0">
+                            <Border Grid.Column="1"
+                                    StrokeThickness="0">
                                 <toolkit:AvatarView Padding="2"
                                                     BorderColor="{StaticResource Primary}"
                                                     CornerRadius="15"
@@ -153,13 +158,15 @@
                        Text="Çıkış İşlemleri"
                        TextColor="{StaticResource OffBlack}" />
 
-                <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="2">
+                <Grid RowDefinitions="Auto,Auto,Auto"
+                      RowSpacing="2">
                     <Border Grid.Row="0"
                             HeightRequest="60"
                             Padding="5"
                             StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
+                        <Grid ColumnDefinitions=".85*,.15*"
+                              ColumnSpacing="0">
                             <Grid Grid.Column="0"
                                   ColumnDefinitions="Auto,*"
                                   ColumnSpacing="10">
@@ -178,9 +185,9 @@
                                            TextColor="{StaticResource White}"
                                            VerticalOptions="Center" />
                                 </Border>
-                                <VerticalStackLayout Grid.Column="1" Spacing="4">
-                                    <Label 
-                                           FontAttributes="Bold"
+                                <VerticalStackLayout Grid.Column="1"
+                                                     Spacing="4">
+                                    <Label FontAttributes="Bold"
                                            FontSize="Subtitle"
                                            Text="Satınalma İade İşlemleri"
                                            TextColor="{StaticResource Gray500}"
@@ -188,13 +195,12 @@
                                     <Label VerticalOptions="End"
                                            Text="Lorem Ipsum... "
                                            TextColor="{StaticResource Gray400}">
-
                                     </Label>
-
                                 </VerticalStackLayout>
                             </Grid>
 
-                            <Border Grid.Column="1" StrokeThickness="0">
+                            <Border Grid.Column="1"
+                                    StrokeThickness="0">
                                 <toolkit:AvatarView Padding="2"
                                                     BorderColor="{StaticResource Primary}"
                                                     CornerRadius="15"
@@ -213,7 +219,8 @@
                             HeightRequest="60"
                             StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
+                        <Grid ColumnDefinitions=".85*,.15*"
+                              ColumnSpacing="0">
                             <Grid Grid.Column="0"
                                   ColumnDefinitions="Auto,*"
                                   ColumnSpacing="10">
@@ -232,9 +239,9 @@
                                            TextColor="{StaticResource White}"
                                            VerticalOptions="Center" />
                                 </Border>
-                                <VerticalStackLayout Grid.Column="1" Spacing="4">
-                                    <Label 
-                                           FontAttributes="Bold"
+                                <VerticalStackLayout Grid.Column="1"
+                                                     Spacing="4">
+                                    <Label FontAttributes="Bold"
                                            FontSize="Subtitle"
                                            LineBreakMode="TailTruncation"
                                            Text="İrsaliyeye Bağlı Satınalma İade İşlemleri"
@@ -243,12 +250,12 @@
                                     <Label VerticalOptions="End"
                                            Text="Lorem Ipsum... "
                                            TextColor="{StaticResource Gray400}">
-
                                     </Label>
                                 </VerticalStackLayout>
                             </Grid>
 
-                            <Border Grid.Column="1" StrokeThickness="0">
+                            <Border Grid.Column="1"
+                                    StrokeThickness="0">
                                 <toolkit:AvatarView Padding="2"
                                                     BorderColor="{StaticResource Primary}"
                                                     CornerRadius="15"
