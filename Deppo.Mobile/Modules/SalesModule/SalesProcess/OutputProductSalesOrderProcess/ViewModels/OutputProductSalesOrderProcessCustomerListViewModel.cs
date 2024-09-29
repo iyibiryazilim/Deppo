@@ -247,10 +247,12 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
         {
             IsBusy = true;
 
+            // Tıklanan öğe ne olursa olsun bottom sheet açılıyor
+            await LoadShipAddressesAsync(item);
+            CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
+
             if (SalesCustomer == item)
             {
-                await LoadShipAddressesAsync(item);
-                CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
                 SalesCustomer.IsSelected = false;
                 SalesCustomer = null;
             }
