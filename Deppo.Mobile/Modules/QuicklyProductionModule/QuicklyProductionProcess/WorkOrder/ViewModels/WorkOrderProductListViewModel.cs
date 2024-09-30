@@ -118,6 +118,10 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
                 {
                     SelectedProduct.IsSelected = false;
                     SelectedProduct = null;
+                    if(BasketModel is not null)
+                    {
+                        BasketModel.QuicklyBomProduct = null;
+                    }
                 }
                 else
                 {

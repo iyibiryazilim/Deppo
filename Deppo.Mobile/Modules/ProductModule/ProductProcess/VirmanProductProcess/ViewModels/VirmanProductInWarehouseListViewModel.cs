@@ -56,6 +56,7 @@ public partial class VirmanProductInWarehouseListViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<WarehouseModel>(ItemTappedAsync);
         NextViewCommand = new Command(async () => await NextViewAsync());
+        BackCommand = new Command(async () => await BackAsync());
     }
 
     public Page CurrentPage { get; set; }
@@ -64,6 +65,8 @@ public partial class VirmanProductInWarehouseListViewModel : BaseViewModel
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
+    public Command BackCommand { get; }
+
 
     private async Task LoadItemsAsync()
     {
@@ -212,6 +215,35 @@ public partial class VirmanProductInWarehouseListViewModel : BaseViewModel
         catch (Exception ex)
         {
             _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+            var confirm = await _userDialogs.ConfirmAsync("İşlemi iptal etmek istediğinize emin misiniz?", "İptal", "Evet", "Hayır");
+            if (!confirm)
+                return;
+            if (SelectedWarehouseModel != null)
+            {
+                SelectedWarehouseModel.IsSelected = false;
+                SelectedWarehouseModel = null;
+            }
+
+            await Shell.Current.GoToAsync($"..");
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
