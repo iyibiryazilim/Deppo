@@ -38,6 +38,9 @@ public partial class CountingInputReferenceProductListViewModel : BaseViewModel
         _httpClientService = httpClientService;
         _countingPanelService = countingPanelService;
         _userDialogs = userDialogs;
+
+        Title = "Artan Referans Ürün Listesi";
+
           BackCommand = new Command(async () => await BackAsync());
         ItemTappedCommand = new Command<ProductModel>(async (product) => await ItemTappedAsync(product));
           LoadItemsCommand = new Command(async () => await LoadItemsAsync());

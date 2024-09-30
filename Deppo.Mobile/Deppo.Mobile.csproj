@@ -121,6 +121,9 @@
 	  <MauiXaml Update="Modules\CountingModule\CountingPanel\Views\CountingOutputReferenceProductListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\CountingPanel\Views\CountingTransactionsListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\CountingModule\CountingProcess\ProductCountingProcess\Views\ProductCountingBasketView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
