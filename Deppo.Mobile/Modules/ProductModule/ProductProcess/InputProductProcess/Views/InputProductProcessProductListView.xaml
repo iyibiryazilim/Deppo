@@ -8,15 +8,14 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModels="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels"
              Title="{Binding Title}"
+             Padding="10"
              x:DataType="viewModels:InputProductProcessProductListViewModel"
              Shell.PresentationMode="Modal"
              Shell.TabBarIsVisible="False">
 
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
-                                        EventName="Loaded" />
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
-                                   StatusBarStyle="Default" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -27,26 +26,37 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android"
-                Value="artboard.png" />
+            <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
     <Grid Grid.Row="0"
-          RowDefinitions="Auto,Auto,*,Auto,Auto">
+          RowDefinitions="Auto,Auto,*,Auto,Auto"
+          RowSpacing="10">
+        <Grid Grid.Row="0"
+              ColumnDefinitions="*, Auto"
+              ColumnSpacing="10">
+            <Label Grid.Column="0"
+                   FontAttributes="Bold"
+                   FontSize="Medium"
+                   Text="Ürün Listesi"
+                   TextColor="{StaticResource WhiteSmoke}"
+                   VerticalOptions="Center" />
 
-        <ImageButton Grid.Row="0"
-                     Command="{Binding BackCommand}"
-                     HeightRequest="25"
-                     HorizontalOptions="End">
-            <ImageButton.Source>
-                <FontImageSource FontFamily="FAS"
-                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
-                                 Color="{StaticResource WhiteSmoke}" />
-            </ImageButton.Source>
-        </ImageButton>
+            <ImageButton Grid.Column="1"
+                         Command="{Binding BackCommand}"
+                         HeightRequest="25"
+                         HorizontalOptions="End">
+                <ImageButton.Source>
+                    <FontImageSource FontFamily="FAS"
+                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                                     Size="Medium"
+                                     Color="{StaticResource WhiteSmoke}" />
+                </ImageButton.Source>
+            </ImageButton>
+        </Grid>
         <Border Grid.Row="1"
-                Margin="5,0,5,0"
+                Margin="0,0,0,0"
                 Padding="0"
                 BackgroundColor="{StaticResource PrimaryLight}"
                 HeightRequest="35"
@@ -76,11 +86,9 @@
                             StrokeShape="RoundRectangle 10"
                             StrokeThickness="0.1">
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessProductListViewModel}}, Path=ItemTappedCommand}"
-                                                  CommandParameter="{Binding .}" />
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessProductListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>
-                        <Grid ColumnDefinitions="Auto,*, Auto"
-                              ColumnSpacing="10">
+                        <Grid ColumnDefinitions="Auto,*, Auto" ColumnSpacing="10">
                             <Border BackgroundColor="{StaticResource Secondary}"
                                     StrokeShape="RoundRectangle 5"
                                     StrokeThickness="0.5">
@@ -90,8 +98,7 @@
                                        WidthRequest="50" />
                             </Border>
 
-                            <VerticalStackLayout Grid.Column="1"
-                                                 Spacing="2">
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
                                 <Label x:Name="itemReferenceId"
                                        IsVisible="Hidden"
                                        Text="{Binding ReferenceId}" />
@@ -102,8 +109,7 @@
                                        Text="{Binding Name}"
                                        TextColor="{StaticResource Gray600}" />
 
-                                <Label TextColor="{StaticResource Gray600}"
-                                       VerticalOptions="Center">
+                                <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
                                     <Label.FormattedText>
                                         <FormattedString>
                                             <Span FontAttributes="Bold"
@@ -123,10 +129,26 @@
                                 </Label>
                             </VerticalStackLayout>
 
-                            <Grid ColumnDefinitions="Auto, Auto, Auto" ColumnSpacing="3" HorizontalOptions="End" VerticalOptions="Start" Grid.Column="2"> 
-                                <Label Grid.Column="0" FontFamily="FAS" Text="{Binding VariantIcon}" TextColor="{Binding VariantIconColor}" FontSize="10" />
-                                <Label Grid.Column="1" FontFamily="FAS" Text="{Binding LocTrackingIcon}" TextColor="{Binding LocTrackingIconColor}" FontSize="10" />
-                                <Label Grid.Column="2" FontFamily="FAS" Text="{Binding TrackingTypeIcon}" TextColor="{Binding TrackingTypeIconColor}" FontSize="10" />
+                            <Grid Grid.Column="2"
+                                  ColumnDefinitions="Auto, Auto, Auto"
+                                  ColumnSpacing="3"
+                                  HorizontalOptions="End"
+                                  VerticalOptions="Start">
+                                <Label Grid.Column="0"
+                                       FontFamily="FAS"
+                                       FontSize="10"
+                                       Text="{Binding VariantIcon}"
+                                       TextColor="{Binding VariantIconColor}" />
+                                <Label Grid.Column="1"
+                                       FontFamily="FAS"
+                                       FontSize="10"
+                                       Text="{Binding LocTrackingIcon}"
+                                       TextColor="{Binding LocTrackingIconColor}" />
+                                <Label Grid.Column="2"
+                                       FontFamily="FAS"
+                                       FontSize="10"
+                                       Text="{Binding TrackingTypeIcon}"
+                                       TextColor="{Binding TrackingTypeIconColor}" />
                             </Grid>
                         </Grid>
 
@@ -134,8 +156,7 @@
                             <DataTrigger Binding="{Binding IsSelected}"
                                          TargetType="Border"
                                          Value="True">
-                                <Setter Property="BackgroundColor"
-                                        Value="{StaticResource SecondaryLight}" />
+                                <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
                             </DataTrigger>
                         </Border.Triggers>
                     </Border>
@@ -144,9 +165,8 @@
         </CollectionView>
 
         <Button Grid.Row="3"
-        Margin="5,10,5,10"
                 Command="{Binding ConfirmCommand}"
-                Text="{Binding SelectedProducts.Count,StringFormat='Sepete Ekle : {0}'}" />
+                Text="{Binding SelectedProducts.Count, StringFormat='Sepete Ekle : {0}'}" />
 
         <dx:BottomSheet x:Name="variantBottomSheet"
                         Grid.Row="4"
@@ -161,14 +181,12 @@
                                  Spacing="10"
                                  VerticalOptions="Center">
                 <VerticalStackLayout Spacing="5">
-                    <Label FontSize="Title"
-                           Text="Ayarlar" />
+                    <Label FontSize="Title" Text="Ayarlar" />
                     <Entry FontSize="Subtitle"
                            Placeholder="http://172.16.1.25:52789"
                            Text="test" />
                 </VerticalStackLayout>
-                <Button Text="Kaydet"
-                        VerticalOptions="End" />
+                <Button Text="Kaydet" VerticalOptions="End" />
             </VerticalStackLayout>
 
             <!--#endregion-->
