@@ -198,8 +198,10 @@ public partial class ManuelCalcViewModel : BaseViewModel
                 var result = await _userDialogs.ConfirmAsync("Çıkıyorsunuz Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
                 if (!result)
                     return;
+                QuicklyBomProductBasketModel.MainLocations.Clear();
 
-                QuicklyBomProductBasketModel.SubProducts.Clear();
+                QuicklyBomProductBasketModel.QuicklyBomProduct = null;
+
                 LocationTransactions.Clear();
                 SelectedLocationTransactions.Clear();
 
