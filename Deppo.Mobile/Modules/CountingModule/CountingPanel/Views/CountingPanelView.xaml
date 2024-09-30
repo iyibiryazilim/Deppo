@@ -84,6 +84,9 @@
                     Stroke="{StaticResource Primary}"
                     StrokeShape="RoundRectangle 10"
                     StrokeThickness="0.1">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding InCountingReferenceProductCommand}" />
+                    </Border.GestureRecognizers>
                     <VerticalStackLayout Spacing="5" VerticalOptions="End">
                         <Label
                             FontAttributes="Bold"
@@ -218,12 +221,41 @@
             Grid.Row="2"
             RowDefinitions="Auto,*"
             RowSpacing="10">
-            <Label
-                Grid.Row="0"
-                FontAttributes="Bold"
-                FontSize="Subtitle"
-                Text="Son Hareketler"
-                TextColor="{StaticResource OffBlack}" />
+            <Grid ColumnDefinitions="*, Auto"  ColumnSpacing="10">
+                <Label
+     Grid.Row="0"
+     FontAttributes="Bold"
+     FontSize="Subtitle"
+     Text="Son Hareketler"
+     TextColor="{StaticResource OffBlack}" />
+
+                <Border Grid.Column="1"
+                        Padding="5"
+                        BackgroundColor="{StaticResource Primary}"
+                        HorizontalOptions="End"
+                        Stroke="{StaticResource Primary}"
+                        StrokeShape="RoundRectangle 10">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GetAllTransactionsCommand}" />
+                    </Border.GestureRecognizers>
+                    <Label FontFamily="FAS"
+                           FontSize="15"
+                           TextColor="{StaticResource White}">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span FontAttributes="Bold"
+                                      Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                      TextColor="{StaticResource White}" />
+                                <Span Text=" " />
+                                <Span FontAttributes="Bold"
+                                      Text="Tümü"
+                                      TextColor="{StaticResource White}" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </Border>
+            </Grid>
+           
 
             <CollectionView Grid.Row="1" ItemsSource="{Binding CountingPanelModel.LastCountingFiche}">
                 <CollectionView.ItemTemplate>
