@@ -201,20 +201,15 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                     foreach (var subProduct in QuicklyBomProductBasketModel.SubProducts)
                     {
                         subProduct.SubBOMQuantity = 0;
-                        subProduct.LocationTransactions.Clear();
-                        subProduct.SubAmount = default;
-                        subProduct.ProductModel = null;
                         subProduct.ProductModel.Amount = subProduct.SubAmount;
                         subProduct.LocationTransactions.Clear();
-                        QuicklyBomProductBasketModel.SubProducts.Clear();
-
+                        subProduct.LocationTransactions.Clear();
                     }
                 }
                 Locations.Clear();
                 SelectedLocations.Clear();
                 QuicklyBomProductBasketModel.MainLocations.Clear();
-                QuicklyBomProductBasketModel.QuicklyBomProduct = null;
-                QuicklyBomProductBasketModel.MainAmount = 0;
+                QuicklyBomProductBasketModel.QuicklyBomProduct.Amount = QuicklyBomProductBasketModel.MainAmount;
                 QuicklyBomProductBasketModel.BOMQuantity = 0;
                 LocationTransactions.Clear();
                 SelectedLocationTransactions.Clear();
