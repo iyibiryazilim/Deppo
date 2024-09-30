@@ -52,6 +52,9 @@
                         Stroke="{StaticResource Primary}"
                         StrokeShape="RoundRectangle 10"
                         StrokeThickness="0.2">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ProductInputTappedCommand}" />
+                    </Border.GestureRecognizers>
                     <VerticalStackLayout Spacing="10" VerticalOptions="End">
                         <Label FontAttributes="Bold"
                                FontSize="45"
@@ -71,7 +74,9 @@
                         Stroke="{StaticResource Primary}"
                         StrokeShape="RoundRectangle 10"
                         StrokeThickness="0.2">
-
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ProductOutputTappedCommand}" />
+                    </Border.GestureRecognizers>
                     <VerticalStackLayout Spacing="10" VerticalOptions="End">
                         <Label FontAttributes="Bold"
                                FontSize="45"

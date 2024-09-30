@@ -9,6 +9,7 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
+using Deppo.Mobile.Modules.ProductModule.ProductPanel.Views;
 using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views;
 using DevExpress.Maui.Controls;
@@ -38,14 +39,19 @@ public partial class ProductPanelViewModel : BaseViewModel
 		ItemTappedCommand = new Command<ProductFiche>(async (productFiche) => await ItemTappedAsync(productFiche));
 		WarehouseTappedCommand = new Command<WarehouseModel>(async (warehouseModel) => await WarehouseTappedAsync(warehouseModel));
 		ProductTappedCommand = new Command<ProductModel>(async (productModel) => await ProductTappedAsync(productModel));
+		ProductInputTappedCommand = new Command(async () => await ProductInputTappedAsync());
+		ProductOutputTappedCommand = new Command(async () => await ProductOutputTappedAsync());
 	}
 
 	public Page CurrentPage { get; set; }
 
 	public Command LoadItemsCommand { get; }
 	public Command ItemTappedCommand { get; }
+
 	public Command<WarehouseModel> WarehouseTappedCommand { get; }
 	public Command<ProductModel> ProductTappedCommand { get; }
+	public Command ProductInputTappedCommand { get; }
+	public Command ProductOutputTappedCommand { get; }
 
 	public async Task LoadItemsAsync()
 	{
@@ -329,6 +335,52 @@ public partial class ProductPanelViewModel : BaseViewModel
 		catch (Exception ex)
 		{
 			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task ProductInputTappedAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			await Shell.Current.GoToAsync($"{nameof(InputProductListView)}");
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task ProductOutputTappedAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			await Shell.Current.GoToAsync($"{nameof(OutputProductListView)}");
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
