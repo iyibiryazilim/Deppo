@@ -510,6 +510,56 @@ public class ProductPanelDataStore : IProductPanelService
 		}
 	}
 
+	public async Task<DataResult<IEnumerable<dynamic>>> GetAllTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int skip = 0, int take = 20)
+	{
+		var content = new StringContent(JsonConvert.SerializeObject(GetAllTransactionsQuery(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
+
+		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+		if (responseMessage.IsSuccessStatusCode)
+		{
+			var data = await responseMessage.Content.ReadAsStringAsync();
+			if (data != null)
+			{
+				if (!string.IsNullOrEmpty(data))
+				{
+					var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+
+					dataResult.Data = result?.Data;
+					dataResult.IsSuccess = true;
+					dataResult.Message = "success";
+					return dataResult;
+				}
+				else
+				{
+					var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+					dataResult.Data = result?.Data;
+					dataResult.IsSuccess = true;
+					dataResult.Message = "empty";
+					return dataResult;
+				}
+			}
+			else
+			{
+				var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+				dataResult.Data = Enumerable.Empty<dynamic>();
+				dataResult.IsSuccess = false;
+				dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+				return dataResult;
+			}
+		}
+		else
+		{
+			dataResult.Data = Enumerable.Empty<dynamic>();
+			dataResult.IsSuccess = false;
+			dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+			return dataResult;
+		}
+	}
+
 
 	private string GetLastFiche(int firmNumber, int periodNumber)
     {
@@ -860,6 +910,43 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
 		WHERE STLINE.IOCODE IN (3,4) AND STFICHE.GRPCODE = 3 AND ITEMS.LOGICALREF = {productReferenceId} AND STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0
 		ORDER BY STLINE.DATE_ DESC";
 
+		return baseQuery;
+	}
+
+
+	private string GetAllTransactionsQuery(int firmNumber, int periodNumber, int skip = 0, int take = 20)
+	{
+		string baseQuery = $@"SELECT
+        [ReferenceId] = STLINE.LOGICALREF,
+        [TransactionDate] = STLINE.DATE_,
+        [TransactionTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
+		[BaseTransactionReferenceId] = STFICHE.LOGICALREF,
+        [BaseTransactionCode] = STFICHE.FICHENO,
+        [TransactionType] = STLINE.TRCODE,
+        [ProductReferenceId] = STLINE.STOCKREF,
+        [ProductCode] = ITEMS.CODE,
+        [ProductName] = ITEMS.NAME,
+        [SubUnitsetCode] = SUBUNITSET.CODE,
+        [SubUnitsetName] = SUBUNITSET.NAME,
+        [SubUnitsetReferenceId] = SUBUNITSET.LOGICALREF,
+        [UnitsetCode] = UNITSET.CODE,
+        [UnitsetReferenceId] = UNITSET.LOGICALREF,
+		[UnitsetName] = UNITSET.NAME,
+        [Quantity] = STLINE.AMOUNT,
+        [Description] = STLINE.LINEEXP,
+        [IOType] = STLINE.IOCODE,
+        [WarehouseNumber] = CAPIWHOUSE.NR,
+        [WarehouseName] = CAPIWHOUSE.NAME
+
+        FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF
+		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
+		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
+		WHERE STFICHE.GRPCODE = 3 AND STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0
+		ORDER BY STLINE.DATE_ DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 		return baseQuery;
 	}
 
