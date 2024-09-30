@@ -204,10 +204,7 @@
                            TextColor="{StaticResource White}">
                         <Label.FormattedText>
                             <FormattedString>
-                                <Span FontAttributes="Bold"
-                                      Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
-                                      TextColor="{StaticResource White}" />
-                                <Span Text=" " />
+                                
                                 <Span FontAttributes="Bold"
                                       Text="Tümü"
                                       TextColor="{StaticResource White}" />

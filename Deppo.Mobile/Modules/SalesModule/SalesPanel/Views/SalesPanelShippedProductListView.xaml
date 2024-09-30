@@ -197,7 +197,7 @@
                                                            TextColor="{StaticResource OffBlack}" />
                                                     <Label HorizontalOptions="Center"
                                                            Text="{Binding TransactionTime, StringFormat='{0:hh\\:mm}'}"
-                                                           TextColor="{StaticResource Gray400}" />
+                                                           TextColor="{StaticResource OffBlack}" />
                                                 </VerticalStackLayout>
                                             </Border>
 
