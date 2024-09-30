@@ -52,6 +52,7 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
 		ItemTappedCommand = new Command<SalesCustomer>(async (customer) => await ItemTappedAsync(customer));
 		NextViewCommand = new Command(async () => await NextViewAsync());
+		BackCommand = new Command(async () => await BackAsync());
 
 		ShowProductsCommand = new Command<SalesCustomer>(async (customer) => await ShowProductsAsync(customer));
 		LoadMoreProductsCommand = new Command(async () => await LoadMoreProductsAsync());
@@ -69,6 +70,7 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 	public Command LoadMoreItemsCommand { get; }
 	public Command ItemTappedCommand { get; }
 	public Command NextViewCommand { get; }
+	public Command BackCommand { get; }
 
 	public Command ShowProductsCommand { get; }
 	public Command LoadMoreProductsCommand { get; }
@@ -457,5 +459,33 @@ public partial class OutputProductSalesProcessCustomerListViewModel : BaseViewMo
 		}
 	}
 
+	private async Task BackAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			if(SalesCustomer is not null)
+			{
+				SalesCustomer.IsSelected = false;
+				SalesCustomer = null;
+			}
+			
+			await Shell.Current.GoToAsync("..");
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 
 }

@@ -24,7 +24,7 @@ public partial class SalesCustomer : ObservableObject
     private string city = string.Empty;
 
     [ObservableProperty]
-    private int shipAddressReferenceId;
+    private int shipAddressReferenceId = 0;
 
     [ObservableProperty]
     private string shipAddressCode = string.Empty;
