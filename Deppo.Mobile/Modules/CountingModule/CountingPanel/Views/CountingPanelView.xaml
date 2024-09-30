@@ -107,6 +107,9 @@
                     Stroke="{StaticResource Primary}"
                     StrokeShape="RoundRectangle 10"
                     StrokeThickness="0.2">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OutCountingReferenceProductCommand}" />
+                    </Border.GestureRecognizers>
                     <VerticalStackLayout Spacing="5" VerticalOptions="End">
                         <Label
                             FontAttributes="Bold"
@@ -154,6 +157,9 @@
                             MaximumWidthRequest="275"
                             StrokeShape="RoundRectangle 10"
                             StrokeThickness="0.1">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:CountingPanelViewModel}}, Path=ProductTappedCommand}" CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
 
                             <Grid ColumnDefinitions="Auto,*, Auto" ColumnSpacing="10">
                                 <Border
