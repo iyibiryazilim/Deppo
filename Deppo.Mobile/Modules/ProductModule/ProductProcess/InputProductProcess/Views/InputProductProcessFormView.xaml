@@ -102,6 +102,7 @@
         </VerticalStackLayout>
 
         <Button Grid.Row="1"
+                Margin="5,10,5,20"
                 Command="{Binding SaveCommand}"
                 Text="Kaydet"
                 VerticalOptions="End" />

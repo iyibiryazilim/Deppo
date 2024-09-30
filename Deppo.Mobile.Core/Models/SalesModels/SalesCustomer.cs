@@ -28,6 +28,8 @@ public partial class SalesCustomer : ObservableObject
 
     [ObservableProperty]
     private string shipAddressCode = string.Empty;
+    [ObservableProperty]
+    private string shipAddressName = string.Empty;
 
     [ObservableProperty]
     private int shipAddressCount;
