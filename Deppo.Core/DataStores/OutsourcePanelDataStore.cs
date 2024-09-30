@@ -160,7 +160,7 @@ public class OutsourcePanelDataStore : IOutsourcePanelService
         }
     }
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetAllOutsourceFiches(HttpClient httpClient, int firmNumber, int periodNumber)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetAllOutsourceFiches(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
     {
         var content = new StringContent(JsonConvert.SerializeObject(GetAllOutsourceFichesQuery(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
 
@@ -489,7 +489,7 @@ END
         return baseQuery;
     }
 
-    private string GetAllOutsourceFichesQuery(int firmNumber, int periodNumber)
+    private string GetAllOutsourceFichesQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
     {
         string baseQuery = $@"Select
             [ReferenceId] = STFICHE.LOGICALREF,
@@ -509,8 +509,12 @@ END
 			left join LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
 			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
 			WHERE STFICHE.TRCODE = 25 AND STFICHE.PRODSTAT = 0 AND STFICHE.CLIENTREF > 0 AND CLCARD.SUBCONT = 1
-			ORDER BY STFICHE.DATE_ DESC;";
+			";
+        if (!string.IsNullOrEmpty(search))
+            baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";
 
+        baseQuery += $@" ORDER BY STFICHE.DATE_ DESC
+OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
         return baseQuery;
     }

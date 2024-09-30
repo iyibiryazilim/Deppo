@@ -9,7 +9,7 @@
              Title="{Binding Title}"
              x:DataType="viewModel:OutsourcePanelAllFicheListViewModel"
              Shell.TabBarIsVisible="False"
-             Shell.PresentationMode="Modal">
+             Shell.PresentationMode="ModalAnimated">
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
                                         EventName="Loaded" />
@@ -32,11 +32,31 @@
     <Shell.BackButtonBehavior>
         <BackButtonBehavior Command="{Binding BackCommand}" />
     </Shell.BackButtonBehavior>
-    <Grid RowDefinitions="Auto,Auto"
+    <Grid RowDefinitions="Auto,* "
           RowSpacing="10">
-        <Grid Grid.Row="0">
+        <Grid ColumnDefinitions="*, Auto"
+              Grid.Row="0"
+              Padding="10,10,0,0">
+            <Label Text="{Binding Title}"
+                   TextColor="WhiteSmoke"
+                   FontSize="Title"
+                   FontAttributes="Bold"
+                   Grid.Column="0" />
+
+            <ImageButton Grid.Column="1"
+                         Command="{Binding BackCommand}"
+                         HeightRequest="25"
+                         HorizontalOptions="End">
+                <ImageButton.Source>
+                    <FontImageSource FontFamily="FAS"
+                                     Size="Medium"
+                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                                     Color="{StaticResource WhiteSmoke}" />
+                </ImageButton.Source>
+            </ImageButton>
         </Grid>
         <CollectionView Grid.Row="1"
+                        
                         ItemsSource="{Binding Items}"
                         RemainingItemsThreshold="2"
                         RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">

@@ -57,7 +57,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.ViewModels
                 var result = await _outsourcePanelService.GetAllOutsourceFiches(
                     httpClient: httpClient,
                     firmNumber: _httpClientService.FirmNumber,
-                    periodNumber: _httpClientService.PeriodNumber
+                    periodNumber: _httpClientService.PeriodNumber, search: string.Empty, skip: 0, take: 20
                 );
 
                 if (result.IsSuccess)
@@ -101,7 +101,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.ViewModels
                 var result = await _outsourcePanelService.GetAllOutsourceFiches(
                     httpClient: httpClient,
                     firmNumber: _httpClientService.FirmNumber,
-                    periodNumber: _httpClientService.PeriodNumber
+                    periodNumber: _httpClientService.PeriodNumber, search: string.Empty, skip: 0, take: 20
                 );
                 if (result.IsSuccess)
                 {

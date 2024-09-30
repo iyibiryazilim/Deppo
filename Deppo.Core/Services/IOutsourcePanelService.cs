@@ -17,7 +17,5 @@ public interface IOutsourcePanelService
 
     public Task<DataResult<dynamic>> GetOutsourceTotalProductCount(HttpClient httpClient, int firmNumber, int periodNumber);
 
-    public Task<DataResult<IEnumerable<dynamic>>> GetAllOutsourceFiches(HttpClient httpClient, int firmNumber, int periodNumber);
-
-
+    public Task<DataResult<IEnumerable<dynamic>>> GetAllOutsourceFiches(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20);
 }

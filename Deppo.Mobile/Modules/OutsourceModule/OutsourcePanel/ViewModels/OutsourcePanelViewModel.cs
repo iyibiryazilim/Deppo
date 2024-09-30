@@ -37,7 +37,7 @@ public partial class OutsourcePanelViewModel : BaseViewModel
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         ItemTappedCommand = new Command<OutsourceFiche>(async (outsourceFiche) => await ItemTappedAsync(outsourceFiche));
-        GoToSupplierDetailCommand = new Command<Supplier>(async (supplier) => await GoToSupplierDetailAsync(supplier));
+        GoToSupplierDetailCommand = new Command<OutsourceModel>(async (supplier) => await GoToSupplierDetailAsync(supplier));
         AddAllFicheCommand = new Command(async () => await AddAllFicheAsync());
     }
 
@@ -313,9 +313,9 @@ public partial class OutsourcePanelViewModel : BaseViewModel
         }
     }
 
-    private async Task GoToSupplierDetailAsync(Supplier supplier)
+    private async Task GoToSupplierDetailAsync(OutsourceModel outsourceModel)
     {
-        if (supplier is null)
+        if (outsourceModel is null)
             return;
         if (IsBusy)
             return;
@@ -324,7 +324,28 @@ public partial class OutsourcePanelViewModel : BaseViewModel
             IsBusy = true;
 
             SupplierDetailModel supplierDetailModel = new();
-            supplierDetailModel.Supplier = supplier;
+
+            Supplier newSupplier = new();
+            newSupplier.ReferenceId = outsourceModel.ReferenceId;
+            newSupplier.Name = outsourceModel.Name;
+            newSupplier.FirstName = outsourceModel.FirstName;
+            newSupplier.LastName = outsourceModel.LastName;
+            newSupplier.Address = outsourceModel.Address;
+            newSupplier.City = outsourceModel.City;
+            newSupplier.Email = outsourceModel.Email;
+            newSupplier.Code = outsourceModel.Code;
+            newSupplier.Country = outsourceModel.Country;
+            newSupplier.IsActive = outsourceModel.IsActive;
+            newSupplier.IsPersonal = outsourceModel.IsPersonal;
+            newSupplier.PostalCode = outsourceModel.PostalCode;
+            newSupplier.TaxNumber = outsourceModel.TaxNumber;
+            newSupplier.TaxOffice = outsourceModel.TaxOffice;
+            newSupplier.Tckn = outsourceModel.Tckn;
+            newSupplier.Telephone = outsourceModel.Telephone;
+
+            
+
+            supplierDetailModel.Supplier = newSupplier;
 
             await Shell.Current.GoToAsync($"{nameof(SupplierDetailView)}", new Dictionary<string, object>
             {

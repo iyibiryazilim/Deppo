@@ -148,7 +148,12 @@
                                                 Text="{Binding TitleName}"
                                                 TextColor="{StaticResource White}"
                                                 VerticalOptions="Start"
-                                                WidthRequest="50" />
+                                                WidthRequest="50">
+                                <toolkit:AvatarView.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutsourcePanelViewModel}}, Path=GoToSupplierDetailCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                </toolkit:AvatarView.GestureRecognizers>
+                            </toolkit:AvatarView>
 
                             <Label LineBreakMode="TailTruncation"
                                    MaxLines="1"
@@ -160,8 +165,7 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
             <Grid.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutsourcePanelViewModel}}, Path=GoToSupplierDetailCommand}"
-                                      CommandParameter="{Binding .}" />
+                
             </Grid.GestureRecognizers>
         </Grid>
 
@@ -202,8 +206,6 @@
                     </Border.GestureRecognizers>
                 </Border>
             </Grid>
-
-
 
             <CollectionView Grid.Row="1"
                             ItemsSource="{Binding OutsourcePanelModel.LastOutsourceFiche}">
