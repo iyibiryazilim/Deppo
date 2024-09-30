@@ -274,7 +274,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<ISalesDispatchTransactionService, SalesDispatchTransactionDataStore>();
         builder.Services.AddSingleton<IOutsourceService, OutsourceDataStore>();
         builder.Services.AddSingleton<IWarehouseCountingService, WarehouseCountingDataStore>();
-        builder.Services.AddSingleton<IProductCountingService,ProductCountingDataStore>();
+        builder.Services.AddSingleton<IProductCountingService, ProductCountingDataStore>();
 
         builder.Services.AddSingleton<IQuicklyBomService, QuicklyBomDataStore>();
         builder.Services.AddSingleton<IOutsourcePanelService, OutsourcePanelDataStore>();
@@ -497,22 +497,23 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddScopedWithShellRoute<WarehouseCountingProductListView, WarehouseCountingProductListViewModel>(nameof(WarehouseCountingProductListView));
         builder.Services.AddScopedWithShellRoute<WarehouseCountingFormView, WarehouseCountingFormViewModel>(nameof(WarehouseCountingFormView));
 
-		#endregion Ambara Gore Sayim
+        #endregion Ambara Gore Sayim
 
-		#region Urune Gore Sayim
-		builder.Services.AddScopedWithShellRoute<ProductCountingProductListView, ProductCountingProductListViewModel>(nameof(ProductCountingProductListView));
-		builder.Services.AddScopedWithShellRoute<ProductCountingWarehouseTotalListView, ProductCountingWarehouseTotalListViewModel>(nameof(ProductCountingWarehouseTotalListView));
-		builder.Services.AddScopedWithShellRoute<ProductCountingLocationListView, ProductCountingLocationListViewModel>(nameof(ProductCountingLocationListView));
-		builder.Services.AddScopedWithShellRoute<ProductCountingBasketView, ProductCountingBasketViewModel>(nameof(ProductCountingBasketView));
-		builder.Services.AddScopedWithShellRoute<ProductCountingFormView, ProductCountingFormViewModel>(nameof(ProductCountingFormView));
+        #region Urune Gore Sayim
 
-		#endregion
+        builder.Services.AddScopedWithShellRoute<ProductCountingProductListView, ProductCountingProductListViewModel>(nameof(ProductCountingProductListView));
+        builder.Services.AddScopedWithShellRoute<ProductCountingWarehouseTotalListView, ProductCountingWarehouseTotalListViewModel>(nameof(ProductCountingWarehouseTotalListView));
+        builder.Services.AddScopedWithShellRoute<ProductCountingLocationListView, ProductCountingLocationListViewModel>(nameof(ProductCountingLocationListView));
+        builder.Services.AddScopedWithShellRoute<ProductCountingBasketView, ProductCountingBasketViewModel>(nameof(ProductCountingBasketView));
+        builder.Services.AddScopedWithShellRoute<ProductCountingFormView, ProductCountingFormViewModel>(nameof(ProductCountingFormView));
 
-		#endregion Counting Modules
+        #endregion Urune Gore Sayim
 
-		#region Quickly Production Modules
+        #endregion Counting Modules
 
-		builder.Services.AddSingletonWithShellRoute<QuicklyProductionPanelView, QuicklyProductionPanelViewModel>(nameof(QuicklyProductionPanelView));
+        #region Quickly Production Modules
+
+        builder.Services.AddSingletonWithShellRoute<QuicklyProductionPanelView, QuicklyProductionPanelViewModel>(nameof(QuicklyProductionPanelView));
         builder.Services.AddSingletonWithShellRoute<QuicklyProductionBOMMenuView, QuicklyProductionBOMMenuViewModel>(nameof(QuicklyProductionBOMMenuView));
         builder.Services.AddSingletonWithShellRoute<QuicklyProductionProcessView, QuicklyProductionProcessViewModel>(nameof(QuicklyProductionProcessView));
 
@@ -558,6 +559,12 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferBasketListView, OutputOutsourceTransferBasketListViewModel>(nameof(OutputOutsourceTransferBasketListView));
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferProductListView, OutputOutsourceTransferProductListViewModel>(nameof(OutputOutsourceTransferProductListView));
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferFormView, OutputOutsourceTransferFormViewModel>(nameof(OutputOutsourceTransferFormView));
+
+        #region OutSource Panel
+
+        builder.Services.AddScopedWithShellRoute<OutsourcePanelAllFicheListView, OutsourcePanelAllFicheListViewModel>(nameof(OutsourcePanelAllFicheListView));
+
+        #endregion
 
         #endregion Outsource Modules
 
