@@ -150,14 +150,15 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
 
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
                 var customerOrders = await _salesCustomerProductService.GetObjects(
-                    httpClient: httpClient,
-                    firmNumber: _httpClientService.FirmNumber,
-                    periodNumber: _httpClientService.PeriodNumber,
-                    customerReferenceId: selectedItem.ReferenceId,
-                    warehouseNumber: WarehouseModel.Number,
-                    skip: 0,
-                    take: 20
-                );
+					httpClient: httpClient,
+					firmNumber: _httpClientService.FirmNumber,
+					periodNumber: _httpClientService.PeriodNumber,
+					customerReferenceId: selectedItem.ReferenceId,
+					warehouseNumber: WarehouseModel.Number,
+                    search: "",
+					skip: 0,
+					take: 20
+				);
 
                 if (customerOrders.IsSuccess)
                 {

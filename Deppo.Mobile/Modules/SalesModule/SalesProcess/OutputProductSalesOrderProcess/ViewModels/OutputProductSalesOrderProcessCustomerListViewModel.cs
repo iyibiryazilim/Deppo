@@ -154,6 +154,8 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 
     private async Task SwipeItemAsync(SalesCustomer selectedItem)
     {
+        if (selectedItem is null)
+            return;
         if (IsBusy)
             return;
         try
@@ -241,30 +243,43 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 
     private async Task ItemTappedAsync(SalesCustomer item)
     {
+        if (item is null)
+            return;
         if (IsBusy)
             return;
         try
         {
             IsBusy = true;
 
-            // Tıklanan öğe ne olursa olsun bottom sheet açılıyor
-            await LoadShipAddressesAsync(item);
-            CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
-
-            if (SalesCustomer == item)
-            {
-                SalesCustomer.IsSelected = false;
+            if (SalesCustomer is not null)
+			{
+				SalesCustomer.IsSelected = false;
                 SalesCustomer = null;
-            }
+			}
+
+            SalesCustomer = item;
+            if(item.ShipAddressCount > 0)
+            {
+				await LoadShipAddressesAsync(item);
+				CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
+			}
             else
             {
-                if (SalesCustomer is not null)
-                {
-                    SalesCustomer.IsSelected = false;
-                }
-                SalesCustomer = item;
-                SalesCustomer.IsSelected = true;
-            }
+				if (SalesCustomer == item)
+				{
+					SalesCustomer.IsSelected = false;
+					SalesCustomer = null;
+				}
+				else
+				{
+					if (SalesCustomer is not null)
+					{
+						SalesCustomer.IsSelected = false;
+					}
+					SalesCustomer = item;
+					SalesCustomer.IsSelected = true;
+				}
+			}
         }
         catch (Exception ex)
         {
@@ -358,7 +373,15 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
             {
                 SalesCustomer.ShipAddressReferenceId = selectedShipAddress.ReferenceId;
                 SalesCustomer.ShipAddressCode = selectedShipAddress.Code;
-                CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.Hidden;
+                SalesCustomer.ShipAddressName = selectedShipAddress.Name;
+
+				if (SalesCustomer is not null)
+				{
+					SalesCustomer.IsSelected = true;
+				}
+				
+
+				CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.Hidden;
             }
             else
             {
