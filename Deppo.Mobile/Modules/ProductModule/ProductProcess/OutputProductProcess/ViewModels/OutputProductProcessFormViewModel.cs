@@ -30,8 +30,9 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
     private readonly IWastageTransactionService _wastageTransactionService;
     private readonly IOutCountingTransactionService _outCountingTransactionService;
     private readonly IUserDialogs _userDialogs;
+    private readonly IServiceProvider _serviceProvider;
 
-	[ObservableProperty]
+    [ObservableProperty]
 	OutputProductProcessType outputProductProcessType;
 
 	[ObservableProperty]
@@ -57,20 +58,20 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 	string specialCode = string.Empty;
 
 
-    public OutputProductProcessFormViewModel(IHttpClientService httpClientService, IConsumableTransactionService consumableTransactionService, IUserDialogs userDialogs, IWastageTransactionService wastageTransactionService, IOutCountingTransactionService outCountingTransactionService)
+    public OutputProductProcessFormViewModel(IHttpClientService httpClientService, IConsumableTransactionService consumableTransactionService, IUserDialogs userDialogs, IWastageTransactionService wastageTransactionService, IOutCountingTransactionService outCountingTransactionService, IServiceProvider serviceProvider)
     {
         _httpClientService = httpClientService;
         _consumableTransactionService = consumableTransactionService;
         _wastageTransactionService = wastageTransactionService;
         _outCountingTransactionService = outCountingTransactionService;
         _userDialogs = userDialogs;
+        _serviceProvider = serviceProvider;
 
         Items = new();
         SaveCommand = new Command(async () => await SaveAsync());
         LoadPageCommand = new Command(async () => await LoadPageAsync());
         ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
         BackCommand = new Command(async () => await BackAsync());
-
     }
     public Page CurrentPage { get; set; }
 
@@ -245,8 +246,12 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
             resultModel.PageTitle = Title;
             resultModel.PageCountToBack = 4;
 
+            await ClearFormAsync();
+
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
+
+
 
             await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
             {
@@ -326,6 +331,7 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
             resultModel.PageTitle = Title;
             resultModel.PageCountToBack = 4;
 
+            await ClearFormAsync();
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
 
@@ -410,6 +416,7 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
 
+            await ClearFormAsync();
             await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
             {
                 [nameof(ResultModel)] = resultModel
@@ -442,11 +449,7 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 			if (!confirm)
 				return;
 
-            DocumentNumber = string.Empty;
-            TransactionDate = DateTime.Now;
-            Description = string.Empty;
-            DocumentTrackingNumber = string.Empty;
-            SpecialCode = string.Empty;
+            await ClearFormAsync();
 
             await Shell.Current.GoToAsync("..");
 		}
@@ -472,7 +475,27 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 			Description = string.Empty;
 			DocumentTrackingNumber = string.Empty;
 			SpecialCode = string.Empty;
-		}
+
+            var basketViewModel = _serviceProvider.GetRequiredService<OutputProductProcessBasketListViewModel>();
+            var productListViewModel = _serviceProvider.GetRequiredService<OutputProductProcessProductListViewModel>();
+            var warehouseListViewModel = _serviceProvider.GetRequiredService<OutputProductProcessWarehouseListViewModel>();
+
+            foreach (var item in productListViewModel.Items)
+                item.IsSelected = false;
+            
+            productListViewModel.Items.Clear();
+            productListViewModel.SelectedProducts.Clear();
+
+            foreach (var item in basketViewModel.Items)
+                item.Details.Clear();
+           
+            basketViewModel.Items.Clear();
+
+            foreach (var item in warehouseListViewModel.Items)
+                item.IsSelected = false;
+            
+            warehouseListViewModel.SelectedWarehouseModel = null;
+        }
         catch (Exception ex)
         {
 			if (_userDialogs.IsHudShowing)

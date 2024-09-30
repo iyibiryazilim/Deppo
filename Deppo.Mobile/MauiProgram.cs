@@ -354,6 +354,9 @@ public static class MauiProgram
         #region Sales Modules
 
         builder.Services.AddSingletonWithShellRoute<SalesPanelView, SalesPanelViewModel>(nameof(SalesPanelView));
+        builder.Services.AddSingletonWithShellRoute<SalesPanelWaitingProductListView, SalesPanelWaitingProductListViewModel>(nameof(SalesPanelWaitingProductListView));
+        builder.Services.AddSingletonWithShellRoute<SalesPanelShippedProductListView, SalesPanelShippedProductListViewModel>(nameof(SalesPanelShippedProductListView));
+        builder.Services.AddSingletonWithShellRoute<SalesPanelAllFicheListView, SalesPanelAllFicheListViewModel>(nameof(SalesPanelAllFicheListView));
         builder.Services.AddSingletonWithShellRoute<CustomerListView, CustomerListViewModel>(nameof(CustomerListView));
         builder.Services.AddSingletonWithShellRoute<CustomerDetailView, CustomerDetailViewModel>(nameof(CustomerDetailView));
         builder.Services.AddSingletonWithShellRoute<CustomerInputTransactionView, CustomerInputTransactionViewModel>(nameof(CustomerInputTransactionView));
