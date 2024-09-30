@@ -297,7 +297,10 @@ public static class MauiProgram
         #region Product Modules
 
         builder.Services.AddSingletonWithShellRoute<ProductPanelView, ProductPanelViewModel>(nameof(ProductPanelView));
-        builder.Services.AddSingletonWithShellRoute<ProductListView, ProductListViewModel>(nameof(ProductListView));
+        builder.Services.AddTransientWithShellRoute<InputProductListView, InputProductListViewModel>(nameof(InputProductListView));
+		builder.Services.AddTransientWithShellRoute<OutputProductListView, OutputProductListViewModel>(nameof(OutputProductListView));
+
+		builder.Services.AddSingletonWithShellRoute<ProductListView, ProductListViewModel>(nameof(ProductListView));
         builder.Services.AddScopedWithShellRoute<ProductDetailView, ProductDetailViewModel>(nameof(ProductDetailView));
         builder.Services.AddSingletonWithShellRoute<ProductInputTransactionView, ProductInputTransactionViewModel>(nameof(ProductInputTransactionView));
         builder.Services.AddSingletonWithShellRoute<ProductOutputTransactionView, ProductOutputTransactionViewModel>(nameof(ProductOutputTransactionView));
