@@ -510,9 +510,60 @@ public class CountingPanelDataStore : ICountingPanelService
     }
 
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetAllCountingTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int skip = 0, int take = 20)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetAllCountingTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId,int skip = 0, int take = 20)
     {
-        var content = new StringContent(JsonConvert.SerializeObject(GetAllCountingTransactionsQuery(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(GetAllCountingTransactionsQuery(firmNumber, periodNumber,ficheReferenceId)), Encoding.UTF8, "application/json");
+
+        HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+        DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            var data = await responseMessage.Content.ReadAsStringAsync();
+            if (data != null)
+            {
+                if (!string.IsNullOrEmpty(data))
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "success";
+                    return dataResult;
+                }
+                else
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "empty";
+                    return dataResult;
+                }
+            }
+            else
+            {
+                var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                dataResult.Data = Enumerable.Empty<dynamic>();
+                dataResult.IsSuccess = false;
+                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+                return dataResult;
+            }
+        }
+        else
+        {
+            dataResult.Data = Enumerable.Empty<dynamic>();
+            dataResult.IsSuccess = false;
+            dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+            return dataResult;
+        }
+    }
+
+
+    public async Task<DataResult<IEnumerable<dynamic>>> GetCountingFiches(HttpClient httpClient, int firmNumber, int periodNumber ,int skip = 0, int take = 20)
+    {
+        var content = new StringContent(JsonConvert.SerializeObject(GetCountingFichesQuery(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -888,7 +939,7 @@ ORDER BY MAX(STLINE.DATE_) DESC  OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY;
     }
 
 
-    private string GetAllCountingTransactionsQuery(int firmNumber, int periodNumber, int skip = 0, int take = 20)
+    private string GetAllCountingTransactionsQuery(int firmNumber, int periodNumber, int ficheReferenceId,int skip = 0, int take = 20)
     {
         string baseQuery = $@"SELECT
         [ReferenceId] = STLINE.LOGICALREF,
@@ -919,8 +970,34 @@ ORDER BY MAX(STLINE.DATE_) DESC  OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY;
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
 		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
-		WHERE STFICHE.TRCODE IN(50,51) AND  STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0
+		WHERE STFICHE.TRCODE IN(50,51) AND STFICHE.LOGICALREF = {ficheReferenceId} AND  STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0
 		ORDER BY STLINE.DATE_ DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+        return baseQuery;
+    }
+
+
+
+    private string GetCountingFichesQuery(int firmNumber, int periodNumber , int skip = 0, int take = 20)
+    {
+        string baseQuery = $@"Select
+            [ReferenceId] = STFICHE.LOGICALREF,
+			[FicheType] = STFICHE.TRCODE,
+			[FicheNumber] = STFICHE.FICHENO,
+            [FicheDate] = STFICHE.DATE_,
+            [FicheTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
+			[DocumentNumber] =ISNULL (STFICHE.DOCODE , ''),			
+			[SpecialCode] = ISNULL  ( STFICHE.SPECODE , ''),
+			[CurrentReferenceID] = ISNULL ( CLCARD.LOGICALREF, 0),
+			[CurrentCode] = ISNULL (CLCARD.CODE , '' ),
+			[CurrentName] = ISNULL ( CLCARD.DEFINITION_ ,''),
+			[WarehouseName] =  ISNULL (CAPIWHOUSE.NAME , ''),
+			[WarehouseNumber] = ISNULL( CAPIWHOUSE.NR, 0),
+			[Description] =  ISNULL (STFICHE.GENEXP1, '')
+			From LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
+			left join LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
+			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
+			WHERE STFICHE.TRCODE IN(50,51) AND STFICHE.PRODSTAT = 0
+			ORDER BY STFICHE.DATE_ DESC  OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY;";
 
         return baseQuery;
     }

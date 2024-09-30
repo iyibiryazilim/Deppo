@@ -25,6 +25,8 @@ public interface ICountingPanelService
 
     public Task<DataResult<dynamic>> GetOutCountingTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId);
 
-    public Task<DataResult<IEnumerable<dynamic>>> GetAllCountingTransactions(HttpClient httpClient, int firmNumber, int periodNumber , int skip = 0, int take = 20);
+    public Task<DataResult<IEnumerable<dynamic>>> GetAllCountingTransactions(HttpClient httpClient, int firmNumber, int periodNumber,int ficheReferenceId , int skip = 0, int take = 20);
+
+    public Task<DataResult<IEnumerable<dynamic>>> GetCountingFiches(HttpClient httpClient, int firmNumber, int periodNumber, int skip = 0, int take = 20);
 
 }
