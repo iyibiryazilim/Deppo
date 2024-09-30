@@ -7,7 +7,6 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using DevExpress.Maui.Controls;
-using Org.Apache.Http.Conn.Params;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductPanel.ViewModels;
@@ -30,18 +29,21 @@ public partial class InputProductListViewModel : BaseViewModel
 		_httpClientService = httpClientService;
 		_productPanelService = productPanelService;
 		_userDialogs = userDialogs;
+
+		Title = "Giriş Hareketleri Listesi";
+
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+		ItemTappedCommand = new Command<ProductModel>(async (product) => await ItemTappedAsync(product));
+		BackCommand = new Command(async () => await BackAsync());
 	}
 
 	public Page CurrentPage { get; set; } = null!;
 
-	public Command LoadItemsCommand { get;}
-	public Command LoadMoreItemsCommand { get;}
+	public Command LoadItemsCommand { get; }
+	public Command LoadMoreItemsCommand { get; }
 	public Command ItemTappedCommand { get; }
 	public Command BackCommand { get; }
-
-
 
 	private async Task LoadItemsAsync()
 	{
@@ -53,7 +55,7 @@ public partial class InputProductListViewModel : BaseViewModel
 
 			_userDialogs.Loading("Load Items...");
 			await Task.Delay(1000);
-			// List.Clear();
+			Items.Clear();
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
 			var result = await _productPanelService.GetInputProduct(
@@ -65,7 +67,7 @@ public partial class InputProductListViewModel : BaseViewModel
 				take: 20
 			);
 
-			if(result.IsSuccess)
+			if (result.IsSuccess)
 			{
 				if (result.Data is null)
 					return;
@@ -76,6 +78,8 @@ public partial class InputProductListViewModel : BaseViewModel
 					Items.Add(obj);
 				}
 			}
+
+			_userDialogs.HideHud();
 		}
 		catch (Exception ex)
 		{
@@ -99,7 +103,7 @@ public partial class InputProductListViewModel : BaseViewModel
 			IsBusy = true;
 
 			_userDialogs.Loading("Load More Items...");
-		
+
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
 			var result = await _productPanelService.GetInputProduct(
@@ -122,8 +126,10 @@ public partial class InputProductListViewModel : BaseViewModel
 					Items.Add(obj);
 				}
 			}
+
+			_userDialogs.HideHud();
 		}
-		catch (Exception ex) 
+		catch (Exception ex)
 		{
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
