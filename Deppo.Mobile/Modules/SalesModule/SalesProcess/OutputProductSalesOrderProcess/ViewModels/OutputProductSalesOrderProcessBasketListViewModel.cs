@@ -386,7 +386,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 
 
 				var totalOutputQuantity = SelectedLocationTransactions.Sum(x => (double)x.OutputQuantity);
-				SelectedItem.Quantity = totalOutputQuantity;
+				SelectedItem.OutputQuantity = totalOutputQuantity;
 
 				CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.Hidden;
 			}

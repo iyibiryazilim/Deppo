@@ -218,6 +218,14 @@ public partial class ManuelProductListViewModel : BaseViewModel
             {
                 SelectedProduct.IsSelected = false;
                 SelectedProduct = null;
+                if(BasketModel is not null)
+                {
+                    BasketModel.WarehouseNumber = default;
+                    BasketModel.WarehouseName = string.Empty;
+                    BasketModel.BOMQuantity = default;
+                    if(BasketModel.QuicklyBomProduct is not null)
+                    BasketModel.QuicklyBomProduct = null;
+                }
             }
 
             await Shell.Current.GoToAsync($"..");

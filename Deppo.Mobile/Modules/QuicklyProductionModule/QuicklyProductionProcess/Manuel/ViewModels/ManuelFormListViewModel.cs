@@ -172,6 +172,9 @@ public partial class ManuelFormListViewModel : BaseViewModel
                     resultModel.Message = "Hızlı üretim için Üretimden Giriş Ve Sarf Başarılı";
                     resultModel.PageTitle = Title;
                     resultModel.PageCountToBack = 7;
+                    QuicklyBomProductBasketModel.QuicklyBomProduct = null;
+                    QuicklyBomProductBasketModel.WarehouseNumber= default;
+                    Cleans();
 
                     if (_userDialogs.IsHudShowing)
                         _userDialogs.HideHud();
@@ -188,6 +191,7 @@ public partial class ManuelFormListViewModel : BaseViewModel
 
                     resultModel.Message = "Hızlı Üretim Için Sarf Başarılı Üretimden Giriş Başarısız";
                     resultModel.Code = resultModel.Code;
+
                     resultModel.PageTitle = Title;
                     resultModel.PageCountToBack = 7;
                     await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
@@ -224,6 +228,16 @@ public partial class ManuelFormListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+    private void Cleans()
+    {
+        QuicklyBomProductBasketModel.MainLocations.Clear();
+        QuicklyBomProductBasketModel.SubProducts.Clear();
+        QuicklyBomProductBasketModel.QuicklyBomProduct = null;
+        QuicklyBomProductBasketModel.BOMQuantity = 0;
+        QuicklyBomProductBasketModel.MainAmount = 0;
+    }
+
 
     private async Task<DataResult<ResponseModel>> ConsumableInsert(HttpClient httpClient, List<QuicklyBomSubProductModel> quicklyBomSubProductModel)
     {

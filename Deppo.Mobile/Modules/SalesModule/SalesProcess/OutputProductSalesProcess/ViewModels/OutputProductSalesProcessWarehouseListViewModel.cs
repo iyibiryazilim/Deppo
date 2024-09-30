@@ -5,6 +5,7 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.Views;
+using DevExpress.Data.Async.Helpers;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.ViewModels;
@@ -12,6 +13,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProces
 public partial class OutputProductSalesProcessWarehouseListViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
+	private readonly IServiceProvider _serviceProvider;
 	private readonly IWarehouseService _warehouseService;
 	private readonly IUserDialogs _userDialogs;
 
@@ -20,9 +22,10 @@ public partial class OutputProductSalesProcessWarehouseListViewModel : BaseViewM
 
 	public ObservableCollection<WarehouseModel> Items { get; } = new();
 
-	public OutputProductSalesProcessWarehouseListViewModel(IHttpClientService httpClientService, IWarehouseService warehouseService, IUserDialogs userDialogs)
+	public OutputProductSalesProcessWarehouseListViewModel(IHttpClientService httpClientService, IWarehouseService warehouseService, IUserDialogs userDialogs, IServiceProvider serviceProvider)
 	{
 		_httpClientService = httpClientService;
+		_serviceProvider = serviceProvider;
 		_warehouseService = warehouseService;
 		_userDialogs = userDialogs;
 
@@ -32,12 +35,14 @@ public partial class OutputProductSalesProcessWarehouseListViewModel : BaseViewM
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
 		ItemTappedCommand = new Command<WarehouseModel>(ItemTappedAsync);
 		NextViewCommand = new Command(async () => await NextViewAsync());
+		BackCommand = new Command(async () => await BackAsync());
 	}
 
 	public Command LoadItemsCommand { get; }
 	public Command LoadMoreItemsCommand { get; }
 	public Command ItemTappedCommand { get; }
 	public Command NextViewCommand { get; }
+	public Command BackCommand { get; }
 
 	private async Task LoadItemsAsync()
 	{
@@ -184,6 +189,28 @@ public partial class OutputProductSalesProcessWarehouseListViewModel : BaseViewM
 		catch (Exception ex)
 		{
 			_userDialogs.Alert(ex.Message);
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task BackAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			await Shell.Current.GoToAsync("..");
+		}
+		catch (Exception ex) 
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{

@@ -24,8 +24,9 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	private readonly ISeriLotTransactionService _serilotTransactionService;
 	private readonly ILocationTransactionService _locationTransactionService;
 	private readonly IUserDialogs _userDialogs;
+	private readonly IServiceProvider _serviceProvider;
 
-	[ObservableProperty]
+    [ObservableProperty]
 	OutputProductProcessType outputProductProcessType;
 
 	[ObservableProperty]
@@ -50,42 +51,43 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	public ObservableCollection<OutputProductBasketModel> Items { get; } = new();
 	public ObservableCollection<SeriLotTransactionModel> SeriLotTransactions { get; } = new();
 	public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
-	#endregion
+    #endregion
 
-	public OutputProductProcessBasketListViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs)
-	{
-		_httpClientService = httpClientService;
-		_serilotTransactionService = serilotTransactionService;
-		_locationTransactionService = locationTransactionService;
-		_userDialogs = userDialogs;
+    public OutputProductProcessBasketListViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs, IServiceProvider serviceProvider)
+    {
+        _httpClientService = httpClientService;
+        _serilotTransactionService = serilotTransactionService;
+        _locationTransactionService = locationTransactionService;
+        _userDialogs = userDialogs;
+        _serviceProvider = serviceProvider;
 
-		Title = "Sepet Listesi";
+        Title = "Sepet Listesi";
 
-		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
-		IncreaseCommand = new Command<OutputProductBasketModel>(async (item) => await IncreaseAsync(item));
-		DecreaseCommand = new Command<OutputProductBasketModel>(async (item) => await DecreaseAsync(item));
-		DeleteItemCommand = new Command<OutputProductBasketModel>(async (item) => await DeleteItemAsync(item));
+        ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
+        IncreaseCommand = new Command<OutputProductBasketModel>(async (item) => await IncreaseAsync(item));
+        DecreaseCommand = new Command<OutputProductBasketModel>(async (item) => await DecreaseAsync(item));
+        DeleteItemCommand = new Command<OutputProductBasketModel>(async (item) => await DeleteItemAsync(item));
 
-		
-		LoadMoreSeriLotTransactionsCommand = new Command(async () => await LoadMoreSeriLotTransactionsAsync());
-		SeriLotTransactionIncreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionIncreaseAsync(item));
-		SeriLotTransactionDecreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionDecreaseAsync(item));
-		ConfirmSeriLotTransactionCommand = new Command(ConfirmSeriLotTransactionAsync);
-		SeriLotTransactionCloseCommand = new Command(async () => await SeriLotTransactionCloseAsync());
 
-		
-		LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
-		LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
-		LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
-		ConfirmLocationTransactionCommand = new Command(ConfirmLocationTransactionAsync);
-		LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
+        LoadMoreSeriLotTransactionsCommand = new Command(async () => await LoadMoreSeriLotTransactionsAsync());
+        SeriLotTransactionIncreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionIncreaseAsync(item));
+        SeriLotTransactionDecreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionDecreaseAsync(item));
+        ConfirmSeriLotTransactionCommand = new Command(ConfirmSeriLotTransactionAsync);
+        SeriLotTransactionCloseCommand = new Command(async () => await SeriLotTransactionCloseAsync());
 
-		NextViewCommand = new Command(async () => await NextViewAsync());
-		BackCommand = new Command(async () => await BackAsync());
-	}
 
-	#region Properties
-	public ContentPage CurrentPage { get; set; } = null!;
+        LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
+        LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
+        LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
+        ConfirmLocationTransactionCommand = new Command(ConfirmLocationTransactionAsync);
+        LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
+
+        NextViewCommand = new Command(async () => await NextViewAsync());
+        BackCommand = new Command(async () => await BackAsync());
+    }
+
+    #region Properties
+    public ContentPage CurrentPage { get; set; } = null!;
 
 	#endregion
 
@@ -784,7 +786,17 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				SelectedLocationTransactions.Clear();
 				SelectedSeriLotTransactions.Clear();
 				Items.Clear();
-				await Shell.Current.GoToAsync("..");
+
+				var productListViewModel = _serviceProvider.GetRequiredService<OutputProductProcessProductListViewModel>();
+
+				foreach (var item in productListViewModel.Items)
+					item.IsSelected = false;
+				
+
+				productListViewModel.Items.Clear();
+				productListViewModel.SelectedProducts.Clear();
+
+                await Shell.Current.GoToAsync("..");
 			}
 			else
 			{

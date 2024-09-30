@@ -173,7 +173,7 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 			await Task.Delay(1000);
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _salesCustomerProductService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SalesCustomer.ReferenceId, WarehouseModel.Number, string.Empty, 0, 20);
+			var result = await _salesCustomerProductService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SalesCustomer.ReferenceId, WarehouseModel.Number, shipInfoReferenceId: SalesCustomer.ShipAddressReferenceId, string.Empty, 0, 20);
 
 			if (result.IsSuccess)
 			{
@@ -208,7 +208,7 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 			IsBusy = true;
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _salesCustomerProductService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SalesCustomer.ReferenceId, WarehouseModel.Number, string.Empty, Items.Count, 20);
+			var result = await _salesCustomerProductService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SalesCustomer.ReferenceId, WarehouseModel.Number, shipInfoReferenceId: SalesCustomer.ShipAddressReferenceId, string.Empty, Items.Count, 20);
 
 			if (result.IsSuccess)
 			{
@@ -312,7 +312,7 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 			await Task.Delay(1000);
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _waitingSalesOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, customerReferenceId: SalesCustomer.ReferenceId, string.Empty, 0, 20);
+			var result = await _waitingSalesOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, customerReferenceId: SalesCustomer.ReferenceId,  shipInfoReferenceId: SalesCustomer.ShipAddressReferenceId,string.Empty, 0, 20);
 
 			if (result.IsSuccess)
 			{
@@ -347,7 +347,7 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 			IsBusy = true;
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _waitingSalesOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, customerReferenceId: SalesCustomer.ReferenceId, string.Empty, Orders.Count, 20);
+			var result = await _waitingSalesOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, customerReferenceId: SalesCustomer.ReferenceId,  shipInfoReferenceId: SalesCustomer.ShipAddressReferenceId,string.Empty, Orders.Count, 20);
 
 			if (result.IsSuccess)
 			{

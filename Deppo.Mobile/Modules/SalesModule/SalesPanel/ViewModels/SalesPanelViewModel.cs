@@ -7,10 +7,14 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.SalesModels;
+using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesPanel.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.Views;
 using DevExpress.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesPanel.ViewModels;
@@ -32,10 +36,18 @@ public partial class SalesPanelViewModel : BaseViewModel
         Title = "Satış Paneli";
         LoadItemsCommand = new Command(async () => await LoadItemAsync());
         ItemTappedCommand = new Command<SalesFiche>(async (salesFiche) => await ItemTappedAsync(salesFiche));
+        WaitingOrderTappedCommand = new Command(async () => await WaitingOrderTappedAsync());
+        ShippedOrderTappedCommand = new Command(async () => await ShippedOrderTappedAsync());
+        CustomerTappedCommand = new Command<Customer>(async (customer) => await CustomerTappedAsync(customer));
+        AllFicheTappedCommand = new Command(async () => await AllFicheTappedAsync());
     }
     public Page CurrentPage { get; set; }
     public Command LoadItemsCommand { get; }
     public Command ItemTappedCommand { get; }
+    public Command WaitingOrderTappedCommand { get; }
+    public Command ShippedOrderTappedCommand { get; }
+    public Command CustomerTappedCommand { get; }
+    public Command AllFicheTappedCommand { get; }
 
     private async Task LoadItemAsync()
     {
@@ -138,11 +150,8 @@ public partial class SalesPanelViewModel : BaseViewModel
     }
     private async Task GetLastTransactionAsync(SalesFiche salesFiche)
     {
-
-
         try
         {
-
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _salesPanelService.GetLastTransaction(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, salesFiche.ReferenceId);
 
@@ -209,11 +218,8 @@ public partial class SalesPanelViewModel : BaseViewModel
     }
     private async Task ShippedOrderCountsAsync()
     {
-
-
         try
         {
-
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _salesPanelService.ShippedOrderCount(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber);
 
@@ -248,10 +254,8 @@ public partial class SalesPanelViewModel : BaseViewModel
     private async Task GetLastFicheAsync()
     {
 
-
         try
         {
-
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _salesPanelService.GetLastFiche(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber);
 
@@ -277,6 +281,98 @@ public partial class SalesPanelViewModel : BaseViewModel
         }
     }
 
+    private async Task WaitingOrderTappedAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(SalesPanelWaitingProductListView)}");
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ShippedOrderTappedAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(SalesPanelShippedProductListView)}");
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task AllFicheTappedAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(SalesPanelAllFicheListView)}");
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task CustomerTappedAsync(Customer customer)
+    {
+        if (customer == null)
+            return;
+
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            CustomerDetailModel customerDetailModel = new();
+            customerDetailModel.Customer = customer;
+
+            await Shell.Current.GoToAsync($"{nameof(CustomerDetailView)}", new Dictionary<string, object> { {
+                nameof(CustomerDetailModel), customerDetailModel
+                }
+                });
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
 
 

@@ -100,6 +100,7 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
                     code = code + " " + result2.Data.Code;
                     resultModel.Message = "Virman için Üretimden Giriş Ve Sarf Başarılı";
                     resultModel.Code = resultModel.Code + " Üretimden Giriş Numarası" + result2.Data.Code;
+                    ClearVirmanBasket();
                     resultModel.PageTitle = Title;
                     resultModel.PageCountToBack = 7;
 
@@ -153,6 +154,18 @@ public partial class VirmanProductFormListViewModel : BaseViewModel
         {
             IsBusy = false;
         }
+    }
+
+    private void ClearVirmanBasket()
+    {
+        VirmanBasketModel.OutVirmanWarehouse = null;
+        VirmanBasketModel.OutVirmanProduct = null;
+        VirmanBasketModel.InVirmanWarehouse = null;
+        VirmanBasketModel.InVirmanProduct = null;
+        VirmanBasketModel.OutVirmanProduct.LocationTransactionModels.Clear();
+        VirmanBasketModel.InVirmanProduct.Locations.Clear();
+        VirmanBasketModel.OutVirmanQuantity = default;
+        VirmanBasketModel.InVirmanQuantity = default;
     }
 
     private async Task<DataResult<ResponseModel>> ConsumableInsert(HttpClient httpClient)

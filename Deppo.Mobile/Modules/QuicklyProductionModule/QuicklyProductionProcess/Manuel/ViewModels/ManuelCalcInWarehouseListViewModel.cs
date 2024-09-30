@@ -51,10 +51,12 @@ public partial class ManuelCalcInWarehouseListViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<WarehouseModel>(ItemTappedAsync);
         NextViewCommand = new Command(async () => await NextViewAsync());
+        BackCommand = new Command(async () => await BackAsync());
     }
 
     public Page CurrentPage { get; set; }
 
+    public Command BackCommand { get; }
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
@@ -208,6 +210,26 @@ public partial class ManuelCalcInWarehouseListViewModel : BaseViewModel
                     [nameof(QuicklyBomProductBasketModel)] = QuicklyBomProductBasketModel
                 });
             }
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync("..");
         }
         catch (Exception ex)
         {

@@ -297,7 +297,10 @@ public static class MauiProgram
         #region Product Modules
 
         builder.Services.AddSingletonWithShellRoute<ProductPanelView, ProductPanelViewModel>(nameof(ProductPanelView));
-        builder.Services.AddSingletonWithShellRoute<ProductListView, ProductListViewModel>(nameof(ProductListView));
+        builder.Services.AddTransientWithShellRoute<InputProductListView, InputProductListViewModel>(nameof(InputProductListView));
+		builder.Services.AddTransientWithShellRoute<OutputProductListView, OutputProductListViewModel>(nameof(OutputProductListView));
+
+		builder.Services.AddSingletonWithShellRoute<ProductListView, ProductListViewModel>(nameof(ProductListView));
         builder.Services.AddScopedWithShellRoute<ProductDetailView, ProductDetailViewModel>(nameof(ProductDetailView));
         builder.Services.AddSingletonWithShellRoute<ProductInputTransactionView, ProductInputTransactionViewModel>(nameof(ProductInputTransactionView));
         builder.Services.AddSingletonWithShellRoute<ProductOutputTransactionView, ProductOutputTransactionViewModel>(nameof(ProductOutputTransactionView));
@@ -354,6 +357,9 @@ public static class MauiProgram
         #region Sales Modules
 
         builder.Services.AddSingletonWithShellRoute<SalesPanelView, SalesPanelViewModel>(nameof(SalesPanelView));
+        builder.Services.AddSingletonWithShellRoute<SalesPanelWaitingProductListView, SalesPanelWaitingProductListViewModel>(nameof(SalesPanelWaitingProductListView));
+        builder.Services.AddSingletonWithShellRoute<SalesPanelShippedProductListView, SalesPanelShippedProductListViewModel>(nameof(SalesPanelShippedProductListView));
+        builder.Services.AddSingletonWithShellRoute<SalesPanelAllFicheListView, SalesPanelAllFicheListViewModel>(nameof(SalesPanelAllFicheListView));
         builder.Services.AddSingletonWithShellRoute<CustomerListView, CustomerListViewModel>(nameof(CustomerListView));
         builder.Services.AddSingletonWithShellRoute<CustomerDetailView, CustomerDetailViewModel>(nameof(CustomerDetailView));
         builder.Services.AddSingletonWithShellRoute<CustomerInputTransactionView, CustomerInputTransactionViewModel>(nameof(CustomerInputTransactionView));
@@ -475,6 +481,10 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         #region Counting Modules
 
         builder.Services.AddSingletonWithShellRoute<CountingPanelView, CountingPanelViewModel>(nameof(CountingPanelView));
+        builder.Services.AddTransientWithShellRoute<CountingInputReferenceProductListView, CountingInputReferenceProductListViewModel>(nameof(CountingInputReferenceProductListView));
+        builder.Services.AddTransientWithShellRoute<CountingOutputReferenceProductListView, CountingOutputReferenceProductListViewModel>(nameof(CountingOutputReferenceProductListView));
+
+
         builder.Services.AddSingletonWithShellRoute<NegativeProductListView, NegativeProductListViewModel>(nameof(NegativeProductListView));
         builder.Services.AddScopedWithShellRoute<NegativeProductFormView, NegativeProductFormViewModel>(nameof(NegativeProductFormView));
         builder.Services.AddSingletonWithShellRoute<CountingProcessView, CountingProcessViewModel>(nameof(CountingProcessView));
