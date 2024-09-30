@@ -17,6 +17,14 @@ public interface ISalesPanelService
 
     Task<DataResult<dynamic>> TotalOrderCount(HttpClient httpClient, int firmNumber, int periodNumber);
     Task<DataResult<dynamic>> ShippedOrderCount(HttpClient httpClient , int firmNumber, int periodNumber);
+    Task<DataResult<IEnumerable<dynamic>>> GetWaitingProducts(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20);
+    Task<DataResult<IEnumerable<dynamic>>> GetWaitingOrders(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20);
+
+    Task<DataResult<IEnumerable<dynamic>>> GetShippedProducts(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20);
+    Task<DataResult<IEnumerable<dynamic>>> GetShippedOrders(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20);
+
+    Task<DataResult<IEnumerable<dynamic>>> GetAllFiche(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20);
+    Task<DataResult<IEnumerable<dynamic>>> GetFicheTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId, string search = "", int skip = 0, int take = 20);
 
 
 }
