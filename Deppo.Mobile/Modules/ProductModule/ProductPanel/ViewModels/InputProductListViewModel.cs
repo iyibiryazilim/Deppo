@@ -1,9 +1,12 @@
-﻿using Controls.UserDialogs.Maui;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Controls.UserDialogs.Maui;
+using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using DevExpress.Maui.Controls;
 using Org.Apache.Http.Conn.Params;
 using System.Collections.ObjectModel;
 
@@ -16,6 +19,11 @@ public partial class InputProductListViewModel : BaseViewModel
 	private readonly IUserDialogs _userDialogs;
 
 	public ObservableCollection<ProductModel> Items { get; } = new();
+	public ObservableCollection<ProductTransaction> Transactions { get; } = new();
+
+	[ObservableProperty]
+	private ProductModel? selectedProduct;
+
 
 	public InputProductListViewModel(IProductPanelService productPanelService, IHttpClientService httpClientService, IUserDialogs userDialogs)
 	{
@@ -31,8 +39,10 @@ public partial class InputProductListViewModel : BaseViewModel
 	public Command LoadItemsCommand { get;}
 	public Command LoadMoreItemsCommand { get;}
 	public Command ItemTappedCommand { get; }
+	public Command BackCommand { get; }
 
-	
+
+
 	private async Task LoadItemsAsync()
 	{
 		if (IsBusy)
@@ -114,6 +124,102 @@ public partial class InputProductListViewModel : BaseViewModel
 			}
 		}
 		catch (Exception ex) 
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+	private async Task ItemTappedAsync(ProductModel product)
+	{
+		if (IsBusy)
+			return;
+
+		try
+		{
+			IsBusy = true;
+
+			SelectedProduct = product;
+
+			_userDialogs.ShowLoading("Yükleniyor...");
+			await Task.Delay(1000);
+			await GetLastCountingTransactionsAsync(SelectedProduct);
+
+			CurrentPage.FindByName<BottomSheet>("ficheTransactionBottomSheet").State = BottomSheetState.HalfExpanded;
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
+		catch (System.Exception)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert("Bir hata oluştu. Lütfen tekrar deneyiniz.", "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+	private async Task GetLastCountingTransactionsAsync(ProductModel productModel)
+	{
+		try
+		{
+			Transactions.Clear();
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _productPanelService.GetInputTransactions(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				productReferenceId: productModel.ReferenceId
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is not null)
+				{
+					foreach (var item in result.Data)
+					{
+						var obj = Mapping.Mapper.Map<ProductTransaction>(item);
+						Transactions.Add(obj);
+					}
+				}
+			}
+		}
+		catch (System.Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+	}
+	private async Task BackAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+			if (Items.Count > 0)
+			{
+				Items.Clear();
+			}
+			if (Transactions.Count > 0)
+			{
+				Transactions.Clear();
+			}
+
+
+			await Shell.Current.GoToAsync("..");
+		}
+		catch (Exception ex)
 		{
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
