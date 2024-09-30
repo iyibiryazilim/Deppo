@@ -478,6 +478,10 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         #region Counting Modules
 
         builder.Services.AddSingletonWithShellRoute<CountingPanelView, CountingPanelViewModel>(nameof(CountingPanelView));
+        builder.Services.AddTransientWithShellRoute<CountingInputReferenceProductListView, CountingInputReferenceProductListViewModel>(nameof(CountingInputReferenceProductListView));
+        builder.Services.AddTransientWithShellRoute<CountingOutputReferenceProductListView, CountingOutputReferenceProductListViewModel>(nameof(CountingOutputReferenceProductListView));
+
+
         builder.Services.AddSingletonWithShellRoute<NegativeProductListView, NegativeProductListViewModel>(nameof(NegativeProductListView));
         builder.Services.AddScopedWithShellRoute<NegativeProductFormView, NegativeProductFormViewModel>(nameof(NegativeProductFormView));
         builder.Services.AddSingletonWithShellRoute<CountingProcessView, CountingProcessViewModel>(nameof(CountingProcessView));

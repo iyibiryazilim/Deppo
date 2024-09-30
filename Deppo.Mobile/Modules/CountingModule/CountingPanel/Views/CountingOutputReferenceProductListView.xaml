@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Deppo.Mobile.Modules.CountingModule.CountingPanel.Views.CountingOutputReferenceProductListView"
+             Title=""
+             Shell.PresentationMode="ModalAnimated"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:productModel="clr-namespace:Deppo.Mobile.Core.Models.ProductModels;assembly=Deppo.Mobile.Core"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.CountingModule.CountingPanel.ViewModels"
+             x:DataType="viewModel:CountingOutputReferenceProductListViewModel">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Loaded" Command="{Binding LoadItemsCommand}" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+   
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid RowDefinitions="Auto, *, Auto" RowSpacing="10">
+        <Grid ColumnDefinitions="*, Auto" Grid.Row="0">
+            <Label Text="Artan Referans Ürün Listesi" TextColor="WhiteSmoke" FontSize="Medium" Grid.Column="0" />
+
+            <ImageButton Grid.Column="1"
+             Command="{Binding BackCommand}"
+             HeightRequest="25"
+             HorizontalOptions="End">
+                <ImageButton.Source>
+                    <FontImageSource FontFamily="FAS"
+                         Size="Medium"
+                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                         Color="{StaticResource WhiteSmoke}" />
+                </ImageButton.Source>
+            </ImageButton>
+        </Grid>
+
+        <CollectionView Grid.Row="1"
+                 ItemsSource="{Binding Items}"
+                 RemainingItemsThreshold="2"
+                 RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="productModel:ProductModel">
+                    <Border Padding="10"
+                     BackgroundColor="Transparent"
+                     StrokeShape="RoundRectangle 10"
+                     StrokeThickness="0.1">
+                        <!--<Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessProductListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>-->
+                        <Grid ColumnDefinitions=".20*,.80*" ColumnSpacing="10">
+                            <Border BackgroundColor="{StaticResource Secondary}"
+                             StrokeShape="RoundRectangle 5"
+                             StrokeThickness="0.5">
+                                <Image Grid.Column="0"
+                                HeightRequest="50"
+                                Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                WidthRequest="50" />
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label FontAttributes="Bold"
+                                LineBreakMode="TailTruncation"
+                                Text="{Binding Code}" />
+                                <Label LineBreakMode="TailTruncation"
+                                Text="{Binding Name}"
+                                TextColor="{StaticResource Gray600}" />
+
+                                <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span FontAttributes="Bold"
+                                           FontFamily="FAS"
+                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                           TextColor="{StaticResource Primary}" />
+                                            <Span Text=" " />
+                                            <Span FontAttributes="Bold"
+                                           Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                           TextColor="{StaticResource Primary}" />
+                                            <Span Text=" " />
+                                            <Span FontAttributes="Bold"
+                                           Text="{Binding SubUnitsetCode}"
+                                           TextColor="{StaticResource Primary}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>
