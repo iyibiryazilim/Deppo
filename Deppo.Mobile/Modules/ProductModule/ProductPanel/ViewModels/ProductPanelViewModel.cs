@@ -45,9 +45,7 @@ public partial class ProductPanelViewModel : BaseViewModel
 		ProductTappedCommand = new Command<ProductModel>(async (productModel) => await ProductTappedAsync(productModel));
 		ProductInputTappedCommand = new Command(async () => await ProductInputTappedAsync());
 		ProductOutputTappedCommand = new Command(async () => await ProductOutputTappedAsync());
-
-		GetAllTransactionsCommand = new Command(async () => await GetAllTransactionsAsync());
-
+		ButtonAllTappedCommand = new Command(async () => await ButtonAllTappedAsync());
 	}
 
 	public Page CurrentPage { get; set; }
@@ -59,7 +57,7 @@ public partial class ProductPanelViewModel : BaseViewModel
 	public Command<ProductModel> ProductTappedCommand { get; }
 	public Command ProductInputTappedCommand { get; }
 	public Command ProductOutputTappedCommand { get; }
-	public Command GetAllTransactionsCommand { get; }
+	public Command ButtonAllTappedCommand { get; }
 
 
 
@@ -400,15 +398,15 @@ public partial class ProductPanelViewModel : BaseViewModel
 			IsBusy = false;
 		}
 	}
-	//ViewEklenecek
-	private async Task GetAllTransactionsAsync()
+	
+	private async Task ButtonAllTappedAsync()
 	{
 		if (IsBusy)
 			return;
 		try
 		{
 			IsBusy = true;
-			await Shell.Current.GoToAsync($"{nameof(View)}");
+			await Shell.Current.GoToAsync($"{nameof(AllFicheListView)}");
 		}
 		catch (Exception ex)
 		{

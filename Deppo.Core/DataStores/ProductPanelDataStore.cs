@@ -510,6 +510,56 @@ public class ProductPanelDataStore : IProductPanelService
 		}
 	}
 
+	public async Task<DataResult<IEnumerable<dynamic>>> GetAllFiches(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+	{
+		var content = new StringContent(JsonConvert.SerializeObject(GetAllFichesQuery(firmNumber, periodNumber, search, skip, take)), Encoding.UTF8, "application/json");
+
+		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+		if (responseMessage.IsSuccessStatusCode)
+		{
+			var data = await responseMessage.Content.ReadAsStringAsync();
+			if (data != null)
+			{
+				if (!string.IsNullOrEmpty(data))
+				{
+					var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+
+					dataResult.Data = result?.Data;
+					dataResult.IsSuccess = true;
+					dataResult.Message = "success";
+					return dataResult;
+				}
+				else
+				{
+					var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+					dataResult.Data = result?.Data;
+					dataResult.IsSuccess = true;
+					dataResult.Message = "empty";
+					return dataResult;
+				}
+			}
+			else
+			{
+				var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+				dataResult.Data = Enumerable.Empty<dynamic>();
+				dataResult.IsSuccess = false;
+				dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+				return dataResult;
+			}
+		}
+		else
+		{
+			dataResult.Data = Enumerable.Empty<dynamic>();
+			dataResult.IsSuccess = false;
+			dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+			return dataResult;
+		}
+	}
+
 	public async Task<DataResult<IEnumerable<dynamic>>> GetAllTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int skip = 0, int take = 20)
 	{
 		var content = new StringContent(JsonConvert.SerializeObject(GetAllTransactionsQuery(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
@@ -563,15 +613,15 @@ public class ProductPanelDataStore : IProductPanelService
 
 	private string GetLastFiche(int firmNumber, int periodNumber)
     {
-        string baseQuery = $@"Select TOP 5
+        string baseQuery = $@"SELECT TOP 5
             [ReferenceId] = STFICHE.LOGICALREF,
 			[FicheType] = STFICHE.TRCODE,
 			[FicheNumber] = STFICHE.FICHENO,
             [FicheDate] = STFICHE.DATE_,
             [FicheTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
 			[DocumentNumber] =ISNULL (STFICHE.DOCODE , ''),			
-			[SpecialCode] = ISNULL  ( STFICHE.SPECODE , ''),
-			[CurrentReferenceID] = ISNULL ( CLCARD.LOGICALREF, 0),
+			[SpecialCode] = ISNULL  (STFICHE.SPECODE , ''),
+			[CurrentReferenceId] = ISNULL (CLCARD.LOGICALREF, 0),
 			[CurrentCode] = ISNULL (CLCARD.CODE , '' ),
 			[CurrentName] = ISNULL ( CLCARD.DEFINITION_ ,''),
 			[WarehouseName] =  ISNULL (CAPIWHOUSE.NAME , ''),
@@ -580,8 +630,8 @@ public class ProductPanelDataStore : IProductPanelService
 			From LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
 			left join LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
 			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
-			WHERE STFICHE.TRCODE in (13,12,11,25,51,50) AND STFICHE.PRODSTAT = 0 
-			ORDER BY STFICHE.DATE_ DESC;";
+			WHERE STFICHE.TRCODE IN (13,12,11,25,51,50) AND STFICHE.PRODSTAT = 0 
+			ORDER BY STFICHE.DATE_ DESC";
 
         return baseQuery;
     }
@@ -733,25 +783,25 @@ WHERE STLINE.IOCODE IN (3,4) AND STFICHE.GRPCODE = 3";
 
 	private string GetInputProductQuery(int firmNumber, int periodNumber , string search = "", int skip = 0, int take = 20)
 	{
-		string baseQuery = $@"SELECT TOP 5
+        string baseQuery = $@"SELECT
     [ReferenceId] = ITEMS.LOGICALREF,
-[Code] = ITEMS.CODE,
-[Name] = ITEMS.NAME,
-[VatRate] = ITEMS.VAT,
-[UnitsetReferenceId] = UNITSETF.LOGICALREF,
-[UnitsetCode] = UNITSETF.CODE,
-[UnitsetName] = UNITSETF.NAME,
-[SubUnitsetReferenceId] = UNITSETL.LOGICALREF,
-[SubUnitsetCode] = UNITSETL.CODE,
-[SubUnitsetName] = UNITSETL.NAME,
-[IsVariant] = ITEMS.CANCONFIGURE,
-[TrackingType] = ITEMS.TRACKTYPE,
-[LocTracking] = ITEMS.LOCTRACKING,
-[GroupCode] = ISNULL(ITEMS.STGRPCODE,''),
-[BrandReferenceId] = ISNULL(BRAND.LOGICALREF,0),
-[BrandCode] = ISNULL(BRAND.CODE,''),
-[BrandName] = ISNULL(BRAND.DESCR,''),
- [StockQuantity] = SUM(ISNULL(STLINE.AMOUNT, 0))
+    [Code] = ITEMS.CODE,
+    [Name] = ITEMS.NAME,
+    [VatRate] = ITEMS.VAT,
+    [UnitsetReferenceId] = UNITSETF.LOGICALREF,
+    [UnitsetCode] = UNITSETF.CODE,
+    [UnitsetName] = UNITSETF.NAME,
+    [SubUnitsetReferenceId] = UNITSETL.LOGICALREF,
+    [SubUnitsetCode] = UNITSETL.CODE,
+    [SubUnitsetName] = UNITSETL.NAME,
+    [IsVariant] = ITEMS.CANCONFIGURE,
+    [TrackingType] = ITEMS.TRACKTYPE,
+    [LocTracking] = ITEMS.LOCTRACKING,
+    [GroupCode] = ISNULL(ITEMS.STGRPCODE,''),
+    [BrandReferenceId] = ISNULL(BRAND.LOGICALREF,0),
+    [BrandCode] = ISNULL(BRAND.CODE,''),
+    [BrandName] = ISNULL(BRAND.DESCR,''),
+    [StockQuantity] = SUM(ISNULL(STLINE.AMOUNT, 0))
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STFICHE.LOGICALREF = STLINE.STFICHEREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS WITH(NOLOCK) ON STLINE.STOCKREF = ITEMS.LOGICALREF
@@ -759,8 +809,14 @@ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT WITH(NOL
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(NOLOCK) ON STLINE.UOMREF = UNITSETL.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON STLINE.USREF = UNITSETF.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_MARK AS BRAND WITH(NOLOCK) ON ITEMS.MARKREF = BRAND.LOGICALREF
-WHERE STLINE.IOCODE IN (1,2) AND STFICHE.GRPCODE = 3
-GROUP BY 
+WHERE STLINE.IOCODE IN (1,2) AND STFICHE.GRPCODE = 3";
+
+        if (!string.IsNullOrEmpty(search))
+        {
+            baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";
+        }
+
+ baseQuery +=  @$" GROUP BY 
     ITEMS.LOGICALREF,
     ITEMS.CODE,
     ITEMS.NAME,
@@ -778,7 +834,7 @@ GROUP BY
     ISNULL(BRAND.LOGICALREF, 0),
     ISNULL(BRAND.CODE, ''),
     ISNULL(BRAND.DESCR, '')
-ORDER BY MAX(STLINE.DATE_) DESC;";
+ORDER BY MAX(STLINE.DATE_) DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY;";
 
 		return baseQuery;
 	}
@@ -787,52 +843,58 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
 
 	private string GetOutputProductQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
 	{
-		string baseQuery = $@"SELECT TOP 5
-    [ReferenceId] = ITEMS.LOGICALREF,
-[Code] = ITEMS.CODE,
-[Name] = ITEMS.NAME,
-[VatRate] = ITEMS.VAT,
-[UnitsetReferenceId] = UNITSETF.LOGICALREF,
-[UnitsetCode] = UNITSETF.CODE,
-[UnitsetName] = UNITSETF.NAME,
-[SubUnitsetReferenceId] = UNITSETL.LOGICALREF,
-[SubUnitsetCode] = UNITSETL.CODE,
-[SubUnitsetName] = UNITSETL.NAME,
-[IsVariant] = ITEMS.CANCONFIGURE,
-[TrackingType] = ITEMS.TRACKTYPE,
-[LocTracking] = ITEMS.LOCTRACKING,
-[GroupCode] = ISNULL(ITEMS.STGRPCODE,''),
-[BrandReferenceId] = ISNULL(BRAND.LOGICALREF,0),
-[BrandCode] = ISNULL(BRAND.CODE,''),
-[BrandName] = ISNULL(BRAND.DESCR,''),
- [StockQuantity] = SUM(ISNULL(STLINE.AMOUNT, 0))
-FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
-LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STFICHE.LOGICALREF = STLINE.STFICHEREF
-LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS WITH(NOLOCK) ON STLINE.STOCKREF = ITEMS.LOGICALREF
-LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT WITH(NOLOCK) ON STLINE.VARIANTREF = VARIANT.LOGICALREF
-LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(NOLOCK) ON STLINE.UOMREF = UNITSETL.LOGICALREF
-LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON STLINE.USREF = UNITSETF.LOGICALREF
-LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_MARK AS BRAND WITH(NOLOCK) ON ITEMS.MARKREF = BRAND.LOGICALREF
-WHERE STLINE.IOCODE IN (3,4) AND STFICHE.GRPCODE = 3
-GROUP BY 
-    ITEMS.LOGICALREF,
-    ITEMS.CODE,
-    ITEMS.NAME,
-    ITEMS.VAT,
-    UNITSETF.LOGICALREF,
-    UNITSETF.CODE,
-    UNITSETF.NAME,
-    UNITSETL.LOGICALREF,
-    UNITSETL.CODE,
-    UNITSETL.NAME,
-    ITEMS.CANCONFIGURE,
-    ITEMS.TRACKTYPE,
-    ITEMS.LOCTRACKING,
-    ISNULL(ITEMS.STGRPCODE, ''),
-    ISNULL(BRAND.LOGICALREF, 0),
-    ISNULL(BRAND.CODE, ''),
-    ISNULL(BRAND.DESCR, '')
-ORDER BY MAX(STLINE.DATE_) DESC;";
+        string baseQuery = $@"SELECT
+            [ReferenceId] = ITEMS.LOGICALREF,
+            [Code] = ITEMS.CODE,
+            [Name] = ITEMS.NAME,
+            [VatRate] = ITEMS.VAT,
+            [UnitsetReferenceId] = UNITSETF.LOGICALREF,
+            [UnitsetCode] = UNITSETF.CODE,
+            [UnitsetName] = UNITSETF.NAME,
+            [SubUnitsetReferenceId] = UNITSETL.LOGICALREF,
+            [SubUnitsetCode] = UNITSETL.CODE,
+            [SubUnitsetName] = UNITSETL.NAME,
+            [IsVariant] = ITEMS.CANCONFIGURE,
+            [TrackingType] = ITEMS.TRACKTYPE,
+            [LocTracking] = ITEMS.LOCTRACKING,
+            [GroupCode] = ISNULL(ITEMS.STGRPCODE,''),
+            [BrandReferenceId] = ISNULL(BRAND.LOGICALREF,0),
+            [BrandCode] = ISNULL(BRAND.CODE,''),
+            [BrandName] = ISNULL(BRAND.DESCR,''),
+            [StockQuantity] = SUM(ISNULL(STLINE.AMOUNT, 0))
+        FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STFICHE.LOGICALREF = STLINE.STFICHEREF
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS WITH(NOLOCK) ON STLINE.STOCKREF = ITEMS.LOGICALREF
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT WITH(NOLOCK) ON STLINE.VARIANTREF = VARIANT.LOGICALREF
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(NOLOCK) ON STLINE.UOMREF = UNITSETL.LOGICALREF
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON STLINE.USREF = UNITSETF.LOGICALREF
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_MARK AS BRAND WITH(NOLOCK) ON ITEMS.MARKREF = BRAND.LOGICALREF
+        WHERE STLINE.IOCODE IN (3,4) AND STFICHE.GRPCODE = 3";
+
+		if (!string.IsNullOrEmpty(search))
+		{
+			baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";
+		}
+
+		baseQuery += $@" GROUP BY 
+                ITEMS.LOGICALREF,
+                ITEMS.CODE,
+                ITEMS.NAME,
+                ITEMS.VAT,
+                UNITSETF.LOGICALREF,
+                UNITSETF.CODE,
+                UNITSETF.NAME,
+                UNITSETL.LOGICALREF,
+                UNITSETL.CODE,
+                UNITSETL.NAME,
+                ITEMS.CANCONFIGURE,
+                ITEMS.TRACKTYPE,
+                ITEMS.LOCTRACKING,
+                ISNULL(ITEMS.STGRPCODE, ''),
+                ISNULL(BRAND.LOGICALREF, 0),
+                ISNULL(BRAND.CODE, ''),
+                ISNULL(BRAND.DESCR, '')
+        ORDER BY MAX(STLINE.DATE_) DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
 		return baseQuery;
 	}
@@ -913,6 +975,37 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
 		return baseQuery;
 	}
 
+    private string GetAllFichesQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+    {
+        string baseQuery = $@"
+            SELECT
+                [ReferenceId] = STFICHE.LOGICALREF,
+			    [FicheType] = STFICHE.TRCODE,
+			    [FicheNumber] = STFICHE.FICHENO,
+                [FicheDate] = STFICHE.DATE_,
+                [FicheTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
+			    [DocumentNumber] =ISNULL (STFICHE.DOCODE , ''),			
+			    [SpecialCode] = ISNULL  (STFICHE.SPECODE , ''),
+			    [CurrentReferenceId] = ISNULL (CLCARD.LOGICALREF, 0),
+			    [CurrentCode] = ISNULL (CLCARD.CODE , '' ),
+			    [CurrentName] = ISNULL (CLCARD.DEFINITION_ ,''),
+			    [WarehouseName] =  ISNULL (CAPIWHOUSE.NAME , ''),
+			    [WarehouseNumber] = ISNULL( CAPIWHOUSE.NR, 0),
+			    [Description] =  ISNULL (STFICHE.GENEXP1, '')
+			FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
+			LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
+			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
+			WHERE STFICHE.TRCODE IN (13,12,11,25,51,50) AND STFICHE.PRODSTAT = 0";
+                
+        if(!string.IsNullOrEmpty(search))
+        {
+            baseQuery += $@" AND (STFICHE.FICHENO LIKE '{search}%')";
+        }
+            
+		baseQuery += $@" ORDER BY STFICHE.DATE_ DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+
+        return baseQuery;
+    }
 
 	private string GetAllTransactionsQuery(int firmNumber, int periodNumber, int skip = 0, int take = 20)
 	{

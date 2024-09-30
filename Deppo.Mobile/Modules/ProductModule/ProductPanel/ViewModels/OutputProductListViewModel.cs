@@ -24,14 +24,18 @@ public partial class OutputProductListViewModel : BaseViewModel
 	[ObservableProperty]
 	private ProductModel? selectedProduct;
 
-
 	public OutputProductListViewModel(IProductPanelService productPanelService, IHttpClientService httpClientService, IUserDialogs userDialogs)
 	{
 		_httpClientService = httpClientService;
 		_productPanelService = productPanelService;
 		_userDialogs = userDialogs;
+
+		Title = "Çıkış Hareketleri Listesi";
+
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+		BackCommand = new Command(async () => await BackAsync());
+		ItemTappedCommand = new Command<ProductModel>(async (product) => await ItemTappedAsync(product));
 	}
 
 	public Page CurrentPage { get; set; } = null!;
@@ -40,8 +44,6 @@ public partial class OutputProductListViewModel : BaseViewModel
 	public Command LoadMoreItemsCommand { get; }
 	public Command ItemTappedCommand { get; }
 	public Command BackCommand { get; }
-
-
 
 	private async Task LoadItemsAsync()
 	{
@@ -53,9 +55,9 @@ public partial class OutputProductListViewModel : BaseViewModel
 
 			_userDialogs.Loading("Load Items...");
 			await Task.Delay(1000);
-			// List.Clear();
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			Items.Clear();
 
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			var result = await _productPanelService.GetOutputProduct(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
@@ -76,6 +78,8 @@ public partial class OutputProductListViewModel : BaseViewModel
 					Items.Add(obj);
 				}
 			}
+
+			_userDialogs.HideHud();
 		}
 		catch (Exception ex)
 		{
@@ -122,6 +126,8 @@ public partial class OutputProductListViewModel : BaseViewModel
 					Items.Add(obj);
 				}
 			}
+
+			_userDialogs.HideHud();
 		}
 		catch (Exception ex)
 		{
@@ -135,6 +141,7 @@ public partial class OutputProductListViewModel : BaseViewModel
 			IsBusy = false;
 		}
 	}
+
 	private async Task ItemTappedAsync(ProductModel product)
 	{
 		if (IsBusy)
@@ -155,12 +162,12 @@ public partial class OutputProductListViewModel : BaseViewModel
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 		}
-		catch (System.Exception)
+		catch (Exception ex)
 		{
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
-			_userDialogs.Alert("Bir hata oluştu. Lütfen tekrar deneyiniz.", "Hata", "Tamam");
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{
@@ -192,7 +199,7 @@ public partial class OutputProductListViewModel : BaseViewModel
 				}
 			}
 		}
-		catch (System.Exception ex)
+		catch (Exception ex)
 		{
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
@@ -200,6 +207,7 @@ public partial class OutputProductListViewModel : BaseViewModel
 			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 		}
 	}
+
 	private async Task BackAsync()
 	{
 		if (IsBusy)
