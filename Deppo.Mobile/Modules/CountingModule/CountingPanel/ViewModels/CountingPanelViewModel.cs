@@ -408,7 +408,7 @@ public partial class CountingPanelViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            await Shell.Current.GoToAsync($"{nameof(View)}");
+            await Shell.Current.GoToAsync($"{nameof(CountingTransactionsListView)}");
         }
         catch (Exception ex)
         {

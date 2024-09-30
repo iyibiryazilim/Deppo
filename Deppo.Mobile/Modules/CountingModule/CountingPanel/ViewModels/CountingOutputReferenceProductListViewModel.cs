@@ -39,6 +39,8 @@ public partial class CountingOutputReferenceProductListViewModel : BaseViewModel
         _countingPanelService = countingPanelService;
         _userDialogs = userDialogs;
 
+        Title = "Azalan Referans Ürün Listesi";
+
         BackCommand = new Command(async () => await BackAsync());
         ItemTappedCommand = new Command<ProductModel>(async (product) => await ItemTappedAsync(product));
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
