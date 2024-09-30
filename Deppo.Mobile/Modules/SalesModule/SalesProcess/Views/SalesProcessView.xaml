@@ -241,7 +241,7 @@
                                            TextColor="{StaticResource White}"
                                            VerticalOptions="Center" />
                                 </Border>
-                                <VerticalStackLayout Grid.Column="1">
+                                <VerticalStackLayout Grid.Column="1" Spacing="4">
                                     <Label FontAttributes="Bold"
                                            FontSize="Subtitle"
                                            Text="İrsaliyeye Bağlı Satış İade İşlemleri"

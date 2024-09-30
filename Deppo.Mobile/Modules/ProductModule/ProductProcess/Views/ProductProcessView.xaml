@@ -287,6 +287,7 @@
                         <!--#region Fire Fişi-->
                         <Border Grid.Row="2"
                                 Padding="5"
+                                HeightRequest="60"
                                 StrokeShape="RoundRectangle 5"
                                 StrokeThickness="0.2">
                             <Grid ColumnDefinitions=".85*,.15*"
@@ -309,7 +310,7 @@
                                                TextColor="{StaticResource White}"
                                                VerticalOptions="Center" />
                                     </Border>
-                                    <VerticalStackLayout Grid.Column="1">
+                                    <VerticalStackLayout Grid.Column="1" Spacing="4">
                                         <Label FontAttributes="Bold"
                                                FontSize="Subtitle"
                                                Text="Fire Fişi İşlemleri"
