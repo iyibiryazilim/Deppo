@@ -51,104 +51,68 @@
                     </SearchBar.Behaviors>
                 </SearchBar>
             </Border>
-            <RefreshView
-                Grid.Row="1"
-                Command="{Binding LoadItemsCommand}"
-                IsRefreshing="{Binding IsBusy, Mode=OneWay}"
-                RefreshColor="Transparent">
-                <CollectionView
-                    ItemsSource="{Binding Items}"
-                    RemainingItemsThreshold="2"
-                    RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="model:Current">
-                            <Border StrokeShape="RoundRectangle 6" StrokeThickness="0.2">
-                                <Grid
-                                    Padding="10"
-                                    ColumnDefinitions="Auto,Auto,*"
-                                    ColumnSpacing="10">
-                                    <toolkit:AvatarView
-                                        Margin="5"
-                                        Background="{StaticResource PrimaryLight}"
-                                        BorderColor="{StaticResource Primary}"
-                                        CornerRadius="200"
-                                        FontAttributes="Bold"
-                                        FontSize="16"
-                                        HeightRequest="50"
-                                        Text="{Binding TitleName}"
-                                        TextColor="{StaticResource White}"
-                                        VerticalOptions="Start"
-                                        WidthRequest="50" />
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Items}"
+                        RemainingItemsThreshold="2"
+                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:Current">
+                    <Border StrokeShape="RoundRectangle 6"
+                            StrokeThickness="0.2">
+                        <Grid Padding="10"
+                              ColumnDefinitions="Auto,Auto,*"
+                              ColumnSpacing="10">
+                            <toolkit:AvatarView Margin="5"
+                                                Background="{StaticResource PrimaryLight}"
+                                                BorderColor="{StaticResource Primary}"
+                                                CornerRadius="200"
+                                                FontAttributes="Bold"
+                                                FontSize="16"
+                                                HeightRequest="50"
+                                                Text="{Binding TitleName}"
+                                                TextColor="{StaticResource OffBlack}"
+                                                VerticalOptions="Start"
+                                                WidthRequest="50" />
 
-                                    <VerticalStackLayout Grid.Column="1" Spacing="2">
-                                        <Label
-                                            FontAttributes="Bold"
-                                            LineBreakMode="TailTruncation"
-                                            Text="{Binding Title}" />
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Spacing="2">
+                                <Label FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation"
+                                       HorizontalOptions="StartAndExpand"
+                                       Text="{Binding Name}" />
 
-                                        <VerticalStackLayout Spacing="5" VerticalOptions="Center">
-                                            <HorizontalStackLayout Spacing="5">
-                                                <Image
-                                                    Aspect="AspectFit"
-                                                    HeightRequest="16"
-                                                    VerticalOptions="Center"
-                                                    WidthRequest="16">
-                                                    <Image.Source>
-                                                        <FontImageSource
-                                                            FontFamily="FAS"
-                                                            Glyph="{x:Static fontAwesome:FontAwesomeIcons.UserClock}"
-                                                            Size="16"
-                                                            Color="{StaticResource Primary}" />
-                                                    </Image.Source>
-                                                </Image>
-                                                <Label
-                                                    HorizontalOptions="Start"
-                                                    LineBreakMode="TailTruncation"
-                                                    Text="{Binding Name}"
-                                                    TextColor="{StaticResource Gray600}"
-                                                    VerticalOptions="Center"
-                                                    WidthRequest="200" />
-                                            </HorizontalStackLayout>
-                                            <HorizontalStackLayout Spacing="5">
-                                                <Image
-                                                    Aspect="AspectFit"
-                                                    HeightRequest="16"
-                                                    VerticalOptions="Center"
-                                                    WidthRequest="16">
-                                                    <Image.Source>
-                                                        <FontImageSource
-                                                            FontFamily="FAS"
-                                                            Glyph="{x:Static fontAwesome:FontAwesomeIcons.MapLocationDot}"
-                                                            Size="16"
-                                                            Color="{StaticResource Primary}" />
-                                                    </Image.Source>
-                                                </Image>
-                                                <Label
-                                                    HorizontalOptions="Start"
-                                                    LineBreakMode="TailTruncation"
-                                                    TextColor="{StaticResource Gray600}"
-                                                    VerticalOptions="Center"
-                                                    WidthRequest="200">
-                                                    <Label.Text>
-                                                        <MultiBinding StringFormat="{}{0} / {1}">
-                                                            <Binding Path="Country" />
-                                                            <Binding Path="City" />
-                                                        </MultiBinding>
-                                                    </Label.Text>
-                                                </Label>
-                                            </HorizontalStackLayout>
-                                        </VerticalStackLayout>
-                                    </VerticalStackLayout>
-                                </Grid>
-                                <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OutsourceListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
-                                </Border.GestureRecognizers>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </RefreshView>
-        </Grid>
+                                <VerticalStackLayout Spacing="5"
+                                                     VerticalOptions="Center">
+                                    <HorizontalStackLayout Spacing="5">
+                                        
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Label HorizontalOptions="FillAndExpand" 
+                                             LineBreakMode="TailTruncation"
+                                             MaxLines="1" 
+                                             TextColor="{StaticResource Gray600}"
+                                             VerticalOptions="Center">
+                                            <Label.Text>
+                                                <MultiBinding StringFormat="{}{0} / {1}">
+                                                    <Binding Path="Country" />
+                                                    <Binding Path="City" />
+                                                </MultiBinding>
+                                            </Label.Text>
+                                        </Label>
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+                        </Grid>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OutsourceListViewModel}}, Path=ItemTappedCommand}"
+                                                  CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </Grid>
 
 
 </ContentPage>

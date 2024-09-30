@@ -16,11 +16,11 @@ public partial class ProductAnalysisViewModel : BaseViewModel
     private readonly IProductAnalysisService _productAnalysisService;
 
     [ObservableProperty]
-    ProductAnalysisModel productAnalysisModel = new();
+    private ProductAnalysisModel productAnalysisModel = new();
 
     public ProductAnalysisViewModel(
-        IHttpClientService httpClientService, 
-        IProductAnalysisService productAnalysisService, 
+        IHttpClientService httpClientService,
+        IProductAnalysisService productAnalysisService,
         IUserDialogs userDialogs)
     {
         _httpClientService = httpClientService;
@@ -30,7 +30,6 @@ public partial class ProductAnalysisViewModel : BaseViewModel
         Title = "Malzeme Analizi";
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
-
     }
 
     public Command LoadItemsCommand { get; }
@@ -53,10 +52,8 @@ public partial class ProductAnalysisViewModel : BaseViewModel
                 GetOutStockProductCountAsync()
             );
 
-
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
-
         }
         catch (Exception ex)
         {
@@ -69,9 +66,7 @@ public partial class ProductAnalysisViewModel : BaseViewModel
         {
             IsBusy = false;
         }
-
     }
-
 
     private async Task GetNegativeStockProductsCountAsync()
     {
@@ -108,12 +103,11 @@ public partial class ProductAnalysisViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
     private async Task GetTotalProductCountAsync()
     {
-
         try
         {
-
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _productAnalysisService.GetTotalProductCountAsync(httpClient, _httpClientService.FirmNumber);
 
@@ -127,11 +121,7 @@ public partial class ProductAnalysisViewModel : BaseViewModel
                     var obj = Mapping.Mapper.Map<ProductAnalysisModel>(item);
                     ProductAnalysisModel.TotalProductCount = obj.TotalProductCount;
                 }
-
-
             }
-
-
         }
         catch (Exception ex)
         {
@@ -140,14 +130,12 @@ public partial class ProductAnalysisViewModel : BaseViewModel
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
-
     }
+
     private async Task GetInStockProductCountAsync()
     {
-
         try
         {
-
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _productAnalysisService.GetInStockProductCountAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber);
 
@@ -170,14 +158,12 @@ public partial class ProductAnalysisViewModel : BaseViewModel
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
-
     }
+
     private async Task GetOutStockProductCountAsync()
     {
-
         try
         {
-
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _productAnalysisService.GetOutStockProductCountAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber);
 
@@ -200,7 +186,5 @@ public partial class ProductAnalysisViewModel : BaseViewModel
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
-
     }
-
 }

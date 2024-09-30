@@ -160,6 +160,56 @@ public class OutsourcePanelDataStore : IOutsourcePanelService
         }
     }
 
+    public async Task<DataResult<IEnumerable<dynamic>>> GetAllOutsourceFiches(HttpClient httpClient, int firmNumber, int periodNumber)
+    {
+        var content = new StringContent(JsonConvert.SerializeObject(GetAllOutsourceFichesQuery(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
+
+        HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+        DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            var data = await responseMessage.Content.ReadAsStringAsync();
+            if (data != null)
+            {
+                if (!string.IsNullOrEmpty(data))
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "success";
+                    return dataResult;
+                }
+                else
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "empty";
+                    return dataResult;
+                }
+            }
+            else
+            {
+                var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                dataResult.Data = Enumerable.Empty<dynamic>();
+                dataResult.IsSuccess = false;
+                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+                return dataResult;
+            }
+        }
+        else
+        {
+            dataResult.Data = Enumerable.Empty<dynamic>();
+            dataResult.IsSuccess = false;
+            dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+            return dataResult;
+        }
+    }
+
     public async Task<DataResult<dynamic>> GetOutsourceInProductCount(HttpClient httpClient, int firmNumber, int periodNumber)
     {
         var content = new StringContent(JsonConvert.SerializeObject(GetOutsourceInProductCountQuery(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
@@ -312,8 +362,8 @@ public class OutsourcePanelDataStore : IOutsourcePanelService
 
     private string GetOutsourceTotalProductCountQuery(int firmNumber, int periodNumber)
     {
-        string baseQuery = $@"SELECT 
-[TotalProductCount] = ISNULL(COUNT(DISTINCT STLINE.STOCKREF),0) 
+        string baseQuery = $@"SELECT
+[TotalProductCount] = ISNULL(COUNT(DISTINCT STLINE.STOCKREF),0)
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS OUTSOURCE WITH(NOLOCK) ON STLINE.CLIENTREF = OUTSOURCE.LOGICALREF
 WHERE STLINE.TRCODE = 25 AND STLINE.IOCODE IN(2,4) AND STLINE.LPRODSTAT = 0 AND OUTSOURCE.SUBCONT = 1";
@@ -351,7 +401,7 @@ WHERE STLINE.TRCODE = 25 AND STLINE.IOCODE IN(2,4) AND STLINE.LPRODSTAT = 0 AND 
 			[FicheNumber] = STFICHE.FICHENO,
             [FicheDate] = STFICHE.DATE_,
             [FicheTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
-			[DocumentNumber] =ISNULL (STFICHE.DOCODE , ''),			
+			[DocumentNumber] =ISNULL (STFICHE.DOCODE , ''),
 			[SpecialCode] = ISNULL  ( STFICHE.SPECODE , ''),
 			[CurrentReferenceID] = ISNULL ( CLCARD.LOGICALREF, 0),
 			[CurrentCode] = ISNULL (CLCARD.CODE , '' ),
@@ -435,6 +485,32 @@ END
 		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
 		WHERE STFICHE.TRCODE = 25 AND STLINE.IOCODE = 2 AND STFICHE.LOGICALREF = {ficheReferenceId} AND STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0
 		ORDER BY STLINE.DATE_ DESC";
+
+        return baseQuery;
+    }
+
+    private string GetAllOutsourceFichesQuery(int firmNumber, int periodNumber)
+    {
+        string baseQuery = $@"Select
+            [ReferenceId] = STFICHE.LOGICALREF,
+			[FicheType] = STFICHE.TRCODE,
+			[FicheNumber] = STFICHE.FICHENO,
+            [FicheDate] = STFICHE.DATE_,
+            [FicheTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
+			[DocumentNumber] =ISNULL (STFICHE.DOCODE , ''),
+			[SpecialCode] = ISNULL  ( STFICHE.SPECODE , ''),
+			[CurrentReferenceID] = ISNULL ( CLCARD.LOGICALREF, 0),
+			[CurrentCode] = ISNULL (CLCARD.CODE , '' ),
+			[CurrentName] = ISNULL ( CLCARD.DEFINITION_ ,''),
+			[WarehouseName] =  ISNULL (CAPIWHOUSE.NAME , ''),
+			[WarehouseNumber] = ISNULL( CAPIWHOUSE.NR, 0),
+			[Description] =  ISNULL (STFICHE.GENEXP1, '')
+			From LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
+			left join LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
+			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
+			WHERE STFICHE.TRCODE = 25 AND STFICHE.PRODSTAT = 0 AND STFICHE.CLIENTREF > 0 AND CLCARD.SUBCONT = 1
+			ORDER BY STFICHE.DATE_ DESC;";
+
 
         return baseQuery;
     }

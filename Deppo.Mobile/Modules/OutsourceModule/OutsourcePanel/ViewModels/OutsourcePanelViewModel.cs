@@ -4,9 +4,16 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.OutsourceModels;
+using Deppo.Mobile.Core.Models.ProductModels;
+using Deppo.Mobile.Core.Models.PurchaseModels;
+using Deppo.Mobile.Core.Models.QuicklyModels.BasketModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.Views;
+using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views;
+using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.Views;
 using DevExpress.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.ViewModels;
@@ -18,7 +25,7 @@ public partial class OutsourcePanelViewModel : BaseViewModel
     private readonly IUserDialogs _userDialogs;
 
     [ObservableProperty]
-    OutsourcePanelModel _outsourcePanelModel = new();
+    private OutsourcePanelModel _outsourcePanelModel = new();
 
     public OutsourcePanelViewModel(IHttpClientService httpClientService, IOutsourcePanelService outsourcePanelService, IUserDialogs userDialogs)
     {
@@ -30,11 +37,15 @@ public partial class OutsourcePanelViewModel : BaseViewModel
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         ItemTappedCommand = new Command<OutsourceFiche>(async (outsourceFiche) => await ItemTappedAsync(outsourceFiche));
+        GoToSupplierDetailCommand = new Command<Supplier>(async (supplier) => await GoToSupplierDetailAsync(supplier));
+        AddAllFicheCommand = new Command(async () => await AddAllFicheAsync());
     }
 
     public Page CurrentPage { get; set; }
     public Command LoadItemsCommand { get; }
+    public Command GoToSupplierDetailCommand { get; }
     public Command ItemTappedCommand { get; }
+    public Command AddAllFicheCommand { get; }
 
     private async Task LoadItemsAsync()
     {
@@ -64,7 +75,6 @@ public partial class OutsourcePanelViewModel : BaseViewModel
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
-
         }
         catch (System.Exception)
         {
@@ -79,36 +89,35 @@ public partial class OutsourcePanelViewModel : BaseViewModel
         }
     }
 
-
     private async Task ItemTappedAsync(OutsourceFiche outsourceFiche)
     {
-        if(IsBusy)
+        if (IsBusy)
             return;
 
-            try
-            {
-                IsBusy = true;
+        try
+        {
+            IsBusy = true;
 
-                _userDialogs.ShowLoading("Yükleniyor...");
-                await Task.Delay(1000);
-                await GetLastOutsourceTransactionsAsync(outsourceFiche);
+            _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(1000);
+            await GetLastOutsourceTransactionsAsync(outsourceFiche);
 
-                CurrentPage.FindByName<BottomSheet>("ficheTransactionBottomSheet").State = BottomSheetState.HalfExpanded;
+            CurrentPage.FindByName<BottomSheet>("ficheTransactionBottomSheet").State = BottomSheetState.HalfExpanded;
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
-            }
-            catch (System.Exception)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.HideHud();
+        }
+        catch (System.Exception)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-                _userDialogs.Alert("Bir hata oluştu. Lütfen tekrar deneyiniz.", "Hata", "Tamam");
-            }
-            finally
-            {
-             IsBusy = false;   
-            }
+            _userDialogs.Alert("Bir hata oluştu. Lütfen tekrar deneyiniz.", "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     private async Task GetLastOutsourceTransactionsAsync(OutsourceFiche outsourceFiche)
@@ -143,6 +152,7 @@ public partial class OutsourcePanelViewModel : BaseViewModel
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
     }
+
     private async Task GetOutsourceOutProductCountAsync()
     {
         try
@@ -303,4 +313,54 @@ public partial class OutsourcePanelViewModel : BaseViewModel
         }
     }
 
+    private async Task GoToSupplierDetailAsync(Supplier supplier)
+    {
+        if (supplier is null)
+            return;
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            SupplierDetailModel supplierDetailModel = new();
+            supplierDetailModel.Supplier = supplier;
+
+            await Shell.Current.GoToAsync($"{nameof(SupplierDetailView)}", new Dictionary<string, object>
+            {
+                [nameof(SupplierDetailModel)] = supplierDetailModel
+            });
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task AddAllFicheAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(OutsourcePanelAllFicheListView)}");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 }

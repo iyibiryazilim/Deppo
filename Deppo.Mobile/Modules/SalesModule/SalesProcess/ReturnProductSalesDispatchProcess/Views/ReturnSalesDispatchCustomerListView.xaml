@@ -32,7 +32,6 @@
     <Grid RowDefinitions="*,Auto">
 
         <Grid Grid.Row="0"
-              Padding="10"
               RowDefinitions="Auto,*">
             <Border Grid.Row="0"
                     Margin="5,5,5,0"
