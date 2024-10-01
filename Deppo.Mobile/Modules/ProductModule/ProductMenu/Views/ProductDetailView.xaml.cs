@@ -4,10 +4,12 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
 
 public partial class ProductDetailView : ContentPage
 {
-	ProductDetailViewModel _viewModel;
-	public ProductDetailView(ProductDetailViewModel viewModel)
-	{
-		InitializeComponent();
-		BindingContext = _viewModel = viewModel;
-	}
+    private ProductDetailViewModel _viewModel;
+
+    public ProductDetailView(ProductDetailViewModel viewModel)
+    {
+        InitializeComponent();
+        BindingContext = _viewModel = viewModel;
+        _viewModel.CurrentPage = this;
+    }
 }

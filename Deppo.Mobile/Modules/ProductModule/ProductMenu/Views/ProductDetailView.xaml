@@ -2,6 +2,7 @@
 <ContentPage x:Class="Deppo.Mobile.Modules.ProductModule.ProductMenu.Views.ProductDetailView"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -10,7 +11,8 @@
              x:DataType="viewModel:ProductDetailViewModel"
              Shell.TabBarIsVisible="False">
     <ContentPage.ToolbarItems>
-        <ToolbarItem Order="Primary">
+        <ToolbarItem Order="Primary"
+                     Command="{Binding ShowProcessBottomSheetCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="FAS"
                                  Glyph="{x:Static fontAwesome:FontAwesomeIcons.EllipsisVertical}"
@@ -19,8 +21,10 @@
         </ToolbarItem>
     </ContentPage.ToolbarItems>
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                        EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -31,12 +35,13 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android" Value="artboard.png" />
+            <On Platform="Android"
+                Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
     <Grid Padding="10"
-          RowDefinitions=".40*, .60*"
+          RowDefinitions=".40*, .50*,Auto"
           RowSpacing="10">
 
         <VerticalStackLayout Grid.Row="0"
@@ -56,7 +61,8 @@
             <!--#endregion-->
 
             <!--#region Code, Name, StockQuantity-->
-            <VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+            <VerticalStackLayout HorizontalOptions="Center"
+                                 Spacing="4">
                 <Label FontAttributes="Bold"
                        FontSize="Large"
                        HorizontalOptions="Center"
@@ -76,7 +82,8 @@
                        VerticalOptions="Center">
                     <Label.FormattedText>
                         <FormattedString>
-                            <Span FontFamily="FAS" Text="{x:Static fontAwesome:FontAwesomeIcons.MoneyBill}" />
+                            <Span FontFamily="FAS"
+                                  Text="{x:Static fontAwesome:FontAwesomeIcons.MoneyBill}" />
                             <Span Text=" " />
                             <Span Text="{Binding ProductDetailModel.Product.StockQuantity}" />
                         </FormattedString>
@@ -132,7 +139,6 @@
             <!--#endregion-->
         </VerticalStackLayout>
 
-
         <!--#region Last Transactions List-->
         <Grid Grid.Row="1"
               RowDefinitions="Auto, *"
@@ -142,7 +148,8 @@
                    Text="Son Hareketler"
                    TextColor="{StaticResource OffBlack}" />
 
-            <CollectionView Grid.Row="1" ItemsSource="{Binding ProductDetailModel.LastTransactions}">
+            <CollectionView Grid.Row="1"
+                            ItemsSource="{Binding ProductDetailModel.LastTransactions}">
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:ProductTransaction">
@@ -150,7 +157,8 @@
                                 BackgroundColor="Transparent"
                                 StrokeShape="RoundRectangle 5"
                                 StrokeThickness="0.1">
-                            <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
+                            <Grid ColumnDefinitions="Auto, *"
+                                  ColumnSpacing="10">
                                 <VerticalStackLayout Grid.Column="0"
                                                      Spacing="1"
                                                      VerticalOptions="Center">
@@ -182,7 +190,8 @@
                                            Text="{Binding WarehouseName}" />
 
                                     <HorizontalStackLayout Spacing="10">
-                                        <Grid ColumnDefinitions="Auto, Auto" ColumnSpacing="3">
+                                        <Grid ColumnDefinitions="Auto, Auto"
+                                              ColumnSpacing="3">
                                             <Label Grid.Column="0"
                                                    FontFamily="FAS"
                                                    FontSize="Small"
@@ -192,14 +201,17 @@
                                             <Label Grid.Column="1">
                                                 <Label.FormattedText>
                                                     <FormattedString>
-                                                        <Span FontAttributes="Bold" Text="{Binding Quantity}" />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding Quantity}" />
                                                         <Span Text=" " />
-                                                        <Span FontAttributes="Bold" Text="{Binding SubUnitsetCode}" />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding SubUnitsetCode}" />
                                                     </FormattedString>
                                                 </Label.FormattedText>
                                             </Label>
                                         </Grid>
-                                        <Grid ColumnDefinitions="Auto, Auto" ColumnSpacing="3">
+                                        <Grid ColumnDefinitions="Auto, Auto"
+                                              ColumnSpacing="3">
                                             <Label Grid.Column="0"
                                                    FontFamily="FAS"
                                                    HeightRequest="15"
@@ -211,7 +223,6 @@
                                                    FontAttributes="Bold"
                                                    Text="{Binding IOTypeName}" />
                                         </Grid>
-
                                     </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Grid>
@@ -221,5 +232,86 @@
             </CollectionView>
         </Grid>
         <!--#endregion-->
+
+        <VerticalStackLayout Grid.Row="2">
+            <dx:BottomSheet x:Name="processBottomSheet"
+                            AllowDismiss="True"
+                            BackgroundColor="White"
+                            CornerRadius="15"
+                            HalfExpandedRatio="0.3"
+                            IsModal="True"
+                            ShowGrabber="True">
+                <Grid RowDefinitions="Auto,*"
+                      RowSpacing="20"
+                      Padding="10">
+                    <VerticalStackLayout Grid.Row="0"
+                                         Spacing="5">
+                        <Label FontAttributes="Bold"
+                               Padding="10"
+                               FontSize="18"
+                               Text="İşlemler" />
+                        <BoxView HeightRequest="2"
+                                 Color="{StaticResource Primary}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Row="1"
+                                         Spacing="10">
+                        <Border Padding="10"
+                                BackgroundColor="Transparent"
+                                StrokeShape="RoundRectangle 10"
+                                StrokeThickness="0">
+
+                            <Label TextColor="{StaticResource Gray600}"
+                                   VerticalOptions="Center">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span FontAttributes="Bold"
+                                              FontFamily="FAS"
+                                              
+                                              Text="{x:Static fontAwesome:FontAwesomeIcons.RightLong}"
+                                              TextColor="{StaticResource OffBlack}" />
+                                        <Span Text=" " />
+
+                                        <Span Text=" " />
+                                        <Span FontAttributes="Bold"
+                                              FontSize="15"
+                                              Text="Ambar Toplamları"
+                                              TextColor="{StaticResource OffBlack}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+
+                            <Border.GestureRecognizers>
+                                <!--<TapGestureRecognizer Command="{Binding SelectWholeCommand}" />-->
+                            </Border.GestureRecognizers>
+                        </Border>
+                        <Border Padding="10"
+                                BackgroundColor="Transparent"
+                                StrokeShape="RoundRectangle 10"
+                                StrokeThickness="0">
+                            <Label TextColor="{StaticResource Gray600}"
+                                   VerticalOptions="Center">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span FontAttributes="Bold"
+                                              FontFamily="FAS"
+                                              Text="{x:Static fontAwesome:FontAwesomeIcons.RightLong}"
+                                              TextColor="{StaticResource OffBlack}" />
+                                        <Span Text=" " />
+
+                                        <Span FontAttributes="Bold"
+                                              FontSize="15"
+                                              Text="Varyant"
+                                              TextColor="{StaticResource OffBlack}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Border.GestureRecognizers>
+                                <!--<TapGestureRecognizer Command="{Binding SelectRetailCommand}" />-->
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </VerticalStackLayout>
+                </Grid>
+            </dx:BottomSheet>
+        </VerticalStackLayout>
     </Grid>
 </ContentPage>

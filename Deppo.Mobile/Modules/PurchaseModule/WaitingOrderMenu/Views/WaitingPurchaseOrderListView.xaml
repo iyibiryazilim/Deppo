@@ -7,12 +7,22 @@
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.WaitingOrderMenu.ViewModels"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
+             xmlns:supplierModel="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels;assembly=Deppo.Mobile.Core"
              Title="{Binding Title}"
              x:DataType="viewModel:WaitingPurchaseOrderListViewModel">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Command="{Binding LoadSupplierCommand}">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Users}"
+                                 Size="Large">
+                </FontImageSource>
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
 
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding LoadSupplierCommand}"
-                                        EventName="Loaded" />
+
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
                                    StatusBarStyle="Default" />
     </ContentPage.Behaviors>
@@ -24,8 +34,9 @@
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
-    <Grid RowDefinitions="Auto, *" RowSpacing="10">
-        <dx:FormListPickerItem Grid.Row="0"
+    <Grid RowDefinitions="*, Auto"
+          RowSpacing="10">
+        <!--<dx:FormListPickerItem Grid.Row="0"
                         InlineContent="{x:Null}"
                         ItemsSource="{Binding Suppliers}"
                         PickerShowMode="BottomSheet"
@@ -52,8 +63,8 @@
                     </Border>
                 </DataTemplate>
             </dx:FormListPickerItem.ItemTemplate>
-        </dx:FormListPickerItem>
-        <CollectionView Grid.Row="1"
+        </dx:FormListPickerItem>-->
+        <CollectionView Grid.Row="0"
                         ItemsSource="{Binding Items}">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout ItemSpacing="0"
@@ -114,5 +125,100 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+        <VerticalStackLayout Grid.Row="1">
+            <dx:BottomSheet x:Name="supplierBottomSheet"
+                            AllowDismiss="True"
+                            BackgroundColor="White"
+                            CornerRadius="15"
+                            HalfExpandedRatio="0.5"
+                            IsModal="True"
+                            ShowGrabber="True">
+                <!--#region BottomSheetContent-->
+                <Grid RowDefinitions="Auto,*,Auto"
+                      RowSpacing="20"
+                      Padding="10">
+
+                    <VerticalStackLayout Grid.Row="0"
+                                         Spacing="5">
+                        <Label FontAttributes="Bold"
+                               FontSize="Subtitle"
+                               Text="Fason Ambarı Seçiniz" />
+                        <BoxView HeightRequest="2"
+                                 Color="{StaticResource OffBlack}" />
+                    </VerticalStackLayout>
+
+                    <CollectionView Grid.Row="1"
+                                    ItemsSource="{Binding Suppliers}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="supplierModel:SupplierModel">
+                                <Border Padding="10"
+                                        BackgroundColor="Transparent"
+                                        StrokeShape="RoundRectangle 10"
+                                        StrokeThickness="0.1">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WaitingPurchaseOrderListViewModel}}, Path=ItemTappedCommand}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <Grid ColumnDefinitions="Auto, *">
+                                        <Border Grid.Column="0"
+                                                Padding="0,0,10,0"
+                                                BackgroundColor="Transparent"
+                                                StrokeThickness="0">
+                                            <toolkit:AvatarView BackgroundColor="{StaticResource Primary}"
+                                                                BorderWidth="0.1"
+                                                                CornerRadius="50"
+                                                                FontAttributes="Bold"
+                                                                HorizontalOptions="Start"
+                                                                Text="{Binding TitleName}"
+                                                                TextColor="{StaticResource White}" />
+                                        </Border>
+
+                                        <VerticalStackLayout Grid.Column="1"
+                                                             Padding="5"
+                                                             Spacing="5"
+                                                             VerticalOptions="Start">
+                                            <Label FontAttributes="Bold"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="1"
+                                                   VerticalOptions="End"
+                                                   Text="{Binding Name}" />
+                                            <Label TextColor="{StaticResource Gray600}"
+                                                   VerticalOptions="Center">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span FontAttributes="Bold"
+                                                              FontFamily="FAS"
+                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding OrderReferenceCount, StringFormat='{0:N2}'}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                        <Span Text=" " />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                    <Border.Triggers>
+                                        <DataTrigger Binding="{Binding IsSelected}"
+                                                     TargetType="Border"
+                                                     Value="True">
+                                            <Setter Property="BackgroundColor"
+                                                    Value="{StaticResource SecondaryLight}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <Button Grid.Row="2"
+                            Text="Tamam"
+                            Command="{Binding SupplierConfirmCommand}">
+                    </Button>
+                </Grid>
+                <!--#endregion-->
+            </dx:BottomSheet>
+        </VerticalStackLayout>
     </Grid>
 </ContentPage>

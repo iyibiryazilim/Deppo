@@ -1,11 +1,14 @@
-﻿using Controls.UserDialogs.Maui;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.OutsourceModels;
+using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using DevExpress.Maui.Controls;
 using Org.Apache.Http.Client;
 using System;
 using System.Collections.Generic;
@@ -22,7 +25,12 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.ViewModels
         private readonly IUserDialogs _userDialogs;
         private readonly IOutsourcePanelService _outsourcePanelService;
 
+        [ObservableProperty]
+        public OutsourceFiche selectedItem;
+
         public ObservableCollection<OutsourceFiche> Items { get; } = new();
+
+        public ObservableCollection<OutsourceTransactionModel> Transactions { get; } = new();
 
         public OutsourcePanelAllFicheListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IOutsourcePanelService outsourcePanelService)
         {
@@ -35,12 +43,24 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.ViewModels
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
             LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
             BackCommand = new Command(async () => await BackAsync());
+            TransactionsCloseCommand = new Command(async () => await TransactionsCloseAsync());
+            LoadMoreTransactionsCommand = new Command(async () => await LoadMoreFicheTransactionsAsync());
+            ItemTappedCommand = new Command<OutsourceFiche>(async (item) => await ItemTappedAsync(item));
+            BackCommand = new Command(async () => await BackAsync());
         }
 
         public Command LoadItemsCommand { get; }
         public Command LoadMoreItemsCommand { get; }
+        public Command TransactionsCloseCommand { get; }
+        public Command LoadMoreTransactionsCommand { get; }
+
+        public Command LoadTransactionCommand { get; }
 
         public Command BackCommand { get; }
+
+        public Command ItemTappedCommand { get; }
+
+        public Page CurrentPage { get; set; }
 
         private async Task LoadItemsAsync()
         {
@@ -151,6 +171,101 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.ViewModels
             {
                 IsBusy = false;
             }
+        }
+
+        private async Task ItemTappedAsync(OutsourceFiche outsourceFiche)
+        {
+            if (IsBusy)
+                return;
+
+            try
+            {
+                IsBusy = true;
+
+                SelectedItem = outsourceFiche;
+
+                await LoadTransactionsAsync(outsourceFiche);
+                CurrentPage.FindByName<BottomSheet>("ficheTransactionsBottomSheet").State = BottomSheetState.HalfExpanded;
+            }
+            catch (Exception ex)
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task LoadTransactionsAsync(OutsourceFiche outsourceFiche)
+        {
+            try
+            {
+                _userDialogs.ShowLoading("Yükleniyor...");
+                await Task.Delay(1000);
+
+                Transactions.Clear();
+
+                var httpClient = _httpClientService.GetOrCreateHttpClient();
+                var result = await _outsourcePanelService.GetLastOutsourceTransactions(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, _httpClientService.PeriodNumber, ficheReferenceId: outsourceFiche.ReferenceId, 0, 20);
+                if (result.IsSuccess)
+                {
+                    if (result.Data is null)
+                        return;
+
+                    foreach (var item in result.Data)
+                        Transactions.Add(Mapping.Mapper.Map<OutsourceTransactionModel>(item));
+                }
+
+                _userDialogs.HideHud();
+            }
+            catch (Exception ex)
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+            }
+        }
+
+        private async Task LoadMoreFicheTransactionsAsync()
+        {
+            if (IsBusy)
+                return;
+            try
+            {
+                IsBusy = true;
+
+                var httpClient = _httpClientService.GetOrCreateHttpClient();
+                var result = await _outsourcePanelService.GetLastOutsourceTransactions(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, _httpClientService.PeriodNumber, ficheReferenceId: SelectedItem.ReferenceId, skip: Transactions.Count, take: 20);
+                if (result.IsSuccess)
+                {
+                    if (result.Data is null)
+                        return;
+
+                    foreach (var item in result.Data)
+                        Transactions.Add(Mapping.Mapper.Map<OutsourceTransactionModel>(item));
+                }
+            }
+            catch (Exception ex)
+            {
+                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task TransactionsCloseAsync()
+        {
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                CurrentPage.FindByName<BottomSheet>("ficheTransactionsBottomSheet").State = BottomSheetState.Hidden;
+            });
         }
     }
 }

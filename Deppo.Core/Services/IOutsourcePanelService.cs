@@ -5,7 +5,7 @@ namespace Deppo.Core.Services;
 
 public interface IOutsourcePanelService
 {
-    public Task<DataResult<IEnumerable<dynamic>>> GetLastOutsourceTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId);
+    public Task<DataResult<IEnumerable<dynamic>>> GetLastOutsourceTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId, int skip = 0, int take = 20);
 
     public Task<DataResult<IEnumerable<dynamic>>> GetLastOutsourceFiches(HttpClient httpClient, int firmNumber, int periodNumber);
 

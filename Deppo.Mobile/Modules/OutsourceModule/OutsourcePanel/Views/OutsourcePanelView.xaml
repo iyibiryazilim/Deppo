@@ -165,7 +165,6 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
             <Grid.GestureRecognizers>
-                
             </Grid.GestureRecognizers>
         </Grid>
 
@@ -175,8 +174,10 @@
             <Grid ColumnDefinitions="Auto,.10*">
                 <Label Grid.Column="0"
                        FontAttributes="Bold"
+                      VerticalOptions="End"
+                       
                        FontSize="18"
-                       Text="Sarf Malzemeleri"
+                       Text="Son Hareketler"
                        TextColor="{StaticResource OffBlack}" />
                 <Border Grid.Column="1"
                         Padding="5"
@@ -190,11 +191,8 @@
                         <Label.FormattedText>
                             <FormattedString>
                                 <Span FontAttributes="Bold"
-                                      Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
-                                      TextColor="{StaticResource White}" />
-                                <Span Text=" " />
-                                <Span FontAttributes="Bold"
                                       Text="Tümü"
+                                      
                                       TextColor="{StaticResource White}" />
                             </FormattedString>
                         </Label.FormattedText>
