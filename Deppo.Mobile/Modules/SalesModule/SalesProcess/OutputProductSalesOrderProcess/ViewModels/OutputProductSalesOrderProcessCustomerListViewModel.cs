@@ -252,34 +252,34 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
             IsBusy = true;
 
             if (SalesCustomer is not null)
-			{
-				SalesCustomer.IsSelected = false;
+            {
+                SalesCustomer.IsSelected = false;
                 SalesCustomer = null;
-			}
+            }
 
             SalesCustomer = item;
-            if(item.ShipAddressCount > 0)
+            if (item.ShipAddressCount > 0)
             {
-				await LoadShipAddressesAsync(item);
-				CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
-			}
+                await LoadShipAddressesAsync(item);
+                CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
+            }
             else
             {
-				if (SalesCustomer == item)
-				{
-					SalesCustomer.IsSelected = false;
-					SalesCustomer = null;
-				}
-				else
-				{
-					if (SalesCustomer is not null)
-					{
-						SalesCustomer.IsSelected = false;
-					}
-					SalesCustomer = item;
-					SalesCustomer.IsSelected = true;
-				}
-			}
+                if (SalesCustomer == item)
+                {
+                    SalesCustomer.IsSelected = false;
+                    SalesCustomer = null;
+                }
+                else
+                {
+                    if (SalesCustomer is not null)
+                    {
+                        SalesCustomer.IsSelected = false;
+                    }
+                    SalesCustomer = item;
+                    SalesCustomer.IsSelected = true;
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -303,7 +303,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _shipAddressService.GetObjects(
+            var result = await _shipAddressService.GetObjectsByOrder(
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
@@ -375,13 +375,12 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
                 SalesCustomer.ShipAddressCode = selectedShipAddress.Code;
                 SalesCustomer.ShipAddressName = selectedShipAddress.Name;
 
-				if (SalesCustomer is not null)
-				{
-					SalesCustomer.IsSelected = true;
-				}
-				
+                if (SalesCustomer is not null)
+                {
+                    SalesCustomer.IsSelected = true;
+                }
 
-				CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.Hidden;
+                CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.Hidden;
             }
             else
             {
