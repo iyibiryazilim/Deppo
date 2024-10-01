@@ -30,7 +30,7 @@ public partial class ProductDetailViewModel : BaseViewModel
     [ObservableProperty]
     private ProductDetailModel productDetailModel = null!;
 
-    public ObservableCollection<ProductActionModel> ProductActionModels{ get; } = new();
+    public ObservableCollection<ProductActionModel> ProductActionModels { get; } = new();
 
     public Page CurrentPage { get; set; }
 
@@ -60,16 +60,13 @@ public partial class ProductDetailViewModel : BaseViewModel
 
     public Command GoToWarehouseTotalView { get; }
 
-
     //ActionModel
-
 
     //Üç Nokta
     public Command ActionModelProcessTappedCommand { get; }
 
     //Tıkladığımı Diğer Sayfaya Göndereceğim
     public Command ActionModelsTappedCommand { get; }
-
 
     #endregion Commands
 
@@ -251,16 +248,12 @@ public partial class ProductDetailViewModel : BaseViewModel
         }
         catch (Exception)
         {
-
             throw;
         }
-        finally 
-        { 
-        
-        } 
+        finally
+        {
+        }
     }
-
-
 
     private async Task ActionModelProcessTappedAsync()
     {
@@ -274,7 +267,7 @@ public partial class ProductDetailViewModel : BaseViewModel
             await Task.Delay(500);
             await LoadActionModelsAsync();
 
-            CurrentPage.FindByName<BottomSheet>("processTappedBottomSheet").State = BottomSheetState.HalfExpanded;
+            CurrentPage.FindByName<BottomSheet>("processBottomSheet").State = BottomSheetState.HalfExpanded;
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
@@ -291,30 +284,30 @@ public partial class ProductDetailViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
     private async Task LoadActionModelsAsync()
     {
         try
         {
             IsBusy = true;
-
+            ProductActionModels.Clear();
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             _userDialogs.Loading("Loading Items...");
             await Task.Delay(1000);
 
-            //ProductActionModels.Add(new ProductActionModel
-            //{
-            //    ActionName = "Varyantları",
-            //    ActionUrl = $"{nameof(ProductVariantListViewModel)}"
-            //});
+            ProductActionModels.Add(new ProductActionModel
+            {
+                ActionName = "Ambar Toplamları",
+                ActionUrl = $"{nameof(ProductDetailWarehouseTotalListView)}"
+            });
             if (ProductDetailModel.Product.IsVariant)
             {
-                ProductActionModels.Add( new ProductActionModel {
-                      ActionName = "Varyantları",
-                      ActionUrl = $"{nameof(ProductVariantListViewModel)}"
+                ProductActionModels.Add(new ProductActionModel
+                {
+                    ActionName = "Varyantları",
+                    ActionUrl = $"{nameof(ProductVariantListViewModel)}"
                 });
             }
-
-
 
             _userDialogs.HideHud();
         }
@@ -333,8 +326,6 @@ public partial class ProductDetailViewModel : BaseViewModel
 
     private async Task ActionModelsTappedAsync(ProductActionModel model)
     {
-        if (IsBusy)
-            return;
         try
         {
             IsBusy = true;
@@ -352,5 +343,4 @@ public partial class ProductDetailViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
 }
