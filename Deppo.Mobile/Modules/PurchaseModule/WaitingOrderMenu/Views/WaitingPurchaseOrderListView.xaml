@@ -14,7 +14,7 @@
         <ToolbarItem Command="{Binding LoadSupplierCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="FAS"
-                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Users}"
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.User}"
                                  Size="Large">
                 </FontImageSource>
             </ToolbarItem.IconImageSource>
