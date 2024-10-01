@@ -124,8 +124,6 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	public Command CameraTappedCommand { get; }
 	#endregion
 
-    #endregion
-
     [ObservableProperty]
     public SearchBar locationTransactionSearchText;
 
