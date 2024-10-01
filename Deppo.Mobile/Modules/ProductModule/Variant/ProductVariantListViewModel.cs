@@ -44,7 +44,7 @@ public partial class ProductVariantListViewModel : BaseViewModel
         _userDialogs = userDialogs;
         _variantService = variantService;
 
-        Title = "Artan Referans Ürün Listesi";
+        Title = "Varyant Listesi";
 
         BackCommand = new Command(async () => await BackAsync());
         ItemTappedCommand = new Command<VariantModel>(async (variant) => await ItemTappedAsync(variant));

@@ -12,6 +12,10 @@ using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
 using DevExpress.Maui.Controls;
+using Deppo.Mobile.Core.Models.ActionModel;
+using System.Collections.ObjectModel;
+using Deppo.Mobile.Modules.ProductModule.Variant;
+using Deppo.Mobile.Core.Models.VariantModels;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels;
 
@@ -25,6 +29,8 @@ public partial class ProductDetailViewModel : BaseViewModel
 
     [ObservableProperty]
     private ProductDetailModel productDetailModel = null!;
+
+    public ObservableCollection<ProductActionModel> ProductActionModels{ get; } = new();
 
     public Page CurrentPage { get; set; }
 
@@ -40,6 +46,8 @@ public partial class ProductDetailViewModel : BaseViewModel
         InputQuantityTappedCommand = new Command(async () => await InputQuantityTappedAsync());
         OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
         ShowProcessBottomSheetCommand = new Command(async () => await ShowProcessBottomSheetAsync());
+        ActionModelProcessTappedCommand = new Command(async () => await ActionModelProcessTappedAsync());
+        ActionModelsTappedCommand = new Command<ProductActionModel>(async (model) => await ActionModelsTappedAsync(model));
     }
 
     #region Commands
@@ -51,6 +59,17 @@ public partial class ProductDetailViewModel : BaseViewModel
     public Command ShowProcessBottomSheetCommand { get; }
 
     public Command GoToWarehouseTotalView { get; }
+
+
+    //ActionModel
+
+
+    //Üç Nokta
+    public Command ActionModelProcessTappedCommand { get; }
+
+    //Tıkladığımı Diğer Sayfaya Göndereceğim
+    public Command ActionModelsTappedCommand { get; }
+
 
     #endregion Commands
 
@@ -240,4 +259,98 @@ public partial class ProductDetailViewModel : BaseViewModel
         
         } 
     }
+
+
+
+    private async Task ActionModelProcessTappedAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+            _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(500);
+            await LoadActionModelsAsync();
+
+            CurrentPage.FindByName<BottomSheet>("processTappedBottomSheet").State = BottomSheetState.HalfExpanded;
+
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+        }
+        catch (System.Exception)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert("Bir hata oluştu. Lütfen tekrar deneyiniz.", "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+    private async Task LoadActionModelsAsync()
+    {
+        try
+        {
+            IsBusy = true;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            _userDialogs.Loading("Loading Items...");
+            await Task.Delay(1000);
+
+            //ProductActionModels.Add(new ProductActionModel
+            //{
+            //    ActionName = "Varyantları",
+            //    ActionUrl = $"{nameof(ProductVariantListViewModel)}"
+            //});
+            if (ProductDetailModel.Product.IsVariant)
+            {
+                ProductActionModels.Add( new ProductActionModel {
+                      ActionName = "Varyantları",
+                      ActionUrl = $"{nameof(ProductVariantListViewModel)}"
+                });
+            }
+
+
+
+            _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
+
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ActionModelsTappedAsync(ProductActionModel model)
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+            await Shell.Current.GoToAsync(model.ActionUrl);
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
+
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
 }
