@@ -14,7 +14,7 @@
         <ToolbarItem Command="{Binding LoadCustomersCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="FAS"
-                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Users}"
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.User}"
                                  Size="Large" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
@@ -197,7 +197,6 @@
                                                               Text="{Binding OrderReferenceCount, StringFormat='{0:N2}'}"
                                                               TextColor="{StaticResource Primary}" />
                                                         <Span Text=" " />
-                                                       
                                                     </FormattedString>
                                                 </Label.FormattedText>
                                             </Label>
