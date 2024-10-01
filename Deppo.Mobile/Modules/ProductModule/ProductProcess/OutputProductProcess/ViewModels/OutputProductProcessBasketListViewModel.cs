@@ -828,7 +828,11 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
-			await Shell.Current.GoToAsync($"{nameof(CameraReaderView)}");
+
+			await Shell.Current.GoToAsync($"{nameof(CameraReaderView)}", new Dictionary<string, object>
+			{
+				["ComingPage"] = "OutputProductProcessBasket"
+			});
 		}
 		catch (Exception ex)
 		{

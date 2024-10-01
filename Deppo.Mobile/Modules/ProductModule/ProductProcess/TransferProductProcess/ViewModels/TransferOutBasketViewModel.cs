@@ -14,6 +14,7 @@ using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 using System.Collections.ObjectModel;
 using Deppo.Mobile.Core.Models.TransferModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.TransferProductProcess.Views;
+using Deppo.Mobile.Modules.CameraModule.Views;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.TransferProductProcess.ViewModels;
 
@@ -80,6 +81,7 @@ public partial class TransferOutBasketViewModel : BaseViewModel
 
         NextViewCommand = new Command(async () => await NextViewAsync());
         BackCommand = new Command(async () => await BackAsync());
+        CameraTappedCommand = new Command(async () => await CameraTappedAsync());
     }
 
     #region Properties
@@ -110,6 +112,7 @@ public partial class TransferOutBasketViewModel : BaseViewModel
     #endregion
     public Command NextViewCommand { get; }
     public Command BackCommand { get; }
+    public Command CameraTappedCommand { get;}
     #endregion
 
     
@@ -772,4 +775,31 @@ public partial class TransferOutBasketViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+    private async Task CameraTappedAsync()
+    {
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+
+			await Shell.Current.GoToAsync($"{nameof(CameraReaderView)}", new Dictionary<string, object>
+			{
+				["ComingPage"] = "TransferOutBasket"
+			});
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 }
