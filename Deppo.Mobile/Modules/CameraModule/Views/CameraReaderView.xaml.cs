@@ -24,6 +24,9 @@ public partial class CameraReaderView : ContentPage
 
 	private void OnBarcodesDetected(object sender, BarcodeDetectionEventArgs e)
 	{
+		if (IsBusy)
+			return;
+		
 		if (_viewModel.CameraDetectedCommand.CanExecute(e))
 		{
 			_viewModel.CameraDetectedCommand.Execute(e);
