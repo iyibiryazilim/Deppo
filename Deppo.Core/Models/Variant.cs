@@ -17,7 +17,7 @@ public class Variant : INotifyPropertyChanged, IDisposable
     private int _productReferenceId;
     private string _productCode = string.Empty;
     private string _productName = string.Empty;
-    private int _vatRate;
+    private int _vatRate = default;
     private int _subUnitsetReferenceId = default;
     private string _subUnitsetCode = string.Empty;
     private string _subUnitsetName = string.Empty;
@@ -28,6 +28,10 @@ public class Variant : INotifyPropertyChanged, IDisposable
     private int _locTracking = default;
     private double _stockQuantity = default;
     private string? _image = default;
+    private int _brandReferenceId = default;
+    private string _brandCode = string.Empty;
+    private string _brandName = string.Empty;
+    private string _groupCode = string.Empty;
     private Product? _product;
 
     public Variant()
@@ -228,6 +232,51 @@ public class Variant : INotifyPropertyChanged, IDisposable
         {
             if (_image == value) return;
             _image = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    [Browsable(false)]
+    public int BrandReferenceId
+    {
+        get => _brandReferenceId;
+        set
+        {
+            if (_brandReferenceId == value) return;
+            _brandReferenceId = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public string BrandCode
+    {
+        get => _brandCode;
+        set
+        {
+            if (_brandCode == value) return;
+            _brandCode = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public string BrandName
+    {
+        get => _brandName;
+        set
+        {
+            if (_brandName == value) return;
+            _brandName = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public string GroupCode
+    {
+        get => _groupCode;
+        set
+        {
+            if (_groupCode == value) return;
+            _groupCode = value;
             NotifyPropertyChanged();
         }
     }

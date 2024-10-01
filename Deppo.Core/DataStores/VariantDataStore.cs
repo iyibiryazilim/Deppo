@@ -222,13 +222,33 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
     private string GetVariantsQuery(int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
     {
-        string baseQuery = $@" select 
-			   [ReferenceId] = ISNULL(Variant.LOGICALREF,0), 
-			   [Name] = ISNULL(Variant.NAME,''), 
-			   [Code] = ISNULL(Variant.CODE,''),
-			   [ProductReferenceId] = ISNULL (Variant.ITEMREF,0)
-			   from LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT as Variant 
-			   where Variant.ITEMREF = {productReferenceId}" ;
+        string baseQuery = $@"  select 
+ [ReferenceId] = VARIANT.LOGICALREF,
+ [Code] = VARIANT.CODE,
+ [Name] = VARIANT.NAME,
+ [ProductReferenceId] = ITEMS.LOGICALREF,
+ [ProductCode] = ITEMS.CODE,
+ [ProductName] = ITEMS.NAME,
+ [VatRate] = ITEMS.VAT,
+ [SubUnitsetReferenceId] = UNITSETL.LOGICALREF,
+ [SubUnitsetCode] = UNITSETL.CODE,
+ [SubUnitsetName] = UNITSETL.NAME,
+ [UnitsetReferenceId] = UNITSETF.LOGICALREF,
+ [UnitsetCode] = UNITSETF.CODE,
+ [UnitsetName] = UNITSETF.NAME,
+ [TrackingType] = ITEMS.TRACKTYPE,
+ [LocTracking] = ITEMS.LOCTRACKING,
+[GroupCode] = ISNULL(ITEMS.STGRPCODE,''),
+[BrandReferenceId] = ISNULL(BRAND.LOGICALREF,0),
+[BrandCode] = ISNULL(BRAND.CODE,''),
+[BrandName] = ISNULL(BRAND.DESCR,''),
+[StockQuantity] = 0
+ from LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT as VARIANT
+ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON ITEMS.LOGICALREF = VARIANT.ITEMREF
+ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF  AS UNITSETF ON UNITSETF.LOGICALREF = VARIANT.UNITSETREF
+ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL ON UNITSETL.UNITSETREF = UNITSETF.LOGICALREF
+ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_MARK AS BRAND WITH(NOLOCK) ON ITEMS.MARKREF = BRAND.LOGICALREF
+ where ITEMS.LOGICALREF = {productReferenceId} AND VARIANT.ACTIVE = 0" ;
         if (!string.IsNullOrEmpty(search))
             baseQuery += $@" AND (Variant.CODE LIKE '{search}%' OR Variant.NAME LIKE '%{search}%')";
         baseQuery += $@" ORDER BY Variant.CODE DESC
