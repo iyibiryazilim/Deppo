@@ -9,6 +9,7 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.CameraModule.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Views;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
@@ -84,6 +85,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 
         NextViewCommand = new Command(async () => await NextViewAsync());
         BackCommand = new Command(async () => await BackAsync());
+		CameraTappedCommand = new Command(async () => await CameraTappedAsync());
     }
 
     #region Properties
@@ -114,6 +116,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	#endregion
 	public Command NextViewCommand { get; }
 	public Command BackCommand { get; }
+
+	public Command CameraTappedCommand { get; }
 	#endregion
 
 	private async Task ShowProductViewAsync()
@@ -809,6 +813,29 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				_userDialogs.HideHud();
 
 			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task CameraTappedAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			await Shell.Current.GoToAsync($"{nameof(CameraReaderView)}");
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{

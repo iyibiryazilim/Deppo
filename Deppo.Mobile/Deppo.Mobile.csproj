@@ -74,6 +74,7 @@
 		<PackageReference Include="DevExpress.Maui.Charts" Version="24.1.*" />
 		<PackageReference Include="AutoMapper" Version="12.0.1" />
 		<PackageReference Include="SkiaSharp.Extended.UI.Maui" Version="2.0.0" />
+		<PackageReference Include="ZXing.Net.Maui.Controls" Version="0.4.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -87,6 +88,9 @@
 	  </Compile>
 	  <Compile Update="Modules/QuicklyProductionModule/QuicklyProductionProcess/Manuel/Views/ManuelCalcOutWarehouseListView.xaml.cs">
 	    <DependentUpon>ManuelCalcOutWarehouseListView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Modules\CameraModule\Views\CameraReaderView.xaml.cs">
+	    <DependentUpon>CameraReaderView.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Modules\ProductModule\ProductPanel\Views\InputProductListView.xaml.cs">
 	    <DependentUpon>InputProductListView.xaml</DependentUpon>
@@ -121,6 +125,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Modules\CameraModule\Views\CameraReaderView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\CountingModule\CountingPanel\Views\CountingInputReferenceProductListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
