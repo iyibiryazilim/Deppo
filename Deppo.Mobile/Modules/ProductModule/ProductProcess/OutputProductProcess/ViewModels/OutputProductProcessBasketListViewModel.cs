@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
@@ -84,6 +85,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 
         NextViewCommand = new Command(async () => await NextViewAsync());
         BackCommand = new Command(async () => await BackAsync());
+        LocationTransactionPerformSearchCommand = new Command(async () => await LocationTransactionPerformSearchAsync());
+        LocationTransactionPerformEmptySearchCommand = new Command(async () => await LocationTransactionPerformEmptySearchAsync());
     }
 
     #region Properties
@@ -114,9 +117,15 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	#endregion
 	public Command NextViewCommand { get; }
 	public Command BackCommand { get; }
-	#endregion
 
-	private async Task ShowProductViewAsync()
+    public Command LocationTransactionPerformSearchCommand { get; }
+    public Command LocationTransactionPerformEmptySearchCommand { get; }
+    #endregion
+
+    [ObservableProperty]
+    public SearchBar locationTransactionSearchText;
+
+    private async Task ShowProductViewAsync()
 	{
 		if (IsBusy)
 			return;
@@ -283,7 +292,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				productReferenceId: SelectedItem.ItemReferenceId,
 				warehouseNumber: WarehouseModel.Number,
 				skip: 0,
-				take: 20
+				take: 20,
+				search:LocationTransactionSearchText.Text
 			);
 
 			if (result.IsSuccess)
@@ -334,7 +344,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				productReferenceId: SelectedItem.ItemReferenceId,
 				warehouseNumber: WarehouseModel.Number,
 				skip: LocationTransactions.Count,
-				take: 20);
+				take: 20,
+                search:LocationTransactionSearchText.Text);
 
 			if (result.IsSuccess)
 			{
@@ -367,7 +378,75 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
-	private async Task LocationTransactionIncreaseAsync(LocationTransactionModel item)
+    private async Task LocationTransactionPerformSearchAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(LocationTransactionSearchText.Text))
+            {
+                await LoadLocationTransactionsAsync();
+                LocationTransactionSearchText.Unfocus();
+                return;
+            }
+            IsBusy = true;
+
+            LocationTransactions.Clear();
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _locationTransactionService.GetInputObjectsAsync(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                productReferenceId: SelectedItem.ItemReferenceId,
+                warehouseNumber: WarehouseModel.Number,
+                skip: 0,
+                take: 20,
+                search: LocationTransactionSearchText.Text
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+                foreach (var item in result.Data)
+                {
+                    LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+                }
+
+                foreach (var locationTransaction in LocationTransactions)
+                {
+                    var matchingItem = SelectedItem.Details.FirstOrDefault(item => item.ReferenceId == locationTransaction.ReferenceId);
+                    if (matchingItem != null)
+                    {
+                        locationTransaction.OutputQuantity = matchingItem.Quantity;
+                    }
+                }
+
+
+            }
+        }
+        catch (System.Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task LocationTransactionPerformEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(LocationTransactionSearchText.Text))
+        {
+            await LocationTransactionPerformSearchAsync();
+        }
+    }
+
+    private async Task LocationTransactionIncreaseAsync(LocationTransactionModel item)
 	{
 		if (IsBusy)
 			return;

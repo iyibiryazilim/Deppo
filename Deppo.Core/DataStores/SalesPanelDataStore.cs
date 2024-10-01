@@ -751,6 +751,7 @@ WHERE ORFLINE.CLOSED = 0
 			[ReferenceId] = ORFLINE.LOGICALREF,
             [OrderReferenceId] = ORFICHE.LOGICALREF,
             [CustomerReferenceId] = CLCARD.LOGICALREF,
+            [OrderNumber] = ORFICHE.FICHENO,
             [CustomerCode] = CLCARD.CODE,
             [CustomerName] = CLCARD.DEFINITION_,
             [ProductReferenceId] = ORFLINE.STOCKREF,
