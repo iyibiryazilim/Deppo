@@ -327,7 +327,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 
                 foreach (var variant in result.Data)
                 {
-                    var item = Mapping.Mapper.Map<Variant>(variant);
+                    var item = Mapping.Mapper.Map<Deppo.Core.Models.Variant>(variant);
                     ItemVariants.Add(new VariantModel
                     {
                         Code = item.Code,
@@ -372,7 +372,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 
                 foreach (var variant in result.Data)
                 {
-                    var item = Mapping.Mapper.Map<Variant>(variant);
+                    var item = Mapping.Mapper.Map<Deppo.Core.Models.Variant>(variant);
                     ItemVariants.Add(new VariantModel
                     {
                         Code = item.Code,
