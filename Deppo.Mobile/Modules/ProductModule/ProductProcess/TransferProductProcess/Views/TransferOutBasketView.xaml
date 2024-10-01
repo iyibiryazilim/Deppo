@@ -19,6 +19,16 @@
         <BackButtonBehavior Command="{Binding BackCommand}" />
     </Shell.BackButtonBehavior>
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Command="{Binding CameraTappedCommand}">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                      Glyph="{x:Static fontAwesome:FontAwesomeIcons.Camera}"
+                      Size="Large" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
+
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />

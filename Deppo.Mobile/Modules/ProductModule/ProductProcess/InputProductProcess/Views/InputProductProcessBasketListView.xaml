@@ -17,6 +17,15 @@
     </Shell.BackButtonBehavior>
 
     <ContentPage.ToolbarItems>
+
+        <ToolbarItem Command="{Binding CameraTappedCommand}">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                   Glyph="{x:Static fontAwesome:FontAwesomeIcons.Camera}"
+                   Size="Large" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+
         <ToolbarItem Command="{Binding ShowProductViewCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="FAS"

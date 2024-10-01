@@ -8,6 +8,7 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.CameraModule.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
@@ -61,6 +62,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		DeleteItemCommand = new Command<InputProductBasketModel>(async (item) => await DeleteItemAsync(item));
 		NextViewCommand = new Command(async () => await NextViewAsync());
 		BackCommand = new Command(async () => await BackAsync());
+		CameraTappedCommand = new Command(async () => await CameraTappedAsync());
 
 		Items.Clear();
 	}
@@ -87,6 +89,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 
 	public Command NextViewCommand { get; }
 	public Command BackCommand { get; }
+	public Command CameraTappedCommand { get; }
 
 	private async Task ShowProductViewAsync()
 	{
@@ -615,6 +618,33 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		}
 		catch (Exception ex)
 		{
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task CameraTappedAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+
+			await Shell.Current.GoToAsync($"{nameof(CameraReaderView)}", new Dictionary<string, object>
+			{
+				["ComingPage"] = "InputProductProcessBasket"
+			});
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 		finally

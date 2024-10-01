@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.CameraModule.Views.CameraReaderView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.CameraModule.ViewModels"
+             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
+             Title="CameraView"
+             x:DataType="viewModel:CameraReaderViewModel"
+             Shell.PresentationMode="ModalAnimated">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid RowDefinitions="Auto, *, Auto" RowSpacing="10">
+        <Grid Grid.Row="0"
+              Padding="10,10,0,0"
+              ColumnDefinitions="*, Auto"
+              ColumnSpacing="10">
+            <Label Grid.Column="0"
+                   FontAttributes="Bold"
+                   FontSize="Large"
+                   Text="Kamera"
+                   TextColor="WhiteSmoke" />
+
+            <ImageButton Grid.Column="1"
+                         Command="{Binding BackCommand}"
+                         HeightRequest="32"
+                         HorizontalOptions="End">
+                <ImageButton.Source>
+                    <FontImageSource FontFamily="FAS"
+                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                                     Size="Medium"
+                                     Color="{StaticResource WhiteSmoke}" />
+                </ImageButton.Source>
+            </ImageButton>
+        </Grid>
+
+        <zxing:CameraBarcodeReaderView x:Name="barcodeReader" Grid.Row="1" BarcodesDetected="OnBarcodesDetected"  >
+            
+        </zxing:CameraBarcodeReaderView>
+
+    </Grid>
+</ContentPage>

@@ -27,6 +27,6 @@ public interface IProductPanelService
     public Task<DataResult<IEnumerable<dynamic>>> GetInputTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId);
 
 	public Task<DataResult<IEnumerable<dynamic>>> GetAllFiches(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20);
-	public Task<DataResult<IEnumerable<dynamic>>> GetAllTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int skip = 0, int take = 20);
+	public Task<DataResult<IEnumerable<dynamic>>> GetTransactionsByFiche(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId, int skip = 0, int take = 20);
 
 }
