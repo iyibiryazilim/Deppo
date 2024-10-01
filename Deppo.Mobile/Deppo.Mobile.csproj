@@ -98,6 +98,9 @@
 	  <Compile Update="Modules\ProductModule\ProductPanel\Views\OutputProductListView.xaml.cs">
 	    <DependentUpon>OutputProductListView.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Modules\PurchaseModule\PurchasePanel\Views\PurchasePanelReceivedProductListView.xaml.cs">
+	    <DependentUpon>PurchasePanelReceivedProductListView.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseProcess\Views\InputProductPurchaseProcessProductListView.xaml.cs">
 	    <DependentUpon>InputProductPurchaseProcessProductListView.xaml</DependentUpon>
 	  </Compile>
@@ -247,6 +250,15 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\ProductModule\WarehouseMenu\Views\WarehouseOutputTransactionView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchasePanel\Views\PurchasePanelAllFicheListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchasePanel\Views\PurchasePanelReceivedProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchasePanel\Views\PurchasePanelWaitingProductListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseOrderProcess\Views\InputProductPurchaseOrderProcessBasketListView.xaml">

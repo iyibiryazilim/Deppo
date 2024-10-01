@@ -8,6 +8,7 @@ public class WaitingPurchaseOrder : INotifyPropertyChanged, IDisposable
 {
     private int _referenceId;
     private int _orderReferenceId;
+    private string _orderNumber = string.Empty;
     private int _productReferenceId;
     private string _productName = string.Empty;
     private string _productCode = string.Empty;
@@ -55,6 +56,17 @@ public class WaitingPurchaseOrder : INotifyPropertyChanged, IDisposable
         {
             if (_orderReferenceId == value) return;
             _orderReferenceId = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public string OrderNumber
+    {
+        get => _orderNumber;
+        set
+        {
+            if (_orderNumber == value) return;
+            _orderNumber = value;
             NotifyPropertyChanged();
         }
     }

@@ -4,6 +4,7 @@
              x:Class="Deppo.Mobile.Modules.SalesModule.SalesPanel.Views.SalesPanelAllFicheListView"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesPanel.ViewModels"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:coreModel="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              xmlns:model="clr-namespace:Deppo.Mobile.Core.Models.SalesModels;assembly=Deppo.Mobile.Core"
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -63,7 +64,7 @@
                                    Orientation="Vertical" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="model:SalesFicheModel">
+                <DataTemplate x:DataType="coreModel:SalesFiche">
                     <Border Padding="5"
                             BackgroundColor="Transparent"
                             StrokeThickness="0.1">
@@ -169,72 +170,59 @@
                                 <DataTemplate x:DataType="model:SalesTransactionModel">
                                     <Border Padding="5"
                                             BackgroundColor="Transparent"
-                                            StrokeShape="RoundRectangle 5"
                                             StrokeThickness="0.1">
                                         <Grid ColumnDefinitions="Auto, *"
                                               ColumnSpacing="10">
-                                            <VerticalStackLayout Grid.Column="0"
-                                                                 Spacing="1"
-                                                                 VerticalOptions="Center">
-                                                <Label FontAttributes="Bold"
-                                                       FontSize="Large"
-                                                       HorizontalOptions="Center"
-                                                       Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
-                                                       TextColor="{StaticResource OffBlack}" />
-                                                <Label FontSize="Medium"
-                                                       HorizontalOptions="Center"
-                                                       Text="{Binding TransactionDate, StringFormat='{0:MM.yyyy}'}"
-                                                       TextColor="{StaticResource OffBlack}" />
-                                                <Label HorizontalOptions="Center"
-                                                       Text="{Binding TransactionTime, StringFormat='{0:hh\\:mm}'}"
-                                                       TextColor="{StaticResource Gray400}" />
-                                            </VerticalStackLayout>
+                                            <Border Grid.Column="0"
+                                                    Padding="5"
+                                                    BackgroundColor="{StaticResource Secondary}"
+                                                    StrokeShape="RoundRectangle 10">
+                                                <VerticalStackLayout Spacing="1"
+                                                                     VerticalOptions="Center">
+                                                    <Image Grid.Column="0"
+                                                           HeightRequest="50"
+                                                           Source="dotnet_bot.png"
+                                                           WidthRequest="50" />
+                                                </VerticalStackLayout>
+                                            </Border>
+
 
                                             <VerticalStackLayout Grid.Column="1"
                                                                  Spacing="1"
                                                                  VerticalOptions="Center">
                                                 <Label FontAttributes="Bold"
                                                        FontSize="Medium"
-                                                       Text="{Binding BaseTransactionCode}" />
+                                                       Text="{Binding ProductCode}" />
                                                 <Label FontSize="13"
                                                        LineBreakMode="TailTruncation"
-                                                       Text="{Binding TransactionTypeName}" />
-                                                <Label FontSize="13"
-                                                       LineBreakMode="TailTruncation"
-                                                       Text="{Binding WarehouseName}" />
-                                                <HorizontalStackLayout Spacing="10">
-                                                    <Grid ColumnDefinitions="Auto, Auto"
-                                                          ColumnSpacing="3">
-                                                        <Label Grid.Column="0"
-                                                               FontFamily="FAS"
-                                                               FontSize="Small"
-                                                               Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
-                                                               TextColor="{StaticResource Primary}"
-                                                               VerticalOptions="Center" />
-                                                        <Label Grid.Column="1">
-                                                            <Label.FormattedText>
-                                                                <FormattedString>
-                                                                    <Span FontAttributes="Bold"
-                                                                          Text="{Binding Quantity}" />
-                                                                    <Span Text=" " />
-                                                                    <Span FontAttributes="Bold"
-                                                                          Text="{Binding SubUnitsetCode}" />
-                                                                </FormattedString>
-                                                            </Label.FormattedText>
-                                                        </Label>
-                                                    </Grid>
-                                                    <Grid ColumnDefinitions="Auto, Auto"
-                                                          ColumnSpacing="3">
-                                                        <Label Grid.Column="0"
-                                                               FontFamily="FAS"
-                                                               HeightRequest="15"
-                                                               Text="{Binding IOTypeImageSource}"
-                                                               TextColor="{Binding IOTypeColor}"
-                                                               WidthRequest="10" />
-                                                        <Label Grid.Column="1"
-                                                               FontAttributes="None"
-                                                               Text="{Binding IOTypeName}" />
-                                                    </Grid>
+                                                       Text="{Binding ProductName}" />
+
+                                                <HorizontalStackLayout Spacing="5">
+                                                    <Label FontFamily="FAS"
+                                                           FontSize="Small"
+                                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
+                                                           TextColor="{StaticResource Primary}"
+                                                           VerticalOptions="Center" />
+                                                    <Label>
+                                                        <Label.FormattedText>
+                                                            <FormattedString>
+                                                                <Span FontAttributes="Bold"
+                                                                      Text="{Binding Quantity, StringFormat='{0:N2}'}" />
+                                                                <Span Text=" " />
+                                                                <Span FontAttributes="Bold"
+                                                                      Text="{Binding SubUnitsetCode}" />
+                                                            </FormattedString>
+                                                        </Label.FormattedText>
+                                                    </Label>
+                                                    <Image>
+                                                        <Image.Source>
+                                                            <FontImageSource FontFamily="FAS"
+                                                                             Glyph="{Binding IOTypeImageSource}"
+                                                                             Size="16"
+                                                                             Color="{StaticResource Primary}" />
+                                                        </Image.Source>
+                                                    </Image>
+                                                    <Label Text="{Binding IOTypeName}" />
                                                 </HorizontalStackLayout>
                                             </VerticalStackLayout>
                                         </Grid>
