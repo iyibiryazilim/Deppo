@@ -37,11 +37,11 @@
         <Grid ColumnDefinitions="*, Auto"
               Grid.Row="0"
               Padding="10,10,0,0">
-            <Label Text="{Binding Title}"
-                   TextColor="WhiteSmoke"
-                   FontSize="Medium"
+            <Label Grid.Column="0"
                    FontAttributes="Bold"
-                   Grid.Column="0" />
+                   FontSize="Large"
+                   Text="{Binding Title}"
+                   TextColor="WhiteSmoke" />
 
             <ImageButton Grid.Column="1"
                          Command="{Binding BackCommand}"
@@ -121,7 +121,7 @@
         </CollectionView>
         <VerticalStackLayout Grid.Row="1">
             <!--#region WaitingOrder BottomSheet-->
-            <dx:BottomSheet x:Name="shippedOrdersBottomSheet"
+            <dx:BottomSheet x:Name="receivedOrdersBottomSheet"
                             Grid.Row="1"
                             Padding="10,30,10,10"
                             AllowDismiss="True"
@@ -210,9 +210,6 @@
                                                 <Label FontSize="13"
                                                        LineBreakMode="TailTruncation"
                                                        Text="{Binding TransactionTypeName}" />
-                                                <Label FontSize="13"
-                                                       LineBreakMode="TailTruncation"
-                                                       Text="{Binding WarehouseName}" />
                                                 <HorizontalStackLayout Spacing="10">
                                                     <Grid ColumnDefinitions="Auto, Auto"
                                                           ColumnSpacing="3">

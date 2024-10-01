@@ -188,20 +188,23 @@
             RowSpacing="10">
             <Label
                 Grid.Row="0"
-                FontAttributes="Bold"
-                FontSize="Subtitle"
-                Text="Son Hareketler"
-                TextColor="{StaticResource OffBlack}" />
+                   FontAttributes="Bold"
+                   FontSize="18"
+                   VerticalOptions="Center"
+                   Text="Son Hareketler"
+                   TextColor="{StaticResource OffBlack}" />
             <Grid ColumnDefinitions="*, Auto"
                   ColumnSpacing="10">
                 <Label Grid.Row="0"
                        FontAttributes="Bold"
-                       FontSize="Subtitle"
+                       FontSize="18"
+                       VerticalOptions="Center"
                        Text="Son Hareketler"
                        TextColor="{StaticResource OffBlack}" />
 
                 <Border Grid.Column="1"
                         Padding="5"
+                        VerticalOptions="Center"
                         BackgroundColor="{StaticResource Primary}"
                         HorizontalOptions="End"
                         Stroke="{StaticResource Primary}"

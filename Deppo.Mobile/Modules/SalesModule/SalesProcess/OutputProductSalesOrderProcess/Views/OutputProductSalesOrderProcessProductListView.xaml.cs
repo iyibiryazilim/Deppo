@@ -11,5 +11,8 @@ public partial class OutputProductSalesOrderProcessProductListView : ContentPage
 		_viewModel = viewModel;
 		BindingContext = _viewModel;
 		_viewModel.CurrentPage = this;
-	}
+		_viewModel.ProductSearchText = searchBar;
+		_viewModel.OrderSearchText = searchBarOrder;
+
+    }
 }
