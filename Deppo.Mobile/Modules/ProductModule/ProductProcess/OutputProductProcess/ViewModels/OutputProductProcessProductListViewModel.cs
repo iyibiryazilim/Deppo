@@ -484,6 +484,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
             }
             await Shell.Current.GoToAsync($"..");
             SelectedProducts.Clear();
+            SelectedItems.Clear();
         }
         catch (Exception ex)
         {
