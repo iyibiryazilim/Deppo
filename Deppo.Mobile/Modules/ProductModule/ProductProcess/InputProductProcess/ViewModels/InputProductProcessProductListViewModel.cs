@@ -35,10 +35,10 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
     [ObservableProperty]
     private ObservableCollection<InputProductBasketModel> selectedProducts = new();
 
-	public ObservableCollection<ProductModel> Items { get; } = new();
-	public ObservableCollection<VariantModel> ItemVariants { get; } = new();
+    public ObservableCollection<ProductModel> Items { get; } = new();
+    public ObservableCollection<VariantModel> ItemVariants { get; } = new();
 
-	private bool IsSearchMode
+    private bool IsSearchMode
     {
         get
         {
@@ -83,7 +83,8 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
         ConfirmVariantCommand = new Command(async () => await ConfirmVariantAsync());
         ConfirmCommand = new Command(async () => await ConfirmAsync());
         BackCommand = new Command(async () => await BackAsync());
-        PerformSearchCommand = new Command<SearchBar>(async (parameter) => await PerformSearchAsync(parameter));
+        PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+        PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
     }
 
     public Page CurrentPage { get; set; } = null!;
@@ -98,9 +99,11 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
     public Command ConfirmVariantCommand { get; }
     public Command ConfirmCommand { get; }
     public Command BackCommand { get; }
-    public Command<SearchBar> PerformSearchCommand { get; }
+    public Command PerformSearchCommand { get; }
+    public Command PerformEmptySearchCommand { get; }
 
-
+    [ObservableProperty]
+    public SearchBar searchText;
     private async Task LoadItemsAsync()
     {
         if (IsBusy)
@@ -118,7 +121,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 20);
+            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, 0, 20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
@@ -172,11 +175,6 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
 
     private async Task LoadMoreItemsAsync()
     {
-        if (IsSearchMode)
-        {
-            await PerformSearchMoreAsync(((SearchBar)CurrentPage.FindByName("searchBar")));
-            return;
-        }
 
         if (IsBusy)
             return;
@@ -187,7 +185,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
 
             _userDialogs.Loading("Loading More Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, Items.Count, 20);
+            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, Items.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
@@ -199,27 +197,27 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
 
                     Items.Add(new ProductModel
                     {
-						ReferenceId = item.ReferenceId,
-						Code = item.Code,
-						Name = item.Name,
-						UnitsetReferenceId = item.UnitsetReferenceId,
-						UnitsetCode = item.UnitsetCode,
-						UnitsetName = item.UnitsetName,
-						SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-						SubUnitsetCode = item.SubUnitsetCode,
-						SubUnitsetName = item.SubUnitsetName,
-						StockQuantity = item.StockQuantity,
-						TrackingType = item.TrackingType,
-						LocTracking = item.LocTracking,
-						GroupCode = item.GroupCode,
-						BrandReferenceId = item.BrandReferenceId,
-						BrandCode = item.BrandCode,
-						BrandName = item.BrandName,
-						VatRate = item.VatRate,
-						Image = item.Image,
-						IsVariant = item.IsVariant,
-						IsSelected = false
-					});
+                        ReferenceId = item.ReferenceId,
+                        Code = item.Code,
+                        Name = item.Name,
+                        UnitsetReferenceId = item.UnitsetReferenceId,
+                        UnitsetCode = item.UnitsetCode,
+                        UnitsetName = item.UnitsetName,
+                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                        SubUnitsetCode = item.SubUnitsetCode,
+                        SubUnitsetName = item.SubUnitsetName,
+                        StockQuantity = item.StockQuantity,
+                        TrackingType = item.TrackingType,
+                        LocTracking = item.LocTracking,
+                        GroupCode = item.GroupCode,
+                        BrandReferenceId = item.BrandReferenceId,
+                        BrandCode = item.BrandCode,
+                        BrandName = item.BrandName,
+                        VatRate = item.VatRate,
+                        Image = item.Image,
+                        IsVariant = item.IsVariant,
+                        IsSelected = false
+                    });
                 }
             }
 
@@ -535,92 +533,26 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
         }
     }
 
-    private async Task PerformSearchAsync(SearchBar searchBar)
+    private async Task PerformSearchAsync()
     {
         if (IsBusy)
             return;
 
         try
         {
-            if (string.IsNullOrWhiteSpace(searchBar.Text))
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
             {
                 await LoadItemsAsync();
-                searchBar.Unfocus();
+                SearchText.Unfocus();
                 return;
             }
-            else
-            {
-                if (searchBar.Text.Length > 5)
-                {
-                    IsBusy = true;
-                    Items.Clear();
-                    _userDialogs.Loading("Searching Items...");
-                    var httpClient = _httpClientService.GetOrCreateHttpClient();
-                    await Task.Delay(1000);
-                    var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, searchBar.Text, 0, 20);
-                    if (result.IsSuccess)
-                    {
-                        if (result.Data == null)
-                            return;
-
-                        foreach (var product in result.Data)
-                        {
-                            var item = Mapping.Mapper.Map<Product>(product);
-
-                            Items.Add(new ProductModel
-                            {
-                                ReferenceId = item.ReferenceId,
-                                Code = item.Code,
-                                Name = item.Name,
-                                UnitsetReferenceId = item.UnitsetReferenceId,
-                                UnitsetCode = item.UnitsetCode,
-                                UnitsetName = item.UnitsetName,
-                                SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                                SubUnitsetCode = item.SubUnitsetCode,
-                                SubUnitsetName = item.SubUnitsetName,
-                                StockQuantity = item.StockQuantity,
-                                TrackingType = item.TrackingType,
-                                LocTracking = item.LocTracking,
-                                GroupCode = item.GroupCode,
-                                BrandReferenceId = item.BrandReferenceId,
-                                BrandCode = item.BrandCode,
-                                BrandName = item.BrandName,
-                                VatRate = item.VatRate,
-                                Image = item.Image,
-                                IsVariant = item.IsVariant,
-                                IsSelected = false
-                            });
-                        }
-                    }
-
-                    _userDialogs.Loading().Hide();
-                    searchBar.Unfocus();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
-    private async Task PerformSearchMoreAsync(SearchBar searchBar)
-    {
-        if (IsBusy)
-            return;
-
-        try
-        {
             IsBusy = true;
-
+            IsBusy = true;
+            Items.Clear();
             _userDialogs.Loading("Searching Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             await Task.Delay(1000);
-            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, searchBar.Text, Items.Count, 20);
+            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, 0, 20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
@@ -657,7 +589,9 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
             }
 
             _userDialogs.Loading().Hide();
+
         }
+
         catch (Exception ex)
         {
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -665,6 +599,15 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
+        }
+    }
+
+
+    private async Task PerformEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText.Text))
+        {
+            await PerformSearchAsync();
         }
     }
 }

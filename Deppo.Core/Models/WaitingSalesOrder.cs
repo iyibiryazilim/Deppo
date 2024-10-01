@@ -7,9 +7,10 @@ namespace Deppo.Core.Models;
 public class WaitingSalesOrder : INotifyPropertyChanged, IDisposable
 {
 	private int _referenceId;
-	private int _orderReferenceId; 
-	private int _productReferenceId;
-	private string _productCode = string.Empty;
+	private int _orderReferenceId;
+    private string _orderNumber = string.Empty;
+    private int _productReferenceId;
+    private string _productCode = string.Empty;
 	private string _productName = string.Empty;
 	private int _unitsetReferenceId;
 	private string _unitsetCode = string.Empty;
@@ -61,7 +62,18 @@ public class WaitingSalesOrder : INotifyPropertyChanged, IDisposable
 		}
 	}
 
-	[Browsable(false)]
+    public string OrderNumber
+    {
+        get => _orderNumber;
+        set
+        {
+            if (_orderNumber == value) return;
+            _orderNumber = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    [Browsable(false)]
 	public int ProductReferenceId
 	{
 		get => _productReferenceId;

@@ -9,6 +9,10 @@ using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.PurchaseModule.PurchasePanel.Views;
+using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views;
+using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesPanel.Views;
 using DevExpress.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchasePanel.ViewModels;
@@ -31,11 +35,21 @@ public partial class PurchasePanelViewModel : BaseViewModel
         Title = "Satınalma Paneli";
         LoadItemsCommand = new Command(async () => await LoadItemAsync());
         ItemTappedCommand = new Command<PurchaseFiche>(async (purchaseFiche) => await ItemTappedAsync(purchaseFiche));
+        WaitingOrderTappedCommand = new Command(async () => await WaitingOrderTappedAsync());
+        ReceivedOrderTappedCommand = new Command(async () => await ReceivedOrderTappedAsync());
+        SupplierTappedCommand = new Command<Supplier>(async (supplier) => await SupplierTappedAsync(supplier));
+        AllFicheTappedCommand = new Command(async () => await AllFicheTappedAsync());
+
     }
 
     public Page CurrentPage { get; set; }
     public Command LoadItemsCommand { get; }
     public Command ItemTappedCommand { get; }
+
+    public Command WaitingOrderTappedCommand { get; }
+    public Command ReceivedOrderTappedCommand { get; }
+    public Command SupplierTappedCommand { get; }
+    public Command AllFicheTappedCommand { get; }
 
     private async Task LoadItemAsync()
     {
@@ -268,6 +282,99 @@ public partial class PurchasePanelViewModel : BaseViewModel
         }
         finally
         {
+        }
+    }
+
+    private async Task WaitingOrderTappedAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(PurchasePanelWaitingProductListView)}");
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ReceivedOrderTappedAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(PurchasePanelReceivedProductListView)}");
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task AllFicheTappedAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(PurchasePanelAllFicheListView)}");
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task SupplierTappedAsync(Supplier supplier)
+    {
+        if (supplier == null)
+            return;
+
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            SupplierDetailModel supplierDetailModel= new();
+            supplierDetailModel.Supplier = supplier;
+
+            await Shell.Current.GoToAsync($"{nameof(SupplierDetailView)}", new Dictionary<string, object> { {
+                nameof(SupplierDetailModel), supplierDetailModel
+                }
+                });
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 
