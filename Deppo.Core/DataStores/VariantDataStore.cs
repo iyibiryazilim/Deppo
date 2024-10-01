@@ -62,8 +62,124 @@ public class VariantDataStore : IVariantService
             dataResult.IsSuccess = false;
             dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
             return dataResult;
+       }
+    }
+
+    public async Task<DataResult<IEnumerable<dynamic>>> GetVariants(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
+    {
+
+        var content = new StringContent(JsonConvert.SerializeObject(GetVariantsQuery(firmNumber, periodNumber, productReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+
+        HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+        DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            var data = await responseMessage.Content.ReadAsStringAsync();
+            if (data != null)
+            {
+                if (!string.IsNullOrEmpty(data))
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "success";
+                    return dataResult;
+
+                }
+                else
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "empty";
+                    return dataResult;
+                }
+
+            }
+            else
+            {
+                var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                dataResult.Data = Enumerable.Empty<dynamic>();
+                dataResult.IsSuccess = false;
+                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+                return dataResult;
+            }
+
+
+        }
+        else
+        {
+            dataResult.Data = Enumerable.Empty<dynamic>();
+            dataResult.IsSuccess = false;
+            dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+            return dataResult;
         }
     }
+
+
+
+
+    public async Task<DataResult<IEnumerable<dynamic>>> GetProductVariants(HttpClient httpClient, int firmNumber, int periodNumber, int variantReferenceId, string search = "", int skip = 0, int take = 20)
+    {
+
+        var content = new StringContent(JsonConvert.SerializeObject(GetProductVariantsQuery(firmNumber, periodNumber, variantReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+
+        HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+        DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            var data = await responseMessage.Content.ReadAsStringAsync();
+            if (data != null)
+            {
+                if (!string.IsNullOrEmpty(data))
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "success";
+                    return dataResult;
+
+                }
+                else
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "empty";
+                    return dataResult;
+                }
+
+            }
+            else
+            {
+                var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                dataResult.Data = Enumerable.Empty<dynamic>();
+                dataResult.IsSuccess = false;
+                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+                return dataResult;
+            }
+
+
+        }
+        else
+        {
+            dataResult.Data = Enumerable.Empty<dynamic>();
+            dataResult.IsSuccess = false;
+            dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+            return dataResult;
+        }
+    }
+
+
+
 
     private string VariantQuery(int firmNumber, int periodNumber,int productReferenceId, int warehouseNumber, string search = "", int skip = 0, int take = 20)
     {
@@ -100,4 +216,45 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
         return baseQuery;
     }
+
+
+
+
+    private string GetVariantsQuery(int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
+    {
+        string baseQuery = $@" select 
+			   [ReferenceId] = ISNULL(Variant.LOGICALREF,0), 
+			   [Name] = ISNULL(Variant.NAME,''), 
+			   [Code] = ISNULL(Variant.CODE,''),
+			   [ProductReferenceId] = ISNULL (Variant.ITEMREF,0)
+			   from LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT as Variant 
+			   where Variant.ITEMREF = {productReferenceId}" ;
+        if (!string.IsNullOrEmpty(search))
+            baseQuery += $@" AND (Variant.CODE LIKE '{search}%' OR Variant.NAME LIKE '%{search}%')";
+        baseQuery += $@" ORDER BY Variant.CODE DESC
+OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+        return baseQuery;
+    }
+
+
+    private string GetProductVariantsQuery(int firmNumber, int periodNumber, int variantReferenceId, string search = "", int skip = 0, int take = 20)
+    {
+        string baseQuery = $@" select
+[CharCodeReferenceId] = CCODE.LOGICALREF,
+[CharCodeName] = CCODE.NAME,
+[CharValReferenceId] = CVAL.LOGICALREF,
+[CharValName] = CVAL.NAME
+from LG_{firmNumber.ToString().PadLeft(3, '0')}_VRNTCHARASGN as VRNTCHRASGN
+left join LG_{firmNumber.ToString().PadLeft(3, '0')}_CHARCODE AS CCODE ON CCODE.LOGICALREF = VRNTCHRASGN.CHARCODEREF
+left join  LG_{firmNumber.ToString().PadLeft(3, '0')}_CHARVAL as CVAL ON CVAL.CHARCODEREF = CCODE.LOGICALREF AND CVAL.LOGICALREF = VRNTCHRASGN.CHARVALREF
+
+WHERE VRNTCHRASGN.VARIANTREF = {variantReferenceId}";
+        if (!string.IsNullOrEmpty(search))
+            baseQuery += $@" AND (Variant.CODE LIKE '{search}%' OR Variant.NAME LIKE '%{search}%')";
+        baseQuery += $@" ORDER BY CCODE.NAME DESC
+OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+        return baseQuery;
+    }
+
+
 }

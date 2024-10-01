@@ -24,10 +24,10 @@ public class Variant : INotifyPropertyChanged, IDisposable
     private int _unitsetReferenceId = default;
     private string _unitsetCode = string.Empty;
     private string _unitsetName = string.Empty;
-    private int _trackingType;
-    private int _locTracking;
-    private double _stockQuantity;
-    private string? _image;
+    private int _trackingType = default;
+    private int _locTracking = default;
+    private double _stockQuantity = default;
+    private string? _image = default;
     private Product? _product;
 
     public Variant()
