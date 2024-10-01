@@ -14,4 +14,12 @@ public interface IQuicklyProductionPanelService
     public Task<DataResult<dynamic>> GetInProductCount(HttpClient httpClient, int firmNumber, int periodNumber);
 
     public Task<DataResult<dynamic>> GetOutProductCount(HttpClient httpClient, int firmNumber, int periodNumber);
+
+    public Task<DataResult<IEnumerable<dynamic>>> GetQuicklyProductionInputProductListAsync(HttpClient httpClient, int firmNumber, int periodNumber,string search = "", int skip = 0, int take = 20);
+    
+    public Task<DataResult<IEnumerable<dynamic>>> GetQuicklyProductionOutputProductListAsync(HttpClient httpClient, int firmNumber, int periodNumber,string search = "", int skip = 0, int take = 20);
+
+
+
+
 }
