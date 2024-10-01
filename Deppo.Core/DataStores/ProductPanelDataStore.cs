@@ -560,9 +560,9 @@ public class ProductPanelDataStore : IProductPanelService
 		}
 	}
 
-	public async Task<DataResult<IEnumerable<dynamic>>> GetAllTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int skip = 0, int take = 20)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetTransactionsByFiche(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId, int skip = 0, int take = 20)
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(GetAllTransactionsQuery(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(GetTransactionsByFicheQuery(firmNumber, periodNumber, ficheReferenceId, skip, take)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -1007,7 +1007,7 @@ ORDER BY MAX(STLINE.DATE_) DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY;"
         return baseQuery;
     }
 
-	private string GetAllTransactionsQuery(int firmNumber, int periodNumber, int skip = 0, int take = 20)
+	private string GetTransactionsByFicheQuery(int firmNumber, int periodNumber,int ficheReferenceId, int skip = 0, int take = 20)
 	{
 		string baseQuery = $@"SELECT
         [ReferenceId] = STLINE.LOGICALREF,
@@ -1038,7 +1038,7 @@ ORDER BY MAX(STLINE.DATE_) DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY;"
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
 		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
-		WHERE STFICHE.GRPCODE = 3 AND STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0
+		WHERE STFICHE.GRPCODE = 3 AND STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0 AND STFICHE.LOGICALREF = {ficheReferenceId}
 		ORDER BY STLINE.DATE_ DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 		return baseQuery;
 	}
