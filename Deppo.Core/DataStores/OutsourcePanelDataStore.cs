@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Deppo.Core.DataResultModel;
 using Deppo.Core.Services;
@@ -110,9 +111,9 @@ public class OutsourcePanelDataStore : IOutsourcePanelService
         }
     }
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetLastOutsourceTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetLastOutsourceTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId, int skip = 0, int take = 20)
     {
-        var content = new StringContent(JsonConvert.SerializeObject(GetLastOutsourceTransactionsQuery(firmNumber, periodNumber, ficheReferenceId)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(GetLastOutsourceTransactionsQuery(firmNumber, periodNumber, ficheReferenceId, skip, take)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -452,7 +453,7 @@ END
         return baseQuery;
     }
 
-    private string GetLastOutsourceTransactionsQuery(int firmNumber, int periodNumber, int ficheReferenceId)
+    private string GetLastOutsourceTransactionsQuery(int firmNumber, int periodNumber, int ficheReferenceId, int skip, int take)
     {
         string baseQuery = $@"SELECT
         [ReferenceId] = STLINE.LOGICALREF,
@@ -484,7 +485,7 @@ END
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
 		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
 		WHERE STFICHE.TRCODE = 25 AND STLINE.IOCODE = 2 AND STFICHE.LOGICALREF = {ficheReferenceId} AND STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0
-		ORDER BY STLINE.DATE_ DESC";
+		ORDER BY STLINE.DATE_ DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
         return baseQuery;
     }

@@ -7,21 +7,34 @@
              xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.WaitingOrderMenu.ViewModels"
+             xmlns:customerModel="clr-namespace:Deppo.Mobile.Core.Models.SalesModels;assembly=Deppo.Mobile.Core"
              Title="{Binding Title}"
              x:DataType="viewModel:WaitingSalesOrderListViewModel">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Command="{Binding LoadCustomersCommand}">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Users}"
+                                 Size="Large" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding LoadCustomersCommand}" EventName="Loaded" />
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android" Value="artboard.png" />
+            <On Platform="Android"
+                Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
-    <Grid RowDefinitions="Auto, *" RowSpacing="10">
-        <dx:FormListPickerItem Grid.Row="0"
+    <Grid RowDefinitions="*, Auto"
+          RowSpacing="10">
+        <!--<dx:FormListPickerItem Grid.Row="0"
                                InlineContent="{x:Null}"
                                ItemsSource="{Binding Customers}"
                                PickerShowMode="BottomSheet"
@@ -48,23 +61,29 @@
                     </Border>
                 </DataTemplate>
             </dx:FormListPickerItem.ItemTemplate>
-        </dx:FormListPickerItem>
+        </dx:FormListPickerItem>-->
 
-        <CollectionView Grid.Row="1" ItemsSource="{Binding Items}" RemainingItemsThreshold="2" RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+        <CollectionView Grid.Row="0"
+                        ItemsSource="{Binding Items}"
+                        RemainingItemsThreshold="2"
+                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
             <CollectionView.ItemsLayout>
-                <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+                <LinearItemsLayout ItemSpacing="0"
+                                   Orientation="Vertical" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="model:WaitingSalesOrder">
                     <Border Padding="10"
                             BackgroundColor="Transparent"
                             StrokeThickness="0.1">
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Grid ColumnDefinitions="Auto,*"
+                              ColumnSpacing="10">
                             <Border Padding="5"
                                     BackgroundColor="{StaticResource Secondary}"
                                     StrokeShape="RoundRectangle 5"
                                     StrokeThickness="0.5">
-                                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                                <VerticalStackLayout HorizontalOptions="Center"
+                                                     VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
                                            FontSize="Subtitle"
                                            HorizontalOptions="Center"
@@ -75,7 +94,8 @@
                                 </VerticalStackLayout>
                             </Border>
 
-                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Spacing="2">
                                 <Label FontAttributes="Bold"
                                        LineBreakMode="TailTruncation"
                                        Text="{Binding ProductCode}" />
@@ -83,7 +103,8 @@
                                        Text="{Binding ProductName}"
                                        TextColor="{StaticResource Gray600}" />
 
-                                <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                                <HorizontalStackLayout Spacing="5"
+                                                       VerticalOptions="Center">
                                     <Image Aspect="AspectFit"
                                            HeightRequest="16"
                                            VerticalOptions="Center"
@@ -100,13 +121,107 @@
                                            VerticalOptions="Center" />
                                 </HorizontalStackLayout>
                             </VerticalStackLayout>
-
                         </Grid>
-
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
-
         </CollectionView>
+
+        <VerticalStackLayout Grid.Row="1">
+            <dx:BottomSheet x:Name="customerBottomSheet"
+                            AllowDismiss="True"
+                            BackgroundColor="White"
+                            CornerRadius="15"
+                            HalfExpandedRatio="0.5"
+                            IsModal="True"
+                            ShowGrabber="True">
+                <!--#region BottomSheetContent-->
+                <Grid RowDefinitions="Auto,*,Auto"
+                      RowSpacing="20"
+                      Padding="10">
+
+                    <VerticalStackLayout Grid.Row="0"
+                                         Spacing="5">
+                        <Label FontAttributes="Bold"
+                               FontSize="Subtitle"
+                               Text="Müşteri Seçiniz" />
+                        <BoxView HeightRequest="2"
+                                 Color="{StaticResource OffBlack}" />
+                    </VerticalStackLayout>
+
+                    <CollectionView Grid.Row="1"
+                                    ItemsSource="{Binding Customers}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="customerModel:CustomerModel">
+                                <Border Padding="10"
+                                        BackgroundColor="Transparent"
+                                        StrokeShape="RoundRectangle 10"
+                                        StrokeThickness="0.1">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WaitingSalesOrderListViewModel}}, Path=ItemTappedCommand}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <Grid ColumnDefinitions="Auto, *">
+                                        <Border Grid.Column="0"
+                                                Padding="0,0,10,0"
+                                                BackgroundColor="Transparent"
+                                                StrokeThickness="0">
+                                            <toolkit:AvatarView BackgroundColor="{StaticResource Primary}"
+                                                                BorderWidth="0.1"
+                                                                CornerRadius="50"
+                                                                FontAttributes="Bold"
+                                                                HorizontalOptions="Start"
+                                                                Text="{Binding TitleName}"
+                                                                TextColor="{StaticResource White}" />
+                                        </Border>
+
+                                        <VerticalStackLayout Grid.Column="1"
+                                                             Padding="5"
+                                                             Spacing="5"
+                                                             VerticalOptions="Start">
+                                            <Label FontAttributes="Bold"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="1"
+                                                   VerticalOptions="End"
+                                                   Text="{Binding Name}" />
+                                            <Label TextColor="{StaticResource Gray600}"
+                                                   VerticalOptions="Center">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span FontAttributes="Bold"
+                                                              FontFamily="FAS"
+                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding OrderReferenceCount, StringFormat='{0:N2}'}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                        <Span Text=" " />
+                                                       
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                    <Border.Triggers>
+                                        <DataTrigger Binding="{Binding IsSelected}"
+                                                     TargetType="Border"
+                                                     Value="True">
+                                            <Setter Property="BackgroundColor"
+                                                    Value="{StaticResource SecondaryLight}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <Button Grid.Row="2"
+                            Text="Tamam"
+                            Command="{Binding CustomerConfirmCommand}">
+                    </Button>
+                </Grid>
+                <!--#endregion-->
+            </dx:BottomSheet>
+        </VerticalStackLayout>
     </Grid>
 </ContentPage>
