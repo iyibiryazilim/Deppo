@@ -203,7 +203,6 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                         subProduct.SubBOMQuantity = 0;
                         subProduct.ProductModel.Amount = subProduct.SubAmount;
                         subProduct.LocationTransactions.Clear();
-                        subProduct.LocationTransactions.Clear();
                     }
                 }
                 Locations.Clear();

@@ -79,6 +79,12 @@ public class MappingProfile : Profile
         CreateMap<ProductionFiche, dynamic>();
         CreateMap<CountingFiche, dynamic>();
         CreateMap<ProductionTransaction, dynamic>();
+        CreateMap<ProductVariant, dynamic>();
+        CreateMap<ProductVariantModel, dynamic>();
+        CreateMap<VariantProperty, dynamic>();
+        CreateMap<VariantPropertyModel, dynamic>();
+        CreateMap<VariantPropertyValue, dynamic>();
+        CreateMap<VariantPropertyValueModel, dynamic>();
 
 
     }
