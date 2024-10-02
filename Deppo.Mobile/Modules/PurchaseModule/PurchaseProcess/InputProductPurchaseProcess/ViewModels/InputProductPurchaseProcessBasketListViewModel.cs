@@ -10,6 +10,7 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.CameraModule.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views;
@@ -22,6 +23,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xamarin.Google.Crypto.Tink.Signature;
 using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels;
@@ -67,6 +69,7 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
 
         NextViewCommand = new Command(async () => await NextViewAsync());
         BackCommand = new Command(async () => await BackAsync());
+        CameraTappedCommand = new Command(async () => await CameraTappedAsync());
 
         Items.Clear();
     }
@@ -85,6 +88,7 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
 
     public Command NextViewCommand { get; }
     public Command BackCommand { get; }
+    public Command CameraTappedCommand { get; }
 
     public ObservableCollection<InputPurchaseBasketModel> Items { get; } = new();
     public ObservableCollection<LocationModel> Locations { get; }
@@ -360,6 +364,33 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
         {
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task CameraTappedAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+			await Shell.Current.GoToAsync($"{nameof(CameraReaderView)}", new Dictionary<string, object>
+			{
+				["ComingPage"] = "InputProductPurchaseProcessBasket"
+			});
+
+		}
+        catch (Exception ex)
+        {
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
         finally
         {
             IsBusy = false;

@@ -9,6 +9,7 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.CameraModule.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels;
@@ -63,6 +64,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProces
 
             NextViewCommand = new Command(async () => await NextViewAsync());
             BackCommand = new Command(async () => await BackAsync());
+            CameraTappedCommand = new Command(async () => await CameraTappedAsync());
 
             Items.Clear();
         }
@@ -81,6 +83,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProces
 
         public Command NextViewCommand { get; }
         public Command BackCommand { get; }
+        public Command CameraTappedCommand { get; }
 
         public Command LocationTransactionCloseCommand { get; }
 
@@ -422,6 +425,32 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProces
                 await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
             }
            
+        }
+
+        private async Task CameraTappedAsync()
+        {
+            if (IsBusy)
+                return;
+            try
+            {
+                IsBusy = true;
+
+                await Shell.Current.GoToAsync($"{nameof(CameraReaderView)}", new Dictionary<string, object>
+                {
+                    ["ComingPage"] = "ReturnSalesBasket"
+				});
+            }
+            catch (Exception ex)
+            {
+                if(_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
     }
 }

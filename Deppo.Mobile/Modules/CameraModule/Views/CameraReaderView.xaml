@@ -9,44 +9,105 @@
              xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
              Title="CameraView"
              x:DataType="viewModel:CameraReaderViewModel"
+             BackgroundColor="#000000"
              Shell.PresentationMode="ModalAnimated">
 
-    <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
-    </ContentPage.Behaviors>
-    <ContentPage.BackgroundImageSource>
-        <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android" Value="artboard.png" />
-        </OnPlatform>
-    </ContentPage.BackgroundImageSource>
-
-    <Grid RowDefinitions="Auto, *, Auto" RowSpacing="10">
+    <Grid RowDefinitions="1*, 5*, 1*">
         <Grid Grid.Row="0"
-              Padding="10,10,0,0"
+              Padding="20"
+              BackgroundColor="#aa000000"
               ColumnDefinitions="*, Auto"
-              ColumnSpacing="10">
-            <Label Grid.Column="0"
-                   FontAttributes="Bold"
-                   FontSize="Large"
-                   Text="Kamera"
-                   TextColor="WhiteSmoke" />
+              VerticalOptions="Start"
+              ZIndex="9999">
+            <Border Grid.Column="1"
+                    Padding="15"
+                    BackgroundColor="{StaticResource Gray600}"
+                    StrokeShape="RoundRectangle 50"
+                    StrokeThickness="0"
+                    VerticalOptions="Center">
+                <ImageButton Command="{Binding BackCommand}"
+                             HeightRequest="25"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             WidthRequest="25">
+                    <ImageButton.Source>
+                        <FontImageSource FontFamily="FAS"
+                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                                         Color="{StaticResource WhiteSmoke}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </Border>
 
-            <ImageButton Grid.Column="1"
-                         Command="{Binding BackCommand}"
-                         HeightRequest="32"
-                         HorizontalOptions="End">
-                <ImageButton.Source>
-                    <FontImageSource FontFamily="FAS"
-                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
-                                     Size="Medium"
-                                     Color="{StaticResource WhiteSmoke}" />
-                </ImageButton.Source>
-            </ImageButton>
         </Grid>
 
-        <zxing:CameraBarcodeReaderView x:Name="barcodeReader" Grid.Row="1" BarcodesDetected="OnBarcodesDetected"  >
-            
-        </zxing:CameraBarcodeReaderView>
+        <Image Grid.Row="1"
+               Aspect="AspectFit"
+               Source="barcode_border.png"
+               ZIndex="9999"
+               VerticalOptions="Center"
+               HorizontalOptions="Center"/>
+
+        <zxing:CameraBarcodeReaderView x:Name="barcodeReader"
+                                       Grid.Row="0"
+                                       Grid.RowSpan="3"
+                                       BarcodesDetected="OnBarcodesDetected" />
+
+        <Grid Grid.Row="3"
+              Padding="20"
+              BackgroundColor="#aa000000"
+              ColumnDefinitions="Auto,*,Auto">
+
+            <Border Grid.Column="0"
+                    Padding="15"
+                    BackgroundColor="{StaticResource Gray600}"
+                    StrokeShape="RoundRectangle 50"
+                    StrokeThickness="0"
+                    VerticalOptions="Center">
+                <ImageButton Command="{Binding FlashlightTappedCommand}"
+                             HeightRequest="25"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             WidthRequest="25">
+                    <ImageButton.Source>
+                        <FontImageSource FontFamily="FAS"
+                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Lightbulb}"
+                                         Color="{StaticResource WhiteSmoke}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </Border>
+
+            <zxing:BarcodeGeneratorView x:Name="barcodeGenerator"
+                                        Grid.Column="1"
+                                        BarcodeMargin="1"
+                                        ForegroundColor="DarkBlue"
+                                        Format="QrCode"
+                                        HeightRequest="80"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center"
+                                        WidthRequest="80"
+                                        Value="Bla" />
+
+            <Border Grid.Column="2"
+                    Padding="15"
+                    BackgroundColor="{StaticResource Gray600}"
+                    StrokeShape="RoundRectangle 50"
+                    StrokeThickness="0"
+                    VerticalOptions="Center">
+                <ImageButton Command="{Binding SwitchCameraTappedCommand}"
+                             HeightRequest="25"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             WidthRequest="25">
+                    <ImageButton.Source>
+                        <FontImageSource FontFamily="FAS"
+                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Rotate}"
+                                         Color="{StaticResource WhiteSmoke}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </Border>
+        </Grid>
+
 
     </Grid>
+
 </ContentPage>

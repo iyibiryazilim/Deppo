@@ -48,12 +48,16 @@ public partial class CameraReaderViewModel : BaseViewModel
 
 		BackCommand = new Command(async () => await BackAsync());
 		CameraDetectedCommand = new Command<BarcodeDetectionEventArgs>(async (e) => await CameraDetectedAsync(e));
+		SwitchCameraTappedCommand = new Command(async () => await SwitchCameraTappedAsync());
+		FlashlightTappedCommand = new Command(async () => await FlashlightTappedAsync());
 	}
 
 	public CameraBarcodeReaderView BarcodeReader { get; set; } = null!;
 
 	public Command BackCommand { get; }
 	public Command CameraDetectedCommand { get; }
+	public Command SwitchCameraTappedCommand { get; }
+	public Command FlashlightTappedCommand { get; }
 
 	private async Task ReadBarcodeAsync(BarcodeResult[] readBarcodes)
 	{
@@ -835,6 +839,53 @@ public partial class CameraReaderViewModel : BaseViewModel
 			IsBusy = true;
 
 			await Shell.Current.GoToAsync("..");
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task SwitchCameraTappedAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			BarcodeReader.CameraLocation = BarcodeReader.CameraLocation == CameraLocation.Rear ? CameraLocation.Front : CameraLocation.Rear;
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+			
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+		
+	}
+
+	private async Task FlashlightTappedAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			BarcodeReader.IsTorchOn = !BarcodeReader.IsTorchOn;
 		}
 		catch (Exception ex)
 		{
