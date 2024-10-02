@@ -408,6 +408,9 @@
 	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessFormView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessOrderListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessWarehouseListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

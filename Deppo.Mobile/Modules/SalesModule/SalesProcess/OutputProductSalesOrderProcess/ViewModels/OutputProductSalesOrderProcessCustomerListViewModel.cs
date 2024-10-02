@@ -414,7 +414,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 
             if (SalesCustomer is not null)
             {
-                await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessProductListView)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessBasketListView)}", new Dictionary<string, object>
                 {
                     [nameof(SalesCustomer)] = SalesCustomer,
                     [nameof(WarehouseModel)] = WarehouseModel,
