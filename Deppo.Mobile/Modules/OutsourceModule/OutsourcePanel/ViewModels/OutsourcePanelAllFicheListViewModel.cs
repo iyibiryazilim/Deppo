@@ -38,7 +38,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.ViewModels
             _userDialogs = userDialogs;
             _outsourcePanelService = outsourcePanelService;
 
-            Title = "Fiş Listesi";
+            Title = "Fason Hareketleri";
 
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
             LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
@@ -210,7 +210,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.ViewModels
                 Transactions.Clear();
 
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _outsourcePanelService.GetLastOutsourceTransactions(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, _httpClientService.PeriodNumber, ficheReferenceId: outsourceFiche.ReferenceId, 0, 20);
+                var result = await _outsourcePanelService.GetLastOutsourceTransactions(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, _httpClientService.PeriodNumber, ficheReferenceId: outsourceFiche.ReferenceId);
                 if (result.IsSuccess)
                 {
                     if (result.Data is null)
@@ -240,7 +240,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.ViewModels
                 IsBusy = true;
 
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _outsourcePanelService.GetLastOutsourceTransactions(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, _httpClientService.PeriodNumber, ficheReferenceId: SelectedItem.ReferenceId, skip: Transactions.Count, take: 20);
+                var result = await _outsourcePanelService.GetLastOutsourceTransactions(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, _httpClientService.PeriodNumber, ficheReferenceId: SelectedItem.ReferenceId);
                 if (result.IsSuccess)
                 {
                     if (result.Data is null)

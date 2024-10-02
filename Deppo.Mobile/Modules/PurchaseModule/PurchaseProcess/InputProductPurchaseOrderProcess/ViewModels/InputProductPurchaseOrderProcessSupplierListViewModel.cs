@@ -57,6 +57,7 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
 
         ShipAddressTappedCommand = new Command<ShipAddressModel>(async (shipAddress) => await ShipAddressTappedAsync(shipAddress));
         ConfirmShipAddressCommand = new Command(async () => await ConfirmShipAddressAsync());
+        ShipAddressCloseCommand = new Command(async () => await ShipAddressCloseAsync());
     }
 
     public ObservableCollection<PurchaseSupplier> Items { get; } = new();
@@ -72,6 +73,7 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
 
     public Command ConfirmShipAddressCommand { get; }
     public Command ShipAddressTappedCommand { get; }
+    public Command ShipAddressCloseCommand { get; }
 
     private async Task LoadItemsAsync()
     {
@@ -150,29 +152,31 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
 
     private async Task ItemTappedAsync(PurchaseSupplier purchaseSupplier)
     {
+        if (purchaseSupplier is null)
+            return;
         if (IsBusy)
             return;
+
         try
         {
             IsBusy = true;
 
-            // Tıklanan öğe ne olursa olsun bottom sheet açılıyor
-            await LoadShipAddressesAsync(purchaseSupplier);
-            CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
-
-            if (PurchaseSupplier == purchaseSupplier)
+            // Önceki seçimi kaldır
+            if (PurchaseSupplier is not null)
             {
                 PurchaseSupplier.IsSelected = false;
                 PurchaseSupplier = null;
             }
-            else
+
+            // Yeni öğeyi seç
+            PurchaseSupplier = purchaseSupplier;
+            PurchaseSupplier.IsSelected = true;
+
+            // Ship adresleri varsa, bottom sheet aç
+            if (purchaseSupplier.ShipAddressCount > 0)
             {
-                if (PurchaseSupplier is not null)
-                {
-                    PurchaseSupplier.IsSelected = false;
-                }
-                PurchaseSupplier = purchaseSupplier;
-                PurchaseSupplier.IsSelected = true;
+                await LoadShipAddressesAsync(purchaseSupplier);
+                CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
             }
         }
         catch (Exception ex)
@@ -197,7 +201,7 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _shipAddressService.GetObjects(
+            var result = await _shipAddressService.GetObjectsByOrder(
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
@@ -224,6 +228,10 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
                 _userDialogs.HideHud();
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 
@@ -310,5 +318,13 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
         {
             IsBusy = false;
         }
+    }
+
+    private async Task ShipAddressCloseAsync()
+    {
+        await MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.Hidden;
+        });
     }
 }

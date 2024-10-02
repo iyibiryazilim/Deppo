@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.ShipAddressModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
@@ -63,6 +64,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 
         ShipAddressTappedCommand = new Command<ShipAddressModel>(async (shipAddress) => await ShipAddressTappedAsync(shipAddress));
         ConfirmShipAddressCommand = new Command(async () => await ConfirmShipAddressAsync());
+        ShipAddressCloseCommand = new Command(async () => await ShipAddressCloseAsync());
     }
 
     public Page CurrentPage { get; set; } = null!;
@@ -77,6 +79,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 
     public Command ConfirmShipAddressCommand { get; }
     public Command ShipAddressTappedCommand { get; }
+    public Command ShipAddressCloseCommand { get; }
 
     #endregion Commands
 
@@ -247,38 +250,27 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
             return;
         if (IsBusy)
             return;
+
         try
         {
             IsBusy = true;
 
+            // Önceki seçimi kaldır
             if (SalesCustomer is not null)
             {
                 SalesCustomer.IsSelected = false;
                 SalesCustomer = null;
             }
 
+            // Yeni öğeyi seç
             SalesCustomer = item;
+            SalesCustomer.IsSelected = true;
+
+            // Ship adresleri varsa, bottom sheet aç
             if (item.ShipAddressCount > 0)
             {
                 await LoadShipAddressesAsync(item);
                 CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
-            }
-            else
-            {
-                if (SalesCustomer == item)
-                {
-                    SalesCustomer.IsSelected = false;
-                    SalesCustomer = null;
-                }
-                else
-                {
-                    if (SalesCustomer is not null)
-                    {
-                        SalesCustomer.IsSelected = false;
-                    }
-                    SalesCustomer = item;
-                    SalesCustomer.IsSelected = true;
-                }
             }
         }
         catch (Exception ex)
@@ -432,5 +424,13 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
         {
             IsBusy = false;
         }
+    }
+
+    private async Task ShipAddressCloseAsync()
+    {
+        await MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.Hidden;
+        });
     }
 }
