@@ -31,5 +31,8 @@ public interface IBarcodeSearchService
 
     Task<DataResult<dynamic>> SearcBySupplierProductCode(HttpClient httpClient, int firmNumber, int periodNumber, string barcode);
 
- 
+    Task<DataResult<dynamic>> SearcBySupplierVariantCode(HttpClient httpClient, int firmNumber, int periodNumber, string barcode);
+
+
+
 }
