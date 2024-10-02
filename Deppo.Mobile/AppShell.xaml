@@ -33,6 +33,7 @@
     xmlns:waitingPurchaseOrderView="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.WaitingOrderMenu.Views"
     xmlns:waitingSalesOrderView="clr-namespace:Deppo.Mobile.Modules.SalesModule.WaitingOrderMenu.Views"
     xmlns:warehouseView="clr-namespace:Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views"
+    xmlns:loginViewModel="clr-namespace:Deppo.Mobile.Modules.LoginModule.ViewModels"
     Title="Deppo"
     Shell.FlyoutBehavior="Flyout">
 
@@ -69,12 +70,13 @@
     </Shell.ItemTemplate>
 
     <Shell.FlyoutFooterTemplate>
-        <DataTemplate>
+        <DataTemplate x:DataType="loginViewModel:LoginViewModel">
             <VerticalStackLayout
                 Margin="0,0,20,0"
                 Padding="10"
                 Spacing="5">
                 <Button
+                    Command="{Binding LogoutCommand}"
                     BackgroundColor="{StaticResource Secondary}"
                     Text="Oturumu Kapat"
                     TextColor="{StaticResource OffBlack}" />

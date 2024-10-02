@@ -24,6 +24,7 @@ public partial class LoginViewModel : BaseViewModel
         LoginCommand = new Command(async () => await LoginAsync());
         ShowParameterCommand = new Command<BottomSheet>(ShowParameterAsync);
         SaveCommand = new Command(async () => await SaveAsync());
+        LogoutCommand = new Command(async () => await LogoutAsync());
     }
 
     [ObservableProperty]
@@ -38,6 +39,7 @@ public partial class LoginViewModel : BaseViewModel
     public Command LoginCommand { get; }
     public Command<BottomSheet> ShowParameterCommand { get; }
     public Command SaveCommand { get; }
+    public Command LogoutCommand { get; }
 
     private async Task LoginAsync()
     {
@@ -124,6 +126,33 @@ public partial class LoginViewModel : BaseViewModel
         catch (Exception ex)
         {
             _userDialogs.Alert(ex.Message, "Error", "OK");
+        }
+    }
+
+    private async Task LogoutAsync()
+    {
+        if(IsBusy)
+			return;        
+        try
+        {
+            SecureStorage.RemoveAll();
+
+            _userDialogs.Loading("Oturum kapatýlýyor...");
+            await Task.Delay(1000);
+            Application.Current.MainPage = new LoginView(this);
+
+            _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Error", "Ok");
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 }
