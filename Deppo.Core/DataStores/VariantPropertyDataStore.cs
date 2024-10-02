@@ -13,10 +13,10 @@ public class VariantPropertyDataStore : IVariantPropertyService
 {
     private string postUrl = "/gateway/customQuery/CustomQuery";
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber,  string search = "", int skip = 0, int take = 20)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int varyantRef, string search = "", int skip = 0, int take = 20)
     {
 
-        var content = new StringContent(JsonConvert.SerializeObject(VariantPropertysQuery(firmNumber, periodNumber, search, skip, take)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(VariantPropertysQuery(firmNumber, periodNumber, varyantRef  ,search, skip, take)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -68,14 +68,16 @@ public class VariantPropertyDataStore : IVariantPropertyService
         }
     }
 
-    private string VariantPropertysQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+    private string VariantPropertysQuery(int firmNumber, int periodNumber,int varyantRef ,string search = "", int skip = 0, int take = 20)
     {
         string baseQuery = $@" select 
  [ReferenceId] = CHARCODE.LOGICALREF , 
  [Code] = CHARCODE.CODE , 
- [Name] = CHARCODE.NAME 
+ [Name] = CHARCODE.NAME
  from LG_{firmNumber.ToString().PadLeft(3, '0')}_CHARCODE AS CHARCODE
-WHERE CHARCODE.ACTIVE=0"
+ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VRNTCHARASGN AS VRNT ON VRNT.CHARCODEREF = CHARCODE.LOGICALREF
+ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARYANT ON VARYANT.LOGICALREF = VRNT.VARIANTREF
+WHERE CHARCODE.ACTIVE=0 AND VARYANT.LOGICALREF = {varyantRef}"
 ;
 
         if (!string.IsNullOrEmpty(search))

@@ -13,10 +13,10 @@ public class VariantPropertyValueDataStore : IVariantPropertyValueService
 {
     private string postUrl = "/gateway/customQuery/CustomQuery";
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int variantPropertReferenceId ,string search = "", int skip = 0, int take = 20)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int variantPropertReferenceId, int varyantRef ,string search = "", int skip = 0, int take = 20)
     {
 
-        var content = new StringContent(JsonConvert.SerializeObject(VariantPropertysQuery(firmNumber, periodNumber,variantPropertReferenceId ,search, skip, take)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(VariantPropertysQuery(firmNumber, periodNumber,variantPropertReferenceId, varyantRef, search, skip, take)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -68,16 +68,18 @@ public class VariantPropertyValueDataStore : IVariantPropertyValueService
         }
     }
 
-    private string VariantPropertysQuery(int firmNumber, int periodNumber, int variantPropertReferenceId, string search = "", int skip = 0, int take = 20)
+    private string VariantPropertysQuery(int firmNumber, int periodNumber, int variantPropertReferenceId, int varyantRef, string search = "", int skip = 0, int take = 20)
     {
         string baseQuery = $@"  select
  [ReferenceId] = CHARVAL.LOGICALREF , 
  [Code] = CHARVAL.CODE , 
  [Name] = CHARVAL.NAME ,
  [VariantPropertyReferenceId] = CHARVAL.CHARCODEREF,
- [ValNo] = CHARVAL.VALNO
+ [ValNo] = CHARVAL.VALNO,
+ VRNTC.VARIANTREF
  from LG_{firmNumber.ToString().PadLeft(3, '0')}_CHARVAL as CHARVAL
- where CHARVAL.CHARCODEREF = {variantPropertReferenceId}"
+Left JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VRNTCHARASGN as VRNTC ON VRNTC.CHARVALREF = CHARVAL.LOGICALREF
+ where CHARVAL.CHARCODEREF = {variantPropertReferenceId} AND VRNTC.VARIANTREF = {varyantRef} "
 ;
 
         if (!string.IsNullOrEmpty(search))
