@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
@@ -30,6 +31,7 @@ public partial class TransferOutProductListViewModel : BaseViewModel
     WarehouseModel warehouseModel = null!;
 
     public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
+    public ObservableCollection<WarehouseTotalModel> SelectedItems { get; } = new();
     public ObservableCollection<VariantModel> ItemVariants { get; } = new();
 
     [ObservableProperty]
@@ -82,8 +84,8 @@ public partial class TransferOutProductListViewModel : BaseViewModel
         LoadMoreVariantItemsCommand = new Command(async () => await LoadMoreVariantItemsAsync());
         VariantTappedCommand = new Command<VariantModel>(async (parameter) => await VariantTappedAsync(parameter));
         ConfirmVariantCommand = new Command(async () => await ConfirmVariantAsync());
-        //ConfirmCommand = new Command(async () => await ConfirmAsync());
-        PerformSearchCommand = new Command<SearchBar>(async (parameter) => await PerformSearchAsync(parameter));
+        PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+        PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
         BackCommand = new Command(async () => await BackAsync());
         NextViewCommand = new Command(async () => await NextViewAsync());
     }
@@ -97,11 +99,13 @@ public partial class TransferOutProductListViewModel : BaseViewModel
     public Command VariantTappedCommand { get; }
     public Command ConfirmVariantCommand { get; }
     //public Command ConfirmCommand { get; }
-    public Command<SearchBar> PerformSearchCommand { get; }
+    public Command PerformSearchCommand { get; }
+    public Command PerformEmptySearchCommand { get; }
     public Command BackCommand { get; }
     public Command NextViewCommand { get; }
     #endregion
-
+    [ObservableProperty]
+    public SearchBar searchText;
     private async Task LoadItemsAsync()
     {
         if (IsBusy)
@@ -114,7 +118,7 @@ public partial class TransferOutProductListViewModel : BaseViewModel
             Items.Clear();
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number);
+            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, search: SearchText.Text);
 
             if (result.IsSuccess)
             {
@@ -123,32 +127,14 @@ public partial class TransferOutProductListViewModel : BaseViewModel
 
                 foreach (var product in result.Data)
                 {
-
                     var item = Mapping.Mapper.Map<WarehouseTotalModel>(product);
+                    var matcedItem = SelectedItems.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
+                    if (matcedItem is not null)
+                        item.IsSelected = matcedItem.IsSelected;
+                    else
+                        item.IsSelected = false;
+
                     Items.Add(item);
-                    //Items.Add(new WarehouseTotalModel
-                    //{
-                    //    ProductReferenceId = item.ProductReferenceId,
-                    //    ProductCode = item.ProductCode,
-                    //    ProductName = item.ProductName,
-                    //    UnitsetReferenceId = item.UnitsetReferenceId,
-                    //    UnitsetCode = item.UnitsetCode,
-                    //    UnitsetName = item.UnitsetName,
-                    //    SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                    //    SubUnitsetCode = item.SubUnitsetCode,
-                    //    SubUnitsetName = item.SubUnitsetName,
-                    //    StockQuantity = item.StockQuantity,
-                    //    WarehouseReferenceId = item.WarehouseReferenceId,
-                    //    WarehouseName = item.WarehouseName,
-                    //    WarehouseNumber = item.WarehouseNumber,
-                    //    LocTracking = item.LocTracking,
-                    //    IsVariant = item.IsVariant,
-                    //    TrackingType = item.TrackingType,
-                    //    IsSelected = false,
-                    //    LocTrackingIcon = product.LocTrackingIcon,
-                    //    VariantIcon = product.VariantIcon,
-                    //    TrackingTypeIcon = product.TrackingTypeIcon,
-                    //});
                 }
             }
 
@@ -177,7 +163,7 @@ public partial class TransferOutProductListViewModel : BaseViewModel
 
             _userDialogs.Loading("Loading More Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: Items.Count, take: 20);
+            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: Items.Count, take: 20,search: SearchText.Text);
 
             if (result.IsSuccess)
             {
@@ -187,30 +173,13 @@ public partial class TransferOutProductListViewModel : BaseViewModel
                 foreach (var product in result.Data)
                 {
                     var item = Mapping.Mapper.Map<WarehouseTotalModel>(product);
+                    var matcedItem = SelectedItems.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
+                    if (matcedItem is not null)
+                        item.IsSelected = matcedItem.IsSelected;
+                    else
+                        item.IsSelected = false;
+
                     Items.Add(item);
-                    //Items.Add(new WarehouseTotalModel
-                    //{
-                    //    ProductReferenceId = item.ProductReferenceId,
-                    //    ProductCode = item.ProductCode,
-                    //    ProductName = item.ProductName,
-                    //    UnitsetReferenceId = item.UnitsetReferenceId,
-                    //    UnitsetCode = item.UnitsetCode,
-                    //    UnitsetName = item.UnitsetName,
-                    //    SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                    //    SubUnitsetCode = item.SubUnitsetCode,
-                    //    SubUnitsetName = item.SubUnitsetName,
-                    //    StockQuantity = item.StockQuantity,
-                    //    WarehouseReferenceId = item.WarehouseReferenceId,
-                    //    WarehouseName = item.WarehouseName,
-                    //    WarehouseNumber = item.WarehouseNumber,
-                    //    LocTracking = item.LocTracking,
-                    //    IsVariant = item.IsVariant,
-                    //    TrackingType = item.TrackingType,
-                    //    IsSelected = false,
-                    //    LocTrackingIcon = product.LocTrackingIcon,
-                    //    VariantIcon = product.VariantIcon,
-                    //    TrackingTypeIcon = product.TrackingTypeIcon,
-                    //});
                 }
             }
 
@@ -259,6 +228,7 @@ public partial class TransferOutProductListViewModel : BaseViewModel
 
                         Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
                         SelectedProduct = item;
+                        SelectedItems.Add(item);
 
 
                         var outProductModel = new OutProductModel()
@@ -294,6 +264,7 @@ public partial class TransferOutProductListViewModel : BaseViewModel
                         {
                             TransferBasketModel.OutProducts.Remove(selectedItem);
                             Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
+                            SelectedItems.Remove(item);
                         }
                     }
                 }
@@ -513,6 +484,7 @@ public partial class TransferOutProductListViewModel : BaseViewModel
             }
 
             TransferBasketModel.OutWarehouse = WarehouseModel;
+            SelectedItems.Clear();
 
             await Shell.Current.GoToAsync($"{nameof(TransferOutBasketView)}", new Dictionary<string, object>
             {
@@ -532,75 +504,58 @@ public partial class TransferOutProductListViewModel : BaseViewModel
         }
     }
 
-    private async Task PerformSearchAsync(SearchBar searchBar)
+    private async Task PerformSearchAsync()
     {
         if (IsBusy)
             return;
+
         try
         {
-            if (string.IsNullOrWhiteSpace(searchBar.Text))
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
             {
                 await LoadItemsAsync();
-                searchBar.Unfocus();
+                SearchText.Unfocus();
                 return;
             }
-            else
+            IsBusy = true;
+            Items.Clear();
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number,search:SearchText.Text);
+
+            if (result.IsSuccess)
             {
-                if (searchBar.Text.Length > 5)
+                if (result.Data is null)
+                    return;
+
+                foreach (var product in result.Data)
                 {
-                    IsBusy = true;
-                    Items.Clear();
-                    _userDialogs.Loading("Searching Items...");
-                    var httpClient = _httpClientService.GetOrCreateHttpClient();
-                    await Task.Delay(1000);
-                    var result = await _warehouseTotalService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, searchBar.Text, 0, 20);
-                    if (result.IsSuccess)
-                    {
-                        if (result.Data is null)
-                            return;
 
-                        foreach (var product in result.Data)
-                        {
-                            var item = Mapping.Mapper.Map<WarehouseTotal>(product);
-
-                            Items.Add(new WarehouseTotalModel
-                            {
-                                ProductReferenceId = item.ProductReferenceId,
-                                ProductCode = item.ProductCode,
-                                ProductName = item.ProductName,
-                                UnitsetReferenceId = item.UnitsetReferenceId,
-                                UnitsetCode = item.UnitsetCode,
-                                UnitsetName = item.UnitsetName,
-                                SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                                SubUnitsetCode = item.SubUnitsetCode,
-                                SubUnitsetName = item.SubUnitsetName,
-                                StockQuantity = item.StockQuantity,
-                                WarehouseReferenceId = item.WarehouseReferenceId,
-                                WarehouseName = item.WarehouseName,
-                                WarehouseNumber = item.WarehouseNumber,
-                                IsVariant = item.IsVariant,
-                                LocTracking = item.LocTracking,
-                                TrackingType = item.TrackingType,
-                                IsSelected = false,
-                                LocTrackingIcon = product.LocTrackingIcon,
-                                VariantIcon = product.VariantIcon,
-                                TrackingTypeIcon = product.TrackingTypeIcon
-                            });
-                        }
-                    }
-
-                    _userDialogs.Loading().Hide();
-                    searchBar.Unfocus();
+                    var item = Mapping.Mapper.Map<WarehouseTotalModel>(product);
+                    Items.Add(item);
+          
                 }
             }
+            if (!result.IsSuccess)
+            {
+                _userDialogs.Alert(result.Message, "Hata");
+                return;
+            }
         }
-        catch (Exception ex)
+        catch (System.Exception ex)
         {
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            _userDialogs.Alert(ex.Message, "Hata");
         }
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    private async Task PerformEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText.Text))
+        {
+            await PerformSearchAsync();
         }
     }
 

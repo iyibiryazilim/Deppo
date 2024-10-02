@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
@@ -36,8 +37,9 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
     private WarehouseModel warehouseModel = null!;
 
 	public ObservableCollection<PurchaseTransactionModel> Items { get; } = new();
+    public ObservableCollection<PurchaseTransactionModel> SelectedItems { get; } = new();
 
-	public ObservableCollection<PurchaseTransactionModel> SelectedPurchaseTransactions { get; } = new();
+    public ObservableCollection<PurchaseTransactionModel> SelectedPurchaseTransactions { get; } = new();
 
 	public ObservableCollection<ReturnPurchaseBasketModel> SelectedProducts = new();
 
@@ -46,6 +48,7 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
         _purchaseDispatchTransactionService = purchaseDispatchTransactionService;
+        _serviceProvider = serviceProvider;
 
 
         Title = "Ürünler";
@@ -54,7 +57,8 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<PurchaseTransactionModel>(async (x) => await ItemTappedAsync(x));
         NextViewCommand = new Command(async () => await NextViewAsync());
-        _serviceProvider = serviceProvider;
+        PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+        PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
     }
 
     public Page CurrentPage { get; set; } = null!;
@@ -63,7 +67,12 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
+    public Command PerformSearchCommand { get; }
+    public Command PerformEmptySearchCommand { get; }
 
+
+    [ObservableProperty]
+    public SearchBar searchText;
     private async Task LoadItemsAsync()
     {
         if (IsBusy)
@@ -77,7 +86,7 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _purchaseDispatchTransactionService.GetTransactionsByFicheReferenceId(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseFicheModel.ReferenceId,string.Empty, 0, 20);
+            var result = await _purchaseDispatchTransactionService.GetTransactionsByFicheReferenceId(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseFicheModel.ReferenceId,SearchText.Text, 0, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -85,6 +94,11 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
                     foreach (var transaction in result.Data)
                     {
                         var item = Mapping.Mapper.Map<PurchaseTransactionModel>(transaction);
+                        var matchedItem = SelectedItems.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
+                        if (matchedItem is not null)
+                            item.IsSelected = matchedItem.IsSelected;
+                        else
+                            item.IsSelected = false;
                         Items.Add(item);
                     }
                 }
@@ -115,16 +129,20 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
             IsBusy = true;
             _userDialogs.ShowLoading("Yükleniyor...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _purchaseDispatchTransactionService.GetTransactionsByFicheReferenceId(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseFicheModel.ReferenceId,string.Empty, Items.Count, 20);
+            var result = await _purchaseDispatchTransactionService.GetTransactionsByFicheReferenceId(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseFicheModel.ReferenceId, SearchText.Text, Items.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
                     foreach (var transaction in result.Data)
                     {
-
                         var item = Mapping.Mapper.Map<PurchaseTransactionModel>(transaction);
-                        Items.Add(item);   
+                        var matchedItem = SelectedItems.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
+                        if (matchedItem is not null)
+                            item.IsSelected = matchedItem.IsSelected;
+                        else
+                            item.IsSelected = false;
+                        Items.Add(item);
                     }
 
                     _userDialogs.HideHud();
@@ -161,6 +179,7 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
                     Items.FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = false;
                     SelectedPurchaseTransactions.Remove(SelectedPurchaseTransactions.FirstOrDefault(x => x.ReferenceId == selectedItem.ReferenceId));
                     SelectedProducts.Remove(SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == selectedItem.ProductReferenceId));
+                    SelectedItems.Remove(selectedItem);
                 }
                 else
                 {
@@ -210,6 +229,7 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
 
 
                     SelectedPurchaseTransactions.Add(selectedItem);
+                    SelectedItems.Add(selectedItem);
                 }
             }
         }
@@ -235,7 +255,7 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            
+            SelectedItems.Clear();
 
             await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseDispatchBasketView)}", new Dictionary<string, object>
             {
@@ -254,6 +274,67 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
+        }
+    }
+    private async Task PerformSearchAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
+            {
+                await LoadItemsAsync();
+                SearchText.Unfocus();
+                return;
+            }
+            IsBusy = true;
+
+            Items.Clear();
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _purchaseDispatchTransactionService.GetTransactionsByFicheReferenceId(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseFicheModel.ReferenceId, SearchText.Text, 0, 20);
+            if (result.IsSuccess)
+            {
+                if (result.Data is not null)
+                {
+                    foreach (var transaction in result.Data)
+                    {
+                        var item = Mapping.Mapper.Map<PurchaseTransactionModel>(transaction);
+                        var matchedItem = SelectedItems.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
+                        if (matchedItem is not null)
+                            item.IsSelected = matchedItem.IsSelected;
+                        else
+                            item.IsSelected = false;
+                        Items.Add(item);
+                    }
+                }
+            }
+
+            if (!result.IsSuccess)
+            {
+                _userDialogs.Alert(result.Message, "Hata");
+                return;
+            }
+
+
+        }
+        catch (System.Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task PerformEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText.Text))
+        {
+            await PerformSearchAsync();
         }
     }
 }

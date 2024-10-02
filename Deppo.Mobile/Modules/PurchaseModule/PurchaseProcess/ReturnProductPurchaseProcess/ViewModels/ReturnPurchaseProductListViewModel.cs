@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
@@ -30,6 +31,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
     WarehouseModel warehouseModel = null!;
 
     public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
+    public ObservableCollection<WarehouseTotalModel> SelectedItems { get; } = new();
     public ObservableCollection<VariantModel> ItemVariants { get; } = new();
 
     [ObservableProperty]
@@ -75,8 +77,9 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<WarehouseTotalModel>(async (parameter) => await ItemTappedAsync(parameter));
-        PerformSearchCommand = new Command<SearchBar>(async (parameter) => await PerformSearchAsync(parameter));
         ConfirmCommand = new Command(async () => await ConfirmAsync());
+        PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+        PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
         BackCommand = new Command(async () => await BackAsync());
 
         LoadVariantItemsCommand = new Command(async () => await LoadVariantItemsAsync());
@@ -90,8 +93,9 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
 	public Command ConfirmCommand { get; }
-	public Command<SearchBar> PerformSearchCommand { get; }
-	public Command BackCommand { get; }
+    public Command PerformSearchCommand { get; }
+    public Command PerformEmptySearchCommand { get; }
+    public Command BackCommand { get; }
 
 
 	public Command LoadVariantItemsCommand { get; }
@@ -99,6 +103,9 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
     public Command VariantTappedCommand { get; }
     public Command ConfirmVariantCommand { get; }
     #endregion
+
+    [ObservableProperty]
+    public SearchBar searchText;
 
     private async Task LoadItemsAsync()
     {
@@ -113,7 +120,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number);
+            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number,search:SearchText.Text);
 
             if (result.IsSuccess)
             {
@@ -124,6 +131,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
                 {
 
                     var item = Mapping.Mapper.Map<WarehouseTotal>(product);
+                    var matchedItem = SelectedItems.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
                     Items.Add(new WarehouseTotalModel
                     {
                         ProductReferenceId = item.ProductReferenceId,
@@ -142,7 +150,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
                         LocTracking = item.LocTracking,
                         IsVariant = item.IsVariant,
                         TrackingType = item.TrackingType,
-                        IsSelected = false,
+                        IsSelected = matchedItem != null ? matchedItem.IsSelected : false,
                         LocTrackingIcon = product.LocTrackingIcon,
                         VariantIcon = product.VariantIcon,
                         TrackingTypeIcon = product.TrackingTypeIcon,
@@ -175,7 +183,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             _userDialogs.Loading("Loading Items");
-            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: Items.Count, take: 20);
+            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: Items.Count, take: 20,search:SearchText.Text);
 
             if (result.IsSuccess)
             {
@@ -185,7 +193,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
                 foreach (var product in result.Data)
                 {
                     var item = Mapping.Mapper.Map<WarehouseTotal>(product);
-
+                    var matchedItem = SelectedItems.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
                     Items.Add(new WarehouseTotalModel
                     {
                         ProductReferenceId = item.ProductReferenceId,
@@ -204,7 +212,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
                         LocTracking = item.LocTracking,
                         IsVariant = item.IsVariant,
                         TrackingType = item.TrackingType,
-                        IsSelected = false,
+                        IsSelected = matchedItem != null ? matchedItem.IsSelected : false,
                         LocTrackingIcon = product.LocTrackingIcon,
                         VariantIcon = product.VariantIcon,
                         TrackingTypeIcon = product.TrackingTypeIcon,
@@ -250,6 +258,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
                     {
                         Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
                         SelectedProduct = item;
+                        SelectedItems.Add(item);
 
                         var basketItem = new ReturnPurchaseBasketModel
                         {
@@ -286,6 +295,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
                         {
                             SelectedProducts.Remove(selectedItem);
                             Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
+                            SelectedItems.Remove(item);
                         }
                     }
                 }
@@ -470,6 +480,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
             }
             await Shell.Current.GoToAsync($"..");
             SelectedProducts.Clear();
+            SelectedItems.Clear();
         }
         catch (Exception ex)
         {
@@ -481,77 +492,82 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
         }
     }
 
-    private async Task PerformSearchAsync(SearchBar searchBar)
+    private async Task PerformSearchAsync()
     {
         if (IsBusy)
             return;
+
         try
         {
-            if (string.IsNullOrWhiteSpace(searchBar.Text))
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
             {
                 await LoadItemsAsync();
-                searchBar.Unfocus();
+                SearchText.Unfocus();
                 return;
             }
-            else
+            IsBusy = true;
+            Items.Clear();
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, search: SearchText.Text);
+
+            if (result.IsSuccess)
             {
-                if (searchBar.Text.Length > 5)
+                if (result.Data is null)
+                    return;
+
+                foreach (var product in result.Data)
                 {
-                    IsBusy = true;
-                    Items.Clear();
-                    _userDialogs.Loading("Searching Items...");
-                    var httpClient = _httpClientService.GetOrCreateHttpClient();
-                    await Task.Delay(1000);
-                    var result = await _warehouseTotalService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, searchBar.Text, 0, 20);
-                    if (result.IsSuccess)
+
+                    var item = Mapping.Mapper.Map<WarehouseTotal>(product);
+                    Items.Add(new WarehouseTotalModel
                     {
-                        if (result.Data is null)
-                            return;
-
-                        foreach (var product in result.Data)
-                        {
-                            var item = Mapping.Mapper.Map<WarehouseTotal>(product);
-
-                            Items.Add(new WarehouseTotalModel
-                            {
-                                ProductReferenceId = item.ProductReferenceId,
-                                ProductCode = item.ProductCode,
-                                ProductName = item.ProductName,
-                                UnitsetReferenceId = item.UnitsetReferenceId,
-                                UnitsetCode = item.UnitsetCode,
-                                UnitsetName = item.UnitsetName,
-                                SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                                SubUnitsetCode = item.SubUnitsetCode,
-                                SubUnitsetName = item.SubUnitsetName,
-                                StockQuantity = item.StockQuantity,
-                                WarehouseReferenceId = item.WarehouseReferenceId,
-                                WarehouseName = item.WarehouseName,
-                                WarehouseNumber = item.WarehouseNumber,
-                                IsVariant = item.IsVariant,
-                                LocTracking = item.LocTracking,
-                                TrackingType = item.TrackingType,
-                                IsSelected = false,
-                                LocTrackingIcon = product.LocTrackingIcon,
-                                VariantIcon = product.VariantIcon,
-                                TrackingTypeIcon = product.TrackingTypeIcon
-                            });
-                        }
-                    }
-
-                    _userDialogs.Loading().Hide();
-                    searchBar.Unfocus();
+                        ProductReferenceId = item.ProductReferenceId,
+                        ProductCode = item.ProductCode,
+                        ProductName = item.ProductName,
+                        UnitsetReferenceId = item.UnitsetReferenceId,
+                        UnitsetCode = item.UnitsetCode,
+                        UnitsetName = item.UnitsetName,
+                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                        SubUnitsetCode = item.SubUnitsetCode,
+                        SubUnitsetName = item.SubUnitsetName,
+                        StockQuantity = item.StockQuantity,
+                        WarehouseReferenceId = item.WarehouseReferenceId,
+                        WarehouseName = item.WarehouseName,
+                        WarehouseNumber = item.WarehouseNumber,
+                        LocTracking = item.LocTracking,
+                        IsVariant = item.IsVariant,
+                        TrackingType = item.TrackingType,
+                        IsSelected = false,
+                        LocTrackingIcon = product.LocTrackingIcon,
+                        VariantIcon = product.VariantIcon,
+                        TrackingTypeIcon = product.TrackingTypeIcon,
+                    });
                 }
             }
+            if (!result.IsSuccess)
+            {
+                _userDialogs.Alert(result.Message, "Hata");
+                return;
+            }
         }
-        catch (Exception ex)
+        catch (System.Exception ex)
         {
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            _userDialogs.Alert(ex.Message, "Hata");
         }
         finally
         {
             IsBusy = false;
         }
     }
+
+    private async Task PerformEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText.Text))
+        {
+            await PerformSearchAsync();
+        }
+    }
+
 
 
     private async Task BackAsync()

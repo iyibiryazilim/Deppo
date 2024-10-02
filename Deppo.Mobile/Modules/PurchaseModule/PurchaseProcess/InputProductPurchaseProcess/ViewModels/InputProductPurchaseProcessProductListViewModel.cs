@@ -59,6 +59,8 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
         //ConfirmVariantCommand = new Command(async () => await ConfirmVariantAsync());
         ConfirmCommand = new Command(async () => await ConfirmAsync());
         BackCommand = new Command(async () => await BackAsync());
+        PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+        PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
     }
 
     private Page CurrentPage { get; set; } = null!;
@@ -72,10 +74,17 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
     public Command ConfirmVariantCommand { get; }
     public Command ConfirmCommand { get; }
     public Command BackCommand { get; }
+    public Command PerformSearchCommand { get; }
+    public Command PerformEmptySearchCommand { get; }
 
     public ObservableCollection<ProductModel> Items { get; } = new();
+
+    //Arama işleminde seçilen ürünlerin listesi
+    public ObservableCollection<ProductModel> SelectedItems { get; } = new();
     public ObservableCollection<VariantModel> ItemVariants { get; } = new();
 
+    [ObservableProperty]
+    public SearchBar searchText;
     private async Task LoadItemsAsync()
     {
         if (IsBusy)
@@ -90,7 +99,7 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
             _userDialogs.Loading("Loading Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             await Task.Delay(1000);
-            var result = await _productService.GetObjectsPurchaseProduct(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 20);
+            var result = await _productService.GetObjectsPurchaseProduct(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, 0, 20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
@@ -99,7 +108,7 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
                 foreach (var product in result.Data)
                 {
                     var item = Mapping.Mapper.Map<Product>(product);
-
+                    var matchedItem = SelectedItems.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
                     Items.Add(new ProductModel
                     {
                         ReferenceId = item.ReferenceId,
@@ -115,7 +124,7 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
                         TrackingType = item.TrackingType,
                         LocTracking = item.LocTracking,
                         IsVariant = item.IsVariant,
-                        IsSelected = false
+                        IsSelected = matchedItem != null ? matchedItem.IsSelected : false
                     });
                 }
             }
@@ -147,7 +156,7 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
 
             _userDialogs.Loading("Loading More Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _productService.GetObjectsPurchaseProduct(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, Items.Count, 20);
+            var result = await _productService.GetObjectsPurchaseProduct(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, Items.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
@@ -156,7 +165,7 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
                 foreach (var product in result.Data)
                 {
                     var item = Mapping.Mapper.Map<Product>(product);
-
+                    var matchedItem = SelectedItems.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
                     Items.Add(new ProductModel
                     {
                         ReferenceId = item.ReferenceId,
@@ -172,7 +181,7 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
                         TrackingType = item.TrackingType,
                         LocTracking = item.LocTracking,
                         IsVariant = item.IsVariant,
-                        IsSelected = false
+                        IsSelected = matchedItem != null ? matchedItem.IsSelected : false
                     });
                 }
             }
@@ -239,6 +248,7 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
                         };
 
                         SelectedProducts.Add(basketItem);
+                        SelectedItems.Add(item);
                     }
                     else
                     {
@@ -248,6 +258,7 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
                         {
                             SelectedProducts.Remove(selectedItem);
                             Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = false;
+                            SelectedItems.Remove(item);
                         }
                     }
                 }
@@ -429,6 +440,7 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
 
                 await Shell.Current.GoToAsync($"..");
             }
+            SelectedItems.Clear();
         }
         catch (Exception ex)
         {
@@ -458,6 +470,78 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
         finally
         {
             IsBusy = false;
+        }
+    }
+    private async Task PerformSearchAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
+            {
+                await LoadItemsAsync();
+                SearchText.Unfocus();
+                return;
+            }
+            IsBusy = true;
+
+            Items.Clear();
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _productService.GetObjectsPurchaseProduct(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, 0, 20);
+            if (result.IsSuccess)
+            {
+                if (result.Data == null)
+                    return;
+
+                foreach (var product in result.Data)
+                {
+                    var item = Mapping.Mapper.Map<Product>(product);
+                    var matchedItem = SelectedItems.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
+                    Items.Add(new ProductModel
+                    {
+                        ReferenceId = item.ReferenceId,
+                        Code = item.Code,
+                        Name = item.Name,
+                        UnitsetReferenceId = item.UnitsetReferenceId,
+                        UnitsetCode = item.UnitsetCode,
+                        UnitsetName = item.UnitsetName,
+                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                        SubUnitsetCode = item.SubUnitsetCode,
+                        SubUnitsetName = item.SubUnitsetName,
+                        StockQuantity = item.StockQuantity,
+                        TrackingType = item.TrackingType,
+                        LocTracking = item.LocTracking,
+                        IsVariant = item.IsVariant,
+                        IsSelected = matchedItem != null ? matchedItem.IsSelected : false
+                    });
+                }
+            }
+
+            if (!result.IsSuccess)
+            {
+                _userDialogs.Alert(result.Message, "Hata");
+                return;
+            }
+
+        }
+        catch (System.Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task PerformEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText.Text))
+        {
+            await PerformSearchAsync();
         }
     }
 }

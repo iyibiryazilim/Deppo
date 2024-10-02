@@ -12,5 +12,6 @@ public partial class VirmanProductOutListView : ContentPage
         _viewModel = viewModel;
         BindingContext = viewModel;
         _viewModel.CurrentPage = this;
+        _viewModel.SearchText = searchBar;
     }
 }

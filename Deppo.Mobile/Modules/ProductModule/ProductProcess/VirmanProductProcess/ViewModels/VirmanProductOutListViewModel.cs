@@ -1,27 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.BaseModels;
+using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
-using Deppo.Mobile.Helpers.MVVMHelper;
-
-using System;
-using System.Collections.Generic;
-
-using System.Collections.ObjectModel;
-
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Deppo.Core.Models;
 using Deppo.Mobile.Helpers.MappingHelper;
+using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.Views;
+using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.ViewModels;
 
@@ -57,6 +44,8 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<WarehouseTotalModel>(async (parameter) => await ItemTappedAsync(parameter));
         NextViewCommand = new Command(async () => await NextViewAsync());
+        PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+        PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
     }
 
     public Command LoadItemsCommand { get; }
@@ -65,7 +54,11 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
     public Command ConfirmCommand { get; }
     public Command BackCommand { get; }
     public Command NextViewCommand { get; }
+    public Command PerformSearchCommand { get; }
+    public Command PerformEmptySearchCommand { get; }
 
+    [ObservableProperty]
+    public SearchBar searchText;
     private async Task NextViewAsync()
     {
         if (IsBusy)
@@ -148,7 +141,7 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: OutWarehouse.Number, skip: Items.Count, take: 20);
+            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: OutWarehouse.Number, skip: Items.Count, take: 20,search: SearchText.Text);
 
             if (result.IsSuccess)
             {
@@ -240,7 +233,7 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
             Items.Clear();
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: OutWarehouse.Number);
+            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: OutWarehouse.Number, SearchText.Text);
 
             if (result.IsSuccess)
             {
@@ -288,6 +281,80 @@ public partial class VirmanProductOutListViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
+        }
+    }
+    private async Task PerformSearchAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
+            {
+                await LoadItemsAsync();
+                SearchText.Unfocus();
+                return;
+            }
+            IsBusy = true;
+            Items.Clear();
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: OutWarehouse.Number,SearchText.Text);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var product in result.Data)
+                {
+                    var item = Mapping.Mapper.Map<WarehouseTotal>(product);
+                    Items.Add(new WarehouseTotalModel
+                    {
+                        ProductReferenceId = item.ProductReferenceId,
+                        ProductCode = item.ProductCode,
+                        ProductName = item.ProductName,
+                        UnitsetReferenceId = item.UnitsetReferenceId,
+                        UnitsetCode = item.UnitsetCode,
+                        UnitsetName = item.UnitsetName,
+                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                        SubUnitsetCode = item.SubUnitsetCode,
+                        SubUnitsetName = item.SubUnitsetName,
+                        StockQuantity = item.StockQuantity,
+                        WarehouseReferenceId = item.WarehouseReferenceId,
+                        WarehouseName = item.WarehouseName,
+                        WarehouseNumber = item.WarehouseNumber,
+                        LocTracking = item.LocTracking,
+                        IsVariant = item.IsVariant,
+                        TrackingType = item.TrackingType,
+                        IsSelected = false,
+                        LocTrackingIcon = product.LocTrackingIcon,
+                        VariantIcon = product.VariantIcon,
+                        TrackingTypeIcon = product.TrackingTypeIcon,
+                    });
+                }
+            }
+            if (!result.IsSuccess)
+            {
+                _userDialogs.Alert(result.Message, "Hata");
+                return;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task PerformEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText.Text))
+        {
+            await PerformSearchAsync();
         }
     }
 }

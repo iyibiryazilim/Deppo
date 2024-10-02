@@ -81,11 +81,12 @@
                                Placeholder="Ara..."
                                PlaceholderColor="{StaticResource OffBlack}"
                                TextColor="{StaticResource OffBlack}">
-                        <!-- <SearchBar.Behaviors>
-                        <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
-                                                        CommandParameter="{Binding ., Source={x:Reference searchBar}}"
-                                                        EventName="TextChanged" />
-                    </SearchBar.Behaviors>-->
+                        <SearchBar.Behaviors>
+                            <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                            EventName="SearchButtonPressed" />
+                            <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}"
+                                                            EventName="TextChanged" />
+                        </SearchBar.Behaviors>
                     </SearchBar>
                 </Border>
 
@@ -221,11 +222,12 @@
                                Placeholder="Ara..."
                                PlaceholderColor="{StaticResource OffBlack}"
                                TextColor="{StaticResource OffBlack}">
-                        <!-- <SearchBar.Behaviors>
-                <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
-                                                CommandParameter="{Binding ., Source={x:Reference searchBar}}"
-                                                EventName="TextChanged" />
-            </SearchBar.Behaviors>-->
+                        <SearchBar.Behaviors>
+                            <toolkit:EventToCommandBehavior Command="{Binding OrderSearchCommand}"
+                                                            EventName="SearchButtonPressed" />
+                            <toolkit:EventToCommandBehavior Command="{Binding OrderEmptySearchCommand}"
+                                                            EventName="TextChanged" />
+                        </SearchBar.Behaviors>
                     </SearchBar>
                 </Border>
 
