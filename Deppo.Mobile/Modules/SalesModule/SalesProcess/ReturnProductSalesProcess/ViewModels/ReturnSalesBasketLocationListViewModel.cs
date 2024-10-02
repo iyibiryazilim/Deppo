@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.BaseModels;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
@@ -42,6 +43,8 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
 
         LoadSelectedItemsCommand = new Command(async () => await LoadSelectedItemsAsync());
         ShowLocationsCommand = new Command(async () => await ShowLocationsAsync());
+        LocationPerformSearchCommand = new Command(async () => await LocationPerformSearchAsync());
+        LocationPerformEmptySearchCommand = new Command(async () => await LocationPerformEmptySearchAsync());
         PerformSearchCommand = new Command<Entry>(async (searchBar) => await PerformSearchAsync(searchBar));
         IncreaseCommand = new Command<LocationModel>(async (locationModel) => await IncreaseAsync(locationModel));
         DecreaseCommand = new Command<LocationModel>(async (locationModel) => await DecreaseAsync(locationModel));
@@ -62,6 +65,7 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
     private ReturnSalesBasketModel returnSalesBasketModel = null!;
 
     public ObservableCollection<LocationModel> Items { get; } = new(); // serilotmodel
+
     public ObservableCollection<LocationModel> SelectedItems { get; } = new();
 
     [ObservableProperty]
@@ -72,6 +76,9 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
     public Command LoadSelectedItemsCommand { get; }
     public Command<LocationModel> IncreaseCommand { get; }
     public Command<LocationModel> DecreaseCommand { get; }
+    public Command LocationPerformSearchCommand { get; }
+    public Command LocationPerformEmptySearchCommand { get; }
+
     public Command<Entry> PerformSearchCommand { get; }
     public Command ConfirmCommand { get; }
     public Command CancelCommand { get; }
@@ -87,6 +94,9 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
     public Command ConfirmLocationsCommand { get; }
 
     #endregion Location BottomSheet Commands
+
+    [ObservableProperty]
+    public SearchBar searchText;
 
     public async Task LoadSelectedItemsAsync()
     {
@@ -159,7 +169,7 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, ReturnSalesBasketModel.ItemReferenceId, string.Empty, 0, 20);
+            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, ReturnSalesBasketModel.ItemReferenceId, SearchText.Text, 0, 20);
 
             if (result.IsSuccess)
             {
@@ -201,7 +211,8 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
                 warehouseNumber: WarehouseModel.Number,
                 productReferenceId: ReturnSalesBasketModel.ItemReferenceId,
                 skip: Items.Count,
-                take: 20);
+                take: 20,
+                search: SearchText.Text);
 
             if (result.IsSuccess)
             {
@@ -224,40 +235,6 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
         }
     }
 
-    private async Task LocationsPerformSearchAsync(SearchBar searchText)
-    {
-        try
-        {
-            if (!string.IsNullOrEmpty(searchText.Text))
-                return;
-
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationService.GetObjects(
-                httpClient: httpClient,
-                firmNumber: _httpClientService.FirmNumber,
-                periodNumber: _httpClientService.PeriodNumber,
-                warehouseNumber: WarehouseModel.Number,
-                productReferenceId: ReturnSalesBasketModel.ItemReferenceId,
-                search: searchText.Text,
-                skip: 0,
-                take: 20
-            );
-
-            if (result.IsSuccess)
-            {
-                if (result.Data is null)
-                    return;
-            }
-        }
-        catch (Exception)
-        {
-            throw;
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
 
     private async Task CloseLocationsAsync()
     {
@@ -410,6 +387,65 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    private async Task LocationPerformSearchAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
+            {
+                await LoadItemsAsync();
+                SearchText.Unfocus();
+                return;
+            }
+            IsBusy = true;
+            Items.Clear();
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            var result = await _locationService.GetObjects(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                warehouseNumber: WarehouseModel.Number,
+                productReferenceId: ReturnSalesBasketModel.ItemReferenceId,
+                skip: Items.Count,
+                take: 20,
+                search: SearchText.Text);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is not null)
+                {
+                    foreach (var item in result.Data)
+                        Items.Add(Mapping.Mapper.Map<LocationModel>(item));
+                }
+            }
+            if (!result.IsSuccess)
+            {
+                _userDialogs.Alert(result.Message, "Hata");
+                return;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task LocationPerformEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText.Text))
+        {
+            await LocationPerformSearchAsync();
         }
     }
 

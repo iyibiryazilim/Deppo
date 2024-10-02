@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.PurchaseModels;
@@ -41,6 +42,8 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
         Title = "İrsaliye Listesi";
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+        PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+        PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
         ItemTappedCommand = new Command<SalesFicheModel>(async (x) => await ItemTappedAsync(x));
 
         NextViewCommand = new Command(async () => await NextViewAsync());
@@ -49,11 +52,15 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
-    public Command<SearchBar> PerformSearchCommand { get; }
+    public Command PerformSearchCommand { get; }
+    public Command PerformEmptySearchCommand { get; }
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
 
     public ObservableCollection<SalesFicheModel> Items { get; } = new();
+
+    [ObservableProperty]
+    public SearchBar searchText;
 
     private async Task LoadItemsAsync()
     {
@@ -68,7 +75,7 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _salesDispatchTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, SalesCustomer.ReferenceId, string.Empty, 0, 20);
+            var result = await _salesDispatchTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, SalesCustomer.ReferenceId, SearchText.Text, 0, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -108,7 +115,7 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _salesDispatchTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, SalesCustomer.ReferenceId, string.Empty, Items.Count, 20);
+            var result = await _salesDispatchTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, SalesCustomer.ReferenceId, SearchText.Text, Items.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -222,5 +229,58 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
 
+    }
+
+    private async Task PerformSearchAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
+            {
+                await LoadItemsAsync();
+                SearchText.Unfocus();
+                return;
+            }
+            IsBusy = true;
+            Items.Clear();
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _salesDispatchTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, SalesCustomer.ReferenceId, SearchText.Text, 0, 20);
+            if (result.IsSuccess)
+            {
+                if (result.Data is not null)
+                {
+                    foreach (var fiche in result.Data)
+                    {
+                        var item = Mapping.Mapper.Map<SalesFicheModel>(fiche);
+                        Items.Add(item);
+                    }
+                }
+            }
+            if (!result.IsSuccess)
+            {
+                _userDialogs.Alert(result.Message, "Hata");
+                return;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task PerformEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText.Text))
+        {
+            await PerformSearchAsync();
+        }
     }
 }
