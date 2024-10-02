@@ -36,6 +36,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
     private ObservableCollection<InputProductBasketModel> selectedProducts = new();
 
     public ObservableCollection<ProductModel> Items { get; } = new();
+    public ObservableCollection<ProductModel> SelectedItems { get; } = new();
     public ObservableCollection<VariantModel> ItemVariants { get; } = new();
 
     private bool IsSearchMode
@@ -130,6 +131,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                 foreach (var product in result.Data)
                 {
                     var item = Mapping.Mapper.Map<Product>(product);
+                    var matchingItem = SelectedItems.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
 
                     Items.Add(new ProductModel
                     {
@@ -152,7 +154,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                         VatRate = item.VatRate,
                         Image = item.Image,
                         IsVariant = item.IsVariant,
-                        IsSelected = false
+                        IsSelected = matchingItem != null ? matchingItem.IsSelected : false
                     });
                 }
             }
@@ -194,7 +196,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                 foreach (var product in result.Data)
                 {
                     var item = Mapping.Mapper.Map<Product>(product);
-
+                    var matchingItem = SelectedItems.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
                     Items.Add(new ProductModel
                     {
                         ReferenceId = item.ReferenceId,
@@ -216,7 +218,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                         VatRate = item.VatRate,
                         Image = item.Image,
                         IsVariant = item.IsVariant,
-                        IsSelected = false
+                        IsSelected = matchingItem != null ? matchingItem.IsSelected : false
                     });
                 }
             }
@@ -291,6 +293,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                         };
 
                         SelectedProducts.Add(basketItem);
+                        SelectedItems.Add(item);
                     }
                     else
                     {
@@ -300,6 +303,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                         {
                             SelectedProducts.Remove(selectedItem);
                             Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = false;
+                            SelectedItems.Remove(item);
                         }
                     }
                 }
@@ -501,6 +505,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
 
                 await Shell.Current.GoToAsync($"..");
             }
+            SelectedItems.Clear();
         }
         catch (Exception ex)
         {

@@ -17,7 +17,7 @@ public partial class CameraReaderView : ContentPage
 		_viewModel.BarcodeReader.Options = new BarcodeReaderOptions
 		{
 			Formats = BarcodeFormats.All,
-			Multiple = false,
+			Multiple = true,
 			AutoRotate = true,
 		};
 	}

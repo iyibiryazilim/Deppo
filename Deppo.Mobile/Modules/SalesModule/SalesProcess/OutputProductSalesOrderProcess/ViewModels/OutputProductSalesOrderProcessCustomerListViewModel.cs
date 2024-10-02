@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.PurchaseModels;
@@ -65,9 +66,16 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
         ShipAddressTappedCommand = new Command<ShipAddressModel>(async (shipAddress) => await ShipAddressTappedAsync(shipAddress));
         ConfirmShipAddressCommand = new Command(async () => await ConfirmShipAddressAsync());
         ShipAddressCloseCommand = new Command(async () => await ShipAddressCloseAsync());
+
+        PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+        PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
+
     }
 
     public Page CurrentPage { get; set; } = null!;
+
+    [ObservableProperty]
+    public SearchBar searchText;
 
     #region Commands
 
@@ -81,7 +89,11 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
     public Command ShipAddressTappedCommand { get; }
     public Command ShipAddressCloseCommand { get; }
 
+    public Command PerformSearchCommand { get; }
+    public Command PerformEmptySearchCommand { get; }
+
     #endregion Commands
+
 
     private async Task LoadItemsAsync()
     {
@@ -96,7 +108,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _salesCustomerService.GetObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: 0, take: 20, search: "");
+            var result = await _salesCustomerService.GetObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: 0, take: 20, search: SearchText.Text);
             if (result.IsSuccess)
             {
                 if (result.Data is null)
@@ -130,7 +142,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _salesCustomerService.GetObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: Items.Count, take: 20, search: "");
+            var result = await _salesCustomerService.GetObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: Items.Count, take: 20, search: SearchText.Text);
             if (result.IsSuccess)
             {
                 if (result.Data is null)
@@ -426,11 +438,63 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
         }
     }
 
+
     private async Task ShipAddressCloseAsync()
     {
         await MainThread.InvokeOnMainThreadAsync(() =>
         {
             CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.Hidden;
         });
+    }
+
+    private async Task PerformSearchAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
+            {
+                await LoadItemsAsync();
+                SearchText.Unfocus();
+                return;
+            }
+            IsBusy = true;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            Items.Clear();
+            var result = await _salesCustomerService.GetObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: 0, take: 20, search: SearchText.Text);
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                    Items.Add(Mapping.Mapper.Map<SalesCustomer>(item));
+            }
+            else
+            {
+                _userDialogs.Alert(result.Message, "Hata");
+                return;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task PerformEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText.Text))
+        {
+            await PerformSearchAsync();
+        }
+
     }
 }

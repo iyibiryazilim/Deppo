@@ -177,7 +177,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchasePanel.ViewModels
                 SelectedItem = product;
 
                 await LoadShippedOrdersAsync(product);
-                CurrentPage.FindByName<BottomSheet>("shippedOrdersBottomSheet").State = BottomSheetState.HalfExpanded;
+                CurrentPage.FindByName<BottomSheet>("receivedOrdersBottomSheet").State = BottomSheetState.HalfExpanded;
 
 
             }
