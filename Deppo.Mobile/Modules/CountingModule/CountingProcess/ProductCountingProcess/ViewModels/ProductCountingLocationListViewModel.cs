@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.BaseModels;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.CountingModels;
 using Deppo.Mobile.Core.Models.CountingModels.BasketModels;
@@ -47,16 +48,22 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 		ItemTappedCommand = new Command<LocationModel>(async (item) => await ItemTappedAsync(item));
 		NextViewCommand = new Command(async () => await NextViewAsync());
 		BackCommand = new Command(async () => await BackAsync());
+        PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+        PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
 
-	}
+    }
 
 	public Command LoadItemsCommand { get; }
 	public Command LoadMoreItemsCommand { get; }
 	public Command ItemTappedCommand { get; }
 	public Command NextViewCommand { get; }
 	public Command BackCommand { get; }
+    public Command PerformSearchCommand { get; }
+    public Command PerformEmptySearchCommand { get; }
 
-	private async Task LoadItemsAsync()
+    [ObservableProperty]
+    public SearchBar searchText;
+    private async Task LoadItemsAsync()
 	{
 		if (IsBusy)
 			return;
@@ -76,7 +83,8 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 				warehouseNumber: ProductCountingWarehouseModel.Number,
 				productReferenceId: ProductCountingBasketModel.ProductReferenceId,
 				skip: 0,
-				take: 20
+				take: 20,
+				search:SearchText.Text
 			);
 
 			if (result.IsSuccess)
@@ -121,8 +129,9 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 				warehouseNumber: ProductCountingWarehouseModel.Number,
                 productReferenceId: ProductCountingBasketModel.ProductReferenceId,
                 skip: Items.Count,
-				take: 20
-			);
+				take: 20,
+                search: SearchText.Text
+            );
 
 			if (result.IsSuccess)
 			{
@@ -260,4 +269,65 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 			IsBusy = false;
 		}
 	}
+    private async Task PerformSearchAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
+            {
+                await LoadItemsAsync();
+                SearchText.Unfocus();
+                return;
+            }
+            IsBusy = true;
+            Items.Clear();
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _locationService.GetObjects(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                warehouseNumber: ProductCountingWarehouseModel.Number,
+                productReferenceId: ProductCountingBasketModel.ProductReferenceId,
+                skip: 0,
+                take: 20,
+                search: SearchText.Text
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is not null)
+                {
+                    foreach (var item in result.Data)
+                        Items.Add(Mapping.Mapper.Map<LocationModel>(item));
+                }
+            }
+            else
+            {
+                _userDialogs.Alert(result.Message, "Hata");
+                return;
+            }
+
+        }
+        catch (System.Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task PerformEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText.Text))
+        {
+            await PerformSearchAsync();
+        }
+    }
+
 }

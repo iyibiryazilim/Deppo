@@ -85,6 +85,10 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
 
         SwitchViewCommand = new Command(async () => await SwitchViewAsync());
         NextViewCommand = new Command(async () => await NextViewAsync());
+        PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+        PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
+        OrderSearchCommand = new Command(async () => await OrderSearchAsync());
+        OrderEmptySearchCommand = new Command(async () => await OrderEmptySearchAsync());
     }
 
     public Command SwitchViewCommand { get; }
@@ -97,9 +101,26 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
     public Command<WaitingPurchaseOrderModel> OrderTappedCommand { get; }
 
     public Command NextViewCommand { get; }
+    public Command PerformSearchCommand { get; }
+    public Command PerformEmptySearchCommand { get; }
+
+    public Command OrderSearchCommand { get; }
+    public Command OrderEmptySearchCommand { get; }
 
     public ObservableCollection<WaitingPurchaseOrderModel> Orders { get; } = new();
+
+    //Arama işlemi için seçilenlerin tutlduğu liste
+    public ObservableCollection<WaitingPurchaseOrderModel> SelectedOrderItems { get; } = new();
     public ObservableCollection<PurchaseSupplierProduct> Items { get; } = new();
+
+    //Arama işlemi için seçilenlerin tutlduğu liste
+    public ObservableCollection<PurchaseSupplierProduct> SelectedItems { get; } = new();
+
+    [ObservableProperty]
+    public SearchBar productSearchText;
+
+    [ObservableProperty]
+    public SearchBar orderSearchText;
 
     private async Task SwitchViewAsync()
     {
@@ -189,13 +210,23 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _purchaseSupplierProductService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseSupplier.ReferenceId, WarehouseModel.Number, string.Empty, 0, 20);
+            var result = await _purchaseSupplierProductService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseSupplier.ReferenceId, WarehouseModel.Number, ProductSearchText.Text, 0, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
                     foreach (var item in result.Data)
-                        Items.Add(Mapping.Mapper.Map<PurchaseSupplierProduct>(item));
+                    {
+                        var product = Mapping.Mapper.Map<PurchaseSupplierProduct>(item);
+                        var matchedItem = SelectedItems.FirstOrDefault(x => x.ItemReferenceId == product.ItemReferenceId);
+                        if (matchedItem is not null)
+                            product.IsSelected = matchedItem.IsSelected;
+                        else
+                            product.IsSelected = false;
+
+                        Items.Add(product);
+
+                    }
                 }
             }
 
@@ -226,13 +257,23 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _purchaseSupplierProductService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseSupplier.ReferenceId, WarehouseModel.Number, string.Empty, Items.Count, 20);
+            var result = await _purchaseSupplierProductService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseSupplier.ReferenceId, WarehouseModel.Number, ProductSearchText.Text, Items.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
                     foreach (var item in result.Data)
-                        Items.Add(Mapping.Mapper.Map<PurchaseSupplierProduct>(item));
+                    {
+                        var product = Mapping.Mapper.Map<PurchaseSupplierProduct>(item);
+                        var matchedItem = SelectedItems.FirstOrDefault(x => x.ItemReferenceId == product.ItemReferenceId);
+                        if (matchedItem is not null)
+                            product.IsSelected = matchedItem.IsSelected;
+                        else
+                            product.IsSelected = false;
+
+                        Items.Add(product);
+
+                    }
 
                     _userDialogs.HideHud();
                 }
@@ -264,13 +305,23 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _waitingPurchaseOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, PurchaseSupplier.ReferenceId, string.Empty, 0, 20);
+            var result = await _waitingPurchaseOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, PurchaseSupplier.ReferenceId, OrderSearchText.Text, 0, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
                     foreach (var item in result.Data)
-                        Orders.Add(Mapping.Mapper.Map<WaitingPurchaseOrderModel>(item));
+                    {
+                        var order = Mapping.Mapper.Map<WaitingPurchaseOrderModel>(item);
+                        var matchedItem = SelectedOrderItems.FirstOrDefault(x => x.ReferenceId == order.ReferenceId);
+                        if (matchedItem is not null)
+                            order.IsSelected = matchedItem.IsSelected;
+                        else
+                            order.IsSelected = false;
+
+                        Orders.Add(order);
+
+                    }
                 }
             }
 
@@ -301,13 +352,23 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _waitingPurchaseOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, PurchaseSupplier.ReferenceId, string.Empty, Orders.Count, 20);
+            var result = await _waitingPurchaseOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, PurchaseSupplier.ReferenceId, OrderSearchText.Text, Orders.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
                     foreach (var item in result.Data)
-                        Orders.Add(Mapping.Mapper.Map<WaitingPurchaseOrderModel>(item));
+                    {
+                        var order = Mapping.Mapper.Map<WaitingPurchaseOrderModel>(item);
+                        var matchedItem = SelectedOrderItems.FirstOrDefault(x => x.ReferenceId == order.ReferenceId);
+                        if (matchedItem is not null)
+                            order.IsSelected = matchedItem.IsSelected;
+                        else
+                            order.IsSelected = false;
+
+                        Orders.Add(order);
+
+                    }
                 }
             }
 
@@ -342,6 +403,7 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
                 {
                     Items.FirstOrDefault(x => x.ItemReferenceId == purchaseSupplierProduct.ItemReferenceId).IsSelected = false;
                     SelectedProducts.Remove(SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == selectedItem.ItemReferenceId));
+                    SelectedItems.Remove(SelectedItems.FirstOrDefault(x => x.ItemReferenceId == selectedItem.ItemReferenceId));
                 }
                 else
                 {
@@ -377,6 +439,7 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
                     //     basketItem.InputQuantity = 1;
 
                     SelectedProducts.Add(selectedItem);
+                    SelectedItems.Add(selectedItem);
                 }
             }
         }
@@ -409,11 +472,13 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
                 {
                     Orders.FirstOrDefault(x => x.ReferenceId == waitingPurchaseOrderModel.ReferenceId).IsSelected = false;
                     SelectedOrders.Remove(SelectedOrders.FirstOrDefault(x => x.ReferenceId == selectedItem.ReferenceId));
+                    SelectedOrderItems.Remove(SelectedOrderItems.FirstOrDefault(x => x.ReferenceId == selectedItem.ReferenceId));
                 }
                 else
                 {
                     Orders.FirstOrDefault(x => x.ReferenceId == waitingPurchaseOrderModel.ReferenceId).IsSelected = true;
                     SelectedOrders.Add(selectedItem);
+                    SelectedOrderItems.Add(selectedItem);
 
                     // if (SelectedProducts.ToList().Exists(x => x.ItemReferenceId == selectedItem.ProductReferenceId))
                     // {
@@ -495,6 +560,8 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
                 default:
                     break;
             }
+            SelectedOrderItems.Clear();
+            SelectedItems.Clear();
 
             await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessBasketListView)}", new Dictionary<string, object>
             {
@@ -629,4 +696,115 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
             return basketItems;
         });
     }
+
+    private async Task PerformSearchAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(ProductSearchText.Text))
+            {
+                await LoadItemsAsync();
+                ProductSearchText.Unfocus();
+                return;
+            }
+            IsBusy = true;
+            Items.Clear();
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _purchaseSupplierProductService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseSupplier.ReferenceId, WarehouseModel.Number, ProductSearchText.Text, 0, 20);
+            if (result.IsSuccess)
+            {
+                if (result.Data is not null)
+                {
+                    foreach (var item in result.Data)
+                    {
+                        var product = Mapping.Mapper.Map<PurchaseSupplierProduct>(item);
+                        var matchedItem = SelectedItems.FirstOrDefault(x => x.ItemReferenceId == product.ItemReferenceId);
+                        if (matchedItem is not null)
+                            product.IsSelected = matchedItem.IsSelected;
+                        else
+                            product.IsSelected = false;
+
+                        Items.Add(product);
+
+                    }
+                }
+            }
+        }
+        catch (System.Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task PerformEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(ProductSearchText.Text))
+        {
+            await PerformSearchAsync();
+        }
+    }
+    private async Task OrderSearchAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(OrderSearchText.Text))
+            {
+                await LoadOrdersAsync();
+                OrderSearchText.Unfocus();
+                return;
+            }
+            IsBusy = true;
+            Orders.Clear();
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _waitingPurchaseOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, PurchaseSupplier.ReferenceId, OrderSearchText.Text, 0, 20);
+            if (result.IsSuccess)
+            {
+                if (result.Data is not null)
+                {
+                    foreach (var item in result.Data)
+                    {
+                        var order = Mapping.Mapper.Map<WaitingPurchaseOrderModel>(item);
+                        var matchedItem = SelectedOrderItems.FirstOrDefault(x => x.ReferenceId == order.ReferenceId);
+                        if (matchedItem is not null)
+                            order.IsSelected = matchedItem.IsSelected;
+                        else
+                            order.IsSelected = false;
+
+                        Orders.Add(order);
+
+                    }
+                }
+            }
+
+        }
+        catch (System.Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task OrderEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(OrderSearchText.Text))
+        {
+            await OrderSearchAsync();
+        }
+    }
+
 }
