@@ -63,9 +63,10 @@
                             <Border StrokeShape="RoundRectangle 6"
                                     StrokeThickness="0.2">
                                 <Grid Padding="10"
-                                      ColumnDefinitions="Auto,Auto,*"
+                                      ColumnDefinitions="Auto,*"
                                       ColumnSpacing="10">
                                     <toolkit:AvatarView CornerRadius="200"
+                                                        Grid.Column="0"
                                                         Margin="5"
                                                         BorderColor="{StaticResource Primary}"
                                                         Background="{StaticResource PrimaryLight}"

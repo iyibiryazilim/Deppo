@@ -175,9 +175,9 @@
                 <Label Grid.Column="0"
                        FontAttributes="Bold"
                       VerticalOptions="Center"
-                       
                        FontSize="18"
                        Text="Son Hareketler"
+                      
                        TextColor="{StaticResource OffBlack}" />
                 <Border Grid.Column="1"
                         Padding="5"
@@ -191,7 +191,7 @@
                         <Label.FormattedText>
                             <FormattedString>
                                 <Span FontAttributes="Bold"
-                                      Text="Tümü"
+                                      Text="Tüm Hareketler"
                                       
                                       TextColor="{StaticResource White}" />
                             </FormattedString>

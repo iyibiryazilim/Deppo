@@ -13,7 +13,6 @@ namespace Deppo.Core.DataStores
     {
         private string postUrl = "/gateway/customQuery/CustomQuery";
 
-
         public async Task<DataResult<IEnumerable<dynamic>>> SupplierTransaction(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId)
         {
             var content = new StringContent(JsonConvert.SerializeObject(SupplierTransaction(firmNumber, periodNumber, ficheReferenceId)), Encoding.UTF8, "application/json");
@@ -165,6 +164,7 @@ namespace Deppo.Core.DataStores
                 return dataResult;
             }
         }
+
         //Toplamların Toplamı
         public async Task<DataResult<dynamic>> TotalOrderCount(HttpClient httpClient, int firmNumber, int periodNumber)
         {
@@ -315,6 +315,7 @@ namespace Deppo.Core.DataStores
                 return dataResult;
             }
         }
+
         public async Task<DataResult<IEnumerable<dynamic>>> GetWaitingOrders(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
         {
             var content = new StringContent(JsonConvert.SerializeObject(GetWaitingOrders(firmNumber, periodNumber, productReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
@@ -364,6 +365,7 @@ namespace Deppo.Core.DataStores
                 return dataResult;
             }
         }
+
         public async Task<DataResult<IEnumerable<dynamic>>> GetReceivedProducts(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
         {
             var content = new StringContent(JsonConvert.SerializeObject(GetReceivedProducts(firmNumber, periodNumber, search, skip, take)), Encoding.UTF8, "application/json");
@@ -413,6 +415,7 @@ namespace Deppo.Core.DataStores
                 return dataResult;
             }
         }
+
         public async Task<DataResult<IEnumerable<dynamic>>> GetReceivedOrders(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
         {
             var content = new StringContent(JsonConvert.SerializeObject(GetReceivedOrders(firmNumber, periodNumber, productReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
@@ -563,7 +566,6 @@ namespace Deppo.Core.DataStores
             }
         }
 
-
         private string GetLastFiche(int firmNumber, int periodNumber)
         {
             string baseQuery = $@"Select TOP 5
@@ -618,13 +620,13 @@ namespace Deppo.Core.DataStores
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
 Left Join LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE on STLINE.STFICHEREF = STFICHE.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
-WHERE CLCARD.CODE LIKE '32%' 
-  AND CLCARD.CODE <> 'ÿ' 
+WHERE CLCARD.CODE LIKE '32%'
+  AND CLCARD.CODE <> 'ÿ'
   AND CLCARD.ACTIVE = 0
   AND STFICHE.GRPCODE = 1
-GROUP BY CLCARD.LOGICALREF, CLCARD.CODE, CLCARD.DEFINITION_, CLCARD.ISPERSCOMP, 
-         CLCARD.EMAILADDR, CLCARD.TELNRS1, CLCARD.TELNRS2, CLCARD.ADDR1, 
-         CLCARD.CITY, CLCARD.COUNTRY, CLCARD.POSTCODE, CLCARD.TAXOFFICE, 
+GROUP BY CLCARD.LOGICALREF, CLCARD.CODE, CLCARD.DEFINITION_, CLCARD.ISPERSCOMP,
+         CLCARD.EMAILADDR, CLCARD.TELNRS1, CLCARD.TELNRS2, CLCARD.ADDR1,
+         CLCARD.CITY, CLCARD.COUNTRY, CLCARD.POSTCODE, CLCARD.TAXOFFICE,
          CLCARD.TAXNR, CLCARD.ACTIVE
 ORDER BY MAX(STLINE.DATE_) DESC;";
 
@@ -633,7 +635,7 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
 
         private string ShippedOrderCount(int firmNumber, int periodNumber)
         {
-            string baseQuery = $@"SELECT 
+            string baseQuery = $@"SELECT
 	ISNULL(COUNT(Distinct ORFLINE.STOCKREF),0) AS ShippedQuantityTotal
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
 WHERE ORFLINE.TRCODE = 2 AND ORFLINE.SHIPPEDAMOUNT > 0";
@@ -642,12 +644,13 @@ WHERE ORFLINE.TRCODE = 2 AND ORFLINE.SHIPPEDAMOUNT > 0";
 
         private string TotalOrderCount(int firmNumber, int periodNumber)
         {
-            string baseQuery = $@"SELECT 
+            string baseQuery = $@"SELECT
 	ISNULL(COUNT(Distinct ORFLINE.STOCKREF),0) AS AmountTotal
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
 WHERE ORFLINE.TRCODE = 2";
             return baseQuery;
         }
+
         private string SupplierTransaction(int firmNumber, int periodNumber, int ficheReferenceId)
         {
             string baseQuery = $@"Select
@@ -695,53 +698,58 @@ order by STLINE.DATE_ desc;";
 
         private string GetWaitingProducts(int firmNumber, int periodNumber, string search, int skip, int take)
         {
-            string baseQuery = $@"SELECT
-    [ProductReferenceId] = ORFLINE.STOCKREF,
-    [ProductCode] = ISNULL(ITEMS.CODE, ''),
-    [ProductName] = ISNULL(ITEMS.NAME, ''),
-    [UnitsetReferenceId] = UNITSET.LOGICALREF,
-    [UnitsetCode] = UNITSET.CODE,
-    [UnitsetName] = UNITSET.NAME,
-    [SubUnitsetReferenceId] = SUBUNITSET.LOGICALREF,
-    [SubUnitsetCode] = SUBUNITSET.CODE,
-    [SubUnitsetName] = SUBUNITSET.NAME,
-    [WaitingQuantity] = SUM(ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT),
-    [IsVariant] = ITEMS.CANCONFIGURE,
-    [VariantReferenceId] = ORFLINE.VARIANTREF,
-    [VariantCode] = ISNULL(VARIANT.CODE, ''),
-    [VariantName] = ISNULL(VARIANT.NAME, ''),
-    [LocTracking] = ITEMS.LOCTRACKING,
-    [TrackingType] = ITEMS.TRACKTYPE
-FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
-LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON ORFLINE.STOCKREF = ITEMS.LOGICALREF
-LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT ON ORFLINE.VARIANTREF = VARIANT.LOGICALREF
-LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON ORFLINE.UOMREF = SUBUNITSET.LOGICALREF
-LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON ORFLINE.USREF = UNITSET.LOGICALREF 
-WHERE ORFLINE.CLOSED = 0 
-  AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 
+            string baseQuery = $@"
+    SELECT * FROM (
+        SELECT
+            [ProductReferenceId] = ORFLINE.STOCKREF,
+            [ProductCode] = ISNULL(ITEMS.CODE, ''),
+            [ProductName] = ISNULL(ITEMS.NAME, ''),
+            [UnitsetReferenceId] = UNITSET.LOGICALREF,
+            [UnitsetCode] = UNITSET.CODE,
+            [UnitsetName] = UNITSET.NAME,
+            [SubUnitsetReferenceId] = SUBUNITSET.LOGICALREF,
+            [SubUnitsetCode] = SUBUNITSET.CODE,
+            [SubUnitsetName] = SUBUNITSET.NAME,
+            [WaitingQuantity] = SUM(ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT),
+            [IsVariant] = ITEMS.CANCONFIGURE,
+            [VariantReferenceId] = ORFLINE.VARIANTREF,
+            [VariantCode] = ISNULL(VARIANT.CODE, ''),
+            [VariantName] = ISNULL(VARIANT.NAME, ''),
+            [LocTracking] = ITEMS.LOCTRACKING,
+            [TrackingType] = ITEMS.TRACKTYPE
+        FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON ORFLINE.STOCKREF = ITEMS.LOGICALREF
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT ON ORFLINE.VARIANTREF = VARIANT.LOGICALREF
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON ORFLINE.UOMREF = SUBUNITSET.LOGICALREF
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON ORFLINE.USREF = UNITSET.LOGICALREF
+        WHERE ORFLINE.CLOSED = 0
+  AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0
   AND ORFLINE.TRCODE = 2
   AND ITEMS.UNITSETREF <> 0
 ";
             if (!string.IsNullOrEmpty(search))
                 baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";
 
-            baseQuery += $@"GROUP BY
-    ORFLINE.STOCKREF,
-    ITEMS.CODE,
-    ITEMS.NAME,
-    UNITSET.LOGICALREF,
-    UNITSET.CODE,
-    UNITSET.NAME,
-    SUBUNITSET.LOGICALREF,
-    SUBUNITSET.CODE,
-    SUBUNITSET.NAME,
-    ITEMS.CANCONFIGURE,
-    ORFLINE.VARIANTREF,
-    VARIANT.CODE,
-    VARIANT.NAME,
-    ITEMS.LOCTRACKING,
-    ITEMS.TRACKTYPE ORDER BY ITEMS.CODE DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
-
+            baseQuery += $@"
+        GROUP BY
+            ORFLINE.STOCKREF,
+            ITEMS.CODE,
+            ITEMS.NAME,
+            UNITSET.LOGICALREF,
+            UNITSET.CODE,
+            UNITSET.NAME,
+            SUBUNITSET.LOGICALREF,
+            SUBUNITSET.CODE,
+            SUBUNITSET.NAME,
+            ITEMS.CANCONFIGURE,
+            ORFLINE.VARIANTREF,
+            VARIANT.CODE,
+            VARIANT.NAME,
+            ITEMS.LOCTRACKING,
+            ITEMS.TRACKTYPE
+        ) AS subQuery
+        ORDER BY subQuery.WaitingQuantity DESC
+        OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
             return baseQuery;
         }
@@ -781,7 +789,7 @@ WHERE ORFLINE.CLOSED = 0
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON ORFICHE.CLIENTREF = CLCARD.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT ON ORFLINE.VARIANTREF = VARIANT.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON ORFLINE.UOMREF = SUBUNITSET.LOGICALREF
-		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON ORFLINE.USREF = UNITSET.LOGICALREF 
+		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON ORFLINE.USREF = UNITSET.LOGICALREF
         LEFT JOIN L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR ={firmNumber}
 		WHERE ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 2
 		AND ITEMS.UNITSETREF <> 0 AND ITEMS.LOGICALREF = {productReferenceId}
@@ -791,51 +799,55 @@ WHERE ORFLINE.CLOSED = 0
 
             baseQuery += $@" ORDER BY ITEMS.CODE DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
-
             return baseQuery;
         }
 
         private string GetReceivedProducts(int firmNumber, int periodNumber, string search, int skip, int take)
         {
-            string baseQuery = $@"SELECT
-    [ProductReferenceId] = ITEMS.LOGICALREF,
-    [ProductCode] = ISNULL(ITEMS.CODE, ''),
-    [ProductName] = ISNULL(ITEMS.NAME, ''),
-    [UnitsetReferenceId] = ISNULL(UNITSET.LOGICALREF, 0),
-    [UnitsetCode] = ISNULL(UNITSET.CODE, ''),
-    [UnitsetName] = ISNULL(UNITSET.NAME, ''),
-    [SubUnitsetReferenceId] = ISNULL(SUBUNITSET.LOGICALREF, 0),
-    [SubUnitsetCode] = ISNULL(SUBUNITSET.CODE, ''),
-    [SubUnitsetName] = ISNULL(SUBUNITSET.NAME, ''),
-    [Quantity] = ISNULL(SUM(STLINE.AMOUNT), 0),
-    [IsVariant] = ITEMS.CANCONFIGURE,
-    [LocTracking] = ITEMS.LOCTRACKING,
-    [TrackingType] = ITEMS.TRACKTYPE
+            string baseQuery = $@"
+    SELECT * FROM (
+        SELECT
+            [ProductReferenceId] = ITEMS.LOGICALREF,
+            [ProductCode] = ISNULL(ITEMS.CODE, ''),
+            [ProductName] = ISNULL(ITEMS.NAME, ''),
+            [UnitsetReferenceId] = ISNULL(UNITSET.LOGICALREF, 0),
+            [UnitsetCode] = ISNULL(UNITSET.CODE, ''),
+            [UnitsetName] = ISNULL(UNITSET.NAME, ''),
+            [SubUnitsetReferenceId] = ISNULL(SUBUNITSET.LOGICALREF, 0),
+            [SubUnitsetCode] = ISNULL(SUBUNITSET.CODE, ''),
+            [SubUnitsetName] = ISNULL(SUBUNITSET.NAME, ''),
+            [Quantity] = ISNULL(SUM(STLINE.AMOUNT), 0),
+            [IsVariant] = ITEMS.CANCONFIGURE,
+            [LocTracking] = ITEMS.LOCTRACKING,
+            [TrackingType] = ITEMS.TRACKTYPE
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
-WHERE STLINE.TRCODE IN (1) 
+WHERE STLINE.TRCODE IN (1)
   AND STLINE.LINETYPE = 0
 
 ";
             if (!string.IsNullOrEmpty(search))
                 baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";
 
-            baseQuery += $@"GROUP BY 
-    ITEMS.LOGICALREF,
-    ITEMS.CODE,
-    ITEMS.NAME,
-    UNITSET.LOGICALREF,
-    UNITSET.CODE,
-    UNITSET.NAME,
-    SUBUNITSET.LOGICALREF,
-    SUBUNITSET.CODE,    
-    ITEMS.CANCONFIGURE,
-    ITEMS.LOCTRACKING,
-    ITEMS.TRACKTYPE,
-    SUBUNITSET.NAME ORDER BY ITEMS.CODE DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
-
+            baseQuery += $@"
+        GROUP BY
+            ITEMS.LOGICALREF,
+            ITEMS.CODE,
+            ITEMS.NAME,
+            UNITSET.LOGICALREF,
+            UNITSET.CODE,
+            UNITSET.NAME,
+            SUBUNITSET.LOGICALREF,
+            SUBUNITSET.CODE,
+            ITEMS.CANCONFIGURE,
+            ITEMS.LOCTRACKING,
+            ITEMS.TRACKTYPE,
+            SUBUNITSET.NAME
+    ) AS subQuery
+    ORDER BY subQuery.Quantity DESC
+    OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
             return baseQuery;
         }
@@ -885,7 +897,6 @@ where STFICHE.TRCODE IN(1) AND STLINE.LINETYPE = 0 AND ITEMS.LOGICALREF = {produ
                 baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";
 
             baseQuery += $@" ORDER BY ITEMS.CODE DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
-
 
             return baseQuery;
         }
@@ -960,7 +971,5 @@ order by STLINE.DATE_ desc OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
             return baseQuery;
         }
-
-
     }
 }
