@@ -162,6 +162,7 @@
                         <ImageButton Grid.Column="1"
                                      HeightRequest="25"
                                      HorizontalOptions="End"
+                                     Command="{Binding ShipAddressCloseCommand}"
                                      VerticalOptions="Center">
                             <ImageButton.Source>
                                 <FontImageSource FontFamily="FAS"

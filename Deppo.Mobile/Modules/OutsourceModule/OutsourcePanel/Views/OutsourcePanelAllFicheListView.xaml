@@ -6,7 +6,7 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.ViewModels"
              xmlns:dx="http://schemas.devexpress.com/maui"
-             xmlns:model="clr-namespace:Deppo.Mobile.Core.Models.OutsourceModels;assembly=Deppo.Mobile.Core"
+             xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              xmlns:transactionModel="clr-namespace:Deppo.Mobile.Core.Models.OutsourceModels;assembly=Deppo.Mobile.Core"
              Title="{Binding Title}"
              x:DataType="viewModel:OutsourcePanelAllFicheListViewModel"
@@ -66,7 +66,7 @@
                             RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
 
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="model:OutsourceFicheModel">
+                    <DataTemplate x:DataType="model:OutsourceFiche">
                         <Border Padding="5"
                                 BackgroundColor="Transparent"
                                 StrokeThickness="0.1">
@@ -138,7 +138,7 @@
                                    FontAttributes="Bold"
                                    FontSize="Medium"
                                    HorizontalOptions="Start"
-                                   Text="Hareketler" />
+                                   Text="Hareket Detayı" />
                             <ImageButton Grid.Column="1"
                                          Command="{Binding TransactionsCloseCommand}"
                                          HeightRequest="25"

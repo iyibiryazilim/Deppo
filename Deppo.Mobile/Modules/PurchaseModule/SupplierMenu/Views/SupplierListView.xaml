@@ -60,9 +60,10 @@
                     <Border StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.1">
                         <Grid Padding="10"
-                              ColumnDefinitions="Auto,Auto,*"
+                              ColumnDefinitions="Auto,*"
                               ColumnSpacing="10">
                             <toolkit:AvatarView CornerRadius="200"
+                                                Grid.Column="0"
                                                 Margin="5"
                                                 BorderColor="{StaticResource Primary}"
                                                 Background="{StaticResource PrimaryLight}"
@@ -77,8 +78,7 @@
                             <VerticalStackLayout Grid.Column="1"
                                                  Spacing="2">
                                 <Label FontAttributes="Bold"
-                                       LineBreakMode="TailTruncation"
-                                       MaxLines="1"
+                                       LineBreakMode="TailTruncation"     
                                        Text="{Binding Name}" />
 
                                 <Label>
@@ -97,6 +97,7 @@
                                             <Span FontFamily="FAS"
                                                   Text="{x:Static fontAwesome:FontAwesomeIcons.Box}" />
                                             <Span Text=" " />
+                                            
                                         </FormattedString>
                                     </Label.FormattedText>
                                 </Label>

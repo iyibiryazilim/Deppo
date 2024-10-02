@@ -61,55 +61,52 @@ public class SalesCustomerDataStore : ISalesCustomerService
 
     public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsReturnAsync(HttpClient httpClient, int firmNumber, int periodNumber, int skip = 0, int take = 20, string search = "")
     {
+        var content = new StringContent(JsonConvert.SerializeObject(SalesCustomerQueryReturn(firmNumber, periodNumber,/* warehouseNumber,*/ search, skip, take)), Encoding.UTF8, "application/json");
 
-        
-            var content = new StringContent(JsonConvert.SerializeObject(SalesCustomerQueryReturn(firmNumber, periodNumber,/* warehouseNumber,*/ search, skip, take)), Encoding.UTF8, "application/json");
-
-            HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
-            DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
-            if (responseMessage.IsSuccessStatusCode)
+        HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+        DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            var data = await responseMessage.Content.ReadAsStringAsync();
+            if (data != null)
             {
-                var data = await responseMessage.Content.ReadAsStringAsync();
-                if (data != null)
+                if (!string.IsNullOrEmpty(data))
                 {
-                    if (!string.IsNullOrEmpty(data))
-                    {
-                        var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
 
-                        dataResult.Data = result?.Data;
-                        dataResult.IsSuccess = true;
-                        dataResult.Message = "success";
-                        return dataResult;
-                    }
-                    else
-                    {
-                        var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
-
-                        dataResult.Data = result?.Data;
-                        dataResult.IsSuccess = true;
-                        dataResult.Message = "empty";
-                        return dataResult;
-                    }
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "success";
+                    return dataResult;
                 }
                 else
                 {
                     var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
 
-                    dataResult.Data = Enumerable.Empty<dynamic>();
-                    dataResult.IsSuccess = false;
-                    dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
-
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "empty";
                     return dataResult;
                 }
             }
             else
             {
+                var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
                 dataResult.Data = Enumerable.Empty<dynamic>();
                 dataResult.IsSuccess = false;
                 dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
                 return dataResult;
             }
-        
+        }
+        else
+        {
+            dataResult.Data = Enumerable.Empty<dynamic>();
+            dataResult.IsSuccess = false;
+            dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+            return dataResult;
+        }
     }
 
     public async Task<DataResult<IEnumerable<dynamic>>> SalesCustomerQueryFiche(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int skip = 0, int take = 20, string search = "")
@@ -171,7 +168,7 @@ public class SalesCustomerDataStore : ISalesCustomerService
 			[ProductReferenceCount] = COUNT(DISTINCT ORFLINE.STOCKREF),
             [Country] = CLCARD.COUNTRY,
             [City] = CLCARD.CITY,
-            [ShipAddressCount] = COUNT(SHIPADRESS.CLIENTREF),
+             [ShipAddressCount]=ISNULL((SELECT COUNT(SHIP.LOGICALREF) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_SHIPINFO AS SHIP WHERE CLIENTREF = CLCARD.LOGICALREF),0),
             [FicheType] =  CLCARD.ACCEPTEINV
 
         FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
@@ -187,6 +184,7 @@ public class SalesCustomerDataStore : ISalesCustomerService
 
         return baseQuery;
     }
+
     private string SalesCustomerQueryReturn(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
     {
         string baseQuery = $@"SELECT

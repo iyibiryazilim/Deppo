@@ -174,7 +174,7 @@
             <Grid ColumnDefinitions="Auto,.10*">
                 <Label Grid.Column="0"
                        FontAttributes="Bold"
-                      VerticalOptions="End"
+                      VerticalOptions="Center"
                        
                        FontSize="18"
                        Text="Son Hareketler"

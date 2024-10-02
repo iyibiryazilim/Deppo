@@ -59,9 +59,11 @@
                     <Border StrokeShape="RoundRectangle 6"
                             StrokeThickness="0.2">
                         <Grid Padding="10"
-                              ColumnDefinitions="Auto,Auto,*"
+                              
+                              ColumnDefinitions="Auto,*"
                               ColumnSpacing="10">
                             <toolkit:AvatarView Margin="5"
+                                                Grid.Column="0"
                                                 Background="{StaticResource PrimaryLight}"
                                                 BorderColor="{StaticResource Primary}"
                                                 CornerRadius="200"
@@ -76,7 +78,7 @@
                             <VerticalStackLayout Grid.Column="1"
                                                  Spacing="2">
                                 <Label FontAttributes="Bold"
-                                       LineBreakMode="TailTruncation"
+                                       LineBreakMode="TailTruncation" 
                                        Text="{Binding Name}" />
 
                                 <VerticalStackLayout Spacing="5"
