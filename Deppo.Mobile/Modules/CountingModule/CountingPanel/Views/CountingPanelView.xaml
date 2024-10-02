@@ -225,14 +225,16 @@
                 <Label
      Grid.Row="0"
      FontAttributes="Bold"
-     FontSize="Subtitle"
+     FontSize="18"
      Text="Son Hareketler"
+                    VerticalOptions="Center"
      TextColor="{StaticResource OffBlack}" />
 
                 <Border Grid.Column="1"
                         Padding="5"
                         BackgroundColor="{StaticResource Primary}"
                         HorizontalOptions="End"
+                        VerticalOptions="Center"
                         Stroke="{StaticResource Primary}"
                         StrokeShape="RoundRectangle 10">
                     <Border.GestureRecognizers>
@@ -240,15 +242,12 @@
                     </Border.GestureRecognizers>
                     <Label FontFamily="FAS"
                            FontSize="15"
+                           VerticalOptions="Center"
                            TextColor="{StaticResource White}">
                         <Label.FormattedText>
                             <FormattedString>
                                 <Span FontAttributes="Bold"
-                                      Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
-                                      TextColor="{StaticResource White}" />
-                                <Span Text=" " />
-                                <Span FontAttributes="Bold"
-                                      Text="Tümü"
+                                      Text="Tüm Hareketler"     
                                       TextColor="{StaticResource White}" />
                             </FormattedString>
                         </Label.FormattedText>
@@ -265,26 +264,23 @@
                             BackgroundColor="Transparent"
                             StrokeThickness="0.1">
                             <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
-                                <Border
-                                    Grid.Column="0"
-                                    Padding="5"
-                                    BackgroundColor="{StaticResource Secondary}"
-                                    StrokeShape="RoundRectangle 10">
-                                    <VerticalStackLayout Spacing="0" VerticalOptions="Center">
-                                        <Label
-                                            FontAttributes="Bold"
-                                            FontSize="Subtitle"
-                                            HorizontalOptions="Center"
-                                            Text="{Binding FicheDate, StringFormat='{0:dd}'}"
-                                            TextColor="{StaticResource OffBlack}" />
-                                        <Label
-                                            HorizontalOptions="Center"
-                                            Text="{Binding FicheDate, StringFormat='{0:MM/yyyy}'}"
-                                            TextColor="{StaticResource OffBlack}" />
-                                        <Label
-                                            HorizontalOptions="Center"
-                                            Text="{Binding FicheTime, StringFormat='{0:hh\\:mm}'}"
-                                            TextColor="{StaticResource Black}" />
+                                <Border Grid.Column="0"
+                                        Padding="5"
+                                        BackgroundColor="{StaticResource Secondary}"
+                                        StrokeShape="RoundRectangle 10">
+                                    <VerticalStackLayout Spacing="0"
+                                                         VerticalOptions="Center">
+                                        <Label FontAttributes="Bold"
+                                               FontSize="Subtitle"
+                                               HorizontalOptions="Center"
+                                               Text="{Binding FicheDate, StringFormat='{0:dd}'}"
+                                               TextColor="{StaticResource OffBlack}" />
+                                        <Label HorizontalOptions="Center"
+                                               Text="{Binding FicheDate, StringFormat='{0:MM/yyyy}'}"
+                                               TextColor="{StaticResource OffBlack}" />
+                                        <Label HorizontalOptions="Center"
+                                               Text="{Binding FicheTime, StringFormat='{0:hh\\:mm}'}"
+                                               TextColor="{StaticResource Black}" />
                                     </VerticalStackLayout>
                                 </Border>
 

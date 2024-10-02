@@ -230,18 +230,20 @@
                         Padding="5"
                         BackgroundColor="{StaticResource Primary}"
                         HorizontalOptions="End"
+                        
                         Stroke="{StaticResource Primary}"
                         StrokeShape="RoundRectangle 10">
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding ButtonAllTappedCommand}" />
                     </Border.GestureRecognizers>
                     <Label FontFamily="FAS"
+                           VerticalOptions="Center"
                            FontSize="15"
                            TextColor="{StaticResource White}">
                         <Label.FormattedText>
                             <FormattedString>
                                 <Span FontAttributes="Bold"
-                                      Text="Tümü"
+                                      Text="Tüm Hareketler"
                                       TextColor="{StaticResource White}" />
                             </FormattedString>
                         </Label.FormattedText>
@@ -257,17 +259,17 @@
                                 StrokeThickness="0.1">
                             <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
                                 <Border Grid.Column="0"
-                                        Padding="10"
+                                        Padding="5"
                                         BackgroundColor="{StaticResource Secondary}"
                                         StrokeShape="RoundRectangle 10">
-                                    <VerticalStackLayout Spacing="1" VerticalOptions="Center">
+                                    <VerticalStackLayout Spacing="0"
+                                                         VerticalOptions="Center">
                                         <Label FontAttributes="Bold"
-                                               FontSize="Large"
+                                               FontSize="Subtitle"
                                                HorizontalOptions="Center"
                                                Text="{Binding FicheDate, StringFormat='{0:dd}'}"
                                                TextColor="{StaticResource OffBlack}" />
-                                        <Label FontSize="Medium"
-                                               HorizontalOptions="Center"
+                                        <Label HorizontalOptions="Center"
                                                Text="{Binding FicheDate, StringFormat='{0:MM/yyyy}'}"
                                                TextColor="{StaticResource OffBlack}" />
                                         <Label HorizontalOptions="Center"
