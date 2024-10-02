@@ -23,6 +23,24 @@
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Command="{Binding CameraTappedCommand}">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                      Glyph="{x:Static fontAwesome:FontAwesomeIcons.Camera}"
+                      Size="Medium" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+
+        <ToolbarItem Command="{Binding PlusTappedCommand}">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                             Glyph="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                             Size="Medium" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
+
     <Grid RowDefinitions="*,Auto">
         <Grid RowDefinitions="*,Auto">
             <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
@@ -460,5 +478,34 @@
 
             <!--#endregion-->
         </dx:BottomSheet>
+
+        <!--#region basketOptionsBottomSheet-->
+        <dx:BottomSheet Grid.Row="1"
+                 Padding="10,30,10,10"
+                 x:Name="basketOptionsBottomSheet"
+                 AllowDismiss="True"
+                 BackgroundColor="{StaticResource Gray100}"
+                 CornerRadius="10"
+                 HalfExpandedRatio="0.3"
+                 IsModal="True"
+                 ShowGrabber="True">
+            <VerticalStackLayout Spacing="20">
+                <Border Padding="10" StrokeShape="RoundRectangle 10" BackgroundColor="WhiteSmoke">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ProductOptionTappedCommand}" />
+                    </Border.GestureRecognizers>
+                    <Label Text="Ürüne Göre" />
+                </Border>
+
+                <Border Padding="10" StrokeShape="RoundRectangle 10" BackgroundColor="WhiteSmoke">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OrderOptionTappedCommand}" />
+                    </Border.GestureRecognizers>
+                    <Label Text="Siparişe Göre" />
+                </Border>
+            </VerticalStackLayout>
+            
+        </dx:BottomSheet>
+        <!--#endregion-->
     </Grid>
 </ContentPage>
