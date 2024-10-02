@@ -10,10 +10,10 @@ public class VariantDataStore : IVariantService
 {
     private string postUrl = "/gateway/customQuery/CustomQuery";
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber,int productReferenceId, int warehouseNumber, string search = "", int skip = 0, int take = 20)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, string search = "", int skip = 0, int take = 20)
     {
 
-        var content = new StringContent(JsonConvert.SerializeObject(VariantQuery(firmNumber, periodNumber,productReferenceId, warehouseNumber, search, skip, take)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(VariantQuery(firmNumber, periodNumber, productReferenceId, warehouseNumber, search, skip, take)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -62,9 +62,8 @@ public class VariantDataStore : IVariantService
             dataResult.IsSuccess = false;
             dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
             return dataResult;
-       }
+        }
     }
-
     public async Task<DataResult<IEnumerable<dynamic>>> GetVariants(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
     {
 
@@ -181,7 +180,9 @@ public class VariantDataStore : IVariantService
 
 
 
-    private string VariantQuery(int firmNumber, int periodNumber,int productReferenceId, int warehouseNumber, string search = "", int skip = 0, int take = 20)
+
+
+    private string VariantQuery(int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, string search = "", int skip = 0, int take = 20)
     {
         string baseQuery = $@"SELECT 
 [ReferenceId] = NEWID(),
@@ -248,7 +249,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
  LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF  AS UNITSETF ON UNITSETF.LOGICALREF = VARIANT.UNITSETREF
  LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL ON UNITSETL.UNITSETREF = UNITSETF.LOGICALREF
  LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_MARK AS BRAND WITH(NOLOCK) ON ITEMS.MARKREF = BRAND.LOGICALREF
- where ITEMS.LOGICALREF = {productReferenceId} AND VARIANT.ACTIVE = 0" ;
+ where ITEMS.LOGICALREF = {productReferenceId} AND VARIANT.ACTIVE = 0";
         if (!string.IsNullOrEmpty(search))
             baseQuery += $@" AND (Variant.CODE LIKE '{search}%' OR Variant.NAME LIKE '%{search}%')";
         baseQuery += $@" ORDER BY Variant.CODE DESC
@@ -260,13 +261,23 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
     private string GetProductVariantsQuery(int firmNumber, int periodNumber, int variantReferenceId, string search = "", int skip = 0, int take = 20)
     {
         string baseQuery = $@" select
-[CharCodeReferenceId] = CCODE.LOGICALREF,
-[CharCodeName] = CCODE.NAME,
-[CharValReferenceId] = CVAL.LOGICALREF,
-[CharValName] = CVAL.NAME
+[VariantPropertyReferenceId] = CCODE.LOGICALREF,
+[VariantPropertyName] = ISNULL(CCODE.NAME,''),
+[VariantPropertyCode] = ISNULL(CCODE.CODE,''),
+[VariantPropertyValueReferenceId] = CVAL.LOGICALREF,
+[VariantPropertyValueName] = ISNULL(CVAL.NAME,''),
+[VariantPropertyValueCode] = ISNULL(CVAL.CODE,''),
+[VariantReferenceId] = VARIANT.LOGICALREF,
+[VariantName] = ISNULL(VARIANT.NAME,''),
+[VariantCode] = ISNULL(VARIANT.CODE,''),
+[ItemReferenceId] = ITEMS.LOGICALREF,
+[ItemName] = ISNULL(ITEMS.NAME,''),
+[ItemCode] = ISNULL(ITEMS.CODE,'')
 from LG_{firmNumber.ToString().PadLeft(3, '0')}_VRNTCHARASGN as VRNTCHRASGN
 left join LG_{firmNumber.ToString().PadLeft(3, '0')}_CHARCODE AS CCODE ON CCODE.LOGICALREF = VRNTCHRASGN.CHARCODEREF
 left join  LG_{firmNumber.ToString().PadLeft(3, '0')}_CHARVAL as CVAL ON CVAL.CHARCODEREF = CCODE.LOGICALREF AND CVAL.LOGICALREF = VRNTCHRASGN.CHARVALREF
+left join LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT ON VARIANT.LOGICALREF = VRNTCHRASGN.VARIANTREF
+left join LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON ITEMS.LOGICALREF = VRNTCHRASGN.ITEMREF 
 
 WHERE VRNTCHRASGN.VARIANTREF = {variantReferenceId}";
         if (!string.IsNullOrEmpty(search))
