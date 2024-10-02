@@ -11,5 +11,6 @@ public partial class OutputProductSalesOrderProcessBasketListView : ContentPage
 		_viewModel = viewModel;
 		BindingContext = _viewModel;
 		_viewModel.CurrentPage = this;
-	}
+		_viewModel.LocationTransactionSearchText = locationTransactionSearchBar;
+    }
 }

@@ -12,5 +12,6 @@ public partial class ReturnSalesBasketLocationListView : ContentPage
         _viewModel = viewModel;
         BindingContext = _viewModel;
         _viewModel.CurrentPage = this;
+        _viewModel.SearchText = locationSearchBar;
     }
 }

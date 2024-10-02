@@ -240,12 +240,12 @@
                                    Placeholder="Ara..."
                                    PlaceholderColor="{StaticResource OffBlack}"
                                    TextColor="{StaticResource OffBlack}">
-                            <!-- <SearchBar.Behaviors>
-    <toolkit:EventToCommandBehavior
-        Command="{Binding PerformSearchCommand}"
-        CommandParameter="{Binding Text, Source={x:Reference searchBar}}"
-        EventName="SearchButtonPressed" />
-</SearchBar.Behaviors>-->
+                            <SearchBar.Behaviors>
+                                <toolkit:EventToCommandBehavior Command="{Binding LocationPerformSearchCommand}"
+                                                                EventName="SearchButtonPressed" />
+                                <toolkit:EventToCommandBehavior Command="{Binding LocationPerformEmptySearchCommand}"
+                                                                EventName="TextChanged" />
+                            </SearchBar.Behaviors>
                         </SearchBar>
                     </Border>
 

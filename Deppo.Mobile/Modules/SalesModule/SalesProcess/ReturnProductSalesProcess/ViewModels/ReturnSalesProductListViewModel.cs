@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.BaseModels;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
@@ -38,6 +39,7 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
 
 
     public ObservableCollection<ProductModel> Items { get; } = new();
+    public ObservableCollection<ProductModel> SelectedItems { get; } = new();
 
     public ReturnSalesProductListViewModel(
         IHttpClientService httpClientService,
@@ -59,6 +61,8 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<ProductModel>(async (item) => await ItemTappedAsync(item));
         ConfirmCommand = new Command(async () => await ConfirmAsync());
+        PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+        PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
 
 
     }
@@ -69,8 +73,11 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
     public Command ItemTappedCommand { get; }
     public Command ConfirmCommand { get; }
     public Command BackCommand { get; }
+    public Command PerformSearchCommand { get; }
+    public Command PerformEmptySearchCommand { get; }
 
-
+    [ObservableProperty]
+    public SearchBar searchText;
     private async Task LoadItemsAsync()
     {
         if (IsBusy)
@@ -85,15 +92,20 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 20);
+            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, 0, 20);
             if (result.IsSuccess)
             {
                 if(result.Data is not null)
                 {
                     foreach (var item in result.Data)
                     {
-
-                        Items.Add(Mapping.Mapper.Map<ProductModel>(item));
+                        var product = Mapping.Mapper.Map<ProductModel>(item);
+                        var matchingItem = SelectedItems.FirstOrDefault(x => x.ReferenceId == product.ReferenceId);
+                        if (matchingItem != null)
+                            product.IsSelected = matchingItem.IsSelected;
+                        else
+                            product.IsSelected = false;
+                        Items.Add(product);
                     }
                 }
             }
@@ -123,15 +135,20 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 20);
+            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, Items.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
                     foreach (var item in result.Data)
                     {
-
-                        Items.Add(Mapping.Mapper.Map<ProductModel>(item));
+                        var product = Mapping.Mapper.Map<ProductModel>(item);
+                        var matchingItem = SelectedItems.FirstOrDefault(x => x.ReferenceId == product.ReferenceId);
+                        if (matchingItem != null)
+                            product.IsSelected = matchingItem.IsSelected;
+                        else
+                            product.IsSelected = false;
+                        Items.Add(product);
                     }
                 }
             }
@@ -148,6 +165,60 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    private async Task PerformSearchAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
+            {
+                await LoadItemsAsync();
+                SearchText.Unfocus();
+                return;
+            }
+            IsBusy = true;
+            Items.Clear();
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, 0, 20);
+            if (result.IsSuccess)
+            {
+                if (result.Data is not null)
+                {
+                    foreach (var item in result.Data)
+                    {
+
+                        Items.Add(Mapping.Mapper.Map<ProductModel>(item));
+                    }
+                }
+            }
+
+            if (!result.IsSuccess)
+            {
+                _userDialogs.Alert(result.Message, "Hata");
+                return;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task PerformEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText.Text))
+        {
+            await PerformSearchAsync();
         }
     }
     private async Task ItemTappedAsync(ProductModel item)
@@ -171,6 +242,7 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
                         Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = true;
 
                         SelectedProduct = item;
+                        SelectedItems.Add(item);
 
                         var basketItem = new ReturnSalesBasketModel
                         {
@@ -205,6 +277,7 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
                         {
                             SelectedProducts.Remove(selectedItem);
                             Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = false;
+                            SelectedItems.Remove(item);
                         }
                     }
                 }
@@ -236,6 +309,7 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
                         previouseViewModel.Items.Add(item);
 
                 await Shell.Current.GoToAsync($"..");
+                SelectedItems.Clear();
             }
         }
         catch (Exception ex)

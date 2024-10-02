@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.BaseModels;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.ShipAddressModels;
@@ -35,6 +36,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
 
         #region Collections
         public ObservableCollection<SalesCustomer> Items { get; } = new();
+
         #endregion
 
         public ReturnSalesDispatchCustomerListViewModel(IHttpClientService httpClientService,
@@ -47,6 +49,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
             _salesCustomerService = salesCustomerService;
             _userDialogs = userDialogs;
             _salesCustomerProductService = salesCustomerProductService;
+            _serviceProvider = serviceProvider;
 
             Title = "Müşteri Listesi";
 
@@ -55,7 +58,8 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
             ItemTappedCommand = new Command<SalesCustomer>(async (customer) => ItemTappedAsync(customer));
             NextViewCommand = new Command(async () => await NextViewAsync());
             ShowOrdersCommand = new Command<SalesCustomer>(async (customer) => await ShowOrdersAsync(customer));
-            _serviceProvider = serviceProvider;
+            PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+            PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
         }
 
         #region Commands
@@ -64,7 +68,12 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
         public Command ItemTappedCommand { get; }
         public Command ShowOrdersCommand { get; }
         public Command NextViewCommand { get; }
+        public Command PerformSearchCommand { get; }
+        public Command PerformEmptySearchCommand { get; }
         #endregion
+
+        [ObservableProperty]
+        public SearchBar searchText;
 
         private async Task LoadItemsAsync()
         {
@@ -79,7 +88,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
                 await Task.Delay(1000);
 
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _salesCustomerService.SalesCustomerQueryFiche(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: 0, take: 20, search: "");
+                var result = await _salesCustomerService.SalesCustomerQueryFiche(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: 0, take: 20, search: SearchText.Text);
                 if (result.IsSuccess)
                 {
                     if (result.Data is null)
@@ -115,7 +124,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
 
                 _userDialogs.Loading("Loading Items...");
-                var result = await _salesCustomerService.SalesCustomerQueryFiche(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: Items.Count, take: 20, search: "");
+                var result = await _salesCustomerService.SalesCustomerQueryFiche(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: Items.Count, take: 20, search: SearchText.Text);
                 if (result.IsSuccess)
                 {
                     if (result.Data is null)
@@ -274,6 +283,56 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispat
                 await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
             }
 
+        }
+        private async Task PerformSearchAsync()
+        {
+            if (IsBusy)
+                return;
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(SearchText.Text))
+                {
+                    await LoadItemsAsync();
+                    SearchText.Unfocus();
+                    return;
+                }
+                IsBusy = true;
+
+                Items.Clear();
+                var httpClient = _httpClientService.GetOrCreateHttpClient();
+                var result = await _salesCustomerService.SalesCustomerQueryFiche(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: 0, take: 20, search: SearchText.Text);
+                if (result.IsSuccess)
+                {
+                    if (result.Data is null)
+                        return;
+
+                    foreach (var item in result.Data)
+                        Items.Add(Mapping.Mapper.Map<SalesCustomer>(item));
+                }
+                if (!result.IsSuccess)
+                {
+                    _userDialogs.Alert(result.Message, "Hata");
+                    return;
+                }
+
+            }
+            catch (System.Exception ex)
+            {
+                _userDialogs.Alert(ex.Message, "Hata");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task PerformEmptySearchAsync()
+        {
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
+            {
+                await PerformSearchAsync();
+            }
         }
     }
 }

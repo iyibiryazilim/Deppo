@@ -193,7 +193,7 @@ FETCH NEXT {take} ROWS ONLY";
 			WHERE STFICHE.TRCODE IN (7,8) AND STFICHE.SOURCEINDEX = {warehouseNumber} AND STFICHE.CLIENTREF = {customerReferenceId} ";
 
             if (!string.IsNullOrEmpty(search))
-                baseQuery += $@" AND (STFICHE.FICHENO LIKE '{search}%' OR STFICHE.GENEXP1 LIKE '%{search}%')";
+                baseQuery += $@" AND (STFICHE.FICHENO LIKE '%{search}%' OR STFICHE.GENEXP1 LIKE '%{search}%')";
 
             baseQuery += $@"
 ORDER BY STFICHE.DATE_ DESC
