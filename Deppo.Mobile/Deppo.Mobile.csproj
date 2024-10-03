@@ -179,7 +179,22 @@
 	  <MauiXaml Update="Modules\OutsourceModule\OutsourcePanel\Views\OutsourcePanelAllFicheListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ProductDetailWarehouseTotalListView.xaml">
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailLocationTransactionListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailVariantListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailVariantTotalListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailWaitingPurchaseOrderListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailWaitingSalesOrderListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailWarehouseTotalListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ProductInputTransactionView.xaml">

@@ -1,8 +1,11 @@
 using System;
 using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -24,8 +27,9 @@ public partial class OutsourceListViewModel : BaseViewModel
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-        PerformSearchCommand = new Command<SearchBar>(async (searchBar) => await PerformSearchAsync(searchBar));
         ItemTappedCommand = new Command<Outsource>(async (outsource) => await ItemTappedAsync(outsource));
+        PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+        PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
     }
 
     public Page CurrentPage { get; set; }
@@ -33,8 +37,11 @@ public partial class OutsourceListViewModel : BaseViewModel
     public Command<Outsource> ItemTappedCommand { get; }
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
-    public Command<SearchBar> PerformSearchCommand { get; }
+    public Command PerformSearchCommand { get; }
+    public Command PerformEmptySearchCommand { get; }
 
+    [ObservableProperty]
+    public SearchBar searchText;
     public async Task LoadItemsAsync()
     {
         if (IsBusy)
@@ -48,7 +55,7 @@ public partial class OutsourceListViewModel : BaseViewModel
             _userDialogs.Loading("Loading Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             await Task.Delay(1000);
-            var result = await _outsourceService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, Items.Count, 20);
+            var result = await _outsourceService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber,SearchText.Text, Items.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
@@ -90,7 +97,7 @@ public partial class OutsourceListViewModel : BaseViewModel
             IsBusy = true;
             _userDialogs.Loading("Refreshing Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _outsourceService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, Items.Count, 20);
+            var result = await _outsourceService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, Items.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
@@ -123,49 +130,64 @@ public partial class OutsourceListViewModel : BaseViewModel
         }
     }
 
-    private async Task PerformSearchAsync(SearchBar searchBar)
+    private async Task PerformSearchAsync()
     {
         if (IsBusy)
             return;
 
         try
         {
-            if (string.IsNullOrWhiteSpace(searchBar.Text))
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
             {
                 await LoadItemsAsync();
-                searchBar.Unfocus();
+                SearchText.Unfocus();
                 return;
+            }
+            IsBusy = true;
+           
+            Items.Clear();
+            _userDialogs.Loading("Searching Items...");
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            await Task.Delay(1000);
+            var result = await _outsourceService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, Items.Count, 20);
+            if (result.IsSuccess)
+            {
+                if (result.Data == null)
+                    return;
+
+                foreach (var item in result.Data)
+                    Items.Add(Mapping.Mapper.Map<Outsource>(item));
+
+                _userDialogs.Loading().Hide();
             }
             else
             {
-                if (searchBar.Text.Length >= 3)
-                {
-                    IsBusy = true;
-                    using (_userDialogs.Loading("Searching.."))
-                    {
-                        var httpClient = _httpClientService.GetOrCreateHttpClient();
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.Loading().Hide();
 
-                        var result = await _outsourceService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, Items.Count, 20);
-                        if (!result.IsSuccess)
-                        {
-                            _userDialogs.Alert(result.Message, "Hata");
-                            return;
-                        }
-
-                        Items.Clear();
-                        foreach (var item in result.Data)
-                            Items.Add(item);
-                    }
-                }
+                _userDialogs.Alert(message: result.Message, title: "Load Items");
             }
+
+            _userDialogs.Loading().Hide();
+
         }
-        catch (System.Exception ex)
+
+        catch (Exception ex)
         {
-            _userDialogs.Alert(ex.Message, "Hata");
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
             IsBusy = false;
+        }
+    }
+
+
+    private async Task PerformEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText.Text))
+        {
+            await PerformSearchAsync();
         }
     }
 

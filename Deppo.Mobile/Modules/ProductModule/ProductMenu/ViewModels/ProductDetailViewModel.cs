@@ -2,20 +2,15 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
-using Deppo.Mobile.Core.Models.CountingModels.BasketModels;
-using Deppo.Mobile.Core.Models.CountingModels;
-using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.ActionModels.ProductActionModels;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
-using Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
+using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views.ActionViews;
 using DevExpress.Maui.Controls;
-using Deppo.Mobile.Core.Models.ActionModel;
 using System.Collections.ObjectModel;
-using Deppo.Mobile.Modules.ProductModule.Variant;
-using Deppo.Mobile.Core.Models.VariantModels;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels;
 
@@ -30,7 +25,7 @@ public partial class ProductDetailViewModel : BaseViewModel
     [ObservableProperty]
     private ProductDetailModel productDetailModel = null!;
 
-    public ObservableCollection<ProductActionModel> ProductActionModels { get; } = new();
+    public ObservableCollection<ProductDetailActionModel> ProductActionModels { get; } = new();
 
     public Page CurrentPage { get; set; }
 
@@ -47,7 +42,7 @@ public partial class ProductDetailViewModel : BaseViewModel
         OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
         ShowProcessBottomSheetCommand = new Command(async () => await ShowProcessBottomSheetAsync());
         ActionModelProcessTappedCommand = new Command(async () => await ActionModelProcessTappedAsync());
-        ActionModelsTappedCommand = new Command<ProductActionModel>(async (model) => await ActionModelsTappedAsync(model));
+        ActionModelsTappedCommand = new Command<ProductDetailActionModel>(async (model) => await ActionModelsTappedAsync(model));
     }
 
     #region Commands
@@ -292,23 +287,66 @@ public partial class ProductDetailViewModel : BaseViewModel
             IsBusy = true;
             ProductActionModels.Clear();
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            _userDialogs.Loading("Loading Items...");
-            await Task.Delay(1000);
 
-            ProductActionModels.Add(new ProductActionModel
+            ProductActionModels.Add(new ProductDetailActionModel
             {
                 ActionName = "Ambar Toplamları",
-                ActionUrl = $"{nameof(ProductDetailWarehouseTotalListView)}"
+                ActionUrl = $"{nameof(ProductDetailWarehouseTotalListView)}",
+                LineNumber = 1,
+                Icon = "",
+                IsSelected = false
             });
+
+
             if (ProductDetailModel.Product.IsVariant)
             {
-                ProductActionModels.Add(new ProductActionModel
+                ProductActionModels.Add(new ProductDetailActionModel
                 {
-                    ActionName = "Varyantları",
-                    ActionUrl = $"{nameof(ProductVariantListViewModel)}"
+                    ActionName = "Varyant Toplamları",
+                    ActionUrl = $"{nameof(ProductDetailVariantTotalListView)}",
+                    LineNumber = 2,
+                    Icon = "",
+                    IsSelected = false
+                });
+
+                ProductActionModels.Add(new ProductDetailActionModel
+                {
+                    ActionName = "Varyantlar",
+                    ActionUrl = $"{nameof(ProductDetailVariantListView)}",
+                    LineNumber = 3,
+                    Icon = "",
+                    IsSelected = false
+                });
+            }
+            if (ProductDetailModel.Product.LocTracking == 1)
+            {
+                ProductActionModels.Add(new ProductDetailActionModel
+                {
+                    ActionName = "Stok Yeri Dağılımı",
+                    ActionUrl = $"{nameof(ProductDetailLocationTransactionListView)}",
+                    LineNumber = 4,
+                    Icon = "",
+                    IsSelected = false
                 });
             }
 
+            ProductActionModels.Add(new ProductDetailActionModel
+            {
+                ActionName = "Bekleyen Satış Siparişleri",
+                ActionUrl = $"{nameof(ProductDetailWaitingSalesOrderListView)}",
+                LineNumber = 5,
+                Icon = "",
+                IsSelected = false
+            });
+
+            ProductActionModels.Add(new ProductDetailActionModel
+            {
+                ActionName = "Bekleyen Satınalma Siparişleri",
+                ActionUrl = $"{nameof(ProductDetailWaitingPurchaseOrderListView)}",
+                LineNumber = 6,
+                Icon = "",
+                IsSelected = false
+            });
             _userDialogs.HideHud();
         }
         catch (Exception ex)
@@ -324,12 +362,18 @@ public partial class ProductDetailViewModel : BaseViewModel
         }
     }
 
-    private async Task ActionModelsTappedAsync(ProductActionModel model)
+    private async Task ActionModelsTappedAsync(ProductDetailActionModel model)
     {
         try
         {
             IsBusy = true;
-            await Shell.Current.GoToAsync(model.ActionUrl);
+            CurrentPage.FindByName<BottomSheet>("processBottomSheet").State = BottomSheetState.Hidden;
+            await Task.Delay(300);
+            await Shell.Current.GoToAsync($"{model.ActionUrl}", new Dictionary<string, object>
+            {
+                [nameof(ProductDetailModel)] = ProductDetailModel
+            });
+
         }
         catch (Exception ex)
         {

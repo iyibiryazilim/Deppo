@@ -38,11 +38,17 @@
             Stroke="{StaticResource Primary}"
             StrokeShape="RoundRectangle 5"
             StrokeThickness="0.5">
-            <SearchBar
-                x:Name="searchBar"
-                Placeholder="Ara..."
-                PlaceholderColor="{StaticResource OffBlack}"
-                TextColor="{StaticResource OffBlack}" />
+            <SearchBar x:Name="searchBar"
+                       Placeholder="Ara..."
+                       PlaceholderColor="{StaticResource OffBlack}"
+                       TextColor="{StaticResource OffBlack}">
+                <SearchBar.Behaviors>
+                    <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                    EventName="SearchButtonPressed" />
+                    <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}"
+                                                    EventName="TextChanged" />
+                </SearchBar.Behaviors>
+            </SearchBar>
         </Border>
 
         <CollectionView

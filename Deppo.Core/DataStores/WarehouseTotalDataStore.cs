@@ -319,6 +319,6 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
         return baseQuery;
     }
 
-
+  
 
 }
