@@ -12,7 +12,6 @@ public partial class InputProductPurchaseOrderProcessProductListView : ContentPa
         _viewModel = viewModel;
         BindingContext = _viewModel;
         _viewModel.CurrentPage = this;
-        _viewModel.OrderSearchText = searchBarOrder;
-        _viewModel.ProductSearchText = searchBar;
+        _viewModel.SearchText = searchBar;
     }
 }

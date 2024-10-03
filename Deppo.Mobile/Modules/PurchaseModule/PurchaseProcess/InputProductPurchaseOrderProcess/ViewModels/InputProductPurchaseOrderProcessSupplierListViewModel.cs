@@ -310,7 +310,10 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
         {
             IsBusy = true;
 
-            await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessProductListView)}", new Dictionary<string, object>
+			Console.WriteLine(WarehouseModel);
+			Console.WriteLine(PurchaseSupplier);
+
+            await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessBasketListView)}", new Dictionary<string, object>
             {
                 [nameof(WarehouseModel)] = WarehouseModel,
                 [nameof(PurchaseSupplier)] = PurchaseSupplier
