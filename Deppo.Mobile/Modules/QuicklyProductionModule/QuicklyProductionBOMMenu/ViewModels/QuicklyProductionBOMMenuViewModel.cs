@@ -9,6 +9,8 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrder.Views;
+using Deppo.Core.BaseModels;
+using Deppo.Mobile.Core.Models.ProductModels;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionBOMMenu.ViewModels;
 
@@ -28,6 +30,7 @@ public partial class QuicklyProductionBOMMenuViewModel : BaseViewModel
 
     public Page CurrentPage { get; set; }
 
+
     public QuicklyProductionBOMMenuViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IQuicklyBomService quicklyBomService)
     {
         _httpClientService = httpClientService;
@@ -41,6 +44,8 @@ public partial class QuicklyProductionBOMMenuViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<QuicklyBOMProductModel>(async (parameter) => await ItemTappedAsync(parameter));
         //NextViewCommand = new Command(async () => await NextViewAsync());
+        PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+        PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
     }
 
     public Command LoadItemsCommand { get; }
@@ -49,6 +54,11 @@ public partial class QuicklyProductionBOMMenuViewModel : BaseViewModel
     public Command ConfirmCommand { get; }
     public Command BackCommand { get; }
     public Command NextViewCommand { get; }
+    public Command PerformSearchCommand { get; }
+    public Command PerformEmptySearchCommand { get; }
+
+    [ObservableProperty]
+    public SearchBar searchText;
 
     //private async Task NextViewAsync()
     //{
@@ -133,7 +143,7 @@ public partial class QuicklyProductionBOMMenuViewModel : BaseViewModel
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _quicklyBomService.GetObjectsWorkOrder(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, skip: Items.Count, take: 20);
+            var result = await _quicklyBomService.GetObjectsWorkOrder(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, skip: Items.Count, take: 20,search:SearchText.Text);
 
             if (result.IsSuccess)
             {
@@ -203,7 +213,7 @@ public partial class QuicklyProductionBOMMenuViewModel : BaseViewModel
             Items.Clear();
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _quicklyBomService.GetObjectsWorkOrder(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber);
+            var result = await _quicklyBomService.GetObjectsWorkOrder(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, search: SearchText.Text);
 
             if (result.IsSuccess)
             {
@@ -229,6 +239,58 @@ public partial class QuicklyProductionBOMMenuViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
+        }
+    }
+    private async Task PerformSearchAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
+            {
+                await LoadItemsAsync();
+                SearchText.Unfocus();
+                return;
+            }
+            IsBusy = true;
+            Items.Clear();
+            _userDialogs.Loading("Searching Items...");
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _quicklyBomService.GetObjectsWorkOrder(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, search: SearchText.Text);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var product in result.Data)
+                {
+                    var item = Mapping.Mapper.Map<QuicklyBOMProductModel>(product);
+                    Items.Add(item);
+                }
+            }
+            _userDialogs.Loading().Hide();
+
+        }
+
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+
+    private async Task PerformEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText.Text))
+        {
+            await PerformSearchAsync();
         }
     }
 }
