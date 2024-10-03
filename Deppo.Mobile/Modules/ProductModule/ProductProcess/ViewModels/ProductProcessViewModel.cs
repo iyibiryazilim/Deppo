@@ -8,6 +8,7 @@ using Deppo.Mobile.Modules.ProductModule.ProductProcess.TransferProductProcess.V
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.Views;
 using Deppo.Mobile.Modules.ResultModule;
 using Deppo.Mobile.Modules.ResultModule.Views;
+using DevExpress.Maui.Controls;
 using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.ViewModels;
@@ -31,8 +32,11 @@ public partial class ProductProcessViewModel : BaseViewModel
         WasteProcessCommand = new Command(async () => await WasteProcessAsync());
         VirmanProductProcessCommand = new Command(async () => await VirmanProductProcessAsync());
         TransferProductProcessCommand = new Command(async () => await TransferProductProcessAsync());
+        OpenInfoBottemSheetCommand = new Command(async () => await OpenInfoBottemSheetAsync());
+
     }
 
+    public Page CurrentPage { get; set; }   
     public Command ProductionInputCommand { get; }
     public Command OverCountCommand { get; }
     public Command ConsumableProcessCommand { get; }
@@ -41,6 +45,9 @@ public partial class ProductProcessViewModel : BaseViewModel
 
     public Command VirmanProductProcessCommand { get; }
     public Command TransferProductProcessCommand { get; }
+
+    public Command OpenInfoBottemSheetCommand { get; }
+
 
     #region Will be removed
 
@@ -100,5 +107,10 @@ public partial class ProductProcessViewModel : BaseViewModel
     private async Task TransferProductProcessAsync()
     {
         await Shell.Current.GoToAsync($"{nameof(TransferOutWarehouseListView)}");
+    }
+
+    private async Task OpenInfoBottemSheetAsync()
+    {
+        CurrentPage.FindByName<BottomSheet>("ınfoBottomSheet").State = BottomSheetState.HalfExpanded;
     }
 }

@@ -25,5 +25,6 @@ namespace Deppo.Mobile.Core.Models.SalesModels
         }
 
         public ObservableCollection<CustomerTransaction> LastTransactions { get; } = new();
+        public ObservableCollection<SalesFiche> Transactions { get; } = new();
     }
 }

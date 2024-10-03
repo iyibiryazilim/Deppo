@@ -1,0 +1,15 @@
+﻿using Deppo.Core.DataResultModel;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Deppo.Core.Services
+{
+    public interface ICustomerDetailAllFichesService
+    {
+        public Task<DataResult<IEnumerable<dynamic>>> GetAllFiches(HttpClient httpClient, int firmNumber, int periodNumber,int customerRefernceId, string search = "", int skip = 0, int take = 20);
+        public Task<DataResult<IEnumerable<dynamic>>> GetTransactionsByFiche(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId, int skip = 0, int take = 20);
+    }
+}

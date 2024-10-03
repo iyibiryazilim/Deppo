@@ -8,6 +8,10 @@ using Deppo.Mobile.Core.Models.QuicklyModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
+using Deppo.Mobile.Modules.ProductModule.ProductPanel.Views;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionPanel.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesPanel.Views;
 using DevExpress.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionPanel.ViewModels;
@@ -19,7 +23,7 @@ public partial class QuicklyProductionPanelViewModel : BaseViewModel
     private readonly IUserDialogs _userDialogs;
 
     [ObservableProperty]
-    QuicklyProductionPanelModel quicklyProductionPanelModel = new();
+    private QuicklyProductionPanelModel quicklyProductionPanelModel = new();
 
     public QuicklyProductionPanelViewModel(IHttpClientService httpClientService, IQuicklyProductionPanelService quicklyProductionPanelService, IUserDialogs userDialogs)
     {
@@ -31,11 +35,20 @@ public partial class QuicklyProductionPanelViewModel : BaseViewModel
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         ItemTappedCommand = new Command<ProductionFiche>(async (productionFiche) => await ItemTappedAsync(productionFiche));
+        ProductTappedCommand = new Command<ProductModel>(async (productModel) => await ProductTappedAsync(productModel));
+        AllFicheTappedCommand = new Command(async () => await AllFicheTappedAsync());
+        ProductInputTappedCommand = new Command(async () => await ProductInputTappedAsync());
+        ProductOutputTappedCommand = new Command(async () => await ProductOutputTappedAsync());
     }
 
     public Page CurrentPage { get; set; }
     public Command LoadItemsCommand { get; }
     public Command ItemTappedCommand { get; }
+    public Command AllFicheTappedCommand { get; }
+
+    public Command ProductInputTappedCommand { get; }
+    public Command ProductOutputTappedCommand { get; }
+    public Command ProductTappedCommand { get; }
 
     private async Task LoadItemsAsync()
     {
@@ -64,7 +77,6 @@ public partial class QuicklyProductionPanelViewModel : BaseViewModel
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
-
         }
         catch (System.Exception)
         {
@@ -268,6 +280,104 @@ public partial class QuicklyProductionPanelViewModel : BaseViewModel
                 _userDialogs.HideHud();
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+    }
+
+    private async Task AllFicheTappedAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(SalesPanelAllFicheListView)}");
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ProductInputTappedAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(QuicklyProductionInputProductListView)}");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ProductOutputTappedAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(QuicklyProductionOutputProductListView)}");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ProductTappedAsync(ProductModel productModel)
+    {
+        if (productModel is null)
+            return;
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            ProductDetailModel productDetailModel = new();
+            productDetailModel.Product = productModel;
+
+            await Shell.Current.GoToAsync($"{nameof(ProductDetailView)}", new Dictionary<string, object>
+            {
+                [nameof(ProductDetailModel)] = productDetailModel
+            });
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 }

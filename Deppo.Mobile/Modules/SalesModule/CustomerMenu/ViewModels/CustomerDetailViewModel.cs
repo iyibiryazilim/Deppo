@@ -27,21 +27,23 @@ public partial class CustomerDetailViewModel : BaseViewModel
     private readonly ICustomerTransactionService _customerTransactionService;
     private readonly IUserDialogs _userDialogs;
     private readonly ICustomQueryService _customQueryService;
+    private readonly ICustomerDetailService _customerDetailService;
 
     [ObservableProperty]
     private CustomerDetailModel customerDetailModel = null!;
 
     public CustomerDetailViewModel(IHttpClientService httpClientService,
     ICustomerService customerService,
-	ICustomerTransactionService customerTransactionService,
-	IUserDialogs userDialogs,
-    ICustomQueryService customQueryService)
+    ICustomerTransactionService customerTransactionService,
+    IUserDialogs userDialogs,
+    ICustomQueryService customQueryService, ICustomerDetailService customerDetailService)
     {
         _httpClientService = httpClientService;
         _customerService = customerService;
         _customerTransactionService = customerTransactionService;
         _userDialogs = userDialogs;
         _customQueryService = customQueryService;
+        _customerDetailService = customerDetailService;
 
         Title = "Müşteri Detayı";
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
@@ -60,11 +62,11 @@ public partial class CustomerDetailViewModel : BaseViewModel
         {
             IsBusy = true;
 
-			_userDialogs.Loading("Loading Items...");
+            _userDialogs.Loading("Loading Items...");
             await Task.Delay(1000);
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastTransactionsAsync(httpClient));
+            await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastFicheAsync());
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
@@ -110,38 +112,65 @@ public partial class CustomerDetailViewModel : BaseViewModel
         }
     }
 
-    private async Task GetLastTransactionsAsync(HttpClient httpClient)
+    //private async Task GetLastTransactionsAsync(HttpClient httpClient)
+    //{
+    //    try
+    //    {
+    //        var result = await _customerTransactionService.GetObjects(
+    //            httpClient: httpClient,
+    //            firmNumber: _httpClientService.FirmNumber,
+    //            periodNumber: _httpClientService.PeriodNumber,
+    //            customerReferenceId: CustomerDetailModel.Customer.ReferenceId,
+    //            search: "",
+    //            skip: 0,
+    //            take: 5
+    //        );
+
+    //        if (result.IsSuccess)
+    //        {
+    //            if (result.Data == null)
+    //                return;
+
+    //            foreach (var item in result.Data)
+    //            {
+    //                CustomerDetailModel.LastTransactions.Add(Mapping.Mapper.Map<CustomerTransaction>(item));
+    //            }
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        if (_userDialogs.IsHudShowing)
+    //            _userDialogs.Loading().Hide();
+
+    //        _userDialogs.Alert(message: ex.Message, title: "Hata");
+    //    }
+    //}
+
+    private async Task GetLastFicheAsync()
     {
         try
         {
-
-            var result = await _customerTransactionService.GetObjects(
-                httpClient: httpClient,
-                firmNumber: _httpClientService.FirmNumber,
-                periodNumber: _httpClientService.PeriodNumber,
-                customerReferenceId: CustomerDetailModel.Customer.ReferenceId,
-                search: "",
-                skip: 0,
-                take: 5
-            );
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _customerDetailService.GetLastFichesByCustomer(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, CustomerDetailModel.Customer.ReferenceId);
 
             if (result.IsSuccess)
             {
-                if (result.Data == null)
+                if (result.Data is null)
                     return;
-
+                CustomerDetailModel.LastTransactions.Clear();
                 foreach (var item in result.Data)
-                {
                     CustomerDetailModel.LastTransactions.Add(Mapping.Mapper.Map<CustomerTransaction>(item));
-                }
             }
         }
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+                _userDialogs.HideHud();
 
-            _userDialogs.Alert(message: ex.Message, title: "Hata");
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
         }
     }
 
