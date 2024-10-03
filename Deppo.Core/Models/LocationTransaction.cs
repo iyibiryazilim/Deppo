@@ -30,6 +30,7 @@ public class LocationTransaction :INotifyPropertyChanged, IDisposable
 	private double _quantity;
 	private double _remainingQuantity;
 	private double _remainingUnitQuantity;
+	private int _ioType;
 
 
 	public LocationTransaction()
@@ -309,7 +310,8 @@ public class LocationTransaction :INotifyPropertyChanged, IDisposable
 		}
 	}
 
-	public event PropertyChangedEventHandler? PropertyChanged;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
 	public void Dispose()
 	{

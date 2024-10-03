@@ -1,11 +1,10 @@
-using Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels;
+using Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewModels;
 
-namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
+namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.Views.ActionViews;
 
 public partial class ProductDetailWarehouseTotalListView : ContentPage
 {
-    private readonly ProductDetailWarehouseTotalListViewModel _viewModel;
-
+	private readonly ProductDetailWarehouseTotalListViewModel _viewModel;
     public ProductDetailWarehouseTotalListView(ProductDetailWarehouseTotalListViewModel viewModel)
     {
         InitializeComponent();

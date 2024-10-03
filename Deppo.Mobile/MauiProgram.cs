@@ -38,7 +38,9 @@ using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.Views;
 using Deppo.Mobile.Modules.OutsourceModule.WaitingOutsourceMenu.ViewModels;
 using Deppo.Mobile.Modules.OutsourceModule.WaitingOutsourceMenu.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels;
+using Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
+using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views.ActionViews;
 using Deppo.Mobile.Modules.ProductModule.ProductPanel.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductPanel.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
@@ -276,6 +278,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IOutsourcePanelService, OutsourcePanelDataStore>();
         builder.Services.AddSingleton<ICountingPanelService, CountingPanelDataStore>();
         builder.Services.AddSingleton<IQuicklyProductionPanelService, QuicklyProductionPanelDataStore>();
+        builder.Services.AddSingleton<IProductDetailActionService, ProductDetailActionDataStore>();
 
         builder.Services.AddSingleton<IBarcodeSearchService, BarcodeSearchDataStore>();
 
@@ -284,6 +287,11 @@ public static class MauiProgram
         builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
         builder.Services.AddTransientWithShellRoute<CompanyListView, CompanyListViewModel>(nameof(CompanyListView));
 
+        builder.Services.AddScopedWithShellRoute<ProductDetailLocationTransactionListView, ProductDetailLocationTransactionListViewModel>(nameof(ProductDetailLocationTransactionListView));
+        builder.Services.AddScopedWithShellRoute<ProductDetailVariantListView, ProductDetailVariantListViewModel>(nameof(ProductDetailVariantListView));
+        builder.Services.AddScopedWithShellRoute<ProductDetailVariantTotalListView, ProductDetailVariantTotalListViewModel>(nameof(ProductDetailVariantTotalListView));
+        builder.Services.AddScopedWithShellRoute<ProductDetailWaitingPurchaseOrderListView, ProductDetailWaitingPurchaseOrderListViewModel>(nameof(ProductDetailWaitingPurchaseOrderListView));
+        builder.Services.AddScopedWithShellRoute<ProductDetailWaitingSalesOrderListView, ProductDetailWaitingSalesOrderListViewModel>(nameof(ProductDetailWaitingSalesOrderListView));
         builder.Services.AddScopedWithShellRoute<ProductDetailWarehouseTotalListView, ProductDetailWarehouseTotalListViewModel>(nameof(ProductDetailWarehouseTotalListView));
 
         #region Analysis Modules
