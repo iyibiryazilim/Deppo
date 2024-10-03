@@ -13,6 +13,7 @@ using Deppo.Mobile.Modules.AnalysisModule.PurchaseAnalysis.ViewModels;
 using Deppo.Mobile.Modules.AnalysisModule.PurchaseAnalysis.Views;
 using Deppo.Mobile.Modules.AnalysisModule.SalesAnalysis.ViewModels;
 using Deppo.Mobile.Modules.AnalysisModule.SalesAnalysis.Views;
+
 using Deppo.Mobile.Modules.CameraModule.ViewModels;
 using Deppo.Mobile.Modules.CameraModule.Views;
 using Deppo.Mobile.Modules.CountingModule.CountingPanel.ViewModels;
@@ -279,6 +280,9 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<IBarcodeSearchService, BarcodeSearchDataStore>();
 
+        builder.Services.AddSingleton<ICustomerDetailService, CustomerDetailDataStore>();
+        builder.Services.AddSingleton<ICustomerDetailAllFichesService, CustomerDetailAllFichesDataStore>();
+
 
         builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
         builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
@@ -368,6 +372,8 @@ public static class MauiProgram
         builder.Services.AddSingletonWithShellRoute<CustomerOutputTransactionView, CustomerOutputTransactionViewModel>(nameof(CustomerOutputTransactionView));
         builder.Services.AddSingletonWithShellRoute<WaitingSalesOrderListView, WaitingSalesOrderListViewModel>(nameof(WaitingSalesOrderListView));
         builder.Services.AddSingletonWithShellRoute<SalesProcessView, SalesProcessViewModel>(nameof(SalesProcessView));
+        builder.Services.AddSingletonWithShellRoute<CustomerDetailAllFichesView, CustomerDetailAllFichesViewModel>(nameof(CustomerDetailAllFichesView));
+
 
         #region Sevk Islemleri
 
@@ -523,6 +529,11 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddSingletonWithShellRoute<QuicklyProductionProcessView, QuicklyProductionProcessViewModel>(nameof(QuicklyProductionProcessView));
 
         builder.Services.AddScopedWithShellRoute<QuicklyProductionBOMMenuDetailView, QuicklyProductionBOMMenuDetailView>(nameof(QuicklyProductionBOMMenuDetailView));
+
+        builder.Services.AddSingletonWithShellRoute<QuicklyProductionPanelAllFicheListView, QuicklyProductionPanelAllFicheListViewModel>(nameof(QuicklyProductionPanelAllFicheListView));
+
+        builder.Services.AddScopedWithShellRoute<QuicklyProductionInputProductListView, QuicklyProductionInputProductListViewModel>(nameof(QuicklyProductionInputProductListView));
+        builder.Services.AddScopedWithShellRoute<QuicklyProductionOutputProductListView, QuicklyProductionOutputProductListViewModel>(nameof(QuicklyProductionOutputProductListView));
 
         #region Quickly Production Manuel
 

@@ -127,126 +127,105 @@
                             HalfExpandedRatio="0.5"
                             IsModal="True"
                             ShowGrabber="True">
-                <Grid RowDefinitions="Auto,*"
-                      RowSpacing="20">
-
+                <Grid RowDefinitions="Auto, *"
+                      RowSpacing="10">
                     <VerticalStackLayout Grid.Row="0"
                                          Spacing="5">
-                        <Grid ColumnDefinitions=".80*, .20*"
-                              ColumnSpacing="10">
-                            <Label Grid.Column="0"
-                                   FontAttributes="Bold"
-                                   FontSize="Medium"
-                                   HorizontalOptions="Start"
-                                   Text="Hareket Detayı" />
-                            <ImageButton Grid.Column="1"
-                                         Command="{Binding TransactionsCloseCommand}"
-                                         HeightRequest="25"
-                                         HorizontalOptions="End"
-                                         VerticalOptions="Center">
-                                <ImageButton.Source>
-                                    <FontImageSource FontFamily="FAS"
-                                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.ChevronDown}"
-                                                     Size="Medium"
-                                                     Color="{StaticResource OffBlack}" />
-                                </ImageButton.Source>
-                            </ImageButton>
-                        </Grid>
+                        <Label FontAttributes="Bold"
+                               FontSize="Medium"
+                               HorizontalOptions="Start"
+                               Text="Fiş Hareketleri" />
+
                         <BoxView HeightRequest="2"
                                  Color="{StaticResource Primary}" />
                     </VerticalStackLayout>
 
-                    <Grid Grid.Row="1"
-                          RowDefinitions="Auto,*"
-                          RowSpacing="10">
-                        <CollectionView Grid.Row="1"
-                                        ItemsSource="{Binding Transactions}"
-                                        RemainingItemsThreshold="2"
-                                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreTransactionsCommand}">
-                            <CollectionView.ItemsLayout>
-                                <LinearItemsLayout ItemSpacing="5"
-                                                   Orientation="Vertical" />
-                            </CollectionView.ItemsLayout>
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="transactionModel:OutsourceTransactionModel">
-                                    <Border Padding="5"
-                                            BackgroundColor="Transparent"
-                                            StrokeShape="RoundRectangle 5"
-                                            StrokeThickness="0.1">
-                                        <Grid ColumnDefinitions="Auto, *"
-                                              ColumnSpacing="10">
-                                            <VerticalStackLayout Grid.Column="0"
-                                                                 Spacing="1"
+                    <CollectionView Grid.Row="1"
+                                    ItemsSource="{Binding Transactions}">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout ItemSpacing="5"
+                                               Orientation="Vertical" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="transactionModel:OutsourceTransactionModel">
+                                <Border Padding="5"
+                                        BackgroundColor="Transparent"
+                                        StrokeThickness="0.1">
+                                    <Grid ColumnDefinitions="Auto, *"
+                                          ColumnSpacing="10">
+                                        <Border Grid.Column="0"
+                                                Padding="5"
+                                                BackgroundColor="{StaticResource Secondary}"
+                                                StrokeShape="RoundRectangle 10">
+                                            <VerticalStackLayout Spacing="0"
                                                                  VerticalOptions="Center">
                                                 <Label FontAttributes="Bold"
-                                                       FontSize="Large"
+                                                       FontSize="Subtitle"
                                                        HorizontalOptions="Center"
                                                        Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
                                                        TextColor="{StaticResource OffBlack}" />
-                                                <Label FontSize="Medium"
-                                                       HorizontalOptions="Center"
+                                                <Label HorizontalOptions="Center"
                                                        Text="{Binding TransactionDate, StringFormat='{0:MM.yyyy}'}"
                                                        TextColor="{StaticResource OffBlack}" />
                                                 <Label HorizontalOptions="Center"
                                                        Text="{Binding TransactionTime, StringFormat='{0:hh\\:mm}'}"
-                                                       TextColor="{StaticResource Gray400}" />
+                                                       TextColor="{StaticResource Black}" />
                                             </VerticalStackLayout>
+                                        </Border>
 
-                                            <VerticalStackLayout Grid.Column="1"
-                                                                 Spacing="1"
-                                                                 VerticalOptions="Center">
-                                                <Label FontAttributes="Bold"
-                                                       FontSize="Medium"
-                                                       Text="{Binding BaseTransactionCode}" />
-                                                <Label FontSize="13"
-                                                       LineBreakMode="TailTruncation"
-                                                       Text="{Binding TransactionTypeName}" />
-                                                <Label FontSize="13"
-                                                       LineBreakMode="TailTruncation"
-                                                       Text="{Binding WarehouseName}" />
-                                                <HorizontalStackLayout Spacing="10">
-                                                    <Grid ColumnDefinitions="Auto, Auto"
-                                                          ColumnSpacing="3">
-                                                        <Label Grid.Column="0"
-                                                               FontFamily="FAS"
-                                                               FontSize="Small"
-                                                               Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
-                                                               TextColor="{StaticResource Primary}"
-                                                               VerticalOptions="Center" />
-                                                        <Label Grid.Column="1">
-                                                            <Label.FormattedText>
-                                                                <FormattedString>
-                                                                    <Span FontAttributes="Bold"
-                                                                          Text="{Binding Quantity}" />
-                                                                    <Span Text=" " />
-                                                                    <Span FontAttributes="Bold"
-                                                                          Text="{Binding SubUnitsetCode}" />
-                                                                </FormattedString>
-                                                            </Label.FormattedText>
-                                                        </Label>
-                                                    </Grid>
-                                                    <Grid ColumnDefinitions="Auto, Auto"
-                                                          ColumnSpacing="3">
-                                                        <Label Grid.Column="0"
-                                                               FontFamily="FAS"
-                                                               HeightRequest="15"
-                                                               Text="{Binding IOTypeImageSource}"
-                                                               TextColor="{Binding IOTypeColor}"
-                                                               WidthRequest="10" />
-                                                        <Label Grid.Column="1"
-                                                               FontAttributes="None"
-                                                               Text="{Binding IOTypeName}" />
-                                                    </Grid>
-                                                </HorizontalStackLayout>
-                                            </VerticalStackLayout>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                    </Grid>
+                                        <VerticalStackLayout Grid.Column="1"
+                                                             Spacing="1"
+                                                             VerticalOptions="Center">
+                                            <Label FontAttributes="Bold"
+                                                   FontSize="Medium"
+                                                   Text="{Binding BaseTransactionCode}" />
+                                            <Label FontSize="13"
+                                                   LineBreakMode="TailTruncation"
+                                                   Text="{Binding TransactionTypeName}" />
+                                            <Label FontSize="13"
+                                                   LineBreakMode="TailTruncation"
+                                                   Text="{Binding WarehouseName}" />
+                                            <HorizontalStackLayout Spacing="10">
+                                                <Grid ColumnDefinitions="Auto, Auto"
+                                                      ColumnSpacing="3">
+                                                    <Label Grid.Column="0"
+                                                           FontFamily="FAS"
+                                                           FontSize="Small"
+                                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
+                                                           TextColor="{StaticResource Primary}"
+                                                           VerticalOptions="Center" />
+                                                    <Label Grid.Column="1">
+                                                        <Label.FormattedText>
+                                                            <FormattedString>
+                                                                <Span FontAttributes="Bold"
+                                                                      Text="{Binding Quantity}" />
+                                                                <Span Text=" " />
+                                                                <Span FontAttributes="Bold"
+                                                                      Text="{Binding SubUnitsetCode}" />
+                                                            </FormattedString>
+                                                        </Label.FormattedText>
+                                                    </Label>
+                                                </Grid>
+                                                <Grid ColumnDefinitions="Auto, Auto"
+                                                      ColumnSpacing="3">
+                                                    <Label Grid.Column="0"
+                                                           FontFamily="FAS"
+                                                           HeightRequest="15"
+                                                           Text="{Binding IOTypeImageSource}"
+                                                           TextColor="{Binding IOTypeColor}"
+                                                           WidthRequest="10" />
+                                                    <Label Grid.Column="1"
+                                                           FontAttributes="None"
+                                                           Text="{Binding IOTypeName}" />
+                                                </Grid>
+                                            </HorizontalStackLayout>
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
                 </Grid>
-                <!--#endregion-->
             </dx:BottomSheet>
         </VerticalStackLayout>
     </Grid>

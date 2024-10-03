@@ -109,10 +109,41 @@
         <Grid Grid.Row="1"
               RowDefinitions="Auto, *"
               RowSpacing="10">
-            <Label FontAttributes="Bold"
-                   FontSize="Title"
-                   Text="Son Hareketler" />
+            <Grid ColumnDefinitions="*, Auto"
+                  ColumnSpacing="10">
+                <Label Grid.Row="0"
+                       FontAttributes="Bold"
+                       FontSize="18"
+                       VerticalOptions="Center"
+                       Text="Son Hareketler"
+                       TextColor="{StaticResource OffBlack}" />
 
+
+                <Border Grid.Column="1"
+                        VerticalOptions="Center"
+                        Padding="5"
+                        BackgroundColor="{StaticResource Primary}"
+                        HorizontalOptions="End"
+                        Stroke="{StaticResource Primary}"
+                        StrokeShape="RoundRectangle 10">
+                    <!--<Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding AllFicheTappedCommand}" />
+                    </Border.GestureRecognizers>-->
+                    <Label FontFamily="FAS"
+                           VerticalOptions="Center"
+                           FontSize="15"
+                           TextColor="{StaticResource White}">
+                        <Label.FormattedText>
+                            <FormattedString>
+
+                                <Span FontAttributes="Bold"
+                                      Text="Tüm Hareketler"
+                                      TextColor="{StaticResource White}" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </Border>
+            </Grid>
             <CollectionView Grid.Row="1" ItemsSource="{Binding CustomerDetailModel.LastTransactions}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:CustomerTransaction">
