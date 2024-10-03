@@ -42,7 +42,8 @@
 
         <Image Grid.Row="1"
                Aspect="AspectFit"
-               Source="barcode_border.png"
+               Source="barcode_scan.png"
+               HeightRequest="300"
                ZIndex="9999"
                VerticalOptions="Center"
                HorizontalOptions="Center"/>
