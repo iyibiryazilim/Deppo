@@ -297,6 +297,8 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 		{
 			IsBusy = true;
 
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
 			var previousViewModel = _serviceProvider.GetRequiredService<OutputProductSalesOrderProcessBasketListViewModel>();
 			if (BasketItems.Count > 0)
 			{
@@ -305,6 +307,52 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 				{
 					foreach (var basketItem in BasketItems)
 					{
+						var productOrdersResult = await _waitingSalesOrderService.GetObjectsByProduct(
+							httpClient: httpClient,
+									firmNumber: _httpClientService.FirmNumber,
+									periodNumber: _httpClientService.PeriodNumber,
+									warehouseNumber: WarehouseModel.Number,
+									customerReferenceId: SalesCustomer.ReferenceId,
+									productReferenceId: basketItem.ItemReferenceId,
+									skip: 0,
+									take: 99999999
+						);
+
+						if(productOrdersResult.IsSuccess)
+						{
+							if (productOrdersResult.Data is not null)
+							{
+								foreach (var productOrder in productOrdersResult.Data)
+								{
+									if(basketItem.Orders.Count == 0)
+									{
+										basketItem.Orders.Add(new OutputSalesBasketOrderModel
+										{
+											ReferenceId = productOrder.ReferenceId,
+											OrderReferenceId = productOrder.OrderReferenceId,
+											CustomerReferenceId = productOrder.CustomerReferenceId,
+											CustomerCode = productOrder.CustomerCode,
+											CustomerName = productOrder.CustomerName,
+											ProductReferenceId = productOrder.ProductReferenceId,
+											ProductCode = productOrder.ProductCode,
+											ProductName = productOrder.ProductName,
+											UnitsetReferenceId = productOrder.UnitsetReferenceId,
+											UnitsetCode = productOrder.UnitsetCode,
+											UnitsetName = productOrder.UnitsetName,
+											SubUnitsetReferenceId = productOrder.SubUnitsetReferenceId,
+											SubUnitsetCode = productOrder.SubUnitsetCode,
+											SubUnitsetName = productOrder.SubUnitsetName,
+											Quantity = productOrder.Quantity,
+											ShippedQuantity = productOrder.ShippedQuantity,
+											WaitingQuantity = productOrder.WaitingQuantity,
+											OrderDate = productOrder.OrderDate,
+											DueDate = productOrder.DueDate,
+										});
+									}
+								}
+							}
+						}
+
 						if (!previousViewModel.Items.Any(x => x.ItemReferenceId == basketItem.ItemReferenceId))
 						{
 							previousViewModel.Items.Add(basketItem);
