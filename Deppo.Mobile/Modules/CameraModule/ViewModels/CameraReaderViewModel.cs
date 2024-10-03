@@ -34,12 +34,27 @@ public partial class CameraReaderViewModel : BaseViewModel
 	private readonly IWarehouseTotalService _warehouseTotalService;
 	private readonly IProductService _productService;
 	private readonly IServiceProvider _serviceProvider;
+	private readonly IBarcodeSearchService _barcodeSearchService;
 
 	[ObservableProperty]
 	string comingPage = null!;
 
-	public CameraReaderViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, IWarehouseTotalService warehouseTotalService, IProductService productService, IServiceProvider serviceProvider)
+	bool isFind = false;
+	public CameraReaderViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, IWarehouseTotalService warehouseTotalService, IProductService productService, IServiceProvider serviceProvider, IBarcodeSearchService barcodeSearchService)
 	{
+		_userDialogs = userDialogs;
+		_httpClientService = httpClientService;
+		_warehouseTotalService = warehouseTotalService;
+		_productService = productService;
+		_serviceProvider = serviceProvider;
+		_barcodeSearchService = barcodeSearchService;
+
+		BackCommand = new Command(async () => await BackAsync());
+		CameraDetectedCommand = new Command<BarcodeDetectionEventArgs>(async (e) => await CameraDetectedAsync(e));
+		SwitchCameraTappedCommand = new Command(async () => await SwitchCameraTappedAsync());
+		FlashlightTappedCommand = new Command(async () => await FlashlightTappedAsync());
+	
+	
 		_userDialogs = userDialogs;
 		_httpClientService = httpClientService;
 		_warehouseTotalService = warehouseTotalService;
@@ -58,6 +73,37 @@ public partial class CameraReaderViewModel : BaseViewModel
 	public Command CameraDetectedCommand { get; }
 	public Command SwitchCameraTappedCommand { get; }
 	public Command FlashlightTappedCommand { get; }
+
+	private async Task SearchBarcodeAsync(BarcodeResult[] readBarcodes) {
+		try
+		{
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var firmNumber = _httpClientService.FirmNumber;
+			var periodNumber = _httpClientService.PeriodNumber;
+
+			for(int i = 0; i < readBarcodes.Length; i++) {
+				var first = readBarcodes[i];
+
+				if(first is null) {
+					await _userDialogs.AlertAsync("Barkod Bulunamadı", "Hata", "Tamam");
+					return;
+				}
+				Task searchByProductCodeTask = SearchByProductCodeAsync(httpClient, firmNumber, periodNumber, first.Value);
+
+
+				await Task.WhenAll(
+					searchByProductCodeTask
+
+				);
+			
+			}
+		}
+		catch (System.Exception)
+		{
+			
+			throw;
+		}
+	}
 
 	private async Task ReadBarcodeAsync(BarcodeResult[] readBarcodes)
 	{
@@ -899,4 +945,172 @@ public partial class CameraReaderViewModel : BaseViewModel
 			IsBusy = false;
 		}
 	}
+
+	private async Task SearchByProductCodeAsync(HttpClient httpClient, int firmNumber, int periodNumber, string barcode)
+	{
+		try
+		{
+			
+
+			if(!isFind){
+				var result = await _barcodeSearchService.SearchByProductCode(httpClient, firmNumber, periodNumber, barcode);
+
+				if(result.IsSuccess) {
+					if(result.Data is not null) {
+						var item = Mapping.Mapper.Map<ProductModel>(result.Data);
+						if(item is not null)
+						{
+							isFind = true;
+							await SendProductBasketPageAsync(item);
+						}
+						
+					}
+
+
+				} 
+			}
+		}
+		catch (System.Exception)
+		{
+			
+			throw;
+		}
+	}
+
+	private async Task SendProductBasketPageAsync(ProductModel productModel)
+	{
+		try
+		{
+			switch (ComingPage)
+			{
+				case "InputProductProcessBasket":
+					var inputProductProcessBasketListViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketListViewModel>();
+					var basketItem = await ConvertInputProductProcessBasketAsync(productModel);
+					inputProductProcessBasketListViewModel.Items.Add(basketItem);
+					break;
+				case "OutputProductProcessBasket":
+					var outputProductProcessBasketListViewModel = _serviceProvider.GetRequiredService<OutputProductProcessBasketListViewModel>();
+					var outputProductBasketItem = await ConvertOutputProductProcessBasketAsync(productModel);
+					outputProductProcessBasketListViewModel.Items.Add(outputProductBasketItem);
+					break;
+				case "TransferOutBasket":
+					var transferOutBasketViewModel = _serviceProvider.GetRequiredService<TransferOutBasketViewModel>();
+					//await transferOutBasketViewModel.AddProductToBasketAsync(productModel);
+					break;
+				case "OutputProductSalesProcessBasket":
+					var outputProductSalesProcessBasketListViewModel = _serviceProvider.GetRequiredService<OutputProductSalesProcessBasketListViewModel>();
+					//await outputProductSalesProcessBasketListViewModel.AddProductToBasketAsync(productModel);
+					break;
+				case "InputProductPurchaseProcessBasket":
+					var inputProductPurchaseProcessBasketListViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseProcessBasketListViewModel>();
+					//await inputProductPurchaseProcessBasketListViewModel.AddProductToBasketAsync(productModel);
+					break;
+				case "ReturnPurchaseBasket":
+					var returnPurchaseBasketViewModel = _serviceProvider.GetRequiredService<ReturnPurchaseBasketViewModel>();
+					//await returnPurchaseBasketViewModel.AddProductToBasketAsync(productModel);
+					break;
+				case "ReturnSalesBasket":
+					var returnSalesBasketViewModel = _serviceProvider.GetRequiredService<ReturnSalesBasketViewModel>();
+					//await returnSalesBasketViewModel.AddProductToBasketAsync(productModel);
+					break;
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+	}
+
+	private async Task<InputProductBasketModel> ConvertInputProductProcessBasketAsync(ProductModel productModel) {
+		
+		try
+		{
+			return await Task.Run(() => {
+
+					var basketItem = new InputProductBasketModel
+					{
+						ItemReferenceId = productModel.ReferenceId,
+						ItemCode = productModel.Code,
+						ItemName = productModel.Name,
+						UnitsetReferenceId = productModel.UnitsetReferenceId,
+						UnitsetCode = productModel.UnitsetCode,
+						UnitsetName = productModel.UnitsetName,
+						SubUnitsetReferenceId = productModel.SubUnitsetReferenceId,
+						SubUnitsetCode = productModel.SubUnitsetCode,
+						SubUnitsetName = productModel.SubUnitsetName,
+						IsSelected = false,
+						MainItemCode = string.Empty,
+						MainItemName = string.Empty,
+						MainItemReferenceId = default,
+						StockQuantity = productModel.StockQuantity,
+						Quantity = productModel.LocTracking == 0 ? 1 : 0,
+						LocTracking = productModel.LocTracking,
+						TrackingType = productModel.TrackingType,
+						IsVariant = productModel.IsVariant,
+						VariantIcon = productModel.VariantIcon,
+						LocTrackingIcon = productModel.LocTrackingIcon,
+						TrackingTypeIcon = productModel.TrackingTypeIcon
+					};
+
+				return basketItem;
+			});
+			
+			
+
+		}
+		catch (System.Exception)
+		{
+			
+			throw;
+		}
+
+	} 
+
+	private async Task<OutputProductBasketModel> ConvertOutputProductProcessBasketAsync(ProductModel productModel) {
+		
+		try
+		{
+			return await Task.Run(() => {
+
+					var basketItem = new OutputProductBasketModel
+					{
+						ItemReferenceId = productModel.ReferenceId,
+						ItemCode = productModel.Code,
+						ItemName = productModel.Name,
+						UnitsetReferenceId = productModel.UnitsetReferenceId,
+						UnitsetCode = productModel.UnitsetCode,
+						UnitsetName = productModel.UnitsetName,
+						SubUnitsetReferenceId = productModel.SubUnitsetReferenceId,
+						SubUnitsetCode = productModel.SubUnitsetCode,
+						SubUnitsetName = productModel.SubUnitsetName,
+						IsSelected = false,
+						MainItemCode = string.Empty,
+						MainItemName = string.Empty,
+						MainItemReferenceId = default,
+						StockQuantity = productModel.StockQuantity,
+						Quantity = productModel.LocTracking == 0 ? 1 : 0,
+						LocTracking = productModel.LocTracking,
+						TrackingType = productModel.TrackingType,
+						IsVariant = productModel.IsVariant,
+						VariantIcon = productModel.VariantIcon,
+						LocTrackingIcon = productModel.LocTrackingIcon,
+						TrackingTypeIcon = productModel.TrackingTypeIcon
+					};
+
+				return basketItem;
+			});
+			
+			
+
+		}
+		catch (System.Exception)
+		{
+			
+			throw;
+		}
+
+	} 		
 }
