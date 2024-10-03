@@ -510,7 +510,7 @@ public class BarcodeSearchDataStore : IBarcodeSearchService
             return dataResult;
         }
     }
-    public async Task<DataResult<dynamic>> SearcBySupplierProductCode(HttpClient httpClient, int firmNumber, int periodNumber, string barcode)
+    public async Task<DataResult<dynamic>> SearchBySupplierProductCode(HttpClient httpClient, int firmNumber, int periodNumber, string barcode)
     {
         var content = new StringContent(JsonConvert.SerializeObject(SearcBySupplierProductCodeQuery(firmNumber, periodNumber, barcode)), Encoding.UTF8, "application/json");
 
@@ -559,7 +559,7 @@ public class BarcodeSearchDataStore : IBarcodeSearchService
             return dataResult;
         }
     }
-    public async Task<DataResult<dynamic>> SearcBySupplierVariantCode(HttpClient httpClient, int firmNumber, int periodNumber, string barcode)
+    public async Task<DataResult<dynamic>> SearchBySupplierVariantCode(HttpClient httpClient, int firmNumber, int periodNumber, string barcode)
     {
         var content = new StringContent(JsonConvert.SerializeObject(SearcBySupplierVariantCodeQuery(firmNumber, periodNumber, barcode)), Encoding.UTF8, "application/json");
 
