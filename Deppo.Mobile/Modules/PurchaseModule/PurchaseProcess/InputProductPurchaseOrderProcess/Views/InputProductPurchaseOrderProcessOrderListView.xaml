@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views.InputProductPurchaseOrderProcessProductListView"
+<ContentPage x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views.InputProductPurchaseOrderProcessOrderListView"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
-             xmlns:model="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels;assembly=Deppo.Mobile.Core"
              xmlns:purchaseModels="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels;assembly=Deppo.Mobile.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.ViewModels"
-             Title="{Binding Title}"
-             Shell.PresentationMode="ModalAnimated"
-             x:DataType="viewModel:InputProductPurchaseOrderProcessProductListViewModel"
-             Shell.TabBarIsVisible="False">
+             x:DataType="viewModel:InputProductPurchaseOrderProcessOrderListViewModel"
+             Shell.PresentationMode="ModalAnimated">
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
@@ -40,7 +37,7 @@
                     <Label Grid.Column="0"
                            FontAttributes="Bold"
                            FontSize="Large"
-                           Text="Ürün Listesi"
+                           Text="{Binding Title}"
                            TextColor="{StaticResource WhiteSmoke}"
                            VerticalOptions="Center" />
 
@@ -105,12 +102,12 @@
                 <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="purchaseModels:PurchaseSupplierProduct">
+                <DataTemplate x:DataType="purchaseModels:WaitingPurchaseOrderModel">
                     <Border Padding="10"
                             BackgroundColor="Transparent"
                             StrokeThickness="0.1">
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputProductPurchaseOrderProcessProductListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputProductPurchaseOrderProcessOrderListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>
                         <Border.Triggers>
                             <DataTrigger Binding="{Binding IsSelected}"
@@ -121,21 +118,28 @@
 
                         </Border.Triggers>
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-                            <Border BackgroundColor="{StaticResource Secondary}"
+                            <Border Padding="5"
+                                    BackgroundColor="{StaticResource Secondary}"
                                     StrokeShape="RoundRectangle 5"
                                     StrokeThickness="0.5">
-                                <Image Grid.Column="0"
-                                       HeightRequest="50"
-                                       Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
-                                       WidthRequest="50" />
+                                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Label FontAttributes="Bold"
+                                           FontSize="Subtitle"
+                                           HorizontalOptions="Center"
+                                           Text="{Binding OrderDate, StringFormat='{0:dd}'}" />
+                                    <Label FontSize="Caption"
+                                           HorizontalOptions="Center"
+                                           Text="{Binding OrderDate, StringFormat='{0:MM/yyyy}'}" />
+                                </VerticalStackLayout>
                             </Border>
 
                             <VerticalStackLayout Grid.Column="1" Spacing="2">
                                 <Label FontAttributes="Bold"
                                        LineBreakMode="TailTruncation"
-                                       Text="{Binding ItemCode}" />
+                                       Text="{Binding ProductCode}" />
                                 <Label LineBreakMode="TailTruncation"
-                                       Text="{Binding ItemName}"
+                                       MaxLines="1"
+                                       Text="{Binding ProductName}"
                                        TextColor="{StaticResource Gray600}" />
 
                                 <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
@@ -156,7 +160,9 @@
                                 </HorizontalStackLayout>
                             </VerticalStackLayout>
                         </Grid>
+
                     </Border>
+
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
@@ -166,5 +172,4 @@
                 Command="{Binding ConfirmCommand}"
                 Text="Tamam" />
     </Grid>
-
 </ContentPage>

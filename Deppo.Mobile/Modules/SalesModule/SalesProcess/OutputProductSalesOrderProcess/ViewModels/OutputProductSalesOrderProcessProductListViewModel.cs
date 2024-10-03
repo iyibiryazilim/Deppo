@@ -398,6 +398,7 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
 					return;
 
 				SelectedItems.Clear();
+				BasketItems.Clear();
 				await Shell.Current.GoToAsync("..");
 			}
 			else

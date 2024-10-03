@@ -276,6 +276,9 @@
 	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseOrderProcess\Views\InputProductPurchaseOrderProcessFormView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseOrderProcess\Views\InputProductPurchaseOrderProcessOrderListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseOrderProcess\Views\InputProductPurchaseOrderProcessOtherProductListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

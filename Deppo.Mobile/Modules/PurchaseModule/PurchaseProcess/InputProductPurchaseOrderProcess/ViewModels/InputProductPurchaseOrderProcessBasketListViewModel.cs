@@ -5,16 +5,19 @@ using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
+using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.CameraModule.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
 using static Deppo.Mobile.Core.Helpers.DeppoEnums;
@@ -23,8 +26,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(PurchaseSupplier), queryId: nameof(PurchaseSupplier))]
-[QueryProperty(name: nameof(InputProductProcessType), queryId: nameof(InputProductProcessType))]
-[QueryProperty(name: nameof(Items), queryId: nameof(Items))]
+
 public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -34,19 +36,16 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
     private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty]
-    private WarehouseModel warehouseModel = null!;
+    WarehouseModel warehouseModel = null!;
 
     [ObservableProperty]
-    private PurchaseSupplier purchaseSupplier;
+    PurchaseSupplier purchaseSupplier = null!;
 
     [ObservableProperty]
-    private InputPurchaseBasketModel? selectedInputPurchaseBasketModel;
+    InputPurchaseBasketModel? selectedInputPurchaseBasketModel;
 
     [ObservableProperty]
-    private ObservableCollection<InputPurchaseBasketModel> items;
-
-    [ObservableProperty]
-    private InputProductProcessType inputProductProcessType;
+    public ObservableCollection<InputPurchaseBasketModel> items = new();
 
     public InputProductPurchaseOrderProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider)
     {
@@ -73,10 +72,13 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
         SeriLotCloseCommand = new Command(async () => await SeriLotCloseAsync());
 
         NextViewCommand = new Command(async () => await NextViewAsync());
-
         BackCommand = new Command(async () => await BackAsync());
+		PlusTappedCommand = new Command(async () => await PlusTappedAsync());
+		ProductOptionTappedCommand = new Command(async () => await ProductOptionTappedAsync());
+		OrderOptionTappedCommand = new Command(async () => await OrderOptionTappedAsync());
+		CameraTappedCommand = new Command(async () => await CameraTappedAsync());
 
-        ShowOtherProductCommand = new Command(async () => await ShowOtherProductAsync());
+		ShowOtherProductCommand = new Command(async () => await ShowOtherProductAsync());
     }
 
     public Page CurrentPage { get; set; }
@@ -104,8 +106,12 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
 
     public Command NextViewCommand { get; }
     public Command BackCommand { get; }
+	public Command PlusTappedCommand { get; }
+	public Command ProductOptionTappedCommand { get; }
+	public Command OrderOptionTappedCommand { get; }
+	public Command CameraTappedCommand { get; }
 
-    public Command ShowOtherProductCommand { get; }
+	public Command ShowOtherProductCommand { get; }
 
     #endregion Commands
 
@@ -658,4 +664,116 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
             IsBusy = false;
         }
     }
+
+    private async Task CameraTappedAsync()
+    {
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			await Shell.Current.GoToAsync($"{nameof(CameraReaderView)}", new Dictionary<string, object>
+			{
+				["ComingPage"] = "InputProductPurchaseOrderBasket"
+			});
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task PlusTappedAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			CurrentPage.FindByName<BottomSheet>("basketOptionsBottomSheet").State = BottomSheetState.HalfExpanded;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task ProductOptionTappedAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			CurrentPage.FindByName<BottomSheet>("basketOptionsBottomSheet").State = BottomSheetState.Hidden;
+
+			await Task.Delay(300);
+			await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessProductListView)}", new Dictionary<string, object>
+			{
+				[nameof(WarehouseModel)] = WarehouseModel,
+				[nameof(PurchaseSupplier)] = PurchaseSupplier
+			});
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task OrderOptionTappedAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			CurrentPage.FindByName<BottomSheet>("basketOptionsBottomSheet").State = BottomSheetState.Hidden;
+			await Task.Delay(300);
+
+            Console.WriteLine("WarehouseModel: " + WarehouseModel);
+            Console.WriteLine("PurchaseSupplier: " + PurchaseSupplier);
+
+			await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessOrderListView)}", new Dictionary<string, object>
+			{
+				[nameof(WarehouseModel)] = WarehouseModel,
+				[nameof(PurchaseSupplier)] = PurchaseSupplier
+			});
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 }
