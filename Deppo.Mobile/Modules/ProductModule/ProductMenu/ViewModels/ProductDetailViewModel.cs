@@ -52,7 +52,6 @@ public partial class ProductDetailViewModel : BaseViewModel
         ShowProcessBottomSheetCommand = new Command(async () => await ShowProcessBottomSheetAsync());
         ActionModelProcessTappedCommand = new Command(async () => await ActionModelProcessTappedAsync());
 
-        ActionModelsTappedCommand = new Command<ProductActionModel>(async (model) => await ActionModelsTappedAsync(model));
         GetLastTransactionsCommand = new Command(async () => await GetLastTransactionsAsync());
         AllFicheTappedCommand = new Command(async () => await AllFicheTappedAsync());
         ItemTappedCommand = new Command<ProductFiche>(async (productFiche) => await ItemTappedAsync(productFiche));
