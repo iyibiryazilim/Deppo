@@ -33,7 +33,7 @@ public partial class ManuelCalcInWarehouseListViewModel : BaseViewModel
     QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
 
     [ObservableProperty]
-    private WarehouseModel selectedWarehouseModel = null!;
+    WarehouseModel selectedWarehouseModel = null!;
 
     public ObservableCollection<WarehouseModel> Items { get; } = new();
 
@@ -53,8 +53,6 @@ public partial class ManuelCalcInWarehouseListViewModel : BaseViewModel
         NextViewCommand = new Command(async () => await NextViewAsync());
         BackCommand = new Command(async () => await BackAsync());
     }
-
-    public Page CurrentPage { get; set; }
 
     public Command BackCommand { get; }
     public Command LoadItemsCommand { get; }
@@ -93,7 +91,8 @@ public partial class ManuelCalcInWarehouseListViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.HideHud();
+            if(_userDialogs.IsHudShowing) 
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {

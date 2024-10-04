@@ -12,6 +12,7 @@ using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views.ActionViews;
 using Deppo.Mobile.Modules.SalesModule.SalesPanel.Views;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
+using System.Net.Http;
 using static Android.Graphics.ColorSpace;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels;
@@ -46,11 +47,13 @@ public partial class SupplierDetailViewModel : BaseViewModel
 		ActionModelProcessTappedCommand = new Command(async () => await ActionModelProcessTappedAsync());
 		ActionModelsTappedCommand = new Command<SupplierDetailActionModel>(async (model) => await ActionModelsTappedAsync(model));
         AllFicheListTappedCommand = new Command(async () => await AllFicheTappedAsync());
+		FicheTappedCommand = new Command<PurchaseFiche>(async (purchaseFiche) => await FicheTappedAsync(purchaseFiche));
     }
 
 	public Page CurrentPage { get; set; } = null!;
 
 	public Command LoadItemsCommand { get; }
+	public Command FicheTappedCommand { get; }
 	public Command InputQuantityTappedCommand { get; }
 
 	public Command OutputQuantityTappedCommand { get; }
@@ -181,6 +184,71 @@ public partial class SupplierDetailViewModel : BaseViewModel
 			_userDialogs.Alert(message: ex.Message, title: "Hata");
 
 		}
+	}
+
+	private async Task FicheTappedAsync(PurchaseFiche purchaseFiche)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+			_userDialogs.ShowLoading("Yükleniyor...");
+			await LoadFicheTransactionsAsync(purchaseFiche);
+			await Task.Delay(500);
+			CurrentPage.FindByName<BottomSheet>("ficheTransactionBottomSheet").State = BottomSheetState.HalfExpanded;
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task LoadFicheTransactionsAsync(PurchaseFiche purchaseFiche)
+	{
+		try
+		{
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			var result = await _supplierTransactionService.GetObjects(
+					httpClient: httpClient,
+					firmNumber: _httpClientService.FirmNumber,
+					periodNumber: _httpClientService.PeriodNumber,
+					supplierReferenceId: SupplierDetailModel.Supplier.ReferenceId,
+					skip: 0,
+					take: 999999
+				);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+				{
+					SupplierDetailModel.Transactions.Add(Mapping.Mapper.Map<SupplierTransaction>(item));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(message: ex.Message, title: "Hata");
+		}
+		
 	}
 
 	private async Task InputQuantityTappedAsync()
