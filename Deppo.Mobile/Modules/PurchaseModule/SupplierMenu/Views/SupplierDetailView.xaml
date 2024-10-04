@@ -152,6 +152,9 @@
                             </FormattedString>
                         </Label.FormattedText>
                     </Label>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding AllFicheListTappedCommand}" />
+                    </Border.GestureRecognizers>
                 </Border>
             </Grid>
 

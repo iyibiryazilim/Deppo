@@ -9,8 +9,10 @@ using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views;
 using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views.ActionViews;
+using Deppo.Mobile.Modules.SalesModule.SalesPanel.Views;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
+using static Android.Graphics.ColorSpace;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels;
 
@@ -43,7 +45,8 @@ public partial class SupplierDetailViewModel : BaseViewModel
 		OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
 		ActionModelProcessTappedCommand = new Command(async () => await ActionModelProcessTappedAsync());
 		ActionModelsTappedCommand = new Command<SupplierDetailActionModel>(async (model) => await ActionModelsTappedAsync(model));
-	}
+        AllFicheListTappedCommand = new Command(async () => await AllFicheTappedAsync());
+    }
 
 	public Page CurrentPage { get; set; } = null!;
 
@@ -53,9 +56,10 @@ public partial class SupplierDetailViewModel : BaseViewModel
 	public Command OutputQuantityTappedCommand { get; }
 	public Command ActionModelProcessTappedCommand { get; }
 	public Command ActionModelsTappedCommand { get; }
+	public Command AllFicheListTappedCommand { get; }
 
 
-	private async Task LoadItemsAsync()
+    private async Task LoadItemsAsync()
 	{
 		try
 		{
@@ -317,4 +321,28 @@ public partial class SupplierDetailViewModel : BaseViewModel
 			IsBusy = false;
 		}
 	}
+
+    private async Task AllFicheTappedAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(SupplierDetailAllFicheListView)}", new Dictionary<string, object>
+            {
+                [nameof(SupplierDetailModel)] = SupplierDetailModel
+            });
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 }

@@ -227,6 +227,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IWaitingSalesOrderService, WaitingSalesOrderDataStore>();
         builder.Services.AddSingleton<ISupplierService, SupplierDataStoreV2>();
         builder.Services.AddSingleton<ISupplierDetailService, SupplierDetailDataStore>();
+        builder.Services.AddSingleton<ISupplierDetailAllFicheService, SupplierDetailAllFicheDataStore>();
         builder.Services.AddSingleton<ISupplierDetailActionService, SupplierDetailActionDataStore>();
         builder.Services.AddSingleton<IProductTransactionService, ProductTransactionDataStore>();
         builder.Services.AddSingleton<IWarehouseTransactionService, WarehouseTransactionDataStore>();
@@ -449,6 +450,7 @@ public static class MauiProgram
         builder.Services.AddSingletonWithShellRoute<SupplierDetailView, SupplierDetailViewModel>(nameof(SupplierDetailView));
         builder.Services.AddSingletonWithShellRoute<SupplierInputTransactionView, SupplierInputTransactionViewModel>(nameof(SupplierInputTransactionView));
         builder.Services.AddSingletonWithShellRoute<SupplierOutputTransactionView, SupplierOutputTransactionViewModel>(nameof(SupplierOutputTransactionView));
+        builder.Services.AddSingletonWithShellRoute<SupplierDetailAllFicheListView, SupplierDetailAllFicheListViewModel>(nameof(SupplierDetailAllFicheListView));
 
         builder.Services.AddTransientWithShellRoute<SupplierDetailShipAddressListView, SupplierDetailShipAddressListViewModel>(nameof(SupplierDetailShipAddressListView));
 		builder.Services.AddTransientWithShellRoute<SupplierDetailWaitingPurchaseOrderListView, SupplierDetailWaitingPurchaseOrderListViewModel>(nameof(SupplierDetailWaitingPurchaseOrderListView));

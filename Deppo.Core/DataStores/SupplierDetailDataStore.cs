@@ -81,9 +81,10 @@ public class SupplierDetailDataStore : ISupplierDetailService
 			From LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
 			left join LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
 			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
-			WHERE STFICHE.TRCODE IN (13,12,11,25,51,50) AND STFICHE.PRODSTAT = 0 AND CLCARD.LOGICALREF={supplierReferenceId}
+			WHERE STFICHE.PRODSTAT = 0 AND CLCARD.LOGICALREF={supplierReferenceId}
 			ORDER BY STFICHE.DATE_ DESC";
 
 		return baseQuery;
 	}
+
 }
