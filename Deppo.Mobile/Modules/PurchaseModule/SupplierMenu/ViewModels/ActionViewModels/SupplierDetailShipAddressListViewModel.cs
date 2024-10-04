@@ -20,7 +20,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels.ActionView
 public partial class SupplierDetailShipAddressListViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
-	private readonly IShipAddressService _shipAddressService;
+	private readonly ISupplierDetailActionService _supplierDetailActionService;
 	private readonly IUserDialogs _userDialogs;
 
 	[ObservableProperty]
@@ -28,10 +28,10 @@ public partial class SupplierDetailShipAddressListViewModel : BaseViewModel
 
 	public ObservableCollection<ShipAddress> Items { get; } = new();
 
-	public SupplierDetailShipAddressListViewModel(IHttpClientService httpClientService, IShipAddressService shipAddressService, IUserDialogs userDialogs)
+	public SupplierDetailShipAddressListViewModel(IHttpClientService httpClientService, ISupplierDetailActionService supplierDetailActionService, IUserDialogs userDialogs)
 	{
 		_httpClientService = httpClientService;
-		_shipAddressService = shipAddressService;
+		_supplierDetailActionService = supplierDetailActionService;
 		_userDialogs = userDialogs;
 
 		Title = "Sevk Adresleri";
@@ -59,11 +59,11 @@ public partial class SupplierDetailShipAddressListViewModel : BaseViewModel
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			var result = await _shipAddressService.GetObjects(
+			var result = await _supplierDetailActionService.GetShipAddressesBySupplier(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
-				currentReferenceId: SupplierDetailModel.Supplier.ReferenceId,
+				supplierReferenceId: SupplierDetailModel.Supplier.ReferenceId,
 				search: "",
 				skip: 0,
 				take: 20
@@ -109,11 +109,11 @@ public partial class SupplierDetailShipAddressListViewModel : BaseViewModel
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			var result = await _shipAddressService.GetObjects(
+			var result = await _supplierDetailActionService.GetShipAddressesBySupplier(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
-				currentReferenceId: SupplierDetailModel.Supplier.ReferenceId,
+				supplierReferenceId: SupplierDetailModel.Supplier.ReferenceId,
 				search: "",
 				skip: Items.Count,
 				take: 20

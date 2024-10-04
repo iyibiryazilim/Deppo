@@ -14,7 +14,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels.ActionView
 public partial class SupplierDetailWaitingPurchaseOrderListViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
-	private readonly IWaitingPurchaseOrderService _waitingPurchaseOrderService;
+	private readonly ISupplierDetailActionService _supplierDetailActionService;
 	private readonly IUserDialogs _userDialogs;
 
 	[ObservableProperty]
@@ -22,10 +22,10 @@ public partial class SupplierDetailWaitingPurchaseOrderListViewModel : BaseViewM
 
 	public ObservableCollection<WaitingPurchaseOrderModel> Items { get; } = new();
 
-	public SupplierDetailWaitingPurchaseOrderListViewModel(IHttpClientService httpClientService, IWaitingPurchaseOrderService waitingPurchaseOrderService, IUserDialogs userDialogs)
+	public SupplierDetailWaitingPurchaseOrderListViewModel(IHttpClientService httpClientService, ISupplierDetailActionService supplierDetailActionService, IUserDialogs userDialogs)
 	{
 		_httpClientService = httpClientService;
-		_waitingPurchaseOrderService = waitingPurchaseOrderService;
+		_supplierDetailActionService = supplierDetailActionService;
 		_userDialogs = userDialogs;
 
 		Title = "Bekleyen Satınalma Siparişleri";
@@ -51,7 +51,7 @@ public partial class SupplierDetailWaitingPurchaseOrderListViewModel : BaseViewM
 			Items.Clear();
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _waitingPurchaseOrderService.GetObjectsBySupplier(
+			var result = await _supplierDetailActionService.GetWaitingPurchaseOrdersBySupplier(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
@@ -100,7 +100,7 @@ public partial class SupplierDetailWaitingPurchaseOrderListViewModel : BaseViewM
 			_userDialogs.Loading("Loading More Items");
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _waitingPurchaseOrderService.GetObjectsBySupplier(
+			var result = await _supplierDetailActionService.GetWaitingPurchaseOrdersBySupplier(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
