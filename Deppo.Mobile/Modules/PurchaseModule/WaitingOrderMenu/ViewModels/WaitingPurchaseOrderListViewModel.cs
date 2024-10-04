@@ -68,7 +68,7 @@ public partial class WaitingPurchaseOrderListViewModel : BaseViewModel
             await Task.Delay(1000);
             Suppliers.Clear();
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _supplierService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 999999);
+            var result = await _waitingPurchaseOrderService.GetSuppliers(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 999999);
             if (result.IsSuccess)
             {
                 if (result.Data == null)

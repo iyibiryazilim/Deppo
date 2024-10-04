@@ -259,8 +259,57 @@ public class WaitingPurchaseOrderDataStore : IWaitingPurchaseOrderService
 			return dataResult;
 		}
 	}
+    public async Task<DataResult<IEnumerable<dynamic>>> GetSuppliers(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 0)
+    {
+        var content = new StringContent(JsonConvert.SerializeObject(GetSuppliersQuery(firmNumber, periodNumber, search, skip, take)), Encoding.UTF8, "application/json");
 
-	private string WaitingPurchaseOrderQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+        HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+        DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            var data = await responseMessage.Content.ReadAsStringAsync();
+            if (data != null)
+            {
+                if (!string.IsNullOrEmpty(data))
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "success";
+                    return dataResult;
+                }
+                else
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "empty";
+                    return dataResult;
+                }
+            }
+            else
+            {
+                var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                dataResult.Data = Enumerable.Empty<dynamic>();
+                dataResult.IsSuccess = false;
+                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+                return dataResult;
+            }
+        }
+        else
+        {
+            dataResult.Data = Enumerable.Empty<dynamic>();
+            dataResult.IsSuccess = false;
+            dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+            return dataResult;
+        }
+    }
+
+    private string WaitingPurchaseOrderQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
     {
         string baseQuery = $@"SELECT
 
@@ -517,5 +566,46 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
 		return baseQuery;
 	}
-	
+
+    private string GetSuppliersQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+    {
+        string baseQuery = @$"SELECT * FROM (SELECT
+[ReferenceId]=SUPPLIER.LOGICALREF,
+[Code]=SUPPLIER.CODE,
+[Title]=SUPPLIER.DEFINITION_,
+[IsPersonal] =
+        CASE
+            WHEN SUPPLIER.ISPERSCOMP= 0 THEN 0
+            ELSE 1
+        END,
+[Name]=SUPPLIER.DEFINITION_,
+[Email]=SUPPLIER.EMAILADDR,
+[Telephone]=SUPPLIER.TELNRS1+' '+ SUPPLIER.TELNRS2,
+[Address]=SUPPLIER.ADDR1,
+[City]=SUPPLIER.CITY,
+[Country]=SUPPLIER.COUNTRY,
+[PostalCode]=SUPPLIER.POSTCODE,
+[TaxOffice]=SUPPLIER.TAXOFFICE,
+[TaxNumber]=SUPPLIER.TAXNR,
+[OrderReferenceCount] = ISNULL((SELECT COUNT(DISTINCT STOCKREF) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE WHERE CLIENTREF = SUPPLIER.LOGICALREF AND (AMOUNT-SHIPPEDAMOUNT) > 0 AND CLOSED = 0  AND LINETYPE = 0 AND TRCODE = 2 ),0),
+[IsActive]=
+       CASE
+	      WHEN SUPPLIER.ACTIVE=0 THEN 0
+		  ELSE 1
+END
+FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS SUPPLIER
+WHERE SUPPLIER.CODE LIKE '32%' AND SUPPLIER.CODE <> 'ÿ' AND SUPPLIER.ACTIVE = 0) DD
+WHERE DD.OrderReferenceCount > 0
+		";
+
+        if (!string.IsNullOrEmpty(search))
+        {
+            baseQuery += $@" AND (DD.Code LIKE '%{search}%' OR DD.Name LIKE '%{search}%')";
+        }
+
+        baseQuery += $@" ORDER BY DD.OrderReferenceCount DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+
+        return baseQuery;
+    }
+
 }
