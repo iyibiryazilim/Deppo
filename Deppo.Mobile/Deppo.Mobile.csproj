@@ -363,6 +363,9 @@
 	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\ReturnProductPurchaseProcess\Views\ReturnPurchaseWarehouseListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\SupplierMenu\Views\ActionViews\SupplierDetailApprovedProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\PurchaseModule\SupplierMenu\Views\ActionViews\SupplierDetailShipAddressListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

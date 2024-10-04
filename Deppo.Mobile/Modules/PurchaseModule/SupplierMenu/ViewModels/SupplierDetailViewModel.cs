@@ -271,6 +271,15 @@ public partial class SupplierDetailViewModel : BaseViewModel
 			SupplierActionModels.Add(new SupplierDetailActionModel
 			{
 				LineNumber = 1,
+				ActionName = "Tedarik Edilebilen Ürünler",
+				ActionUrl = $"{nameof(SupplierDetailApprovedProductListView)}",
+				Icon = "",
+				IsSelected = false
+			});
+
+			SupplierActionModels.Add(new SupplierDetailActionModel
+			{
+				LineNumber = 2,
 				ActionName = "Bekleyen Satınalma Siparişleri",
 				ActionUrl = $"{nameof(SupplierDetailWaitingPurchaseOrderListView)}",
 				Icon = "",
@@ -279,7 +288,7 @@ public partial class SupplierDetailViewModel : BaseViewModel
 
 			SupplierActionModels.Add(new SupplierDetailActionModel
 			{
-				LineNumber = 2,
+				LineNumber = 3,
 				ActionName = "Sevk Adresleri",
 				ActionUrl = $"{nameof(SupplierDetailShipAddressListView)}",
 				Icon = "",
