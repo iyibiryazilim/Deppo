@@ -3,9 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Deppo.Mobile.Modules.ProductModule.ProductMenu.Views.ActionViews.ProductDetailVariantListView"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewModels"
+             xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:model="clr-namespace:Deppo.Mobile.Core.Models.VariantModels;assembly=Deppo.Mobile.Core"
+             xmlns:actionModel="clr-namespace:Deppo.Mobile.Core.ActionModels.ProductActionModels;assembly=Deppo.Mobile.Core"
              Title="{Binding Title}"
              x:DataType="viewModel:ProductDetailVariantListViewModel"
              Shell.TabBarIsVisible="False"
@@ -32,7 +34,7 @@
     </ContentPage.BackgroundImageSource>
 
 
-    <Grid RowDefinitions="Auto, *"
+    <Grid RowDefinitions="Auto, *,Auto"
           RowSpacing="10">
         <Grid Grid.Row="0"
               Padding="10,10,0,0"
@@ -63,10 +65,10 @@
                     <Border Padding="10"
                             BackgroundColor="Transparent"
                             StrokeThickness="0.1">
-                        <!--<Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProductListViewModel}}, Path=ItemTappedCommand}"
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProductDetailVariantListViewModel}}, Path=ItemTappedCommand}"
                                                   CommandParameter="{Binding .}" />
-                        </Border.GestureRecognizers>-->
+                        </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="Auto,*"
                               ColumnSpacing="10">
                             <Border BackgroundColor="{StaticResource Secondary}"
@@ -113,5 +115,73 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+        <VerticalStackLayout Grid.Row="2">
+            <dx:BottomSheet x:Name="variantActionsBottomSheet"
+                            AllowDismiss="True"
+                            BackgroundColor="White"
+                            CornerRadius="15"
+                            HalfExpandedRatio="0.4"
+                            IsModal="True"
+                            ShowGrabber="True">
+                <Grid RowDefinitions="Auto,*"
+                      RowSpacing="20"
+                      Padding="10">
+                    <VerticalStackLayout Grid.Row="0"
+                                         Spacing="5">
+                        <Label FontAttributes="Bold"
+                               Padding="10"
+                               FontSize="18"
+                               Text="İşlemler" />
+                        <BoxView HeightRequest="2"
+                                 Color="{StaticResource Primary}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Row="1"
+                                         Spacing="10">
+                        <CollectionView Grid.Row="0"
+                                        ItemsSource="{Binding VariantActionModels}">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout ItemSpacing="0"
+                                                   Orientation="Vertical" />
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="actionModel:VariantListActionModel">
+
+                                    <Border Padding="10"
+                                            BackgroundColor="Transparent"
+                                            StrokeShape="RoundRectangle 10"
+                                            StrokeThickness="0.1">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProductDetailVariantListViewModel}}, Path=ActionModelsTappedCommand}"
+                                                                  CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                        <Grid ColumnDefinitions="Auto, *">
+
+                                            <VerticalStackLayout Grid.Column="1"
+                                                                 Padding="5"
+                                                                 Spacing="5"
+                                                                 VerticalOptions="Start">
+                                                <Label FontAttributes="Bold"
+                                                       LineBreakMode="TailTruncation"
+                                                       MaxLines="1"
+                                                       VerticalOptions="End"
+                                                       Text="{Binding ActionName}" />
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                        <Border.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected}"
+                                                         TargetType="Border"
+                                                         Value="True">
+                                                <Setter Property="BackgroundColor"
+                                                        Value="{StaticResource SecondaryLight}" />
+                                            </DataTrigger>
+                                        </Border.Triggers>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Grid>
+            </dx:BottomSheet>
+        </VerticalStackLayout>
     </Grid>
 </ContentPage>

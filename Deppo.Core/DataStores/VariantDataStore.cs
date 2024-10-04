@@ -243,16 +243,16 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 [BrandReferenceId] = ISNULL(BRAND.LOGICALREF,0),
 [BrandCode] = ISNULL(BRAND.CODE,''),
 [BrandName] = ISNULL(BRAND.DESCR,''),
-[StockQuantity] = 0
+[StockQuantity] = ISNULL((SELECT SUM(ONHAND) FROM LV_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_VRNTINVTOT AS VRNTINVTOT WITH(NOLOCK) WHERE VRNTINVTOT.VARIANTREF = VARIANT.LOGICALREF AND VRNTINVTOT.INVENNO = -1),0)
  from LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT as VARIANT
  LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON ITEMS.LOGICALREF = VARIANT.ITEMREF
  LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF  AS UNITSETF ON UNITSETF.LOGICALREF = VARIANT.UNITSETREF
- LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL ON UNITSETL.UNITSETREF = UNITSETF.LOGICALREF
+ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL ON UNITSETL.UNITSETREF = UNITSETF.LOGICALREF AND MAINUNIT = 1
  LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_MARK AS BRAND WITH(NOLOCK) ON ITEMS.MARKREF = BRAND.LOGICALREF
  where ITEMS.LOGICALREF = {productReferenceId} AND VARIANT.ACTIVE = 0";
         if (!string.IsNullOrEmpty(search))
-            baseQuery += $@" AND (Variant.CODE LIKE '{search}%' OR Variant.NAME LIKE '%{search}%')";
-        baseQuery += $@" ORDER BY Variant.CODE DESC
+            baseQuery += $@" AND (VARIANT.CODE LIKE '{search}%' OR VARIANT.NAME LIKE '%{search}%')";
+        baseQuery += $@" ORDER BY VARIANT.CODE DESC
 OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
         return baseQuery;
     }

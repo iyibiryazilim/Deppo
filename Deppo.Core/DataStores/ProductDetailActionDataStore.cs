@@ -158,9 +158,109 @@ namespace Deppo.Core.DataStores
             }
         }
 
+        public async Task<DataResult<IEnumerable<dynamic>>> GetVariantTotals(HttpClient httpClient, int firmNumber, int periodNumber, int variantReferenceId, string search = "", int skip = 0, int take = 20)
+        {
+            var content = new StringContent(JsonConvert.SerializeObject(GetVariantTotalsQuery(firmNumber, periodNumber, variantReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+            DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+            if (responseMessage.IsSuccessStatusCode)
+            {
+                var data = await responseMessage.Content.ReadAsStringAsync();
+                if (data != null)
+                {
+                    if (!string.IsNullOrEmpty(data))
+                    {
+                        var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+
+                        dataResult.Data = result?.Data;
+                        dataResult.IsSuccess = true;
+                        dataResult.Message = "success";
+                        return dataResult;
+                    }
+                    else
+                    {
+                        var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                        dataResult.Data = result?.Data;
+                        dataResult.IsSuccess = true;
+                        dataResult.Message = "empty";
+                        return dataResult;
+                    }
+                }
+                else
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                    dataResult.Data = Enumerable.Empty<dynamic>();
+                    dataResult.IsSuccess = false;
+                    dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+                    return dataResult;
+                }
+            }
+            else
+            {
+                dataResult.Data = Enumerable.Empty<dynamic>();
+                dataResult.IsSuccess = false;
+                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+                return dataResult;
+            }
+        }
+
         public async Task<DataResult<IEnumerable<dynamic>>> GetLocationTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int skip = 0, int take = 20, string search = "")
         {
             var content = new StringContent(JsonConvert.SerializeObject(LocationTransactionQuery(firmNumber, periodNumber, productReferenceId, skip, take, search)), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+            DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+            if (responseMessage.IsSuccessStatusCode)
+            {
+                var data = await responseMessage.Content.ReadAsStringAsync();
+                if (data != null)
+                {
+                    if (!string.IsNullOrEmpty(data))
+                    {
+                        var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+
+                        dataResult.Data = result?.Data;
+                        dataResult.IsSuccess = true;
+                        dataResult.Message = "success";
+                        return dataResult;
+                    }
+                    else
+                    {
+                        var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                        dataResult.Data = result?.Data;
+                        dataResult.IsSuccess = true;
+                        dataResult.Message = "empty";
+                        return dataResult;
+                    }
+                }
+                else
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                    dataResult.Data = Enumerable.Empty<dynamic>();
+                    dataResult.IsSuccess = false;
+                    dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+                    return dataResult;
+                }
+            }
+            else
+            {
+                dataResult.Data = Enumerable.Empty<dynamic>();
+                dataResult.IsSuccess = false;
+                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+                return dataResult;
+            }
+        }
+
+        public async Task<DataResult<IEnumerable<dynamic>>> GetApprovedSuppliers(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
+        {
+            var content = new StringContent(JsonConvert.SerializeObject(GetApprovedSuppliersQuery(firmNumber, periodNumber, productReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -388,6 +488,73 @@ FETCH NEXT {take} ROWS ONLY;";
             }
 
             baseQuery += $@" ORDER BY INVLOC.CODE OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+
+            return baseQuery;
+        }
+
+        private string GetVariantTotalsQuery(int firmNumber, int periodNumber, int variantReferenceId, string search = "", int skip = 0, int take = 20)
+        {
+            string baseQuery = @$"SELECT
+			[ReferenceId] = LGMAIN.LOGICALREF,
+			[Number] = LGMAIN.NR,
+			[Name] = LGMAIN.NAME,
+			[DivisionReferenceId] = 0,
+			[DivisionNumber] = LGMAIN.DIVISNR,
+			[City] = LGMAIN.CITY,
+			[Country] = LGMAIN.COUNTRY,
+			[Quantity] = ISNULL((SELECT SUM(ONHAND) FROM LV_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_VRNTINVTOT AS VRNTINVTOT WITH(NOLOCK) WHERE VRNTINVTOT.VARIANTREF = {variantReferenceId} AND VRNTINVTOT.INVENNO = LGMAIN.NR),0)
+			FROM L_CAPIWHOUSE AS LGMAIN WITH (NOLOCK) 
+
+            WHERE LGMAIN.FIRMNR = {firmNumber}";
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                baseQuery += $" AND (LGMAIN.NAME LIKE '%{search}%' OR LGMAIN.NR LIKE '%{search}%')";
+            }
+
+            baseQuery += @$"
+ORDER BY 
+    LGMAIN.NR
+OFFSET {skip} ROWS 
+FETCH NEXT {take} ROWS ONLY;";
+
+            return baseQuery;
+        }
+
+        private string GetApprovedSuppliersQuery(int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
+        {
+            string baseQuery = @$"SELECT 
+SUPPASGN.CLCARDTYPE,
+    SUPPASGN.ITEMREF,
+    CLCARD.LOGICALREF AS [ReferenceId],
+    CLCARD.CODE AS [Code],
+    CLCARD.DEFINITION_ AS [Title],
+    CASE
+        WHEN CLCARD.ISPERSCOMP = 0 THEN 0
+        ELSE 1
+    END AS [IsPersonal],
+    CLCARD.DEFINITION_ AS [Name],
+    CLCARD.EMAILADDR AS [Email],
+    CLCARD.TELNRS1 + ' ' + CLCARD.TELNRS2 AS [Telephone],
+    CLCARD.ADDR1 AS [Address],
+    CLCARD.CITY AS [City],
+    CLCARD.COUNTRY AS [Country],
+    CLCARD.POSTCODE AS [PostalCode],
+    CLCARD.TAXOFFICE AS [TaxOffice],
+    CLCARD.TAXNR AS [TaxNumber] FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_SUPPASGN AS SUPPASGN
+LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON SUPPASGN.CLIENTREF = CLCARD.LOGICALREF
+WHERE SUPPASGN.ITEMREF = {productReferenceId}";
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                baseQuery += $" AND (CLCARD.CODE LIKE '%{search}%' OR CLCARD.DEFINITION_ LIKE '%{search}%')";
+            }
+
+            baseQuery += @$"
+ORDER BY 
+    CLCARD.CODE
+OFFSET {skip} ROWS 
+FETCH NEXT {take} ROWS ONLY;";
 
             return baseQuery;
         }

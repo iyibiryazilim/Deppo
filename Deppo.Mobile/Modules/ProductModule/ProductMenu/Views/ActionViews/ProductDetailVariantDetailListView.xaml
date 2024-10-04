@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Deppo.Mobile.Modules.ProductModule.ProductMenu.Views.ActionViews.ProductDetailVariantTotalListView"
+             x:Class="Deppo.Mobile.Modules.ProductModule.ProductMenu.Views.ActionViews.ProductDetailVariantDetailListView"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewModels"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
-             xmlns:model="clr-namespace:Deppo.Mobile.Core.Models.WarehouseModels;assembly=Deppo.Mobile.Core"
+             xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              Title="{Binding Title}"
-             x:DataType="viewModel:ProductDetailVariantTotalListViewModel"
+             x:DataType="viewModel:ProductDetailVariantDetailListViewModel"
              Shell.TabBarIsVisible="False"
              Shell.PresentationMode="ModalAnimated">
     <ContentPage.Behaviors>
@@ -60,52 +60,37 @@
                         RemainingItemsThreshold="2"
                         RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="model:WarehouseModel">
+                <DataTemplate x:DataType="model:ProductVariant">
                     <Border Padding="10"
-                            BackgroundColor="Transparent"
+                            BackgroundColor="{StaticResource WhiteSmoke}"
                             StrokeShape="RoundRectangle 10"
                             StrokeThickness="0.1">
 
-                        <Grid ColumnDefinitions="Auto, *">
-                            <Border Grid.Column="0"
-                                    Padding="0,0,10,0"
-                                    BackgroundColor="Transparent"
-                                    StrokeThickness="0">
-                                <toolkit:AvatarView BackgroundColor="{StaticResource Primary}"
-                                                    BorderWidth="0.1"
-                                                    CornerRadius="50"
-                                                    FontAttributes="Bold"
-                                                    HorizontalOptions="Start"
-                                                    Text="{Binding Number}"
-                                                    TextColor="{StaticResource White}" />
-                            </Border>
+                        <Grid ColumnDefinitions="*,Auto, *">
 
-                            <VerticalStackLayout Grid.Column="1"
+                            <VerticalStackLayout Grid.Column="0"
                                                  Padding="5"
                                                  Spacing="5"
                                                  VerticalOptions="Start">
+
+
                                 <Label FontAttributes="Bold"
                                        LineBreakMode="TailTruncation"
                                        MaxLines="1"
-                                       Text="{Binding Name}"
+                                       Text="{Binding VariantPropertyName}"
                                        VerticalOptions="Center" />
-                                <HorizontalStackLayout Spacing="5"
-                                                       VerticalOptions="Center">
-                                    <Image Aspect="AspectFit"
-                                           HeightRequest="16"
-                                           VerticalOptions="Center"
-                                           WidthRequest="16">
-                                        <Image.Source>
-                                            <FontImageSource FontFamily="FAS"
-                                                             Glyph="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                                                             Size="16"
-                                                             Color="{StaticResource Primary}" />
-                                        </Image.Source>
-                                    </Image>
-                                    <Label Text="{Binding Quantity, StringFormat='{0:N2}'}"
-                                           TextColor="{StaticResource Gray600}"
-                                           VerticalOptions="Center" />
-                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                            
+                            <VerticalStackLayout Grid.Column="2"
+                                                 Padding="5"
+                                                 Spacing="5"
+                                                 VerticalOptions="Start">
+
+                                <Label FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="1"
+                                       Text="{Binding VariantPropertyValueName}"
+                                       VerticalOptions="Center" />
                             </VerticalStackLayout>
                         </Grid>
                         <Border.Triggers>
