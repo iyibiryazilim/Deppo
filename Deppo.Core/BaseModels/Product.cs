@@ -29,6 +29,7 @@ public class Product : INotifyPropertyChanged, IDisposable
     private string _brandCode = string.Empty;
     private string _brandName = string.Empty;
     private string _groupCode = string.Empty;
+    private bool isPurchased;
 
     public Product()
     {
@@ -258,7 +259,18 @@ public class Product : INotifyPropertyChanged, IDisposable
             NotifyPropertyChanged();
         }
     }
-   
+
+    public bool IsPurchased
+    {
+        get => isPurchased;
+        set
+        {
+            if (isPurchased == value) return;
+            isPurchased = value;
+            NotifyPropertyChanged();
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")

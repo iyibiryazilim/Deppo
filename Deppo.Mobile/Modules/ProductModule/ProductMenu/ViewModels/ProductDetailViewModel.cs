@@ -302,18 +302,9 @@ public partial class ProductDetailViewModel : BaseViewModel
             {
                 ProductActionModels.Add(new ProductDetailActionModel
                 {
-                    ActionName = "Varyant Toplamları",
-                    ActionUrl = $"{nameof(ProductDetailVariantTotalListView)}",
-                    LineNumber = 2,
-                    Icon = "",
-                    IsSelected = false
-                });
-
-                ProductActionModels.Add(new ProductDetailActionModel
-                {
                     ActionName = "Varyantlar",
                     ActionUrl = $"{nameof(ProductDetailVariantListView)}",
-                    LineNumber = 3,
+                    LineNumber = 2,
                     Icon = "",
                     IsSelected = false
                 });
@@ -324,7 +315,7 @@ public partial class ProductDetailViewModel : BaseViewModel
                 {
                     ActionName = "Stok Yeri Dağılımı",
                     ActionUrl = $"{nameof(ProductDetailLocationTransactionListView)}",
-                    LineNumber = 4,
+                    LineNumber = 3,
                     Icon = "",
                     IsSelected = false
                 });
@@ -334,7 +325,7 @@ public partial class ProductDetailViewModel : BaseViewModel
             {
                 ActionName = "Bekleyen Satış Siparişleri",
                 ActionUrl = $"{nameof(ProductDetailWaitingSalesOrderListView)}",
-                LineNumber = 5,
+                LineNumber = 4,
                 Icon = "",
                 IsSelected = false
             });
@@ -343,10 +334,22 @@ public partial class ProductDetailViewModel : BaseViewModel
             {
                 ActionName = "Bekleyen Satınalma Siparişleri",
                 ActionUrl = $"{nameof(ProductDetailWaitingPurchaseOrderListView)}",
-                LineNumber = 6,
+                LineNumber = 5,
                 Icon = "",
                 IsSelected = false
             });
+
+            if (ProductDetailModel.Product.IsPurchased)
+            {
+                ProductActionModels.Add(new ProductDetailActionModel
+                {
+                    ActionName = "Onaylı Tedarikçiler",
+                    ActionUrl = $"{nameof(ProductDetailApprovedSupplierView)}",
+                    LineNumber = 6,
+                    Icon = "",
+                    IsSelected = false
+                });
+            }
             _userDialogs.HideHud();
         }
         catch (Exception ex)

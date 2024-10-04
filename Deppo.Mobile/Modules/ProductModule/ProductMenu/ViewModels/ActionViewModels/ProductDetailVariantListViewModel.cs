@@ -1,12 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.ActionModels.ProductActionModels;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.VariantModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views.ActionViews;
+using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
@@ -30,6 +33,8 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewMo
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
             LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
             BackCommand = new Command(async () => await BackAsync());
+            ItemTappedCommand = new Command<VariantModel>(async (item) => await ItemTappedAsync(item));
+            ActionModelsTappedCommand = new Command<VariantListActionModel>(async (model) => await ActionModelsTappedAsync(model));
 
         }
 
@@ -37,12 +42,23 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewMo
         [ObservableProperty]
         public ProductDetailModel productDetailModel;
 
+        [ObservableProperty]
+        public VariantModel selectedVariant;
+
 
         public ObservableCollection<VariantModel> Items { get; } = new();
+
+        public ObservableCollection<VariantListActionModel> VariantActionModels { get; } = new();
 
         public Command LoadItemsCommand { get; }
         public Command LoadMoreItemsCommand { get; }
         public Command BackCommand { get; }
+
+        public Command ItemTappedCommand { get; }
+
+        public Command ActionModelsTappedCommand { get; }
+
+        public Page CurrentPage { get; set; }
 
         public async Task LoadItemsAsync()
         {
@@ -168,5 +184,104 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewMo
                 IsBusy = false;
             }
         }
+
+        private async Task ItemTappedAsync(VariantModel item)
+        {
+            if (IsBusy)
+                return;
+
+            try
+            {
+                SelectedVariant = item;
+                IsBusy = true;
+                _userDialogs.ShowLoading("Yükleniyor...");
+                await Task.Delay(500);
+
+                await LoadActionModelsAsync();
+
+                CurrentPage.FindByName<BottomSheet>("variantActionsBottomSheet").State = BottomSheetState.HalfExpanded;
+
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+            }
+            catch (System.Exception)
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                _userDialogs.Alert("Bir hata oluştu. Lütfen tekrar deneyiniz.", "Hata", "Tamam");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task LoadActionModelsAsync()
+        {
+            try
+            {
+                IsBusy = true;
+                VariantActionModels.Clear();
+                var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+                VariantActionModels.Add(new VariantListActionModel
+                {
+                    ActionName = "Varyant Toplamları",
+                    ActionUrl = $"{nameof(ProductDetailVariantTotalListView)}",
+                    LineNumber = 1,
+                    Icon = "",
+                    IsSelected = false
+                });
+
+                VariantActionModels.Add(new VariantListActionModel
+                {
+                    ActionName = "Varyant Detayları",
+                    ActionUrl = $"{nameof(ProductDetailVariantDetailListView)}",
+                    LineNumber = 2,
+                    Icon = "",
+                    IsSelected = false
+                });
+                _userDialogs.HideHud();
+            }
+            catch (Exception ex)
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.Loading().Hide();
+
+                await _userDialogs.AlertAsync(message: ex.Message, title: "Hata");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task ActionModelsTappedAsync(VariantListActionModel model)
+        {
+            try
+            {
+                IsBusy = true;
+                CurrentPage.FindByName<BottomSheet>("variantActionsBottomSheet").State = BottomSheetState.Hidden;
+                await Task.Delay(300);
+                await Shell.Current.GoToAsync($"{model.ActionUrl}", new Dictionary<string, object>
+                {
+                    [nameof(VariantModel)] = SelectedVariant
+                });
+
+            }
+            catch (Exception ex)
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.Loading().Hide();
+
+                _userDialogs.Alert(message: ex.Message, title: "Hata");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
     }
 }

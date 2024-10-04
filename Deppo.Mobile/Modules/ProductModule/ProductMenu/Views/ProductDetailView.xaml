@@ -239,7 +239,7 @@
                             AllowDismiss="True"
                             BackgroundColor="White"
                             CornerRadius="15"
-                            HalfExpandedRatio="0.3"
+                            HalfExpandedRatio="0.4"
                             IsModal="True"
                             ShowGrabber="True">
                 <Grid RowDefinitions="Auto,*"

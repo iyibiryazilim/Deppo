@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.VariantModels;
@@ -13,19 +14,19 @@ using System.Diagnostics;
 namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewModels
 {
     [QueryProperty(nameof(VariantModel), nameof(VariantModel))]
-    public partial class ProductDetailVariantTotalListViewModel : BaseViewModel
+    public partial class ProductDetailVariantDetailListViewModel : BaseViewModel
     {
         private readonly IUserDialogs _userDialogs;
         private readonly IHttpClientService _httpClientService;
-        private readonly IProductDetailActionService _productDetailActionService;
+        private readonly IVariantService _variantService;
 
-        public ProductDetailVariantTotalListViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, IProductDetailActionService productDetailActionService)
+        public ProductDetailVariantDetailListViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, IVariantService variantService)
         {
             _userDialogs = userDialogs;
             _httpClientService = httpClientService;
-            _productDetailActionService = productDetailActionService;
+            _variantService = variantService;
 
-            Title = "Varyant Toplamları";
+            Title = "Varyant Detayları";
 
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
             LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
@@ -38,7 +39,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewMo
         public VariantModel variantModel;
 
 
-        public ObservableCollection<WarehouseModel> Items { get; } = new();
+        public ObservableCollection<ProductVariant> Items { get; } = new();
 
         public Command LoadItemsCommand { get; }
         public Command LoadMoreItemsCommand { get; }
@@ -61,7 +62,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewMo
 
 
 
-                var result = await _productDetailActionService.GetVariantTotals(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, VariantModel.ReferenceId, string.Empty, 0, 20);
+                var result = await _variantService.GetProductVariants(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, VariantModel.ReferenceId, string.Empty, 0, 20);
                 if (result.IsSuccess)
                 {
                     if (result.Data == null)
@@ -70,7 +71,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewMo
                     foreach (var item in result.Data)
                     {
 
-                        Items.Add(Mapping.Mapper.Map<WarehouseModel>(item));
+                        Items.Add(Mapping.Mapper.Map<ProductVariant>(item));
 
                     }
                     _userDialogs.Loading().Hide();
@@ -108,7 +109,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewMo
                 IsBusy = true;
                 _userDialogs.Loading("Loading Items...");
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _productDetailActionService.GetVariantTotals(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, VariantModel.ReferenceId, string.Empty, Items.Count, 20);
+                var result = await _variantService.GetProductVariants(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, VariantModel.ReferenceId, string.Empty, Items.Count, 20);
                 if (result.IsSuccess)
                 {
                     if (result.Data == null)
@@ -117,7 +118,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewMo
                     foreach (var item in result.Data)
                     {
 
-                        Items.Add(Mapping.Mapper.Map<WarehouseModel>(item));
+                        Items.Add(Mapping.Mapper.Map<ProductVariant>(item));
 
                     }
                     _userDialogs.Loading().Hide();

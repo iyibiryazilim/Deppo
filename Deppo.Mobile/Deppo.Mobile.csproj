@@ -92,6 +92,9 @@
 	  <Compile Update="Modules\CameraModule\Views\CameraReaderView.xaml.cs">
 	    <DependentUpon>CameraReaderView.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailApprovedSupplierView.xaml.cs">
+	    <DependentUpon>ProductDetailApprovedSupplierView.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Modules\ProductModule\ProductPanel\Views\InputProductListView.xaml.cs">
 	    <DependentUpon>InputProductListView.xaml</DependentUpon>
 	  </Compile>
@@ -179,7 +182,13 @@
 	  <MauiXaml Update="Modules\OutsourceModule\OutsourcePanel\Views\OutsourcePanelAllFicheListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailApprovedSupplierView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailLocationTransactionListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailVariantDetailListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailVariantListView.xaml">
