@@ -2,6 +2,7 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.CountingModels;
+using Deppo.Mobile.Core.Models.CountingModels.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
@@ -40,13 +41,19 @@ public partial class WarehouseCountingLocationListViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<LocationModel>(ItemTappedAsync);
         NextViewCommand = new Command(async () => await NextViewAsync());
+        PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+        PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
     }
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
+    public Command PerformSearchCommand { get; }
+    public Command PerformEmptySearchCommand { get; }
 
+    [ObservableProperty]
+    public SearchBar searchText;
     private async Task LoadItemsAsync()
     {
         if (IsBusy)
@@ -60,7 +67,7 @@ public partial class WarehouseCountingLocationListViewModel : BaseViewModel
             Items.Clear();
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseCountingWarehouseModel.Number, string.Empty, 0, 20);
+            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseCountingWarehouseModel.Number, SearchText.Text, 0, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -96,7 +103,7 @@ public partial class WarehouseCountingLocationListViewModel : BaseViewModel
 
             _userDialogs.ShowLoading("Loading...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseCountingWarehouseModel.Number, string.Empty, Items.Count, 20);
+            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseCountingWarehouseModel.Number, SearchText.Text, Items.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -183,6 +190,56 @@ public partial class WarehouseCountingLocationListViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
+        }
+    }
+    private async Task PerformSearchAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
+            {
+                await LoadItemsAsync();
+                SearchText.Unfocus();
+                return;
+            }
+            IsBusy = true;
+            Items.Clear();
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseCountingWarehouseModel.Number, SearchText.Text, 0, 20);
+            if (result.IsSuccess)
+            {
+                if (result.Data is not null)
+                {
+                    foreach (var item in result.Data)
+                        Items.Add(Mapping.Mapper.Map<LocationModel>(item));
+                }
+            }
+            else
+            {
+                _userDialogs.Alert(result.Message, "Hata");
+                return;
+            }
+
+        }
+        catch (System.Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task PerformEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText.Text))
+        {
+            await PerformSearchAsync();
         }
     }
 }

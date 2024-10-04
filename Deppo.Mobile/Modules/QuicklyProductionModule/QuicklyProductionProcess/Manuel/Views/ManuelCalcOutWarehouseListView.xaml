@@ -33,6 +33,7 @@
     <Grid RowDefinitions="*,Auto"
           RowSpacing="10">
         <CollectionView ItemsSource="{Binding Items}"
+                        Grid.Row="0"
                         RemainingItemsThreshold="2"
                         RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
             <CollectionView.ItemTemplate>

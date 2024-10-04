@@ -78,7 +78,7 @@ public partial class WaitingSalesOrderListViewModel : BaseViewModel
             _userDialogs.Loading("Loading Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             await Task.Delay(1000);
-            var result = await _customerService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, "", 0, 999999);
+            var result = await _waitingSalesOrderService.GetCustomers(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, "", 0, 999999);
 
             if (result.IsSuccess)
             {

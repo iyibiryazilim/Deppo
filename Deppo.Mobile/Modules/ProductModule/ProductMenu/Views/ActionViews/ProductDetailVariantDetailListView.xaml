@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.ProductModule.ProductMenu.Views.ActionViews.ProductDetailVariantDetailListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:ProductDetailVariantDetailListViewModel"
+             Shell.PresentationMode="ModalAnimated"
+             Shell.TabBarIsVisible="False">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+
+    <Grid RowDefinitions="Auto, Auto, Auto,*" RowSpacing="10">
+        <Grid Grid.Row="0"
+              Padding="10,10,0,0"
+              ColumnDefinitions="*, Auto">
+            <Label Grid.Column="0"
+                   FontAttributes="Bold"
+                   FontSize="Large"
+                   Text="{Binding Title}"
+                   TextColor="WhiteSmoke" />
+
+            <ImageButton Grid.Column="1"
+                         Command="{Binding BackCommand}"
+                         HeightRequest="32"
+                         HorizontalOptions="End">
+                <ImageButton.Source>
+                    <FontImageSource FontFamily="FAS"
+                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                                     Size="Medium"
+                                     Color="{StaticResource WhiteSmoke}" />
+                </ImageButton.Source>
+            </ImageButton>
+        </Grid>
+        <Grid Grid.Row="1"
+              Padding="15,0,0,0"
+              ColumnDefinitions=".60*, .40*">
+            <Label Grid.Column="0"
+                   FontAttributes="Bold"
+                   FontSize="Medium"
+                   LineBreakMode="TailTruncation"
+                   MaxLines="1"
+                   Text="Özellik"
+                   TextColor="WhiteSmoke" />
+            <Label Grid.Column="1"
+                   FontAttributes="Bold"
+                   FontSize="Medium"
+                   LineBreakMode="TailTruncation"
+                   MaxLines="1"
+                   Text="Değeri"
+                   TextColor="WhiteSmoke" />
+        </Grid>
+        <BoxView Grid.Row="2"
+                 Margin="0,0,0,0"
+                 BackgroundColor="{StaticResource White}"
+                 HeightRequest="1" />
+        <CollectionView Grid.Row="3"
+                        ItemsSource="{Binding Items}"
+                        RemainingItemsThreshold="2"
+                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:ProductVariant">
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0.1">
+
+                        <Grid ColumnDefinitions=".60*, .40*" ColumnSpacing="10">
+
+                            <VerticalStackLayout Grid.Column="0"
+                                                 Padding="5"
+                                                 Spacing="5"
+                                                 VerticalOptions="Start">
+
+                                <Label FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="1"
+                                       Text="{Binding VariantPropertyName}"
+                                       TextColor="{StaticResource Gray600}"
+                                       VerticalOptions="Start" />
+                            </VerticalStackLayout>
+
+
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Padding="5"
+                                                 Spacing="5"
+                                                 VerticalOptions="Start">
+                                <Label FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="1"
+                                       Text="{Binding VariantPropertyValueName}"
+                                       TextColor="{StaticResource Gray600}"
+                                       VerticalOptions="Start" />
+                            </VerticalStackLayout>
+                        </Grid>
+                        <Border.Triggers>
+                            <DataTrigger Binding="{Binding IsSelected}"
+                                         TargetType="Border"
+                                         Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>net8.0-android</TargetFrameworks>
@@ -92,6 +92,9 @@
 	  <Compile Update="Modules\CameraModule\Views\CameraReaderView.xaml.cs">
 	    <DependentUpon>CameraReaderView.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailApprovedSupplierView.xaml.cs">
+	    <DependentUpon>ProductDetailApprovedSupplierView.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Modules\ProductModule\ProductPanel\Views\InputProductListView.xaml.cs">
 	    <DependentUpon>InputProductListView.xaml</DependentUpon>
 	  </Compile>
@@ -179,10 +182,36 @@
 	  <MauiXaml Update="Modules\OutsourceModule\OutsourcePanel\Views\OutsourcePanelAllFicheListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+
 	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ProductDetailAllFicheListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ProductDetailWarehouseTotalListView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailApprovedSupplierView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailLocationTransactionListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailVariantDetailListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailVariantListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailVariantTotalListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailWaitingPurchaseOrderListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailWaitingSalesOrderListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailWarehouseTotalListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ProductInputTransactionView.xaml">
@@ -279,6 +308,9 @@
 	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseOrderProcess\Views\InputProductPurchaseOrderProcessFormView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseOrderProcess\Views\InputProductPurchaseOrderProcessOrderListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseOrderProcess\Views\InputProductPurchaseOrderProcessOtherProductListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -337,6 +369,18 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\ReturnProductPurchaseProcess\Views\ReturnPurchaseWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\SupplierMenu\Views\ActionViews\SupplierDetailApprovedProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\SupplierMenu\Views\ActionViews\SupplierDetailShipAddressListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\SupplierMenu\Views\ActionViews\SupplierDetailWaitingPurchaseOrderListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\SupplierMenu\Views\SupplierDetailAllFicheListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\PurchaseModule\SupplierMenu\Views\SupplierDetailView.xaml">
@@ -415,6 +459,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessOrderListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessWarehouseListView.xaml">

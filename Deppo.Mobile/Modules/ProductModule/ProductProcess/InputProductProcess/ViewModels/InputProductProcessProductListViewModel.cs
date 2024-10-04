@@ -552,7 +552,6 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                 return;
             }
             IsBusy = true;
-            IsBusy = true;
             Items.Clear();
             _userDialogs.Loading("Searching Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();

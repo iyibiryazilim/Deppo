@@ -247,6 +247,7 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
             IsBusy = true;
             var viewModel = _serviceProvider.GetRequiredService<ReturnSalesDispatchBasketViewModel>();
             // await viewModel.LoadPageAsync();
+            SelectedItems.Clear();
             await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchBasketView)}", new Dictionary<string, object>
             {
                 [nameof(Items)] = SelectedProducts,

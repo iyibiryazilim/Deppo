@@ -39,7 +39,9 @@ using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.Views;
 using Deppo.Mobile.Modules.OutsourceModule.WaitingOutsourceMenu.ViewModels;
 using Deppo.Mobile.Modules.OutsourceModule.WaitingOutsourceMenu.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels;
+using Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
+using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views.ActionViews;
 using Deppo.Mobile.Modules.ProductModule.ProductPanel.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductPanel.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
@@ -67,7 +69,9 @@ using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseP
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ViewModels;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels;
+using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels.ActionViewModels;
 using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views;
+using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views.ActionViews;
 using Deppo.Mobile.Modules.PurchaseModule.WaitingOrderMenu.ViewModels;
 using Deppo.Mobile.Modules.PurchaseModule.WaitingOrderMenu.Views;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionBOMMenu.ViewModels;
@@ -222,6 +226,9 @@ public static class MauiProgram
         builder.Services.AddSingleton<ICustomerService, CustomerDataStoreV2>();
         builder.Services.AddSingleton<IWaitingSalesOrderService, WaitingSalesOrderDataStore>();
         builder.Services.AddSingleton<ISupplierService, SupplierDataStoreV2>();
+        builder.Services.AddSingleton<ISupplierDetailService, SupplierDetailDataStore>();
+        builder.Services.AddSingleton<ISupplierDetailAllFicheService, SupplierDetailAllFicheDataStore>();
+        builder.Services.AddSingleton<ISupplierDetailActionService, SupplierDetailActionDataStore>();
         builder.Services.AddSingleton<IProductTransactionService, ProductTransactionDataStore>();
         builder.Services.AddSingleton<IWarehouseTransactionService, WarehouseTransactionDataStore>();
         builder.Services.AddSingleton<ICustomerTransactionService, CustomerTransactionDataStore>();
@@ -277,6 +284,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IOutsourcePanelService, OutsourcePanelDataStore>();
         builder.Services.AddSingleton<ICountingPanelService, CountingPanelDataStore>();
         builder.Services.AddSingleton<IQuicklyProductionPanelService, QuicklyProductionPanelDataStore>();
+        builder.Services.AddSingleton<IProductDetailActionService, ProductDetailActionDataStore>();
 
         builder.Services.AddSingleton<IBarcodeSearchService, BarcodeSearchDataStore>();
 
@@ -290,7 +298,14 @@ public static class MauiProgram
         builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
         builder.Services.AddTransientWithShellRoute<CompanyListView, CompanyListViewModel>(nameof(CompanyListView));
 
+        builder.Services.AddScopedWithShellRoute<ProductDetailLocationTransactionListView, ProductDetailLocationTransactionListViewModel>(nameof(ProductDetailLocationTransactionListView));
+        builder.Services.AddScopedWithShellRoute<ProductDetailVariantListView, ProductDetailVariantListViewModel>(nameof(ProductDetailVariantListView));
+        builder.Services.AddScopedWithShellRoute<ProductDetailVariantTotalListView, ProductDetailVariantTotalListViewModel>(nameof(ProductDetailVariantTotalListView));
+        builder.Services.AddScopedWithShellRoute<ProductDetailWaitingPurchaseOrderListView, ProductDetailWaitingPurchaseOrderListViewModel>(nameof(ProductDetailWaitingPurchaseOrderListView));
+        builder.Services.AddScopedWithShellRoute<ProductDetailWaitingSalesOrderListView, ProductDetailWaitingSalesOrderListViewModel>(nameof(ProductDetailWaitingSalesOrderListView));
         builder.Services.AddScopedWithShellRoute<ProductDetailWarehouseTotalListView, ProductDetailWarehouseTotalListViewModel>(nameof(ProductDetailWarehouseTotalListView));
+        builder.Services.AddScopedWithShellRoute<ProductDetailApprovedSupplierView, ProductDetailApprovedSupplierViewModel>(nameof(ProductDetailApprovedSupplierView));
+        builder.Services.AddScopedWithShellRoute<ProductDetailVariantDetailListView, ProductDetailVariantDetailListViewModel>(nameof(ProductDetailVariantDetailListView));
 
         #region Analysis Modules
 
@@ -393,6 +408,7 @@ public static class MauiProgram
         builder.Services.AddTransientWithShellRoute<OutputProductSalesOrderProcessWarehouseListView, OutputProductSalesOrderProcessWarehouseListViewModel>(nameof(OutputProductSalesOrderProcessWarehouseListView));
         builder.Services.AddScopedWithShellRoute<OutputProductSalesOrderProcessCustomerListView, OutputProductSalesOrderProcessCustomerListViewModel>(nameof(OutputProductSalesOrderProcessCustomerListView));
         builder.Services.AddScopedWithShellRoute<OutputProductSalesOrderProcessProductListView, OutputProductSalesOrderProcessProductListViewModel>(nameof(OutputProductSalesOrderProcessProductListView));
+        builder.Services.AddScopedWithShellRoute<OutputProductSalesOrderProcessOrderListView, OutputProductSalesOrderProcessOrderListViewModel>(nameof(OutputProductSalesOrderProcessOrderListView));
         builder.Services.AddScopedWithShellRoute<OutputProductSalesOrderProcessBasketListView, OutputProductSalesOrderProcessBasketListViewModel>(nameof(OutputProductSalesOrderProcessBasketListView));
         builder.Services.AddScopedWithShellRoute<OutputProductSalesOrderProcessFormView, OutputProductSalesOrderProcessFormViewModel>(nameof(OutputProductSalesOrderProcessFormView));
 
@@ -431,11 +447,18 @@ public static class MauiProgram
         builder.Services.AddSingletonWithShellRoute<PurchasePanelAllFicheListView, PurchasePanelAllFicheListViewModel>(nameof(PurchasePanelAllFicheListView));
         builder.Services.AddSingletonWithShellRoute<PurchasePanelWaitingProductListView, PurchasePanelWaitingProductListViewModel>(nameof(PurchasePanelWaitingProductListView));
         builder.Services.AddSingletonWithShellRoute<PurchasePanelReceivedProductListView, PurchasePanelReceivedProductListViewModel>(nameof(PurchasePanelReceivedProductListView));
+
         builder.Services.AddSingletonWithShellRoute<SupplierListView, SupplierListViewModel>(nameof(SupplierListView));
+
         builder.Services.AddSingletonWithShellRoute<SupplierDetailView, SupplierDetailViewModel>(nameof(SupplierDetailView));
         builder.Services.AddSingletonWithShellRoute<SupplierInputTransactionView, SupplierInputTransactionViewModel>(nameof(SupplierInputTransactionView));
         builder.Services.AddSingletonWithShellRoute<SupplierOutputTransactionView, SupplierOutputTransactionViewModel>(nameof(SupplierOutputTransactionView));
-        builder.Services.AddSingletonWithShellRoute<WaitingPurchaseOrderListView, WaitingPurchaseOrderListViewModel>(nameof(WaitingPurchaseOrderListView));
+        builder.Services.AddSingletonWithShellRoute<SupplierDetailAllFicheListView, SupplierDetailAllFicheListViewModel>(nameof(SupplierDetailAllFicheListView));
+
+        builder.Services.AddTransientWithShellRoute<SupplierDetailApprovedProductListView, SupplierDetailApprovedProductListViewModel>(nameof(SupplierDetailApprovedProductListView));
+        builder.Services.AddTransientWithShellRoute<SupplierDetailShipAddressListView, SupplierDetailShipAddressListViewModel>(nameof(SupplierDetailShipAddressListView));
+		builder.Services.AddTransientWithShellRoute<SupplierDetailWaitingPurchaseOrderListView, SupplierDetailWaitingPurchaseOrderListViewModel>(nameof(SupplierDetailWaitingPurchaseOrderListView));
+		builder.Services.AddSingletonWithShellRoute<WaitingPurchaseOrderListView, WaitingPurchaseOrderListViewModel>(nameof(WaitingPurchaseOrderListView));
         builder.Services.AddSingletonWithShellRoute<PurchaseProcessView, PurchaseProcessViewModel>(nameof(PurchaseProcessView));
 
         #region Satınalma İşlemleri
@@ -459,6 +482,7 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessSupplierListView, InputProductPurchaseOrderProcessSupplierListViewModel>(nameof(InputProductPurchaseOrderProcessSupplierListView));
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessProductListView, InputProductPurchaseOrderProcessProductListViewModel>(nameof(InputProductPurchaseOrderProcessProductListView));
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessBasketListView, InputProductPurchaseOrderProcessBasketListViewModel>(nameof(InputProductPurchaseOrderProcessBasketListView));
+        builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessOrderListView, InputProductPurchaseOrderProcessOrderListViewModel>(nameof(InputProductPurchaseOrderProcessOrderListView));
 
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessBasketLocationListView, InputProductPurchaseOrderProcessBasketLocationListViewModel>(nameof(InputProductPurchaseOrderProcessBasketLocationListView));
 

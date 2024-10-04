@@ -29,7 +29,10 @@ public interface IBarcodeSearchService
 
     Task<DataResult<dynamic>> SearchByVariantLotNumber(HttpClient httpClient, int firmNumber, int periodNumber, string barcode);
 
-    Task<DataResult<dynamic>> SearcBySupplierProductCode(HttpClient httpClient, int firmNumber, int periodNumber, string barcode);
+    Task<DataResult<dynamic>> SearchBySupplierProductCode(HttpClient httpClient, int firmNumber, int periodNumber, string barcode);
 
- 
+    Task<DataResult<dynamic>> SearchBySupplierVariantCode(HttpClient httpClient, int firmNumber, int periodNumber, string barcode);
+
+
+
 }

@@ -9,6 +9,7 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.CameraModule.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
@@ -17,7 +18,6 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderP
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(SalesCustomer), queryId: nameof(SalesCustomer))]
-[QueryProperty(name: nameof(Items), queryId: nameof(Items))]
 public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
@@ -31,8 +31,8 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 	[ObservableProperty]
 	SalesCustomer salesCustomer = null!;
 
-	[ObservableProperty]
-	ObservableCollection<OutputSalesBasketModel> items = null!;
+
+	public ObservableCollection<OutputSalesBasketModel> Items { get; } = new();
 
 	[ObservableProperty]
 	OutputSalesBasketModel? selectedItem;
@@ -66,6 +66,10 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 		IncreaseCommand = new Command<OutputSalesBasketModel>(async (outputSalesBasketModel) => await IncreaseAsync(outputSalesBasketModel));
 		DecreaseCommand = new Command<OutputSalesBasketModel>(async (outputSalesBasketModel) => await DecreaseAsync(outputSalesBasketModel));
 		BackCommand = new Command(async () => await BackAsync());
+		PlusTappedCommand = new Command(async () => await PlusTappedAsync());
+		ProductOptionTappedCommand = new Command(async () => await ProductOptionTappedAsync());
+		OrderOptionTappedCommand = new Command(async () => await OrderOptionTappedAsync());
+		CameraTappedCommand = new Command(async () => await CameraTappedAsync());
 		NextViewCommand = new Command(async () => await NextViewAsync());
 
 		LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreWarehouseLocationTransactionsAsync());
@@ -88,6 +92,11 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 	public Command<OutputSalesBasketModel> IncreaseCommand { get; }
 	public Command<OutputSalesBasketModel> DecreaseCommand { get; }
 	public Command<OutputSalesBasketModel> DeleteItemCommand { get; }
+	public Command PlusTappedCommand { get; }
+	public Command ProductOptionTappedCommand { get; }
+	public Command OrderOptionTappedCommand { get; }
+	public Command CameraTappedCommand { get; }
+
 
 	#region LocationTransaction Command
 	public Command LoadMoreLocationTransactionsCommand { get; }
@@ -756,6 +765,118 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 		}
 		catch (Exception ex)
 		{
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task PlusTappedAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			CurrentPage.FindByName<BottomSheet>("basketOptionsBottomSheet").State = BottomSheetState.HalfExpanded;
+
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task ProductOptionTappedAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			CurrentPage.FindByName<BottomSheet>("basketOptionsBottomSheet").State = BottomSheetState.Hidden;
+
+			await Task.Delay(300);
+			await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessProductListView)}", new Dictionary<string, object>
+			{
+				[nameof(WarehouseModel)] = WarehouseModel,
+				[nameof(SalesCustomer)] = SalesCustomer
+			});
+
+			
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task OrderOptionTappedAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			CurrentPage.FindByName<BottomSheet>("basketOptionsBottomSheet").State = BottomSheetState.Hidden;
+			await Task.Delay(300);
+
+			await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessOrderListView)}", new Dictionary<string, object>
+			{
+				[nameof(WarehouseModel)] = WarehouseModel,
+				[nameof(SalesCustomer)] = SalesCustomer
+			});
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task CameraTappedAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			await Shell.Current.GoToAsync($"{nameof(CameraReaderView)}", new Dictionary<string, object>
+			{
+				["ComingPage"] = "OutputProductSalesOrderBasket"
+			});
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 		finally

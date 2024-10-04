@@ -23,6 +23,24 @@
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Command="{Binding CameraTappedCommand}">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Camera}"
+                                 Size="Medium" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+
+        <ToolbarItem Command="{Binding PlusTappedCommand}">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                 Size="Medium" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
+
     <Grid RowDefinitions="*,Auto">
         <Grid RowDefinitions="*,Auto">
             <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
@@ -161,7 +179,9 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
-                <Button Grid.Row="2" Text="İleri" Command="{Binding NextViewCommand}" />
+                <Button Grid.Row="2"
+                        Command="{Binding NextViewCommand}"
+                        Text="İleri" />
 
             </Grid>
 
@@ -215,10 +235,8 @@
                                        PlaceholderColor="{StaticResource OffBlack}"
                                        TextColor="{StaticResource OffBlack}">
                                 <SearchBar.Behaviors>
-                                    <toolkit:EventToCommandBehavior Command="{Binding LocationTransactionPerformSearchCommand}"
-                                                                    EventName="SearchButtonPressed" />
-                                    <toolkit:EventToCommandBehavior Command="{Binding LocationTransactionPerformEmptySearchCommand}"
-                                                                    EventName="TextChanged" />
+                                    <toolkit:EventToCommandBehavior Command="{Binding LocationTransactionPerformSearchCommand}" EventName="SearchButtonPressed" />
+                                    <toolkit:EventToCommandBehavior Command="{Binding LocationTransactionPerformEmptySearchCommand}" EventName="TextChanged" />
                                 </SearchBar.Behaviors>
                             </SearchBar>
                         </Border>
@@ -460,5 +478,81 @@
 
             <!--#endregion-->
         </dx:BottomSheet>
+
+        <!--#region basketOptionsBottomSheet-->
+        <dx:BottomSheet x:Name="basketOptionsBottomSheet"
+                        Grid.Row="1"
+                        AllowDismiss="True"
+                        BackgroundColor="White"
+                        CornerRadius="15"
+                        HalfExpandedRatio="0.3"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <Grid Padding="10"
+                  RowDefinitions="Auto,*"
+                  RowSpacing="20">
+                <VerticalStackLayout Grid.Row="0" Spacing="5">
+                    <Label Padding="10"
+                           FontAttributes="Bold"
+                           FontSize="Subtitle"
+                           Text="Seçim Listesi" />
+                    <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Row="1" Spacing="10">
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ProductOptionTappedCommand}" />
+                        </Border.GestureRecognizers>
+                        <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontAttributes="Bold"
+                                          FontFamily="FAS"
+                                          Text="{x:Static fontAwesome:FontAwesomeIcons.List}"
+                                          TextColor="{StaticResource OffBlack}" />
+                                    <Span Text=" " />
+
+                                    <Span Text=" " />
+                                    <Span FontAttributes="Bold"
+                                          Text="Ürün Listesi"
+                                          TextColor="{StaticResource OffBlack}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+
+
+                    </Border>
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OrderOptionTappedCommand}" />
+                        </Border.GestureRecognizers>
+
+                        <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontAttributes="Bold"
+                                          FontFamily="FAS"
+                                          Text="{x:Static fontAwesome:FontAwesomeIcons.List}"
+                                          TextColor="{StaticResource OffBlack}" />
+                                    <Span Text=" " />
+
+                                    <Span FontAttributes="Bold"
+                                          Text="Sipariş Listesi"
+                                          TextColor="{StaticResource OffBlack}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+
+                    </Border>
+                </VerticalStackLayout>
+            </Grid>
+        </dx:BottomSheet>
+        <!--#endregion-->
     </Grid>
 </ContentPage>

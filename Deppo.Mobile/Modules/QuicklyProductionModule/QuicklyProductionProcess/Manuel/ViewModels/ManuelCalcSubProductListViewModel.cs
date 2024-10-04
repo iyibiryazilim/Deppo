@@ -50,6 +50,8 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
             LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
             ItemTappedCommand = new Command<WarehouseTotalModel>(async (item) => await ItemTappedAsync(item));
             ConfirmCommand = new Command(async () => await ConfirmAsync());
+            PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+            PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
 
         }
 
@@ -60,11 +62,15 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
         public Command NextViewCommand { get; }
         public Command<WarehouseTotalModel> ItemTappedCommand { get; }
         public Command ConfirmCommand { get; }
-
+        public Command PerformSearchCommand { get; }
+        public Command PerformEmptySearchCommand { get; }
         public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
+        //Arama İşlemi için kullanılan liste
+        public ObservableCollection<WarehouseTotalModel> SelectedSearchItems { get; } = new();
         public ObservableCollection<WarehouseTotalModel> SelectedItems { get; } = new();
 
-
+        [ObservableProperty]
+        public SearchBar searchText;
         private async Task LoadItemsAsync()
         {
             if (IsBusy)
@@ -85,7 +91,7 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
                     firmNumber: _httpClientService.FirmNumber,
                     periodNumber: _httpClientService.PeriodNumber,
                     warehouseNumber: WarehouseModel.Number,
-                    search: string.Empty,
+                    search: SearchText.Text,
                     skip: 0,
                     take: 20);
 
@@ -98,6 +104,12 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
                     foreach (var product in result.Data)
                     {
                         var item = Mapping.Mapper.Map<WarehouseTotalModel>(product);
+                        var matchedItem = SelectedItems.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
+                        if (matchedItem is not null)
+                            item.IsSelected = matchedItem.IsSelected;
+                        else
+                            item.IsSelected = false;
+
                         Items.Add(item);
                     }
                 }
@@ -139,7 +151,7 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
                     firmNumber: _httpClientService.FirmNumber,
                     periodNumber: _httpClientService.PeriodNumber,
                     warehouseNumber: WarehouseModel.Number,
-                    search: string.Empty,
+                    search: SearchText.Text,
                     skip: Items.Count,
                     take: 20);
 
@@ -152,6 +164,12 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
                     foreach (var product in result.Data)
                     {
                         var item = Mapping.Mapper.Map<WarehouseTotalModel>(product);
+                        var matchedItem = SelectedItems.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
+                        if (matchedItem is not null)
+                            item.IsSelected = matchedItem.IsSelected;
+                        else
+                            item.IsSelected = false;
+
                         Items.Add(item);
                     }
                 }
@@ -186,6 +204,7 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
                 {
                     Items.FirstOrDefault(x => x.ProductCode == item.ProductCode).IsSelected = false;
                     SelectedItems.Remove(item);
+                    SelectedSearchItems.Remove(item);
                 }
                 else
                 {
@@ -198,6 +217,7 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
                     {
                         Items.FirstOrDefault(x => x.ProductCode == item.ProductCode).IsSelected = true;
                         SelectedItems.Add(item);
+                        SelectedSearchItems.Add(item);
                     }
 
                 }
@@ -270,7 +290,7 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
                         }
                     }
                 }
-
+                SelectedSearchItems.Clear();
                 await Shell.Current.GoToAsync("../..");
 
 
@@ -282,6 +302,74 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
             finally
             {
                 IsBusy = false;
+            }
+        }
+        private async Task PerformSearchAsync()
+        {
+            if (IsBusy)
+                return;
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(SearchText.Text))
+                {
+                    await LoadItemsAsync();
+                    SearchText.Unfocus();
+                    return;
+                }
+                IsBusy = true;
+                Items.Clear();
+                _userDialogs.Loading("Searching Items...");
+                var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+                var result = await _warehouseTotalService.GetObjects(
+                    httpClient: httpClient,
+                    firmNumber: _httpClientService.FirmNumber,
+                    periodNumber: _httpClientService.PeriodNumber,
+                    warehouseNumber: WarehouseModel.Number,
+                    search: SearchText.Text,
+                    skip: 0,
+                    take: 20);
+
+
+                if (result.IsSuccess)
+                {
+                    if (result.Data == null)
+                        return;
+
+                    foreach (var product in result.Data)
+                    {
+                        var item = Mapping.Mapper.Map<WarehouseTotalModel>(product);
+                        var matchedItem = SelectedItems.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
+                        if (matchedItem is not null)
+                            item.IsSelected = matchedItem.IsSelected;
+                        else
+                            item.IsSelected = false;
+
+                        Items.Add(item);
+                    }
+                }
+
+                _userDialogs.Loading().Hide();
+
+            }
+
+            catch (Exception ex)
+            {
+                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+
+        private async Task PerformEmptySearchAsync()
+        {
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
+            {
+                await PerformSearchAsync();
             }
         }
     }

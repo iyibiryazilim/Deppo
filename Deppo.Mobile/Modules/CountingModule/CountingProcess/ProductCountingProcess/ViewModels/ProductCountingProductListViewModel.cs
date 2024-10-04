@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.BaseModels;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
@@ -27,7 +28,8 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-        PerformSearchCommand = new Command<SearchBar>(async (searchBar) => await PerformSearchAsync(searchBar));
+        PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+        PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
         ItemTappedCommand = new Command<ProductModel>(ItemTappedAsync);
         NextViewCommand = new Command(async () => await NextViewAsync());
     }
@@ -39,11 +41,15 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
-    public Command<SearchBar> PerformSearchCommand { get; }
+    public Command PerformSearchCommand { get; }
+    public Command PerformEmptySearchCommand { get; }
     public Command<ProductModel> ItemTappedCommand { get; }
 
     public Command NextViewCommand { get; }
 
+
+    [ObservableProperty]
+    public SearchBar searchText;
     public async Task LoadItemsAsync()
     {
         if (IsBusy)
@@ -57,7 +63,7 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
             _userDialogs.Loading("Loading Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             await Task.Delay(1000);
-            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 20);
+            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, 0, 20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
@@ -101,7 +107,7 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
             IsBusy = true;
             _userDialogs.Loading("Refreshing Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, Items.Count, 20);
+            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, Items.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
@@ -135,40 +141,42 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
         }
     }
 
-    private async Task PerformSearchAsync(SearchBar searchBar)
+    private async Task PerformSearchAsync()
     {
         if (IsBusy)
             return;
 
         try
         {
-            if (string.IsNullOrWhiteSpace(searchBar.Text))
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
             {
                 await LoadItemsAsync();
-                searchBar.Unfocus();
+                SearchText.Unfocus();
                 return;
+            }
+            IsBusy = true;
+            Items.Clear();
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, 0, 20);
+            if (result.IsSuccess)
+            {
+                if (result.Data == null)
+                    return;
+
+                foreach (var item in result.Data)
+                    Items.Add(Mapping.Mapper.Map<ProductModel>(item));
+
+                _userDialogs.Loading().Hide();
             }
             else
             {
-                if (searchBar.Text.Length >= 3)
-                {
-                    IsBusy = true;
-
-                    var httpClient = _httpClientService.GetOrCreateHttpClient();
-
-                    var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, searchBar.Text, 0, 20);
-                    if (!result.IsSuccess)
-                    {
-                        _userDialogs.Alert(result.Message, "Hata");
-                        return;
-                    }
-
-                    Items.Clear();
-                    foreach (var item in result.Data)
-                        Items.Add(Mapping.Mapper.Map<ProductModel>(item));
-                }
+                _userDialogs.Alert(result.Message, "Hata");
+                return;
             }
 
+            Items.Clear();
+            foreach (var item in result.Data)
+                Items.Add(Mapping.Mapper.Map<Product>(item));
         }
         catch (System.Exception ex)
         {
@@ -177,6 +185,14 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    private async Task PerformEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText.Text))
+        {
+            await PerformSearchAsync();
         }
     }
 
