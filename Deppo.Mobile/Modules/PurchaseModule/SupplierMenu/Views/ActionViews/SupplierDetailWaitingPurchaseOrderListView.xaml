@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views.ActionViews.SupplierDetailWaitingPurchaseOrderListView"
+             Title="{Binding Title}"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             Shell.PresentationMode="ModalAnimated"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels.ActionViewModels"
+             x:DataType="viewModel:SupplierDetailWaitingPurchaseOrderListViewModel"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit">
+    <VerticalStackLayout>
+        <Label 
+            Text="Welcome to .NET MAUI!"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
+    </VerticalStackLayout>
+</ContentPage>
