@@ -879,7 +879,7 @@ AS SubQuery
             baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";
         }
 
-        baseQuery += @$" GROUP BY 
+        baseQuery += @$" GROUP BY
             ITEMS.LOGICALREF,
             ITEMS.CODE,
             ITEMS.NAME,

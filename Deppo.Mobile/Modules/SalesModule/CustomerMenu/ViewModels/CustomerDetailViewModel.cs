@@ -2,13 +2,18 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.CountingModels.BasketModels;
+using Deppo.Mobile.Core.Models.CountingModels;
+using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.CountingModule.CountingProcess.ProductCountingProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views;
 using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesPanel.Views;
 using DevExpress.Data.Async.Helpers;
 using System;
 using System.Collections.Generic;
@@ -16,6 +21,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using DevExpress.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels;
 
@@ -31,6 +37,8 @@ public partial class CustomerDetailViewModel : BaseViewModel
 
     [ObservableProperty]
     private CustomerDetailModel customerDetailModel = null!;
+
+    public Page CurrentPage { get; set; }
 
     public CustomerDetailViewModel(IHttpClientService httpClientService,
     ICustomerService customerService,
@@ -49,12 +57,20 @@ public partial class CustomerDetailViewModel : BaseViewModel
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         InputQuantityTappedCommand = new Command(async () => await InputQuantityTappedAsync());
         OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
+        OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
+        ItemTappedCommand = new Command<SalesFiche>(async (salesFiche) => await ItemTappedAsync(salesFiche));
+        AllFicheTappedCommand = new Command(async () => await AllFicheTappedAsync());
+        GetLastTransactionCommand = new Command<SalesFiche>(async (salesFiche) => await GetLastTransactionAsync(salesFiche));
     }
 
     public Command LoadItemsCommand { get; }
     public Command InputQuantityTappedCommand { get; }
 
     public Command OutputQuantityTappedCommand { get; }
+
+    public Command AllFicheTappedCommand { get; }
+    public Command ItemTappedCommand { get; }
+    public Command GetLastTransactionCommand { get; }
 
     private async Task LoadItemsAsync()
     {
@@ -157,9 +173,9 @@ public partial class CustomerDetailViewModel : BaseViewModel
             {
                 if (result.Data is null)
                     return;
-                CustomerDetailModel.LastTransactions.Clear();
+                CustomerDetailModel.Transactions.Clear();
                 foreach (var item in result.Data)
-                    CustomerDetailModel.LastTransactions.Add(Mapping.Mapper.Map<CustomerTransaction>(item));
+                    CustomerDetailModel.Transactions.Add(Mapping.Mapper.Map<SalesFiche>(item));
             }
         }
         catch (Exception ex)
@@ -221,6 +237,87 @@ public partial class CustomerDetailViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    private async Task AllFicheTappedAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(CustomerDetailAllFichesView)}", new Dictionary<string, object> { {
+                nameof(CustomerDetailModel), CustomerDetailModel
+                }
+                });
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ItemTappedAsync(SalesFiche salesFiche)
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+            _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(500);
+            await GetLastTransactionAsync(salesFiche);
+            CurrentPage.FindByName<BottomSheet>("ficheTransactionBottomSheet").State = BottomSheetState.HalfExpanded;
+
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task GetLastTransactionAsync(SalesFiche salesFiche)
+    {
+        try
+        {
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _customerDetailService.GetLastTransaction(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, salesFiche.ReferenceId);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+                CustomerDetailModel.LastTransactions.Clear();
+
+                foreach (var item in result.Data)
+                    CustomerDetailModel.LastTransactions.Add(Mapping.Mapper.Map<CustomerTransaction>(item));
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
         }
     }
 }

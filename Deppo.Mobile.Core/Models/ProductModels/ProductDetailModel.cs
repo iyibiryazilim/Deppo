@@ -24,4 +24,6 @@ public partial class ProductDetailModel : ObservableObject
 
 
     public ObservableCollection<ProductTransaction> LastTransactions { get; } = new();
+
+    public ObservableCollection<ProductFiche> Transactions { get; } = new();
 }

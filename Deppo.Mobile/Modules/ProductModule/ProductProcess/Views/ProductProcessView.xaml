@@ -29,11 +29,11 @@
 
     <Grid RowDefinitions="*,Auto">
         <Grid Grid.Row="0"
-              RowDefinitions=".30*,.70*">
+              RowDefinitions=".07*,.93*">
 
-            <ScrollView Grid.Row="1">
+           
                 <Grid Grid.Row="1"
-                      RowDefinitions="Auto,Auto,Auto"
+                      RowDefinitions="Auto,Auto,Auto,Auto"
                       RowSpacing="20">
                     <VerticalStackLayout Grid.Row="0"
                                          Padding="5"
@@ -463,8 +463,75 @@
                             </Border>
                         </Grid>
                     </VerticalStackLayout>
-                </Grid>
-            </ScrollView>
+                <VerticalStackLayout Grid.Row="3"
+                                     Padding="5"
+                                     Spacing="5">
+                    <Label FontAttributes="Bold"
+                           FontSize="20"
+                           Text="Talep İşlemleri"
+                           TextColor="{StaticResource OffBlack}" />
+
+                    <Grid RowDefinitions="Auto,Auto"
+                          RowSpacing="2">
+                        <Border Grid.Row="0"
+                                HeightRequest="55"
+                                Padding="5"
+                                StrokeShape="RoundRectangle 5"
+                                StrokeThickness="0.2">
+                            <Grid ColumnDefinitions=".85*,.15*"
+                                  ColumnSpacing="0">
+                                <Grid Grid.Column="0"
+                                      ColumnDefinitions="Auto,*"
+                                      ColumnSpacing="10">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding TransferProductProcessCommand}" />
+                                    </Grid.GestureRecognizers>
+                                    <Border Padding="5"
+                                            WidthRequest="45"
+                                            Stroke="{StaticResource Secondary}"
+                                            BackgroundColor="{StaticResource Secondary}"
+                                            StrokeShape="RoundRectangle 5">
+                                        <Label FontFamily="FAS"
+                                               FontSize="25"
+                                               HorizontalOptions="Center"
+                                               Text="{x:Static fontAwesome:FontAwesomeIcons.CalendarPlus}"
+                                               TextColor="{StaticResource White}"
+                                               VerticalOptions="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1"
+                                                         Spacing="4">
+                                        <Label FontAttributes="Bold"
+                                               FontSize="Subtitle"
+                                               Text="Talep İşlemleri"
+                                               TextColor="{StaticResource Gray500}"
+                                               VerticalOptions="Center" />
+                                        <Label VerticalOptions="End"
+                                               Text="Ambarlar arası transfer yapabilirsiniz."
+                                               TextColor="{StaticResource Gray400}">
+                                        </Label>
+                                    </VerticalStackLayout>
+                                </Grid>
+
+                                <Border Grid.Column="1"
+                                        StrokeThickness="0">
+                                    <toolkit:AvatarView Padding="2"
+                                                        BorderColor="{StaticResource Primary}"
+                                                        CornerRadius="15"
+                                                        FontFamily="FAS"
+                                                        FontSize="14"
+                                                        HeightRequest="30"
+                                                        HorizontalOptions="End"
+                                                        Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
+                                                        TextColor="{StaticResource Primary}"
+                                                        WidthRequest="30" />
+                                </Border>
+                            </Grid>
+                        </Border>
+                       
+                    </Grid>
+                </VerticalStackLayout>
+            </Grid>
+          
         </Grid>
         <VerticalStackLayout Grid.Row="1">
             <dx:BottomSheet x:Name="ınfoBottomSheet"

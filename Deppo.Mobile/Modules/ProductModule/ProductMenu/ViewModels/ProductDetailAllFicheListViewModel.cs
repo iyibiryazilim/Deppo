@@ -2,6 +2,7 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
@@ -14,35 +15,36 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels
+namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels
 {
-    [QueryProperty(name: nameof(CustomerDetailModel), queryId: nameof(CustomerDetailModel))]
-    public partial class CustomerDetailAllFichesViewModel : BaseViewModel
+    [QueryProperty(name: nameof(ProductDetailModel), queryId: nameof(ProductDetailModel))]
+    public partial class ProductDetailAllFicheListViewModel : BaseViewModel
     {
         private readonly IHttpClientService _httpClientService;
-        private readonly ICustomerDetailAllFichesService _customerDetailAllFichesService;
+        private readonly IProductDetailAllFichesService _productDetailAllFichesService;
         private readonly IUserDialogs _userDialogs;
 
         [ObservableProperty]
-        private CustomerDetailModel customerDetailModel = null!;
+        private ProductDetailModel productDetailModel = null!;
 
         [ObservableProperty]
-        public SalesFiche selectedItem;
+        public ProductFiche selectedItem;
 
-        public ObservableCollection<SalesFiche> Items { get; } = new();
+        public ObservableCollection<ProductFiche> Items { get; } = new();
 
-        public ObservableCollection<SalesTransactionModel> Transactions { get; } = new();
+        public ObservableCollection<ProductTransaction> Transactions { get; } = new();
 
-        public CustomerDetailAllFichesViewModel(IHttpClientService httpClientService, ICustomerDetailAllFichesService customerDetailAllFichesService, IUserDialogs userDialogs)
+        public ProductDetailAllFicheListViewModel(IHttpClientService httpClientService, IProductDetailAllFichesService productDetailAllFichesService, IUserDialogs userDialogs)
         {
             _httpClientService = httpClientService;
-            _customerDetailAllFichesService = customerDetailAllFichesService;
+            _productDetailAllFichesService = productDetailAllFichesService;
             _userDialogs = userDialogs;
 
             Title = "Hareketler";
+
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
             LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-            ItemTappedCommand = new Command<SalesFiche>(async (item) => await ItemTappedAsync(item));
+            ItemTappedCommand = new Command<ProductFiche>(async (item) => await ItemTappedAsync(item));
             TransactionsCloseCommand = new Command(async () => await TransactionsCloseAsync());
             LoadMoreTransactionsCommand = new Command(async () => await LoadMoreFicheTransactionsAsync());
             BackCommand = new Command(async () => await BackAsync());
@@ -72,23 +74,18 @@ namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels
                 await Task.Delay(1000);
 
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _customerDetailAllFichesService.GetAllFiches(
-                    httpClient: httpClient,
-                    firmNumber: _httpClientService.FirmNumber,
-                    periodNumber: _httpClientService.PeriodNumber,
-                    CustomerDetailModel.Customer.ReferenceId,
-                    search: "", skip: 0, take: 20);
+                var result = await _productDetailAllFichesService.GetAllFiches(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, productRefernceId: ProductDetailModel.Product.ReferenceId, search: "", skip: 0, take: 20);
 
                 if (result.IsSuccess && result.Data is not null)
                 {
                     foreach (var item in result.Data)
                     {
-                        var salesFiche = Mapping.Mapper.Map<SalesFiche>(item);
+                        var productFiche = Mapping.Mapper.Map<ProductFiche>(item);
 
                         // Aynı öğeyi tekrar eklememek için kontrol et
-                        if (!Items.Any(x => x.ReferenceId == salesFiche.ReferenceId))
+                        if (!Items.Any(x => x.ReferenceId == productFiche.ReferenceId))
                         {
-                            Items.Add(salesFiche);
+                            Items.Add(productFiche);
                         }
                     }
                 }
@@ -120,23 +117,18 @@ namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels
                 _userDialogs.ShowLoading("Loading...");
 
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _customerDetailAllFichesService.GetAllFiches(
-                    httpClient: httpClient,
-                    firmNumber: _httpClientService.FirmNumber,
-                    periodNumber: _httpClientService.PeriodNumber,
-                    CustomerDetailModel.Customer.ReferenceId,
-                    search: "", skip: Items.Count, take: 20); // skip, zaten yüklenen öğeler kadar olmalı
+                var result = await _productDetailAllFichesService.GetAllFiches(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, productRefernceId: ProductDetailModel.Product.ReferenceId, search: "", skip: Transactions.Count, take: 20); // skip, zaten yüklenen öğeler kadar olmalı
 
                 if (result.IsSuccess && result.Data is not null)
                 {
                     foreach (var item in result.Data)
                     {
-                        var salesFiche = Mapping.Mapper.Map<SalesFiche>(item);
+                        var productFiche = Mapping.Mapper.Map<ProductFiche>(item);
 
                         // Aynı öğeyi tekrar eklememek için kontrol et
-                        if (!Items.Any(x => x.ReferenceId == salesFiche.ReferenceId))
+                        if (!Items.Any(x => x.ReferenceId == productFiche.ReferenceId))
                         {
-                            Items.Add(salesFiche);
+                            Items.Add(productFiche);
                         }
                     }
                 }
@@ -156,7 +148,7 @@ namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels
             }
         }
 
-        private async Task ItemTappedAsync(SalesFiche salesFiche)
+        private async Task ItemTappedAsync(ProductFiche productFiche)
         {
             if (IsBusy)
                 return;
@@ -165,9 +157,9 @@ namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels
             {
                 IsBusy = true;
 
-                SelectedItem = salesFiche;
+                SelectedItem = productFiche;
 
-                await LoadTransactionsAsync(salesFiche);
+                await LoadTransactionsAsync(productFiche);
                 CurrentPage.FindByName<BottomSheet>("ficheTransactionsBottomSheet").State = BottomSheetState.HalfExpanded;
             }
             catch (Exception ex)
@@ -191,7 +183,7 @@ namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels
             });
         }
 
-        private async Task LoadTransactionsAsync(SalesFiche salesFiche)
+        private async Task LoadTransactionsAsync(ProductFiche productFiche)
         {
             try
             {
@@ -201,14 +193,19 @@ namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels
                 Transactions.Clear();
 
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _customerDetailAllFichesService.GetTransactionsByFiche(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, ficheReferenceId: SelectedItem.ReferenceId, skip: Transactions.Count, take: 20);
+                var result = await _productDetailAllFichesService.GetTransactionsByFiche(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, ficheReferenceId: SelectedItem.ReferenceId, productRefrenceId: ProductDetailModel.Product.ReferenceId, skip: Transactions.Count, take: 20);
                 if (result.IsSuccess)
                 {
                     if (result.Data is null)
                         return;
 
                     foreach (var item in result.Data)
-                        Transactions.Add(Mapping.Mapper.Map<SalesTransactionModel>(item));
+                        Transactions.Add(Mapping.Mapper.Map<ProductTransaction>(item));
+
+                    if (!Transactions.Any(x => x.ReferenceId == productFiche.ReferenceId))
+                    {
+                        Items.Add(productFiche);
+                    }
                 }
 
                 _userDialogs.HideHud();
@@ -231,15 +228,17 @@ namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels
                 IsBusy = true;
 
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _customerDetailAllFichesService.GetTransactionsByFiche(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, ficheReferenceId: SelectedItem.ReferenceId, skip: Transactions.Count, take: 20);
+                var result = await _productDetailAllFichesService.GetTransactionsByFiche(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, ficheReferenceId: SelectedItem.ReferenceId, productRefrenceId: ProductDetailModel.Product.ReferenceId, skip: Transactions.Count, take: 20);
                 if (result.IsSuccess)
                 {
                     if (result.Data is null)
                         return;
 
                     foreach (var item in result.Data)
-                        Transactions.Add(Mapping.Mapper.Map<SalesTransactionModel>(item));
+                        Transactions.Add(Mapping.Mapper.Map<ProductTransaction>(item));
                 }
+                _userDialogs.HideHud();
+
             }
             catch (Exception ex)
             {

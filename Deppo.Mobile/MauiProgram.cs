@@ -291,6 +291,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<ICustomerDetailService, CustomerDetailDataStore>();
         builder.Services.AddSingleton<ICustomerDetailAllFichesService, CustomerDetailAllFichesDataStore>();
 
+        builder.Services.AddSingleton<IProductDetailAllFichesService, ProductDetailAllFichesDataStore>();
+        builder.Services.AddSingleton<IProductDetailService, ProductDetailDataStore>();
 
         builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
         builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
@@ -389,6 +391,7 @@ public static class MauiProgram
         builder.Services.AddSingletonWithShellRoute<SalesProcessView, SalesProcessViewModel>(nameof(SalesProcessView));
         builder.Services.AddSingletonWithShellRoute<CustomerDetailAllFichesView, CustomerDetailAllFichesViewModel>(nameof(CustomerDetailAllFichesView));
 
+        builder.Services.AddSingletonWithShellRoute<ProductDetailAllFicheListView, ProductDetailAllFicheListViewModel>(nameof(ProductDetailAllFicheListView));
 
         #region Sevk Islemleri
 
