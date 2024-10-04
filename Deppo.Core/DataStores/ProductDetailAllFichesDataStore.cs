@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace Deppo.Core.DataStores
 {
-    public class CustomerDetailDataStore : ICustomerDetailService
+    public class ProductDetailAllFichesDataStore : IProductDetailAllFichesService
     {
         private string postUrl = "/gateway/customQuery/CustomQuery";
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetLastFichesByCustomer(HttpClient httpClient, int firmNumber, int periodNumber, int customerReferenceId)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetAllFiches(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetLastFichesByCustomer(firmNumber, periodNumber, customerReferenceId)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetLastFichesByProductQuery(firmNumber, periodNumber, productReferenceId)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -63,9 +63,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetLastTransaction(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetTransactionsByFiche(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int ficheReferenceId, int skip = 0, int take = 20)
         {
-            var content = new StringContent(JsonConvert.SerializeObject(CustomerTransaction(firmNumber, periodNumber, ficheReferenceId)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetLastProductTransactionQuery(firmNumber, periodNumber, ficheReferenceId, productReferenceId)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -113,9 +113,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        private string GetLastFichesByCustomer(int firmNumber, int periodNumber, int customerReferenceId)
+        private string GetLastFichesByProductQuery(int firmNumber, int periodNumber, int productReferenceId)
         {
-            string baseQuery = $@"SELECT TOP 5
+            string baseQuery = $@"SELECT
             [ReferenceId] = STFICHE.LOGICALREF,
 			[FicheType] = STFICHE.TRCODE,
 			[FicheNumber] = STFICHE.FICHENO,
@@ -130,55 +130,48 @@ namespace Deppo.Core.DataStores
 			[WarehouseNumber] = ISNULL( CAPIWHOUSE.NR, 0),
 			[Description] =  ISNULL (STFICHE.GENEXP1, '')
 			From LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
-			left join LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
+			LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+			LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
 			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
-			WHERE  STFICHE.PRODSTAT = 0 AND CLCARD.LOGICALREF={customerReferenceId}
+			WHERE STLINE.STOCKREF = {productReferenceId} AND STFICHE.PRODSTAT = 0
 			ORDER BY STFICHE.DATE_ DESC";
 
             return baseQuery;
         }
 
-        private string CustomerTransaction(int firmNumber, int periodNumber, int ficheReferenceId)
+        private string GetLastProductTransactionQuery(int firmNumber, int periodNumber, int ficheReferenceId, int productReferenceId)
         {
-            string baseQuery = $@"Select
-            [ReferenceId] = STLINE.LOGICALREF,
-            [TransactionDate] = STLINE.DATE_,
-            [TransactionTime] = dbo.LG_INTTOTIME(STLINE.FTIME),
-     [CustomerReferenceId] = ISNULL(CLCARD.LOGICALREF,0),
-	 [CustomerCode] = ISNULL(CLCARD.CODE,''),
-     [CustomerName] = ISNULL(CLCARD.DEFINITION_,''),
-	 [BaseTransactionReferenceId] = STFICHE.LOGICALREF,
-	 [BaseTransactionCode] = STFICHE.FICHENO,
-     [TransactionType] = STLINE.TRCODE,
-	 [GroupCode] = STFICHE.GRPCODE,
-	 [IOType] = STLINE.IOCODE,
-	 [ProductReferenceId] =  ITEMS.LOGICALREF,
-	 [ProductCode] = ISNULL(ITEMS.CODE,''),
-	 [ProductName] = ISNULL(ITEMS.NAME,''),
-	 [UnitsetReferenceId] = ISNULL( unitset.LOGICALREF,0),
-	 [UnitsetCode] = ISNULL( unitset.CODE , ''),
-	 [UnitsetName] =  ISNULL (unitset.NAME , ''),
-	 [SubUnitsetReferenceId] = ISNULL ( subunitset.LOGICALREF, 0),
-	 [SubUnitsetCode] = ISNULL (subunitset.CODE,''),
-	 [SubUnitsetName] = ISNULL (subunitset.NAME , ''),
-	 [WarehouseName] = capiwhouse.NAME,
-     [WarehouseNumber] = capiwhouse.NR,
-	 [Quantity] = ISNULL ( STLINE.AMOUNT,0),
-	 [Length] =  ISNULL ( STLINE.UINFO4 , 0),
-	 [Width] = ISNULL  (STLINE.UINFO5,0),
-	 [Height] = ISNULL ( STLINE.UINFO6,0),
-	 [Weight] = ISNULL  ( STLINE.UINFO7 , 0),
-	 [Volume] = ISNULL  (STLINE.UINFO8 , 0),
-	 [Barcode] = ''
-from  LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE as STLINE
-Left Join LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE on STLINE.STFICHEREF = STFICHE.LOGICALREF
-left join LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS on STLINE.STOCKREF = ITEMS.LOGICALREF
-Left Join LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD as CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
-left join LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS subunitset ON STLINE.UOMREF = subunitset.LOGICALREF
-left join LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS unitset ON STLINE.USREF = unitset.LOGICALREF
-LEFT JOIN L_CAPIWHOUSE AS capiwhouse ON STLINE.SOURCEINDEX = capiwhouse.NR AND capiwhouse.FIRMNR = {firmNumber}
-where STLINE.LINETYPE = 0 AND STFICHE.LOGICALREF = {ficheReferenceId}
-order by STLINE.DATE_ desc;";
+            string baseQuery = $@"SELECT
+        [ReferenceId] = STLINE.LOGICALREF,
+        [TransactionDate] = STLINE.DATE_,
+        [TransactionTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
+		[BaseTransactionReferenceId] = STFICHE.LOGICALREF,
+        [BaseTransactionCode] = STFICHE.FICHENO,
+        [TransactionType] = STLINE.TRCODE,
+        [ProductReferenceId] = STLINE.STOCKREF,
+        [ProductCode] = ITEMS.CODE,
+        [ProductName] = ITEMS.NAME,
+        [SubUnitsetCode] = SUBUNITSET.CODE,
+        [SubUnitsetName] = SUBUNITSET.NAME,
+        [SubUnitsetReferenceId] = SUBUNITSET.LOGICALREF,
+        [UnitsetCode] = UNITSET.CODE,
+        [UnitsetReferenceId] = UNITSET.LOGICALREF,
+		[UnitsetName] = UNITSET.NAME,
+        [Quantity] = STLINE.AMOUNT,
+        [Description] = STLINE.LINEEXP,
+        [IOType] = STLINE.IOCODE,
+        [WarehouseNumber] = CAPIWHOUSE.NR,
+        [WarehouseName] = CAPIWHOUSE.NAME
+
+        FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF
+		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
+		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
+		WHERE STFICHE.GRPCODE = 3 AND STFICHE.LOGICALREF = {ficheReferenceId} AND STLINE.STOCKREF={productReferenceId} AND  STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0
+		ORDER BY STLINE.DATE_ DESC";
 
             return baseQuery;
         }

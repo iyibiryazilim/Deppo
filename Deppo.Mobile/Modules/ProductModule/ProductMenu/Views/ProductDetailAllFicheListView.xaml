@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views.CustomerDetailAllFichesView"
-             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels"
+             x:Class="Deppo.Mobile.Modules.ProductModule.ProductMenu.Views.ProductDetailAllFicheListView"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:coreModel="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
-             xmlns:model="clr-namespace:Deppo.Mobile.Core.Models.SalesModels;assembly=Deppo.Mobile.Core"
+             xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              Title="{Binding Title}"
-             x:DataType="viewModel:CustomerDetailAllFichesViewModel"
+             x:DataType="viewModel:ProductDetailAllFicheListViewModel"
              Shell.TabBarIsVisible="False"
              Shell.PresentationMode="ModalAnimated">
     <ContentPage.Behaviors>
@@ -63,7 +63,7 @@
                                    Orientation="Vertical" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="coreModel:SalesFiche">
+                <DataTemplate x:DataType="coreModel:ProductFiche">
                     <Border Padding="5"
                             BackgroundColor="Transparent"
                             StrokeThickness="0.1">
@@ -106,7 +106,7 @@
                             </VerticalStackLayout>
                         </Grid>
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:CustomerDetailAllFichesViewModel}}, Path=ItemTappedCommand}"
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProductDetailAllFicheListViewModel}}, Path=ItemTappedCommand}"
                                                   CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>
                     </Border>
@@ -165,7 +165,7 @@
                                                    Orientation="Vertical" />
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="model:SalesTransactionModel">
+                                <DataTemplate x:DataType="model:ProductTransaction">
                                     <Border Padding="5"
                                             BackgroundColor="Transparent"
                                             StrokeThickness="0.1">

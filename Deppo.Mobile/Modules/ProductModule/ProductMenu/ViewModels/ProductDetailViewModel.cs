@@ -16,6 +16,9 @@ using Deppo.Mobile.Core.Models.ActionModel;
 using System.Collections.ObjectModel;
 using Deppo.Mobile.Modules.ProductModule.Variant;
 using Deppo.Mobile.Core.Models.VariantModels;
+using Deppo.Mobile.Modules.SalesModule.SalesPanel.Views;
+using Deppo.Mobile.Core.Models.SalesModels;
+using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels;
 
@@ -26,6 +29,7 @@ public partial class ProductDetailViewModel : BaseViewModel
     private readonly IProductTransactionService _productTransactionService;
     private readonly ICustomQueryService _customQueryService;
     private readonly IUserDialogs _userDialogs;
+    private readonly IProductDetailService _productDetailService;
 
     [ObservableProperty]
     private ProductDetailModel productDetailModel = null!;
@@ -34,13 +38,14 @@ public partial class ProductDetailViewModel : BaseViewModel
 
     public Page CurrentPage { get; set; }
 
-    public ProductDetailViewModel(IHttpClientService httpClientService, IProductTransactionService productTransactionService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
+    public ProductDetailViewModel(IHttpClientService httpClientService, IProductTransactionService productTransactionService, ICustomQueryService customQueryService, IUserDialogs userDialogs, IProductDetailService productDetailService)
     {
         Title = "Ürün Detayı";
         _httpClientService = httpClientService;
         _productTransactionService = productTransactionService;
         _customQueryService = customQueryService;
         _userDialogs = userDialogs;
+        _productDetailService = productDetailService;
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         InputQuantityTappedCommand = new Command(async () => await InputQuantityTappedAsync());
@@ -48,6 +53,11 @@ public partial class ProductDetailViewModel : BaseViewModel
         ShowProcessBottomSheetCommand = new Command(async () => await ShowProcessBottomSheetAsync());
         ActionModelProcessTappedCommand = new Command(async () => await ActionModelProcessTappedAsync());
         ActionModelsTappedCommand = new Command<ProductActionModel>(async (model) => await ActionModelsTappedAsync(model));
+        GetLastTransactionsCommand = new Command(async () => await GetLastTransactionsAsync());
+        AllFicheTappedCommand = new Command(async () => await AllFicheTappedAsync());
+        ItemTappedCommand = new Command<ProductFiche>(async (productFiche) => await ItemTappedAsync(productFiche));
+
+        GetLastTransactionCommand = new Command<ProductFiche>(async (productFiche) => await GetLastTransactionAsync(productFiche));
     }
 
     #region Commands
@@ -60,6 +70,12 @@ public partial class ProductDetailViewModel : BaseViewModel
 
     public Command GoToWarehouseTotalView { get; }
 
+    public Command GetLastTransactionsCommand { get; }
+
+    public Command AllFicheTappedCommand { get; }
+
+    public Command GetLastTransactionCommand { get; }
+
     //ActionModel
 
     //Üç Nokta
@@ -67,6 +83,8 @@ public partial class ProductDetailViewModel : BaseViewModel
 
     //Tıkladığımı Diğer Sayfaya Göndereceğim
     public Command ActionModelsTappedCommand { get; }
+
+    public Command ItemTappedCommand { get; }
 
     #endregion Commands
 
@@ -80,7 +98,7 @@ public partial class ProductDetailViewModel : BaseViewModel
             _userDialogs.Loading("Loading Items...");
             await Task.Delay(1000);
 
-            await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastTransactionsAsync(httpClient));
+            await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastTransactionsAsync());
 
             _userDialogs.HideHud();
         }
@@ -125,38 +143,32 @@ public partial class ProductDetailViewModel : BaseViewModel
         }
     }
 
-    private async Task GetLastTransactionsAsync(HttpClient httpclient)
+    private async Task GetLastTransactionsAsync()
     {
         try
         {
-            ProductDetailModel.LastTransactions.Clear();
-
-            var result = await _productTransactionService.GetObjects(
-                httpClient: httpclient,
-                firmNumber: _httpClientService.FirmNumber,
-                periodNumber: _httpClientService.PeriodNumber,
-                productReferenceId: ProductDetailModel.Product.ReferenceId,
-                search: string.Empty,
-                skip: 0,
-                take: 5);
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _productDetailService.GetLastFichesByProduct(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, ProductDetailModel.Product.ReferenceId);
 
             if (result.IsSuccess)
             {
-                if (result.Data == null)
+                if (result.Data is null)
                     return;
 
+                ProductDetailModel.Transactions.Clear();
                 foreach (var item in result.Data)
-                {
-                    ProductDetailModel.LastTransactions.Add(Mapping.Mapper.Map<ProductTransaction>(item));
-                }
+                    ProductDetailModel.Transactions.Add(Mapping.Mapper.Map<ProductFiche>(item));
             }
         }
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+                _userDialogs.HideHud();
 
-            _userDialogs.Alert(message: ex.Message, title: "Hata");
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
         }
     }
 
@@ -337,6 +349,93 @@ public partial class ProductDetailViewModel : BaseViewModel
                 _userDialogs.Loading().Hide();
 
             _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task AllFicheTappedAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(ProductDetailAllFicheListView)}", new Dictionary<string, object> { {
+                nameof(ProductDetailModel), ProductDetailModel
+                }
+                });
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task GetLastTransactionAsync(ProductFiche productFiche)
+    {
+        try
+        {
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _productDetailService.GetLastTransaction(httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                productReferenceId: ProductDetailModel.Product.ReferenceId,
+                ficheReferenceId: productFiche.ReferenceId);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+                ProductDetailModel.LastTransactions.Clear();
+
+                foreach (var item in result.Data)
+                    ProductDetailModel.LastTransactions.Add(Mapping.Mapper.Map<ProductTransaction>(item));
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+        }
+    }
+
+    private async Task ItemTappedAsync(ProductFiche productFiche)
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+            _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(500);
+            await GetLastTransactionAsync(productFiche);
+            CurrentPage.FindByName<BottomSheet>("ficheTransactionBottomSheet").State = BottomSheetState.HalfExpanded;
+
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
         finally
         {

@@ -51,7 +51,6 @@ public partial class CustomerListViewModel : BaseViewModel
     [ObservableProperty]
     public SearchBar searchText;
 
-
     public async Task LoadItemsAsync()
     {
         if (IsBusy)
