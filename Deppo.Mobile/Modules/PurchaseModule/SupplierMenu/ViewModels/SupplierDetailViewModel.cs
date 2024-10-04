@@ -19,6 +19,7 @@ public partial class SupplierDetailViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
 	private readonly ISupplierTransactionService _supplierTransactionService;
+	private readonly ISupplierDetailService _supplierDetailService;
 	private readonly ICustomQueryService _customQueryService;
 	private readonly IUserDialogs _userDialogs;
 
@@ -27,12 +28,13 @@ public partial class SupplierDetailViewModel : BaseViewModel
 
 	public ObservableCollection<SupplierDetailActionModel> SupplierActionModels { get; } = new();
 
-	public SupplierDetailViewModel(IHttpClientService httpClientService, ISupplierTransactionService supplierTransactionService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
+	public SupplierDetailViewModel(IHttpClientService httpClientService, ISupplierTransactionService supplierTransactionService, ISupplierDetailService supplierDetailService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
 	{
 		Title = "Tedarikçi Detayı";
 
 		_httpClientService = httpClientService;
 		_supplierTransactionService = supplierTransactionService;
+		_supplierDetailService = supplierDetailService;
 		_customQueryService = customQueryService;
 		_userDialogs = userDialogs;
 
@@ -64,7 +66,7 @@ public partial class SupplierDetailViewModel : BaseViewModel
 			await Task.Delay(1000);
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastTransactionsAsync(httpClient));
+			await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastFichesAsync(httpClient));
 
 			_userDialogs.HideHud();
 		}
@@ -142,6 +144,38 @@ public partial class SupplierDetailViewModel : BaseViewModel
 				_userDialogs.Loading().Hide();
 
 			_userDialogs.Alert(message: ex.Message, title: "Hata");
+		}
+	}
+
+	private async Task GetLastFichesAsync(HttpClient httpClient)
+	{
+		try
+		{
+			var result = await _supplierDetailService.GetLastFichesBySupplier(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				supplierReferenceId: SupplierDetailModel.Supplier.ReferenceId
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+				{
+					SupplierDetailModel.LastFiches.Add(Mapping.Mapper.Map<PurchaseFiche>(item));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			_userDialogs.Alert(message: ex.Message, title: "Hata");
+
 		}
 	}
 

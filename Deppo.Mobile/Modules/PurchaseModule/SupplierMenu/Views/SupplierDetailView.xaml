@@ -120,77 +120,81 @@
         <Grid Grid.Row="1"
               RowDefinitions="Auto, *"
               RowSpacing="10">
-            <Label Grid.Row="0"
-                   FontAttributes="Bold"
-                   FontSize="Title"
-                   Text="Son Hareketler" />
 
-            <CollectionView Grid.Row="1" ItemsSource="{Binding SupplierDetailModel.LastTransactions}">
+            <Grid Grid.Row="0"
+                  ColumnDefinitions="*, Auto"
+                  ColumnSpacing="10">
+                <Label Grid.Column="0"
+                       FontAttributes="Bold"
+                       FontSize="18"
+                       Text="Son Hareketler"
+                       TextColor="{StaticResource OffBlack}"
+                       VerticalOptions="Center" />
+
+                <Border Grid.Column="1"
+                        Padding="5"
+                        BackgroundColor="{StaticResource Primary}"
+                        HorizontalOptions="End"
+                        Stroke="{StaticResource Primary}"
+                        StrokeShape="RoundRectangle 10"
+                        VerticalOptions="Center">
+
+                    <Label FontFamily="FAS"
+                           FontSize="15"
+                           TextColor="{StaticResource White}"
+                           VerticalOptions="Center">
+                        <Label.FormattedText>
+                            <FormattedString>
+
+                                <Span FontAttributes="Bold"
+                                      Text="Tüm Hareketler"
+                                      TextColor="{StaticResource White}" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </Border>
+            </Grid>
+
+
+            <CollectionView Grid.Row="1" ItemsSource="{Binding SupplierDetailModel.LastFiches}">
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="model:SupplierTransaction">
+                    <DataTemplate x:DataType="model:PurchaseFiche">
                         <Border Padding="5"
                                 BackgroundColor="Transparent"
                                 StrokeThickness="0.1">
                             <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
-                                <VerticalStackLayout Grid.Column="0"
-                                                     Spacing="1"
-                                                     VerticalOptions="Center">
-                                    <Label FontAttributes="Bold"
-                                           FontSize="Large"
-                                           HorizontalOptions="Center"
-                                           Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
-                                           TextColor="{StaticResource OffBlack}" />
-                                    <Label FontSize="Medium"
-                                           HorizontalOptions="Center"
-                                           Text="{Binding TransactionDate, StringFormat='{0:MM/yyyy}'}"
-                                           TextColor="{StaticResource OffBlack}" />
-                                    <Label HorizontalOptions="Center"
-                                           Text="{Binding TransactionTime, StringFormat='{0:hh\\:mm}'}"
-                                           TextColor="{StaticResource Gray400}" />
-                                </VerticalStackLayout>
+                                <Border Grid.Column="0"
+                                        Padding="5"
+                                        BackgroundColor="{StaticResource Secondary}"
+                                        StrokeShape="RoundRectangle 10">
+                                    <VerticalStackLayout Spacing="0" VerticalOptions="Center">
+                                        <Label FontAttributes="Bold"
+                                               FontSize="Subtitle"
+                                               HorizontalOptions="Center"
+                                               Text="{Binding FicheDate, StringFormat='{0:dd}'}"
+                                               TextColor="{StaticResource OffBlack}" />
+                                        <Label HorizontalOptions="Center"
+                                               Text="{Binding FicheDate, StringFormat='{0:MM/yyyy}'}"
+                                               TextColor="{StaticResource OffBlack}" />
+                                        <Label HorizontalOptions="Center"
+                                               Text="{Binding FicheTime, StringFormat='{0:hh\\:mm}'}"
+                                               TextColor="{StaticResource Black}" />
+                                    </VerticalStackLayout>
+                                </Border>
 
                                 <VerticalStackLayout Grid.Column="1"
                                                      Spacing="1"
                                                      VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
                                            FontSize="Medium"
-                                           Text="{Binding BaseTransactionCode}" />
+                                           Text="{Binding FicheNumber}" />
                                     <Label FontSize="13"
                                            LineBreakMode="TailTruncation"
-                                           Text="{Binding ProductName}" />
+                                           Text="{Binding CurrentName}" />
 
-                                    <HorizontalStackLayout Spacing="10">
-                                        <Grid ColumnDefinitions="Auto, Auto" ColumnSpacing="3">
-                                            <Label Grid.Column="0"
-                                                   FontFamily="FAS"
-                                                   FontSize="Small"
-                                                   Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
-                                                   TextColor="{StaticResource Primary}"
-                                                   VerticalOptions="Center" />
-                                            <Label Grid.Column="1">
-                                                <Label.FormattedText>
-                                                    <FormattedString>
-                                                        <Span FontAttributes="Bold" Text="{Binding Quantity}" />
-                                                        <Span Text=" " />
-                                                        <Span FontAttributes="Bold" Text="{Binding SubUnitsetCode}" />
-                                                    </FormattedString>
-                                                </Label.FormattedText>
-                                            </Label>
-                                        </Grid>
-                                        <Grid ColumnDefinitions="Auto, Auto" ColumnSpacing="3">
-                                            <Label Grid.Column="0"
-                                                   FontFamily="FAS"
-                                                   HeightRequest="15"
-                                                   Text="{Binding IOTypeImageSource}"
-                                                   TextColor="{Binding IOTypeColor}"
-                                                   WidthRequest="10" />
-                                            <Label Grid.Column="1"
-                                                   FontAttributes="Bold"
-                                                   Text="{Binding IOTypeName}"
-                                                   VerticalOptions="Start" />
-                                        </Grid>
-
-                                    </HorizontalStackLayout>
+                                    <Label FontSize="13"
+                                           LineBreakMode="TailTruncation"
+                                           Text="{Binding FicheTypeName}" />
                                 </VerticalStackLayout>
                             </Grid>
                         </Border>

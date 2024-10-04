@@ -226,6 +226,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<ICustomerService, CustomerDataStoreV2>();
         builder.Services.AddSingleton<IWaitingSalesOrderService, WaitingSalesOrderDataStore>();
         builder.Services.AddSingleton<ISupplierService, SupplierDataStoreV2>();
+        builder.Services.AddSingleton<ISupplierDetailService, SupplierDetailDataStore>();
         builder.Services.AddSingleton<ISupplierDetailActionService, SupplierDetailActionDataStore>();
         builder.Services.AddSingleton<IProductTransactionService, ProductTransactionDataStore>();
         builder.Services.AddSingleton<IWarehouseTransactionService, WarehouseTransactionDataStore>();

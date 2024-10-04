@@ -26,4 +26,5 @@ public partial class SupplierDetailModel : ObservableObject
     }
 
     public ObservableCollection<SupplierTransaction> LastTransactions { get; } = new();
+	public ObservableCollection<PurchaseFiche> LastFiches { get; } = new();
 }
