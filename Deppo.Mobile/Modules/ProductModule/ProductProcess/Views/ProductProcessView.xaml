@@ -73,7 +73,7 @@
                                                    FontAttributes="Bold"
                                                    FontSize="Subtitle"
                                                    Text="Üretimden Giriş İşlemleri"
-                                                   TextColor="{StaticResource Gray550}" />
+                                                   TextColor="{StaticResource Gray500}" />
                                             <Label Text="Üretimden giriş fişi ile stok girişi yapabilirsiniz."
                                                    TextColor="{StaticResource Gray400}">
                                             </Label>
@@ -129,7 +129,7 @@
                                             <Label FontAttributes="Bold"
                                                    FontSize="Subtitle"
                                                    Text="Sayım Fazlası İşlemleri"
-                                                   TextColor="{StaticResource Gray550}"
+                                                   TextColor="{StaticResource Gray500}"
                                                    VerticalOptions="Center" />
                                             <Label VerticalOptions="End"
                                                    Text="Sayım fazlası fişi ile stok girişi yapabilirsiniz."
@@ -200,7 +200,7 @@
                                             <Label FontAttributes="Bold"
                                                    FontSize="Subtitle"
                                                    Text="Sarf Fişi İşlemleri"
-                                                   TextColor="{StaticResource Gray550}"
+                                                   TextColor="{StaticResource Gray500}"
                                                    VerticalOptions="Center" />
                                             <Label VerticalOptions="End"
                                                    Text="Sarf işlemi ile stok çıkışı yapabilirsiniz."
@@ -258,7 +258,7 @@
                                                    FontAttributes="Bold"
                                                    FontSize="Subtitle"
                                                    Text="Sayım Eksiği İşlemleri"
-                                                   TextColor="{StaticResource Gray550}" />
+                                                   TextColor="{StaticResource Gray500}" />
                                             <Label VerticalOptions="End"
                                                    Text="Sayım eksiği ile stok çıkışı yapabilirsiniz."
                                                    TextColor="{StaticResource Gray400}">
@@ -314,7 +314,7 @@
                                             <Label FontAttributes="Bold"
                                                    FontSize="Subtitle"
                                                    Text="Fire Fişi İşlemleri"
-                                                   TextColor="{StaticResource Gray550}"
+                                                   TextColor="{StaticResource Gray500}"
                                                    VerticalOptions="Center" />
                                             <Label VerticalOptions="End"
                                                    Text="Fire işlemi ile stok çıkışı yapabilirsiniz."
@@ -382,7 +382,7 @@
                                             <Label FontAttributes="Bold"
                                                    FontSize="Subtitle"
                                                    Text="Ambar Transferi İşlemleri"
-                                                   TextColor="{StaticResource Gray550}"
+                                                   TextColor="{StaticResource Gray500}"
                                                    VerticalOptions="Center" />
                                             <Label VerticalOptions="End"
                                                    Text="Ambarlar arası transfer yapabilirsiniz."
@@ -433,7 +433,7 @@
                                             <Label FontAttributes="Bold"
                                                    FontSize="Subtitle"
                                                    Text="Malzeme Virmanı İşlemleri"
-                                                   TextColor="{StaticResource Gray550}"
+                                                   TextColor="{StaticResource Gray500}"
                                                    VerticalOptions="Center" />
                                             <Label VerticalOptions="End"
                                                    Text="Malzemeler arası stok aktarımı yapabilirsiniz."
@@ -492,7 +492,7 @@
                                 BackgroundColor="Transparent"
                                 StrokeShape="RoundRectangle 10"
                                 StrokeThickness="0">
-                            <Label TextColor="{StaticResource Gray550}"
+                            <Label TextColor="{StaticResource Gray500}"
                                    VerticalOptions="Center">
                                 <Label.FormattedText>
                                     <FormattedString>

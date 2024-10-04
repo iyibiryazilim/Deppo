@@ -755,9 +755,6 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
 			CurrentPage.FindByName<BottomSheet>("basketOptionsBottomSheet").State = BottomSheetState.Hidden;
 			await Task.Delay(300);
 
-            Console.WriteLine("WarehouseModel: " + WarehouseModel);
-            Console.WriteLine("PurchaseSupplier: " + PurchaseSupplier);
-
 			await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessOrderListView)}", new Dictionary<string, object>
 			{
 				[nameof(WarehouseModel)] = WarehouseModel,

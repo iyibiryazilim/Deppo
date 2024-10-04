@@ -266,6 +266,7 @@ public class WaitingPurchaseOrderDataStore : IWaitingPurchaseOrderService
 
     [ReferenceId] = ORFLINE.LOGICALREF,
     [OrderReferenceId] = ORFICHE.LOGICALREF,
+    [OrderNumber] = ORFICHE.FICHENO,
     [SupplierReferenceId] = CLCARD.LOGICALREF,
     [SupplierCode] = CLCARD.CODE,
     [SupplierName] = CLCARD.DEFINITION_,
@@ -317,6 +318,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
     [ReferenceId] = ORFLINE.LOGICALREF,
     [OrderReferenceId] = ORFICHE.LOGICALREF,
+    [OrderNumber] = ORFICHE.FICHENO,
     [SupplierReferenceId] = CLCARD.LOGICALREF,
     [SupplierCode] = CLCARD.CODE,
     [SupplierName] = CLCARD.DEFINITION_,
@@ -368,6 +370,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
     [ReferenceId] = ORFLINE.LOGICALREF,
     [OrderReferenceId] = ORFICHE.LOGICALREF,
+    [OrderNumber] = ORFICHE.FICHENO,
     [SupplierReferenceId] = CLCARD.LOGICALREF,
     [SupplierCode] = CLCARD.CODE,
     [SupplierName] = CLCARD.DEFINITION_,
@@ -377,7 +380,6 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
     [UnitsetReferenceId] = UNITSET.LOGICALREF,
     [UnitsetCode] = UNITSET.CODE,
     [UnitsetName] = UNITSET.NAME,
-
     [SubUnitsetReferenceId] = SUBUNITSET.LOGICALREF,
     [SubUnitsetCode] = SUBUNITSET.CODE,
     [SubUnitsetName] = SUBUNITSET.NAME,
@@ -419,6 +421,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
     [ReferenceId] = ORFLINE.LOGICALREF,
     [OrderReferenceId] = ORFICHE.LOGICALREF,
+    [OrderNumber] = ORFICHE.FICHENO,
     [SupplierReferenceId] = CLCARD.LOGICALREF,
     [SupplierCode] = CLCARD.CODE,
     [SupplierName] = CLCARD.DEFINITION_,
@@ -470,6 +473,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
     [ReferenceId] = ORFLINE.LOGICALREF,
     [OrderReferenceId] = ORFICHE.LOGICALREF,
+    [OrderNumber] = ORFICHE.FICHENO,
     [SupplierReferenceId] = CLCARD.LOGICALREF,
     [SupplierCode] = CLCARD.CODE,
     [SupplierName] = CLCARD.DEFINITION_,
