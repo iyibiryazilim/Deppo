@@ -221,6 +221,8 @@ public partial class SupplierDetailViewModel : BaseViewModel
 		{
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
+			SupplierDetailModel.Transactions.Clear();
+
 			var result = await _supplierTransactionService.GetObjects(
 					httpClient: httpClient,
 					firmNumber: _httpClientService.FirmNumber,
