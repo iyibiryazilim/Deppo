@@ -432,6 +432,9 @@
 	  <MauiXaml Update="Modules\ResultModule\Views\InsertSuccessPageView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\CustomerMenu\Views\ActionViews\CustomerDetailApprovedProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\SalesModule\CustomerMenu\Views\ActionViews\CustomerDetailShipAddressListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

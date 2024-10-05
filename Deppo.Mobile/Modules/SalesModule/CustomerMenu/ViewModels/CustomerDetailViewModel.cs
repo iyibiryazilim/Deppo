@@ -338,7 +338,7 @@ public partial class CustomerDetailViewModel : BaseViewModel
 			{
 				LineNumber = 1,
 				ActionName = "Satılabilen Ürünler",
-				//ActionUrl = $"{nameof(CustomerDetailApprovedProductListView)}",
+				ActionUrl = $"{nameof(CustomerDetailApprovedProductListView)}",
 				Icon = "",
 				IsSelected = false
 			});
