@@ -1,40 +1,34 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
-using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.PurchaseModels;
+using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
-using DevExpress.Data.Async.Helpers;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels.ActionViewModels;
+namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels.ActionViewModels;
 
-[QueryProperty(name: nameof(SupplierDetailModel), queryId: nameof(SupplierDetailModel))]
-public partial class SupplierDetailShipAddressListViewModel : BaseViewModel
+[QueryProperty(name: nameof(CustomerDetailModel), queryId: nameof(CustomerDetailModel))]
+public partial class CustomerDetailWaitingSalesOrderListViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
-	private readonly ISupplierDetailActionService _supplierDetailActionService;
+	private readonly ICustomerDetailActionService _customerDetailActionService;
 	private readonly IUserDialogs _userDialogs;
 
 	[ObservableProperty]
-	SupplierDetailModel supplierDetailModel = null!;
+	CustomerDetailModel customerDetailModel = null!;
 
-	public ObservableCollection<ShipAddress> Items { get; } = new();
+	public ObservableCollection<WaitingSalesOrderModel> Items { get; } = new();
 
-	public SupplierDetailShipAddressListViewModel(IHttpClientService httpClientService, ISupplierDetailActionService supplierDetailActionService, IUserDialogs userDialogs)
+	public CustomerDetailWaitingSalesOrderListViewModel(IHttpClientService httpClientService, ICustomerDetailActionService customerDetailActionService, IUserDialogs userDialogs)
 	{
 		_httpClientService = httpClientService;
-		_supplierDetailActionService = supplierDetailActionService;
+		_customerDetailActionService = customerDetailActionService;
 		_userDialogs = userDialogs;
 
-		Title = "Sevk Adresleri";
+		Title = "Bekleyen Satış Siparişleri";
 
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
@@ -58,34 +52,32 @@ public partial class SupplierDetailShipAddressListViewModel : BaseViewModel
 			Items.Clear();
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-
-			var result = await _supplierDetailActionService.GetShipAddressesBySupplier(
+			var result = await _customerDetailActionService.GetWaitingSalesOrdersByCustomer(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
-				supplierReferenceId: SupplierDetailModel.Supplier.ReferenceId,
-				search: "",
+				customerReferenceId: CustomerDetailModel.Customer.ReferenceId,
+				search: string.Empty,
 				skip: 0,
 				take: 20
 			);
 
-
-			if(result.IsSuccess)
+			if (result.IsSuccess)
 			{
 				if (result.Data is null)
 					return;
-                foreach (var item in result.Data)
-                {
-					Items.Add(Mapping.Mapper.Map<ShipAddress>(item));
-                }
-            }
 
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+				foreach (var item in result.Data)
+				{
+					Items.Add(Mapping.Mapper.Map<WaitingSalesOrderModel>(item));
+				}
+			}
+
+			_userDialogs.HideHud();
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -109,25 +101,24 @@ public partial class SupplierDetailShipAddressListViewModel : BaseViewModel
 			_userDialogs.Loading("Loading More Items");
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-
-			var result = await _supplierDetailActionService.GetShipAddressesBySupplier(
+			var result = await _customerDetailActionService.GetWaitingSalesOrdersByCustomer(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
-				supplierReferenceId: SupplierDetailModel.Supplier.ReferenceId,
-				search: "",
+				customerReferenceId: CustomerDetailModel.Customer.ReferenceId,
+				search: string.Empty,
 				skip: Items.Count,
 				take: 20
 			);
-
 
 			if (result.IsSuccess)
 			{
 				if (result.Data is null)
 					return;
+
 				foreach (var item in result.Data)
 				{
-					Items.Add(Mapping.Mapper.Map<ShipAddress>(item));
+					Items.Add(Mapping.Mapper.Map<WaitingSalesOrderModel>(item));
 				}
 			}
 
@@ -159,7 +150,7 @@ public partial class SupplierDetailShipAddressListViewModel : BaseViewModel
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -169,4 +160,5 @@ public partial class SupplierDetailShipAddressListViewModel : BaseViewModel
 			IsBusy = false;
 		}
 	}
+
 }

@@ -1,3 +1,4 @@
+
 using CommunityToolkit.Maui;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.DataStores;
@@ -13,7 +14,6 @@ using Deppo.Mobile.Modules.AnalysisModule.PurchaseAnalysis.ViewModels;
 using Deppo.Mobile.Modules.AnalysisModule.PurchaseAnalysis.Views;
 using Deppo.Mobile.Modules.AnalysisModule.SalesAnalysis.ViewModels;
 using Deppo.Mobile.Modules.AnalysisModule.SalesAnalysis.Views;
-
 using Deppo.Mobile.Modules.CameraModule.ViewModels;
 using Deppo.Mobile.Modules.CameraModule.Views;
 using Deppo.Mobile.Modules.CountingModule.CountingPanel.ViewModels;
@@ -87,7 +87,9 @@ using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Work
 using Deppo.Mobile.Modules.ResultModule.ViewModels;
 using Deppo.Mobile.Modules.ResultModule.Views;
 using Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels;
+using Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels.ActionViewModels;
 using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views;
+using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views.ActionViews;
 using Deppo.Mobile.Modules.SalesModule.SalesPanel.ViewModels;
 using Deppo.Mobile.Modules.SalesModule.SalesPanel.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.ViewModels;
@@ -289,6 +291,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IBarcodeSearchService, BarcodeSearchDataStore>();
 
         builder.Services.AddSingleton<ICustomerDetailService, CustomerDetailDataStore>();
+        builder.Services.AddSingleton<ICustomerDetailActionService, CustomerDetailActionDataStore>();
         builder.Services.AddSingleton<ICustomerDetailAllFichesService, CustomerDetailAllFichesDataStore>();
 
         builder.Services.AddSingleton<IProductDetailAllFichesService, ProductDetailAllFichesDataStore>();
@@ -298,14 +301,6 @@ public static class MauiProgram
         builder.Services.AddTransientWithShellRoute<LoginParameterView, LoginParameterViewModel>(nameof(LoginParameterView));
         builder.Services.AddTransientWithShellRoute<CompanyListView, CompanyListViewModel>(nameof(CompanyListView));
 
-        builder.Services.AddScopedWithShellRoute<ProductDetailLocationTransactionListView, ProductDetailLocationTransactionListViewModel>(nameof(ProductDetailLocationTransactionListView));
-        builder.Services.AddScopedWithShellRoute<ProductDetailVariantListView, ProductDetailVariantListViewModel>(nameof(ProductDetailVariantListView));
-        builder.Services.AddScopedWithShellRoute<ProductDetailVariantTotalListView, ProductDetailVariantTotalListViewModel>(nameof(ProductDetailVariantTotalListView));
-        builder.Services.AddScopedWithShellRoute<ProductDetailWaitingPurchaseOrderListView, ProductDetailWaitingPurchaseOrderListViewModel>(nameof(ProductDetailWaitingPurchaseOrderListView));
-        builder.Services.AddScopedWithShellRoute<ProductDetailWaitingSalesOrderListView, ProductDetailWaitingSalesOrderListViewModel>(nameof(ProductDetailWaitingSalesOrderListView));
-        builder.Services.AddScopedWithShellRoute<ProductDetailWarehouseTotalListView, ProductDetailWarehouseTotalListViewModel>(nameof(ProductDetailWarehouseTotalListView));
-        builder.Services.AddScopedWithShellRoute<ProductDetailApprovedSupplierView, ProductDetailApprovedSupplierViewModel>(nameof(ProductDetailApprovedSupplierView));
-        builder.Services.AddScopedWithShellRoute<ProductDetailVariantDetailListView, ProductDetailVariantDetailListViewModel>(nameof(ProductDetailVariantDetailListView));
 
         #region Analysis Modules
 
@@ -325,8 +320,17 @@ public static class MauiProgram
 
         builder.Services.AddSingletonWithShellRoute<ProductListView, ProductListViewModel>(nameof(ProductListView));
         builder.Services.AddScopedWithShellRoute<ProductDetailView, ProductDetailViewModel>(nameof(ProductDetailView));
-        builder.Services.AddSingletonWithShellRoute<ProductInputTransactionView, ProductInputTransactionViewModel>(nameof(ProductInputTransactionView));
-        builder.Services.AddSingletonWithShellRoute<ProductOutputTransactionView, ProductOutputTransactionViewModel>(nameof(ProductOutputTransactionView));
+		builder.Services.AddScopedWithShellRoute<ProductDetailLocationTransactionListView, ProductDetailLocationTransactionListViewModel>(nameof(ProductDetailLocationTransactionListView));
+		builder.Services.AddTransientWithShellRoute<ProductDetailAllFicheListView, ProductDetailAllFicheListViewModel>(nameof(ProductDetailAllFicheListView));
+		builder.Services.AddScopedWithShellRoute<ProductDetailVariantListView, ProductDetailVariantListViewModel>(nameof(ProductDetailVariantListView));
+		builder.Services.AddScopedWithShellRoute<ProductDetailVariantTotalListView, ProductDetailVariantTotalListViewModel>(nameof(ProductDetailVariantTotalListView));
+		builder.Services.AddScopedWithShellRoute<ProductDetailWaitingPurchaseOrderListView, ProductDetailWaitingPurchaseOrderListViewModel>(nameof(ProductDetailWaitingPurchaseOrderListView));
+		builder.Services.AddScopedWithShellRoute<ProductDetailWaitingSalesOrderListView, ProductDetailWaitingSalesOrderListViewModel>(nameof(ProductDetailWaitingSalesOrderListView));
+		builder.Services.AddScopedWithShellRoute<ProductDetailWarehouseTotalListView, ProductDetailWarehouseTotalListViewModel>(nameof(ProductDetailWarehouseTotalListView));
+		builder.Services.AddScopedWithShellRoute<ProductDetailApprovedSupplierView, ProductDetailApprovedSupplierViewModel>(nameof(ProductDetailApprovedSupplierView));
+		builder.Services.AddScopedWithShellRoute<ProductDetailVariantDetailListView, ProductDetailVariantDetailListViewModel>(nameof(ProductDetailVariantDetailListView));
+		builder.Services.AddTransientWithShellRoute<ProductInputTransactionView, ProductInputTransactionViewModel>(nameof(ProductInputTransactionView));
+        builder.Services.AddTransientWithShellRoute<ProductOutputTransactionView, ProductOutputTransactionViewModel>(nameof(ProductOutputTransactionView));
         builder.Services.AddSingletonWithShellRoute<WarehouseListView, WarehouseListViewModel>(nameof(WarehouseListView));
         builder.Services.AddScopedWithShellRoute<WarehouseDetailView, WarehouseDetailViewModel>(nameof(WarehouseDetailView));
         builder.Services.AddTransientWithShellRoute<WarehouseInputTransactionView, WarehouseInputTransactionViewModel>(nameof(WarehouseInputTransactionView));
@@ -383,15 +387,19 @@ public static class MauiProgram
         builder.Services.AddSingletonWithShellRoute<SalesPanelWaitingProductListView, SalesPanelWaitingProductListViewModel>(nameof(SalesPanelWaitingProductListView));
         builder.Services.AddSingletonWithShellRoute<SalesPanelShippedProductListView, SalesPanelShippedProductListViewModel>(nameof(SalesPanelShippedProductListView));
         builder.Services.AddSingletonWithShellRoute<SalesPanelAllFicheListView, SalesPanelAllFicheListViewModel>(nameof(SalesPanelAllFicheListView));
-        builder.Services.AddSingletonWithShellRoute<CustomerListView, CustomerListViewModel>(nameof(CustomerListView));
-        builder.Services.AddSingletonWithShellRoute<CustomerDetailView, CustomerDetailViewModel>(nameof(CustomerDetailView));
-        builder.Services.AddSingletonWithShellRoute<CustomerInputTransactionView, CustomerInputTransactionViewModel>(nameof(CustomerInputTransactionView));
-        builder.Services.AddSingletonWithShellRoute<CustomerOutputTransactionView, CustomerOutputTransactionViewModel>(nameof(CustomerOutputTransactionView));
-        builder.Services.AddSingletonWithShellRoute<WaitingSalesOrderListView, WaitingSalesOrderListViewModel>(nameof(WaitingSalesOrderListView));
-        builder.Services.AddSingletonWithShellRoute<SalesProcessView, SalesProcessViewModel>(nameof(SalesProcessView));
-        builder.Services.AddSingletonWithShellRoute<CustomerDetailAllFichesView, CustomerDetailAllFichesViewModel>(nameof(CustomerDetailAllFichesView));
 
-        builder.Services.AddSingletonWithShellRoute<ProductDetailAllFicheListView, ProductDetailAllFicheListViewModel>(nameof(ProductDetailAllFicheListView));
+        builder.Services.AddSingletonWithShellRoute<CustomerListView, CustomerListViewModel>(nameof(CustomerListView));
+        builder.Services.AddScopedWithShellRoute<CustomerDetailView, CustomerDetailViewModel>(nameof(CustomerDetailView));
+        builder.Services.AddTransientWithShellRoute<CustomerInputTransactionView, CustomerInputTransactionViewModel>(nameof(CustomerInputTransactionView));
+        builder.Services.AddTransientWithShellRoute<CustomerOutputTransactionView, CustomerOutputTransactionViewModel>(nameof(CustomerOutputTransactionView));
+        builder.Services.AddTransientWithShellRoute<CustomerDetailWaitingSalesOrderListView, CustomerDetailWaitingSalesOrderListViewModel>(nameof(CustomerDetailWaitingSalesOrderListView));
+		builder.Services.AddTransientWithShellRoute<CustomerDetailShipAddressListView, CustomerDetailShipAddressListViewModel> (nameof(CustomerDetailShipAddressListView));
+
+		builder.Services.AddSingletonWithShellRoute<WaitingSalesOrderListView, WaitingSalesOrderListViewModel>(nameof(WaitingSalesOrderListView));
+        builder.Services.AddSingletonWithShellRoute<SalesProcessView, SalesProcessViewModel>(nameof(SalesProcessView));
+        builder.Services.AddTransientWithShellRoute<CustomerDetailAllFichesView, CustomerDetailAllFichesViewModel>(nameof(CustomerDetailAllFichesView));
+
+        
 
         #region Sevk Islemleri
 

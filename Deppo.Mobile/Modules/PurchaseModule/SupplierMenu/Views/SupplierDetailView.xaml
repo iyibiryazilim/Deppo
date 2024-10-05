@@ -52,7 +52,7 @@
                     StrokeThickness="0"
                     VerticalOptions="Center"
                     WidthRequest="100">
-                <!--<Image Source="{Binding SupplierDetailModel.Supplier.Ima, Converter={StaticResource ByteArrayToImageSourceConverter}}" />-->
+                <!--<Image Source="{Binding SupplierDetailModel.Supplier.Image, Converter={StaticResource ByteArrayToImageSourceConverter}}" />-->
             </Border>
 
             <!--#endregion-->

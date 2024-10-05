@@ -316,7 +316,7 @@ public partial class ManuelFormListViewModel : BaseViewModel
             VatRate = 0,
         };
 
-        foreach (var detail in quicklyBomProductBasketModel.MainLocations)
+        foreach (var detail in QuicklyBomProductBasketModel.MainLocations)
         {
             var seriLotTransactionDto = new SeriLotTransactionDto
             {

@@ -14,267 +14,275 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels
+namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels;
+
+[QueryProperty(name: nameof(CustomerDetailModel), queryId: nameof(CustomerDetailModel))]
+public partial class CustomerDetailAllFichesViewModel : BaseViewModel
 {
-    [QueryProperty(name: nameof(CustomerDetailModel), queryId: nameof(CustomerDetailModel))]
-    public partial class CustomerDetailAllFichesViewModel : BaseViewModel
+    private readonly IHttpClientService _httpClientService;
+    private readonly ICustomerDetailAllFichesService _customerDetailAllFichesService;
+    private readonly IUserDialogs _userDialogs;
+
+    [ObservableProperty]
+    private CustomerDetailModel customerDetailModel = null!;
+
+    [ObservableProperty]
+    public SalesFiche selectedItem;
+
+    public ObservableCollection<SalesFiche> Items { get; } = new();
+
+    public ObservableCollection<SalesTransactionModel> Transactions { get; } = new();
+
+    public CustomerDetailAllFichesViewModel(IHttpClientService httpClientService, ICustomerDetailAllFichesService customerDetailAllFichesService, IUserDialogs userDialogs)
     {
-        private readonly IHttpClientService _httpClientService;
-        private readonly ICustomerDetailAllFichesService _customerDetailAllFichesService;
-        private readonly IUserDialogs _userDialogs;
+        _httpClientService = httpClientService;
+        _customerDetailAllFichesService = customerDetailAllFichesService;
+        _userDialogs = userDialogs;
 
-        [ObservableProperty]
-        private CustomerDetailModel customerDetailModel = null!;
+        Title = "Fiş Listesi";
 
-        [ObservableProperty]
-        public SalesFiche selectedItem;
+        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+        LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+        ItemTappedCommand = new Command<SalesFiche>(async (item) => await ItemTappedAsync(item));
+        LoadMoreTransactionsCommand = new Command(async () => await LoadMoreFicheTransactionsAsync());
+        BackCommand = new Command(async () => await BackAsync());
+    }
 
-        public ObservableCollection<SalesFiche> Items { get; } = new();
+    public Command LoadItemsCommand { get; }
+    public Command LoadMoreItemsCommand { get; }
+    public Command ItemTappedCommand { get; }
+    public Command NextViewCommand { get; }
+    public Command LoadMoreTransactionsCommand { get; }
+    public Command BackCommand { get; }
 
-        public ObservableCollection<SalesTransactionModel> Transactions { get; } = new();
+    public Page CurrentPage { get; set; }
 
-        public CustomerDetailAllFichesViewModel(IHttpClientService httpClientService, ICustomerDetailAllFichesService customerDetailAllFichesService, IUserDialogs userDialogs)
+    private async Task LoadItemsAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
         {
-            _httpClientService = httpClientService;
-            _customerDetailAllFichesService = customerDetailAllFichesService;
-            _userDialogs = userDialogs;
+            IsBusy = true;
 
-            Title = "Hareketler";
-            LoadItemsCommand = new Command(async () => await LoadItemsAsync());
-            LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-            ItemTappedCommand = new Command<SalesFiche>(async (item) => await ItemTappedAsync(item));
-            TransactionsCloseCommand = new Command(async () => await TransactionsCloseAsync());
-            LoadMoreTransactionsCommand = new Command(async () => await LoadMoreFicheTransactionsAsync());
-            BackCommand = new Command(async () => await BackAsync());
-        }
+            _userDialogs.ShowLoading("Loading...");
+            Items.Clear();
+            await Task.Delay(1000);
 
-        public Command LoadItemsCommand { get; }
-        public Command LoadMoreItemsCommand { get; }
-        public Command ItemTappedCommand { get; }
-        public Command NextViewCommand { get; }
-        public Command TransactionsCloseCommand { get; }
-        public Command LoadMoreTransactionsCommand { get; }
-        public Command BackCommand { get; }
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _customerDetailAllFichesService.GetAllFiches(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                customerReferenceId: CustomerDetailModel.Customer.ReferenceId,
+                search: "", 
+                skip: 0, 
+                take: 20);
 
-        public Page CurrentPage { get; set; }
-
-        private async Task LoadItemsAsync()
-        {
-            if (IsBusy)
-                return;
-
-            try
+            if (result.IsSuccess)
             {
-                IsBusy = true;
+                if (result.Data is null)
+                    return;
 
-                _userDialogs.ShowLoading("Loading...");
-                Items.Clear(); // İlk yüklemede mevcut öğeleri temizler
-                await Task.Delay(1000);
-
-                var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _customerDetailAllFichesService.GetAllFiches(
-                    httpClient: httpClient,
-                    firmNumber: _httpClientService.FirmNumber,
-                    periodNumber: _httpClientService.PeriodNumber,
-                    CustomerDetailModel.Customer.ReferenceId,
-                    search: "", skip: 0, take: 20);
-
-                if (result.IsSuccess && result.Data is not null)
-                {
-                    foreach (var item in result.Data)
-                    {
-                        var salesFiche = Mapping.Mapper.Map<SalesFiche>(item);
-
-                        // Aynı öğeyi tekrar eklememek için kontrol et
-                        if (!Items.Any(x => x.ReferenceId == salesFiche.ReferenceId))
-                        {
-                            Items.Add(salesFiche);
-                        }
-                    }
+				foreach (var item in result.Data)
+                {   
+                    Items.Add(Mapping.Mapper.Map<SalesFiche>(item));   
                 }
+            }
 
+            _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.HideHud();
 
-                _userDialogs.Alert(ex.Message);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            _userDialogs.Alert(ex.Message);
         }
-
-        private async Task LoadMoreItemsAsync()
+        finally
         {
-            if (IsBusy)
-                return;
-
-            try
-            {
-                IsBusy = true;
-
-                _userDialogs.ShowLoading("Loading...");
-
-                var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _customerDetailAllFichesService.GetAllFiches(
-                    httpClient: httpClient,
-                    firmNumber: _httpClientService.FirmNumber,
-                    periodNumber: _httpClientService.PeriodNumber,
-                    CustomerDetailModel.Customer.ReferenceId,
-                    search: "", skip: Items.Count, take: 20); // skip, zaten yüklenen öğeler kadar olmalı
-
-                if (result.IsSuccess && result.Data is not null)
-                {
-                    foreach (var item in result.Data)
-                    {
-                        var salesFiche = Mapping.Mapper.Map<SalesFiche>(item);
-
-                        // Aynı öğeyi tekrar eklememek için kontrol et
-                        if (!Items.Any(x => x.ReferenceId == salesFiche.ReferenceId))
-                        {
-                            Items.Add(salesFiche);
-                        }
-                    }
-                }
-
-                _userDialogs.HideHud();
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.HideHud();
-
-                _userDialogs.Alert(ex.Message);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
-
-        private async Task ItemTappedAsync(SalesFiche salesFiche)
-        {
-            if (IsBusy)
-                return;
-
-            try
-            {
-                IsBusy = true;
-
-                SelectedItem = salesFiche;
-
-                await LoadTransactionsAsync(salesFiche);
-                CurrentPage.FindByName<BottomSheet>("ficheTransactionsBottomSheet").State = BottomSheetState.HalfExpanded;
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.HideHud();
-
-                _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
-
-        private async Task TransactionsCloseAsync()
-        {
-            await MainThread.InvokeOnMainThreadAsync(() =>
-            {
-                CurrentPage.FindByName<BottomSheet>("ficheTransactionsBottomSheet").State = BottomSheetState.Hidden;
-            });
-        }
-
-        private async Task LoadTransactionsAsync(SalesFiche salesFiche)
-        {
-            try
-            {
-                _userDialogs.ShowLoading("Yükleniyor...");
-                await Task.Delay(1000);
-
-                Transactions.Clear();
-
-                var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _customerDetailAllFichesService.GetTransactionsByFiche(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, ficheReferenceId: SelectedItem.ReferenceId, skip: Transactions.Count, take: 20);
-                if (result.IsSuccess)
-                {
-                    if (result.Data is null)
-                        return;
-
-                    foreach (var item in result.Data)
-                        Transactions.Add(Mapping.Mapper.Map<SalesTransactionModel>(item));
-                }
-
-                _userDialogs.HideHud();
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.HideHud();
-
-                _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-            }
-        }
-
-        private async Task LoadMoreFicheTransactionsAsync()
-        {
-            if (IsBusy)
-                return;
-            try
-            {
-                IsBusy = true;
-
-                var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _customerDetailAllFichesService.GetTransactionsByFiche(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, ficheReferenceId: SelectedItem.ReferenceId, skip: Transactions.Count, take: 20);
-                if (result.IsSuccess)
-                {
-                    if (result.Data is null)
-                        return;
-
-                    foreach (var item in result.Data)
-                        Transactions.Add(Mapping.Mapper.Map<SalesTransactionModel>(item));
-                }
-            }
-            catch (Exception ex)
-            {
-                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
-
-        private async Task BackAsync()
-        {
-            if (IsBusy)
-                return;
-            try
-            {
-                IsBusy = true;
-                if (Items.Count > 0)
-                {
-                    Items.Clear();
-                }
-                await Shell.Current.GoToAsync("..");
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.HideHud();
-
-                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            IsBusy = false;
         }
     }
+
+	private async Task LoadMoreItemsAsync()
+	{
+		if (IsBusy)
+			return;
+
+		try
+		{
+			IsBusy = true;
+
+			_userDialogs.ShowLoading("Loading More...");
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _customerDetailAllFichesService.GetAllFiches(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				customerReferenceId: CustomerDetailModel.Customer.ReferenceId,
+				search: "",
+				skip: Items.Count,
+				take: 20);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+				{
+					Items.Add(Mapping.Mapper.Map<SalesFiche>(item));
+				}
+			}
+
+			_userDialogs.HideHud();
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message);
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+    private async Task ItemTappedAsync(SalesFiche salesFiche)
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            SelectedItem = salesFiche;
+
+			_userDialogs.ShowLoading("Yükleniyor...");
+			await LoadTransactionsAsync(salesFiche);
+            await Task.Delay(500);
+            CurrentPage.FindByName<BottomSheet>("ficheTransactionsBottomSheet").State = BottomSheetState.HalfExpanded;
+			_userDialogs.HideHud();
+		}
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task LoadTransactionsAsync(SalesFiche salesFiche)
+    {
+        try
+        {
+            Transactions.Clear();
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _customerDetailAllFichesService.GetTransactionsByFiche(httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber,
+                ficheReferenceId: salesFiche.ReferenceId, 
+                skip: Transactions.Count, 
+                take: 20);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                    Transactions.Add(Mapping.Mapper.Map<SalesTransactionModel>(item));
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+    }
+
+    private async Task LoadMoreFicheTransactionsAsync()
+    {
+        if (Transactions.Count < 18)
+            return;
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+
+			_userDialogs.ShowLoading("Yükleniyor...");
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _customerDetailAllFichesService.GetTransactionsByFiche(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                ficheReferenceId: SelectedItem.ReferenceId,
+                skip: Transactions.Count,
+                take: 20);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                    Transactions.Add(Mapping.Mapper.Map<SalesTransactionModel>(item));
+            }
+
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+	private async Task BackAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+			if (Items.Count > 0)
+			{
+				Items.Clear();
+			}
+			await Shell.Current.GoToAsync("..");
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+
 }

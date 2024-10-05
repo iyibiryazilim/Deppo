@@ -60,11 +60,12 @@ public partial class SupplierDetailAllFicheListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            Items.Clear();
 
+            Items.Clear();
             _userDialogs.Loading("Loading Items...");
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
             await Task.Delay(1000);
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _supplierDetailAllFicheService.GetAllFichesBySupplier(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber,
               SupplierDetailModel.Supplier.ReferenceId,  string.Empty, Items.Count, 20);
             if (result.IsSuccess)
@@ -75,12 +76,13 @@ public partial class SupplierDetailAllFicheListViewModel : BaseViewModel
                 foreach (var item in result.Data)
                     Items.Add(Mapping.Mapper.Map<PurchaseFicheModel>(item));
 
-                _userDialogs.Loading().Hide();
-            }
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
+			}
             else
             {
                 if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
+                    _userDialogs.HideHud();
 
                 _userDialogs.Alert(message: result.Message, title: "Load Items");
             }
@@ -106,7 +108,9 @@ public partial class SupplierDetailAllFicheListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            _userDialogs.Loading("Refreshing Items...");
+
+            _userDialogs.Loading("Loading More Items...");
+
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _supplierDetailAllFicheService.GetAllFichesBySupplier(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SupplierDetailModel.Supplier.ReferenceId,string.Empty, Items.Count, 20);
             if (result.IsSuccess)
@@ -180,13 +184,11 @@ public partial class SupplierDetailAllFicheListViewModel : BaseViewModel
 
 			SupplierDetailModel.Transactions.Clear();
 
-			var result = await _supplierTransactionService.GetObjects(
+			var result = await _supplierDetailAllFicheService.GetTransactionsByFiche(
 					httpClient: httpClient,
 					firmNumber: _httpClientService.FirmNumber,
 					periodNumber: _httpClientService.PeriodNumber,
-					supplierReferenceId: SupplierDetailModel.Supplier.ReferenceId,
-					skip: 0,
-					take: 999999
+                    ficheReferenceId: purchaseFicheModel.ReferenceId
 				);
 
 			if (result.IsSuccess)
@@ -236,6 +238,4 @@ public partial class SupplierDetailAllFicheListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
-
 }

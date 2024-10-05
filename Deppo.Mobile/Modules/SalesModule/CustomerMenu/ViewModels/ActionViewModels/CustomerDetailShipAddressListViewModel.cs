@@ -2,36 +2,31 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
-using Deppo.Mobile.Core.Models.PurchaseModels;
+using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
-using DevExpress.Data.Async.Helpers;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels.ActionViewModels;
+namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels.ActionViewModels;
 
-[QueryProperty(name: nameof(SupplierDetailModel), queryId: nameof(SupplierDetailModel))]
-public partial class SupplierDetailShipAddressListViewModel : BaseViewModel
+
+[QueryProperty(name: nameof(CustomerDetailModel), queryId: nameof(CustomerDetailModel))]
+public partial class CustomerDetailShipAddressListViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
-	private readonly ISupplierDetailActionService _supplierDetailActionService;
+	private readonly ICustomerDetailActionService _customerDetailActionService;
 	private readonly IUserDialogs _userDialogs;
 
 	[ObservableProperty]
-	SupplierDetailModel supplierDetailModel = null!;
+	CustomerDetailModel customerDetailModel = null!;
 
 	public ObservableCollection<ShipAddress> Items { get; } = new();
 
-	public SupplierDetailShipAddressListViewModel(IHttpClientService httpClientService, ISupplierDetailActionService supplierDetailActionService, IUserDialogs userDialogs)
+	public CustomerDetailShipAddressListViewModel(IHttpClientService httpClientService, ICustomerDetailActionService customerDetailActionService, IUserDialogs userDialogs)
 	{
 		_httpClientService = httpClientService;
-		_supplierDetailActionService = supplierDetailActionService;
+		_customerDetailActionService = customerDetailActionService;
 		_userDialogs = userDialogs;
 
 		Title = "Sevk Adresleri";
@@ -54,38 +49,38 @@ public partial class SupplierDetailShipAddressListViewModel : BaseViewModel
 			IsBusy = true;
 
 			_userDialogs.Loading("Loading Items");
-			await Task.Delay(1000);
 			Items.Clear();
+			await Task.Delay(1000);
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			var result = await _supplierDetailActionService.GetShipAddressesBySupplier(
+			var result = await _customerDetailActionService.GetShipAddressesByCustomer(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
-				supplierReferenceId: SupplierDetailModel.Supplier.ReferenceId,
+				customerReferenceId: CustomerDetailModel.Customer.ReferenceId,
 				search: "",
 				skip: 0,
 				take: 20
 			);
 
 
-			if(result.IsSuccess)
+			if (result.IsSuccess)
 			{
 				if (result.Data is null)
 					return;
-                foreach (var item in result.Data)
-                {
+				foreach (var item in result.Data)
+				{
 					Items.Add(Mapping.Mapper.Map<ShipAddress>(item));
-                }
-            }
+				}
+			}
 
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -110,11 +105,11 @@ public partial class SupplierDetailShipAddressListViewModel : BaseViewModel
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			var result = await _supplierDetailActionService.GetShipAddressesBySupplier(
+			var result = await _customerDetailActionService.GetShipAddressesByCustomer(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
-				supplierReferenceId: SupplierDetailModel.Supplier.ReferenceId,
+				customerReferenceId: CustomerDetailModel.Customer.ReferenceId,
 				search: "",
 				skip: Items.Count,
 				take: 20
@@ -131,7 +126,7 @@ public partial class SupplierDetailShipAddressListViewModel : BaseViewModel
 				}
 			}
 
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 		}
 		catch (Exception ex)
@@ -159,7 +154,7 @@ public partial class SupplierDetailShipAddressListViewModel : BaseViewModel
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");

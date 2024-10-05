@@ -22,6 +22,11 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using DevExpress.Maui.Controls;
+using Deppo.Mobile.Core.ActionModels.SupplierActionModels;
+using System.Collections.ObjectModel;
+using Deppo.Mobile.Core.ActionModels.CustomerActionModels;
+using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views.ActionViews;
+using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views.ActionViews;
 
 namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels;
 
@@ -38,7 +43,7 @@ public partial class CustomerDetailViewModel : BaseViewModel
     [ObservableProperty]
     private CustomerDetailModel customerDetailModel = null!;
 
-    public Page CurrentPage { get; set; }
+	public ObservableCollection<CustomerDetailActionModel> CustomerActionModels { get; } = new();
 
     public CustomerDetailViewModel(IHttpClientService httpClientService,
     ICustomerService customerService,
@@ -61,9 +66,14 @@ public partial class CustomerDetailViewModel : BaseViewModel
         ItemTappedCommand = new Command<SalesFiche>(async (salesFiche) => await ItemTappedAsync(salesFiche));
         AllFicheTappedCommand = new Command(async () => await AllFicheTappedAsync());
         GetLastTransactionCommand = new Command<SalesFiche>(async (salesFiche) => await GetLastTransactionAsync(salesFiche));
+
+        ActionModelProcessTappedCommand = new Command(async () => await ActionModelProcessTappedAsync());
+        ActionModelsTappedCommand = new Command<CustomerDetailActionModel>(async (model) => await ActionModelsTappedAsync(model));
     }
 
-    public Command LoadItemsCommand { get; }
+    public Page CurrentPage { get; set; } = null!;
+
+	public Command LoadItemsCommand { get; }
     public Command InputQuantityTappedCommand { get; }
 
     public Command OutputQuantityTappedCommand { get; }
@@ -72,7 +82,10 @@ public partial class CustomerDetailViewModel : BaseViewModel
     public Command ItemTappedCommand { get; }
     public Command GetLastTransactionCommand { get; }
 
-    private async Task LoadItemsAsync()
+	public Command ActionModelProcessTappedCommand { get; }
+	public Command ActionModelsTappedCommand { get; }
+
+	private async Task LoadItemsAsync()
     {
         try
         {
@@ -127,40 +140,6 @@ public partial class CustomerDetailViewModel : BaseViewModel
             _userDialogs.Alert(message: ex.Message, title: "Hata");
         }
     }
-
-    //private async Task GetLastTransactionsAsync(HttpClient httpClient)
-    //{
-    //    try
-    //    {
-    //        var result = await _customerTransactionService.GetObjects(
-    //            httpClient: httpClient,
-    //            firmNumber: _httpClientService.FirmNumber,
-    //            periodNumber: _httpClientService.PeriodNumber,
-    //            customerReferenceId: CustomerDetailModel.Customer.ReferenceId,
-    //            search: "",
-    //            skip: 0,
-    //            take: 5
-    //        );
-
-    //        if (result.IsSuccess)
-    //        {
-    //            if (result.Data == null)
-    //                return;
-
-    //            foreach (var item in result.Data)
-    //            {
-    //                CustomerDetailModel.LastTransactions.Add(Mapping.Mapper.Map<CustomerTransaction>(item));
-    //            }
-    //        }
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        if (_userDialogs.IsHudShowing)
-    //            _userDialogs.Loading().Hide();
-
-    //        _userDialogs.Alert(message: ex.Message, title: "Hata");
-    //    }
-    //}
 
     private async Task GetLastFicheAsync()
     {
@@ -320,4 +299,102 @@ public partial class CustomerDetailViewModel : BaseViewModel
         {
         }
     }
+
+	private async Task ActionModelProcessTappedAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+			_userDialogs.Loading("Yükleniyor");
+			await LoadActionModelAsync();
+
+			CurrentPage.FindByName<BottomSheet>("processBottomSheet").State = BottomSheetState.HalfExpanded;
+
+            if(_userDialogs.IsHudShowing)
+			    _userDialogs.HideHud();
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task LoadActionModelAsync()
+	{
+		try
+		{
+		    CustomerActionModels.Clear();
+
+			CustomerActionModels.Add(new CustomerDetailActionModel
+			{
+				LineNumber = 1,
+				ActionName = "Satılabilen Ürünler",
+				//ActionUrl = $"{nameof(CustomerDetailApprovedProductListView)}",
+				Icon = "",
+				IsSelected = false
+			});
+
+			CustomerActionModels.Add(new CustomerDetailActionModel
+			{
+				LineNumber = 2,
+				ActionName = "Bekleyen Satış Siparişleri",
+				ActionUrl = $"{nameof(CustomerDetailWaitingSalesOrderListView)}",
+				Icon = "",
+				IsSelected = false
+			});
+
+			CustomerActionModels.Add(new CustomerDetailActionModel
+			{
+				LineNumber = 3,
+				ActionName = "Sevk Adresleri",
+				ActionUrl = $"{nameof(CustomerDetailShipAddressListView)}",
+				Icon = "",
+				IsSelected = false
+			});
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+	}
+
+	private async Task ActionModelsTappedAsync(CustomerDetailActionModel model)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			CurrentPage.FindByName<BottomSheet>("processBottomSheet").State = BottomSheetState.Hidden;
+			await Task.Delay(300);
+			await Shell.Current.GoToAsync($"{model.ActionUrl}", new Dictionary<string, object>
+			{
+				[nameof(CustomerDetailModel)] = CustomerDetailModel
+			});
+
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
 }
