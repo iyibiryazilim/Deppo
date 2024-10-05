@@ -9,11 +9,8 @@ using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views;
 using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views.ActionViews;
-using Deppo.Mobile.Modules.SalesModule.SalesPanel.Views;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
-using System.Net.Http;
-using static Android.Graphics.ColorSpace;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels;
 
@@ -21,7 +18,6 @@ namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels;
 public partial class SupplierDetailViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
-	private readonly ISupplierTransactionService _supplierTransactionService;
 	private readonly ISupplierDetailService _supplierDetailService;
 	private readonly ICustomQueryService _customQueryService;
 	private readonly IUserDialogs _userDialogs;
@@ -31,24 +27,23 @@ public partial class SupplierDetailViewModel : BaseViewModel
 
 	public ObservableCollection<SupplierDetailActionModel> SupplierActionModels { get; } = new();
 
-	public SupplierDetailViewModel(IHttpClientService httpClientService, ISupplierTransactionService supplierTransactionService, ISupplierDetailService supplierDetailService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
+	public SupplierDetailViewModel(IHttpClientService httpClientService, ISupplierDetailService supplierDetailService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
 	{
-		Title = "Tedarikçi Detayı";
-
 		_httpClientService = httpClientService;
-		_supplierTransactionService = supplierTransactionService;
 		_supplierDetailService = supplierDetailService;
 		_customQueryService = customQueryService;
 		_userDialogs = userDialogs;
+
+		Title = "Tedarikçi Detayı";
 
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
 		InputQuantityTappedCommand = new Command(async () => await InputQuantityTappedAsync());
 		OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
 		ActionModelProcessTappedCommand = new Command(async () => await ActionModelProcessTappedAsync());
 		ActionModelsTappedCommand = new Command<SupplierDetailActionModel>(async (model) => await ActionModelsTappedAsync(model));
-        AllFicheListTappedCommand = new Command(async () => await AllFicheTappedAsync());
+		AllFicheListTappedCommand = new Command(async () => await AllFicheTappedAsync());
 		FicheTappedCommand = new Command<PurchaseFiche>(async (purchaseFiche) => await FicheTappedAsync(purchaseFiche));
-    }
+	}
 
 	public Page CurrentPage { get; set; } = null!;
 
@@ -62,7 +57,7 @@ public partial class SupplierDetailViewModel : BaseViewModel
 	public Command AllFicheListTappedCommand { get; }
 
 
-    private async Task LoadItemsAsync()
+	private async Task LoadItemsAsync()
 	{
 		try
 		{
@@ -107,42 +102,6 @@ public partial class SupplierDetailViewModel : BaseViewModel
 				var obj = Mapping.Mapper.Map<SupplierDetailModel>(result.Data);
 				SupplierDetailModel.InputQuantity = obj.InputQuantity;
 				SupplierDetailModel.OutputQuantity = obj.OutputQuantity;
-			}
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.Loading().Hide();
-
-			_userDialogs.Alert(message: ex.Message, title: "Hata");
-		}
-	}
-
-	private async Task GetLastTransactionsAsync(HttpClient httpClient)
-	{
-		try
-		{
-
-			SupplierDetailModel.LastTransactions.Clear();
-
-			var result = await _supplierTransactionService.GetObjects(
-				httpClient: httpClient,
-				firmNumber: _httpClientService.FirmNumber,
-				periodNumber: _httpClientService.PeriodNumber,
-				supplierReferenceId: SupplierDetailModel.Supplier.ReferenceId,
-				skip: 0,
-				take: 5
-			);
-
-			if (result.IsSuccess)
-			{
-				if (result.Data == null)
-					return;
-
-				foreach (var item in result.Data)
-				{
-					SupplierDetailModel.LastTransactions.Add(Mapping.Mapper.Map<SupplierTransaction>(item));
-				}
 			}
 		}
 		catch (Exception ex)
@@ -223,14 +182,12 @@ public partial class SupplierDetailViewModel : BaseViewModel
 
 			SupplierDetailModel.Transactions.Clear();
 
-			var result = await _supplierTransactionService.GetObjects(
-					httpClient: httpClient,
-					firmNumber: _httpClientService.FirmNumber,
-					periodNumber: _httpClientService.PeriodNumber,
-					supplierReferenceId: SupplierDetailModel.Supplier.ReferenceId,
-					skip: 0,
-					take: 999999
-				);
+			var result = await _supplierDetailService.GetTransactionsByFiche(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				ficheRefenceId: purchaseFiche.ReferenceId
+			);
 
 			if (result.IsSuccess)
 			{
@@ -245,12 +202,12 @@ public partial class SupplierDetailViewModel : BaseViewModel
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			_userDialogs.Alert(message: ex.Message, title: "Hata");
 		}
-		
+
 	}
 
 	private async Task InputQuantityTappedAsync()
@@ -302,8 +259,6 @@ public partial class SupplierDetailViewModel : BaseViewModel
 			IsBusy = false;
 		}
 	}
-
-
 
 	private async Task ActionModelProcessTappedAsync()
 	{
@@ -389,7 +344,7 @@ public partial class SupplierDetailViewModel : BaseViewModel
 			});
 
 		}
-		catch (Exception ex) 
+		catch (Exception ex)
 		{
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
@@ -401,27 +356,27 @@ public partial class SupplierDetailViewModel : BaseViewModel
 		}
 	}
 
-    private async Task AllFicheTappedAsync()
-    {
-        if (IsBusy)
-            return;
+	private async Task AllFicheTappedAsync()
+	{
+		if (IsBusy)
+			return;
 
-        try
-        {
-            IsBusy = true;
+		try
+		{
+			IsBusy = true;
 
-            await Shell.Current.GoToAsync($"{nameof(SupplierDetailAllFicheListView)}", new Dictionary<string, object>
-            {
-                [nameof(SupplierDetailModel)] = SupplierDetailModel
-            });
-        }
-        catch (Exception ex)
-        {
-            _userDialogs.Alert(ex.Message);
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
+			await Shell.Current.GoToAsync($"{nameof(SupplierDetailAllFicheListView)}", new Dictionary<string, object>
+			{
+				[nameof(SupplierDetailModel)] = SupplierDetailModel
+			});
+		}
+		catch (Exception ex)
+		{
+			_userDialogs.Alert(ex.Message);
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 }

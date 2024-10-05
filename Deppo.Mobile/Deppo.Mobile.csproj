@@ -1,3 +1,4 @@
+﻿
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
@@ -429,6 +430,12 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\ResultModule\Views\InsertSuccessPageView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\CustomerMenu\Views\ActionViews\CustomerDetailShipAddressListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\CustomerMenu\Views\ActionViews\CustomerDetailWaitingSalesOrderListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\SalesModule\CustomerMenu\Views\CustomerDetailAllFichesView.xaml">

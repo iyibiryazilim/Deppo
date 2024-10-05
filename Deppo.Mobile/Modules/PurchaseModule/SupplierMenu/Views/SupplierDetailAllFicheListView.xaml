@@ -63,6 +63,9 @@
                     <Border Padding="5"
                             BackgroundColor="Transparent"
                             StrokeThickness="0.1">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:SupplierDetailAllFicheListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
                             <Border Grid.Column="0"
                                     Padding="5"
@@ -103,12 +106,12 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <!--<dx:BottomSheet x:Name="ficheTransactionBottomSheet"
+        <dx:BottomSheet x:Name="ficheTransactionBottomSheet"
                         Grid.Row="1"
                         AllowDismiss="True"
                         BackgroundColor="White"
                         CornerRadius="15"
-                        HalfExpandedRatio="0.3"
+                        HalfExpandedRatio="0.4"
                         IsModal="True"
                         ShowGrabber="True">
 
@@ -122,7 +125,7 @@
                     <BoxView HeightRequest="2" Color="{StaticResource OffBlack}" />
                 </VerticalStackLayout>
 
-                <CollectionView Grid.Row="1" ItemsSource="{Binding Transactions}">
+                <CollectionView Grid.Row="1" ItemsSource="{Binding SupplierDetailModel.Transactions}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="models:SupplierTransaction">
                             <Border Padding="5"
@@ -185,6 +188,6 @@
                 </CollectionView>
 
             </Grid>
-        </dx:BottomSheet>-->
+        </dx:BottomSheet>
     </Grid>
 </ContentPage>
