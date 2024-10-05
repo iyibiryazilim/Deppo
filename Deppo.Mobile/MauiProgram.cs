@@ -394,6 +394,7 @@ public static class MauiProgram
         builder.Services.AddTransientWithShellRoute<CustomerOutputTransactionView, CustomerOutputTransactionViewModel>(nameof(CustomerOutputTransactionView));
         builder.Services.AddTransientWithShellRoute<CustomerDetailWaitingSalesOrderListView, CustomerDetailWaitingSalesOrderListViewModel>(nameof(CustomerDetailWaitingSalesOrderListView));
 		builder.Services.AddTransientWithShellRoute<CustomerDetailShipAddressListView, CustomerDetailShipAddressListViewModel> (nameof(CustomerDetailShipAddressListView));
+        builder.Services.AddTransientWithShellRoute<CustomerDetailApprovedProductListView, CustomerDetailApprovedProductListViewModel>(nameof(CustomerDetailApprovedProductListView));
 
 		builder.Services.AddSingletonWithShellRoute<WaitingSalesOrderListView, WaitingSalesOrderListViewModel>(nameof(WaitingSalesOrderListView));
         builder.Services.AddSingletonWithShellRoute<SalesProcessView, SalesProcessViewModel>(nameof(SalesProcessView));
