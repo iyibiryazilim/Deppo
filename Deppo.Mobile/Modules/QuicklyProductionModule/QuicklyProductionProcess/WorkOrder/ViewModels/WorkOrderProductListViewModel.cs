@@ -74,7 +74,6 @@ public partial class WorkOrderProductListViewModel : BaseViewModel
             BasketModel.QuicklyBomProduct.Amount = SelectedProduct.Amount;
             BasketModel.MainAmount = SelectedProduct.Amount;
            // BasketModel.BOMQuantity = SelectedProduct.Amount;
-            BasketModel.MainAmount = SelectedProduct.Amount;
             await Shell.Current.GoToAsync($"{nameof(WorkOrderCalcView)}", new Dictionary<string, object>
             {
                 [nameof(QuicklyBomProductBasketModel)] = BasketModel

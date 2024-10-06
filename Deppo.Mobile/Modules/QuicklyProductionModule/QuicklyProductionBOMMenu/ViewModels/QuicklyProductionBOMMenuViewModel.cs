@@ -11,6 +11,7 @@ using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrder.Views;
 using Deppo.Core.BaseModels;
 using Deppo.Mobile.Core.Models.ProductModels;
+using DevExpress.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionBOMMenu.ViewModels;
 
@@ -23,7 +24,7 @@ public partial class QuicklyProductionBOMMenuViewModel : BaseViewModel
     public ObservableCollection<QuicklyBOMProductModel> Items { get; } = new();
 
     [ObservableProperty]
-    private QuicklyBOMProductModel? selectedProduct;
+    private QuicklyBOMProductModel selectedProduct = null!;
 
     [ObservableProperty]
     private QuicklyBomProductBasketModel? basketModel = new();
@@ -43,7 +44,8 @@ public partial class QuicklyProductionBOMMenuViewModel : BaseViewModel
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<QuicklyBOMProductModel>(async (parameter) => await ItemTappedAsync(parameter));
-        //NextViewCommand = new Command(async () => await NextViewAsync());
+        ProductionOptionTappedCommand = new Command(async () => await ProductionOptionTappedAsync());
+       
         PerformSearchCommand = new Command(async () => await PerformSearchAsync());
         PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
     }
@@ -51,81 +53,65 @@ public partial class QuicklyProductionBOMMenuViewModel : BaseViewModel
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
+    public Command ProductionOptionTappedCommand { get; }
     public Command ConfirmCommand { get; }
     public Command BackCommand { get; }
-    public Command NextViewCommand { get; }
+
     public Command PerformSearchCommand { get; }
     public Command PerformEmptySearchCommand { get; }
 
     [ObservableProperty]
     public SearchBar searchText;
 
-    //private async Task NextViewAsync()
-    //{
-    //    if (IsBusy)
-    //        return;
-
-    //    try
-    //    {
-    //        IsBusy = true;
-
-    //        BasketModel.QuicklyBomProduct = SelectedProduct;
-    //        BasketModel.WarehouseName = SelectedProduct.WarehouseName;
-    //        BasketModel.WarehouseNumber = SelectedProduct.WarehouseNumber;
-    //        BasketModel.QuicklyBomProduct.Amount = SelectedProduct.Amount;
-    //        // BasketModel.BOMQuantity = SelectedProduct.Amount;
-    //        BasketModel.MainAmount = SelectedProduct.Amount;
-    //        await Shell.Current.GoToAsync($"{nameof(WorkOrderCalcView)}", new Dictionary<string, object>
-    //        {
-    //            [nameof(QuicklyBomProductBasketModel)] = BasketModel
-    //        });
-    //    }
-    //    catch (System.Exception ex)
-    //    {
-    //        await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-    //    }
-    //    finally
-    //    {
-    //        IsBusy = false;
-    //    }
-    //}
-
     private async Task ItemTappedAsync(QuicklyBOMProductModel item)
     {
         if (IsBusy)
             return;
-
         try
         {
             IsBusy = true;
 
-            if (item is not null)
-            {
-                if (item == SelectedProduct)
-                {
-                    SelectedProduct.IsSelected = false;
-                    SelectedProduct = null;
-                }
-                else
-                {
-                    if (SelectedProduct != null)
-                    {
-                        SelectedProduct.IsSelected = false;
-                    }
+            SelectedProduct = item;
 
-                    SelectedProduct = item;
-                    SelectedProduct.IsSelected = true;
-
-                    var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-                    if (selectedItem is not null)
-                    {
-                        selectedItem.IsSelected = true;
-                    }
-                }
-            }
+            CurrentPage.FindByName<BottomSheet>("actionBottomSheet").State = BottomSheetState.HalfExpanded;
         }
         catch (Exception ex)
         {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ProductionOptionTappedAsync()
+    {
+        if (IsBusy)
+			return;
+        try
+        {
+            IsBusy = true;
+
+			QuicklyBomProductBasketModel quicklyBomProductBasketModel = new();
+			quicklyBomProductBasketModel.QuicklyBomProduct = SelectedProduct;
+			quicklyBomProductBasketModel.WarehouseName = SelectedProduct.WarehouseName;
+			quicklyBomProductBasketModel.WarehouseNumber = SelectedProduct.WarehouseNumber;
+			quicklyBomProductBasketModel.QuicklyBomProduct.Amount = SelectedProduct.Amount;
+			quicklyBomProductBasketModel.MainAmount = SelectedProduct.Amount;
+
+			CurrentPage.FindByName<BottomSheet>("actionBottomSheet").State = BottomSheetState.Hidden;
+            await Task.Delay(300);
+			await Shell.Current.GoToAsync($"{nameof(WorkOrderCalcView)}", new Dictionary<string, object>
+			{
+				[nameof(QuicklyBomProductBasketModel)] = quicklyBomProductBasketModel
+			});
+		}
+        catch (Exception ex)
+        {
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+            
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally

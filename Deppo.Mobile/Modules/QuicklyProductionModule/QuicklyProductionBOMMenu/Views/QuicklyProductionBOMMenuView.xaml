@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentPage x:Class="Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionBOMMenu.Views.QuicklyProductionBOMMenuView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:viewModels="clr-namespace:Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionBOMMenu.ViewModels"
-             x:Class="Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionBOMMenu.Views.QuicklyProductionBOMMenuView"
+             xmlns:bomProductModel="clr-namespace:Deppo.Mobile.Core.Models.QuicklyModels;assembly=Deppo.Mobile.Core"
+             xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionBOMMenu.ViewModels"
-             xmlns:bomProductModel="clr-namespace:Deppo.Mobile.Core.Models.QuicklyModels;assembly=Deppo.Mobile.Core"
+             xmlns:viewModels="clr-namespace:Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionBOMMenu.ViewModels"
              Title="{Binding Title}"
              x:DataType="viewModels:QuicklyProductionBOMMenuViewModel">
 
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
-                                        EventName="Loaded" />
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
-                                   StatusBarStyle="Default" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -25,13 +24,11 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android"
-                Value="artboard.png" />
+            <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
-    <Grid RowDefinitions="Auto, *, Auto"
-          RowSpacing="10">
+    <Grid RowDefinitions="Auto, *" RowSpacing="10">
         <Border Grid.Row="0"
                 Margin="5,0,5,0"
                 Padding="0"
@@ -45,10 +42,8 @@
                        PlaceholderColor="{StaticResource OffBlack}"
                        TextColor="{StaticResource OffBlack}">
                 <SearchBar.Behaviors>
-                    <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
-                                                    EventName="SearchButtonPressed" />
-                    <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}"
-                                                    EventName="TextChanged" />
+                    <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}" EventName="SearchButtonPressed" />
+                    <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}" EventName="TextChanged" />
                 </SearchBar.Behaviors>
             </SearchBar>
         </Border>
@@ -58,8 +53,7 @@
                         RemainingItemsThreshold="2"
                         RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
             <CollectionView.ItemsLayout>
-                <LinearItemsLayout ItemSpacing="0"
-                                   Orientation="Vertical" />
+                <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="bomProductModel:QuicklyBOMProductModel">
@@ -67,20 +61,10 @@
                             BackgroundColor="Transparent"
                             StrokeShape="RoundRectangle 10"
                             StrokeThickness="0.1">
-                        <!--<Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WorkOrderProductListViewModel}}, Path=ItemTappedCommand}"
-                                                  CommandParameter="{Binding .}" />
-                        </Border.GestureRecognizers>-->
-                        <Border.Triggers>
-                            <DataTrigger Binding="{Binding IsSelected}"
-                                         TargetType="Border"
-                                         Value="True">
-                                <Setter Property="BackgroundColor"
-                                        Value="{StaticResource SecondaryLight}" />
-                            </DataTrigger>
-                        </Border.Triggers>
-                        <Grid ColumnDefinitions="Auto, *, Auto"
-                              ColumnSpacing="10">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:QuicklyProductionBOMMenuViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="10">
                             <Border BackgroundColor="{StaticResource Secondary}"
                                     StrokeShape="RoundRectangle 5"
                                     StrokeThickness="0.5">
@@ -89,8 +73,7 @@
                                        WidthRequest="50" />
                             </Border>
 
-                            <VerticalStackLayout Grid.Column="1"
-                                                 Spacing="2">
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
                                 <Label FontAttributes="Bold"
                                        LineBreakMode="TailTruncation"
                                        Text="{Binding Code}" />
@@ -98,8 +81,7 @@
                                        Text="{Binding Name}"
                                        TextColor="{StaticResource Gray600}" />
 
-                                <Label TextColor="{StaticResource Gray600}"
-                                       VerticalOptions="Center">
+                                <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
                                     <Label.FormattedText>
                                         <FormattedString>
                                             <Span FontAttributes="Bold"
@@ -145,5 +127,62 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+
+        <!--#region BottomSheet-->
+        <dx:BottomSheet x:Name="actionBottomSheet"
+                        AllowDismiss="True"
+                        BackgroundColor="White"
+                        CornerRadius="15"
+                        HalfExpandedRatio="0.3"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <Grid Padding="10"
+                  RowDefinitions="Auto,*"
+                  RowSpacing="20">
+                <VerticalStackLayout Grid.Row="0" Spacing="5">
+                    <Label FontAttributes="Bold"
+                           FontSize="18"
+                           Text="İşlemler" />
+                    <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Row="1" Spacing="10">
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0.1">
+                        <VerticalStackLayout Grid.Column="1"
+                                             Padding="5"
+                                             Spacing="5"
+                                             VerticalOptions="Center">
+                            <Label FontAttributes="Bold"
+                                   LineBreakMode="TailTruncation"
+                                   MaxLines="1"
+                                   Text="Rework"
+                                   VerticalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0.1">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ProductionOptionTappedCommand}" />
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout Grid.Column="1"
+                                             Padding="5"
+                                             Spacing="5"
+                                             VerticalOptions="Start">
+                            <Label FontAttributes="Bold"
+                                   LineBreakMode="TailTruncation"
+                                   MaxLines="1"
+                                   Text="Üretim"
+                                   VerticalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </Grid>
+        </dx:BottomSheet>
+        <!--#endregion-->
     </Grid>
 </ContentPage>
