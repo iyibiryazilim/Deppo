@@ -26,4 +26,10 @@ public partial class ProductDetailModel : ObservableObject
     public ObservableCollection<ProductTransaction> LastTransactions { get; } = new();
 
     public ObservableCollection<ProductFiche> Transactions { get; } = new();
+
+    public ObservableCollection<ProductDetailInputOutputModel> ProductInputOutputModels { get; } = new();
+
+    public ObservableCollection<SalesInventoryTurnover> SalesInventoryTurnovers { get; } = new();
+
+    public ObservableCollection<PurchaseInventoryTurnover> PurchaseInventoryTurnovers { get; } = new();
 }

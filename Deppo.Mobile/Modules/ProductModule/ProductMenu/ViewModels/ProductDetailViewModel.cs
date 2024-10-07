@@ -33,7 +33,12 @@ public partial class ProductDetailViewModel : BaseViewModel
     [ObservableProperty]
     private ProductDetailModel productDetailModel = null!;
 
+    [ObservableProperty]
+    private ProductMeasure productMeasure = new();
+
     public ObservableCollection<ProductDetailActionModel> ProductActionModels { get; } = new();
+
+
 
     public Page CurrentPage { get; set; }
 
@@ -90,6 +95,7 @@ public partial class ProductDetailViewModel : BaseViewModel
 
     #endregion Commands
 
+
     private async Task LoadItemsAsync()
     {
         try
@@ -100,7 +106,7 @@ public partial class ProductDetailViewModel : BaseViewModel
             _userDialogs.Loading("Loading Items...");
             await Task.Delay(1000);
 
-            await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastTransactionsAsync());
+            await Task.WhenAll(GetInputQuantityAsync(),GetOutputQuantityAsync(), GetLastTransactionsAsync(),GetProductMeasuresAsync(), GetProductInputOutputQuantitiesAsync(),CalculateTurnoverRateAsync());
 
             _userDialogs.HideHud();
         }
@@ -117,23 +123,37 @@ public partial class ProductDetailViewModel : BaseViewModel
         }
     }
 
-    private async Task GetInputOutputQuantityAsync(HttpClient httpClient)
+    private async Task SetMonthsAsync()
     {
         try
         {
-            var query = @$"SELECT
-                    [InputQuantity] = (SELECT ISNULL(COUNT(DISTINCT STOCKREF), 0) FROM LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STLINE WHERE IOCODE IN(1, 2) AND STOCKREF = {ProductDetailModel.Product.ReferenceId}),
-                    [OutputQuantity] = (SELECT ISNULL(COUNT(DISTINCT STOCKREF), 0) FROM LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STLINE WHERE IOCODE IN(3, 4) AND STOCKREF = {ProductDetailModel.Product.ReferenceId})";
+            IsBusy = true;
 
-            var result = await _customQueryService.GetObjectAsync(httpClient, query);
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            int currentMonth = DateTime.Now.Month;
 
-            if (result.IsSuccess)
+            if (ProductDetailModel.SalesInventoryTurnovers.Count > 0)
+                ProductDetailModel.SalesInventoryTurnovers.Clear();
+
+            if (ProductDetailModel.PurchaseInventoryTurnovers.Count > 0)
+                ProductDetailModel.PurchaseInventoryTurnovers.Clear();
+
+            for (int i = 0; i < 6; i++)
             {
-                if (result.Data == null)
-                    return;
-                var obj = Mapping.Mapper.Map<ProductDetailModel>(result.Data);
-                ProductDetailModel.InputQuantity = obj.InputQuantity;
-                ProductDetailModel.OutputQuantity = obj.OutputQuantity;
+                int monthToSet = currentMonth - i;
+
+                if (monthToSet <= 0)
+                    break;
+
+
+                var salesTurnover = new SalesInventoryTurnover();
+                salesTurnover.Month = monthToSet;
+
+                var purchaseTurnover = new PurchaseInventoryTurnover();
+                purchaseTurnover.Month = monthToSet;
+
+                ProductDetailModel.SalesInventoryTurnovers.Add(salesTurnover);
+                ProductDetailModel.PurchaseInventoryTurnovers.Add(purchaseTurnover);
             }
         }
         catch (Exception ex)
@@ -143,8 +163,257 @@ public partial class ProductDetailViewModel : BaseViewModel
 
             _userDialogs.Alert(message: ex.Message, title: "Hata");
         }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
+    private async Task GetAvarageStockQuantityAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            foreach (var item in ProductDetailModel.SalesInventoryTurnovers)
+            {
+                var result = await _productDetailService.GetAvarageStockQuantityAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, ProductDetailModel.Product.ReferenceId, item.Month);
+
+                if (result.IsSuccess)
+                {
+                    if (result.Data is null)
+                        return;
+
+                    item.StockQuantity = Convert.ToInt32(result.Data);
+                }
+            }
+
+            foreach (var item in ProductDetailModel.PurchaseInventoryTurnovers)
+            {
+                var result = await _productDetailService.GetAvarageStockQuantityAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, ProductDetailModel.Product.ReferenceId, item.Month);
+
+                if (result.IsSuccess)
+                {
+                    if (result.Data is null)
+                        return;
+
+                    item.StockQuantity = Convert.ToInt32(result.Data);
+                }
+            }
+
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task GetSalesQuantityAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            foreach (var item in ProductDetailModel.SalesInventoryTurnovers)
+            {
+                var result = await _productDetailService.GetSalesQuantityAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, ProductDetailModel.Product.ReferenceId, item.Month);
+
+                if (result.IsSuccess)
+                {
+                    if (result.Data is null)
+                        return;
+
+                    item.StockQuantity = Convert.ToInt32(result.Data);
+                }
+            }
+
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task GetPurchaseQuantityAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            foreach (var item in ProductDetailModel.PurchaseInventoryTurnovers)
+            {
+                var result = await _productDetailService.GetPurchaseQuantityAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, ProductDetailModel.Product.ReferenceId, item.Month);
+
+                if (result.IsSuccess)
+                {
+                    if (result.Data is null)
+                        return;
+
+                    item.StockQuantity = Convert.ToInt32(result.Data);
+                }
+            }
+
+            foreach (var item in ProductDetailModel.PurchaseInventoryTurnovers)
+            {
+                var result = await _productDetailService.GetAvarageStockQuantityAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, ProductDetailModel.Product.ReferenceId, item.Month);
+
+                if (result.IsSuccess)
+                {
+                    if (result.Data is null)
+                        return;
+
+                    item.StockQuantity = Convert.ToInt32(result.Data);
+                }
+            }
+
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task CalculateTurnoverRateAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            await SetMonthsAsync();
+            await Task.WhenAll(GetAvarageStockQuantityAsync(), GetSalesQuantityAsync(), GetPurchaseQuantityAsync());
+
+            foreach (var salesItem in ProductDetailModel.SalesInventoryTurnovers)
+            {
+                if (salesItem.StockQuantity > 0)
+                    salesItem.TurnoverRate = (double)salesItem.SalesQuantity / salesItem.StockQuantity;
+                else
+                    salesItem.TurnoverRate = 0;
+
+            }
+
+            foreach (var purchaseItem in ProductDetailModel.PurchaseInventoryTurnovers)
+            {
+                if (purchaseItem.StockQuantity > 0)
+                    purchaseItem.TurnoverRate = (double)purchaseItem.PurchaseQuantity / purchaseItem.StockQuantity;
+                else
+                    purchaseItem.TurnoverRate = 0;
+
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+
+    private async Task GetInputQuantityAsync()
+    {
+        try
+        {
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _productDetailService.GetInputQuantity(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, ProductDetailModel.Product.ReferenceId);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                {
+                    var obj = Mapping.Mapper.Map<ProductDetailModel>(item);
+                    ProductDetailModel.InputQuantity = obj.InputQuantity;
+                }
+                    
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+        }
+    }
+    private async Task GetOutputQuantityAsync()
+    {
+        try
+        {
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _productDetailService.GetOutputQuantity(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, ProductDetailModel.Product.ReferenceId);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                {
+                    var obj = Mapping.Mapper.Map<ProductDetailModel>(item);
+                    ProductDetailModel.OutputQuantity = obj.OutputQuantity;
+                }
+
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+        }
+    }
     private async Task GetLastTransactionsAsync()
     {
         try
@@ -160,6 +429,65 @@ public partial class ProductDetailViewModel : BaseViewModel
                 ProductDetailModel.Transactions.Clear();
                 foreach (var item in result.Data)
                     ProductDetailModel.Transactions.Add(Mapping.Mapper.Map<ProductFiche>(item));
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+        }
+    }
+
+    private async Task GetProductInputOutputQuantitiesAsync()
+    {
+        try
+        {
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _productDetailService.ProductInputOutputQuantities(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, DateTime.Now,ProductDetailModel.Product.ReferenceId);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                ProductDetailModel.ProductInputOutputModels.Clear();
+                foreach (var item in result.Data)
+                    ProductDetailModel.ProductInputOutputModels.Add(Mapping.Mapper.Map<ProductDetailInputOutputModel>(item));
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+        }
+    }
+
+    private async Task GetProductMeasuresAsync()
+    {
+        try
+        {
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _productDetailService.GetProductMeasure(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, ProductDetailModel.Product.ReferenceId);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+                foreach (var item in result.Data)
+                {
+                    ProductMeasure = Mapping.Mapper.Map<ProductMeasure>(item);
+                }
+                
             }
         }
         catch (Exception ex)

@@ -441,45 +441,32 @@ FETCH NEXT {take} ROWS ONLY;";
         private string LocationTransactionQuery(int firmNumber, int periodNumber, int productReferenceId, int skip = 0, int take = 20, string search = "")
         {
             var baseQuery = @$"SELECT
-        [ReferenceId] = LGMAIN.LOGICALREF,
-        [TransactionDate] = LGMAIN.DATE_,
-        [TransactionReferenceId] = LGMAIN.STTRANSREF,
-        [TransactionFicheReferenceId] = LGMAIN.STFICHEREF,
-		[SerilotReferenceId] = LGMAIN.SLREF,
-        [InTransactionReferenceId] = LGMAIN.INTRANSREF,
-        [InSerilotTransactionReferenceId] = LGMAIN.INSLTRANSREF,
-        [SerilotCode] = ISNULL(SERILOT.CODE, ''),
-        [SerilotName] = ISNULL(SERILOT.NAME, ''),
-        [LocationReferenceId] = ISNULL(LGMAIN.LOCREF, 0),
-        [LocationCode] = ISNULL(INVLOC.CODE, ''),
-        [LocationName] = ISNULL(INVLOC.NAME, ''),
-        [SubUnitsetReferenceId] = USLINE.LOGICALREF,
-        [SubUnitsetCode] = USLINE.CODE,
-        [SubUnitsetName] = USLINE.NAME,
-        [UnitsetReferenceId] = UNITSET.LOGICALREF,
-		[UnitsetCode] = UNITSET.CODE,
-		[UnitsetName] = UNITSET.NAME,
-        [ItemReferenceId] = ITEMS.LOGICALREF,
-		[ItemCode] = ITEMS.CODE,
-		[ItemName] = ITEMS.NAME,
-        [Quantity] = LGMAIN.AMOUNT,
-        [RemainingQuantity] = LGMAIN.REMAMOUNT,
-        [RemainingUnitQuantity] = LGMAIN.REMLNUNITAMNT
-        FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_SLTRANS LGMAIN WITH(NOLOCK)    
-		LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS ITEMS WITH(NOLOCK) ON (LGMAIN.ITEMREF  =  ITEMS.LOGICALREF) 
-		LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_LOCATION INVLOC WITH(NOLOCK) ON (LGMAIN.LOCREF  =  INVLOC.LOGICALREF)
-        LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_SERILOTN SERILOT WITH(NOLOCK) ON (LGMAIN.SLREF = SERILOT.LOGICALREF)
-		LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE STFIC WITH(NOLOCK) ON (LGMAIN.STFICHEREF  =  STFIC.LOGICALREF) 
-		LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL USLINE WITH(NOLOCK) ON (LGMAIN.UOMREF  =  USLINE.LOGICALREF) 
-		LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF UNITSET WITH(NOLOCK) ON (USLINE.UNITSETREF  =  UNITSET.LOGICALREF)
-		LEFT OUTER JOIN L_CAPIWHOUSE WHOUSE WITH(NOLOCK) ON (LGMAIN.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber})
-        WHERE (LGMAIN.CANCELLED = 0) AND 
-              (LGMAIN.LPRODSTAT = 0) AND 
-              (LGMAIN.ITEMREF = {productReferenceId}) AND
-		      (LGMAIN.EXIMFCTYPE IN ( 0 , 4 , 5 , 3 , 2 , 7 )) AND 
-              (LGMAIN.STATUS = 0) AND 
-              (LGMAIN.REMAMOUNT > 0) AND
-              (LGMAIN.IOCODE IN (1,2,3,4))
+    [LocationReferenceId] = ISNULL(LGMAIN.LOCREF, 0),
+    [LocationCode] = ISNULL(INVLOC.CODE, ''),
+    [LocationName] = ISNULL(INVLOC.NAME, ''),
+    [SubUnitsetReferenceId] = USLINE.LOGICALREF,
+    [SubUnitsetCode] = USLINE.CODE,
+    [SubUnitsetName] = USLINE.NAME,
+    [UnitsetReferenceId] = UNITSET.LOGICALREF,
+    [UnitsetCode] = UNITSET.CODE,
+    [UnitsetName] = UNITSET.NAME,
+    [RemainingQuantity] = ISNULL(SUM(LGMAIN.REMAMOUNT), 0),
+	[WarehouseReferenceId] = WHOUSE.LOGICALREF,
+	[WarehouseName] = WHOUSE.NAME,
+	[WarehouseNumber] = WHOUSE.NR
+FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_SLTRANS LGMAIN WITH(NOLOCK)    
+LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS ITEMS WITH(NOLOCK) ON (LGMAIN.ITEMREF  =  ITEMS.LOGICALREF) 
+LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_LOCATION INVLOC WITH(NOLOCK) ON (LGMAIN.LOCREF  =  INVLOC.LOGICALREF)
+LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL USLINE WITH(NOLOCK) ON (LGMAIN.UOMREF  =  USLINE.LOGICALREF) 
+LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF UNITSET WITH(NOLOCK) ON (USLINE.UNITSETREF  =  UNITSET.LOGICALREF)
+LEFT OUTER JOIN L_CAPIWHOUSE WHOUSE WITH(NOLOCK) ON (LGMAIN.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = 1)
+WHERE 
+    LGMAIN.CANCELLED = 0 AND 
+    LGMAIN.LPRODSTAT = 0 AND 
+    LGMAIN.ITEMREF = {productReferenceId} AND
+    LGMAIN.EXIMFCTYPE IN (0, 2, 3, 4, 5, 7) AND 
+    LGMAIN.STATUS = 0 AND 
+    LGMAIN.IOCODE IN (1, 2, 3, 4)
               ";
 
             if (!string.IsNullOrEmpty(search))
@@ -487,7 +474,23 @@ FETCH NEXT {take} ROWS ONLY;";
                 baseQuery += $@" AND (INVLOC.CODE LIKE '{search}%' OR INVLOC.NAME LIKE '%{search}%')";
             }
 
-            baseQuery += $@" ORDER BY INVLOC.CODE OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+            baseQuery += $@" GROUP BY 
+    LGMAIN.LOCREF, 
+    INVLOC.CODE, 
+    INVLOC.NAME, 
+    USLINE.LOGICALREF, 
+    USLINE.CODE, 
+    USLINE.NAME, 
+    UNITSET.LOGICALREF, 
+    UNITSET.CODE, 
+    UNITSET.NAME,
+	WHOUSE.LOGICALREF,
+	WHOUSE.NAME,
+	WHOUSE.NR
+ORDER BY 
+    INVLOC.CODE 
+OFFSET {skip} ROWS 
+FETCH NEXT {take} ROWS ONLY;";
 
             return baseQuery;
         }
