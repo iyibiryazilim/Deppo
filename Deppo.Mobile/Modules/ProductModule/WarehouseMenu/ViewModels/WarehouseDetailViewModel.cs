@@ -6,7 +6,10 @@ using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
 using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views;
+using Newtonsoft.Json;
+using System.Dynamic;
 
 namespace Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels;
 
@@ -16,29 +19,33 @@ public partial class WarehouseDetailViewModel : BaseViewModel
     private readonly IHttpClientService _httpClientService;
     private readonly IWarehouseService _warehouseService;
     private readonly ICustomQueryService _customQueryService;
+    private readonly IWarehouseDetailService _warehouseDetailService;
     private readonly IUserDialogs _userDialogs;
 
-    public WarehouseDetailViewModel(IHttpClientService httpClientService, IWarehouseService warehouseService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
+    public WarehouseDetailViewModel(IHttpClientService httpClientService, IWarehouseService warehouseService, ICustomQueryService customQueryService, IUserDialogs userDialogs, IWarehouseDetailService warehouseDetailService)
     {
         Title = "Ambar Detayı";
         _httpClientService = httpClientService;
         _warehouseService = warehouseService;
         _customQueryService = customQueryService;
         _userDialogs = userDialogs;
+        _warehouseDetailService = warehouseDetailService;
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         InputQuantityTappedCommand = new Command(async () => await InputQuantityTappedAsync());
         OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
-
+        AllFicheTappedCommand = new Command(async () => await AllFicheTappedAsync());
     }
 
     [ObservableProperty]
-    WarehouseDetailModel warehouseDetailModel = null!;
+    private WarehouseDetailModel warehouseDetailModel = null!;
 
     #region Commands
+
     public Command LoadItemsCommand { get; }
     public Command InputQuantityTappedCommand { get; }
     public Command OutputQuantityTappedCommand { get; }
+    public Command AllFicheTappedCommand { get; }
 
     #endregion Commands
 
@@ -53,7 +60,7 @@ public partial class WarehouseDetailViewModel : BaseViewModel
             _userDialogs.Loading("Loading Items...");
 
             await Task.Delay(1000);
-            await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastTransactionsAsync(httpClient));
+            await Task.WhenAll(GetInputQuantityAsync(), GetLastTransactionsAsync(), GetOutputQuantityAsync());
 
             _userDialogs.HideHud();
         }
@@ -70,67 +77,12 @@ public partial class WarehouseDetailViewModel : BaseViewModel
         }
     }
 
-    private async Task GetInputOutputQuantityAsync(HttpClient httpClient)
+    private async Task GetInputQuantityAsync()
     {
         try
         {
-            var query = @$"SELECT 
-                [InputQuantity] = COUNT(DISTINCT CASE WHEN STLINE.IOCODE IN (1, 2) THEN STLINE.STOCKREF END),
-                [OutputQuantity] = COUNT(DISTINCT CASE WHEN STLINE.IOCODE IN (3, 4) THEN STLINE.STOCKREF END)
-            FROM LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
-            LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE 
-            ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {_httpClientService.FirmNumber}
-            WHERE STLINE.SOURCEINDEX = {WarehouseDetailModel.Warehouse.Number};
-            ";
-
-            var result = await _customQueryService.GetObjectAsync(httpClient, query);
-
-            if (result.IsSuccess)
-            {
-                if (result.Data == null)
-                    return;
-                var obj = Mapping.Mapper.Map<WarehouseDetailModel>(result.Data);
-                WarehouseDetailModel.InputQuantity = obj.InputQuantity;
-                WarehouseDetailModel.OutputQuantity = obj.OutputQuantity;
-            }
-		}
-        catch (Exception ex)
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
-
-            _userDialogs.Alert(message: ex.Message, title: "Hata");
-        }
-    }
-
-    private async Task GetLastTransactionsAsync(HttpClient httpclient)
-    {
-        try
-        {
-            WarehouseDetailModel.LastTransactions.Clear();
-
-            var query = @$"SELECT TOP 5
-				[TransactionDate] = STLINE.DATE_,
-				[TransactionTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
-				[BaseTransactionCode] = STFICHE.FICHENO,
-				[TransactionType] = STLINE.TRCODE,
-                [ProductCode] = ITEMS.CODE,
-                [ProductName] = ITEMS.NAME, 
-                [IOType] = STLINE.IOCODE,
-				[SubUnitsetCode] = ISNULL(SUBUNITSET.CODE, ''),
-				[Quantity] = STLINE.AMOUNT,
-				[WarehouseName] = CAPIWHOUSE.NAME,
-                [CurrentCode] = CLCARD.CODE
-				FROM LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
-				LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
-				LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF
-                LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
-				LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
-				LEFT JOIN LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
-				LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {_httpClientService.FirmNumber}
-				WHERE CAPIWHOUSE.LOGICALREF= {WarehouseDetailModel.Warehouse.ReferenceId} AND STLINE.STFICHEREF <> 0 AND STLINE.USREF <> 0 AND STLINE.UOMREF <> 0 ORDER BY STLINE.DATE_ DESC";
-
-            var result = await _customQueryService.GetObjectsAsync(httpclient, query);
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _warehouseDetailService.GetInputQuantity(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseDetailModel.Warehouse.Number);
 
             if (result.IsSuccess)
             {
@@ -139,7 +91,8 @@ public partial class WarehouseDetailViewModel : BaseViewModel
 
                 foreach (var item in result.Data)
                 {
-                    WarehouseDetailModel.LastTransactions.Add(Mapping.Mapper.Map<WarehouseTransaction>(item));
+                    var value = Mapping.Mapper.Map<WarehouseDetailModel>(item);
+                    WarehouseDetailModel.InputQuantity = value.InputQuantity;
                 }
             }
         }
@@ -152,35 +105,91 @@ public partial class WarehouseDetailViewModel : BaseViewModel
         }
     }
 
-	private async Task InputQuantityTappedAsync()
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
+    private async Task GetOutputQuantityAsync()
+    {
+        try
+        {
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _warehouseDetailService.GetOutputQuantity(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseDetailModel.Warehouse.Number);
 
-			await Task.Delay(300);
-			await Shell.Current.GoToAsync($"{nameof(WarehouseInputTransactionView)}", new Dictionary<string, object>
-			{
-				["Warehouse"] = WarehouseDetailModel.Warehouse
-			});
-		}
-		catch (Exception ex)
-		{
+            if (result.IsSuccess)
+            {
+                if (result.Data == null)
+                    return;
 
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.Loading().Hide();
+                foreach (var item in result.Data)
+                {
+                    var value = Mapping.Mapper.Map<WarehouseDetailModel>(item);
+                    WarehouseDetailModel.OutputQuantity = value.OutputQuantity;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
 
-			_userDialogs.Alert(message: ex.Message, title: "Hata");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+    }
 
-	private async Task OutputQuantityTappedAsync()
+    private async Task GetLastTransactionsAsync()
+    {
+        try
+        {
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _warehouseDetailService.GetLastFiches(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, WarehouseDetailModel.Warehouse.Number);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                WarehouseDetailModel.Transactions.Clear();
+                foreach (var item in result.Data)
+                    WarehouseDetailModel.Transactions.Add(Mapping.Mapper.Map<WarehouseFiche>(item));
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+        }
+    }
+
+    private async Task InputQuantityTappedAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            await Task.Delay(300);
+            await Shell.Current.GoToAsync($"{nameof(WarehouseInputTransactionView)}", new Dictionary<string, object>
+            {
+                ["Warehouse"] = WarehouseDetailModel.Warehouse
+            });
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
+
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task OutputQuantityTappedAsync()
     {
         if (IsBusy)
             return;
@@ -196,12 +205,37 @@ public partial class WarehouseDetailViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
 
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.Loading().Hide();
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-			_userDialogs.Alert(message: ex.Message, title: "Hata");
-		}
+    private async Task AllFicheTappedAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(WarehouseDetailAllFicheListView)}", new Dictionary<string, object> { {
+                nameof(WarehouseDetailModel), WarehouseDetailModel
+                }
+                });
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
         finally
         {
             IsBusy = false;

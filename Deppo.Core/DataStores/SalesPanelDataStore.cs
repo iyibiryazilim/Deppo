@@ -137,7 +137,7 @@ namespace Deppo.Core.DataStores
                     }
                     else
                     {
-                        var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+                        var result = JsonConvert.DeserializeObject<DataResult<dynamic>>(data);
 
                         dataResult.Data = result?.Data;
                         dataResult.IsSuccess = true;
@@ -147,7 +147,7 @@ namespace Deppo.Core.DataStores
                 }
                 else
                 {
-                    var result = JsonConvert.DeserializeObject<DataResult<Dictionary<string, object>>>(data);
+                    var result = JsonConvert.DeserializeObject<DataResult<dynamic>>(data);
 
                     dataResult.Data = result.Data;
                     dataResult.IsSuccess = false;
