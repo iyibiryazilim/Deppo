@@ -125,10 +125,10 @@
                         <VerticalStackLayout>
                             <Label FontAttributes="Bold"
                                    FontSize="Subtitle"
-                                   Text="Giriş / Çıkış Analizi"
+                                   Text="Satış / İade Referans Analizi"
                                    TextColor="{StaticResource Primary}" />
                             <Label FontSize="Caption"
-                                   Text="Giriş / Çıkış Miktarları"
+                                   Text="Satış Yapılan / İade Edilen Ürün Referans Sayıları"
                                    TextColor="{StaticResource Gray500}" />
 
                         </VerticalStackLayout>

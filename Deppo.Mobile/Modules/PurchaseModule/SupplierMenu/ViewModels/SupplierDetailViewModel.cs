@@ -159,9 +159,18 @@ public partial class SupplierDetailViewModel : BaseViewModel
 				if (result.Data is null)
 					return;
 
-				SupplierDetailModel.SupplierDetailInputOutputModels.Clear();
+				List<SupplierDetailInputOutputModel> cacheItems = new();
+
 				foreach (var item in result.Data)
-					SupplierDetailModel.SupplierDetailInputOutputModels.Add(Mapping.Mapper.Map<SupplierDetailInputOutputModel>(item));
+				{
+					var value = Mapping.Mapper.Map<SupplierDetailInputOutputModel>(item);
+					cacheItems.Add(value);
+				}
+
+
+				SupplierDetailModel.SupplierDetailInputOutputModels.Clear();
+				foreach (var item in cacheItems.OrderBy(x => x.ArgumentDay))
+					SupplierDetailModel.SupplierDetailInputOutputModels.Add(item);
 			}
 		}
 		catch (Exception ex)

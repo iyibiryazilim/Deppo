@@ -89,5 +89,7 @@ public class MappingProfile : Profile
         CreateMap<WarehouseTransactionModel, dynamic>();
         CreateMap<WarehouseDetailProductReferenceModel, dynamic>();
         CreateMap<InventoryTurnover, dynamic>();
+        CreateMap<SupplierDetailInputOutputModel, dynamic>();
+        CreateMap<CustomerDetailInputOutputModel, dynamic>();
     }
 }
