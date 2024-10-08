@@ -95,7 +95,7 @@ public partial class CustomerDetailViewModel : BaseViewModel
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastFicheAsync());
+            await Task.WhenAll(GetInputQuantityAsync(httpClient), GetOutputQuantityAsync(httpClient), GetLastFicheAsync());
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
@@ -113,35 +113,63 @@ public partial class CustomerDetailViewModel : BaseViewModel
         }
     }
 
-    private async Task GetInputOutputQuantityAsync(HttpClient httpClient)
-    {
-        try
-        {
-            var query = @$"SELECT
-                    [InputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STLINE WHERE IOCODE IN(1, 2) AND CLIENTREF = {CustomerDetailModel.Customer.ReferenceId}),
-                    [OutputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STLINE WHERE IOCODE IN(3, 4) AND CLIENTREF = {CustomerDetailModel.Customer.ReferenceId})";
+	private async Task GetInputQuantityAsync(HttpClient httpClient)
+	{
+		try
+		{
+			var result = await _customerDetailService.GetInputQuantity(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				customerReferenceId: CustomerDetailModel.Customer.ReferenceId
+			);
 
-            var result = await _customQueryService.GetObjectAsync(httpClient, query);
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+				var obj = Mapping.Mapper.Map<CustomerDetailModel>(result.Data);
+				CustomerDetailModel.InputQuantity = obj.InputQuantity;
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
 
-            if (result.IsSuccess)
-            {
-                if (result.Data == null)
-                    return;
-                var obj = Mapping.Mapper.Map<CustomerDetailModel>(result.Data);
-                CustomerDetailModel.InputQuantity = obj.InputQuantity;
-                CustomerDetailModel.OutputQuantity = obj.OutputQuantity;
-            }
-        }
-        catch (Exception ex)
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+			await _userDialogs.AlertAsync(message: ex.Message, title: "Hata");
+		}
+	}
 
-            _userDialogs.Alert(message: ex.Message, title: "Hata");
-        }
-    }
+	private async Task GetOutputQuantityAsync(HttpClient httpClient)
+	{
+		try
+		{
+			var result = await _customerDetailService.GetOutputQuantity(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				customerReferenceId: CustomerDetailModel.Customer.ReferenceId
+			);
 
-    private async Task GetLastFicheAsync()
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+				var obj = Mapping.Mapper.Map<CustomerDetailModel>(result.Data);
+				CustomerDetailModel.OutputQuantity = obj.OutputQuantity;
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			await _userDialogs.AlertAsync(message: ex.Message, title: "Hata");
+		}
+	}
+
+	private async Task GetLastFicheAsync()
     {
         try
         {

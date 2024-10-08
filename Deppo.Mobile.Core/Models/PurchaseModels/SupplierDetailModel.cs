@@ -16,12 +16,12 @@ public partial class SupplierDetailModel : ObservableObject
     private Supplier supplier = null!;
 
     [ObservableProperty]
-    private double inputQuantity;
+    private double inputQuantity; // Satınalınan ve Satış iade Yapılan Malzeme Referans sayısı
 
     [ObservableProperty]
-    private double outputQuantity;
+    private double outputQuantity; // Satın yapılan ve Satınalma iade Yapılan Malzeme Referans sayısı
 
-    public SupplierDetailModel()
+	public SupplierDetailModel()
     {
     }
 

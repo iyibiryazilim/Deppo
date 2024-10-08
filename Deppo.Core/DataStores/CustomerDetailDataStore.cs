@@ -7,115 +7,215 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Deppo.Core.DataStores
+namespace Deppo.Core.DataStores;
+
+public class CustomerDetailDataStore : ICustomerDetailService
 {
-    public class CustomerDetailDataStore : ICustomerDetailService
+    private string postUrl = "/gateway/customQuery/CustomQuery";
+
+    public async Task<DataResult<IEnumerable<dynamic>>> GetLastFichesByCustomer(HttpClient httpClient, int firmNumber, int periodNumber, int customerReferenceId)
     {
-        private string postUrl = "/gateway/customQuery/CustomQuery";
+        var content = new StringContent(JsonConvert.SerializeObject(GetLastFichesByCustomer(firmNumber, periodNumber, customerReferenceId)), Encoding.UTF8, "application/json");
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetLastFichesByCustomer(HttpClient httpClient, int firmNumber, int periodNumber, int customerReferenceId)
+        HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+        DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+        if (responseMessage.IsSuccessStatusCode)
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetLastFichesByCustomer(firmNumber, periodNumber, customerReferenceId)), Encoding.UTF8, "application/json");
-
-            HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
-            DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
-            if (responseMessage.IsSuccessStatusCode)
+            var data = await responseMessage.Content.ReadAsStringAsync();
+            if (data != null)
             {
-                var data = await responseMessage.Content.ReadAsStringAsync();
-                if (data != null)
+                if (!string.IsNullOrEmpty(data))
                 {
-                    if (!string.IsNullOrEmpty(data))
-                    {
-                        var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
 
-                        dataResult.Data = result?.Data;
-                        dataResult.IsSuccess = true;
-                        dataResult.Message = "success";
-                        return dataResult;
-                    }
-                    else
-                    {
-                        var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
-
-                        dataResult.Data = result?.Data;
-                        dataResult.IsSuccess = true;
-                        dataResult.Message = "empty";
-                        return dataResult;
-                    }
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "success";
+                    return dataResult;
                 }
                 else
                 {
                     var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
 
-                    dataResult.Data = Enumerable.Empty<dynamic>();
-                    dataResult.IsSuccess = false;
-                    dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
-
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "empty";
                     return dataResult;
                 }
             }
             else
             {
+                var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
                 dataResult.Data = Enumerable.Empty<dynamic>();
                 dataResult.IsSuccess = false;
                 dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
                 return dataResult;
             }
         }
-
-        public async Task<DataResult<IEnumerable<dynamic>>> GetLastTransaction(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId)
+        else
         {
-            var content = new StringContent(JsonConvert.SerializeObject(CustomerTransaction(firmNumber, periodNumber, ficheReferenceId)), Encoding.UTF8, "application/json");
+            dataResult.Data = Enumerable.Empty<dynamic>();
+            dataResult.IsSuccess = false;
+            dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+            return dataResult;
+        }
+    }
 
-            HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
-            DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
-            if (responseMessage.IsSuccessStatusCode)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetLastTransaction(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId)
+    {
+        var content = new StringContent(JsonConvert.SerializeObject(CustomerTransaction(firmNumber, periodNumber, ficheReferenceId)), Encoding.UTF8, "application/json");
+
+        HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+        DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            var data = await responseMessage.Content.ReadAsStringAsync();
+            if (data != null)
             {
-                var data = await responseMessage.Content.ReadAsStringAsync();
-                if (data != null)
+                if (!string.IsNullOrEmpty(data))
                 {
-                    if (!string.IsNullOrEmpty(data))
-                    {
-                        var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
 
-                        dataResult.Data = result?.Data;
-                        dataResult.IsSuccess = true;
-                        dataResult.Message = "success";
-                        return dataResult;
-                    }
-                    else
-                    {
-                        var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
-
-                        dataResult.Data = result?.Data;
-                        dataResult.IsSuccess = true;
-                        dataResult.Message = "empty";
-                        return dataResult;
-                    }
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "success";
+                    return dataResult;
                 }
                 else
                 {
                     var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
 
-                    dataResult.Data = Enumerable.Empty<dynamic>();
-                    dataResult.IsSuccess = false;
-                    dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
-
+                    dataResult.Data = result?.Data;
+                    dataResult.IsSuccess = true;
+                    dataResult.Message = "empty";
                     return dataResult;
                 }
             }
             else
             {
+                var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
                 dataResult.Data = Enumerable.Empty<dynamic>();
                 dataResult.IsSuccess = false;
                 dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
                 return dataResult;
             }
         }
-
-        private string GetLastFichesByCustomer(int firmNumber, int periodNumber, int customerReferenceId)
+        else
         {
-            string baseQuery = $@"SELECT TOP 5
+            dataResult.Data = Enumerable.Empty<dynamic>();
+            dataResult.IsSuccess = false;
+            dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+            return dataResult;
+        }
+    }
+
+    public async Task<DataResult<dynamic>> GetInputQuantity(HttpClient httpClient, int firmNumber, int periodNumber, int customerReferenceId)
+    {
+		var content = new StringContent(JsonConvert.SerializeObject(GetInputQuantityQuery(firmNumber, periodNumber, customerReferenceId)), Encoding.UTF8, "application/json");
+
+		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+		DataResult<dynamic> dataResult = new DataResult<dynamic>();
+		if (responseMessage.IsSuccessStatusCode)
+		{
+			var data = await responseMessage.Content.ReadAsStringAsync();
+			if (data != null)
+			{
+				if (!string.IsNullOrEmpty(data))
+				{
+					var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+					dataResult.Data = result?.Data.FirstOrDefault();
+					dataResult.IsSuccess = true;
+					dataResult.Message = "success";
+					return dataResult;
+				}
+				else
+				{
+					var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+					dataResult.Data = result?.Data.FirstOrDefault();
+					dataResult.IsSuccess = true;
+					dataResult.Message = "empty";
+					return dataResult;
+				}
+			}
+			else
+			{
+				var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+				dataResult.Data = null;
+				dataResult.IsSuccess = false;
+				dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+				return dataResult;
+			}
+		}
+		else
+		{
+			dataResult.Data = null;
+			dataResult.IsSuccess = false;
+			dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+			return dataResult;
+		}
+	}
+
+	public async Task<DataResult<dynamic>> GetOutputQuantity(HttpClient httpClient, int firmNumber, int periodNumber, int customerReferenceId)
+	{
+		var content = new StringContent(JsonConvert.SerializeObject(GetOutputQuantityQuery(firmNumber, periodNumber, customerReferenceId)), Encoding.UTF8, "application/json");
+
+		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+		DataResult<dynamic> dataResult = new DataResult<dynamic>();
+		if (responseMessage.IsSuccessStatusCode)
+		{
+			var data = await responseMessage.Content.ReadAsStringAsync();
+			if (data != null)
+			{
+				if (!string.IsNullOrEmpty(data))
+				{
+					var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+					dataResult.Data = result?.Data.FirstOrDefault();
+					dataResult.IsSuccess = true;
+					dataResult.Message = "success";
+					return dataResult;
+				}
+				else
+				{
+					var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+					dataResult.Data = result?.Data.FirstOrDefault();
+					dataResult.IsSuccess = true;
+					dataResult.Message = "empty";
+					return dataResult;
+				}
+			}
+			else
+			{
+				var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+				dataResult.Data = null;
+				dataResult.IsSuccess = false;
+				dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+				return dataResult;
+			}
+		}
+		else
+		{
+			dataResult.Data = null;
+			dataResult.IsSuccess = false;
+			dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+			return dataResult;
+		}
+	}
+
+	private string GetLastFichesByCustomer(int firmNumber, int periodNumber, int customerReferenceId)
+    {
+        string baseQuery = $@"SELECT TOP 5
             [ReferenceId] = STFICHE.LOGICALREF,
 			[FicheType] = STFICHE.TRCODE,
 			[FicheNumber] = STFICHE.FICHENO,
@@ -135,12 +235,12 @@ namespace Deppo.Core.DataStores
 			WHERE  STFICHE.PRODSTAT = 0 AND CLCARD.LOGICALREF={customerReferenceId}
 			ORDER BY STFICHE.DATE_ DESC";
 
-            return baseQuery;
-        }
+        return baseQuery;
+    }
 
-        private string CustomerTransaction(int firmNumber, int periodNumber, int ficheReferenceId)
-        {
-            string baseQuery = $@"Select
+    private string CustomerTransaction(int firmNumber, int periodNumber, int ficheReferenceId)
+    {
+        string baseQuery = $@"Select
             [ReferenceId] = STLINE.LOGICALREF,
             [TransactionDate] = STLINE.DATE_,
             [TransactionTime] = dbo.LG_INTTOTIME(STLINE.FTIME),
@@ -180,7 +280,52 @@ LEFT JOIN L_CAPIWHOUSE AS capiwhouse ON STLINE.SOURCEINDEX = capiwhouse.NR AND c
 where STLINE.LINETYPE = 0 AND STFICHE.LOGICALREF = {ficheReferenceId}
 order by STLINE.DATE_ desc;";
 
-            return baseQuery;
-        }
+        return baseQuery;
     }
+
+	/// <summary>
+	/// Satınalınan ve Satış İade Yapılan Malzeme Referans sayısı
+	/// </summary>
+	/// <param name="firmNumber"></param>
+	/// <param name="periodNumber"></param>
+	/// <param name="supplierReferenceId"></param>
+	/// <returns></returns>
+	private string GetInputQuantityQuery(int firmNumber, int periodNumber, int customerReferenceId)
+	{
+		string baseQuery = $@"SELECT 
+    InputQuantity = ISNULL(COUNT(DISTINCT STLINE.STOCKREF), 0)
+FROM 
+    LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
+LEFT JOIN 
+    LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+WHERE 
+    STFICHE.TRCODE IN(1,2,3)
+    STLINE.LINETYPE = 0 AND
+	STLINE.CLIENTREF = {customerReferenceId}";
+
+		return baseQuery;
+	}
+
+	/// <summary>
+	/// Satış Yapılan ve Satınalma İade Yapılan Malzeme Referans sayısı
+	/// </summary>
+	/// <param name="firmNumber"></param>
+	/// <param name="periodNumber"></param>
+	/// <param name="supplierReferenceId"></param>
+	/// <returns></returns>
+	private string GetOutputQuantityQuery(int firmNumber, int periodNumber, int customerReferenceId)
+	{
+		string baseQuery = $@"SELECT 
+    OutputQuantity = ISNULL(COUNT(DISTINCT STLINE.LOGICALREF), 0)
+FROM 
+    LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
+LEFT JOIN 
+    LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+WHERE 
+    STFICHE.TRCODE IN(6,7,8) AND 
+    STLINE.LINETYPE = 0 AND
+	STLINE.CLIENTREF = {customerReferenceId}";
+
+		return baseQuery;
+	}
 }
