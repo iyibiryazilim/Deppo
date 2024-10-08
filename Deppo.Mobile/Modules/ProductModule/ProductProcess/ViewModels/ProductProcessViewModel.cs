@@ -2,6 +2,7 @@ using System;
 using Controls.UserDialogs.Maui;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.TransferProductProcess.Views;
@@ -33,6 +34,7 @@ public partial class ProductProcessViewModel : BaseViewModel
         VirmanProductProcessCommand = new Command(async () => await VirmanProductProcessAsync());
         TransferProductProcessCommand = new Command(async () => await TransferProductProcessAsync());
         OpenInfoBottemSheetCommand = new Command(async () => await OpenInfoBottemSheetAsync());
+        DemandProcessCommand = new Command(async () => await DemandProcessAsync());
 
     }
 
@@ -45,6 +47,7 @@ public partial class ProductProcessViewModel : BaseViewModel
 
     public Command VirmanProductProcessCommand { get; }
     public Command TransferProductProcessCommand { get; }
+    public Command DemandProcessCommand { get; }
 
     public Command OpenInfoBottemSheetCommand { get; }
 
@@ -108,7 +111,10 @@ public partial class ProductProcessViewModel : BaseViewModel
     {
         await Shell.Current.GoToAsync($"{nameof(TransferOutWarehouseListView)}");
     }
-
+    private async Task DemandProcessAsync()
+    {
+        await Shell.Current.GoToAsync($"{nameof(DemandProcessWarehouseListView)}");
+    }
     private async Task OpenInfoBottemSheetAsync()
     {
         CurrentPage.FindByName<BottomSheet>("ınfoBottomSheet").State = BottomSheetState.HalfExpanded;
