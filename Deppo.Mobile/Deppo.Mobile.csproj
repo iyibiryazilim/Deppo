@@ -230,6 +230,21 @@
 	  <MauiXaml Update="Modules\ProductModule\ProductPanel\Views\OutputProductListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\DemandProcess\Views\DemandProcessBasketListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\DemandProcess\Views\DemandProcessFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\DemandProcess\Views\DemandProcessProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\DemandProcess\Views\DemandProcessVariantListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\DemandProcess\Views\DemandProcessWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\ProductModule\ProductProcess\OutputProductProcess\Views\OutputProductProcessBasketListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
