@@ -11,7 +11,6 @@
              Title="{Binding Title}"
              x:DataType="viewModel:SalesPanelViewModel">
 
-
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
                                         EventName="Loaded" />
@@ -31,7 +30,6 @@
                 Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
-
 
     <Grid Padding="10"
           RowDefinitions="Auto,Auto,*"
@@ -71,10 +69,7 @@
                                FontSize="16"
                                Text="Toplam Referans"
                                TextColor="{StaticResource White}" />
-
-
                     </VerticalStackLayout>
-                   
                 </Border>
 
                 <Border Grid.Row="0"
@@ -126,10 +121,7 @@
                                      ProgressColor="{StaticResource Secondary}" />
                     </VerticalStackLayout>
                 </Border>
-
-
             </Grid>
-
         </VerticalStackLayout>
 
         <Grid Grid.Row="1"
@@ -191,7 +183,6 @@
                        Text="Son Hareketler"
                        TextColor="{StaticResource OffBlack}" />
 
-
                 <Border Grid.Column="1"
                         VerticalOptions="Center"
                         Padding="5"
@@ -208,7 +199,7 @@
                            TextColor="{StaticResource White}">
                         <Label.FormattedText>
                             <FormattedString>
-                                
+
                                 <Span FontAttributes="Bold"
                                       Text="Tüm Hareketler"
                                       TextColor="{StaticResource White}" />
@@ -234,14 +225,16 @@
                                     <VerticalStackLayout Spacing="0"
                                                          VerticalOptions="Center">
                                         <Label FontAttributes="Bold"
-                                               FontSize="Subtitle"
+                                               FontSize="14"
                                                HorizontalOptions="Center"
                                                Text="{Binding FicheDate, StringFormat='{0:dd}'}"
                                                TextColor="{StaticResource OffBlack}" />
                                         <Label HorizontalOptions="Center"
+                                               FontSize="13"
                                                Text="{Binding FicheDate, StringFormat='{0:MM/yyyy}'}"
                                                TextColor="{StaticResource OffBlack}" />
                                         <Label HorizontalOptions="Center"
+                                               FontSize="13"
                                                Text="{Binding FicheTime, StringFormat='{0:hh\\:mm}'}"
                                                TextColor="{StaticResource Black}" />
                                     </VerticalStackLayout>
@@ -315,7 +308,6 @@
                                         </VerticalStackLayout>
                                     </Border>
 
-
                                     <VerticalStackLayout Grid.Column="1"
                                                          Spacing="1"
                                                          VerticalOptions="Center">
@@ -359,16 +351,9 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-
             </Grid>
-
-
 
             <!--#endregion-->
         </dx:BottomSheet>
-
     </Grid>
-
-
-
 </ContentPage>

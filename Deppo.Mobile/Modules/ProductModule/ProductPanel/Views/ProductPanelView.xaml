@@ -14,10 +14,11 @@
              Title="{Binding Title}"
              x:DataType="viewModel:ProductPanelViewModel">
 
-
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                        EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -28,7 +29,8 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android" Value="artboard.png" />
+            <On Platform="Android"
+                Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
@@ -36,7 +38,8 @@
           RowDefinitions="Auto,Auto,Auto,*"
           RowSpacing="20">
 
-        <VerticalStackLayout Grid.Row="0" Spacing="5">
+        <VerticalStackLayout Grid.Row="0"
+                             Spacing="5">
             <Label FontAttributes="Bold"
                    FontSize="Subtitle"
                    HorizontalOptions="Start"
@@ -55,17 +58,17 @@
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding ProductInputTappedCommand}" />
                     </Border.GestureRecognizers>
-                    <VerticalStackLayout Spacing="10" VerticalOptions="End">
+                    <VerticalStackLayout Spacing="10"
+                                         VerticalOptions="End">
                         <Label FontAttributes="Bold"
                                FontSize="45"
                                HorizontalTextAlignment="Start"
                                Text="{Binding ProductPanelModel.InputProductQuantity, StringFormat='{0:N0}'}"
                                TextColor="White"
                                VerticalTextAlignment="End" />
-                        <Label Text="Giriş Referansı" TextColor="{StaticResource White}" />
-
+                        <Label Text="Giriş Referansı"
+                               TextColor="{StaticResource White}" />
                     </VerticalStackLayout>
-
                 </Border>
 
                 <Border Grid.Column="1"
@@ -77,22 +80,19 @@
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding ProductOutputTappedCommand}" />
                     </Border.GestureRecognizers>
-                    <VerticalStackLayout Spacing="10" VerticalOptions="End">
+                    <VerticalStackLayout Spacing="10"
+                                         VerticalOptions="End">
                         <Label FontAttributes="Bold"
                                FontSize="45"
                                HorizontalTextAlignment="Start"
                                Text="{Binding ProductPanelModel.OutputProductQuantity, StringFormat='{0:N0}'}"
                                TextColor="White"
                                VerticalTextAlignment="End" />
-                        <Label Text="Çıkış Referansı" TextColor="{StaticResource White}" />
-
+                        <Label Text="Çıkış Referansı"
+                               TextColor="{StaticResource White}" />
                     </VerticalStackLayout>
-
-
-
                 </Border>
             </Grid>
-
         </VerticalStackLayout>
 
         <Grid Grid.Row="1"
@@ -104,7 +104,8 @@
                    Text="Hareket Gören Son 5 Malzeme"
                    TextColor="{StaticResource OffBlack}" />
 
-            <CollectionView Grid.Row="1" ItemsSource="{Binding ProductPanelModel.LastProducts}">
+            <CollectionView Grid.Row="1"
+                            ItemsSource="{Binding ProductPanelModel.LastProducts}">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout ItemSpacing="10"
                                        Orientation="Horizontal"
@@ -119,10 +120,12 @@
                                 StrokeShape="RoundRectangle 10"
                                 StrokeThickness="0.1">
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProductPanelViewModel}}, Path=ProductTappedCommand}" CommandParameter="{Binding .}" />
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProductPanelViewModel}}, Path=ProductTappedCommand}"
+                                                      CommandParameter="{Binding .}" />
                             </Border.GestureRecognizers>
 
-                            <Grid ColumnDefinitions="Auto,*, Auto" ColumnSpacing="10">
+                            <Grid ColumnDefinitions="Auto,*, Auto"
+                                  ColumnSpacing="10">
                                 <Border BackgroundColor="{StaticResource PrimaryLight}"
                                         StrokeShape="RoundRectangle 5"
                                         StrokeThickness="0.5">
@@ -132,7 +135,8 @@
                                            WidthRequest="50" />
                                 </Border>
 
-                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <VerticalStackLayout Grid.Column="1"
+                                                     Spacing="2">
 
                                     <Label FontAttributes="Bold"
                                            LineBreakMode="TailTruncation"
@@ -177,7 +181,8 @@
                    Text="Hareket Gören Son 5 Ambar"
                    TextColor="{StaticResource OffBlack}" />
 
-            <CollectionView Grid.Row="1" ItemsSource="{Binding ProductPanelModel.LastWarehouses}">
+            <CollectionView Grid.Row="1"
+                            ItemsSource="{Binding ProductPanelModel.LastWarehouses}">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout ItemSpacing="10"
                                        Orientation="Horizontal"
@@ -199,7 +204,8 @@
                                                 VerticalOptions="Start"
                                                 WidthRequest="50">
                                 <toolkit:AvatarView.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProductPanelViewModel}}, Path=WarehouseTappedCommand}" CommandParameter="{Binding .}" />
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProductPanelViewModel}}, Path=WarehouseTappedCommand}"
+                                                          CommandParameter="{Binding .}" />
                                 </toolkit:AvatarView.GestureRecognizers>
                             </toolkit:AvatarView>
 
@@ -217,7 +223,8 @@
         <Grid Grid.Row="3"
               RowDefinitions="Auto,*"
               RowSpacing="10">
-            <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+            <Grid ColumnDefinitions="*, Auto"
+                  ColumnSpacing="10">
                 <Label Grid.Row="0"
                        FontAttributes="Bold"
                        FontSize="18"
@@ -230,7 +237,6 @@
                         Padding="5"
                         BackgroundColor="{StaticResource Primary}"
                         HorizontalOptions="End"
-                        
                         Stroke="{StaticResource Primary}"
                         StrokeShape="RoundRectangle 10">
                     <Border.GestureRecognizers>
@@ -251,13 +257,15 @@
                 </Border>
             </Grid>
 
-            <CollectionView Grid.Row="1" ItemsSource="{Binding ProductPanelModel.LastProductFiche}">
+            <CollectionView Grid.Row="1"
+                            ItemsSource="{Binding ProductPanelModel.LastProductFiche}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="ficheModel:ProductFiche">
                         <Border Padding="5"
                                 BackgroundColor="Transparent"
                                 StrokeThickness="0.1">
-                            <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
+                            <Grid ColumnDefinitions="Auto, *"
+                                  ColumnSpacing="10">
                                 <Border Grid.Column="0"
                                         Padding="5"
                                         BackgroundColor="{StaticResource Secondary}"
@@ -265,14 +273,16 @@
                                     <VerticalStackLayout Spacing="0"
                                                          VerticalOptions="Center">
                                         <Label FontAttributes="Bold"
-                                               FontSize="Subtitle"
+                                               FontSize="13"
                                                HorizontalOptions="Center"
                                                Text="{Binding FicheDate, StringFormat='{0:dd}'}"
                                                TextColor="{StaticResource OffBlack}" />
                                         <Label HorizontalOptions="Center"
+                                               FontSize="13"
                                                Text="{Binding FicheDate, StringFormat='{0:MM/yyyy}'}"
                                                TextColor="{StaticResource OffBlack}" />
                                         <Label HorizontalOptions="Center"
+                                               FontSize="12"
                                                Text="{Binding FicheTime, StringFormat='{0:hh\\:mm}'}"
                                                TextColor="{StaticResource Black}" />
                                     </VerticalStackLayout>
@@ -282,7 +292,7 @@
                                                      Spacing="1"
                                                      VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
-                                           FontSize="Medium"
+                                           FontSize="14"
                                            Text="{Binding FicheNumber}" />
                                     <Label FontSize="13"
                                            LineBreakMode="TailTruncation"
@@ -294,7 +304,8 @@
                                 </VerticalStackLayout>
                             </Grid>
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProductPanelViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProductPanelViewModel}}, Path=ItemTappedCommand}"
+                                                      CommandParameter="{Binding .}" />
                             </Border.GestureRecognizers>
                         </Border>
                     </DataTemplate>
@@ -314,32 +325,36 @@
             <Grid Padding="10"
                   RowDefinitions="Auto,*"
                   RowSpacing="20">
-                <VerticalStackLayout Grid.Row="0" Spacing="5">
+                <VerticalStackLayout Grid.Row="0"
+                                     Spacing="5">
                     <Label FontAttributes="Bold"
                            FontSize="Subtitle"
                            Text="Malzemeler" />
-                    <BoxView HeightRequest="2" Color="{StaticResource OffBlack}" />
+                    <BoxView HeightRequest="2"
+                             Color="{StaticResource OffBlack}" />
                 </VerticalStackLayout>
 
-                <CollectionView Grid.Row="1" ItemsSource="{Binding ProductPanelModel.LastTransactions}">
+                <CollectionView Grid.Row="1"
+                                ItemsSource="{Binding ProductPanelModel.LastTransactions}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="model:ProductTransaction">
                             <Border Padding="5"
                                     BackgroundColor="Transparent"
                                     StrokeThickness="0.1">
-                                <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
+                                <Grid ColumnDefinitions="Auto, *"
+                                      ColumnSpacing="10">
                                     <Border Grid.Column="0"
                                             Padding="5"
                                             BackgroundColor="{StaticResource Secondary}"
                                             StrokeShape="RoundRectangle 10">
-                                        <VerticalStackLayout Spacing="1" VerticalOptions="Center">
+                                        <VerticalStackLayout Spacing="1"
+                                                             VerticalOptions="Center">
                                             <Image Grid.Column="0"
                                                    HeightRequest="50"
                                                    Source="dotnet_bot.png"
                                                    WidthRequest="50" />
                                         </VerticalStackLayout>
                                     </Border>
-
 
                                     <VerticalStackLayout Grid.Column="1"
                                                          Spacing="1"
@@ -360,9 +375,11 @@
                                             <Label>
                                                 <Label.FormattedText>
                                                     <FormattedString>
-                                                        <Span FontAttributes="Bold" Text="{Binding Quantity, StringFormat='{0:N2}'}" />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding Quantity, StringFormat='{0:N2}'}" />
                                                         <Span Text=" " />
-                                                        <Span FontAttributes="Bold" Text="{Binding SubUnitsetCode}" />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding SubUnitsetCode}" />
                                                     </FormattedString>
                                                 </Label.FormattedText>
                                             </Label>
@@ -382,12 +399,9 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-
             </Grid>
 
             <!--#endregion-->
         </dx:BottomSheet>
-
     </Grid>
-
 </ContentPage>
