@@ -18,6 +18,9 @@ public partial class ProductDetailModel : ObservableObject
     [ObservableProperty]
     private double outputQuantity;
 
+    [ObservableProperty]
+    private InventoryTurnover inventoryTurnover = new();
+
     public ProductDetailModel()
     {
     }
@@ -29,7 +32,5 @@ public partial class ProductDetailModel : ObservableObject
 
     public ObservableCollection<ProductDetailInputOutputModel> ProductInputOutputModels { get; } = new();
 
-    public ObservableCollection<SalesInventoryTurnover> SalesInventoryTurnovers { get; } = new();
 
-    public ObservableCollection<PurchaseInventoryTurnover> PurchaseInventoryTurnovers { get; } = new();
 }

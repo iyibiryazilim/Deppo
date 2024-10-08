@@ -87,14 +87,14 @@ namespace Deppo.Core.DataStores
         ELSE 1
     END AS [IsActive],
 	[OrderReferenceCount] = ISNULL( (SELECT COUNT(DISTINCT ORFLINE.STOCKREF)
-        FROM LG_001_02_ORFLINE AS ORFLINE
+        FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
         WHERE ORFLINE.CLIENTREF = SUPPLIER.LOGICALREF
         AND ORFLINE.TRCODE = 2
         AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0
         AND ORFLINE.CLOSED = 0),0)
 
 FROM
-    LG_001_CLCARD AS SUPPLIER
+    LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS SUPPLIER
 WHERE
     SUPPLIER.CODE LIKE '32%'
     AND SUPPLIER.CODE <> 'ÿ'";

@@ -3,169 +3,168 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Helpers.QueryHelper;
+using Java.Lang.Invoke;
 using System.Collections.ObjectModel;
 
-namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels
+namespace Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels;
+
+[QueryProperty(name: nameof(SupplierDetailModel), queryId: nameof(SupplierDetailModel))]
+public partial class SupplierInputTransactionViewModel : BaseViewModel
 {
-    [QueryProperty(name: nameof(Supplier), queryId: nameof(Supplier))]
-    public partial class SupplierInputTransactionViewModel : BaseViewModel
+    private readonly IHttpClientService _httpClientService;
+    private readonly ISupplierDetailInputProductService _supplierDetailInputProductService;
+    private readonly IUserDialogs _userDialogs;
+
+    [ObservableProperty]
+    private SupplierDetailModel supplierDetailModel = null!;
+
+    public SupplierInputTransactionViewModel(IHttpClientService httpClientService, ISupplierDetailInputProductService supplierDetailInputProductService, IUserDialogs userDialogs)
     {
-        private readonly IHttpClientService _httpClientService;
-        private readonly ICustomQueryService _customQueryService;
-        private readonly IUserDialogs _userDialogs;
+        _httpClientService = httpClientService;
+        _supplierDetailInputProductService = supplierDetailInputProductService;
+        _userDialogs = userDialogs;
 
-        [ObservableProperty]
-        private Supplier supplier = null!;
+        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+        LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+        GoToBackCommand = new Command(async () => await GoToBackAsync());
+    }
 
-        public SupplierInputTransactionViewModel(IHttpClientService httpClientService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
+    public ObservableCollection<ProductModel> Items { get; } = new();
+
+    public Command LoadItemsCommand { get; }
+    public Command LoadMoreItemsCommand { get; }
+    public Command GoToBackCommand { get; }
+
+    private async Task LoadItemsAsync()
+    {
+        if (IsBusy)
+            return;
+        try
         {
-            _httpClientService = httpClientService;
-            _customQueryService = customQueryService;
-            _userDialogs = userDialogs;
+            IsBusy = true;
 
-            LoadItemsCommand = new Command(async () => await LoadItemsAsync());
-            LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-            GoToBackCommand = new Command(async () => await GoToBackAsync());
+            _userDialogs.Loading("Load Items");
+            Items.Clear();
+            await Task.Delay(1000);
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            var result = await _supplierDetailInputProductService.GetObjects(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                supplierReferenceId: SupplierDetailModel.Supplier.ReferenceId,
+				search: "",
+                skip: 0,
+                take: 20
+					);
+
+            if(result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                {
+                    Items.Add(Mapping.Mapper.Map<ProductModel>(item));
+                }
+            }
+
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+           
         }
-
-        public ObservableCollection<SupplierTransaction> Items { get; } = new();
-
-        public Command LoadItemsCommand { get; }
-        public Command LoadMoreItemsCommand { get; }
-        public Command GoToBackCommand { get; }
-
-        private async Task LoadItemsAsync()
+        catch (Exception ex)
         {
-            if (IsBusy)
-                return;
-            try
-            {
-                IsBusy = true;
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.Loading().Hide();
 
-                var query = SupplierQuery.InputTransactionListQuery(
-                    FirmNumber: _httpClientService.FirmNumber,
-                    PeriodNumber: _httpClientService.PeriodNumber,
-                    SupplierReferenceId: Supplier.ReferenceId
-                    );
+				_userDialogs.Alert(message: ex.Message, title: "Hata", "Tamam");
 
-                Items.Clear();
+			}
+        finally
+        {
+            IsBusy = false;
+        }               
+    }
 
-                _userDialogs.Loading("Loading Items...");
-                await Task.Delay(1000);
+	private async Task LoadMoreItemsAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
 
-                var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _customQueryService.GetObjectsAsync(httpClient, query);
+			_userDialogs.Loading("Load More Items");
+				
 
-                if (result.IsSuccess)
-                {
-                    if (result.Data is null)
-                        return;
-                    foreach (var item in result.Data)
-                    {
-                        Items.Add(Mapping.Mapper.Map<SupplierTransaction>(item));
-                    }
-                    _userDialogs.Loading().Hide();
-                }
-                else
-                {
-                    if (_userDialogs.IsHudShowing)
-                        _userDialogs.Loading().Hide();
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-                    _userDialogs.Alert(message: result.Message, title: "Load Items");
-                }
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
+			var result = await _supplierDetailInputProductService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				supplierReferenceId: SupplierDetailModel.Supplier.ReferenceId,
+				search: "",
+				skip: Items.Count,
+				take: 20
+				);
 
-                _userDialogs.Alert(message: ex.Message, title: "Load Items Error");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+				{
+					Items.Add(Mapping.Mapper.Map<ProductModel>(item));
+				}
+			}
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			_userDialogs.Alert(message: ex.Message, title: "Hata", "Tamam");
+
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task GoToBackAsync()
+    {
+        try
+        {
+            IsBusy = true;
+
+            await Task.Delay(300);
+            await Shell.Current.GoToAsync("..");
         }
-
-        private async Task LoadMoreItemsAsync()
+        catch (Exception ex)
         {
-            if (IsBusy)
-                return;
-            try
-            {
-                IsBusy = true;
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
 
-                var query = SupplierQuery.InputTransactionListQuery(
-                    FirmNumber: _httpClientService.FirmNumber,
-                    PeriodNumber: _httpClientService.PeriodNumber,
-                    SupplierReferenceId: Supplier.ReferenceId,
-                    Sorting: "DESC",
-                    Skip: Items.Count,
-                    Take: 20
-
-                    );
-
-                
-
-                var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _customQueryService.GetObjectsAsync(httpClient, query);
-
-                if (result.IsSuccess)
-                {
-                    if (result.Data is null)
-                        return;
-                    foreach (var item in result.Data)
-                    {
-                        Items.Add(Mapping.Mapper.Map<SupplierTransaction>(item));
-                    }
-                    _userDialogs.Loading().Hide();
-                }
-                else
-                {
-                    if (_userDialogs.IsHudShowing)
-                        _userDialogs.Loading().Hide();
-
-                    _userDialogs.Alert(message: result.Message, title: "Load More Items");
-                }
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
-
-                _userDialogs.Alert(message: ex.Message, title: "Load More Items Error");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
         }
-
-        private async Task GoToBackAsync()
+        finally
         {
-            try
-            {
-                IsBusy = true;
-
-                await Task.Delay(300);
-                await Shell.Current.GoToAsync("..");
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
-
-                _userDialogs.Alert(message: ex.Message, title: "Hata");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            IsBusy = false;
         }
     }
 }

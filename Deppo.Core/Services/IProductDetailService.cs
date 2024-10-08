@@ -1,9 +1,4 @@
 ﻿using Deppo.Core.DataResultModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Deppo.Core.Services
 {
@@ -16,8 +11,9 @@ namespace Deppo.Core.Services
         Task<DataResult<IEnumerable<dynamic>>> ProductInputOutputQuantities(HttpClient httpClient, int firmNumber, int periodNumber, DateTime dateTime, int productReferenceId);
         Task<DataResult<dynamic>> GetInputQuantity(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId);
         Task<DataResult<dynamic>> GetOutputQuantity(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId);
-        Task<DataResult<dynamic>> GetAvarageStockQuantityAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int month);
-        Task<DataResult<dynamic>> GetSalesQuantityAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int month);
-        Task<DataResult<dynamic>> GetPurchaseQuantityAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int month);
+        Task<DataResult<dynamic>> GetFirstStockQuantityAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId);
+        Task<DataResult<dynamic>> GetSalesQuantityAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId);
+        Task<DataResult<dynamic>> GetLastStockQuantityAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId);
+       Task<DataResult<dynamic>> GetPurchaseQuantityAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int month);
     }
 }
