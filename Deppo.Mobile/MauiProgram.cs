@@ -294,8 +294,10 @@ public static class MauiProgram
         builder.Services.AddSingleton<ICustomerDetailService, CustomerDetailDataStore>();
         builder.Services.AddSingleton<ICustomerDetailActionService, CustomerDetailActionDataStore>();
         builder.Services.AddSingleton<ICustomerDetailAllFichesService, CustomerDetailAllFichesDataStore>();
+        builder.Services.AddSingleton<ICustomerDetailInputProductService, CustomerDetailInputProductDataStore>();
+		builder.Services.AddSingleton<ICustomerDetailOutputProductService, CustomerDetailOutputProductDataStore>();
 
-        builder.Services.AddSingleton<IProductDetailAllFichesService, ProductDetailAllFichesDataStore>();
+		builder.Services.AddSingleton<IProductDetailAllFichesService, ProductDetailAllFichesDataStore>();
         builder.Services.AddSingleton<IProductDetailService, ProductDetailDataStore>();
 
         builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));

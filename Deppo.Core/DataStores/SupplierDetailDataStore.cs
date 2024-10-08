@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -65,6 +66,155 @@ public class SupplierDetailDataStore : ISupplierDetailService
 	public async Task<DataResult<IEnumerable<dynamic>>> GetTransactionsByFiche(HttpClient httpClient, int firmNumber, int periodNumber, int ficheRefenceId)
 	{
 		var content = new StringContent(JsonConvert.SerializeObject(GetTransactionsByFicheQuery(firmNumber, periodNumber, ficheRefenceId)), Encoding.UTF8, "application/json");
+
+		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+		if (responseMessage.IsSuccessStatusCode)
+		{
+			var data = await responseMessage.Content.ReadAsStringAsync();
+			if (data != null)
+			{
+				if (!string.IsNullOrEmpty(data))
+				{
+					var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+
+					dataResult.Data = result?.Data;
+					dataResult.IsSuccess = true;
+					dataResult.Message = "success";
+					return dataResult;
+				}
+				else
+				{
+					var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+					dataResult.Data = result?.Data;
+					dataResult.IsSuccess = true;
+					dataResult.Message = "empty";
+					return dataResult;
+				}
+			}
+			else
+			{
+				var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+				dataResult.Data = Enumerable.Empty<dynamic>();
+				dataResult.IsSuccess = false;
+				dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+				return dataResult;
+			}
+		}
+		else
+		{
+			dataResult.Data = Enumerable.Empty<dynamic>();
+			dataResult.IsSuccess = false;
+			dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+			return dataResult;
+		}
+	}
+
+	public async Task<DataResult<dynamic>> GetInputQuantity(HttpClient httpClient, int firmNumber, int periodNumber, int supplierReferenceId)
+	{
+		var content = new StringContent(JsonConvert.SerializeObject(GetInputQuantityQuery(firmNumber, periodNumber, supplierReferenceId)), Encoding.UTF8, "application/json");
+
+		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+		DataResult<dynamic> dataResult = new DataResult<dynamic>();
+		if (responseMessage.IsSuccessStatusCode)
+		{
+			var data = await responseMessage.Content.ReadAsStringAsync();
+			if (data != null)
+			{
+				if (!string.IsNullOrEmpty(data))
+				{
+					var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+					dataResult.Data = result?.Data.FirstOrDefault();
+					dataResult.IsSuccess = true;
+					dataResult.Message = "success";
+					return dataResult;
+				}
+				else
+				{
+					var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+					dataResult.Data = result?.Data.FirstOrDefault();
+					dataResult.IsSuccess = true;
+					dataResult.Message = "empty";
+					return dataResult;
+				}
+			}
+			else
+			{
+				var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+				dataResult.Data = null;
+				dataResult.IsSuccess = false;
+				dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+				return dataResult;
+			}
+		}
+		else
+		{
+			dataResult.Data = null;
+			dataResult.IsSuccess = false;
+			dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+			return dataResult;
+		}
+	}
+
+	public async Task<DataResult<dynamic>> GetOutputQuantity(HttpClient httpClient, int firmNumber, int periodNumber, int supplierReferenceId)
+	{
+		var content = new StringContent(JsonConvert.SerializeObject(GetOutputQuantityQuery(firmNumber, periodNumber, supplierReferenceId)), Encoding.UTF8, "application/json");
+
+		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+		DataResult<dynamic> dataResult = new DataResult<dynamic>();
+		if (responseMessage.IsSuccessStatusCode)
+		{
+			var data = await responseMessage.Content.ReadAsStringAsync();
+			if (data != null)
+			{
+				if (!string.IsNullOrEmpty(data))
+				{
+					var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+					dataResult.Data = result?.Data.FirstOrDefault();
+					dataResult.IsSuccess = true;
+					dataResult.Message = "success";
+					return dataResult;
+				}
+				else
+				{
+					var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+					dataResult.Data = result?.Data.FirstOrDefault();
+					dataResult.IsSuccess = true;
+					dataResult.Message = "empty";
+					return dataResult;
+				}
+			}
+			else
+			{
+				var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+				dataResult.Data = null;
+				dataResult.IsSuccess = false;
+				dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+				return dataResult;
+			}
+		}
+		else
+		{
+			dataResult.Data = null;
+			dataResult.IsSuccess = false;
+			dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+			return dataResult;
+		}
+	}
+	public async Task<DataResult<IEnumerable<dynamic>>> SupplierInputOutputQuantities(HttpClient httpClient, int firmNumber, int periodNumber, DateTime dateTime, int supplierReferenceId)
+	{
+		var content = new StringContent(JsonConvert.SerializeObject(SupplierInputOutputChartQuery(firmNumber, periodNumber, dateTime, supplierReferenceId)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -178,6 +328,151 @@ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET WITH(NO
 LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE WITH(NOLOCK) ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
 WHERE STLINE.LINETYPE = 0 AND STFICHE.LOGICALREF = {ficheReferenceId}
 ORDER BY STLINE.DATE_ DESC";
+
+		return baseQuery;
+
+	}
+
+
+	/// <summary>
+	/// Satınalınan ve Satış İade Yapılan Malzeme Referans sayısı
+	/// </summary>
+	/// <param name="firmNumber"></param>
+	/// <param name="periodNumber"></param>
+	/// <param name="supplierReferenceId"></param>
+	/// <returns></returns>
+	private string GetInputQuantityQuery(int firmNumber, int periodNumber, int supplierReferenceId)
+	{
+		string baseQuery = $@"SELECT 
+    InputQuantity = ISNULL(COUNT(DISTINCT STLINE.STOCKREF), 0)
+FROM 
+    LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
+LEFT JOIN 
+    LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+WHERE 
+    STFICHE.TRCODE IN(1,2,3) AND 
+    STLINE.LINETYPE = 0 AND
+	STLINE.CLIENTREF = {supplierReferenceId}";
+
+		return baseQuery;
+	}
+
+	/// <summary>
+	/// Satış Yapılan ve Satınalma İade Yapılan Malzeme Referans sayısı
+	/// </summary>
+	/// <param name="firmNumber"></param>
+	/// <param name="periodNumber"></param>
+	/// <param name="supplierReferenceId"></param>
+	/// <returns></returns>
+	private string GetOutputQuantityQuery(int firmNumber, int periodNumber, int supplierReferenceId)
+	{
+		string baseQuery = $@"SELECT 
+    OutputQuantity = ISNULL(COUNT(DISTINCT STLINE.STOCKREF), 0)
+FROM 
+    LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
+LEFT JOIN 
+    LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+WHERE 
+   STFICHE.TRCODE IN(6,7,8) AND 
+    STLINE.LINETYPE = 0 AND
+	STLINE.CLIENTREF = {supplierReferenceId}";
+
+		return baseQuery;
+	}
+
+	/// <summary>
+	/// Son 5 günün (Satınalınan ve Satış İade Yapılan) ve (Satış Yapılan ve Satınalma İade Yapılan) Malzeme Referansları
+	/// </summary>
+	/// <param name="firmNumber"></param>
+	/// <param name="periodNumber"></param>
+	/// <param name="dateTime"></param>
+	/// <param name="supplierReferenceId"></param>
+	/// <returns></returns>
+
+	private string SupplierInputOutputChartQuery(int firmNumber, int periodNumber, DateTime dateTime, int supplierReferenceId)
+	{
+		string baseQuery = $@"";
+		DateTime xDate = dateTime;
+		for (int i = 1; i < 6; i++)
+		{
+			if (i != 1)
+				xDate = xDate.AddDays(-1);
+
+			if (i != 5)
+			{
+				baseQuery += $@"
+	SELECT
+		[Argument] = '{xDate.ToString("dddd")}',
+		[ArgumentDay] = {xDate.Day.ToString().PadLeft(2, '0')},
+		[InputQuantity] = ISNULL(
+			(SELECT COUNT(DISTINCT STLINE.STOCKREF)
+			 FROM 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
+			 LEFT JOIN 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+			 WHERE 
+				 STFICHE.TRCODE IN (1, 2, 3) AND 
+				 STLINE.LINETYPE = 0 AND
+				 YEAR(STLINE.DATE_) = {xDate.Year} AND 
+				 MONTH(STLINE.DATE_) = {xDate.Month} AND 
+                 DAY(STLINE.DATE_) = {xDate.Day} AND
+				 STLINE.CLIENTREF = {supplierReferenceId}
+			), 
+		0), 
+		[OutputQuantity] = ISNULL(
+			(SELECT COUNT(DISTINCT STLINE.STOCKREF)
+			 FROM 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
+			 LEFT JOIN 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+			 WHERE 
+				 STFICHE.TRCODE IN (6, 7, 8) AND 
+				 YEAR(STLINE.DATE_) = {xDate.Year} AND 
+                 MONTH(STLINE.DATE_) = {xDate.Month} AND
+                 DAY(STLINE.DATE_) = {xDate.Day} AND
+				 STLINE.LINETYPE = 0 AND
+				 STLINE.CLIENTREF = {supplierReferenceId}
+			), 
+		0) UNION ALL";
+			}
+			else
+			{
+				baseQuery += $@"
+	SELECT
+		[Argument] = '{xDate.ToString("dddd")}',
+		[ArgumentDay] = {xDate.Day.ToString().PadLeft(2, '0')},
+		[InputQuantity] = ISNULL(
+			(SELECT COUNT(DISTINCT STLINE.STOCKREF)
+			 FROM 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
+			 LEFT JOIN 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+			 WHERE 
+				 STFICHE.TRCODE IN (1, 2, 3) AND 
+				 STLINE.LINETYPE = 0 AND
+				 YEAR(STLINE.DATE_) = {xDate.Year} AND 
+				 MONTH(STLINE.DATE_) = {xDate.Month} AND 
+                 DAY(STLINE.DATE_) = {xDate.Day} AND
+				 STLINE.CLIENTREF = {supplierReferenceId}
+			), 
+		0), 
+		[OutputQuantity] = ISNULL(
+			(SELECT COUNT(DISTINCT STLINE.STOCKREF)
+			 FROM 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
+			 LEFT JOIN 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+			 WHERE 
+				 STFICHE.TRCODE IN (6, 7, 8) AND 
+				 YEAR(STLINE.DATE_) = {xDate.Year} AND 
+                 MONTH(STLINE.DATE_) = {xDate.Month} AND
+                 DAY(STLINE.DATE_) = {xDate.Day} AND
+				 STLINE.LINETYPE = 0 AND
+				 STLINE.CLIENTREF = {supplierReferenceId}
+			), 
+		0)";
+			}
+		}
 
 		return baseQuery;
 
