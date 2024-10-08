@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Mobile.Core.Models.AnalysisModels;
@@ -87,7 +87,7 @@ public class MappingProfile : Profile
         CreateMap<VariantPropertyValueModel, dynamic>();
         CreateMap<WarehouseFiche, dynamic>();
         CreateMap<WarehouseTransactionModel, dynamic>();
+        CreateMap<WarehouseDetailProductReferenceModel, dynamic>();
         CreateMap<InventoryTurnover, dynamic>();
-
     }
 }

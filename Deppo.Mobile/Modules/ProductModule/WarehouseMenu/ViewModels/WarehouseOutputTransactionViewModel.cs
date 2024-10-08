@@ -3,11 +3,13 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.CompanyHelper;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Helpers.QueryHelper;
+using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels;
@@ -15,169 +17,290 @@ namespace Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels;
 [QueryProperty(name: nameof(Warehouse), queryId: nameof(Warehouse))]
 public partial class WarehouseOutputTransactionViewModel : BaseViewModel
 {
-	private readonly IHttpClientService _httpClientService;
-	private readonly ICustomQueryService _customQueryService;
-	private readonly IUserDialogs _userDialogs;
-	public WarehouseOutputTransactionViewModel(IHttpClientService httpClientService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
-	{
-		Title = "Ambar Çıkış Hareketleri";
-		_httpClientService = httpClientService;
-        _customQueryService = customQueryService;
-		_userDialogs = userDialogs;
+    private readonly IHttpClientService _httpClientService;
+    private readonly IWarehouseOutputTransactionService _warehouseOutputTransactionService;
+    private readonly IUserDialogs _userDialogs;
 
-		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
-		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-		GoToBackCommand = new Command(async () => await GoToBackAsync());
-	}
+    #region Properties
 
-	#region Commands
-	public Command LoadItemsCommand { get; }
-	public Command LoadMoreItemsCommand { get; }
-	public Command<SearchBar> PerformSearchCommand { get; }
-	public Command GoToBackCommand { get; }
-	#endregion
+    [ObservableProperty]
+    private string searchText = string.Empty;
 
-	#region Collections
-	public ObservableCollection<WarehouseTransaction> Items { get; } = new();
-	#endregion
+    [ObservableProperty]
+    public Product selectedItem;
 
-	#region Properties
-	[ObservableProperty]
-	string searchText = string.Empty;
+    [ObservableProperty]
+    private Warehouse warehouse = null!;
 
-	[ObservableProperty]
-	Warehouse warehouse = null!;
-	#endregion
+    public Page CurrentPage { get; set; }
 
-	async Task LoadItemsAsync()
-	{
-		try
-		{
-			IsBusy = true;
-			Items.Clear();
+    #endregion Properties
 
-			var query = WarehouseQuery.OutputTransactionListQuery(
-				FirmNumber: _httpClientService.FirmNumber,
-				PeriodNumber: _httpClientService.PeriodNumber,
-				WarehouseNumber: Warehouse.Number,
-				Sorting: "DESC",
-				Skip: 0,
-				Take: 20
-			);
+    #region Collections
 
-			_userDialogs.Loading("Loading Items...");
-			await Task.Delay(1000);
+    public ObservableCollection<Product> Items { get; } = new();
 
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _customQueryService.GetObjectsAsync(httpClient, query);
-			
+    public ObservableCollection<WarehouseTransactionModel> Transactions { get; } = new();
 
-			if(result.IsSuccess)
-			{
-				if (result.Data is null)
-					return;
-				foreach (var item in result.Data)
-					Items.Add(Mapping.Mapper.Map<WarehouseTransaction>(item));
+    #endregion Collections
 
-				_userDialogs.Loading().Hide();
-			}
-			else
-			{
-				if (_userDialogs.IsHudShowing)
-					_userDialogs.Loading().Hide();
+    public WarehouseOutputTransactionViewModel(IHttpClientService httpClientService, IWarehouseOutputTransactionService warehouseOutputTransactionService, IUserDialogs userDialogs)
+    {
+        Title = "Ambar Çıkış Hareketleri";
+        _httpClientService = httpClientService;
+        _warehouseOutputTransactionService = warehouseOutputTransactionService;
+        _userDialogs = userDialogs;
 
-				_userDialogs.Alert(message: result.Message, title: "Hata");
-			}
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.Loading().Hide();
+        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+        LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+        ItemTappedCommand = new Command<Product>(async (item) => await ItemTappedAsync(item));
+        TransactionCloseCommand = new Command(async () => await TransactionCloseAsync());
+        LoadMoreTransactionsCommand = new Command(async () => await LoadMoreTransactionsAsync());
+        BackCommand = new Command(async () => await BackAsync());
+    }
 
-			_userDialogs.Alert(message: ex.Message, title: "Load Items Error");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+    #region Commands
 
-	async Task LoadMoreItemsAsync()
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
+    public Command LoadItemsCommand { get; }
+    public Command LoadMoreItemsCommand { get; }
+    public Command<SearchBar> PerformSearchCommand { get; }
+    public Command BackCommand { get; }
+    public Command ItemTappedCommand { get; }
 
-			var query = WarehouseQuery.OutputTransactionListQuery(
-				FirmNumber: _httpClientService.FirmNumber,
-				PeriodNumber: _httpClientService.PeriodNumber,
-				WarehouseNumber: Warehouse.Number,
-				Sorting: "DESC",
-				Skip: Items.Count,
-				Take: 20
-			);
+    public Command TransactionCloseCommand { get; }
 
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _customQueryService.GetObjectsAsync(httpClient, query);
+    public Command LoadMoreTransactionsCommand { get; }
 
-			if(result.IsSuccess)
-			{
-				if (result.Data is null)
-					return;
+    #endregion Commands
 
-				foreach (var item in result.Data)
-					Items.Add(Mapping.Mapper.Map<WarehouseTransaction>(item));
+    private async Task LoadItemsAsync()
+    {
+        if (IsBusy)
+            return;
 
-				if(_userDialogs.IsHudShowing)
-					_userDialogs.Loading().Hide();
-			}
-			else
-			{
-				if(_userDialogs.IsHudShowing)
-					_userDialogs.Loading().Hide();
+        try
+        {
+            IsBusy = true;
 
-				_userDialogs.Alert(message: result.Message, title: "Hata");
-			}
+            _userDialogs.ShowLoading("Loading...");
+            Items.Clear();
+            await Task.Delay(1000);
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _warehouseOutputTransactionService.GetWarehouseOutputProducts(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, Warehouse.Number, "", 0, 20);
+            if (result.IsSuccess)
+            {
+                if (result.Data is not null)
+                {
+                    foreach (var item in result.Data)
+                    {
+                        var warehouseProduct = Mapping.Mapper.Map<WarehouseTransactionModel>(item);
 
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.Loading().Hide();
+                        Items.Add(new Product
+                        {
+                            ReferenceId = warehouseProduct.ProductReferenceId,
+                            Code = warehouseProduct.ProductCode,
+                            Name = warehouseProduct.ProductName,
+                            StockQuantity = warehouseProduct.Quantity,
+                            UnitsetReferenceId = warehouseProduct.UnitsetReferenceId,
+                            UnitsetName = warehouseProduct.UnitsetName,
+                            UnitsetCode = warehouseProduct.UnitsetCode,
+                            SubUnitsetReferenceId = warehouseProduct.SubUnitsetReferenceId,
+                            SubUnitsetName = warehouseProduct.SubUnitsetName,
+                            SubUnitsetCode = warehouseProduct.SubUnitsetCode,
+                            LocTracking = warehouseProduct.LocTracking,
+                            TrackingType = warehouseProduct.TrackingType,
+                            IsVariant = warehouseProduct.IsVariant
+                        });
+                    }
+                }
+            }
 
-			_userDialogs.Alert(message: ex.Message, title: "Hata");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+            _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-	async Task GoToBackAsync()
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-			await Task.Delay(300);
-			await Shell.Current.GoToAsync("..");
+    private async Task LoadMoreItemsAsync()
+    {
+        if (IsBusy)
+            return;
 
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.Loading().Hide();
+        try
+        {
+            IsBusy = true;
 
-			_userDialogs.Alert(message: ex.Message, title: "Hata");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+            _userDialogs.ShowLoading("Loading...");
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _warehouseOutputTransactionService.GetWarehouseOutputProducts(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, Warehouse.Number, "", Items.Count, 20);
+            if (result.IsSuccess)
+            {
+                if (result.Data is not null)
+                {
+                    foreach (var item in result.Data)
+                    {
+                        var warehouseProduct = Mapping.Mapper.Map<WarehouseTransactionModel>(item);
 
+                        Items.Add(new Product
+                        {
+                            ReferenceId = warehouseProduct.ProductReferenceId,
+                            Code = warehouseProduct.ProductCode,
+                            Name = warehouseProduct.ProductName,
+                            StockQuantity = warehouseProduct.Quantity,
+                            UnitsetReferenceId = warehouseProduct.UnitsetReferenceId,
+                            UnitsetName = warehouseProduct.UnitsetName,
+                            UnitsetCode = warehouseProduct.UnitsetCode,
+                            SubUnitsetReferenceId = warehouseProduct.SubUnitsetReferenceId,
+                            SubUnitsetName = warehouseProduct.SubUnitsetName,
+                            SubUnitsetCode = warehouseProduct.SubUnitsetCode,
+                            LocTracking = warehouseProduct.LocTracking,
+                            TrackingType = warehouseProduct.TrackingType,
+                            IsVariant = warehouseProduct.IsVariant
+                        });
+                    }
+                }
+            }
+
+            _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ItemTappedAsync(Product product)
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            SelectedItem = product;
+
+            await LoadTransactionsAsync(product);
+            CurrentPage.FindByName<BottomSheet>("transactionBottomSheet").State = BottomSheetState.HalfExpanded;
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task TransactionCloseAsync()
+    {
+        await MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            CurrentPage.FindByName<BottomSheet>("transactionBottomSheet").State = BottomSheetState.Hidden;
+        });
+    }
+
+    private async Task LoadTransactionsAsync(Product product)
+    {
+        try
+        {
+            _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(1000);
+
+            Transactions.Clear();
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _warehouseOutputTransactionService.GetWarehouseOutputTransactions(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, product.ReferenceId, "", 0, 20);
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                    Transactions.Add(Mapping.Mapper.Map<WarehouseTransactionModel>(item));
+            }
+
+            _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+    }
+
+    private async Task LoadMoreTransactionsAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _warehouseOutputTransactionService.GetWarehouseOutputTransactions(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SelectedItem.ReferenceId, "", Transactions.Count, 20);
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                    Transactions.Add(Mapping.Mapper.Map<WarehouseTransactionModel>(item));
+            }
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            await Task.Delay(300);
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
+
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 }

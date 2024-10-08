@@ -71,18 +71,17 @@
                         <Grid ColumnDefinitions="Auto, *"
                               ColumnSpacing="10">
                             <Border Grid.Column="0"
-                                    Padding="10"
+                                    Padding="5"
                                     BackgroundColor="{StaticResource Secondary}"
                                     StrokeShape="RoundRectangle 10">
-                                <VerticalStackLayout Spacing="1"
+                                <VerticalStackLayout Spacing="0"
                                                      VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
-                                           FontSize="Large"
+                                           FontSize="Subtitle"
                                            HorizontalOptions="Center"
                                            Text="{Binding FicheDate, StringFormat='{0:dd}'}"
                                            TextColor="{StaticResource OffBlack}" />
-                                    <Label FontSize="Medium"
-                                           HorizontalOptions="Center"
+                                    <Label HorizontalOptions="Center"
                                            Text="{Binding FicheDate, StringFormat='{0:MM/yyyy}'}"
                                            TextColor="{StaticResource OffBlack}" />
                                     <Label HorizontalOptions="Center"
@@ -111,7 +110,6 @@
                                                   CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>
                     </Border>
-
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
@@ -185,7 +183,6 @@
                                                            WidthRequest="50" />
                                                 </VerticalStackLayout>
                                             </Border>
-
 
                                             <VerticalStackLayout Grid.Column="1"
                                                                  Spacing="1"
