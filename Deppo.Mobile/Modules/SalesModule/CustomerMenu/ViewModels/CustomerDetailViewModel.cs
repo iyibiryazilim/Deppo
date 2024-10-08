@@ -186,10 +186,19 @@ public partial class CustomerDetailViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                CustomerDetailModel.CustomerDetailInputOutputModels.Clear();
+                List<CustomerDetailInputOutputModel> cacheItems = new();
+
                 foreach (var item in result.Data)
-                    CustomerDetailModel.CustomerDetailInputOutputModels.Add(Mapping.Mapper.Map<CustomerDetailInputOutputModel>(item));
-            }
+                {
+					var value = Mapping.Mapper.Map<CustomerDetailInputOutputModel>(item);
+					cacheItems.Add(value);
+				}
+					
+
+				CustomerDetailModel.CustomerDetailInputOutputModels.Clear();
+				foreach (var item in cacheItems.OrderBy(x => x.ArgumentDay))
+					CustomerDetailModel.CustomerDetailInputOutputModels.Add(item);
+			}
         }
         catch (Exception ex)
         {
@@ -231,6 +240,8 @@ public partial class CustomerDetailViewModel : BaseViewModel
 
     private async Task InputQuantityTappedAsync()
     {
+        if (IsBusy)
+            return;
         try
         {
             IsBusy = true;
@@ -256,6 +267,8 @@ public partial class CustomerDetailViewModel : BaseViewModel
 
     private async Task OutputQuantityTappedAsync()
     {
+        if (IsBusy)
+            return;
         try
         {
             IsBusy = true;

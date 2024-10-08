@@ -232,7 +232,9 @@ public static class MauiProgram
         builder.Services.AddSingleton<ISupplierDetailService, SupplierDetailDataStore>();
         builder.Services.AddSingleton<ISupplierDetailAllFicheService, SupplierDetailAllFicheDataStore>();
         builder.Services.AddSingleton<ISupplierDetailActionService, SupplierDetailActionDataStore>();
-        builder.Services.AddSingleton<IProductTransactionService, ProductTransactionDataStore>();
+		builder.Services.AddSingleton<ISupplierDetailInputProductService, SupplierDetailInputProductDataStore>();
+		builder.Services.AddSingleton<ISupplierDetailOutputProductService, SupplierDetailOutputProductDataStore>();
+		builder.Services.AddSingleton<IProductTransactionService, ProductTransactionDataStore>();
         builder.Services.AddSingleton<IWarehouseTransactionService, WarehouseTransactionDataStore>();
         builder.Services.AddSingleton<ICustomerTransactionService, CustomerTransactionDataStore>();
         builder.Services.AddSingleton<ISupplierTransactionService, SupplierTransactionDataStore>();
