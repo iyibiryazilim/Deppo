@@ -1,11 +1,7 @@
 ﻿using Deppo.Core.DataResultModel;
 using Deppo.Core.Services;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Deppo.Core.DataStores
 {
@@ -310,9 +306,9 @@ namespace Deppo.Core.DataStores
                 return dataResult;
             }
         }
-        public async Task<DataResult<dynamic>> GetAvarageStockQuantityAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int month)
+        public async Task<DataResult<dynamic>> GetFirstStockQuantityAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId)
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetAvarageStockQuantityQuery(firmNumber, periodNumber, productReferenceId, month)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetFirstStockQuantityQuery(firmNumber, periodNumber, productReferenceId)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<dynamic> dataResult = new DataResult<dynamic>();
@@ -360,9 +356,59 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<dynamic>> GetSalesQuantityAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int month)
+        public async Task<DataResult<dynamic>> GetLastStockQuantityAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId)
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetSalesQuantityQuery(firmNumber, periodNumber, productReferenceId, month)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetLastStockQuantityQuery(firmNumber, periodNumber, productReferenceId)), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+            DataResult<dynamic> dataResult = new DataResult<dynamic>();
+            if (responseMessage.IsSuccessStatusCode)
+            {
+                var data = await responseMessage.Content.ReadAsStringAsync();
+                if (data != null)
+                {
+                    if (!string.IsNullOrEmpty(data))
+                    {
+                        var result = JsonConvert.DeserializeObject<DataResult<dynamic>>(data);
+
+                        dataResult.Data = result?.Data;
+                        dataResult.IsSuccess = true;
+                        dataResult.Message = "success";
+                        return dataResult;
+                    }
+                    else
+                    {
+                        var result = JsonConvert.DeserializeObject<DataResult<Dictionary<string, object>>>(data);
+
+                        dataResult.Data = result?.Data;
+                        dataResult.IsSuccess = true;
+                        dataResult.Message = "empty";
+                        return dataResult;
+                    }
+                }
+                else
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<Dictionary<string, object>>>(data);
+
+                    dataResult.Data = Enumerable.Empty<dynamic>();
+                    dataResult.IsSuccess = false;
+                    dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+                    return dataResult;
+                }
+            }
+            else
+            {
+                dataResult.Data = Enumerable.Empty<dynamic>();
+                dataResult.IsSuccess = false;
+                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+                return dataResult;
+            }
+        }
+
+        public async Task<DataResult<dynamic>> GetSalesQuantityAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId)
+        {
+            var content = new StringContent(JsonConvert.SerializeObject(GetSalesQuantityQuery(firmNumber, periodNumber, productReferenceId)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<dynamic> dataResult = new DataResult<dynamic>();
@@ -586,19 +632,24 @@ UNION All ";
             return baseQuery;
         }
 
-        private string GetAvarageStockQuantityQuery(int firmNumber, int periodNumber, int productReferenceId, int month)
+        private string GetFirstStockQuantityQuery(int firmNumber, int periodNumber, int productReferenceId)
         {
-            string baseQuery = $@"SELECT ISNULL(AVG(ONHAND),0) AvarageStockQuantity FROM LV_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STINVTOT WHERE STOCKREF = {productReferenceId} AND INVENNO = -1  AND YEAR(DATE_) = YEAR(GETDATE())  
-  AND MONTH(DATE_) = {month}";
+            string baseQuery = $@"SELECT ISNULL(SUM(ONHAND),0) FirstStockQuantity FROM LV_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STINVTOT WHERE STOCKREF = {productReferenceId} AND INVENNO = -1  AND DATE_ ='{DateTime.Now.Year}-01-01' ";
 
             return baseQuery;
         }
 
-        private string GetSalesQuantityQuery(int firmNumber, int periodNumber, int productReferenceId, int month)
+        private string GetLastStockQuantityQuery(int firmNumber, int periodNumber, int productReferenceId)
+        {
+            string baseQuery = $@"SELECT ISNULL(SUM(ONHAND),0) LastStockQuantity FROM LV_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STINVTOT WHERE STOCKREF = {productReferenceId} AND INVENNO = -1 AND YEAR(DATE_) = YEAR(GETDATE()) ";
+
+            return baseQuery;
+        }
+
+        private string GetSalesQuantityQuery(int firmNumber, int periodNumber, int productReferenceId)
         {
             string baseQuery = $@"SELECT ISNULL(SUM(AMOUNT),0) SalesQuantity FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE 
-WHERE STOCKREF = {productReferenceId} AND YEAR(DATE_) = YEAR(GETDATE())  
-  AND MONTH(DATE_) = {month} AND TRCODE IN (7,8,9)";
+WHERE STOCKREF = {productReferenceId} AND YEAR(DATE_) = YEAR(GETDATE()) AND TRCODE IN (7,8)";
 
             return baseQuery;
         }

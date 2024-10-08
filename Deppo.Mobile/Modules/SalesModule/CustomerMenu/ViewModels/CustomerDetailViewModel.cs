@@ -27,6 +27,7 @@ using System.Collections.ObjectModel;
 using Deppo.Mobile.Core.ActionModels.CustomerActionModels;
 using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views.ActionViews;
 using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views.ActionViews;
+using Deppo.Mobile.Core.Models.ProductModels;
 
 namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels;
 
@@ -95,7 +96,7 @@ public partial class CustomerDetailViewModel : BaseViewModel
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            await Task.WhenAll(GetInputOutputQuantityAsync(httpClient), GetLastFicheAsync());
+            await Task.WhenAll(GetInputQuantityAsync(httpClient), GetOutputQuantityAsync(httpClient), CustomerInputOutputQuantitiesAsync(httpClient),GetLastFicheAsync());
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
@@ -113,35 +114,94 @@ public partial class CustomerDetailViewModel : BaseViewModel
         }
     }
 
-    private async Task GetInputOutputQuantityAsync(HttpClient httpClient)
+	private async Task GetInputQuantityAsync(HttpClient httpClient)
+	{
+		try
+		{
+			var result = await _customerDetailService.GetInputQuantity(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				customerReferenceId: CustomerDetailModel.Customer.ReferenceId
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+				var obj = Mapping.Mapper.Map<CustomerDetailModel>(result.Data);
+				CustomerDetailModel.InputQuantity = obj.InputQuantity;
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			await _userDialogs.AlertAsync(message: ex.Message, title: "Hata");
+		}
+	}
+
+	private async Task GetOutputQuantityAsync(HttpClient httpClient)
+	{
+		try
+		{
+			var result = await _customerDetailService.GetOutputQuantity(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				customerReferenceId: CustomerDetailModel.Customer.ReferenceId
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+				var obj = Mapping.Mapper.Map<CustomerDetailModel>(result.Data);
+				CustomerDetailModel.OutputQuantity = obj.OutputQuantity;
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			await _userDialogs.AlertAsync(message: ex.Message, title: "Hata");
+		}
+	}
+
+    private async Task CustomerInputOutputQuantitiesAsync(HttpClient httpClient)
     {
         try
         {
-            var query = @$"SELECT
-                    [InputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STLINE WHERE IOCODE IN(1, 2) AND CLIENTREF = {CustomerDetailModel.Customer.ReferenceId}),
-                    [OutputQuantity] = (SELECT ISNULL(SUM(AMOUNT), 0) FROM LG_{_httpClientService.FirmNumber.ToString().PadLeft(3, '0')}_{_httpClientService.PeriodNumber.ToString().PadLeft(2, '0')}_STLINE WHERE IOCODE IN(3, 4) AND CLIENTREF = {CustomerDetailModel.Customer.ReferenceId})";
-
-            var result = await _customQueryService.GetObjectAsync(httpClient, query);
+            var result = await _customerDetailService.CustomerInputOutputQuantities(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                dateTime: DateTime.Now,
+                customerReferenceId: CustomerDetailModel.Customer.ReferenceId);
 
             if (result.IsSuccess)
             {
-                if (result.Data == null)
+                if (result.Data is null)
                     return;
-                var obj = Mapping.Mapper.Map<CustomerDetailModel>(result.Data);
-                CustomerDetailModel.InputQuantity = obj.InputQuantity;
-                CustomerDetailModel.OutputQuantity = obj.OutputQuantity;
+
+                CustomerDetailModel.CustomerDetailInputOutputModels.Clear();
+                foreach (var item in result.Data)
+                    CustomerDetailModel.CustomerDetailInputOutputModels.Add(Mapping.Mapper.Map<CustomerDetailInputOutputModel>(item));
             }
         }
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+                _userDialogs.HideHud();
 
-            _userDialogs.Alert(message: ex.Message, title: "Hata");
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
     }
 
-    private async Task GetLastFicheAsync()
+
+	private async Task GetLastFicheAsync()
     {
         try
         {
@@ -152,9 +212,9 @@ public partial class CustomerDetailViewModel : BaseViewModel
             {
                 if (result.Data is null)
                     return;
-                CustomerDetailModel.Transactions.Clear();
+                CustomerDetailModel.LastFiches.Clear();
                 foreach (var item in result.Data)
-                    CustomerDetailModel.Transactions.Add(Mapping.Mapper.Map<SalesFiche>(item));
+                    CustomerDetailModel.LastFiches.Add(Mapping.Mapper.Map<SalesFiche>(item));
             }
         }
         catch (Exception ex)
@@ -178,7 +238,7 @@ public partial class CustomerDetailViewModel : BaseViewModel
             await Task.Delay(300);
             await Shell.Current.GoToAsync($"{nameof(CustomerInputTransactionView)}", new Dictionary<string, object>
             {
-                ["Customer"] = CustomerDetailModel.Customer
+                [nameof(CustomerDetailModel)] = CustomerDetailModel
             });
         }
         catch (Exception ex)
@@ -203,8 +263,8 @@ public partial class CustomerDetailViewModel : BaseViewModel
             await Task.Delay(300);
             await Shell.Current.GoToAsync($"{nameof(CustomerOutputTransactionView)}", new Dictionary<string, object>
             {
-                ["Customer"] = CustomerDetailModel.Customer
-            });
+				[nameof(CustomerDetailModel)] = CustomerDetailModel
+			});
         }
         catch (Exception ex)
         {

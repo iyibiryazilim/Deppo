@@ -43,6 +43,8 @@ using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views.ActionViews;
 using Deppo.Mobile.Modules.ProductModule.ProductPanel.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductPanel.Views;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewModels;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.ViewModels;
@@ -292,8 +294,10 @@ public static class MauiProgram
         builder.Services.AddSingleton<ICustomerDetailService, CustomerDetailDataStore>();
         builder.Services.AddSingleton<ICustomerDetailActionService, CustomerDetailActionDataStore>();
         builder.Services.AddSingleton<ICustomerDetailAllFichesService, CustomerDetailAllFichesDataStore>();
+        builder.Services.AddSingleton<ICustomerDetailInputProductService, CustomerDetailInputProductDataStore>();
+		builder.Services.AddSingleton<ICustomerDetailOutputProductService, CustomerDetailOutputProductDataStore>();
 
-        builder.Services.AddSingleton<IProductDetailAllFichesService, ProductDetailAllFichesDataStore>();
+		builder.Services.AddSingleton<IProductDetailAllFichesService, ProductDetailAllFichesDataStore>();
         builder.Services.AddSingleton<IProductDetailService, ProductDetailDataStore>();
 
         builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
@@ -340,7 +344,6 @@ public static class MauiProgram
         builder.Services.AddTransientWithShellRoute<WarehouseInputTransactionView, WarehouseInputTransactionViewModel>(nameof(WarehouseInputTransactionView));
         builder.Services.AddTransientWithShellRoute<WarehouseOutputTransactionView, WarehouseOutputTransactionViewModel>(nameof(WarehouseOutputTransactionView));
         builder.Services.AddSingletonWithShellRoute<ProductProcessView, ProductProcessViewModel>(nameof(ProductProcessView));
-
         builder.Services.AddTransientWithShellRoute<WarehouseDetailAllFicheListView, WarehouseDetailAllFicheListViewModel>(nameof(WarehouseDetailAllFicheListView));
 
         #region ProductionInput Modules
@@ -362,6 +365,16 @@ public static class MauiProgram
         builder.Services.AddTransientWithShellRoute<OutputProductProcessFormView, OutputProductProcessFormViewModel>(nameof(OutputProductProcessFormView));
 
         #endregion OutputProductProcess Modules
+
+        #region DemandProcess Modules
+
+        builder.Services.AddTransientWithShellRoute<DemandProcessWarehouseListView, DemandProcessWarehouseListViewModel>(nameof(DemandProcessWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<DemandProcessBasketListView, DemandProcessBasketListViewModel>(nameof(DemandProcessBasketListView));
+        builder.Services.AddScopedWithShellRoute<DemandProcessProductListView, DemandProcessProductListViewModel>(nameof(DemandProcessProductListView));
+        builder.Services.AddScopedWithShellRoute<DemandProcessVariantListView, DemandProcessVariantListViewModel>(nameof(DemandProcessVariantListView));
+        builder.Services.AddTransientWithShellRoute<DemandProcessFormView, DemandProcessFormViewModel>(nameof(DemandProcessFormView));
+
+        #endregion DemandProcess Modules
 
         #region TransferProductProcess Modules
 

@@ -3,6 +3,7 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models;
+using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
@@ -16,110 +17,161 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels
+namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels;
+
+[QueryProperty(name: nameof(CustomerDetailModel), queryId: nameof(CustomerDetailModel))]
+public partial class CustomerInputTransactionViewModel : BaseViewModel
 {
-    [QueryProperty(name: nameof(Customer), queryId: nameof(Customer))]
-    public partial class CustomerInputTransactionViewModel : BaseViewModel
+    private readonly IHttpClientService _httpClientService;
+    private readonly ICustomerDetailInputProductService _customerDetailInputProductService;
+    private readonly IUserDialogs _userDialogs;
+
+    [ObservableProperty]
+    private CustomerDetailModel customerDetailModel = null!;
+
+    public CustomerInputTransactionViewModel(IHttpClientService httpClientService, ICustomerDetailInputProductService customerDetailInputProductService, IUserDialogs userDialogs)
     {
-        private readonly IHttpClientService _httpClientService;
-        private readonly ICustomQueryService _customQueryService;
-        private readonly IUserDialogs _userDialogs;
+        _httpClientService = httpClientService;
+        _customerDetailInputProductService = customerDetailInputProductService;
+        _userDialogs = userDialogs;
 
-        [ObservableProperty]
-        private CustomerDetailModel customerDetailMode = null!;
+        Title = "Müşteri Giriş Hareketleri";
 
-        [ObservableProperty]
-        private Customer customer = null!;
+        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+        GoToBackCommand = new Command(async () => await GoToBackAsync());
+    }
 
-        public CustomerInputTransactionViewModel(IHttpClientService httpClientService, ICustomQueryService customQueryService, IUserDialogs userDialogs)
+    public ObservableCollection<ProductModel> Items { get; } = new();
+
+    public Command LoadItemsCommand { get; }
+    public Command LoadMoreItemsCommand { get; }
+    public Command GoToBackCommand { get; }
+
+	private async Task LoadItemsAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			_userDialogs.Loading("Load Items");
+			Items.Clear();
+			await Task.Delay(1000);
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			var result = await _customerDetailInputProductService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				customerReferenceId: CustomerDetailModel.Customer.ReferenceId,
+				search: "",
+				skip: 0,
+				take: 20
+					);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+				{
+					Items.Add(Mapping.Mapper.Map<ProductModel>(item));
+				}
+			}
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			_userDialogs.Alert(message: ex.Message, title: "Hata", "Tamam");
+
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task LoadMoreItemsAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			_userDialogs.Loading("Load More Items");
+
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			var result = await _customerDetailInputProductService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				customerReferenceId: CustomerDetailModel.Customer.ReferenceId,
+				search: "",
+				skip: Items.Count,
+				take: 20
+				);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+				{
+					Items.Add(Mapping.Mapper.Map<ProductModel>(item));
+				}
+			}
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			_userDialogs.Alert(message: ex.Message, title: "Hata", "Tamam");
+
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task GoToBackAsync()
+    {
+        try
         {
-            _httpClientService = httpClientService;
-            _customQueryService = customQueryService;
-            _userDialogs = userDialogs;
+            IsBusy = true;
 
-            Title = "Müşteri Giriş Hareketleri";
-
-            LoadItemsCommand = new Command(async () => await LoadItemsAsync());
-            GoToBackCommand = new Command(async () => await GoToBackAsync());
+            await Task.Delay(300);
+            await Shell.Current.GoToAsync("..");
         }
-
-        public ObservableCollection<CustomerTransaction> Items { get; } = new();
-
-        public Command LoadItemsCommand { get; }
-        public Command GoToBackCommand { get; }
-
-        private async Task LoadItemsAsync()
+        catch (Exception ex)
         {
-            if (IsBusy)
-                return;
-            try
-            {
-                IsBusy = true;
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
 
-                var query = CustomerQuery.InputTransactionListQuery(FirmNumber: _httpClientService.FirmNumber,
-                    PeriodNumber: _httpClientService.PeriodNumber,
-                    CustomerReferenceId: Customer.ReferenceId
-                    );
-
-                Items.Clear();
-
-                _userDialogs.Loading("Loading Items...");
-                await Task.Delay(1000);
-
-                var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _customQueryService.GetObjectsAsync(httpClient, query);
-
-                if (result.IsSuccess)
-                {
-                    if (result.Data is null)
-                        return;
-                    foreach (var item in result.Data)
-                    {
-                        Items.Add(Mapping.Mapper.Map<CustomerTransaction>(item));
-                    }
-                    _userDialogs.Loading().Hide();
-                }
-                else
-                {
-                    if (_userDialogs.IsHudShowing)
-                        _userDialogs.Loading().Hide();
-
-                    _userDialogs.Alert(message: result.Message, title: "Load Items");
-                }
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
-
-                _userDialogs.Alert(message: ex.Message, title: "Load Items Error");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
         }
-
-        private async Task GoToBackAsync()
+        finally
         {
-            try
-            {
-                IsBusy = true;
-
-                await Task.Delay(300);
-                await Shell.Current.GoToAsync("..");
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
-
-                _userDialogs.Alert(message: ex.Message, title: "Hata");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            IsBusy = false;
         }
     }
 }

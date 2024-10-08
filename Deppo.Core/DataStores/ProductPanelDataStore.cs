@@ -726,33 +726,36 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
     private string GetLastWarehousesQuery(int firmNumber, int periodNumber)
     {
         string baseQuery = $@"WITH LastWarehouses AS (
-    SELECT
+    SELECT 
         CAPIWHOUSE.LOGICALREF AS ReferenceId,
         CAPIWHOUSE.NR AS Number,
         CAPIWHOUSE.NAME AS Name,
         CAPIWHOUSE.CITY AS City,
         CAPIWHOUSE.COUNTRY AS Country,
         0 AS Quantity,
-        STLINE.DATE_ AS Date_,
-        STLINE.FTIME AS Time,
-        ROW_NUMBER() OVER (PARTITION BY CAPIWHOUSE.LOGICALREF ORDER BY STLINE.DATE_ DESC, STLINE.FTIME DESC) AS RowNum
-    FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
-    LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
-    LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR ={firmNumber}
-    WHERE STFICHE.GRPCODE = 3 AND STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0
+        LatestMovement.LastMovementDate,
+        LatestMovement.LastMovementTime
+    FROM L_CAPIWHOUSE AS CAPIWHOUSE
+    INNER JOIN (
+        SELECT 
+            SOURCEINDEX, 
+            MAX(DATE_) AS LastMovementDate, 
+            MAX(FTIME) AS LastMovementTime
+        FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE
+        GROUP BY SOURCEINDEX
+    ) AS LatestMovement ON CAPIWHOUSE.NR = LatestMovement.SOURCEINDEX
+    WHERE CAPIWHOUSE.FIRMNR = {firmNumber}
 )
-SELECT TOP 5
+
+SELECT TOP 5 
     ReferenceId,
     Number,
     Name,
     City,
     Country,
-    Quantity,
-    Date_,
-    Time
+    Quantity
 FROM LastWarehouses
-WHERE RowNum = 1
-ORDER BY Date_ DESC, Time DESC;
+ORDER BY LastMovementDate DESC, LastMovementTime DESC;;
 ";
 
         return baseQuery;
