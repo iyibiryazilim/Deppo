@@ -67,9 +67,9 @@ public class SupplierDetailInputProductDataStore : ISupplierDetailInputProductSe
 		string baseQuery = $@"
     SELECT * FROM (
         SELECT
-            [ProductReferenceId] = ITEMS.LOGICALREF,
-            [ProductCode] = ISNULL(ITEMS.CODE, ''),
-            [ProductName] = ISNULL(ITEMS.NAME, ''),
+            [ReferenceId] = ITEMS.LOGICALREF,
+            [Code] = ISNULL(ITEMS.CODE, ''),
+            [Name] = ISNULL(ITEMS.NAME, ''),
             [UnitsetReferenceId] = ISNULL(UNITSET.LOGICALREF, 0),
             [UnitsetCode] = ISNULL(UNITSET.CODE, ''),
             [UnitsetName] = ISNULL(UNITSET.NAME, ''),

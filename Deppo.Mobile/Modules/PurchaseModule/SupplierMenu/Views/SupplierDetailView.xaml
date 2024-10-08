@@ -128,10 +128,10 @@
                         <VerticalStackLayout>
                             <Label FontAttributes="Bold"
                                    FontSize="Subtitle"
-                                   Text="Giriş / Çıkış Analizi"
+                                   Text="Satınalma / İade Analizi"
                                    TextColor="{StaticResource Primary}" />
                             <Label FontSize="Caption"
-                                   Text="Giriş / Çıkış Miktarları"
+                                   Text="Satınalma Yapılan / İade Edilen Ürün Referans Sayıları"
                                    TextColor="{StaticResource Gray500}" />
 
                         </VerticalStackLayout>
@@ -142,7 +142,7 @@
                                     <!--  Bind the series to the data source.  -->
                                     <dx:AreaSeries.Data>
                                         <dx:SeriesDataAdapter ArgumentDataMember="Argument" DataSource="{Binding SupplierDetailModel.SupplierDetailInputOutputModels}">
-                                            <dx:ValueDataMember Member="InputQuantity" Type="Value" />
+                                            <dx:ValueDataMember Member="PurchaseReferenceQuantity" Type="Value" />
                                         </dx:SeriesDataAdapter>
 
                                     </dx:AreaSeries.Data>
@@ -158,7 +158,7 @@
                                     <!--  Bind the series to the data source.  -->
                                     <dx:AreaSeries.Data>
                                         <dx:SeriesDataAdapter ArgumentDataMember="Argument" DataSource="{Binding SupplierDetailModel.SupplierDetailInputOutputModels}">
-                                            <dx:ValueDataMember Member="OutputQuantity" Type="Value" />
+                                            <dx:ValueDataMember Member="ReturnReferenceQuantity" Type="Value" />
                                         </dx:SeriesDataAdapter>
 
                                     </dx:AreaSeries.Data>

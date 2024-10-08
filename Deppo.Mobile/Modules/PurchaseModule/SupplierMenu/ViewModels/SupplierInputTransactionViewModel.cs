@@ -5,6 +5,7 @@ using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
+using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -24,7 +25,12 @@ public partial class SupplierInputTransactionViewModel : BaseViewModel
     [ObservableProperty]
     private SupplierDetailModel supplierDetailModel = null!;
 
-    public SupplierInputTransactionViewModel(IHttpClientService httpClientService, ISupplierDetailInputProductService supplierDetailInputProductService, IUserDialogs userDialogs)
+	public ObservableCollection<ProductModel> Items { get; } = new();
+
+    [ObservableProperty]
+    public SearchBar searchText;
+
+	public SupplierInputTransactionViewModel(IHttpClientService httpClientService, ISupplierDetailInputProductService supplierDetailInputProductService, IUserDialogs userDialogs)
     {
         _httpClientService = httpClientService;
         _supplierDetailInputProductService = supplierDetailInputProductService;
@@ -32,14 +38,18 @@ public partial class SupplierInputTransactionViewModel : BaseViewModel
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+		PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+		PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
         GoToBackCommand = new Command(async () => await GoToBackAsync());
     }
 
-    public ObservableCollection<ProductModel> Items { get; } = new();
+   
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
-    public Command GoToBackCommand { get; }
+	public Command PerformSearchCommand { get; }
+	public Command PerformEmptySearchCommand { get; }
+	public Command GoToBackCommand { get; }
 
     private async Task LoadItemsAsync()
     {
@@ -60,7 +70,7 @@ public partial class SupplierInputTransactionViewModel : BaseViewModel
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 supplierReferenceId: SupplierDetailModel.Supplier.ReferenceId,
-				search: "",
+				search: SearchText.Text,
                 skip: 0,
                 take: 20
 					);
@@ -112,7 +122,7 @@ public partial class SupplierInputTransactionViewModel : BaseViewModel
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
 				supplierReferenceId: SupplierDetailModel.Supplier.ReferenceId,
-				search: "",
+				search: SearchText.Text,
 				skip: Items.Count,
 				take: 20
 				);
@@ -146,6 +156,63 @@ public partial class SupplierInputTransactionViewModel : BaseViewModel
 		}
 	}
 
+	private async Task PerformSearchAsync()
+	{
+		if (IsBusy)
+			return;
+
+		try
+		{
+			if (string.IsNullOrWhiteSpace(SearchText.Text))
+			{
+				await LoadItemsAsync();
+				SearchText.Unfocus();
+				return;
+			}
+			IsBusy = true;
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			var result = await _supplierDetailInputProductService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				supplierReferenceId: SupplierDetailModel.Supplier.ReferenceId,
+				search: SearchText.Text,
+				skip: 0,
+				take: 20
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				Items.Clear();
+				foreach (var item in result.Data)
+				{
+					Items.Add(Mapping.Mapper.Map<ProductModel>(item));
+				}
+			}
+		}
+		catch (System.Exception ex)
+		{
+			_userDialogs.Alert(ex.Message, "Hata");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task PerformEmptySearchAsync()
+	{
+		if (string.IsNullOrWhiteSpace(SearchText.Text))
+		{
+			await PerformSearchAsync();
+		}
+	}
+
 	private async Task GoToBackAsync()
     {
         try
@@ -154,6 +221,7 @@ public partial class SupplierInputTransactionViewModel : BaseViewModel
 
             await Task.Delay(300);
             await Shell.Current.GoToAsync("..");
+			SearchText.Text = "";
         }
         catch (Exception ex)
         {

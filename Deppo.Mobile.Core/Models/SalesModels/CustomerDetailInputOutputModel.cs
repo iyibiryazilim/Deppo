@@ -6,8 +6,8 @@ public class CustomerDetailInputOutputModel : ObservableObject
 {
 	string argument = string.Empty;
 	int argumentDay = 0;
-	double inputQuantity = 0;
-	double outputQuantity = 0;
+	double salesReferenceQuantity = 0;
+	double returnReferenceQuantity = 0;
 
 	public CustomerDetailInputOutputModel()
 	{
@@ -26,15 +26,15 @@ public class CustomerDetailInputOutputModel : ObservableObject
 		set => SetProperty(ref argumentDay, value);
 	}
 
-	public double InputQuantity
+	public double SalesReferenceQuantity
 	{
-		get => inputQuantity;
-		set => SetProperty(ref inputQuantity, value);
+		get => salesReferenceQuantity;
+		set => SetProperty(ref salesReferenceQuantity, value);
 	}
 
-	public double OutputQuantity
+	public double ReturnReferenceQuantity
 	{
-		get => outputQuantity;
-		set => SetProperty(ref outputQuantity, value);
+		get => returnReferenceQuantity;
+		set => SetProperty(ref returnReferenceQuantity, value);
 	}
 }

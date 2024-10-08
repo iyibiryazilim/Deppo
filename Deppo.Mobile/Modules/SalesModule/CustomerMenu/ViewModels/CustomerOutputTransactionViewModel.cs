@@ -29,7 +29,12 @@ public partial class CustomerOutputTransactionViewModel : BaseViewModel
     [ObservableProperty]
     CustomerDetailModel customerDetailModel = null!;
 
-    public CustomerOutputTransactionViewModel(IHttpClientService httpClientService, ICustomerDetailOutputProductService customerDetailOutputProductService, IUserDialogs userDialogs)
+	[ObservableProperty]
+	public SearchBar searchText;
+
+	public ObservableCollection<ProductModel> Items { get; } = new();
+
+	public CustomerOutputTransactionViewModel(IHttpClientService httpClientService, ICustomerDetailOutputProductService customerDetailOutputProductService, IUserDialogs userDialogs)
     {
         _httpClientService = httpClientService;
 		_customerDetailOutputProductService = customerDetailOutputProductService;
@@ -39,14 +44,17 @@ public partial class CustomerOutputTransactionViewModel : BaseViewModel
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+		PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+		PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
         GoToBackCommand = new Command(async () => await GoToBackAsync());
     }
 
-    public ObservableCollection<ProductModel> Items { get; } = new();
-
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
-    public Command GoToBackCommand { get; }
+
+	public Command PerformSearchCommand { get; }
+	public Command PerformEmptySearchCommand { get; }
+	public Command GoToBackCommand { get; }
 
 	private async Task LoadItemsAsync()
 	{
@@ -67,7 +75,7 @@ public partial class CustomerOutputTransactionViewModel : BaseViewModel
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
 				customerReferenceId: CustomerDetailModel.Customer.ReferenceId,
-				search: "",
+				search: SearchText.Text,
 				skip: 0,
 				take: 20
 			);
@@ -119,7 +127,7 @@ public partial class CustomerOutputTransactionViewModel : BaseViewModel
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
 				customerReferenceId: CustomerDetailModel.Customer.ReferenceId,
-				search: "",
+				search: SearchText.Text,
 				skip: Items.Count,
 				take: 20
 			);
@@ -153,15 +161,76 @@ public partial class CustomerOutputTransactionViewModel : BaseViewModel
 		}
 	}
 
+	private async Task PerformSearchAsync()
+	{
+		if (IsBusy)
+			return;
+
+		try
+		{
+			if (string.IsNullOrWhiteSpace(SearchText.Text))
+			{
+				await LoadItemsAsync();
+				SearchText.Unfocus();
+				return;
+			}
+			IsBusy = true;
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			var result = await _customerDetailOutputProductService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				customerReferenceId: CustomerDetailModel.Customer.ReferenceId,
+				search: SearchText.Text,
+				skip: 0,
+				take: 20
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				Items.Clear();
+				foreach (var item in result.Data)
+				{
+					Items.Add(Mapping.Mapper.Map<ProductModel>(item));
+				}
+			}
+		}
+		catch (System.Exception ex)
+		{
+			_userDialogs.Alert(ex.Message, "Hata");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task PerformEmptySearchAsync()
+	{
+		if (string.IsNullOrWhiteSpace(SearchText.Text))
+		{
+			await PerformSearchAsync();
+		}
+	}
+
 	private async Task GoToBackAsync()
     {
+		if (IsBusy)
+			return;
         try
         {
             IsBusy = true;
 
-            await Task.Delay(300);
+			
+			await Task.Delay(300);
             await Shell.Current.GoToAsync("..");
-        }
+			SearchText.Text = string.Empty;
+		}
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)

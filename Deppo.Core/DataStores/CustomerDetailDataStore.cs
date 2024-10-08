@@ -349,7 +349,7 @@ FROM
 LEFT JOIN 
     LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
 WHERE 
-    STFICHE.TRCODE IN(1,2,3)
+    STFICHE.TRCODE IN(1,2,3) AND
     STLINE.LINETYPE = 0 AND
 	STLINE.CLIENTREF = {customerReferenceId}";
 
@@ -403,14 +403,14 @@ WHERE
 	SELECT
 		[Argument] = '{xDate.ToString("dddd")}',
 		[ArgumentDay] = {xDate.Day.ToString().PadLeft(2, '0')},
-		[InputQuantity] = ISNULL(
+		[SalesReferenceQuantity] = ISNULL(
 			(SELECT COUNT(DISTINCT STLINE.STOCKREF)
 			 FROM 
 				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
 			 LEFT JOIN 
 				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
 			 WHERE 
-				 STFICHE.TRCODE IN (1, 2, 3) AND 
+				 STFICHE.TRCODE IN (7,8) AND 
 				 STLINE.LINETYPE = 0 AND
 				 YEAR(STLINE.DATE_) = {xDate.Year} AND 
 				 MONTH(STLINE.DATE_) = {xDate.Month} AND 
@@ -418,14 +418,14 @@ WHERE
 				 STLINE.CLIENTREF = {customerReferenceId}
 			), 
 		0), 
-		[OutputQuantity] = ISNULL(
+		[ReturnReferenceQuantity] = ISNULL(
 			(SELECT COUNT(DISTINCT STLINE.STOCKREF)
 			 FROM 
 				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
 			 LEFT JOIN 
 				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
 			 WHERE 
-				 STFICHE.TRCODE IN (6, 7, 8) AND 
+				 STFICHE.TRCODE IN (2,3) AND 
 				 YEAR(STLINE.DATE_) = {xDate.Year} AND 
                  MONTH(STLINE.DATE_) = {xDate.Month} AND
                  DAY(STLINE.DATE_) = {xDate.Day} AND
@@ -440,14 +440,14 @@ WHERE
 	SELECT
 		[Argument] = '{xDate.ToString("dddd")}',
 		[ArgumentDay] = {xDate.Day.ToString().PadLeft(2, '0')},
-		[InputQuantity] = ISNULL(
+		[SalesReferenceQuantity] = ISNULL(
 			(SELECT COUNT(DISTINCT STLINE.STOCKREF)
 			 FROM 
 				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
 			 LEFT JOIN 
 				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
 			 WHERE 
-				 STFICHE.TRCODE IN (1, 2, 3) AND 
+				 STFICHE.TRCODE IN (7,8) AND 
 				 STLINE.LINETYPE = 0 AND
 				 YEAR(STLINE.DATE_) = {xDate.Year} AND 
 				 MONTH(STLINE.DATE_) = {xDate.Month} AND 
@@ -455,14 +455,14 @@ WHERE
 				 STLINE.CLIENTREF = {customerReferenceId}
 			), 
 		0), 
-		[OutputQuantity] = ISNULL(
+		[ReturnReferenceQuantity] = ISNULL(
 			(SELECT COUNT(DISTINCT STLINE.STOCKREF)
 			 FROM 
 				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
 			 LEFT JOIN 
 				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
 			 WHERE 
-				 STFICHE.TRCODE IN (6, 7, 8) AND 
+				 STFICHE.TRCODE IN (2,3) AND 
 				 YEAR(STLINE.DATE_) = {xDate.Year} AND 
                  MONTH(STLINE.DATE_) = {xDate.Month} AND
                  DAY(STLINE.DATE_) = {xDate.Day} AND
