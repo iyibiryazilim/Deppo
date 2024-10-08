@@ -77,15 +77,16 @@
                                 <VerticalStackLayout Spacing="1"
                                                      VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
-                                           FontSize="Large"
+                                           FontSize="14"
                                            HorizontalOptions="Center"
                                            Text="{Binding FicheDate, StringFormat='{0:dd}'}"
                                            TextColor="{StaticResource OffBlack}" />
-                                    <Label FontSize="Medium"
+                                    <Label FontSize="13"
                                            HorizontalOptions="Center"
                                            Text="{Binding FicheDate, StringFormat='{0:MM/yyyy}'}"
                                            TextColor="{StaticResource OffBlack}" />
                                     <Label HorizontalOptions="Center"
+                                           FontSize="13"
                                            Text="{Binding FicheTime, StringFormat='{0:hh\\:mm}'}"
                                            TextColor="{StaticResource Black}" />
                                 </VerticalStackLayout>
@@ -95,13 +96,13 @@
                                                  Spacing="1"
                                                  VerticalOptions="Center">
                                 <Label FontAttributes="Bold"
-                                       FontSize="Medium"
+                                       FontSize="15"
                                        Text="{Binding FicheNumber}" />
                                 <Label FontSize="13"
                                        LineBreakMode="TailTruncation"
                                        Text="{Binding CurrentName}" />
 
-                                <Label FontSize="13"
+                                <Label FontSize="12"
                                        LineBreakMode="TailTruncation"
                                        Text="{Binding FicheTypeName}" />
                             </VerticalStackLayout>
