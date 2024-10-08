@@ -484,7 +484,7 @@
                                       ColumnDefinitions="Auto,*"
                                       ColumnSpacing="10">
                                     <Grid.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding TransferProductProcessCommand}" />
+                                        <TapGestureRecognizer Command="{Binding DemandProcessCommand}" />
                                     </Grid.GestureRecognizers>
                                     <Border Padding="5"
                                             WidthRequest="45"
