@@ -42,14 +42,14 @@
     </ContentPage.BackgroundImageSource>
 
     <Grid Padding="10"
-          RowDefinitions=".40*, .50*,Auto,Auto"
+          RowDefinitions=".45*,.45*,.10*"
           RowSpacing="10">
 
         <VerticalStackLayout Grid.Row="0"
                              Padding="10"
                              HorizontalOptions="Fill"
                              Spacing="10"
-                             VerticalOptions="Center">
+                             VerticalOptions="Start">
             <!--#region Image-->
             <Border BackgroundColor="{StaticResource Secondary}"
                     HeightRequest="100"
@@ -84,7 +84,7 @@
                     <Label.FormattedText>
                         <FormattedString>
                             <Span FontFamily="FAS"
-                                  Text="{x:Static fontAwesome:FontAwesomeIcons.MoneyBill}" />
+                                  Text="{x:Static fontAwesome:FontAwesomeIcons.Box}" />
                             <Span Text=" " />
                             <Span Text="{Binding ProductDetailModel.Product.StockQuantity}" />
                         </FormattedString>
@@ -138,9 +138,193 @@
                 </Border>
             </Grid>
             <!--#endregion-->
+            
+            <!--#region Width,Length,Height,Volume-->
+            <Grid ColumnDefinitions="*,Auto,*,Auto,*,Auto,*,Auto,*" ColumnSpacing="10">
+                <VerticalStackLayout VerticalOptions="Center" Grid.Column="0">
+                    <Label FontAttributes="Bold"
+                           FontSize="14"
+                           HorizontalOptions="Center"
+                           Text="{Binding ProductMeasure.Width}"
+                           TextColor="{StaticResource Black}" />
+                    <Label HorizontalOptions="Center"
+                           Text="En"
+                           FontSize="12"
+                           TextColor="{StaticResource Black}" />
+                </VerticalStackLayout>
+                <BoxView HeightRequest="40"
+                         Grid.Column="1"
+                         Color="{StaticResource Secondary}" WidthRequest="0.5">
+                    
+                </BoxView>
+                <VerticalStackLayout VerticalOptions="Center"
+                                     Grid.Column="2">
+                    <Label FontAttributes="Bold"
+                           FontSize="14"
+                           HorizontalOptions="Center"
+                           Text="{Binding ProductMeasure.Length}"
+                           TextColor="{StaticResource Black}" />
+                    <Label HorizontalOptions="Center"
+                           Text="Boy"
+                           FontSize="12"
+                           TextColor="{StaticResource Black}" />
+                </VerticalStackLayout>
+                <BoxView HeightRequest="40"
+                         Grid.Column="3"
+                         Color="{StaticResource Secondary}"
+                         WidthRequest="0.5">
+
+                </BoxView>
+
+                <VerticalStackLayout VerticalOptions="Center" Spacing="3"
+                                     Grid.Column="4">
+                    <Label FontAttributes="Bold"
+                           FontSize="14"
+                           HorizontalOptions="Center"
+                           Text="{Binding ProductMeasure.Height}"
+                           TextColor="{StaticResource Black}" />
+                    <Label HorizontalOptions="Center"
+                           Text="Yükseklik"
+                           FontSize="12"
+                           TextColor="{StaticResource Black}" />
+                </VerticalStackLayout>
+                <BoxView HeightRequest="40"
+                         Grid.Column="5"
+                         Color="{StaticResource Secondary}"
+                         WidthRequest="0.5">
+
+                </BoxView>
+                <VerticalStackLayout VerticalOptions="Center"
+                                     Grid.Column="6">
+                    <Label FontAttributes="Bold"
+                           FontSize="14"
+                           HorizontalOptions="Center"
+                           Text="{Binding ProductMeasure.Weight}"
+                           TextColor="{StaticResource Black}" />
+                    <Label HorizontalOptions="Center"
+                           Text="Ağırlık"
+                           FontSize="12"
+                           TextColor="{StaticResource Black}" />
+                </VerticalStackLayout>
+                <BoxView HeightRequest="40"
+                         Grid.Column="7"
+                         Color="{StaticResource Secondary}"
+                         WidthRequest="0.5">
+
+                </BoxView>
+                <VerticalStackLayout VerticalOptions="Center"
+                                     Grid.Column="8">
+                    <Label FontAttributes="Bold"
+                           FontSize="14"
+                           HorizontalOptions="Center"
+                           Text="{Binding ProductMeasure.Volume}"
+                           TextColor="{StaticResource Black}" />
+                    <Label HorizontalOptions="Center"
+                           Text="Hacim"
+                           FontSize="12"
+                           TextColor="{StaticResource Black}" />
+                </VerticalStackLayout>
+               
+            </Grid>
+            <!--#endregion-->
+            
         </VerticalStackLayout>
 
-        <Grid Grid.Row="1"
+        <Border Grid.Row="1"  Padding="10"
+                BackgroundColor="{StaticResource White}"
+                Stroke="Transparent"
+                StrokeShape="RoundRectangle 10">
+            <Grid RowDefinitions=".20*,.80*"
+                  RowSpacing="10">
+                <VerticalStackLayout>
+                    <Label FontAttributes="Bold"
+                           FontSize="Subtitle"
+                           Text="Giriş / Çıkış Analizi"
+                           TextColor="{StaticResource Primary}" />
+                    <Label FontSize="Caption"
+                           Text="Giriş / Çıkış Miktarları"
+                           TextColor="{StaticResource Gray500}" />
+
+                </VerticalStackLayout>
+
+                <dx:ChartView Grid.Row="1">
+                    <dx:ChartView.Series>
+                        <dx:AreaSeries DisplayName="Giren Malzeme Miktarı">
+                            <!--  Bind the series to the data source.  -->
+                            <dx:AreaSeries.Data>
+                                <dx:SeriesDataAdapter ArgumentDataMember="Argument"
+                                                      DataSource="{Binding ProductDetailModel.ProductInputOutputModels}">
+                                    <dx:ValueDataMember Member="InputQuantity"
+                                                        Type="Value" />
+                                </dx:SeriesDataAdapter>
+
+                            </dx:AreaSeries.Data>
+                            <dx:AreaSeries.Style>
+                                <dx:AreaSeriesStyle Fill="{StaticResource Secondary}">
+                                    <dx:AreaSeriesStyle.FillEffect>
+                                        <dx:TransparencyGradient BaselineAlpha="0"
+                                                                 SeriesLineAlpha="0.6" />
+                                    </dx:AreaSeriesStyle.FillEffect>
+                                </dx:AreaSeriesStyle>
+                            </dx:AreaSeries.Style>
+                        </dx:AreaSeries>
+                        <dx:AreaSeries DisplayName="Çıkan Malzeme Miktarı">
+                            <!--  Bind the series to the data source.  -->
+                            <dx:AreaSeries.Data>
+                                <dx:SeriesDataAdapter ArgumentDataMember="Argument"
+                                                      DataSource="{Binding ProductDetailModel.ProductInputOutputModels}">
+                                    <dx:ValueDataMember Member="OutputQuantity"
+                                                        Type="Value" />
+                                </dx:SeriesDataAdapter>
+
+                            </dx:AreaSeries.Data>
+                            <dx:AreaSeries.Style>
+                                <dx:AreaSeriesStyle Fill="{StaticResource Primary}">
+                                    <dx:AreaSeriesStyle.FillEffect>
+                                        <dx:TransparencyGradient BaselineAlpha="0"
+                                                                 SeriesLineAlpha="0.4" />
+                                    </dx:AreaSeriesStyle.FillEffect>
+                                </dx:AreaSeriesStyle>
+                            </dx:AreaSeries.Style>
+                        </dx:AreaSeries>
+                    </dx:ChartView.Series>
+
+                    <dx:ChartView.AxisY>
+                        <dx:NumericAxisY AlwaysShowZeroLevel="False"
+                                         AutoRangeMode="VisibleValues">
+                            <dx:NumericAxisY.Label>
+                                <dx:AxisLabel>
+                                    <dx:AxisLabel.Style>
+                                        <dx:AxisLabelStyle>
+                                            <dx:AxisLabelStyle.TextStyle>
+                                                <dx:TextStyle Size="12" />
+                                            </dx:AxisLabelStyle.TextStyle>
+                                        </dx:AxisLabelStyle>
+                                    </dx:AxisLabel.Style>
+                                </dx:AxisLabel>
+                            </dx:NumericAxisY.Label>
+                        </dx:NumericAxisY>
+                    </dx:ChartView.AxisY>
+                    <!-- <dx:ChartView.AxisY>
+        <dx:NumericAxisY>
+            <dx:NumericAxisY.Title>
+                <dx:AxisTitle Text="Intensivity, %" />
+            </dx:NumericAxisY.Title>
+            <dx:NumericAxisY.Style>
+                <dx:AxisStyle InterlacedColor="#22DDDDDD" InterlacedVisible="True" />
+            </dx:NumericAxisY.Style>
+        </dx:NumericAxisY>
+    </dx:ChartView.AxisY>-->
+                    <dx:ChartView.Legend>
+                        <dx:Legend />
+                    </dx:ChartView.Legend>
+                </dx:ChartView>
+
+
+            </Grid>
+        </Border>
+        
+        <Grid Grid.Row="2"
               RowDefinitions="Auto,*"
               RowSpacing="10">
             <Grid ColumnDefinitions="*, Auto"

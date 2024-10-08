@@ -24,7 +24,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewMo
             _httpClientService = httpClientService;
             _productDetailActionService = productDetailActionService;
 
-            Title = "Raf Hareketleri";
+            Title = "Stok Yeri Dağılımları";
 
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
             LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
@@ -35,7 +35,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewMo
         [ObservableProperty]
         public ProductDetailModel productDetailModel;
 
-        public ObservableCollection<LocationTransaction> Items { get; } = new();
+        public ObservableCollection<ProductActionLocationTransactionModel> Items { get; } = new();
 
         public Command LoadItemsCommand { get; }
         public Command LoadMoreItemsCommand { get; }
@@ -65,7 +65,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewMo
                     foreach (var item in result.Data)
                     {
 
-                        Items.Add(Mapping.Mapper.Map<LocationTransaction>(item));
+                        Items.Add(Mapping.Mapper.Map<ProductActionLocationTransactionModel>(item));
 
                     }
                     _userDialogs.Loading().Hide();
@@ -112,7 +112,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewMo
                     foreach (var item in result.Data)
                     {
 
-                        Items.Add(Mapping.Mapper.Map<LocationTransaction>(item));
+                        Items.Add(Mapping.Mapper.Map<ProductActionLocationTransactionModel>(item));
 
                     }
                     _userDialogs.Loading().Hide();

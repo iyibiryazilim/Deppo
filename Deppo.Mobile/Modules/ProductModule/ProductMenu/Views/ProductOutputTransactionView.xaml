@@ -79,23 +79,27 @@
                                 StrokeShape="RoundRectangle 5"
                                 StrokeThickness="0.1">
                             <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
-                                <VerticalStackLayout Grid.Column="0"
-                                                     Spacing="1"
-                                                     VerticalOptions="Center">
-                                    <Label FontAttributes="Bold"
-                                           FontSize="Large"
-                                           HorizontalOptions="Center"
-                                           Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
-                                           TextColor="{StaticResource OffBlack}" />
-                                    <Label FontSize="Medium"
-                                           HorizontalOptions="Center"
-                                           Text="{Binding TransactionDate, StringFormat='{0:MM.yyyy}'}"
-                                           TextColor="{StaticResource OffBlack}" />
-                                    <Label HorizontalOptions="Center"
-                                           Text="{Binding TransactionTime, StringFormat='{0:hh\\:mm}'}"
-                                           TextColor="{StaticResource Gray400}" />
-                                </VerticalStackLayout>
-
+                                <Border Padding="5"
+                                        BackgroundColor="{StaticResource Secondary}"
+                                        StrokeShape="RoundRectangle 5"
+                                        StrokeThickness="0.5">
+                                    <VerticalStackLayout Grid.Column="0"
+                                                         Spacing="1"
+                                                         VerticalOptions="Center">
+                                        <Label FontAttributes="Bold"
+                                               FontSize="Large"
+                                               HorizontalOptions="Center"
+                                               Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
+                                               TextColor="{StaticResource OffBlack}" />
+                                        <Label FontSize="Medium"
+                                               HorizontalOptions="Center"
+                                               Text="{Binding TransactionDate, StringFormat='{0:MM.yyyy}'}"
+                                               TextColor="{StaticResource OffBlack}" />
+                                        <Label HorizontalOptions="Center"
+                                               Text="{Binding TransactionTime, StringFormat='{0:hh\\:mm}'}"
+                                               TextColor="{StaticResource Gray400}" />
+                                    </VerticalStackLayout>
+                                </Border>
                                 <VerticalStackLayout Grid.Column="1"
                                                      Spacing="1"
                                                      VerticalOptions="Center">
