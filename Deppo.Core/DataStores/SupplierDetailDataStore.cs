@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -211,6 +212,55 @@ public class SupplierDetailDataStore : ISupplierDetailService
 			return dataResult;
 		}
 	}
+	public async Task<DataResult<IEnumerable<dynamic>>> SupplierInputOutputQuantities(HttpClient httpClient, int firmNumber, int periodNumber, DateTime dateTime, int supplierReferenceId)
+	{
+		var content = new StringContent(JsonConvert.SerializeObject(SupplierInputOutputChartQuery(firmNumber, periodNumber, dateTime, supplierReferenceId)), Encoding.UTF8, "application/json");
+
+		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+		if (responseMessage.IsSuccessStatusCode)
+		{
+			var data = await responseMessage.Content.ReadAsStringAsync();
+			if (data != null)
+			{
+				if (!string.IsNullOrEmpty(data))
+				{
+					var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+
+					dataResult.Data = result?.Data;
+					dataResult.IsSuccess = true;
+					dataResult.Message = "success";
+					return dataResult;
+				}
+				else
+				{
+					var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+					dataResult.Data = result?.Data;
+					dataResult.IsSuccess = true;
+					dataResult.Message = "empty";
+					return dataResult;
+				}
+			}
+			else
+			{
+				var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+				dataResult.Data = Enumerable.Empty<dynamic>();
+				dataResult.IsSuccess = false;
+				dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+				return dataResult;
+			}
+		}
+		else
+		{
+			dataResult.Data = Enumerable.Empty<dynamic>();
+			dataResult.IsSuccess = false;
+			dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+			return dataResult;
+		}
+	}
 
 	private string GetLastFichesBySupplierQuery(int firmNumber, int periodNumber, int supplierReferenceId)
 	{
@@ -351,20 +401,76 @@ WHERE
 			if (i != 5)
 			{
 				baseQuery += $@"
-SELECT 
-[Argument] = '{xDate.ToString("dddd")}',
-[ArgumentDay] = {xDate.Day.ToString().PadLeft(2, '0')},
-[InputQuantity] = ISNULL((SELECT SUM(STLINE.AMOUNT) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK) WHERE IOCODE IN(1,2) AND LINETYPE = 0 AND YEAR(STLINE.DATE_) = {xDate.Year} AND MONTH(STLINE.DATE_) = {xDate.Month} AND DAY(STLINE.DATE_) = {xDate.Day} AND STLINE.STOCKREF = {supplierReferenceId}),0),
-[OutputQuantity] = ISNULL((SELECT SUM(STLINE.AMOUNT) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK) WHERE TRCODE IN(3,4) AND LINETYPE = 0 AND YEAR(STLINE.DATE_) = {xDate.Year} AND DAY(STLINE.DATE_) = {xDate.Month} AND DAY(STLINE.DATE_) = {xDate.Day} AND STLINE.STOCKREF = {supplierReferenceId}),0)
-UNION All ";
+	SELECT
+		[Argument] = '{xDate.ToString("dddd")}',
+		[ArgumentDay] = {xDate.Day.ToString().PadLeft(2, '0')},
+		[InputQuantity] = ISNULL(
+			(SELECT COUNT(DISTINCT STLINE.STOCKREF)
+			 FROM 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
+			 LEFT JOIN 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+			 WHERE 
+				 STFICHE.TRCODE IN (1, 2, 3) AND 
+				 STLINE.LINETYPE = 0 AND
+				 YEAR(STLINE.DATE_) = {xDate.Year} AND 
+				 MONTH(STLINE.DATE_) = {xDate.Month} AND 
+                 DAY(STLINE.DATE_) = {xDate.Day} AND
+				 STLINE.CLIENTREF = {supplierReferenceId}
+			), 
+		0), 
+		[OutputQuantity] = ISNULL(
+			(SELECT COUNT(DISTINCT STLINE.STOCKREF)
+			 FROM 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
+			 LEFT JOIN 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+			 WHERE 
+				 STFICHE.TRCODE IN (6, 7, 8) AND 
+				 YEAR(STLINE.DATE_) = {xDate.Year} AND 
+                 MONTH(STLINE.DATE_) = {xDate.Month} AND
+                 DAY(STLINE.DATE_) = {xDate.Day} AND
+				 STLINE.LINETYPE = 0 AND
+				 STLINE.CLIENTREF = {supplierReferenceId}
+			), 
+		0) UNION ALL";
 			}
 			else
 			{
-				baseQuery += $@"SELECT 
-[Argument] = '{xDate.ToString("dddd")}',
-[ArgumentDay] = {xDate.Day.ToString().PadLeft(2, '0')},
-[InputQuantity] = ISNULL((SELECT SUM(STLINE.AMOUNT) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK) WHERE IOCODE IN(1,2) AND LINETYPE = 0 AND YEAR(STLINE.DATE_) = {xDate.Year} AND MONTH(STLINE.DATE_) = {xDate.Month} AND DAY(STLINE.DATE_) = {xDate.Day} AND STLINE.STOCKREF = {supplierReferenceId}),0),
-[OutputQuantity] = ISNULL((SELECT SUM(STLINE.AMOUNT) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK) WHERE TRCODE IN(3,4) AND LINETYPE = 0 AND YEAR(STLINE.DATE_) = {xDate.Year} AND DAY(STLINE.DATE_) = {xDate.Month} AND DAY(STLINE.DATE_) = {xDate.Day} AND STLINE.STOCKREF = {supplierReferenceId}),0)";
+				baseQuery += $@"
+	SELECT
+		[Argument] = '{xDate.ToString("dddd")}',
+		[ArgumentDay] = {xDate.Day.ToString().PadLeft(2, '0')},
+		[InputQuantity] = ISNULL(
+			(SELECT COUNT(DISTINCT STLINE.STOCKREF)
+			 FROM 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
+			 LEFT JOIN 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+			 WHERE 
+				 STFICHE.TRCODE IN (1, 2, 3) AND 
+				 STLINE.LINETYPE = 0 AND
+				 YEAR(STLINE.DATE_) = {xDate.Year} AND 
+				 MONTH(STLINE.DATE_) = {xDate.Month} AND 
+                 DAY(STLINE.DATE_) = {xDate.Day} AND
+				 STLINE.CLIENTREF = {supplierReferenceId}
+			), 
+		0), 
+		[OutputQuantity] = ISNULL(
+			(SELECT COUNT(DISTINCT STLINE.STOCKREF)
+			 FROM 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
+			 LEFT JOIN 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+			 WHERE 
+				 STFICHE.TRCODE IN (6, 7, 8) AND 
+				 YEAR(STLINE.DATE_) = {xDate.Year} AND 
+                 MONTH(STLINE.DATE_) = {xDate.Month} AND
+                 DAY(STLINE.DATE_) = {xDate.Day} AND
+				 STLINE.LINETYPE = 0 AND
+				 STLINE.CLIENTREF = {supplierReferenceId}
+			), 
+		0)";
 			}
 		}
 

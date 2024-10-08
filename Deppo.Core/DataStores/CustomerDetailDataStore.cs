@@ -213,6 +213,56 @@ public class CustomerDetailDataStore : ICustomerDetailService
 		}
 	}
 
+	public async Task<DataResult<IEnumerable<dynamic>>> CustomerInputOutputQuantities(HttpClient httpClient, int firmNumber, int periodNumber, DateTime dateTime, int customerReferenceId)
+	{
+		var content = new StringContent(JsonConvert.SerializeObject(CustomerInputOutputChartQuery(firmNumber, periodNumber, dateTime, customerReferenceId)), Encoding.UTF8, "application/json");
+
+		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+		if (responseMessage.IsSuccessStatusCode)
+		{
+			var data = await responseMessage.Content.ReadAsStringAsync();
+			if (data != null)
+			{
+				if (!string.IsNullOrEmpty(data))
+				{
+					var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+
+					dataResult.Data = result?.Data;
+					dataResult.IsSuccess = true;
+					dataResult.Message = "success";
+					return dataResult;
+				}
+				else
+				{
+					var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+					dataResult.Data = result?.Data;
+					dataResult.IsSuccess = true;
+					dataResult.Message = "empty";
+					return dataResult;
+				}
+			}
+			else
+			{
+				var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+				dataResult.Data = Enumerable.Empty<dynamic>();
+				dataResult.IsSuccess = false;
+				dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+				return dataResult;
+			}
+		}
+		else
+		{
+			dataResult.Data = Enumerable.Empty<dynamic>();
+			dataResult.IsSuccess = false;
+			dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+			return dataResult;
+		}
+	}
+
 	private string GetLastFichesByCustomer(int firmNumber, int periodNumber, int customerReferenceId)
     {
         string baseQuery = $@"SELECT TOP 5
@@ -327,5 +377,103 @@ WHERE
 	STLINE.CLIENTREF = {customerReferenceId}";
 
 		return baseQuery;
+	}
+
+	/// <summary>
+	/// Son 5 günün (Satınalınan ve Satış İade Yapılan) ve (Satış Yapılan ve Satınalma İade Yapılan) Malzeme Referansları
+	/// </summary>
+	/// <param name="firmNumber"></param>
+	/// <param name="periodNumber"></param>
+	/// <param name="dateTime"></param>
+	/// <param name="supplierReferenceId"></param>
+	/// <returns></returns>
+
+	private string CustomerInputOutputChartQuery(int firmNumber, int periodNumber, DateTime dateTime, int customerReferenceId)
+	{
+		string baseQuery = $@"";
+		DateTime xDate = dateTime;
+		for (int i = 1; i < 6; i++)
+		{
+			if (i != 1)
+				xDate = xDate.AddDays(-1);
+
+			if (i != 5)
+			{
+				baseQuery += $@"
+	SELECT
+		[Argument] = '{xDate.ToString("dddd")}',
+		[ArgumentDay] = {xDate.Day.ToString().PadLeft(2, '0')},
+		[InputQuantity] = ISNULL(
+			(SELECT COUNT(DISTINCT STLINE.STOCKREF)
+			 FROM 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
+			 LEFT JOIN 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+			 WHERE 
+				 STFICHE.TRCODE IN (1, 2, 3) AND 
+				 STLINE.LINETYPE = 0 AND
+				 YEAR(STLINE.DATE_) = {xDate.Year} AND 
+				 MONTH(STLINE.DATE_) = {xDate.Month} AND 
+                 DAY(STLINE.DATE_) = {xDate.Day} AND
+				 STLINE.CLIENTREF = {customerReferenceId}
+			), 
+		0), 
+		[OutputQuantity] = ISNULL(
+			(SELECT COUNT(DISTINCT STLINE.STOCKREF)
+			 FROM 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
+			 LEFT JOIN 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+			 WHERE 
+				 STFICHE.TRCODE IN (6, 7, 8) AND 
+				 YEAR(STLINE.DATE_) = {xDate.Year} AND 
+                 MONTH(STLINE.DATE_) = {xDate.Month} AND
+                 DAY(STLINE.DATE_) = {xDate.Day} AND
+				 STLINE.LINETYPE = 0 AND
+				 STLINE.CLIENTREF = {customerReferenceId}
+			), 
+		0) UNION ALL";
+			}
+			else
+			{
+				baseQuery += $@"
+	SELECT
+		[Argument] = '{xDate.ToString("dddd")}',
+		[ArgumentDay] = {xDate.Day.ToString().PadLeft(2, '0')},
+		[InputQuantity] = ISNULL(
+			(SELECT COUNT(DISTINCT STLINE.STOCKREF)
+			 FROM 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
+			 LEFT JOIN 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+			 WHERE 
+				 STFICHE.TRCODE IN (1, 2, 3) AND 
+				 STLINE.LINETYPE = 0 AND
+				 YEAR(STLINE.DATE_) = {xDate.Year} AND 
+				 MONTH(STLINE.DATE_) = {xDate.Month} AND 
+                 DAY(STLINE.DATE_) = {xDate.Day} AND
+				 STLINE.CLIENTREF = {customerReferenceId}
+			), 
+		0), 
+		[OutputQuantity] = ISNULL(
+			(SELECT COUNT(DISTINCT STLINE.STOCKREF)
+			 FROM 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK)
+			 LEFT JOIN 
+				 LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE WITH(NOLOCK) ON STLINE.STFICHEREF = STFICHE.LOGICALREF
+			 WHERE 
+				 STFICHE.TRCODE IN (6, 7, 8) AND 
+				 YEAR(STLINE.DATE_) = {xDate.Year} AND 
+                 MONTH(STLINE.DATE_) = {xDate.Month} AND
+                 DAY(STLINE.DATE_) = {xDate.Day} AND
+				 STLINE.LINETYPE = 0 AND
+				 STLINE.CLIENTREF = {customerReferenceId}
+			), 
+		0)";
+			}
+		}
+
+		return baseQuery;
+
 	}
 }

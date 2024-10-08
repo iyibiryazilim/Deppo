@@ -5,6 +5,7 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Core.ActionModels.SupplierActionModels;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
+using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -69,7 +70,7 @@ public partial class SupplierDetailViewModel : BaseViewModel
 			await Task.Delay(1000);
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			await Task.WhenAll(GetInputQuantityAsync(httpClient), GetOutputQuantityAsync(httpClient),GetLastFichesAsync(httpClient));
+			await Task.WhenAll(GetInputQuantityAsync(httpClient), GetOutputQuantityAsync(httpClient), GetSupplierInputOutputQuantitiesAsync(httpClient),GetLastFichesAsync(httpClient));
 
 			_userDialogs.HideHud();
 		}
@@ -139,6 +140,36 @@ public partial class SupplierDetailViewModel : BaseViewModel
 				_userDialogs.Loading().Hide();
 
 			await _userDialogs.AlertAsync(message: ex.Message, title: "Hata");
+		}
+	}
+
+	private async Task GetSupplierInputOutputQuantitiesAsync(HttpClient httpClient)
+	{
+		try
+		{
+			var result = await _supplierDetailService.SupplierInputOutputQuantities(
+				httpClient: httpClient, 
+				firmNumber: _httpClientService.FirmNumber, 
+				periodNumber: _httpClientService.PeriodNumber,
+				dateTime: DateTime.Now,
+				supplierReferenceId: SupplierDetailModel.Supplier.ReferenceId);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				SupplierDetailModel.SupplierDetailInputOutputModels.Clear();
+				foreach (var item in result.Data)
+					SupplierDetailModel.SupplierDetailInputOutputModels.Add(Mapping.Mapper.Map<SupplierDetailInputOutputModel>(item));
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 	}
 

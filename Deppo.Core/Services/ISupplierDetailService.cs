@@ -14,4 +14,5 @@ public interface ISupplierDetailService
 
 	Task<DataResult<dynamic>> GetInputQuantity(HttpClient httpClient, int firmNumber, int periodNumber, int supplierReferenceId);
 	Task<DataResult<dynamic>> GetOutputQuantity(HttpClient httpClient, int firmNumber, int periodNumber, int supplierReferenceId);
+	Task<DataResult<IEnumerable<dynamic>>> SupplierInputOutputQuantities(HttpClient httpClient, int firmNumber, int periodNumber, DateTime dateTime, int supplierReferenceId);
 }

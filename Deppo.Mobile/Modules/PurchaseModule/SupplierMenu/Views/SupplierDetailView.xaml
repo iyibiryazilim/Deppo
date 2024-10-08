@@ -38,10 +38,10 @@
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
-    <ScrollView Orientation="Vertical" Padding="0">
-        <VerticalStackLayout>
+    <ScrollView Padding="0" Orientation="Vertical">
+        <VerticalStackLayout Padding="10">
             <Grid Padding="10"
-                  RowDefinitions="Auto,*"
+                  RowDefinitions="Auto,Auto,*"
                   RowSpacing="10">
 
                 <VerticalStackLayout Grid.Row="0"
@@ -119,8 +119,95 @@
                     </Grid>
                 </VerticalStackLayout>
 
+                <Border Grid.Row="1"
+                        Padding="0"
+                        BackgroundColor="{StaticResource White}"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 10">
+                    <Grid RowDefinitions=".20*,.80*" RowSpacing="10">
+                        <VerticalStackLayout>
+                            <Label FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   Text="Giriş / Çıkış Analizi"
+                                   TextColor="{StaticResource Primary}" />
+                            <Label FontSize="Caption"
+                                   Text="Giriş / Çıkış Miktarları"
+                                   TextColor="{StaticResource Gray500}" />
+
+                        </VerticalStackLayout>
+
+                        <dx:ChartView Grid.Row="1" MaximumHeightRequest="330">
+                            <dx:ChartView.Series>
+                                <dx:AreaSeries DisplayName="Giren Malzeme Miktarı">
+                                    <!--  Bind the series to the data source.  -->
+                                    <dx:AreaSeries.Data>
+                                        <dx:SeriesDataAdapter ArgumentDataMember="Argument" DataSource="{Binding SupplierDetailModel.SupplierDetailInputOutputModels}">
+                                            <dx:ValueDataMember Member="InputQuantity" Type="Value" />
+                                        </dx:SeriesDataAdapter>
+
+                                    </dx:AreaSeries.Data>
+                                    <dx:AreaSeries.Style>
+                                        <dx:AreaSeriesStyle Fill="{StaticResource Secondary}">
+                                            <dx:AreaSeriesStyle.FillEffect>
+                                                <dx:TransparencyGradient BaselineAlpha="0" SeriesLineAlpha="0.6" />
+                                            </dx:AreaSeriesStyle.FillEffect>
+                                        </dx:AreaSeriesStyle>
+                                    </dx:AreaSeries.Style>
+                                </dx:AreaSeries>
+                                <dx:AreaSeries DisplayName="Çıkan Malzeme Miktarı">
+                                    <!--  Bind the series to the data source.  -->
+                                    <dx:AreaSeries.Data>
+                                        <dx:SeriesDataAdapter ArgumentDataMember="Argument" DataSource="{Binding SupplierDetailModel.SupplierDetailInputOutputModels}">
+                                            <dx:ValueDataMember Member="OutputQuantity" Type="Value" />
+                                        </dx:SeriesDataAdapter>
+
+                                    </dx:AreaSeries.Data>
+                                    <dx:AreaSeries.Style>
+                                        <dx:AreaSeriesStyle Fill="{StaticResource Primary}">
+                                            <dx:AreaSeriesStyle.FillEffect>
+                                                <dx:TransparencyGradient BaselineAlpha="0" SeriesLineAlpha="0.4" />
+                                            </dx:AreaSeriesStyle.FillEffect>
+                                        </dx:AreaSeriesStyle>
+                                    </dx:AreaSeries.Style>
+                                </dx:AreaSeries>
+                            </dx:ChartView.Series>
+
+                            <dx:ChartView.AxisY>
+                                <dx:NumericAxisY AlwaysShowZeroLevel="False" AutoRangeMode="VisibleValues">
+                                    <dx:NumericAxisY.Label>
+                                        <dx:AxisLabel>
+                                            <dx:AxisLabel.Style>
+                                                <dx:AxisLabelStyle>
+                                                    <dx:AxisLabelStyle.TextStyle>
+                                                        <dx:TextStyle Size="12" />
+                                                    </dx:AxisLabelStyle.TextStyle>
+                                                </dx:AxisLabelStyle>
+                                            </dx:AxisLabel.Style>
+                                        </dx:AxisLabel>
+                                    </dx:NumericAxisY.Label>
+                                </dx:NumericAxisY>
+                            </dx:ChartView.AxisY>
+                            <!-- <dx:ChartView.AxisY>
+    <dx:NumericAxisY>
+        <dx:NumericAxisY.Title>
+            <dx:AxisTitle Text="Intensivity, %" />
+        </dx:NumericAxisY.Title>
+        <dx:NumericAxisY.Style>
+            <dx:AxisStyle InterlacedColor="#22DDDDDD" InterlacedVisible="True" />
+        </dx:NumericAxisY.Style>
+    </dx:NumericAxisY>
+</dx:ChartView.AxisY>-->
+                            <dx:ChartView.Legend>
+                                <dx:Legend />
+                            </dx:ChartView.Legend>
+                        </dx:ChartView>
+
+
+                    </Grid>
+                </Border>
+
                 <!--#region Last Transactions List-->
-                <Grid Grid.Row="1"
+                <Grid Grid.Row="2"
                       RowDefinitions="Auto, *"
                       RowSpacing="10">
 

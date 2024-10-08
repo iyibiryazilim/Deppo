@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
+using Deppo.Mobile.Core.Models.ProductModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,4 +28,6 @@ public partial class SupplierDetailModel : ObservableObject
 
 	public ObservableCollection<SupplierTransaction> Transactions { get; } = new();
 	public ObservableCollection<PurchaseFiche> LastFiches { get; } = new();
+
+	public ObservableCollection<SupplierDetailInputOutputModel> SupplierDetailInputOutputModels { get; } = new();
 }

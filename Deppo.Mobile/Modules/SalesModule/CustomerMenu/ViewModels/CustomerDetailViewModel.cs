@@ -27,6 +27,7 @@ using System.Collections.ObjectModel;
 using Deppo.Mobile.Core.ActionModels.CustomerActionModels;
 using Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views.ActionViews;
 using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views.ActionViews;
+using Deppo.Mobile.Core.Models.ProductModels;
 
 namespace Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels;
 
@@ -95,7 +96,7 @@ public partial class CustomerDetailViewModel : BaseViewModel
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            await Task.WhenAll(GetInputQuantityAsync(httpClient), GetOutputQuantityAsync(httpClient), GetLastFicheAsync());
+            await Task.WhenAll(GetInputQuantityAsync(httpClient), GetOutputQuantityAsync(httpClient), CustomerInputOutputQuantitiesAsync(httpClient),GetLastFicheAsync());
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
@@ -169,6 +170,37 @@ public partial class CustomerDetailViewModel : BaseViewModel
 		}
 	}
 
+    private async Task CustomerInputOutputQuantitiesAsync(HttpClient httpClient)
+    {
+        try
+        {
+            var result = await _customerDetailService.CustomerInputOutputQuantities(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                dateTime: DateTime.Now,
+                customerReferenceId: CustomerDetailModel.Customer.ReferenceId);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                CustomerDetailModel.CustomerDetailInputOutputModels.Clear();
+                foreach (var item in result.Data)
+                    CustomerDetailModel.CustomerDetailInputOutputModels.Add(Mapping.Mapper.Map<CustomerDetailInputOutputModel>(item));
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+    }
+
+
 	private async Task GetLastFicheAsync()
     {
         try
@@ -180,9 +212,9 @@ public partial class CustomerDetailViewModel : BaseViewModel
             {
                 if (result.Data is null)
                     return;
-                CustomerDetailModel.Transactions.Clear();
+                CustomerDetailModel.LastFiches.Clear();
                 foreach (var item in result.Data)
-                    CustomerDetailModel.Transactions.Add(Mapping.Mapper.Map<SalesFiche>(item));
+                    CustomerDetailModel.LastFiches.Add(Mapping.Mapper.Map<SalesFiche>(item));
             }
         }
         catch (Exception ex)
