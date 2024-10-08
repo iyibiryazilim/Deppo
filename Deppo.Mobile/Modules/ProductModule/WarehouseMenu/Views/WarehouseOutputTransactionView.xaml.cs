@@ -4,10 +4,12 @@ namespace Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views;
 
 public partial class WarehouseOutputTransactionView : ContentPage
 {
-	WarehouseOutputTransactionViewModel _viewModel;
-	public WarehouseOutputTransactionView(WarehouseOutputTransactionViewModel viewModel)
-	{
-		InitializeComponent();
-		BindingContext = _viewModel = viewModel;
-	}
+    private WarehouseOutputTransactionViewModel _viewModel;
+
+    public WarehouseOutputTransactionView(WarehouseOutputTransactionViewModel viewModel)
+    {
+        InitializeComponent();
+        BindingContext = _viewModel = viewModel;
+        _viewModel.CurrentPage = this;
+    }
 }

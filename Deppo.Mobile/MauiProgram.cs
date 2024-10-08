@@ -304,6 +304,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IWarehouseDetailAllFicheListService, WarehouseDetailAllFicheListDataStore>();
 
         builder.Services.AddSingleton<IWarehouseInputTransactionService, WarehouseInputTransactionDataStore>();
+        builder.Services.AddSingleton<IWarehouseOutputTransactionService, WarehouseOutputTransactionDataStore>();
 
         #region Analysis Modules
 

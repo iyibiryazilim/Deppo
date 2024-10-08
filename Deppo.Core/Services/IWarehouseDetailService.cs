@@ -16,5 +16,7 @@ namespace Deppo.Core.Services
         Task<DataResult<dynamic>> GetInputQuantity(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber);
 
         Task<DataResult<dynamic>> GetOutputQuantity(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber);
+
+        Task<DataResult<IEnumerable<dynamic>>> ProductInputOutputReferences(HttpClient httpClient, int firmNumber, int periodNumber, DateTime dateTime, int warehouseNumber);
     }
 }

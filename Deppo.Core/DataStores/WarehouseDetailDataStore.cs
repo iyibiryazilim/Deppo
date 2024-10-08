@@ -163,9 +163,59 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetLastTransaction(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int ficheReferenceId)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetLastTransaction(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferendeId, int warehouseNumber)
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetLastTransactionQuery(firmNumber, periodNumber, ficheReferenceId, warehouseNumber)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetLastTransactionQuery(firmNumber, periodNumber, ficheReferendeId, warehouseNumber)), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+            DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+            if (responseMessage.IsSuccessStatusCode)
+            {
+                var data = await responseMessage.Content.ReadAsStringAsync();
+                if (data != null)
+                {
+                    if (!string.IsNullOrEmpty(data))
+                    {
+                        var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+
+                        dataResult.Data = result?.Data;
+                        dataResult.IsSuccess = true;
+                        dataResult.Message = "success";
+                        return dataResult;
+                    }
+                    else
+                    {
+                        var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                        dataResult.Data = result?.Data;
+                        dataResult.IsSuccess = true;
+                        dataResult.Message = "empty";
+                        return dataResult;
+                    }
+                }
+                else
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                    dataResult.Data = Enumerable.Empty<dynamic>();
+                    dataResult.IsSuccess = false;
+                    dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+                    return dataResult;
+                }
+            }
+            else
+            {
+                dataResult.Data = Enumerable.Empty<dynamic>();
+                dataResult.IsSuccess = false;
+                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+                return dataResult;
+            }
+        }
+
+        public async Task<DataResult<IEnumerable<dynamic>>> ProductInputOutputReferences(HttpClient httpClient, int firmNumber, int periodNumber, DateTime dateTime, int warehouseNumber)
+        {
+            var content = new StringContent(JsonConvert.SerializeObject(ProductInputOutputReferencesQuery(firmNumber, periodNumber, dateTime, warehouseNumber)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -303,6 +353,38 @@ LEFT JOIN
     ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR
     AND CAPIWHOUSE.FIRMNR = 1
 WHERE STLINE.SOURCEINDEX ={warehouseNumber} AND STLINE.IOCODE IN (3, 4)";
+
+            return baseQuery;
+        }
+
+        private string ProductInputOutputReferencesQuery(int firmNumber, int periodNumber, DateTime dateTime, int warehouseNumber)
+        {
+            string baseQuery = $@"";
+            DateTime xDate = dateTime;
+            for (int i = 1; i < 6; i++)
+            {
+                if (i != 1)
+                    xDate = xDate.AddDays(-1);
+
+                if (i != 5)
+                {
+                    baseQuery += $@"
+SELECT
+[Argument] = '{xDate.ToString("dddd")}',
+[ArgumentDay] = {xDate.Day.ToString().PadLeft(2, '0')},
+[InputQuantity] = ISNULL((SELECT COUNT(DISTINCT STLINE.STOCKREF) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK) WHERE IOCODE IN(1,2) AND LINETYPE = 0 AND YEAR(STLINE.DATE_) = {xDate.Year} AND MONTH(STLINE.DATE_) = {xDate.Month} AND DAY(STLINE.DATE_) = {xDate.Day} AND  STLINE.SOURCEINDEX={warehouseNumber}),0),
+[OutputQuantity] = ISNULL((SELECT COUNT(DISTINCT STLINE.STOCKREF) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK) WHERE TRCODE IN(3,4) AND LINETYPE = 0 AND YEAR(STLINE.DATE_) = {xDate.Year} AND DAY(STLINE.DATE_) = {xDate.Month} AND DAY(STLINE.DATE_) = {xDate.Day} AND  STLINE.SOURCEINDEX={warehouseNumber}),0)
+UNION All ";
+                }
+                else
+                {
+                    baseQuery += $@"SELECT
+[Argument] = '{xDate.ToString("dddd")}',
+[ArgumentDay] = {xDate.Day.ToString().PadLeft(2, '0')},
+[InputQuantity] = ISNULL((SELECT SUM(STLINE.AMOUNT) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK) WHERE IOCODE IN(1,2) AND LINETYPE = 0 AND YEAR(STLINE.DATE_) = {xDate.Year} AND MONTH(STLINE.DATE_) = {xDate.Month} AND DAY(STLINE.DATE_) = {xDate.Day} AND  STLINE.SOURCEINDEX={warehouseNumber}),0),
+[OutputQuantity] = ISNULL((SELECT SUM(STLINE.AMOUNT) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE WITH(NOLOCK) WHERE TRCODE IN(3,4) AND LINETYPE = 0 AND YEAR(STLINE.DATE_) = {xDate.Year} AND DAY(STLINE.DATE_) = {xDate.Month} AND DAY(STLINE.DATE_) = {xDate.Day} AND  STLINE.SOURCEINDEX={warehouseNumber}),0)";
+                }
+            }
 
             return baseQuery;
         }

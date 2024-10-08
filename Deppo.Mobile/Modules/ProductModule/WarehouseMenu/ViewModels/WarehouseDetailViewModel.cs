@@ -2,14 +2,19 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.AnalysisModels;
 using Deppo.Mobile.Core.Models.ProductModels;
+using Deppo.Mobile.Core.Models.SalesModels;
+using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
 using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views;
+using DevExpress.Maui.Controls;
 using Newtonsoft.Json;
 using System.Dynamic;
+using static DevExpress.Data.Filtering.Helpers.SubExprHelper.UiThreadRowStubSubExpressive;
 
 namespace Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels;
 
@@ -34,11 +39,14 @@ public partial class WarehouseDetailViewModel : BaseViewModel
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         InputQuantityTappedCommand = new Command(async () => await InputQuantityTappedAsync());
         OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
+        ItemTappedCommand = new Command<WarehouseFiche>(async (warehouseFiche) => await ItemTappedAsync(warehouseFiche));
         AllFicheTappedCommand = new Command(async () => await AllFicheTappedAsync());
     }
 
     [ObservableProperty]
     private WarehouseDetailModel warehouseDetailModel = null!;
+
+    public Page CurrentPage { get; set; }
 
     #region Commands
 
@@ -46,6 +54,8 @@ public partial class WarehouseDetailViewModel : BaseViewModel
     public Command InputQuantityTappedCommand { get; }
     public Command OutputQuantityTappedCommand { get; }
     public Command AllFicheTappedCommand { get; }
+
+    public Command ItemTappedCommand { get; }
 
     #endregion Commands
 
@@ -60,7 +70,7 @@ public partial class WarehouseDetailViewModel : BaseViewModel
             _userDialogs.Loading("Loading Items...");
 
             await Task.Delay(1000);
-            await Task.WhenAll(GetInputQuantityAsync(), GetLastTransactionsAsync(), GetOutputQuantityAsync());
+            await Task.WhenAll(GetInputQuantityAsync(), GetLastTransactionFicheAsync(), GetOutputQuantityAsync(), GetProductInputOutputQuantitiesAsync());
 
             _userDialogs.HideHud();
         }
@@ -133,21 +143,113 @@ public partial class WarehouseDetailViewModel : BaseViewModel
         }
     }
 
-    private async Task GetLastTransactionsAsync()
+    private async Task GetProductInputOutputQuantitiesAsync()
     {
         try
         {
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseDetailService.GetLastFiches(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, WarehouseDetailModel.Warehouse.Number);
+            var result = await _warehouseDetailService.ProductInputOutputReferences(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, DateTime.Now, WarehouseDetailModel.Warehouse.Number);
 
             if (result.IsSuccess)
             {
                 if (result.Data is null)
                     return;
 
-                WarehouseDetailModel.Transactions.Clear();
+                List<WarehouseDetailProductReferenceModel> cacheItems = new();
+
+                cacheItems.Clear();
                 foreach (var item in result.Data)
-                    WarehouseDetailModel.Transactions.Add(Mapping.Mapper.Map<WarehouseFiche>(item));
+                    cacheItems.Add(Mapping.Mapper.Map<WarehouseDetailProductReferenceModel>(item));
+
+                WarehouseDetailModel.ProductReferences.Clear();
+                foreach (var item in cacheItems.OrderBy(x => x.ArgumentDay))
+                    WarehouseDetailModel.ProductReferences.Add(item);
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+        }
+    }
+
+    private async Task ItemTappedAsync(WarehouseFiche warehouseFiche)
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+            _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(500);
+            await GetLastTransactionAsync(warehouseFiche);
+            CurrentPage.FindByName<BottomSheet>("ficheTransactionBottomSheet").State = BottomSheetState.HalfExpanded;
+
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task GetLastTransactionAsync(WarehouseFiche warehouseFiche)
+    {
+        try
+        {
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _warehouseDetailService.GetLastTransaction(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseFiche.ReferenceId, WarehouseDetailModel.Warehouse.Number);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+                WarehouseDetailModel.LastTransactions.Clear();
+
+                foreach (var item in result.Data)
+                    WarehouseDetailModel.LastTransactions.Add(Mapping.Mapper.Map<WarehouseTransaction>(item));
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+        }
+    }
+
+    private async Task GetLastTransactionFicheAsync()
+    {
+        try
+        {
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _warehouseDetailService.GetLastFiches(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseDetailModel.Warehouse.Number);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                WarehouseDetailModel.LastFiches.Clear();
+                foreach (var item in result.Data)
+                    WarehouseDetailModel.LastFiches.Add(Mapping.Mapper.Map<WarehouseFiche>(item));
             }
         }
         catch (Exception ex)

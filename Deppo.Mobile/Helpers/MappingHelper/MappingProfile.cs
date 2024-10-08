@@ -87,5 +87,6 @@ public class MappingProfile : Profile
         CreateMap<VariantPropertyValueModel, dynamic>();
         CreateMap<WarehouseFiche, dynamic>();
         CreateMap<WarehouseTransactionModel, dynamic>();
+        CreateMap<WarehouseDetailProductReferenceModel, dynamic>();
     }
 }
