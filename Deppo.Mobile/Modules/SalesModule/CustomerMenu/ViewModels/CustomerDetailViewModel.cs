@@ -240,6 +240,8 @@ public partial class CustomerDetailViewModel : BaseViewModel
 
     private async Task InputQuantityTappedAsync()
     {
+        if (IsBusy)
+            return;
         try
         {
             IsBusy = true;
@@ -265,6 +267,8 @@ public partial class CustomerDetailViewModel : BaseViewModel
 
     private async Task OutputQuantityTappedAsync()
     {
+        if (IsBusy)
+            return;
         try
         {
             IsBusy = true;

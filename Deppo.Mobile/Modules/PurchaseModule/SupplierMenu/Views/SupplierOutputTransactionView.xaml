@@ -67,12 +67,19 @@
                 <SearchBar x:Name="searchBar"
                            Placeholder="Ara..."
                            PlaceholderColor="{StaticResource OffBlack}"
-                           TextColor="{StaticResource OffBlack}" />
+                           TextColor="{StaticResource OffBlack}">
+                    <SearchBar.Behaviors>
+                        <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}" EventName="SearchButtonPressed" />
+                        <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}" EventName="TextChanged" />
+                    </SearchBar.Behaviors>
+                </SearchBar>
             </Border>
             <!--#endregion-->
 
             <CollectionView Grid.Row="1"
                             Margin="5,0,5,0"
+                            RemainingItemsThreshold="2"
+                            RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}"
                             ItemsSource="{Binding Items}">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
