@@ -12,8 +12,10 @@
              x:DataType="viewModel:SupplierDetailViewModel"
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
-        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                        EventName="Loaded" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -23,7 +25,8 @@
     </ContentPage.Resources>
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Command="{Binding ActionModelProcessTappedCommand}" Order="Primary">
+        <ToolbarItem Command="{Binding ActionModelProcessTappedCommand}"
+                     Order="Primary">
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="FAS"
                                  Glyph="{x:Static fontAwesome:FontAwesomeIcons.EllipsisVertical}"
@@ -34,11 +37,13 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android" Value="artboard.png" />
+            <On Platform="Android"
+                Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
-    <ScrollView Padding="0" Orientation="Vertical">
+    <ScrollView Padding="0"
+                Orientation="Vertical">
         <VerticalStackLayout Padding="10">
             <Grid Padding="10"
                   RowDefinitions="Auto,Auto,*"
@@ -61,7 +66,8 @@
                     <!--#endregion-->
 
                     <!--#region Code, Name-->
-                    <VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+                    <VerticalStackLayout HorizontalOptions="Center"
+                                         Spacing="4">
                         <Label FontAttributes="Bold"
                                FontSize="Large"
                                HorizontalOptions="Center"
@@ -124,7 +130,8 @@
                         BackgroundColor="{StaticResource White}"
                         Stroke="Transparent"
                         StrokeShape="RoundRectangle 10">
-                    <Grid RowDefinitions=".20*,.80*" RowSpacing="10">
+                    <Grid RowDefinitions=".20*,.80*"
+                          RowSpacing="10">
                         <VerticalStackLayout>
                             <Label FontAttributes="Bold"
                                    FontSize="Subtitle"
@@ -133,23 +140,25 @@
                             <Label FontSize="Caption"
                                    Text="Giriş / Çıkış Miktarları"
                                    TextColor="{StaticResource Gray500}" />
-
                         </VerticalStackLayout>
 
-                        <dx:ChartView Grid.Row="1" MaximumHeightRequest="330">
+                        <dx:ChartView Grid.Row="1"
+                                      MaximumHeightRequest="330">
                             <dx:ChartView.Series>
                                 <dx:AreaSeries DisplayName="Satınalma Yapılan Malzeme Referans Sayısı">
                                     <!--  Bind the series to the data source.  -->
                                     <dx:AreaSeries.Data>
-                                        <dx:SeriesDataAdapter ArgumentDataMember="Argument" DataSource="{Binding SupplierDetailModel.SupplierDetailInputOutputModels}">
-                                            <dx:ValueDataMember Member="InputQuantity" Type="Value" />
+                                        <dx:SeriesDataAdapter ArgumentDataMember="Argument"
+                                                              DataSource="{Binding SupplierDetailModel.SupplierDetailInputOutputModels}">
+                                            <dx:ValueDataMember Member="InputQuantity"
+                                                                Type="Value" />
                                         </dx:SeriesDataAdapter>
-
                                     </dx:AreaSeries.Data>
                                     <dx:AreaSeries.Style>
                                         <dx:AreaSeriesStyle Fill="{StaticResource Secondary}">
                                             <dx:AreaSeriesStyle.FillEffect>
-                                                <dx:TransparencyGradient BaselineAlpha="0" SeriesLineAlpha="0.6" />
+                                                <dx:TransparencyGradient BaselineAlpha="0"
+                                                                         SeriesLineAlpha="0.6" />
                                             </dx:AreaSeriesStyle.FillEffect>
                                         </dx:AreaSeriesStyle>
                                     </dx:AreaSeries.Style>
@@ -157,15 +166,17 @@
                                 <dx:AreaSeries DisplayName="İade Edilen Malzeme Referans Sayısı">
                                     <!--  Bind the series to the data source.  -->
                                     <dx:AreaSeries.Data>
-                                        <dx:SeriesDataAdapter ArgumentDataMember="Argument" DataSource="{Binding SupplierDetailModel.SupplierDetailInputOutputModels}">
-                                            <dx:ValueDataMember Member="OutputQuantity" Type="Value" />
+                                        <dx:SeriesDataAdapter ArgumentDataMember="Argument"
+                                                              DataSource="{Binding SupplierDetailModel.SupplierDetailInputOutputModels}">
+                                            <dx:ValueDataMember Member="OutputQuantity"
+                                                                Type="Value" />
                                         </dx:SeriesDataAdapter>
-
                                     </dx:AreaSeries.Data>
                                     <dx:AreaSeries.Style>
                                         <dx:AreaSeriesStyle Fill="{StaticResource Primary}">
                                             <dx:AreaSeriesStyle.FillEffect>
-                                                <dx:TransparencyGradient BaselineAlpha="0" SeriesLineAlpha="0.4" />
+                                                <dx:TransparencyGradient BaselineAlpha="0"
+                                                                         SeriesLineAlpha="0.4" />
                                             </dx:AreaSeriesStyle.FillEffect>
                                         </dx:AreaSeriesStyle>
                                     </dx:AreaSeries.Style>
@@ -173,7 +184,8 @@
                             </dx:ChartView.Series>
 
                             <dx:ChartView.AxisY>
-                                <dx:NumericAxisY AlwaysShowZeroLevel="False" AutoRangeMode="VisibleValues">
+                                <dx:NumericAxisY AlwaysShowZeroLevel="False"
+                                                 AutoRangeMode="VisibleValues">
                                     <dx:NumericAxisY.Label>
                                         <dx:AxisLabel>
                                             <dx:AxisLabel.Style>
@@ -201,8 +213,6 @@
                                 <dx:Legend />
                             </dx:ChartView.Legend>
                         </dx:ChartView>
-
-
                     </Grid>
                 </Border>
 
@@ -248,31 +258,36 @@
                         </Border>
                     </Grid>
 
-
-                    <CollectionView Grid.Row="1" ItemsSource="{Binding SupplierDetailModel.LastFiches}">
+                    <CollectionView Grid.Row="1"
+                                    ItemsSource="{Binding SupplierDetailModel.LastFiches}">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="model:PurchaseFiche">
                                 <Border Padding="5"
                                         BackgroundColor="Transparent"
                                         StrokeThickness="0.1">
                                     <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:SupplierDetailViewModel}}, Path=FicheTappedCommand}" CommandParameter="{Binding .}" />
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:SupplierDetailViewModel}}, Path=FicheTappedCommand}"
+                                                              CommandParameter="{Binding .}" />
                                     </Border.GestureRecognizers>
-                                    <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
+                                    <Grid ColumnDefinitions="Auto, *"
+                                          ColumnSpacing="10">
                                         <Border Grid.Column="0"
                                                 Padding="5"
                                                 BackgroundColor="{StaticResource Secondary}"
                                                 StrokeShape="RoundRectangle 10">
-                                            <VerticalStackLayout Spacing="0" VerticalOptions="Center">
+                                            <VerticalStackLayout Spacing="0"
+                                                                 VerticalOptions="Center">
                                                 <Label FontAttributes="Bold"
-                                                       FontSize="Subtitle"
+                                                       FontSize="13"
                                                        HorizontalOptions="Center"
                                                        Text="{Binding FicheDate, StringFormat='{0:dd}'}"
                                                        TextColor="{StaticResource OffBlack}" />
                                                 <Label HorizontalOptions="Center"
+                                                       FontSize="13"
                                                        Text="{Binding FicheDate, StringFormat='{0:MM/yyyy}'}"
                                                        TextColor="{StaticResource OffBlack}" />
                                                 <Label HorizontalOptions="Center"
+                                                       FontSize="12"
                                                        Text="{Binding FicheTime, StringFormat='{0:hh\\:mm}'}"
                                                        TextColor="{StaticResource Black}" />
                                             </VerticalStackLayout>
@@ -282,7 +297,7 @@
                                                              Spacing="1"
                                                              VerticalOptions="Center">
                                             <Label FontAttributes="Bold"
-                                                   FontSize="Medium"
+                                                   FontSize="14"
                                                    Text="{Binding FicheNumber}" />
                                             <Label FontSize="13"
                                                    LineBreakMode="TailTruncation"
@@ -310,17 +325,22 @@
                     <Grid Padding="10"
                           RowDefinitions="Auto,*"
                           RowSpacing="20">
-                        <VerticalStackLayout Grid.Row="0" Spacing="5">
+                        <VerticalStackLayout Grid.Row="0"
+                                             Spacing="5">
                             <Label Padding="10"
                                    FontAttributes="Bold"
                                    FontSize="18"
                                    Text="İşlemler" />
-                            <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
+                            <BoxView HeightRequest="2"
+                                     Color="{StaticResource Primary}" />
                         </VerticalStackLayout>
-                        <VerticalStackLayout Grid.Row="1" Spacing="10">
-                            <CollectionView Grid.Row="0" ItemsSource="{Binding SupplierActionModels}">
+                        <VerticalStackLayout Grid.Row="1"
+                                             Spacing="10">
+                            <CollectionView Grid.Row="0"
+                                            ItemsSource="{Binding SupplierActionModels}">
                                 <CollectionView.ItemsLayout>
-                                    <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+                                    <LinearItemsLayout ItemSpacing="0"
+                                                       Orientation="Vertical" />
                                 </CollectionView.ItemsLayout>
                                 <CollectionView.ItemTemplate>
                                     <DataTemplate x:DataType="supplierActionModel:SupplierDetailActionModel">
@@ -330,7 +350,8 @@
                                                 StrokeShape="RoundRectangle 10"
                                                 StrokeThickness="0.1">
                                             <Border.GestureRecognizers>
-                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:SupplierDetailViewModel}}, Path=ActionModelsTappedCommand}" CommandParameter="{Binding .}" />
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:SupplierDetailViewModel}}, Path=ActionModelsTappedCommand}"
+                                                                      CommandParameter="{Binding .}" />
                                             </Border.GestureRecognizers>
                                             <Grid ColumnDefinitions="Auto, *">
 
@@ -349,7 +370,8 @@
                                                 <DataTrigger Binding="{Binding IsSelected}"
                                                              TargetType="Border"
                                                              Value="True">
-                                                    <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
+                                                    <Setter Property="BackgroundColor"
+                                                            Value="{StaticResource SecondaryLight}" />
                                                 </DataTrigger>
                                             </Border.Triggers>
                                         </Border>
@@ -372,32 +394,36 @@
                     <Grid Padding="10"
                           RowDefinitions="Auto,*"
                           RowSpacing="20">
-                        <VerticalStackLayout Grid.Row="0" Spacing="5">
+                        <VerticalStackLayout Grid.Row="0"
+                                             Spacing="5">
                             <Label FontAttributes="Bold"
                                    FontSize="Subtitle"
                                    Text="Malzemeler" />
-                            <BoxView HeightRequest="2" Color="{StaticResource OffBlack}" />
+                            <BoxView HeightRequest="2"
+                                     Color="{StaticResource OffBlack}" />
                         </VerticalStackLayout>
 
-                        <CollectionView Grid.Row="1" ItemsSource="{Binding SupplierDetailModel.Transactions}">
+                        <CollectionView Grid.Row="1"
+                                        ItemsSource="{Binding SupplierDetailModel.Transactions}">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="model:SupplierTransaction">
                                     <Border Padding="5"
                                             BackgroundColor="Transparent"
                                             StrokeThickness="0.1">
-                                        <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
+                                        <Grid ColumnDefinitions="Auto, *"
+                                              ColumnSpacing="10">
                                             <Border Grid.Column="0"
                                                     Padding="5"
                                                     BackgroundColor="{StaticResource Secondary}"
                                                     StrokeShape="RoundRectangle 10">
-                                                <VerticalStackLayout Spacing="1" VerticalOptions="Center">
+                                                <VerticalStackLayout Spacing="1"
+                                                                     VerticalOptions="Center">
                                                     <Image Grid.Column="0"
                                                            HeightRequest="50"
                                                            Source="dotnet_bot.png"
                                                            WidthRequest="50" />
                                                 </VerticalStackLayout>
                                             </Border>
-
 
                                             <VerticalStackLayout Grid.Column="1"
                                                                  Spacing="1"
@@ -418,9 +444,11 @@
                                                     <Label>
                                                         <Label.FormattedText>
                                                             <FormattedString>
-                                                                <Span FontAttributes="Bold" Text="{Binding Quantity, StringFormat='{0:N2}'}" />
+                                                                <Span FontAttributes="Bold"
+                                                                      Text="{Binding Quantity, StringFormat='{0:N2}'}" />
                                                                 <Span Text=" " />
-                                                                <Span FontAttributes="Bold" Text="{Binding SubUnitsetCode}" />
+                                                                <Span FontAttributes="Bold"
+                                                                      Text="{Binding SubUnitsetCode}" />
                                                             </FormattedString>
                                                         </Label.FormattedText>
                                                     </Label>
@@ -440,13 +468,10 @@
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>
-
                     </Grid>
                 </dx:BottomSheet>
                 <!--#endregion-->
             </Grid>
         </VerticalStackLayout>
     </ScrollView>
-
-
 </ContentPage>

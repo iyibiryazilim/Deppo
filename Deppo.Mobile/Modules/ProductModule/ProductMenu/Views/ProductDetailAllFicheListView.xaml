@@ -70,21 +70,22 @@
                         <Grid ColumnDefinitions="Auto, *"
                               ColumnSpacing="10">
                             <Border Grid.Column="0"
-                                    Padding="10"
+                                    Padding="5"
                                     BackgroundColor="{StaticResource Secondary}"
                                     StrokeShape="RoundRectangle 10">
-                                <VerticalStackLayout Spacing="1"
+                                <VerticalStackLayout Spacing="0"
                                                      VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
-                                           FontSize="Large"
+                                           FontSize="14"
                                            HorizontalOptions="Center"
                                            Text="{Binding FicheDate, StringFormat='{0:dd}'}"
                                            TextColor="{StaticResource OffBlack}" />
-                                    <Label FontSize="Medium"
-                                           HorizontalOptions="Center"
+                                    <Label HorizontalOptions="Center"
+                                           FontSize="13"
                                            Text="{Binding FicheDate, StringFormat='{0:MM/yyyy}'}"
                                            TextColor="{StaticResource OffBlack}" />
                                     <Label HorizontalOptions="Center"
+                                           FontSize="13"
                                            Text="{Binding FicheTime, StringFormat='{0:hh\\:mm}'}"
                                            TextColor="{StaticResource Black}" />
                                 </VerticalStackLayout>
@@ -94,13 +95,13 @@
                                                  Spacing="1"
                                                  VerticalOptions="Center">
                                 <Label FontAttributes="Bold"
-                                       FontSize="Medium"
+                                       FontSize="15"
                                        Text="{Binding FicheNumber}" />
-                                <Label FontSize="13"
-                                       LineBreakMode="TailTruncation"
+                                <Label LineBreakMode="TailTruncation"
+                                       FontSize="13"
                                        Text="{Binding CurrentName}" />
 
-                                <Label FontSize="13"
+                                <Label FontSize="12"
                                        LineBreakMode="TailTruncation"
                                        Text="{Binding FicheTypeName}" />
                             </VerticalStackLayout>
