@@ -5,51 +5,50 @@ namespace Deppo.Core.BaseModels
 {
     public class InventoryTurnover : INotifyPropertyChanged, IDisposable
     {
+
+        private double _firstStockQuantity;
+        private double _lastStockQuantity;
+        private double _salesQuantity;
+        private double _turnoverRate;
+
         public InventoryTurnover()
         {
             
         }
 
-        private int _month;
-        private double _stockQuantity;
-        private double _turnoverRate;
 
-
-        public int Month
+        public double FirstStockQuantity
         {
-            get => _month;
+            get => _firstStockQuantity;
             set
             {
-                if (_month == value) return;
-                _month = value;
+                if (_firstStockQuantity == value)
+                    return;
+                _firstStockQuantity = value;
                 NotifyPropertyChanged();
             }
         }
 
-        public string MonthName => Month switch
+        public double LastStockQuantity
         {
-            1 => "Ocak",
-            2 => "Şubat",
-            3 => "Mart",
-            4 => "Nisan",
-            5 => "Mayıs",
-            6 => "Haziran",
-            7 => "Temmuz",
-            8 => "Ağustos",
-            9 => "Eylül",
-            10 => "Ekim",
-            11 => "Kasım",
-            12 => "Aralık",
-            _ => "Default"
-        };
-
-        public double StockQuantity
-        {
-            get => _stockQuantity;
+            get => _lastStockQuantity;
             set
             {
-                if (_stockQuantity == value) return;
-                _stockQuantity = value;
+                if (_lastStockQuantity == value)
+                    return;
+                _lastStockQuantity = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public double SalesQuantity
+        {
+            get => _salesQuantity;
+            set
+            {
+                if (_salesQuantity == value)
+                    return;
+                _salesQuantity = value;
                 NotifyPropertyChanged();
             }
         }
@@ -59,11 +58,15 @@ namespace Deppo.Core.BaseModels
             get => _turnoverRate;
             set
             {
-                if (_turnoverRate == value) return;
+                if (_turnoverRate == value)
+                    return;
                 _turnoverRate = value;
                 NotifyPropertyChanged();
             }
         }
+
+
+
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
