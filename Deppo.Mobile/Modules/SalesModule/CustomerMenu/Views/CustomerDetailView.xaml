@@ -135,7 +135,7 @@
 
                         <dx:ChartView Grid.Row="1" MaximumHeightRequest="330">
                             <dx:ChartView.Series>
-                                <dx:AreaSeries DisplayName="Giren Malzeme Miktarı">
+                                <dx:AreaSeries DisplayName="Satış Yapılan Malzeme Referans Sayısı">
                                     <!--  Bind the series to the data source.  -->
                                     <dx:AreaSeries.Data>
                                         <dx:SeriesDataAdapter ArgumentDataMember="Argument" DataSource="{Binding CustomerDetailModel.CustomerDetailInputOutputModels}">
@@ -151,7 +151,7 @@
                                         </dx:AreaSeriesStyle>
                                     </dx:AreaSeries.Style>
                                 </dx:AreaSeries>
-                                <dx:AreaSeries DisplayName="Çıkan Malzeme Miktarı">
+                                <dx:AreaSeries DisplayName="İade Yapılan Malzeme Referans Sayısı">
                                     <!--  Bind the series to the data source.  -->
                                     <dx:AreaSeries.Data>
                                         <dx:SeriesDataAdapter ArgumentDataMember="Argument" DataSource="{Binding CustomerDetailModel.CustomerDetailInputOutputModels}">

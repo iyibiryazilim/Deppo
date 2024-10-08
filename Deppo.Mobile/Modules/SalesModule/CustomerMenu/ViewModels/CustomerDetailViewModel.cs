@@ -238,7 +238,7 @@ public partial class CustomerDetailViewModel : BaseViewModel
             await Task.Delay(300);
             await Shell.Current.GoToAsync($"{nameof(CustomerInputTransactionView)}", new Dictionary<string, object>
             {
-                ["Customer"] = CustomerDetailModel.Customer
+                [nameof(CustomerDetailModel)] = CustomerDetailModel
             });
         }
         catch (Exception ex)
@@ -263,8 +263,8 @@ public partial class CustomerDetailViewModel : BaseViewModel
             await Task.Delay(300);
             await Shell.Current.GoToAsync($"{nameof(CustomerOutputTransactionView)}", new Dictionary<string, object>
             {
-                ["Customer"] = CustomerDetailModel.Customer
-            });
+				[nameof(CustomerDetailModel)] = CustomerDetailModel
+			});
         }
         catch (Exception ex)
         {
