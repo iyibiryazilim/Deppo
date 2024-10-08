@@ -68,16 +68,16 @@
                                 <VerticalStackLayout Spacing="0" VerticalOptions="Center">
                                     <Label
                     FontAttributes="Bold"
-                    FontSize="Subtitle"
+                    FontSize="14"
                     HorizontalOptions="Center"
                     Text="{Binding FicheDate, StringFormat='{0:dd}'}"
                     TextColor="{StaticResource OffBlack}" />
-                                    <Label
-                    HorizontalOptions="Center"
+                                    <Label FontSize="13"
+                                           HorizontalOptions="Center"
                     Text="{Binding FicheDate, StringFormat='{0:MM/yyyy}'}"
                     TextColor="{StaticResource OffBlack}" />
-                                    <Label
-                    HorizontalOptions="Center"
+                                    <Label FontSize="13"
+                                           HorizontalOptions="Center"
                     Text="{Binding FicheTime, StringFormat='{0:hh\\:mm}'}"
                     TextColor="{StaticResource Black}" />
                                 </VerticalStackLayout>
@@ -89,7 +89,7 @@
             VerticalOptions="Center">
                                 <Label
                 FontAttributes="Bold"
-                FontSize="Medium"
+                FontSize="15"
                 Text="{Binding FicheNumber}" />
                                 <Label
                 FontSize="13"
@@ -97,7 +97,7 @@
                 Text="{Binding CurrentName}" />
 
                                 <Label
-                FontSize="13"
+                FontSize="12"
                 LineBreakMode="TailTruncation"
                 Text="{Binding FicheTypeName}" />
                             </VerticalStackLayout>
