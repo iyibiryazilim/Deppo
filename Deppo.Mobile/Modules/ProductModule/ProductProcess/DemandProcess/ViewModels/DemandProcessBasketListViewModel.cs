@@ -18,6 +18,7 @@ using Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.Views;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewModels
 {
+    [QueryProperty(nameof(WarehouseModel), nameof(WarehouseModel))]
     public partial class DemandProcessBasketListViewModel : BaseViewModel
     {
         private readonly IHttpClientService _httpClientService;
@@ -85,7 +86,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
                 IsBusy = true;
 
                 CurrentPage.FindByName<BottomSheet>("productTypeBottomSheet").State = BottomSheetState.HalfExpanded;
-               
+
             }
             catch (Exception ex)
             {
@@ -151,7 +152,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
                 IsBusy = false;
             }
         }
-       
+
 
         private async Task DeleteItemAsync(DemandProcessBasketModel item)
         {
@@ -199,9 +200,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
                 {
                     SelectedItem = item;
 
-
-                    if (item.Quantity < item.StockQuantity)
-                        item.Quantity++;
+                    item.Quantity++;
 
                 }
             }
@@ -230,7 +229,8 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
                 {
                     SelectedItem = item;
 
-                    item.Quantity--;
+                    if (item.Quantity > 0)
+                        item.Quantity--;
 
 
                 }
@@ -269,7 +269,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
                     return;
                 }
 
-                await Shell.Current.GoToAsync($"{nameof(OutputProductProcessFormView)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"{nameof(DemandProcessFormView)}", new Dictionary<string, object>
                 {
                     [nameof(WarehouseModel)] = WarehouseModel,
                     [nameof(Items)] = Items
@@ -304,11 +304,17 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
 
                     Items.Clear();
 
-                    var productListViewModel = _serviceProvider.GetRequiredService<OutputProductProcessProductListViewModel>();
+                    var productListViewModel = _serviceProvider.GetRequiredService<DemandProcessProductListViewModel>();
+                    var variantListViewModel = _serviceProvider.GetRequiredService<DemandProcessVariantListViewModel>();
 
                     foreach (var item in productListViewModel.Items)
                         item.IsSelected = false;
 
+                    foreach (var item in variantListViewModel.Items)
+                        item.IsSelected = false;
+
+                    variantListViewModel.Items.Clear();
+                    variantListViewModel.SelectedVariants.Clear();
 
                     productListViewModel.Items.Clear();
                     productListViewModel.SelectedProducts.Clear();

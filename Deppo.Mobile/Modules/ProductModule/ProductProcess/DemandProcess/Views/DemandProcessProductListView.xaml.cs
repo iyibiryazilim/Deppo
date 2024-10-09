@@ -10,6 +10,8 @@ public partial class DemandProcessProductListView : ContentPage
         InitializeComponent();
         _viewModel = viewModel;
         BindingContext = _viewModel;
+        _viewModel.SearchText = searchBar;
+        _viewModel.CurrentPage = this;
     }
 
 }

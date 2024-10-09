@@ -20,6 +20,7 @@ namespace Deppo.Mobile.Core.Models.BasketModels
         private string _unitsetName = string.Empty;
         private double _stockQuantity;
         private double _quantity;
+        private double _safeLevel;
         private bool _isVariant;
         private int _trackingType;
         private int _locTracking;
@@ -219,6 +220,17 @@ namespace Deppo.Mobile.Core.Models.BasketModels
             {
                 if (_quantity == value) return;
                 _quantity = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public double SafeLevel
+        {
+            get => _safeLevel;
+            set
+            {
+                if (_safeLevel == value) return;
+                _safeLevel = value;
                 NotifyPropertyChanged();
             }
         }

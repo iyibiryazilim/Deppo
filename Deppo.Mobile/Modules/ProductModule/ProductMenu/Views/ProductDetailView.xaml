@@ -230,42 +230,38 @@
             <Border Padding="10"
                     Margin="10,0,10,0"
                     StrokeShape="RoundRectangle 10"
+                    BackgroundColor="{StaticResource Secondary}"
                     VerticalOptions="Center">
-                <Grid ColumnDefinitions=".10*,.50*,.35*" ColumnSpacing="5">
+                <Grid ColumnDefinitions=".10*,.70*,.20*" ColumnSpacing="5">
                     <Border Grid.Column="0" HorizontalOptions="Start"
                             StrokeThickness="0">
                         <toolkit:AvatarView Padding="2"
-                                            BorderColor="{StaticResource Secondary}"
+                                            BorderColor="{StaticResource Black}"
                                             CornerRadius="15"
                                             FontFamily="FAS"
                                             FontSize="14"
                                             HeightRequest="30"
                                             HorizontalOptions="End"
                                             Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
-                                            TextColor="{StaticResource Secondary}"
+                                            TextColor="{StaticResource Black}"
                                             WidthRequest="30" />
                         <!--<Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding OpenInfoBottemSheetCommand}" />
                         </Border.GestureRecognizers>-->
                     </Border>
-                    
+
                     <Label Grid.Column="1"
                            FontSize="Subtitle"
                            FontAttributes="Bold"
-                           VerticalOptions="Center">
-                        <Label.FormattedText>
-                            <FormattedString>
-                                <Span Text="Stok Devir Hızı : ">
-                                    
-                                </Span>
-                                <Span Text="{Binding ProductDetailModel.InventoryTurnover.TurnoverRate}">
-                                    
-                                </Span>
-                                <Span>
-                                    
-                                </Span>
-                            </FormattedString>
-                        </Label.FormattedText>
+                           VerticalOptions="Center"
+                           HorizontalOptions="Start"
+                           Text="Stok Devir Hızı : ">
+                    </Label>
+                    <Label Grid.Column="2"
+                           FontSize="Subtitle"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center" HorizontalOptions="Center" Text="{Binding ProductDetailModel.InventoryTurnover.TurnoverRate, StringFormat='{0:N2}'}">
+                        
                     </Label>
 
                 </Grid>
