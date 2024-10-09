@@ -42,7 +42,7 @@
                       RowSpacing="2">
                     <Border Grid.Row="0"
                             Padding="5"
-                            HeightRequest="60"
+                            HeightRequest="55"
                             StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.2">
                         <Grid ColumnDefinitions=".85*,.15*"
@@ -96,7 +96,7 @@
                     </Border>
                     <Border Grid.Row="1"
                             Padding="5"
-                            HeightRequest="60"
+                            HeightRequest="55"
                             StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.2">
                         <Grid ColumnDefinitions=".85*,.15*"
@@ -161,7 +161,7 @@
                 <Grid RowDefinitions="Auto,Auto,Auto"
                       RowSpacing="2">
                     <Border Grid.Row="0"
-                            HeightRequest="60"
+                            HeightRequest="55"
                             Padding="5"
                             StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.2">
@@ -216,7 +216,7 @@
                     </Border>
                     <Border Grid.Row="1"
                             Padding="5"
-                            HeightRequest="60"
+                            HeightRequest="55"
                             StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.2">
                         <Grid ColumnDefinitions=".85*,.15*"

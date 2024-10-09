@@ -5,13 +5,15 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:actionModel="clr-namespace:Deppo.Mobile.Core.ActionModels.WarehouseActionModels;assembly=Deppo.Mobile.Core"
              xmlns:dx="http://schemas.devexpress.com/maui"
              Title="{Binding Title}"
              Shell.TabBarIsVisible="False"
              xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              x:DataType="viewModel:WarehouseDetailViewModel">
     <ContentPage.ToolbarItems>
-        <ToolbarItem Order="Primary">
+        <ToolbarItem Order="Primary"
+                     Command="{Binding ActionModelProcessTappedCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="FAS"
                                  Glyph="{x:Static fontAwesome:FontAwesomeIcons.EllipsisVertical}"
@@ -319,6 +321,72 @@
                     </Grid>
                 </Grid>
 
+                <dx:BottomSheet x:Name="processBottomSheet"
+                                AllowDismiss="True"
+                                BackgroundColor="White"
+                                CornerRadius="15"
+                                HalfExpandedRatio="0.5"
+                                IsModal="True"
+                                ShowGrabber="True">
+                    <Grid RowDefinitions="Auto,*"
+                          RowSpacing="20"
+                          Padding="10">
+                        <VerticalStackLayout Grid.Row="0"
+                                             Spacing="5">
+                            <Label FontAttributes="Bold"
+                                   Padding="10"
+                                   FontSize="18"
+                                   Text="İşlemler" />
+                            <BoxView HeightRequest="2"
+                                     Color="{StaticResource Primary}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Row="1"
+                                             Spacing="10">
+                            <CollectionView Grid.Row="0"
+                                            ItemsSource="{Binding WarehouseActionModels}">
+                                <CollectionView.ItemsLayout>
+                                    <LinearItemsLayout ItemSpacing="0"
+                                                       Orientation="Vertical" />
+                                </CollectionView.ItemsLayout>
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="actionModel:WarehouseDetailActionModel">
+
+                                        <Border Padding="10"
+                                                BackgroundColor="Transparent"
+                                                StrokeShape="RoundRectangle 10"
+                                                StrokeThickness="0.1">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WarehouseDetailViewModel}}, Path=ActionModelsTappedCommand}"
+                                                                      CommandParameter="{Binding .}" />
+                                            </Border.GestureRecognizers>
+                                            <Grid ColumnDefinitions="Auto, *">
+
+                                                <VerticalStackLayout Grid.Column="1"
+                                                                     Padding="5"
+                                                                     Spacing="5"
+                                                                     VerticalOptions="Start">
+                                                    <Label FontAttributes="Bold"
+                                                           LineBreakMode="TailTruncation"
+                                                           MaxLines="1"
+                                                           VerticalOptions="End"
+                                                           Text="{Binding ActionName}" />
+                                                </VerticalStackLayout>
+                                            </Grid>
+                                            <Border.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected}"
+                                                             TargetType="Border"
+                                                             Value="True">
+                                                    <Setter Property="BackgroundColor"
+                                                            Value="{StaticResource SecondaryLight}" />
+                                                </DataTrigger>
+                                            </Border.Triggers>
+                                        </Border>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Grid>
+                </dx:BottomSheet>
                 <dx:BottomSheet x:Name="ficheTransactionBottomSheet"
                                 Grid.Row="1"
                                 AllowDismiss="True"

@@ -2,6 +2,8 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.ActionModels.ProductActionModels;
+using Deppo.Mobile.Core.ActionModels.WarehouseActionModels;
 using Deppo.Mobile.Core.Models.AnalysisModels;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.SalesModels;
@@ -10,9 +12,12 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
+using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views.ActionViews;
 using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views;
+using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views.ActionViews;
 using DevExpress.Maui.Controls;
 using Newtonsoft.Json;
+using System.Collections.ObjectModel;
 using System.Dynamic;
 using static DevExpress.Data.Filtering.Helpers.SubExprHelper.UiThreadRowStubSubExpressive;
 
@@ -26,6 +31,13 @@ public partial class WarehouseDetailViewModel : BaseViewModel
     private readonly ICustomQueryService _customQueryService;
     private readonly IWarehouseDetailService _warehouseDetailService;
     private readonly IUserDialogs _userDialogs;
+
+    [ObservableProperty]
+    private WarehouseDetailModel warehouseDetailModel = null!;
+
+    public Page CurrentPage { get; set; }
+
+    public ObservableCollection<WarehouseDetailActionModel> WarehouseActionModels { get; } = new();
 
     public WarehouseDetailViewModel(IHttpClientService httpClientService, IWarehouseService warehouseService, ICustomQueryService customQueryService, IUserDialogs userDialogs, IWarehouseDetailService warehouseDetailService)
     {
@@ -41,12 +53,10 @@ public partial class WarehouseDetailViewModel : BaseViewModel
         OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
         ItemTappedCommand = new Command<WarehouseFiche>(async (warehouseFiche) => await ItemTappedAsync(warehouseFiche));
         AllFicheTappedCommand = new Command(async () => await AllFicheTappedAsync());
+
+        ActionModelProcessTappedCommand = new Command(async () => await ActionModelProcessTappedAsync());
+        ActionModelsTappedCommand = new Command<WarehouseDetailActionModel>(async (model) => await ActionModelsTappedAsync(model));
     }
-
-    [ObservableProperty]
-    private WarehouseDetailModel warehouseDetailModel = null!;
-
-    public Page CurrentPage { get; set; }
 
     #region Commands
 
@@ -56,6 +66,10 @@ public partial class WarehouseDetailViewModel : BaseViewModel
     public Command AllFicheTappedCommand { get; }
 
     public Command ItemTappedCommand { get; }
+
+    public Command ActionModelProcessTappedCommand { get; }
+
+    public Command ActionModelsTappedCommand { get; }
 
     #endregion Commands
 
@@ -337,6 +351,103 @@ public partial class WarehouseDetailViewModel : BaseViewModel
         catch (Exception ex)
         {
             _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task LoadActionModelsAsync()
+    {
+        try
+        {
+            IsBusy = true;
+            WarehouseActionModels.Clear();
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            WarehouseActionModels.Add(new WarehouseDetailActionModel
+            {
+                ActionName = "Ambar Toplamları",
+                ActionUrl = $"{nameof(WarehouseDetailWarehouseTotalListView)}",
+                LineNumber = 1,
+                Icon = "",
+                IsSelected = false
+            });
+
+            //WarehouseActionModels.Add(new WarehouseDetailActionModel
+            //{
+            //    ActionName = "Raf Listesi",
+            //    ActionUrl = $"{nameof(ProductDetailWaitingSalesOrderListView)}",
+            //    LineNumber = 2,
+            //    Icon = "",
+            //    IsSelected = false
+            //});
+
+            _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
+
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ActionModelProcessTappedAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+            _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(500);
+            await LoadActionModelsAsync();
+
+            CurrentPage.FindByName<BottomSheet>("processBottomSheet").State = BottomSheetState.HalfExpanded;
+
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+        }
+        catch (System.Exception)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert("Bir hata oluştu. Lütfen tekrar deneyiniz.", "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ActionModelsTappedAsync(WarehouseDetailActionModel model)
+    {
+        try
+        {
+            IsBusy = true;
+            CurrentPage.FindByName<BottomSheet>("processBottomSheet").State = BottomSheetState.Hidden;
+            await Task.Delay(100);
+
+            await Shell.Current.GoToAsync($"{model.ActionUrl}", new Dictionary<string, object>
+            {
+                [nameof(WarehouseDetailModel)] = WarehouseDetailModel
+            });
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
+
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
         }
         finally
         {

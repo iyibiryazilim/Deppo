@@ -1,5 +1,8 @@
-using System;
+using Android.Graphics.Drawables;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Mobile.Core.Models.ProcessBottomSheetModels;
+using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.Views;
@@ -7,8 +10,6 @@ using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.View
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.TransferProductProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.Views;
-using Deppo.Mobile.Modules.ResultModule;
-using Deppo.Mobile.Modules.ResultModule.Views;
 using DevExpress.Maui.Controls;
 using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
@@ -33,12 +34,27 @@ public partial class ProductProcessViewModel : BaseViewModel
         WasteProcessCommand = new Command(async () => await WasteProcessAsync());
         VirmanProductProcessCommand = new Command(async () => await VirmanProductProcessAsync());
         TransferProductProcessCommand = new Command(async () => await TransferProductProcessAsync());
-        OpenInfoBottemSheetCommand = new Command(async () => await OpenInfoBottemSheetAsync());
+        ProductionOpenInfoBottemSheetCommand = new Command(async () => await ProductionOpenInfoBottemSheetAsync());
         DemandProcessCommand = new Command(async () => await DemandProcessAsync());
-
+        OverCountOpenInfoBottemSheetCommand = new Command(async () => await OverCountOpenInfoBottemSheetAsync());
+        ConsumableOpenInfoBottemSheetCommand = new Command(async () => await ConsumableOpenInfoBottemSheetAsync());
+        UnderCountOpenInfoBottemSheetCommand = new Command(async () => await UnderCountOpenInfoBottemSheetAsync());
+        WasteOpenInfoBottemSheetCommand = new Command(async () => await WasteOpenInfoBottemSheetAsync());
+        VirmanOpenInfoBottemSheetCommand = new Command(async () => await VirmanOpenInfoBottemSheetAsync());
+        TransferProductInfoBottemSheetCommand = new Command(async () => await TransferProductInfoBottemSheetAsync());
+        DemandProcessInfoBottemSheetCommand = new Command(async () => await DemandProcessInfoBottemSheetAsync());
     }
 
-    public Page CurrentPage { get; set; }   
+    [ObservableProperty]
+    private string infoTitle = string.Empty;
+
+    [ObservableProperty]
+    private string description = string.Empty;
+
+    [ObservableProperty]
+    private ProcessBottomSheetModel processBottomSheetModel = new();
+
+    public Page CurrentPage { get; set; }
     public Command ProductionInputCommand { get; }
     public Command OverCountCommand { get; }
     public Command ConsumableProcessCommand { get; }
@@ -49,8 +65,18 @@ public partial class ProductProcessViewModel : BaseViewModel
     public Command TransferProductProcessCommand { get; }
     public Command DemandProcessCommand { get; }
 
-    public Command OpenInfoBottemSheetCommand { get; }
+    public Command ProductionOpenInfoBottemSheetCommand { get; }
 
+    public Command OverCountOpenInfoBottemSheetCommand { get; }
+    public Command ConsumableOpenInfoBottemSheetCommand { get; }
+    public Command UnderCountOpenInfoBottemSheetCommand { get; }
+    public Command WasteOpenInfoBottemSheetCommand { get; }
+
+    public Command VirmanOpenInfoBottemSheetCommand { get; }
+
+    public Command TransferProductInfoBottemSheetCommand { get; }
+
+    public Command DemandProcessInfoBottemSheetCommand { get; }
 
     #region Will be removed
 
@@ -111,12 +137,95 @@ public partial class ProductProcessViewModel : BaseViewModel
     {
         await Shell.Current.GoToAsync($"{nameof(TransferOutWarehouseListView)}");
     }
+
     private async Task DemandProcessAsync()
     {
         await Shell.Current.GoToAsync($"{nameof(DemandProcessWarehouseListView)}");
     }
-    private async Task OpenInfoBottemSheetAsync()
+
+    private async Task ProductionOpenInfoBottemSheetAsync()
     {
-        CurrentPage.FindByName<BottomSheet>("ınfoBottomSheet").State = BottomSheetState.HalfExpanded;
+        ProcessBottomSheetModel.InfoTitle = "Üretimden Giriş İşlemleri";
+        ProcessBottomSheetModel.Description = "Üretimden giriş fişi üretilen malların ambarlara giriş işlemlerini kaydetmek için kullanılır.\nÜretimden giriş işlemleri bölümünün kullanılıması durumunda sarf fişleri program tarafından otomatik oluşturulur.";
+        ProcessBottomSheetModel.IconText = "plus";
+        ProcessBottomSheetModel.IconColor = "#44B0C0";
+
+        CurrentPage.FindByName<BottomSheet>("infoBottomSheet").State = BottomSheetState.HalfExpanded;
+    }
+
+    private async Task OverCountOpenInfoBottemSheetAsync()
+    {
+        ProcessBottomSheetModel.InfoTitle = "Sayım Fazlası İşlemleri";
+        ProcessBottomSheetModel.Description = "Sayım fazlası bilgilerini kaydetmek için kullanılır.";
+        ProcessBottomSheetModel.IconText = "plus";
+        ProcessBottomSheetModel.IconColor = "#44B0C0";
+
+        CurrentPage.FindByName<BottomSheet>("infoBottomSheet").State = BottomSheetState.HalfExpanded;
+    }
+
+    private async Task ConsumableOpenInfoBottemSheetAsync()
+    {
+        ProcessBottomSheetModel.InfoTitle = "Sarf Fişi İşlemleri";
+        ProcessBottomSheetModel.Description = "Üretim sırasında ya da başka nedenlerle oluşan sarfları kaydetmek için kullanılır.\nSarf fişi işlemleri bölümünün kullanılması durumunda sarf fişleri formlarda doldurularak oluşturulur.";
+
+        ProcessBottomSheetModel.IconText = "minus"; // Metni ayrı ayarlayabilirsin
+        ProcessBottomSheetModel.IconColor = "#44B0C0";
+
+        CurrentPage.FindByName<BottomSheet>("infoBottomSheet").State = BottomSheetState.HalfExpanded;
+    }
+
+    private async Task UnderCountOpenInfoBottemSheetAsync()
+    {
+        ProcessBottomSheetModel.InfoTitle = "Sayım Eksiği İşlemleri";
+        ProcessBottomSheetModel.Description = "Sayım eksiği bilgilerini kaydetmek için kullanılır.";
+
+        ProcessBottomSheetModel.IconText = "minus"; // Metni ayrı ayarlayabilirsin
+        ProcessBottomSheetModel.IconColor = "#44B0C0";
+
+        CurrentPage.FindByName<BottomSheet>("infoBottomSheet").State = BottomSheetState.HalfExpanded;
+    }
+
+    private async Task WasteOpenInfoBottemSheetAsync()
+    {
+        ProcessBottomSheetModel.InfoTitle = "Fire Fişi İşlemleri";
+        ProcessBottomSheetModel.Description = "Üretim sırasında ya da başka nedenlerle oluşan fireleri kaydetmek için kullanılır.\nSarf fişi işlemleri bölümünün kullanılması durumunda fire fişleri formlarda doldurularak oluşturulur.";
+
+        ProcessBottomSheetModel.IconText = "minus"; // Metni ayrı ayarlayabilirsin
+        ProcessBottomSheetModel.IconColor = "#44B0C0";
+
+        CurrentPage.FindByName<BottomSheet>("infoBottomSheet").State = BottomSheetState.HalfExpanded;
+    }
+
+    private async Task VirmanOpenInfoBottemSheetAsync()
+    {
+        ProcessBottomSheetModel.InfoTitle = "Ambar Transferi İşlemleri";
+        ProcessBottomSheetModel.Description = "Ambarlar arası malzeme hareketlerini kaydetmek için kullanılır.";
+
+        ProcessBottomSheetModel.IconText = "arrow-right-arrow-left"; // Metni ayrı ayarlayabilirsin
+        ProcessBottomSheetModel.IconColor = "#E6BE0C";
+
+        CurrentPage.FindByName<BottomSheet>("infoBottomSheet").State = BottomSheetState.HalfExpanded;
+    }
+
+    private async Task TransferProductInfoBottemSheetAsync()
+    {
+        ProcessBottomSheetModel.InfoTitle = "Malzeme Virmanı İşlemleri";
+        ProcessBottomSheetModel.Description = "Ambarlar arası malzeme hareketlerini kaydetmek için kullanılır.";
+
+        ProcessBottomSheetModel.IconText = "arrow-right-arrow-left"; // Metni ayrı ayarlayabilirsin
+        ProcessBottomSheetModel.IconColor = "#E6BE0C";
+
+        CurrentPage.FindByName<BottomSheet>("infoBottomSheet").State = BottomSheetState.HalfExpanded;
+    }
+
+    private async Task DemandProcessInfoBottemSheetAsync()
+    {
+        ProcessBottomSheetModel.InfoTitle = "Talep İşlemleri";
+        ProcessBottomSheetModel.Description = "Ambarlar arası malzeme hareketlerini kaydetmek için kullanılır.";
+
+        ProcessBottomSheetModel.IconText = "calendar-plus"; // Metni ayrı ayarlayabilirsin
+        ProcessBottomSheetModel.IconColor = "#E6BE0C";
+
+        CurrentPage.FindByName<BottomSheet>("infoBottomSheet").State = BottomSheetState.HalfExpanded;
     }
 }
