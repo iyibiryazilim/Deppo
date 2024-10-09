@@ -81,11 +81,31 @@ public partial class ManuelReworkProcessBasketViewModel : BaseViewModel
 
 	private async Task InProductDecreaseAsync(ReworkInProductModel item)
 	{
+		if (item is null)
+			return;
 		if (IsBusy)
 			return;
 		try
 		{
 			IsBusy = true;
+
+			if(item.InputQuantity > 0)
+			{
+				SelectedReworkInProductModel = item;
+
+				if (SelectedReworkInProductModel.LocTracking == 1 && SelectedReworkInProductModel.TrackingType == 0)
+				{
+					await Shell.Current.GoToAsync($"{nameof(ManuelReworkProcessBasketLocationListView)}", new Dictionary<string, object>
+					{
+						["SelectedReworkInProductModel"] = SelectedReworkInProductModel
+					});
+				}
+				else if (SelectedReworkInProductModel.LocTracking == 0 && SelectedReworkInProductModel.TrackingType == 0)
+				{
+					SelectedReworkInProductModel.InputQuantity -= 1;
+				}
+
+			}
 		}
 		catch (Exception ex)
 		{
