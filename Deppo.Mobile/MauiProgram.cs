@@ -81,6 +81,8 @@ using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionPanel.ViewMo
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionPanel.Views;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.Views;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.ManuelRemorkProcess.ViewModels;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.ManuelRemorkProcess.Views;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.ViewModels;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Views;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrder.ViewModels;
@@ -608,6 +610,13 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddTransientWithShellRoute<WorkOrderFormView, WorkOrderFormViewModel>(nameof(WorkOrderFormView));
 
         #endregion Quickly Production WorkOrder
+
+        #region Manuel Rework
+        builder.Services.AddScopedWithShellRoute<ManuelReworkProcessOutWarehouseListView, ManuelReworkProcessOutWarehouseListViewModel>(nameof(ManuelReworkProcessOutWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<ManuelReworkProcessWarehouseTotalListView, ManuelReworkProcessWarehouseTotalListViewModel>(nameof(ManuelReworkProcessWarehouseTotalListView));
+        builder.Services.AddScopedWithShellRoute<ManuelReworkProcessBasketView, ManuelReworkProcessBasketViewModel>(nameof(ManuelReworkProcessBasketView));
+        #endregion
+
 
         #endregion Quickly Production Modules
 
