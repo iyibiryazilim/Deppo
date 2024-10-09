@@ -225,7 +225,7 @@
                                     <VerticalStackLayout Spacing="0"
                                                          VerticalOptions="Center">
                                         <Label FontAttributes="Bold"
-                                               FontSize="14"
+                                               FontSize="13"
                                                HorizontalOptions="Center"
                                                Text="{Binding FicheDate, StringFormat='{0:dd}'}"
                                                TextColor="{StaticResource OffBlack}" />
@@ -234,7 +234,7 @@
                                                Text="{Binding FicheDate, StringFormat='{0:MM/yyyy}'}"
                                                TextColor="{StaticResource OffBlack}" />
                                         <Label HorizontalOptions="Center"
-                                               FontSize="13"
+                                               FontSize="12"
                                                Text="{Binding FicheTime, StringFormat='{0:hh\\:mm}'}"
                                                TextColor="{StaticResource Black}" />
                                     </VerticalStackLayout>
@@ -244,7 +244,7 @@
                                                      Spacing="1"
                                                      VerticalOptions="Center">
                                     <Label FontAttributes="Bold"
-                                           FontSize="Medium"
+                                           FontSize="14"
                                            Text="{Binding FicheNumber}" />
                                     <Label FontSize="13"
                                            LineBreakMode="TailTruncation"

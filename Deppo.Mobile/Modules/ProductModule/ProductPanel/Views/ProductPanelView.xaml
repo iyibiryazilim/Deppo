@@ -297,7 +297,6 @@
                                     <Label FontSize="13"
                                            LineBreakMode="TailTruncation"
                                            Text="{Binding CurrentName}" />
-
                                     <Label FontSize="13"
                                            LineBreakMode="TailTruncation"
                                            Text="{Binding FicheTypeName}" />
