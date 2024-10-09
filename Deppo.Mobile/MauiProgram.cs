@@ -81,6 +81,8 @@ using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionPanel.ViewMo
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionPanel.Views;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.Views;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.ManuelRemorkProcess.ViewModels;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.ManuelRemorkProcess.Views;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.ViewModels;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Views;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrder.ViewModels;
@@ -609,11 +611,22 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
 
         #endregion Quickly Production WorkOrder
 
-        #endregion Quickly Production Modules
+        #region Manuel Rework
+        builder.Services.AddScopedWithShellRoute<ManuelReworkProcessOutWarehouseListView, ManuelReworkProcessOutWarehouseListViewModel>(nameof(ManuelReworkProcessOutWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<ManuelReworkProcessWarehouseTotalListView, ManuelReworkProcessWarehouseTotalListViewModel>(nameof(ManuelReworkProcessWarehouseTotalListView));
+        builder.Services.AddScopedWithShellRoute<ManuelReworkProcessBasketView, ManuelReworkProcessBasketViewModel>(nameof(ManuelReworkProcessBasketView));
+        builder.Services.AddScopedWithShellRoute<ManuelReworkProcessBasketLocationListView, ManuelReworkProcessBasketLocationListViewModel>(nameof(ManuelReworkProcessBasketLocationListView));
+        builder.Services.AddScopedWithShellRoute<ManuelReworkProcessInWarehouseListView, ManuelReworkProcessInWarehouseListViewModel>(nameof(ManuelReworkProcessInWarehouseListView));
+		builder.Services.AddScopedWithShellRoute<ManuelReworkProcessAllProductListView, ManuelReworkProcessAllProductListViewModel>(nameof(ManuelReworkProcessAllProductListView));
+		builder.Services.AddScopedWithShellRoute<ManuelReworkProcessFormView, ManuelReworkProcessFormViewModel>(nameof(ManuelReworkProcessFormView));
+		#endregion
 
-        #region Result Modules
 
-        builder.Services.AddTransientWithShellRoute<InsertSuccessPageView, InsertSuccessPageViewModel>(nameof(InsertSuccessPageView));
+		#endregion Quickly Production Modules
+
+		#region Result Modules
+
+		builder.Services.AddTransientWithShellRoute<InsertSuccessPageView, InsertSuccessPageViewModel>(nameof(InsertSuccessPageView));
         builder.Services.AddTransientWithShellRoute<InsertFailurePageView, InsertFailurePageViewModel>(nameof(InsertFailurePageView));
 
         #endregion Result Modules

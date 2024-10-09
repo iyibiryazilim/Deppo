@@ -9,8 +9,7 @@
              x:DataType="viewModels:QuicklyProductionProcessViewModel">
 
     <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
-                                   StatusBarStyle="Default" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -21,8 +20,7 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android"
-                Value="artboard.png" />
+            <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
@@ -34,29 +32,27 @@
             <VerticalStackLayout Grid.Row="0"
                                  Padding="5"
                                  Spacing="5">
-                <Label FontAttributes="Bold"
-                       Padding="5"
+                <Label Padding="5"
+                       FontAttributes="Bold"
                        FontSize="20"
                        Text="Manuel Üretim İşlemleri"
                        TextColor="{StaticResource OffBlack}" />
 
-                <Grid RowDefinitions="Auto,Auto,Auto"
-                      RowSpacing="5">
+                <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="5">
                     <Border Grid.Row="0"
                             Padding="5"
                             HeightRequest="60"
                             StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*"
-                              ColumnSpacing="0">
+                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
                             <Grid Grid.Column="0"
                                   ColumnDefinitions="Auto,*"
                                   ColumnSpacing="10">
                                 <Border Padding="5"
-                                        WidthRequest="45"
-                                        Stroke="{StaticResource Primary}"
                                         BackgroundColor="{StaticResource Primary}"
-                                        StrokeShape="RoundRectangle 5">
+                                        Stroke="{StaticResource Primary}"
+                                        StrokeShape="RoundRectangle 5"
+                                        WidthRequest="45">
                                     <Label FontFamily="FAS"
                                            FontSize="25"
                                            HorizontalOptions="Center"
@@ -64,24 +60,74 @@
                                            TextColor="{StaticResource White}"
                                            VerticalOptions="Center" />
                                 </Border>
-                                <VerticalStackLayout  Grid.Column="1" Spacing="4">
-                                    <Label VerticalOptions="Center" Margin="0,3,0,0"
+                                <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                    <Label Margin="0,3,0,0"
                                            FontAttributes="Bold"
                                            FontSize="Subtitle"
                                            Text="Manuel Hızlı Üretim"
                                            TextColor="{StaticResource Gray500}"
-                                            />
-                                    <Label VerticalOptions="End" Text="Lorem Ipsum... " TextColor="{StaticResource Gray400}">
-                                        
-                                    </Label>
+                                           VerticalOptions="Center" />
+                                    <Label Text="Lorem Ipsum... "
+                                           TextColor="{StaticResource Gray400}"
+                                           VerticalOptions="End" />
                                 </VerticalStackLayout>
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding QuicklyProductionManuelCommand}" />
                                 </Grid.GestureRecognizers>
                             </Grid>
 
-                            <Border Grid.Column="1"
-                                    StrokeThickness="0">
+                            <Border Grid.Column="1" StrokeThickness="0">
+                                <toolkit:AvatarView Padding="2"
+                                                    BorderColor="{StaticResource Primary}"
+                                                    CornerRadius="15"
+                                                    FontFamily="FAS"
+                                                    FontSize="14"
+                                                    HeightRequest="30"
+                                                    HorizontalOptions="End"
+                                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
+                                                    TextColor="{StaticResource Primary}"
+                                                    WidthRequest="30" />
+                            </Border>
+                        </Grid>
+                    </Border>
+                    <Border Grid.Row="1"
+                            Padding="5"
+                            HeightRequest="60"
+                            StrokeShape="RoundRectangle 5"
+                            StrokeThickness="0.2">
+                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
+                            <Grid Grid.Column="0"
+                                  ColumnDefinitions="Auto,*"
+                                  ColumnSpacing="10">
+                                <Border Padding="5"
+                                        BackgroundColor="{StaticResource Primary}"
+                                        Stroke="{StaticResource Primary}"
+                                        StrokeShape="RoundRectangle 5"
+                                        WidthRequest="45">
+                                    <Label FontFamily="FAS"
+                                           FontSize="25"
+                                           HorizontalOptions="Center"
+                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Hand}"
+                                           TextColor="{StaticResource White}"
+                                           VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                    <Label Margin="0,3,0,0"
+                                           FontAttributes="Bold"
+                                           FontSize="Subtitle"
+                                           Text="Manuel Rework"
+                                           TextColor="{StaticResource Gray500}"
+                                           VerticalOptions="Center" />
+                                    <Label Text="Lorem Ipsum... "
+                                           TextColor="{StaticResource Gray400}"
+                                           VerticalOptions="End" />
+                                </VerticalStackLayout>
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ManuelReworkProcessCommand}" />
+                                </Grid.GestureRecognizers>
+                            </Grid>
+
+                            <Border Grid.Column="1" StrokeThickness="0">
                                 <toolkit:AvatarView Padding="2"
                                                     BorderColor="{StaticResource Primary}"
                                                     CornerRadius="15"
@@ -100,27 +146,27 @@
             <VerticalStackLayout Grid.Row="1"
                                  Padding="5"
                                  Spacing="5">
-                <Label FontAttributes="Bold"
-                       Padding="5"
+                <Label Padding="5"
+                       FontAttributes="Bold"
                        FontSize="20"
                        Text="Ürün Sayım İşlemleri"
                        TextColor="{StaticResource OffBlack}" />
 
-                <Grid RowDefinitions="Auto,Auto,Auto"
-                      RowSpacing="0">
+                <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="0">
                     <Border Grid.Row="0"
                             Padding="5"
                             HeightRequest="60"
                             StrokeShape="RoundRectangle 5"
                             StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*"
-                              ColumnSpacing="0">
+                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
                             <Grid Grid.Column="0"
                                   ColumnDefinitions="Auto,*"
                                   ColumnSpacing="10">
-                                <Border Padding="5" WidthRequest="45" Stroke="{StaticResource Secondary}"
+                                <Border Padding="5"
                                         BackgroundColor="{StaticResource Secondary}"
-                                        StrokeShape="RoundRectangle 5">
+                                        Stroke="{StaticResource Secondary}"
+                                        StrokeShape="RoundRectangle 5"
+                                        WidthRequest="45">
                                     <Label FontFamily="FAS"
                                            FontSize="24"
                                            HorizontalOptions="Center"
@@ -128,22 +174,23 @@
                                            TextColor="{StaticResource White}"
                                            VerticalOptions="Center" />
                                 </Border>
-                                <VerticalStackLayout  Grid.Column="1" Spacing="4" >
-                                    <Label FontAttributes="Bold"
-                                           Margin="0,3,0,0"
+                                <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                    <Label Margin="0,3,0,0"
+                                           FontAttributes="Bold"
                                            FontSize="Subtitle"
                                            Text="İş Emrine Bağlı Hızlı Üretim"
                                            TextColor="{StaticResource Gray500}"
                                            VerticalOptions="Center" />
-                                    <Label VerticalOptions="End" Text="Lorem Ipsum..." TextColor="{StaticResource Gray400}" ></Label>
+                                    <Label Text="Lorem Ipsum..."
+                                           TextColor="{StaticResource Gray400}"
+                                           VerticalOptions="End" />
                                 </VerticalStackLayout>
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding QuicklyProductionWorkOrderCommand}" />
                                 </Grid.GestureRecognizers>
                             </Grid>
 
-                            <Border Grid.Column="1"
-                                    StrokeThickness="0">
+                            <Border Grid.Column="1" StrokeThickness="0">
                                 <toolkit:AvatarView Padding="2"
                                                     BorderColor="{StaticResource Primary}"
                                                     CornerRadius="15"
