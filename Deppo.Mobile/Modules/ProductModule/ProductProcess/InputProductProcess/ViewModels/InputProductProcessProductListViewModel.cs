@@ -7,6 +7,7 @@ using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.ProductModels;
+using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.VariantModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
@@ -252,14 +253,20 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
             BottomSheet variantBottomSheet = (BottomSheet)CurrentPage.FindByName("variantBottomSheet");
 
             if (item is not null)
-                if (item.IsVariant)
+            {
+
+
+                if (!item.IsSelected)
                 {
-                    if (variantBottomSheet is not null)
-                        variantBottomSheet.State = BottomSheetState.HalfExpanded;
-                }
-                else
-                {
-                    if (!item.IsSelected)
+
+                    if (item.IsVariant)
+                    {
+                        SelectedProduct = item;
+                        await LoadVariantItemsAsync(item);
+                        if (variantBottomSheet is not null)
+                            variantBottomSheet.State = BottomSheetState.HalfExpanded;
+                    }
+                    else
                     {
                         var tappedItem = Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
                         if (tappedItem != null)
@@ -295,18 +302,23 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                         SelectedProducts.Add(basketItem);
                         SelectedItems.Add(item);
                     }
-                    else
+
+                   
+                }
+                else
+                {
+                    SelectedProduct = null;
+                    var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ReferenceId);
+                    if (selectedItem != null)
                     {
-                        SelectedProduct = null;
-                        var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ReferenceId);
-                        if (selectedItem != null)
-                        {
-                            SelectedProducts.Remove(selectedItem);
-                            Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = false;
-                            SelectedItems.Remove(item);
-                        }
+                        SelectedProducts.Remove(selectedItem);
+                        Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = false;
+                        SelectedItems.Remove(item);
                     }
                 }
+
+            }
+
         }
         catch (Exception ex)
         {
@@ -341,28 +353,25 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
 
     private async Task LoadVariantItemsAsync(ProductModel item)
     {
-        if (IsBusy)
-            return;
 
         try
         {
-            IsBusy = true;
-            Items.Clear();
-            SelectedProducts.Clear();
 
             _userDialogs.Loading("Loading Variant Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            await Task.Delay(1000);
             var result = await _variantService
-                                .GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, item.ReferenceId, WarehouseModel.Number, string.Empty, 0, 20);
+                                .GetVariants(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, item.ReferenceId, string.Empty, 0, 20);
 
             if (result.IsSuccess)
             {
                 if (result.Data == null)
                     return;
-
+                ItemVariants.Clear();
                 foreach (var variant in result.Data)
-                    ItemVariants.Add(variant);
+                {
+                    var obj = Mapping.Mapper.Map<VariantModel>(variant);
+                    ItemVariants.Add(obj);
+                }
             }
 
             _userDialogs.Loading().Hide();
@@ -376,24 +385,26 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
         }
         finally
         {
-            IsBusy = false;
             _userDialogs.Loading().Dispose();
         }
     }
 
     private async Task LoadMoreVariantItemsAsync()
     {
+        if (ItemVariants.Count < 18)
+            return;
         if (IsBusy)
             return;
 
         try
         {
+
             IsBusy = true;
 
             _userDialogs.Loading("Loading More Variant Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _variantService
-                                .GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SelectedProduct.ReferenceId, WarehouseModel.Number, string.Empty, 0, 20);
+                                .GetVariants(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SelectedProduct.ReferenceId, string.Empty, ItemVariants.Count, 20);
 
             if (result.IsSuccess)
             {
@@ -401,7 +412,10 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                     return;
 
                 foreach (var variant in result.Data)
-                    ItemVariants.Add(variant);
+                {
+                    var obj = Mapping.Mapper.Map<VariantModel>(variant);
+                    ItemVariants.Add(obj);
+                }
             }
 
             _userDialogs.Loading().Hide();
@@ -476,6 +490,13 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
             };
 
             SelectedProducts.Add(basketItem);
+
+            if (SelectedProduct is not null)
+            {
+                SelectedProduct.IsSelected = true;
+            }
+
+            CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.Hidden;
         }
         catch (Exception ex)
         {
