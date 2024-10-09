@@ -9,6 +9,7 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              Title="{Binding Title}"
              x:DataType="viewModel:DemandProcessBasketListViewModel"
+             Padding="10"
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
@@ -129,21 +130,38 @@
                                                Text="{Binding ItemName}"
                                                TextColor="{StaticResource Gray600}" />
 
-                                        <Label>
-                                            <Label.FormattedText>
-                                                <FormattedString>
-                                                    <Span FontAttributes="Bold"
-                                                          FontFamily="FAS"
-                                                          Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                                                          TextColor="{StaticResource Primary}" />
-                                                    <Span Text=" " />
-                                                    <Span FontAttributes="Bold"
-                                                          Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
-                                                          TextColor="{StaticResource Primary}" />
-                                                </FormattedString>
-                                            </Label.FormattedText>
-                                        </Label>
+                                        <HorizontalStackLayout Spacing="5">
+                                            <Label>
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span FontAttributes="Bold"
+                                                              FontFamily="FAS"
+                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                            <Label>
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span FontAttributes="Bold"
+                                                                  FontFamily="FAS"
+                                                                  Text="{x:Static fontAwesome:FontAwesomeIcons.Shield}"
+                                                                  TextColor="{StaticResource Primary}" />
+                                                            <Span Text=" " />
+                                                            <Span FontAttributes="Bold"
+                                                                  Text="{Binding SafeLevel, StringFormat='{0:N2}'}"
+                                                                  TextColor="{StaticResource Primary}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
 
+                                        </HorizontalStackLayout>
+                                        
                                         <Grid ColumnDefinitions="Auto, *">
                                             <Grid Grid.Column="0"
                                                   ColumnDefinitions="Auto, Auto,Auto"
@@ -242,7 +260,7 @@
                     <Label Padding="10"
                            FontAttributes="Bold"
                            FontSize="Subtitle"
-                           Text="Ürün Türünü Seçiniz" />
+                           Text="İşlem Türünü Seçiniz" />
                     <BoxView HeightRequest="2"
                              Color="{StaticResource Primary}" />
                 </VerticalStackLayout>
@@ -268,7 +286,7 @@
 
                                     <Span Text=" " />
                                     <Span FontAttributes="Bold"
-                                          Text="Varyantsız Ürünler"
+                                          Text="Ürün Bazında"
                                           TextColor="{StaticResource OffBlack}" />
                                 </FormattedString>
                             </Label.FormattedText>
@@ -292,7 +310,7 @@
                                     <Span Text=" " />
 
                                     <Span FontAttributes="Bold"
-                                          Text="Varyantlı Ürünler"
+                                          Text=" Varyant Bazında"
                                           TextColor="{StaticResource OffBlack}" />
                                 </FormattedString>
                             </Label.FormattedText>
