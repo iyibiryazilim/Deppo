@@ -2,10 +2,10 @@ using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manu
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.ManuelRemorkProcess.Views;
 
-public partial class ManuelReworkProcessFormView : ContentPage
+public partial class ManuelReworkProcessBasketLocationListView : ContentPage
 {
-	private readonly ManuelReworkProcessFormViewModel _viewModel;
-	public ManuelReworkProcessFormView(ManuelReworkProcessFormViewModel viewModel)
+	private readonly ManuelReworkProcessBasketLocationListViewModel _viewModel;
+	public ManuelReworkProcessBasketLocationListView(ManuelReworkProcessBasketLocationListViewModel viewModel)
 	{
 		InitializeComponent();
 		_viewModel = viewModel;

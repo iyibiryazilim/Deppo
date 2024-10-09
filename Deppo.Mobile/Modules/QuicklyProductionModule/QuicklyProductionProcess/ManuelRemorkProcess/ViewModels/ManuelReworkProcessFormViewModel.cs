@@ -9,4 +9,10 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
 
 public partial class ManuelReworkProcessFormViewModel : BaseViewModel
 {
+    public ManuelReworkProcessFormViewModel()
+    {
+        
+    }
+
+    public Page CurrentPage { get; set; } = null!;
 }

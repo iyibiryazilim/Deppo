@@ -53,6 +53,8 @@ public partial class ManuelReworkProcessAllProductListViewModel : BaseViewModel
 		BackCommand = new Command(async () => await BackAsync());
 	}
 
+	public Page CurrentPage { get; set; } = null!;
+
 	public Command LoadItemsCommand { get; }
 	public Command LoadMoreItemsCommand { get; }
 	public Command ItemTappedCommand { get; }

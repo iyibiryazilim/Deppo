@@ -420,6 +420,9 @@
 	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\ManuelRemorkProcess\Views\ManuelReworkProcessAllProductListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\ManuelRemorkProcess\Views\ManuelReworkProcessBasketLocationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\ManuelRemorkProcess\Views\ManuelReworkProcessBasketView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

@@ -615,6 +615,7 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddScopedWithShellRoute<ManuelReworkProcessOutWarehouseListView, ManuelReworkProcessOutWarehouseListViewModel>(nameof(ManuelReworkProcessOutWarehouseListView));
         builder.Services.AddScopedWithShellRoute<ManuelReworkProcessWarehouseTotalListView, ManuelReworkProcessWarehouseTotalListViewModel>(nameof(ManuelReworkProcessWarehouseTotalListView));
         builder.Services.AddScopedWithShellRoute<ManuelReworkProcessBasketView, ManuelReworkProcessBasketViewModel>(nameof(ManuelReworkProcessBasketView));
+        builder.Services.AddScopedWithShellRoute<ManuelReworkProcessBasketLocationListView, ManuelReworkProcessBasketLocationListViewModel>(nameof(ManuelReworkProcessBasketLocationListView));
         builder.Services.AddScopedWithShellRoute<ManuelReworkProcessInWarehouseListView, ManuelReworkProcessInWarehouseListViewModel>(nameof(ManuelReworkProcessInWarehouseListView));
 		builder.Services.AddScopedWithShellRoute<ManuelReworkProcessAllProductListView, ManuelReworkProcessAllProductListViewModel>(nameof(ManuelReworkProcessAllProductListView));
 		builder.Services.AddScopedWithShellRoute<ManuelReworkProcessFormView, ManuelReworkProcessFormViewModel>(nameof(ManuelReworkProcessFormView));
