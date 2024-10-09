@@ -6,12 +6,24 @@ namespace Deppo.Mobile.Core.Models.ReworkModels;
 
 public class ReworkInProductModel : ProductModel
 {
+	private double _inputQuantity;
 	private WarehouseModel _inWarehouseModel;
 
 	private List<ReworkInProductDetailModel> _details = new();
 
 	public ReworkInProductModel()
 	{
+	}
+
+	public double InputQuantity
+	{
+		get => _inputQuantity;
+		set
+		{
+			if (_inputQuantity == value) return;
+			_inputQuantity = value;
+			NotifyPropertyChanged();
+		}
 	}
 
 	public WarehouseModel InWarehouseModel

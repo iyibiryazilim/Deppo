@@ -222,7 +222,7 @@ public partial class ManuelReworkProcessWarehouseTotalListViewModel : BaseViewMo
 				WarehouseName = SelectedWarehouseTotalModel.WarehouseName,
 				WarehouseNumber = SelectedWarehouseTotalModel.WarehouseNumber,
 				StockQuantity = SelectedWarehouseTotalModel.StockQuantity,
-				OutputQuantity = SelectedWarehouseTotalModel.LocTracking == 0 ? 1 : 0
+				OutputQuantity = 0
 			};
 
 			await Shell.Current.GoToAsync($"{nameof(ManuelReworkProcessBasketView)}", new Dictionary<string, object>

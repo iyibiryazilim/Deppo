@@ -10,6 +10,7 @@ namespace Deppo.Mobile.Core.Models.ReworkModels;
 public class ReworkOutProductModel : WarehouseTotalModel
 {
 	private double _outputQuantity;
+	private List<ReworkOutProductDetailModel> _details = new();
 
     public ReworkOutProductModel()
     {
@@ -23,6 +24,17 @@ public class ReworkOutProductModel : WarehouseTotalModel
 		{
 			if (_outputQuantity == value) return;
 			_outputQuantity = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	public List<ReworkOutProductDetailModel> Details
+	{
+		get => _details;
+		set
+		{
+			if (_details == value) return;
+			_details = value;
 			NotifyPropertyChanged();
 		}
 	}

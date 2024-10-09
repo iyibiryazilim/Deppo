@@ -132,6 +132,9 @@
                             Stroke="{StaticResource Primary}"
                             StrokeShape="RoundRectangle 10"
                             VerticalOptions="Center">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding AddProductTappedCommand}" />
+                        </Border.GestureRecognizers>
                         <Label FontFamily="FAS"
                                FontSize="15"
                                TextColor="{StaticResource White}">
