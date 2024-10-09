@@ -46,7 +46,7 @@
                     <Border
                         Grid.Row="0"
                         Padding="5"
-                        HeightRequest="60"
+                        HeightRequest="55"
                         StrokeShape="RoundRectangle 5"
                         StrokeThickness="0.2">
                         <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
@@ -119,7 +119,7 @@
                     <Border
                         Grid.Row="0"
                         Padding="5"
-                        HeightRequest="60"
+                        HeightRequest="55"
                         StrokeShape="RoundRectangle 5"
                         StrokeThickness="0.2">
                         <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">

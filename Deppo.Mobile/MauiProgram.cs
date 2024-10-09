@@ -56,7 +56,9 @@ using Deppo.Mobile.Modules.ProductModule.ProductProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.VirmanProductProcess.Views;
 using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels;
+using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels.ActionViewModels;
 using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views;
+using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views.ActionViews;
 using Deppo.Mobile.Modules.PurchaseModule.PurchasePanel.ViewModels;
 using Deppo.Mobile.Modules.PurchaseModule.PurchasePanel.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.ViewModels;
@@ -234,9 +236,9 @@ public static class MauiProgram
         builder.Services.AddSingleton<ISupplierDetailService, SupplierDetailDataStore>();
         builder.Services.AddSingleton<ISupplierDetailAllFicheService, SupplierDetailAllFicheDataStore>();
         builder.Services.AddSingleton<ISupplierDetailActionService, SupplierDetailActionDataStore>();
-		builder.Services.AddSingleton<ISupplierDetailInputProductService, SupplierDetailInputProductDataStore>();
-		builder.Services.AddSingleton<ISupplierDetailOutputProductService, SupplierDetailOutputProductDataStore>();
-		builder.Services.AddSingleton<IProductTransactionService, ProductTransactionDataStore>();
+        builder.Services.AddSingleton<ISupplierDetailInputProductService, SupplierDetailInputProductDataStore>();
+        builder.Services.AddSingleton<ISupplierDetailOutputProductService, SupplierDetailOutputProductDataStore>();
+        builder.Services.AddSingleton<IProductTransactionService, ProductTransactionDataStore>();
         builder.Services.AddSingleton<IWarehouseTransactionService, WarehouseTransactionDataStore>();
         builder.Services.AddSingleton<ICustomerTransactionService, CustomerTransactionDataStore>();
         builder.Services.AddSingleton<ISupplierTransactionService, SupplierTransactionDataStore>();
@@ -303,9 +305,9 @@ public static class MauiProgram
         builder.Services.AddSingleton<ICustomerDetailActionService, CustomerDetailActionDataStore>();
         builder.Services.AddSingleton<ICustomerDetailAllFichesService, CustomerDetailAllFichesDataStore>();
         builder.Services.AddSingleton<ICustomerDetailInputProductService, CustomerDetailInputProductDataStore>();
-		builder.Services.AddSingleton<ICustomerDetailOutputProductService, CustomerDetailOutputProductDataStore>();
+        builder.Services.AddSingleton<ICustomerDetailOutputProductService, CustomerDetailOutputProductDataStore>();
 
-		builder.Services.AddSingleton<IProductDetailAllFichesService, ProductDetailAllFichesDataStore>();
+        builder.Services.AddSingleton<IProductDetailAllFichesService, ProductDetailAllFichesDataStore>();
         builder.Services.AddSingleton<IProductDetailService, ProductDetailDataStore>();
 
         builder.Services.AddSingletonWithShellRoute<LoginView, LoginViewModel>(nameof(LoginView));
@@ -317,6 +319,7 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<IWarehouseInputTransactionService, WarehouseInputTransactionDataStore>();
         builder.Services.AddSingleton<IWarehouseOutputTransactionService, WarehouseOutputTransactionDataStore>();
+        builder.Services.AddSingleton<IWarehouseDetailActionService, WarehouseDetailActionDataStore>();
 
         #region Analysis Modules
 
@@ -353,6 +356,7 @@ public static class MauiProgram
         builder.Services.AddTransientWithShellRoute<WarehouseOutputTransactionView, WarehouseOutputTransactionViewModel>(nameof(WarehouseOutputTransactionView));
         builder.Services.AddSingletonWithShellRoute<ProductProcessView, ProductProcessViewModel>(nameof(ProductProcessView));
         builder.Services.AddTransientWithShellRoute<WarehouseDetailAllFicheListView, WarehouseDetailAllFicheListViewModel>(nameof(WarehouseDetailAllFicheListView));
+        builder.Services.AddScopedWithShellRoute<WarehouseDetailWarehouseTotalListView, WarehouseDetailWarehouseTotalListViewModel>(nameof(WarehouseDetailWarehouseTotalListView));
 
         #region ProductionInput Modules
 
