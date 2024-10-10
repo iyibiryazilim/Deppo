@@ -10,6 +10,10 @@ using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Core.Models.ReworkModels.BasketModels;
 
+/// <summary>
+///  Used for ManuelRework
+/// </summary>
+
 public partial class ReworkBasketModel : ObservableObject
 {
 	[ObservableProperty]

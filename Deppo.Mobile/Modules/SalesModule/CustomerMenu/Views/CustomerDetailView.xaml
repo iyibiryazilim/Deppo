@@ -259,7 +259,7 @@
                                         BackgroundColor="Transparent"
                                         StrokeThickness="0.1">
                                     <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:CustomerDetailViewModel}}, Path=FicheTappedCommand}"
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:CustomerDetailViewModel}}, Path=ItemTappedCommand}"
                                                               CommandParameter="{Binding .}" />
                                     </Border.GestureRecognizers>
                                     <Grid ColumnDefinitions="Auto, *"
