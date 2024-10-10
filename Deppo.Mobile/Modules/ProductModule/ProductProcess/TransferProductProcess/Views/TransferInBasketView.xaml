@@ -84,10 +84,10 @@
                                             <Label FontAttributes="Bold"
                                                    LineBreakMode="TailTruncation"
                                                    MaxLines="1"
-                                                   Text="{Binding Code}" />
+                                                   Text="{Binding ItemCode}" />
                                             <Label LineBreakMode="TailTruncation"
                                                    MaxLines="1"
-                                                   Text="{Binding Name}"
+                                                   Text="{Binding ItemName}"
                                                    TextColor="{StaticResource Gray600}" />
                                         </VerticalStackLayout>
 

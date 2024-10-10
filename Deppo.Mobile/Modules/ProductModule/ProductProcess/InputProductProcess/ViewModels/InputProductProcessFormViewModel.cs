@@ -207,7 +207,8 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
 		{
 			var productionTransactionLineDto = new ProductionTransactionLineDto
 			{
-				ProductCode = item.ItemCode,
+				ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
+				VariantCode = item.IsVariant ? item.ItemCode : "",
 				WarehouseNumber = WarehouseModel.Number,
 				Quantity = item.Quantity,
 				ConversionFactor = 1,
@@ -291,8 +292,9 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
 		{
 			var inCountingTransactionLineDto = new InCountingTransactionLineDto
 			{
-				ProductCode = item.ItemCode,
-				WarehouseNumber = WarehouseModel.Number,
+                ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
+                VariantCode = item.IsVariant ? item.ItemCode : "",
+                WarehouseNumber = WarehouseModel.Number,
 				Quantity = item.Quantity,
 				ConversionFactor = 1,
 				OtherConversionFactor = 1,

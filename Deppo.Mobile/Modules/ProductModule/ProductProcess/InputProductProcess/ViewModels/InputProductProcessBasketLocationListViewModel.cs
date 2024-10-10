@@ -163,7 +163,8 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 warehouseNumber: WarehouseModel.Number,
-                productReferenceId: InputProductBasketModel.ItemReferenceId,
+                productReferenceId: InputProductBasketModel.IsVariant == true ? InputProductBasketModel.MainItemReferenceId : InputProductBasketModel.ItemReferenceId,
+                variantReferenceId: InputProductBasketModel.IsVariant == true ? InputProductBasketModel.ItemReferenceId : 0,
                 skip: 0,
                 take: 20);
 
@@ -205,7 +206,8 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 warehouseNumber: WarehouseModel.Number,
-                productReferenceId: InputProductBasketModel.ItemReferenceId,
+                productReferenceId: InputProductBasketModel.IsVariant == true ? InputProductBasketModel.MainItemReferenceId : InputProductBasketModel.ItemReferenceId,
+                variantReferenceId: InputProductBasketModel.IsVariant == true ? InputProductBasketModel.ItemReferenceId : 0,
                 skip: Items.Count,
                 take: 20);
 
@@ -243,7 +245,8 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 warehouseNumber: WarehouseModel.Number,
-                productReferenceId: InputProductBasketModel.ItemReferenceId,
+                productReferenceId: InputProductBasketModel.IsVariant == true ? InputProductBasketModel.MainItemReferenceId : InputProductBasketModel.ItemReferenceId,
+                variantReferenceId: InputProductBasketModel.IsVariant == true ? InputProductBasketModel.ItemReferenceId : 0,
                 search: searchText.Text,
                 skip: 0,
                 take: 20

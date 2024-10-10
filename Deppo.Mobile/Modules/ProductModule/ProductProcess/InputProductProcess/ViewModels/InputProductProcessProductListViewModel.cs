@@ -116,9 +116,6 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
             IsBusy = true;
             Items.Clear();
 
-            if (!IsSearchMode)
-                SelectedProducts.Clear();
-
             _userDialogs.Loading("Loading Items...");
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
@@ -181,7 +178,8 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
 
         if (IsBusy)
             return;
-
+        if (Items.Count < 18)
+            return;
         try
         {
             IsBusy = true;
@@ -447,6 +445,8 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
             var selectedItem = ItemVariants.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
             if (selectedItem != null)
                 selectedItem.IsSelected = true;
+
+            
         }
         catch (Exception ex)
         {
@@ -468,6 +468,9 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
             IsBusy = true;
 
             var item = ItemVariants.FirstOrDefault(x => x.IsSelected);
+
+           
+
             var basketItem = new InputProductBasketModel
             {
                 ItemReferenceId = item.ReferenceId,
@@ -486,6 +489,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                 StockQuantity = item.StockQuantity,
                 Quantity = item.LocTracking == 0 ? 1 : 0,
                 TrackingType = item.TrackingType,
+                IsVariant = true,
                 LocTracking = item.LocTracking,
             };
 
@@ -494,6 +498,8 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
             if (SelectedProduct is not null)
             {
                 SelectedProduct.IsSelected = true;
+                SelectedItems.Add(SelectedProduct);
+
             }
 
             CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.Hidden;
@@ -576,7 +582,6 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
             Items.Clear();
             _userDialogs.Loading("Searching Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            await Task.Delay(1000);
             var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, 0, 20);
             if (result.IsSuccess)
             {
@@ -586,7 +591,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                 foreach (var product in result.Data)
                 {
                     var item = Mapping.Mapper.Map<Product>(product);
-
+                    var matchedItem = SelectedItems.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
                     Items.Add(new ProductModel
                     {
                         ReferenceId = item.ReferenceId,
@@ -608,8 +613,10 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                         VatRate = item.VatRate,
                         Image = item.Image,
                         IsVariant = item.IsVariant,
-                        IsSelected = false
+                        IsSelected = matchedItem != null ? matchedItem.IsSelected : false
                     });
+
+
                 }
             }
 
