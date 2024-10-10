@@ -69,7 +69,6 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 
         PerformSearchCommand = new Command(async () => await PerformSearchAsync());
         PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
-
     }
 
     public Page CurrentPage { get; set; } = null!;
@@ -93,7 +92,6 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
     public Command PerformEmptySearchCommand { get; }
 
     #endregion Commands
-
 
     private async Task LoadItemsAsync()
     {
@@ -276,7 +274,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 
             // Yeni öğeyi seç
             SalesCustomer = item;
-            SalesCustomer.IsSelected = true;
+            //SalesCustomer.IsSelected = true;
 
             // Ship adresleri varsa, bottom sheet aç
             if (item.ShipAddressCount > 0)
@@ -350,6 +348,12 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
             var selectedItem = ShipAddresses.FirstOrDefault(x => x.ReferenceId == shipAddressModel.ReferenceId);
             if (selectedItem != null)
                 selectedItem.IsSelected = true;
+
+            // Ship address seçildiğinde SalesCustomer'ı seç
+            //if (SalesCustomer != null)
+            //{
+            //    SalesCustomer.IsSelected = true;
+            //}
         }
         catch (Exception ex)
         {
@@ -379,10 +383,9 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
                 SalesCustomer.ShipAddressCode = selectedShipAddress.Code;
                 SalesCustomer.ShipAddressName = selectedShipAddress.Name;
 
-                if (SalesCustomer is not null)
-                {
-                    SalesCustomer.IsSelected = true;
-                }
+                // Hem SalesCustomer hem de seçilen Ship Address'in seçildiğini işaretle
+                SalesCustomer.IsSelected = true;
+                selectedShipAddress.IsSelected = true;
 
                 CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.Hidden;
             }
@@ -437,7 +440,6 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
             IsBusy = false;
         }
     }
-
 
     private async Task ShipAddressCloseAsync()
     {
@@ -495,6 +497,5 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
         {
             await PerformSearchAsync();
         }
-
     }
 }

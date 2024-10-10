@@ -18,8 +18,6 @@ using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views;
 using Deppo.Core.BaseModels;
 
-
-
 namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels;
 
 [QueryProperty(name: nameof(ProductDetailModel), queryId: nameof(ProductDetailModel))]
@@ -37,9 +35,10 @@ public partial class ProductDetailViewModel : BaseViewModel
     [ObservableProperty]
     private ProductMeasure productMeasure = new();
 
+    [ObservableProperty]
+    private bool isEdit = false;
+
     public ObservableCollection<ProductDetailActionModel> ProductActionModels { get; } = new();
-
-
 
     public Page CurrentPage { get; set; }
 
@@ -66,6 +65,21 @@ public partial class ProductDetailViewModel : BaseViewModel
 
         ActionModelsTappedCommand = new Command<ProductDetailActionModel>(async (model) => await ActionModelsTappedAsync(model));
 
+        SwitchButtonTappedCommand = new Command(async () => await SwitchButtonTappedAsync());
+        WidthIncreaseCommand = new Command(async () => await WidthIncreaseAsync());
+        WidthDecreaseCommand = new Command(async () => await WidthDecreaseAsync());
+
+        HeightIncreaseCommand = new Command(async () => await HeightIncreaseAsync());
+        HeightDecreaseCommand = new Command(async () => await HeightDecreaseAsync());
+
+        LengthIncreaseCommand = new Command(async () => await LengthIncreaseAsync());
+        LengthDecreaseCommand = new Command(async () => await LengthDecreaseAsync());
+
+        WeightIncreaseCommand = new Command(async () => await WeightIncreaseAsync());
+        WeightDecreaseCommand = new Command(async () => await WeightDecreaseAsync());
+
+        VolumeIncreaseCommand = new Command(async () => await VolumeIncreaseAsync());
+        VolumeDecreaseCommand = new Command(async () => await VolumeDecreaseAsync());
     }
 
     #region Commands
@@ -93,9 +107,29 @@ public partial class ProductDetailViewModel : BaseViewModel
     public Command ActionModelsTappedCommand { get; }
 
     public Command ItemTappedCommand { get; }
+    public Command SwitchButtonTappedCommand { get; }
+
+    public Command WidthIncreaseCommand { get; }
+
+    public Command WidthDecreaseCommand { get; }
+
+    public Command HeightIncreaseCommand { get; }
+
+    public Command HeightDecreaseCommand { get; }
+
+    public Command LengthIncreaseCommand { get; }
+
+    public Command LengthDecreaseCommand { get; }
+
+    public Command WeightIncreaseCommand { get; }
+
+    public Command WeightDecreaseCommand { get; }
+
+    public Command VolumeIncreaseCommand { get; }
+
+    public Command VolumeDecreaseCommand { get; }
 
     #endregion Commands
-
 
     private async Task LoadItemsAsync()
     {
@@ -127,7 +161,6 @@ public partial class ProductDetailViewModel : BaseViewModel
     //Devir hızı dönem başı stok miktarı
     private async Task GetFirstStockQuantityAsync()
     {
-
         try
         {
             IsBusy = true;
@@ -147,8 +180,6 @@ public partial class ProductDetailViewModel : BaseViewModel
                     ProductDetailModel.InventoryTurnover.FirstStockQuantity = obj.FirstStockQuantity;
                 }
             }
-
-
         }
         catch (Exception ex)
         {
@@ -162,10 +193,10 @@ public partial class ProductDetailViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
     //Devir Hızı Son stok miktarı
     private async Task GetLastStockQuantityAsync()
     {
-
         try
         {
             IsBusy = true;
@@ -185,8 +216,6 @@ public partial class ProductDetailViewModel : BaseViewModel
                     ProductDetailModel.InventoryTurnover.LastStockQuantity = obj.LastStockQuantity;
                 }
             }
-
-
         }
         catch (Exception ex)
         {
@@ -210,7 +239,6 @@ public partial class ProductDetailViewModel : BaseViewModel
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-
             var result = await _productDetailService.GetSalesQuantityAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, ProductDetailModel.Product.ReferenceId);
 
             if (result.IsSuccess)
@@ -223,8 +251,6 @@ public partial class ProductDetailViewModel : BaseViewModel
                     ProductDetailModel.InventoryTurnover.SalesQuantity = obj.SalesQuantity;
                 }
             }
-
-
         }
         catch (Exception ex)
         {
@@ -302,8 +328,7 @@ public partial class ProductDetailViewModel : BaseViewModel
             await GetSalesQuantityAsync();
 
             var avarageStockQuantity = (ProductDetailModel.InventoryTurnover.FirstStockQuantity + ProductDetailModel.InventoryTurnover.LastStockQuantity) / 2;
-            ProductDetailModel.InventoryTurnover.TurnoverRate = ProductDetailModel.InventoryTurnover.SalesQuantity / (avarageStockQuantity == 0 ? 1 : avarageStockQuantity); 
-
+            ProductDetailModel.InventoryTurnover.TurnoverRate = ProductDetailModel.InventoryTurnover.SalesQuantity / (avarageStockQuantity == 0 ? 1 : avarageStockQuantity);
         }
         catch (Exception ex)
         {
@@ -317,7 +342,6 @@ public partial class ProductDetailViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
 
     private async Task GetInputQuantityAsync()
     {
@@ -336,7 +360,6 @@ public partial class ProductDetailViewModel : BaseViewModel
                     var obj = Mapping.Mapper.Map<ProductDetailModel>(item);
                     ProductDetailModel.InputQuantity = obj.InputQuantity;
                 }
-
             }
         }
         catch (Exception ex)
@@ -350,6 +373,7 @@ public partial class ProductDetailViewModel : BaseViewModel
         {
         }
     }
+
     private async Task GetOutputQuantityAsync()
     {
         try
@@ -367,7 +391,6 @@ public partial class ProductDetailViewModel : BaseViewModel
                     var obj = Mapping.Mapper.Map<ProductDetailModel>(item);
                     ProductDetailModel.OutputQuantity = obj.OutputQuantity;
                 }
-
             }
         }
         catch (Exception ex)
@@ -381,6 +404,7 @@ public partial class ProductDetailViewModel : BaseViewModel
         {
         }
     }
+
     private async Task GetLastTransactionsAsync()
     {
         try
@@ -454,7 +478,6 @@ public partial class ProductDetailViewModel : BaseViewModel
                 {
                     ProductMeasure = Mapping.Mapper.Map<ProductMeasure>(item);
                 }
-
             }
         }
         catch (Exception ex)
@@ -611,7 +634,6 @@ public partial class ProductDetailViewModel : BaseViewModel
                 IsSelected = false
             });
 
-
             if (ProductDetailModel.Product.IsVariant)
             {
                 ProductActionModels.Add(new ProductDetailActionModel
@@ -695,7 +717,7 @@ public partial class ProductDetailViewModel : BaseViewModel
             IsBusy = true;
             CurrentPage.FindByName<BottomSheet>("processBottomSheet").State = BottomSheetState.Hidden;
             await Task.Delay(300);
-            if(model.ActionName != "Malzeme Ölçüleri")
+            if (model.ActionName != "Malzeme Ölçüleri")
             {
                 await Shell.Current.GoToAsync($"{model.ActionUrl}", new Dictionary<string, object>
                 {
@@ -711,8 +733,6 @@ public partial class ProductDetailViewModel : BaseViewModel
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();
             }
-          
-
         }
         catch (Exception ex)
         {
@@ -800,6 +820,326 @@ public partial class ProductDetailViewModel : BaseViewModel
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task SwitchButtonTappedAsync()
+    {
+        IsEdit = !IsEdit;
+    }
+
+    private async Task WidthIncreaseAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            if (ProductMeasure is not null)
+            {
+                ProductMeasure.Width++;
+            }
+            else
+            {
+                _userDialogs.Alert("İşlem Yapılamadı", "Tamam");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task WidthDecreaseAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            if (ProductMeasure is not null)
+            {
+                if (ProductMeasure.Width > 0)
+                    ProductMeasure.Width--;
+            }
+            else
+            {
+                _userDialogs.Alert("İşlem Yapılamadı", "Tamam");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task HeightIncreaseAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            if (ProductMeasure is not null)
+            {
+                ProductMeasure.Height++;
+            }
+            else
+            {
+                _userDialogs.Alert("İşlem Yapılamadı", "Tamam");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task HeightDecreaseAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            if (ProductMeasure is not null)
+            {
+                if (ProductMeasure.Height > 0)
+                    ProductMeasure.Height--;
+            }
+            else
+            {
+                _userDialogs.Alert("İşlem Yapılamadı", "Tamam");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task LengthIncreaseAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            if (ProductMeasure is not null)
+            {
+                ProductMeasure.Length++;
+            }
+            else
+            {
+                _userDialogs.Alert("İşlem Yapılamadı", "Tamam");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task LengthDecreaseAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            if (ProductMeasure is not null)
+            {
+                if (ProductMeasure.Length > 0)
+                    ProductMeasure.Length--;
+            }
+            else
+            {
+                _userDialogs.Alert("İşlem Yapılamadı", "Tamam");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task WeightIncreaseAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            if (ProductMeasure is not null)
+            {
+                ProductMeasure.Weight++;
+            }
+            else
+            {
+                _userDialogs.Alert("İşlem Yapılamadı", "Tamam");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task WeightDecreaseAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            if (ProductMeasure is not null)
+            {
+                if (ProductMeasure.Weight > 0)
+                    ProductMeasure.Weight--;
+            }
+            else
+            {
+                _userDialogs.Alert("İşlem Yapılamadı", "Tamam");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task VolumeIncreaseAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            if (ProductMeasure is not null)
+            {
+                ProductMeasure.Volume++;
+            }
+            else
+            {
+                _userDialogs.Alert("İşlem Yapılamadı", "Tamam");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task VolumeDecreaseAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            if (ProductMeasure is not null)
+            {
+                if (ProductMeasure.Volume > 0)
+                    ProductMeasure.Volume--;
+            }
+            else
+            {
+                _userDialogs.Alert("İşlem Yapılamadı", "Tamam");
+            }
         }
         catch (Exception ex)
         {

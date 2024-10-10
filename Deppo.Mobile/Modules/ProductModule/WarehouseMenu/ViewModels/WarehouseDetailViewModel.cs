@@ -375,14 +375,14 @@ public partial class WarehouseDetailViewModel : BaseViewModel
                 IsSelected = false
             });
 
-            //WarehouseActionModels.Add(new WarehouseDetailActionModel
-            //{
-            //    ActionName = "Raf Listesi",
-            //    ActionUrl = $"{nameof(ProductDetailWaitingSalesOrderListView)}",
-            //    LineNumber = 2,
-            //    Icon = "",
-            //    IsSelected = false
-            //});
+            WarehouseActionModels.Add(new WarehouseDetailActionModel
+            {
+                ActionName = "Raf Listesi",
+                ActionUrl = $"{nameof(WarehouseDetailLocationListView)}",
+                LineNumber = 2,
+                Icon = "",
+                IsSelected = false
+            });
 
             _userDialogs.HideHud();
         }
