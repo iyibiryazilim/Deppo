@@ -294,6 +294,9 @@
 	  <MauiXaml Update="Modules\ProductModule\ProductProcess\VirmanProductProcess\Views\VirmanProductOutWarehouseListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\WarehouseMenu\Views\ActionViews\WarehouseDetailLocationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\ProductModule\WarehouseMenu\Views\ActionViews\WarehouseDetailWarehouseTotalListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

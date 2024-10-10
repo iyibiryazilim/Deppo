@@ -82,28 +82,30 @@
                     <DataTemplate x:DataType="salesBasketModel:ReturnSalesBasketModel">
                         <SwipeView Threshold="100">
                             <SwipeView.LeftItems>
-                                <SwipeItemView  BackgroundColor="Red"
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnSalesBasketViewModel}}, Path=DeleteItemCommand}"
-                                                CommandParameter="{Binding .}">
-                                    <Label HorizontalOptions="Center"
-                                           TextColor="White"
-                                           VerticalOptions="Center">
+                                <SwipeItems Mode="Execute">
+                                    <SwipeItemView  BackgroundColor="Red"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnSalesBasketViewModel}}, Path=DeleteItemCommand}"
+                                                    CommandParameter="{Binding .}">
+                                        <Label HorizontalOptions="Center"
+                                               TextColor="White"
+                                               VerticalOptions="Center">
 
-                                        <Label.FormattedText>
-                                            <FormattedString>
-                                                <Span FontAttributes="Bold"
-                                                      FontFamily="FAS"
-                                                      FontSize="Medium"
-                                                      Text="{x:Static fontAwesome:FontAwesomeIcons.Trash}"
-                                                      TextColor="White" />
-                                                <Span Text=" " />
-                                                <Span FontSize="Medium"
-                                                      Text="Sil"
-                                                      TextColor="White" />
-                                            </FormattedString>
-                                        </Label.FormattedText>
-                                    </Label>
-                                </SwipeItemView>
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span FontAttributes="Bold"
+                                                          FontFamily="FAS"
+                                                          FontSize="Medium"
+                                                          Text="{x:Static fontAwesome:FontAwesomeIcons.Trash}"
+                                                          TextColor="White" />
+                                                    <Span Text=" " />
+                                                    <Span FontSize="Medium"
+                                                          Text="Sil"
+                                                          TextColor="White" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </SwipeItemView>
+                                </SwipeItems>
                             </SwipeView.LeftItems>
                             <Border Padding="5"
                                     BackgroundColor="Transparent"

@@ -63,7 +63,7 @@
                                    Orientation="Vertical" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="coreModel:ProductFiche">
+                <DataTemplate x:DataType="coreModel:WarehouseFiche">
                     <Border Padding="5"
                             BackgroundColor="Transparent"
                             StrokeThickness="0.1">

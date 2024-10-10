@@ -29,15 +29,18 @@
     </ContentPage.BackgroundImageSource>
 
 
-    <Grid RowDefinitions="Auto, Auto, Auto, *, Auto" RowSpacing="10">
+    <Grid RowDefinitions="Auto, Auto, Auto, *, Auto"
+          RowSpacing="10"
+         >
         <!--#region Page Title and Close Button-->
-        <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto" >
             <Grid Grid.Row="0">
                 <Grid Grid.Row="0"
                       Padding="10,10,0,0"
                       ColumnDefinitions="*, Auto"
                       ColumnSpacing="10">
                     <Label Grid.Column="0"
+                       
                            FontAttributes="Bold"
                            FontSize="Large"
                            Text="Ürün Listesi"
@@ -162,7 +165,7 @@
         </CollectionView>
 
         <Button Grid.Row="4"
-                Margin="10,10,10,20"
+                Margin="10,10,10,30"
                 Command="{Binding ConfirmCommand}"
                 Text="Tamam" />
     </Grid>
