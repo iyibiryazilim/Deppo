@@ -159,7 +159,9 @@
                             <SwipeView Threshold="100">
                                 <SwipeView.LeftItems>
                                     <SwipeItems Mode="Execute">
-                                        <SwipeItemView BackgroundColor="Red">
+                                        <SwipeItemView BackgroundColor="Red"
+                                                       Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ManuelReworkProcessBasketViewModel}}, Path=InProductDeleteCommand}"
+                                                       CommandParameter="{Binding .}">
                                             <Label HorizontalOptions="Center"
                                                    TextColor="White"
                                                    VerticalOptions="Center">

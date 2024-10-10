@@ -28,11 +28,13 @@ public partial class ManuelReworkProcessBasketViewModel : BaseViewModel
 		Title = "Sepet";
 
 		AddProductTappedCommand = new Command(async () => await AddProductTappedAsync());
+		NextViewCommand = new Command(async () => await NextViewAsync());
 		BackCommand = new Command(async () => await BackAsync());
 
 
 		InProductDecreaseCommand = new Command<ReworkInProductModel>(async (x) => await InProductDecreaseAsync(x));
 		InProductIncreaseCommand = new Command<ReworkInProductModel>(async (x) => await InProductIncreaseAsync(x));
+		InProductDeleteCommand = new Command<ReworkInProductModel>(async (x) => await InProductDeleteAsync(x));
 	}
 	public Command IncreaseCommand { get; }
 	public Command DecreaseCommand { get; }
@@ -42,6 +44,7 @@ public partial class ManuelReworkProcessBasketViewModel : BaseViewModel
 
 	public Command InProductIncreaseCommand { get; }
 	public Command InProductDecreaseCommand { get; }
+	public Command InProductDeleteCommand { get; }
 
 
 	private async Task InProductIncreaseAsync(ReworkInProductModel item)
@@ -126,6 +129,43 @@ public partial class ManuelReworkProcessBasketViewModel : BaseViewModel
 		}
 	}
 
+	private async Task InProductDeleteAsync(ReworkInProductModel item)
+	{
+		if (item is null)
+			return;
+		if (IsBusy)
+			return;
+
+		try
+		{
+			IsBusy = true;
+
+			SelectedReworkInProductModel = item;
+
+			var confirm = await _userDialogs.ConfirmAsync("Ürünü silmek istediğinize emin misiniz?", "Sil", "Evet", "Hayır");
+			if(!confirm)
+				return;
+
+			ReworkBasketModel.ReworkInProducts.Remove(SelectedReworkInProductModel);
+
+			if (SelectedReworkInProductModel.Details.Any())
+			{
+				SelectedReworkInProductModel.Details.Clear();
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
 	private async Task AddProductTappedAsync()
 	{
 		if (IsBusy)
@@ -149,6 +189,32 @@ public partial class ManuelReworkProcessBasketViewModel : BaseViewModel
 		}
 	}
 
+	private async Task NextViewAsync()
+	{
+		if (IsBusy)
+			return;
+
+		try
+		{
+			IsBusy = true;
+
+			await Shell.Current.GoToAsync($"{nameof(ManuelReworkProcessFormView)}", new Dictionary<string, object>
+			{
+				[nameof(ReworkBasketModel)] = ReworkBasketModel
+			});
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 	private async Task BackAsync()
 	{
 		if (IsBusy)
@@ -156,6 +222,23 @@ public partial class ManuelReworkProcessBasketViewModel : BaseViewModel
 		try
 		{
 			IsBusy = true;
+
+			var confirm = await _userDialogs.ConfirmAsync("Sepetinizdeki ürünler silinecektir. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+			if (!confirm)
+				return;
+
+			if(ReworkBasketModel.ReworkInProducts.Any())
+			{
+				foreach(var item in ReworkBasketModel.ReworkInProducts)
+				{
+					if (item.Details.Any())
+						item.Details.Clear();
+				}
+
+				ReworkBasketModel.ReworkInProducts.Clear();
+			}
+			
+			await Shell.Current.GoToAsync("..");
 		}
 		catch (Exception ex)
 		{

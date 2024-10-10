@@ -55,11 +55,11 @@ public partial class ManuelReworkProcessBasketLocationListViewModel : BaseViewMo
 
 	public Page CurrentPage { get; set; } = null!;
 
-	public Command LoadSelectedItemsCommand { get; }  //
+	public Command LoadSelectedItemsCommand { get; }  
 	public Command<LocationModel> IncreaseCommand { get; }
 	public Command<LocationModel> DecreaseCommand { get; }
 	public Command<Entry> PerformSearchCommand { get; } 
-	public Command ConfirmCommand { get; } //
+	public Command ConfirmCommand { get; }
 	public Command CancelCommand { get; }
 
 
