@@ -12,6 +12,7 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
 public partial class ManuelReworkProcessBasketViewModel : BaseViewModel
 {
 	private readonly IUserDialogs _userDialogs;
+	private readonly IServiceProvider _serviceProvider;
 
 	[ObservableProperty]
 	ReworkBasketModel reworkBasketModel = null!;
@@ -19,9 +20,10 @@ public partial class ManuelReworkProcessBasketViewModel : BaseViewModel
 	[ObservableProperty]
 	ReworkInProductModel? selectedReworkInProductModel;
 
-	public ManuelReworkProcessBasketViewModel(IUserDialogs userDialogs)
+	public ManuelReworkProcessBasketViewModel(IUserDialogs userDialogs, IServiceProvider serviceProvider)
 	{
 		_userDialogs = userDialogs;
+		_serviceProvider = serviceProvider;
 
 		Title = "Sepet";
 
@@ -54,12 +56,16 @@ public partial class ManuelReworkProcessBasketViewModel : BaseViewModel
 
 			SelectedReworkInProductModel = item;
 
+			var locationViewModel = _serviceProvider.GetRequiredService<ManuelReworkProcessBasketLocationListViewModel>();
+
 			if(SelectedReworkInProductModel.LocTracking == 1 && SelectedReworkInProductModel.TrackingType == 0)
 			{
 				await Shell.Current.GoToAsync($"{nameof(ManuelReworkProcessBasketLocationListView)}", new Dictionary<string, object>
 				{
 					["SelectedReworkInProductModel"] = SelectedReworkInProductModel
 				});
+
+				await locationViewModel.LoadSelectedItemsAsync();
 			}
 			else if(SelectedReworkInProductModel.LocTracking == 0 && SelectedReworkInProductModel.TrackingType == 0)
 			{

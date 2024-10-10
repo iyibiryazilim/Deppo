@@ -41,8 +41,9 @@ public partial class ManuelReworkProcessBasketLocationListViewModel : BaseViewMo
 
 		IncreaseCommand = new Command<LocationModel>(async (x) => await IncreaseAsync(x));
 		DecreaseCommand = new Command<LocationModel>(async (x) => await DecreaseAsync(x));
-		CancelCommand = new Command(async () => await CancelAsync());
 		PerformSearchCommand = new Command<Entry>(async (x) => await PerformSearchAsync(x));
+		ConfirmCommand = new Command(async () => await ConfirmAsync());
+		CancelCommand = new Command(async () => await CancelAsync());
 
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
@@ -70,6 +71,48 @@ public partial class ManuelReworkProcessBasketLocationListViewModel : BaseViewMo
 	public Command<SearchBar> LocationsPerformSearchCommand { get; } // method will be added
 	public Command ConfirmLocationsCommand { get; }
 
+	public async Task LoadSelectedItemsAsync()
+	{
+		try
+		{
+			IsBusy = true;
+
+			_userDialogs.ShowLoading("Loading...");
+			SelectedItems.Clear();
+			await Task.Delay(1000);
+
+			if(SelectedReworkInProductModel.Details.Count > 0)
+			{
+                foreach (var item in SelectedReworkInProductModel.Details)
+                {
+					SelectedItems.Add(new LocationModel
+					{
+						Code = item.LocationCode,
+						Name = item.LocationName,
+						ReferenceId = item.LocationReferenceId,
+						InputQuantity = item.Quantity,
+						WarehouseName = SelectedReworkInProductModel.InWarehouseModel.Name,
+						WarehouseNumber = SelectedReworkInProductModel.InWarehouseModel.Number,
+						WarehouseReferenceId = SelectedReworkInProductModel.InWarehouseModel.ReferenceId,
+					});
+                }
+            }
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam"); ;
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 
 	private async Task IncreaseAsync(LocationModel locationModel)
 	{
@@ -213,7 +256,42 @@ public partial class ManuelReworkProcessBasketLocationListViewModel : BaseViewMo
 		{
 			IsBusy = true;
 
+			var basketViewModel = _serviceProvider.GetService<ManuelReworkProcessBasketViewModel>();
+			if(SelectedItems.Any(x => x.InputQuantity == 0))
+			{
+				await _userDialogs.AlertAsync("Seçtiğiniz raflarda miktarı 0 olan ögeler bulunmaktadır. Yeniden kontrol ediniz", "Uyarı", "Tamam");
+				return;
+			}
+
 			_userDialogs.ShowLoading("Loading...");
+			foreach (var item in SelectedItems.Where(x => x.InputQuantity > 0))
+            {
+				var selectedItemlocationDetail = SelectedReworkInProductModel.Details.FirstOrDefault(x => x.LocationCode == item.Code);
+
+				if(selectedItemlocationDetail is not null)
+				{
+					selectedItemlocationDetail.Quantity = item.InputQuantity;
+					//selectedItemlocationDetail.RemainingQuantity = item.InputQuantity;
+				}
+				else
+				{
+					SelectedReworkInProductModel.Details.Add(new ReworkInProductDetailModel
+					{
+						LocationReferenceId = item.ReferenceId,
+						LocationCode = item.Code,
+						LocationName = item.Name,
+						RemainingQuantity = item.InputQuantity,
+						Quantity = item.InputQuantity,
+					});
+				}
+			}
+
+			var totalInputQuantity = SelectedItems.Where(x => x.InputQuantity > 0).Sum(x => x.InputQuantity);
+			SelectedReworkInProductModel.InputQuantity = totalInputQuantity;
+
+            await Shell.Current.GoToAsync("..");
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 
 
 		}
