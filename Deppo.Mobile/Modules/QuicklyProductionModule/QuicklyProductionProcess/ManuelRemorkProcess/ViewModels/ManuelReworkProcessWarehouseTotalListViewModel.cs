@@ -198,9 +198,12 @@ public partial class ManuelReworkProcessWarehouseTotalListViewModel : BaseViewMo
 
 			ReworkBasketModel.ReworkOutProductModel = new ReworkOutProductModel
 			{
-				ProductReferenceId = SelectedWarehouseTotalModel.ProductReferenceId,
-				ProductCode = SelectedWarehouseTotalModel.ProductCode,
-				ProductName = SelectedWarehouseTotalModel.ProductName,
+				ReferenceId = SelectedWarehouseTotalModel.ProductReferenceId,
+				Code = SelectedWarehouseTotalModel.ProductCode,
+				Name = SelectedWarehouseTotalModel.ProductName,
+				MainItemReferenceId = SelectedWarehouseTotalModel.ProductReferenceId,
+				MainItemCode = SelectedWarehouseTotalModel.ProductCode,
+				MainItemName = SelectedWarehouseTotalModel.ProductName,
 				UnitsetReferenceId = SelectedWarehouseTotalModel.UnitsetReferenceId,
 				UnitsetCode = SelectedWarehouseTotalModel.UnitsetCode,
 				UnitsetName = SelectedWarehouseTotalModel.UnitsetName,
@@ -219,6 +222,7 @@ public partial class ManuelReworkProcessWarehouseTotalListViewModel : BaseViewMo
 				LocTrackingIcon = SelectedWarehouseTotalModel.LocTrackingIcon,
 				TrackingTypeIcon = SelectedWarehouseTotalModel.TrackingTypeIcon,
 				VariantIcon = SelectedWarehouseTotalModel.VariantIcon,
+				WarehouseReferenceId = SelectedWarehouseTotalModel.WarehouseReferenceId,
 				WarehouseName = SelectedWarehouseTotalModel.WarehouseName,
 				WarehouseNumber = SelectedWarehouseTotalModel.WarehouseNumber,
 				StockQuantity = SelectedWarehouseTotalModel.StockQuantity,
