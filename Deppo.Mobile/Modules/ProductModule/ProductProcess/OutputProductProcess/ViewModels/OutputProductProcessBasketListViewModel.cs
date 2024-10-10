@@ -291,8 +291,9 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
-				productReferenceId: SelectedItem.ItemReferenceId,
-				warehouseNumber: WarehouseModel.Number,
+                productReferenceId: SelectedItem.IsVariant ? SelectedItem.MainItemReferenceId : SelectedItem.ItemReferenceId,
+                variantReferenceId: SelectedItem.IsVariant ? SelectedItem.ItemReferenceId : 0,
+                warehouseNumber: WarehouseModel.Number,
 				skip: 0,
 				take: 20,
 				search:LocationTransactionSearchText.Text
@@ -343,8 +344,9 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 			var result = await _locationTransactionService.GetInputObjectsAsync(httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
-				productReferenceId: SelectedItem.ItemReferenceId,
-				warehouseNumber: WarehouseModel.Number,
+				productReferenceId:SelectedItem.IsVariant ?  SelectedItem.MainItemReferenceId : SelectedItem.ItemReferenceId,
+				variantReferenceId:SelectedItem.IsVariant ? SelectedItem.ItemReferenceId : 0,
+                warehouseNumber: WarehouseModel.Number,
 				skip: LocationTransactions.Count,
 				take: 20,
                 search:LocationTransactionSearchText.Text);

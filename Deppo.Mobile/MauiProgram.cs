@@ -298,6 +298,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<ICountingPanelService, CountingPanelDataStore>();
         builder.Services.AddSingleton<IQuicklyProductionPanelService, QuicklyProductionPanelDataStore>();
         builder.Services.AddSingleton<IProductDetailActionService, ProductDetailActionDataStore>();
+        builder.Services.AddSingleton<IVariantWarehouseTotalService, VariantWarehouseTotalDataStore>();
 
         builder.Services.AddSingleton<IBarcodeSearchService, BarcodeSearchDataStore>();
 

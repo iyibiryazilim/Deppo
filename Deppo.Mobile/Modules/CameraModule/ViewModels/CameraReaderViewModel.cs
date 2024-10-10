@@ -676,7 +676,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 				case "TransferOutBasket":
 					var transferOutBasketViewModel = _serviceProvider.GetRequiredService<TransferOutBasketViewModel>();
 					var outProductItem = await ConvertOutProductAsync(productModel);
-					if(transferOutBasketViewModel.TransferBasketModel.OutProducts.Any(x => x.Code == outProductItem.Code))
+					if(transferOutBasketViewModel.TransferBasketModel.OutProducts.Any(x => x.ItemCode == outProductItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					} else
@@ -814,7 +814,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 				case "TransferOutBasket":
 					var transferOutBasketViewModel = _serviceProvider.GetRequiredService<TransferOutBasketViewModel>();
 					var outProductItem = await ConvertOutProductAsync(variantModel);
-					if (transferOutBasketViewModel.TransferBasketModel.OutProducts.Any(x => x.Code == outProductItem.Code))
+					if (transferOutBasketViewModel.TransferBasketModel.OutProducts.Any(x => x.ItemCode == outProductItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
@@ -1015,9 +1015,10 @@ public partial class CameraReaderViewModel : BaseViewModel
 			{
 				var basketItem = new OutProductModel
 				{
-					ReferenceId = productModel.ReferenceId,
-					Code = productModel.Code,
-					Name = productModel.Name,
+					//ReferenceId = productModel.ReferenceId,
+					ItemReferenceId = productModel.ReferenceId,
+					ItemCode = productModel.Code,
+					ItemName = productModel.Name,
 					UnitsetReferenceId = productModel.UnitsetReferenceId,
 					UnitsetCode = productModel.UnitsetCode,
 					UnitsetName = productModel.UnitsetName,
@@ -1310,11 +1311,14 @@ public partial class CameraReaderViewModel : BaseViewModel
 			{
 				var basketItem = new OutProductModel
 				{
-					ReferenceId = variantModel.ReferenceId,
-					Code = variantModel.Code,
-					Name = variantModel.Name,
-					Image = "",
-					VatRate = variantModel.VatRate,
+					ItemReferenceId = variantModel.ReferenceId,
+					ItemCode = variantModel.Code,
+					ItemName = variantModel.Name,
+					MainItemReferenceId = variantModel.ProductReferenceId,
+					MainItemCode = variantModel.ProductCode,
+					MainItemName = variantModel.ProductName,
+                    Image = "",
+					//VatRate = variantModel.VatRate,
 					UnitsetReferenceId = variantModel.UnitsetReferenceId,
 					UnitsetCode = variantModel.UnitsetCode,
 					UnitsetName = variantModel.UnitsetName,
@@ -1738,12 +1742,16 @@ public partial class CameraReaderViewModel : BaseViewModel
 
 						var basketItem = new OutProductModel()
 						{
-							ReferenceId = item.ProductReferenceId,
-							Code = item.ProductCode,
-							Name = item.ProductName,
+							ReferenceId = item.ReferenceId,
+							ItemCode = item.ProductCode,
+							ItemName = item.ProductName,
+							ItemReferenceId = item.ProductReferenceId,
 							UnitsetReferenceId = item.UnitsetReferenceId,
 							UnitsetCode = item.UnitsetCode,
-							UnitsetName = item.UnitsetName,
+                            MainItemCode = string.Empty,
+							MainItemReferenceId = default,
+							MainItemName = string.Empty,
+                            UnitsetName = item.UnitsetName,
 							SubUnitsetReferenceId = item.SubUnitsetReferenceId,
 							SubUnitsetCode = item.SubUnitsetCode,
 							SubUnitsetName = item.SubUnitsetName,
@@ -1758,7 +1766,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 							IsSelected = item.IsSelected,
 						};
 
-						if (viewModel.TransferBasketModel.OutProducts.Any(x => x.Code == basketItem.Code))
+						if (viewModel.TransferBasketModel.OutProducts.Any(x => x.ItemCode == basketItem.ItemCode))
 						{
 							_userDialogs.ShowToast($"{barcodeValue} kodlu Ürün Sepette Zaten Var");
 						}

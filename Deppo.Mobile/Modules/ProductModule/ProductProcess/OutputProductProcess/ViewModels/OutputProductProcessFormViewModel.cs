@@ -208,7 +208,8 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
         {
             var consumableTransactionLineDto = new ConsumableTransactionLineDto
             {
-                ProductCode = item.ItemCode,
+                ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
+                VariantCode = item.IsVariant ? item.ItemCode : "",
                 WarehouseNumber = WarehouseModel.Number,
                 Quantity = item.Quantity,
                 ConversionFactor = 1,
@@ -293,7 +294,8 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
         {
             var wastageTransactionLineDto = new WastageTransactionLineDto
             {
-                ProductCode = item.ItemCode,
+                ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
+                VariantCode = item.IsVariant ? item.ItemCode : "",
                 WarehouseNumber = WarehouseModel.Number,
                 Quantity = item.Quantity,
                 ConversionFactor = 1,
@@ -375,7 +377,8 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
         {
             var outCountingTransactionLineDto = new OutCountingTransactionLineDto
             {
-                ProductCode = item.ItemCode,
+                ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
+                VariantCode = item.IsVariant ? item.ItemCode : "",
                 WarehouseNumber = WarehouseModel.Number,
                 Quantity = item.Quantity,
                 ConversionFactor = 1,

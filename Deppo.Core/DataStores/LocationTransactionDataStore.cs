@@ -8,9 +8,9 @@ namespace Deppo.Core.DataStores;
 public class LocationTransactionDataStore : ILocationTransactionService
 {
 	string postUrl = "/gateway/customQuery/CustomQuery";
-	public async Task<DataResult<IEnumerable<dynamic>>> GetInputObjectsAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "", int locationRef = 0, int serilotRef = 0)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetInputObjectsAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "", int locationRef = 0, int serilotRef = 0,int variantReferenceId = 0)
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(LocationInputTransactionQuery(firmNumber, periodNumber, productReferenceId, warehouseNumber, skip, take, search, locationRef, serilotRef)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(LocationInputTransactionQuery(firmNumber, periodNumber, productReferenceId, warehouseNumber, skip, take, search, locationRef, serilotRef, variantReferenceId)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -112,7 +112,7 @@ public class LocationTransactionDataStore : ILocationTransactionService
 		}
 	}
 
-	private string LocationInputTransactionQuery(int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "", int locationRef = 0, int serilotRef = 0)
+	private string LocationInputTransactionQuery(int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "", int locationRef = 0, int serilotRef = 0,int variantReferenceId = 0)
 	{
 		var baseQuery = @$"SELECT
         [ReferenceId] = LGMAIN.LOGICALREF,
@@ -151,6 +151,7 @@ public class LocationTransactionDataStore : ILocationTransactionService
               (LGMAIN.LPRODSTAT = 0) AND 
               (LGMAIN.ITEMREF = {productReferenceId}) AND
               (LGMAIN.INVENNO = {warehouseNumber}) AND
+			  (LGMAIN.VARIANTREF = {variantReferenceId}) AND
 		      (LGMAIN.EXIMFCTYPE IN ( 0 , 4 , 5 , 3 , 2 , 7 )) AND 
               (LGMAIN.STATUS = 0) AND 
               (LGMAIN.REMAMOUNT > 0) AND

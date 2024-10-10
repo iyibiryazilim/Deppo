@@ -208,7 +208,7 @@ public partial class TransferOutBasketViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            var result = await _userDialogs.ConfirmAsync($"{item.Code}\n{item.Name}\nİlgili ürün sepetinizden çıkarılacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+            var result = await _userDialogs.ConfirmAsync($"{item.ItemCode}\n{item.ItemName}\nİlgili ürün sepetinizden çıkarılacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
 
             if (!result)
                 return;
@@ -224,7 +224,7 @@ public partial class TransferOutBasketViewModel : BaseViewModel
 
             var viewModel = _serviceProvider.GetRequiredService<TransferOutProductListViewModel>();
             
-            var product = viewModel.Items.FirstOrDefault(x=>x.ProductReferenceId == item.ReferenceId);
+            var product = viewModel.Items.FirstOrDefault(x=>x.ProductReferenceId == item.ItemReferenceId);
             if (product is not null)
                 product.IsSelected = false;
 
@@ -253,7 +253,8 @@ public partial class TransferOutBasketViewModel : BaseViewModel
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
-                productReferenceId: SelectedItem.ReferenceId,
+                productReferenceId: SelectedItem.IsVariant ?  SelectedItem.MainItemReferenceId : SelectedItem.ItemReferenceId,
+                variantReferenceId: SelectedItem.IsVariant ? SelectedItem.ItemReferenceId : 0,
                 warehouseNumber: TransferBasketModel.OutWarehouse.Number,
                 skip: 0,
                 take: 20
@@ -304,7 +305,8 @@ public partial class TransferOutBasketViewModel : BaseViewModel
             var result = await _locationTransactionService.GetInputObjectsAsync(httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
-                productReferenceId: SelectedItem.ReferenceId,
+                productReferenceId: SelectedItem.IsVariant ?  SelectedItem.MainItemReferenceId : SelectedItem.ItemReferenceId,
+                variantReferenceId: SelectedItem.IsVariant ? SelectedItem.ItemReferenceId : 0,
                 warehouseNumber: TransferBasketModel.OutWarehouse.Number,
                 skip: LocationTransactions.Count,
                 take: 20);
@@ -508,7 +510,7 @@ public partial class TransferOutBasketViewModel : BaseViewModel
             await Task.Delay(1000);
             SeriLotTransactions.Clear();
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _serilotTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: SelectedItem.ReferenceId, warehouseNumber: TransferBasketModel.OutWarehouse.Number, search: string.Empty);
+            var result = await _serilotTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId:SelectedItem.IsVariant? SelectedItem.MainItemReferenceId : SelectedItem.ItemReferenceId, warehouseNumber: TransferBasketModel.OutWarehouse.Number, search: string.Empty);
 
             if (result.IsSuccess)
             {
@@ -544,7 +546,7 @@ public partial class TransferOutBasketViewModel : BaseViewModel
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _serilotTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: SelectedItem.ReferenceId, warehouseNumber: TransferBasketModel.OutWarehouse.Number, skip: SeriLotTransactions.Count, take: 20);
+            var result = await _serilotTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: SelectedItem.IsVariant ? SelectedItem.MainItemReferenceId : SelectedItem.ItemReferenceId, warehouseNumber: TransferBasketModel.OutWarehouse.Number, skip: SeriLotTransactions.Count, take: 20);
 
             if (result.IsSuccess)
             {

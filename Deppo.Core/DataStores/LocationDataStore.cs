@@ -10,9 +10,10 @@ public class LocationDataStore : ILocationService
 {
     private string postUrl = "/gateway/customQuery/CustomQuery";
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int productReferenceId,int variantReferenceId = 0, string search = "", int skip = 0, int take = 20)
     {
-        var content = new StringContent(JsonConvert.SerializeObject(LocationQuery(firmNumber, periodNumber, warehouseNumber, productReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(LocationQuery(firmNumber, periodNumber, warehouseNumber, productReferenceId,variantReferenceId,
+            search, skip, take)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -110,7 +111,7 @@ public class LocationDataStore : ILocationService
         }
     }
 
-    private string LocationQuery(int firmNumber, int periodNumber, int warehouseNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
+    private string LocationQuery(int firmNumber, int periodNumber, int warehouseNumber, int productReferenceId, int variantReferenceId = 0, string search = "", int skip = 0, int take = 20)
     {
         string baseQuery = $@"SELECT 
 [ReferenceId] = LOC.LOGICALREF,
@@ -119,7 +120,7 @@ public class LocationDataStore : ILocationService
 [WarehouseReferenceId] = WHOUSE.LOGICALREF,
 [WarehouseNumber] = WHOUSE.NR,
 [WarehouseName] = WHOUSE.NAME,
-[StockQuantity] = ISNULL((SELECT SUM(REMAMOUNT) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_SLTRANS AS SLTRANS WITH(NOLOCK) WHERE SLTRANS.INVENNO = WHOUSE.NR AND SLTRANS.LOCREF = LOC.LOGICALREF AND SLTRANS.ITEMREF = {productReferenceId}),0)
+[StockQuantity] = ISNULL((SELECT SUM(REMAMOUNT) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_SLTRANS AS SLTRANS WITH(NOLOCK) WHERE SLTRANS.INVENNO = WHOUSE.NR AND SLTRANS.LOCREF = LOC.LOGICALREF AND SLTRANS.ITEMREF = {productReferenceId} AND SLTRANS.VARIANTREF = {variantReferenceId}),0)
 
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_LOCATION AS LOC WITH(NOLOCK)
 LEFT JOIN L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON LOC.INVENNR = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}

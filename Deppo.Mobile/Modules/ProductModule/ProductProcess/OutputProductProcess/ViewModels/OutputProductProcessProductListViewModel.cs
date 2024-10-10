@@ -3,6 +3,7 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
+using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.VariantModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
@@ -21,7 +22,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
     private readonly IHttpClientService _httpClientService;
     private readonly IWarehouseTotalService _warehouseTotalService;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IVariantService _variantService;
+    private readonly IVariantWarehouseTotalService _variantWarehouseTotalService;
     private readonly IUserDialogs _userDialogs;
 
     [ObservableProperty]
@@ -29,7 +30,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 
     public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
     public ObservableCollection<WarehouseTotalModel> SelectedItems { get; } = new();
-    public ObservableCollection<VariantModel> ItemVariants { get; } = new();
+    public ObservableCollection<VariantWarehouseTotalModel> ItemVariants { get; } = new();
 
     [ObservableProperty]
     public ObservableCollection<OutputProductBasketModel> selectedProducts = new();
@@ -61,12 +62,12 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
         }
     }
 
-    public OutputProductProcessProductListViewModel(IHttpClientService httpClientService, IWarehouseTotalService warehouseTotalService, IServiceProvider serviceProvider, IVariantService variantService, IUserDialogs userDialogs)
+    public OutputProductProcessProductListViewModel(IHttpClientService httpClientService, IWarehouseTotalService warehouseTotalService, IServiceProvider serviceProvider, IVariantWarehouseTotalService variantWarehouseTotalService, IUserDialogs userDialogs)
     {
         _httpClientService = httpClientService;
         _warehouseTotalService = warehouseTotalService;
         _serviceProvider = serviceProvider;
-        _variantService = variantService;
+        _variantWarehouseTotalService = variantWarehouseTotalService;
         _userDialogs = userDialogs;
 
         Title = "Ürün Listesi";
@@ -76,7 +77,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
         ItemTappedCommand = new Command<WarehouseTotalModel>(async (parameter) => await ItemTappedAsync(parameter));
         LoadVariantItemsCommand = new Command(async () => await LoadVariantItemsAsync());
         LoadMoreVariantItemsCommand = new Command(async () => await LoadMoreVariantItemsAsync());
-        VariantTappedCommand = new Command<VariantModel>(async (parameter) => await VariantTappedAsync(parameter));
+        VariantTappedCommand = new Command<VariantWarehouseTotalModel>(async (parameter) => await VariantTappedAsync(parameter));
         ConfirmVariantCommand = new Command(async () => await ConfirmVariantAsync());
         ConfirmCommand = new Command(async () => await ConfirmAsync());
         PerformSearchCommand = new Command(async () => await PerformSearchAsync());
@@ -241,15 +242,17 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 
             if (item is not null)
             {
-                #region Varyantlı olma durumu
-                if (item.IsVariant)
+
+
+                if (!item.IsSelected)
                 {
-                    CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.HalfExpanded;
-                }
-                #endregion
-                else
-                {
-                    if (!item.IsSelected)
+                    if (item.IsVariant)
+                    {
+                        SelectedProduct = item;
+                        await LoadVariantItemsAsync();
+                        CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.HalfExpanded;
+                    }
+                    else
                     {
                         Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
                         SelectedProduct = item;
@@ -281,19 +284,23 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
                         };
 
                         SelectedProducts.Add(basketItem);
+                        SelectedItems.Add(item);
                     }
-                    else
+
+                  
+                }
+                else
+                {
+                    SelectedProduct = null;
+                    var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ProductReferenceId);
+                    if (selectedItem is not null)
                     {
-                        SelectedProduct = null;
-                        var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ProductReferenceId);
-                        if (selectedItem is not null)
-                        {
-                            SelectedProducts.Remove(selectedItem);
-                            Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
-                            SelectedItems.Remove(item);
-                        }
+                        SelectedProducts.Remove(selectedItem);
+                        Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
+                        SelectedItems.Remove(item);
                     }
                 }
+
             }
         }
         catch (Exception ex)
@@ -308,33 +315,24 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 
     private async Task LoadVariantItemsAsync()
     {
-        if (IsBusy)
-            return;
 
         try
         {
-            IsBusy = true;
 
             _userDialogs.Loading("Loading Variant Items");
             ItemVariants.Clear();
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _variantService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, productReferenceId: SelectedProduct.ProductReferenceId, warehouseNumber: WarehouseModel.Number, skip: 0, take: 20);
+            var result = await _variantWarehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, productReferenceId: SelectedProduct.ProductReferenceId, warehouseNumber: WarehouseModel.Number, skip: 0, take: 20);
 
             if (result.IsSuccess)
             {
-                if (result.Data is null)
+                if (result.Data == null)
                     return;
-
+                ItemVariants.Clear();
                 foreach (var variant in result.Data)
                 {
-                    var item = Mapping.Mapper.Map<Deppo.Core.Models.Variant>(variant);
-                    ItemVariants.Add(new VariantModel
-                    {
-                        Code = item.Code,
-                        Name = item.Name,
-
-                        IsSelected = false,
-                    });
+                    var obj = Mapping.Mapper.Map<VariantWarehouseTotalModel>(variant);
+                    ItemVariants.Add(obj);
                 }
             }
 
@@ -350,12 +348,13 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
         }
         finally
         {
-            IsBusy = false;
         }
     }
 
     private async Task LoadMoreVariantItemsAsync()
     {
+        if (ItemVariants.Count < 18)
+            return;
         if (IsBusy)
             return;
         try
@@ -363,23 +362,17 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _variantService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, productReferenceId: SelectedProduct.ProductReferenceId, warehouseNumber: WarehouseModel.Number, skip: ItemVariants.Count(), take: 20);
+            var result = await _variantWarehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, productReferenceId: SelectedProduct.ProductReferenceId, warehouseNumber: WarehouseModel.Number, skip: ItemVariants.Count(), take: 20);
 
             if (result.IsSuccess)
             {
-                if (result.Data is null)
+                if (result.Data == null)
                     return;
 
                 foreach (var variant in result.Data)
                 {
-                    var item = Mapping.Mapper.Map<Deppo.Core.Models.Variant>(variant);
-                    ItemVariants.Add(new VariantModel
-                    {
-                        Code = item.Code,
-                        Name = item.Name,
-
-                        IsSelected = false,
-                    });
+                    var obj = Mapping.Mapper.Map<VariantWarehouseTotalModel>(variant);
+                    ItemVariants.Add(obj);
                 }
             }
         }
@@ -396,7 +389,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
         }
     }
 
-    private async Task VariantTappedAsync(VariantModel item)
+    private async Task VariantTappedAsync(VariantWarehouseTotalModel item)
     {
         if (IsBusy)
             return;
@@ -404,8 +397,8 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            //ItemVariants.ToList().ForEach(x => x.IsSelected = false);
-            var selectedItem = ItemVariants.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
+            ItemVariants.ToList().ForEach(x => x.IsSelected = false);
+            var selectedItem = ItemVariants.FirstOrDefault(x => x.VariantReferenceId == item.VariantReferenceId);
             if (selectedItem != null)
                 selectedItem.IsSelected = true;
         }
@@ -430,9 +423,9 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
             var item = ItemVariants.FirstOrDefault(x => x.IsSelected);
             var basketItem = new OutputProductBasketModel
             {
-                ItemReferenceId = item.ReferenceId,
-                ItemCode = item.Code,
-                ItemName = item.Name,
+                ItemReferenceId = item.VariantReferenceId,
+                ItemCode = item.VariantCode,
+                ItemName = item.VariantName,
                 UnitsetReferenceId = item.UnitsetReferenceId,
                 UnitsetCode = item.UnitsetCode,
                 UnitsetName = item.UnitsetName,
@@ -446,10 +439,21 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
                 StockQuantity = item.StockQuantity,
                 Quantity = item.LocTracking == 0 ? 1 : 0,
                 TrackingType = item.TrackingType,
-                LocTracking = item.LocTracking
+                LocTracking = item.LocTracking,
+                IsVariant = true
             };
 
             SelectedProducts.Add(basketItem);
+
+            if (SelectedProduct is not null)
+            {
+                SelectedProduct.IsSelected = true;
+                SelectedItems.Add(SelectedProduct);
+
+            }
+
+            CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.Hidden;
+
         }
         catch (Exception ex)
         {
@@ -514,7 +518,6 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
             Items.Clear();
             _userDialogs.Loading("Searching Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            await Task.Delay(1000);
             var result = await _warehouseTotalService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, SearchText.Text, 0, 20);
             if (result.IsSuccess)
             {
@@ -524,7 +527,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
                 foreach (var product in result.Data)
                 {
                     var item = Mapping.Mapper.Map<WarehouseTotal>(product);
-
+                    var matchedItem = SelectedItems.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
                     Items.Add(new WarehouseTotalModel
                     {
                         ProductReferenceId = item.ProductReferenceId,
@@ -543,7 +546,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
                         IsVariant = item.IsVariant,
                         LocTracking = item.LocTracking,
                         TrackingType = item.TrackingType,
-                        IsSelected = false,
+                        IsSelected = matchedItem != null ? matchedItem.IsSelected : false,
                         LocTrackingIcon = product.LocTrackingIcon,
                         VariantIcon = product.VariantIcon,
                         TrackingTypeIcon = product.TrackingTypeIcon
