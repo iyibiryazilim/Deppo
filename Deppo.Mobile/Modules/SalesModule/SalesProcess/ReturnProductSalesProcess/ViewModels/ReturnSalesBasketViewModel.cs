@@ -235,7 +235,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProces
                 _userDialogs.ShowLoading("Yükleniyor...");
                 await Task.Delay(1000);
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, item.ItemReferenceId, string.Empty, 0, 20);
+                var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, item.ItemReferenceId,0, string.Empty, 0, 20);
                 if (result.IsSuccess)
                 {
                     if (result.Data is null)

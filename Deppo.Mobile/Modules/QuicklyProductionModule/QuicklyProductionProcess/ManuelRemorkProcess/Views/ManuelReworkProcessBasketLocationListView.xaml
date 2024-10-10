@@ -71,12 +71,11 @@
                            Placeholder="Barkod okutunuz..."
                            PlaceholderColor="{StaticResource OffBlack}"
                            TextColor="{StaticResource OffBlack}">
-                        <!--<Entry.Behaviors>
-                            <toolkit:EventToCommandBehavior
-                                Command="{Binding PerformSearchCommand}"
-                                CommandParameter="{Binding ., Source={x:Reference barcodeEntry}}"
-                                EventName="TextChanged" />
-                        </Entry.Behaviors>-->
+                        <Entry.Behaviors>
+                            <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                            CommandParameter="{Binding ., Source={x:Reference barcodeEntry}}"
+                                                            EventName="TextChanged" />
+                        </Entry.Behaviors>
                     </Entry>
 
                     <ImageButton Grid.Column="1" HeightRequest="20">
@@ -85,9 +84,9 @@
                                              Glyph="{x:Static fontAwesome:FontAwesomeIcons.MagnifyingGlassPlus}"
                                              Color="{StaticResource OffBlack}" />
                         </ImageButton.Source>
-                        <!--<ImageButton.GestureRecognizers>
+                        <ImageButton.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ShowLocationsCommand}" />
-                        </ImageButton.GestureRecognizers>-->
+                        </ImageButton.GestureRecognizers>
                     </ImageButton>
                 </Grid>
 
@@ -179,7 +178,7 @@
 
         </Grid>
 
-        <!--<dx:BottomSheet x:Name="locationBottomSheet"
+        <dx:BottomSheet x:Name="locationBottomSheet"
                         Grid.Row="1"
                         Padding="10,30,10,10"
                         AllowDismiss="False"
@@ -188,7 +187,7 @@
                         HalfExpandedRatio="0.5"
                         IsModal="True"
                         ShowGrabber="True">
-           
+
             <Grid RowDefinitions="Auto,*" RowSpacing="20">
 
                 <VerticalStackLayout Grid.Row="0" Spacing="5">
@@ -197,7 +196,7 @@
                                FontAttributes="Bold"
                                FontSize="Medium"
                                HorizontalOptions="Start"
-                               Text="{Binding WarehouseModel.Name, StringFormat='{0} Stok Yerleri'}" />
+                               Text="{Binding SelectedReworkInProductModel.InWarehouseModel.Name, StringFormat='{0} Stok Yerleri'}" />
                         <ImageButton Grid.Column="1"
                                      Command="{Binding CloseLocationsCommand}"
                                      HeightRequest="25"
@@ -228,12 +227,11 @@
                                    Placeholder="Ara..."
                                    PlaceholderColor="{StaticResource OffBlack}"
                                    TextColor="{StaticResource OffBlack}">
-                            --><!-- <SearchBar.Behaviors>
-           <toolkit:EventToCommandBehavior
-               Command="{Binding PerformSearchCommand}"
-               CommandParameter="{Binding Text, Source={x:Reference searchBar}}"
-               EventName="SearchButtonPressed" />
-       </SearchBar.Behaviors>--><!--
+                            <!--<SearchBar.Behaviors>
+                                <toolkit:EventToCommandBehavior Command="{Binding LocationsPerformSearchCommand}"
+                                                                CommandParameter="{Binding Text, Source={x:Reference searchBar}}"
+                                                                EventName="SearchButtonPressed" />
+                            </SearchBar.Behaviors>-->
                         </SearchBar>
                     </Border>
 
@@ -251,7 +249,7 @@
                                         StrokeShape="RoundRectangle 10"
                                         StrokeThickness="0.1">
                                     <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessBasketLocationListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ManuelReworkProcessBasketLocationListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
                                     </Border.GestureRecognizers>
                                     <Border.Triggers>
                                         <DataTrigger Binding="{Binding IsSelected}"
@@ -298,9 +296,7 @@
                             Text="Tamam" />
                 </Grid>
             </Grid>
-
-            
-        </dx:BottomSheet>-->
+        </dx:BottomSheet>
 
 
     </Grid>

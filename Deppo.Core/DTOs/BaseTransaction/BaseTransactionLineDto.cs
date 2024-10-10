@@ -1,11 +1,4 @@
-﻿using Deppo.Core.DTOs.SeriLotTransactionDto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Deppo.Core.DTOs.BaseTransaction;
+﻿namespace Deppo.Core.DTOs.BaseTransaction;
 
 public class BaseTransactionLineDto
 {
@@ -26,5 +19,6 @@ public class BaseTransactionLineDto
     public double? OtherConversionFactor { get; set; }
     public double? UnitPrice { get; set; } = default;
     public double? VatRate { get; set; } = default;
+    public string? VariantCode { get; set; } = string.Empty;
 }
 

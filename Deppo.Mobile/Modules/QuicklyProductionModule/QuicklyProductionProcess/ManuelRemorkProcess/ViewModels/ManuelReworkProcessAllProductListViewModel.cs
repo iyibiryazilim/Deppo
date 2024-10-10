@@ -224,11 +224,14 @@ public partial class ManuelReworkProcessAllProductListViewModel : BaseViewModel
 				{
 					ReworkInProductModel reworkInProductModel = new()
 					{
+						ReferenceId = item.ReferenceId,
 						Code = item.Code,
 						Name = item.Name,
+						MainItemCode = item.Code,
+						MainItemName = item.Name,
+						MainItemReferenceId = item.ReferenceId,
 						Image = item.Image,
 						InWarehouseModel = InWarehouseModel,
-						ReferenceId = item.ReferenceId,
 						BrandReferenceId = item.BrandReferenceId,
 						BrandCode = item.BrandCode,
 						BrandName = item.BrandName,
@@ -244,6 +247,9 @@ public partial class ManuelReworkProcessAllProductListViewModel : BaseViewModel
 						IsVariant = item.IsVariant,
 						LocTracking = item.LocTracking,
 						TrackingType = item.TrackingType,
+						VariantIcon = item.VariantIcon,
+						LocTrackingIcon = item.LocTrackingIcon,
+						TrackingTypeIcon = item.TrackingTypeIcon,
 					    InputQuantity = item.LocTracking == 0 ? 1 : 0
 					};
 

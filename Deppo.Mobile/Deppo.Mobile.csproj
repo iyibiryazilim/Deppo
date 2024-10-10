@@ -462,6 +462,15 @@
 	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\Manuel\Views\ManuelProductListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\WorkOrderReworkProcess\Views\WorkOrderReworkProcessBasketView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\WorkOrderReworkProcess\Views\WorkOrderReworkProcessFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\WorkOrderReworkProcess\Views\WorkOrderReworkProcessProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\WorkOrder\Views\WorkOrderCalcView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

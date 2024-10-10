@@ -115,9 +115,9 @@
                                     <VerticalStackLayout Grid.Column="1">
                                         <Label FontAttributes="Bold"
                                                LineBreakMode="TailTruncation"
-                                               Text="{Binding Code}" />
+                                               Text="{Binding ItemCode}" />
                                         <Label LineBreakMode="TailTruncation"
-                                               Text="{Binding Name}"
+                                               Text="{Binding ItemName}"
                                                TextColor="{StaticResource Gray600}" />
 
                                         <Label>

@@ -156,7 +156,8 @@ public partial class TransferFormViewModel : BaseViewModel
 
                 var transferTransactionLineDto = new TransferTransactionLineDto
                 {
-                    ProductCode = item.Code,
+                    ProductCode = item.IsVariant?  item.MainItemCode : item.ItemCode,
+                    VariantCode = item.IsVariant ? item.ItemCode : string.Empty,
                     WarehouseNumber = TransferBasketModel.OutWarehouse.Number,
                     DestinationWarehouseNumber = TransferBasketModel.InWarehouse.Number,
                     Quantity = item.OutputQuantity,

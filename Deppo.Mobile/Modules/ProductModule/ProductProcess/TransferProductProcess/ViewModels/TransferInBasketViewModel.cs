@@ -143,7 +143,7 @@ public partial class TransferInBasketViewModel : BaseViewModel
 			Locations.Clear();
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, TransferBasketModel.InWarehouse.Number, inProductModel.ReferenceId, string.Empty, 0, 20);
+			var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, TransferBasketModel.InWarehouse.Number, productReferenceId:inProductModel.IsVariant ?  inProductModel.MainItemReferenceId : inProductModel.ItemReferenceId, 0, string.Empty, 0, 20);
 			if (result.IsSuccess)
 			{
 				if (result.Data is not null)
@@ -180,7 +180,7 @@ public partial class TransferInBasketViewModel : BaseViewModel
 			IsBusy = true;
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, TransferBasketModel.InWarehouse.Number, SelectedInputProductModel.ReferenceId, search: string.Empty, skip: Locations.Count, take: 20);
+			var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, TransferBasketModel.InWarehouse.Number, productReferenceId: SelectedInputProductModel.IsVariant ?  SelectedInputProductModel.MainItemReferenceId : SelectedInputProductModel.ItemReferenceId, search: string.Empty, skip: Locations.Count, take: 20);
 
 			if (result.IsSuccess)
 			{

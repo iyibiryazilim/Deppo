@@ -6,6 +6,7 @@ using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.View
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.Views;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.ManuelRemorkProcess.Views;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrder.Views;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrderReworkProcess.Views;
 using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.ViewModels;
@@ -25,11 +26,13 @@ public partial class QuicklyProductionProcessViewModel : BaseViewModel
         QuicklyProductionManuelCommand = new Command(async () => await QuicklyProductionManuelAsync());
         QuicklyProductionWorkOrderCommand = new Command(async () => await QuicklyProductionWorkOrderAsync());
         ManuelReworkProcessCommand = new Command(async () => await ManuelReworkProcessAsync());
+        WorkOrderReworkProcessCommand = new Command(async () => await WorkOrderReworkProcessAsync());
     }
 
     public Command QuicklyProductionManuelCommand { get; }
     public Command QuicklyProductionWorkOrderCommand { get; }
     public Command ManuelReworkProcessCommand { get; }
+    public Command WorkOrderReworkProcessCommand { get; }
 
     public async Task QuicklyProductionManuelAsync()
     {
@@ -61,5 +64,27 @@ public partial class QuicklyProductionProcessViewModel : BaseViewModel
         {
             IsBusy = false;
         }
+	}
+
+	public async Task WorkOrderReworkProcessAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			await Shell.Current.GoToAsync($"{nameof(WorkOrderReworkProcessProductListView)}");
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
 	}
 }

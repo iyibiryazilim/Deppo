@@ -258,7 +258,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 			Locations.Clear();
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, inputProductBasketModel.ItemReferenceId, string.Empty, 0, 20);
+			var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, inputProductBasketModel.ItemReferenceId,0, string.Empty, 0, 20);
 			if (result.IsSuccess)
 			{
 				if (result.Data is not null)

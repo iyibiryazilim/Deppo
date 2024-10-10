@@ -196,11 +196,14 @@ public partial class TransferInWarehouseViewModel : BaseViewModel
                 TransferBasketModel.InProducts.Add(new InProductModel
                 {
                     ReferenceId = item.ReferenceId,
-                    Code = item.Code,
-                    Name = item.Name,
+                    ItemReferenceId = item.ItemReferenceId,
+                    ItemCode = item.ItemCode,
+                    ItemName = item.ItemName,
                     Image = item.Image,
+                    MainItemReferenceId = item.MainItemReferenceId,
+                    MainItemCode = item.MainItemCode,
+                    MainItemName = item.MainItemName,
                     OutputQuantity = item.OutputQuantity,
-                    GroupCode = item.GroupCode,
                     IsVariant = item.IsVariant,
                     LocTracking = item.LocTracking,
                     StockQuantity = item.StockQuantity,
@@ -210,15 +213,10 @@ public partial class TransferInWarehouseViewModel : BaseViewModel
                     UnitsetReferenceId = item.UnitsetReferenceId,
                     UnitsetCode = item.UnitsetCode,
                     UnitsetName = item.UnitsetName,
-                    VatRate = item.VatRate,
                     LocTrackingIcon = item.LocTrackingIcon,
                     TrackingType = item.TrackingType,
                     TrackingTypeIcon = item.TrackingTypeIcon,
-                    Unitset = item.Unitset,
                     VariantIcon = item.VariantIcon,
-                    BrandReferenceId = item.BrandReferenceId,
-                    BrandCode = item.BrandCode,
-                    BrandName = item.BrandName,
                 });
 
 			}

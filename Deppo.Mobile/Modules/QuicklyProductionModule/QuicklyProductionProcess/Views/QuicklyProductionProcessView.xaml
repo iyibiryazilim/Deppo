@@ -204,6 +204,57 @@
                             </Border>
                         </Grid>
                     </Border>
+                    <Border Grid.Row="1"
+                            Padding="5"
+                            HeightRequest="60"
+                            StrokeShape="RoundRectangle 5"
+                            StrokeThickness="0.2">
+                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
+                            <Grid Grid.Column="0"
+                                  ColumnDefinitions="Auto,*"
+                                  ColumnSpacing="10">
+                                <Border Padding="5"
+                                        BackgroundColor="{StaticResource Secondary}"
+                                        Stroke="{StaticResource Secondary}"
+                                        StrokeShape="RoundRectangle 5"
+                                        WidthRequest="45">
+                                    <Label FontFamily="FAS"
+                                           FontSize="24"
+                                           HorizontalOptions="Center"
+                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Calculator}"
+                                           TextColor="{StaticResource White}"
+                                           VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                    <Label Margin="0,3,0,0"
+                                           FontAttributes="Bold"
+                                           FontSize="Subtitle"
+                                           Text="İş Emrine Bağlı Rework"
+                                           TextColor="{StaticResource Gray500}"
+                                           VerticalOptions="Center" />
+                                    <Label Text="Lorem Ipsum..."
+                                           TextColor="{StaticResource Gray400}"
+                                           VerticalOptions="End" />
+                                </VerticalStackLayout>
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding WorkOrderReworkProcessCommand}" />
+                                </Grid.GestureRecognizers>
+                            </Grid>
+
+                            <Border Grid.Column="1" StrokeThickness="0">
+                                <toolkit:AvatarView Padding="2"
+                                                    BorderColor="{StaticResource Primary}"
+                                                    CornerRadius="15"
+                                                    FontFamily="FAS"
+                                                    FontSize="14"
+                                                    HeightRequest="30"
+                                                    HorizontalOptions="End"
+                                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
+                                                    TextColor="{StaticResource Primary}"
+                                                    WidthRequest="30" />
+                            </Border>
+                        </Grid>
+                    </Border>
                 </Grid>
             </VerticalStackLayout>
         </Grid>

@@ -89,6 +89,8 @@ using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.View
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Views;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrder.ViewModels;
 using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrder.Views;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrderReworkProcess.ViewModels;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrderReworkProcess.Views;
 using Deppo.Mobile.Modules.ResultModule.ViewModels;
 using Deppo.Mobile.Modules.ResultModule.Views;
 using Deppo.Mobile.Modules.SalesModule.CustomerMenu.ViewModels;
@@ -298,6 +300,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<ICountingPanelService, CountingPanelDataStore>();
         builder.Services.AddSingleton<IQuicklyProductionPanelService, QuicklyProductionPanelDataStore>();
         builder.Services.AddSingleton<IProductDetailActionService, ProductDetailActionDataStore>();
+        builder.Services.AddSingleton<IVariantWarehouseTotalService, VariantWarehouseTotalDataStore>();
 
         builder.Services.AddSingleton<IBarcodeSearchService, BarcodeSearchDataStore>();
 
@@ -630,7 +633,14 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddScopedWithShellRoute<ManuelReworkProcessAllProductListView, ManuelReworkProcessAllProductListViewModel>(nameof(ManuelReworkProcessAllProductListView));
         builder.Services.AddScopedWithShellRoute<ManuelReworkProcessFormView, ManuelReworkProcessFormViewModel>(nameof(ManuelReworkProcessFormView));
 
-        #endregion Manuel Rework
+        #endregion
+
+        #region Work Order Rework
+        builder.Services.AddScopedWithShellRoute<WorkOrderReworkProcessProductListView, WorkOrderReworkProcessProductListViewModel>(nameof(WorkOrderReworkProcessProductListView));
+  	  	builder.Services.AddScopedWithShellRoute<WorkOrderReworkProcessBasketView, WorkOrderReworkProcessBasketViewModel>(nameof(WorkOrderReworkProcessBasketView));
+	  	  builder.Services.AddScopedWithShellRoute<WorkOrderReworkProcessFormView, WorkOrderReworkProcessFormViewModel>(nameof(WorkOrderReworkProcessFormView));
+		   #endregion
+
 
         #endregion Quickly Production Modules
 
