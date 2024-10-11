@@ -17,296 +17,290 @@ using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.ManuelRemorkProcess.ViewModels;
 
-
 [QueryProperty(name: nameof(InWarehouseModel), queryId: nameof(InWarehouseModel))]
 public partial class ManuelReworkProcessAllProductListViewModel : BaseViewModel
 {
-	private readonly IProductService _productService;
-	private readonly IHttpClientService _httpClientService;
-	private readonly IServiceProvider _serviceProvider;
-	private readonly IUserDialogs _userDialogs;
+    private readonly IProductService _productService;
+    private readonly IHttpClientService _httpClientService;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly IUserDialogs _userDialogs;
 
+    [ObservableProperty]
+    private WarehouseModel inWarehouseModel = null!;
 
-	[ObservableProperty]
-	WarehouseModel inWarehouseModel = null!;
+    public ObservableCollection<ProductModel> Items { get; } = new();
 
-	public ObservableCollection<ProductModel> Items { get; } = new();
+    public ObservableCollection<ProductModel> SelectedItems { get; } = new();
 
-	public ObservableCollection<ProductModel> SelectedItems { get; } = new();
+    [ObservableProperty]
+    private ProductModel? selectedItem;
 
-	[ObservableProperty]
-	ProductModel? selectedItem;
+    public ManuelReworkProcessAllProductListViewModel(IProductService productService, IHttpClientService httpClientService, IServiceProvider serviceProvider, IUserDialogs userDialogs)
+    {
+        _productService = productService;
+        _httpClientService = httpClientService;
+        _serviceProvider = serviceProvider;
+        _userDialogs = userDialogs;
 
-	public ManuelReworkProcessAllProductListViewModel(IProductService productService, IHttpClientService httpClientService, IServiceProvider serviceProvider, IUserDialogs userDialogs)
-	{
-		_productService = productService;
-		_httpClientService = httpClientService;
-		_serviceProvider = serviceProvider;
-		_userDialogs = userDialogs;
+        Title = "Giriş Ürün Listesi";
 
-		Title = "Giriş Ürün Listesi";
+        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+        LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+        ItemTappedCommand = new Command<ProductModel>(async (x) => await ItemTappedAsync(x));
+        ConfirmCommand = new Command(async () => await ConfirmAsync());
+        BackCommand = new Command(async () => await BackAsync());
+    }
 
-		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
-		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-		ItemTappedCommand = new Command<ProductModel>(async (x) => await ItemTappedAsync(x));
-		ConfirmCommand = new Command(async () => await ConfirmAsync());
-		BackCommand = new Command(async () => await BackAsync());
-	}
+    public Page CurrentPage { get; set; } = null!;
 
-	public Page CurrentPage { get; set; } = null!;
+    public Command LoadItemsCommand { get; }
+    public Command LoadMoreItemsCommand { get; }
+    public Command ItemTappedCommand { get; }
+    public Command ConfirmCommand { get; }
+    public Command BackCommand { get; }
 
-	public Command LoadItemsCommand { get; }
-	public Command LoadMoreItemsCommand { get; }
-	public Command ItemTappedCommand { get; }
-	public Command ConfirmCommand { get; }
-	public Command BackCommand { get; }
+    private async Task LoadItemsAsync()
+    {
+        if (IsBusy)
+            return;
 
-	private async Task LoadItemsAsync()
-	{
-		if (IsBusy)
-			return;
+        try
+        {
+            IsBusy = true;
 
-		try
-		{
-			IsBusy = true;
+            _userDialogs.ShowLoading("Loading...");
+            await Task.Delay(1000);
+            Items.Clear();
 
-			_userDialogs.ShowLoading("Loading...");
-			await Task.Delay(1000);
-			Items.Clear();
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _productService.GetObjects(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                search: string.Empty,
+                skip: 0,
+                take: 20
+            );
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
 
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _productService.GetObjects(
-				httpClient: httpClient,
-				firmNumber: _httpClientService.FirmNumber,
-				periodNumber: _httpClientService.PeriodNumber,
-				search: string.Empty,
-				skip: 0,
-				take: 20
-			);
-			if (result.IsSuccess)
-			{
-				if (result.Data is null)
-					return;
+                foreach (var item in result.Data)
+                {
+                    Items.Add(Mapping.Mapper.Map<ProductModel>(item));
+                }
+            }
 
-				foreach (var item in result.Data)
-				{
-					Items.Add(Mapping.Mapper.Map<ProductModel>(item));
-				}
-			}
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-			if(_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+    private async Task LoadMoreItemsAsync()
+    {
+        if (IsBusy)
+            return;
 
-		}
-		catch (Exception ex)
-		{
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+        try
+        {
+            IsBusy = true;
 
-	private async Task LoadMoreItemsAsync()
-	{
-		if (IsBusy)
-			return;
+            _userDialogs.ShowLoading("Loading More Items...");
 
-		try
-		{
-			IsBusy = true;
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _productService.GetObjects(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                search: string.Empty,
+                skip: Items.Count,
+                take: 20
+            );
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
 
-			_userDialogs.ShowLoading("Loading More Items...");
-			
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _productService.GetObjects(
-				httpClient: httpClient,
-				firmNumber: _httpClientService.FirmNumber,
-				periodNumber: _httpClientService.PeriodNumber,
-				search: string.Empty,
-				skip: Items.Count,
-				take: 20
-			);
-			if (result.IsSuccess)
-			{
-				if (result.Data is null)
-					return;
+                foreach (var item in result.Data)
+                {
+                    Items.Add(Mapping.Mapper.Map<ProductModel>(item));
+                }
+            }
 
-				foreach (var item in result.Data)
-				{
-					Items.Add(Mapping.Mapper.Map<ProductModel>(item));
-				}
-			}
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+    private async Task ItemTappedAsync(ProductModel item)
+    {
+        if (item is null)
+            return;
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
 
-		}
-		catch (Exception ex)
-		{
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+            SelectedItem = item;
 
-	private async Task ItemTappedAsync(ProductModel item)
-	{
-		if (item is null)
-			return;
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
+            if (SelectedItem.IsSelected)
+            {
+                SelectedItems.Remove(SelectedItem);
+                SelectedItem.IsSelected = false;
+                SelectedItem = null;
+            }
+            else
+            {
+                if (SelectedItem.IsVariant)
+                {
+                    // Variant logic comes here
+                }
+                else
+                {
+                    SelectedItem.IsSelected = true;
+                    SelectedItems.Add(SelectedItem);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			SelectedItem = item;
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-			if(SelectedItem.IsSelected)
-			{
-				SelectedItems.Remove(SelectedItem);
-				SelectedItem.IsSelected = false;
-				SelectedItem = null;
-			}
-			else
-			{
-				if(SelectedItem.IsVariant)
-				{
-					// Variant logic comes here
-				}
-				else
-				{
-					SelectedItem.IsSelected = true;
-					SelectedItems.Add(SelectedItem);
-				}
-			}
-			
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+    private async Task ConfirmAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
 
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;		
-		}
-	}
+            if (SelectedItems.Count == 0)
+            {
+                await _userDialogs.AlertAsync("Lütfen en az bir ürün seçiniz.", "Uyarı", "Tamam");
+                return;
+            }
+            else
+            {
+                var confirm = await _userDialogs.ConfirmAsync("Seçtiğiniz ürünler sepete eklenecektir. Devam etmek istiyor musunuz?", "Bilgilendirme", "Evet", "Hayır");
+                if (!confirm)
+                    return;
 
-	private async Task ConfirmAsync()
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
+                var basketViewModel = _serviceProvider.GetRequiredService<ManuelReworkProcessBasketViewModel>();
+                _userDialogs.Loading("Seçilen ürünler sepete ekleniyor.");
 
-			if(SelectedItems.Count == 0)
-			{
-				await _userDialogs.AlertAsync("Lütfen en az bir ürün seçiniz.", "Uyarı", "Tamam");
-				return;
-			}
-			else
-			{
-				var confirm = await _userDialogs.ConfirmAsync("Seçtiğiniz ürünler sepete eklenecektir. Devam etmek istiyor musunuz?", "Bilgilendirme", "Evet", "Hayır");
-				if (!confirm)
-					return;
+                foreach (var item in SelectedItems)
+                {
+                    ReworkInProductModel reworkInProductModel = new()
+                    {
+                        ReferenceId = item.ReferenceId,
+                        Code = item.Code,
+                        Name = item.Name,
+                        MainItemCode = item.Code,
+                        MainItemName = item.Name,
+                        MainItemReferenceId = item.ReferenceId,
+                        Image = item.ImageData,
+                        InWarehouseModel = InWarehouseModel,
+                        BrandReferenceId = item.BrandReferenceId,
+                        BrandCode = item.BrandCode,
+                        BrandName = item.BrandName,
+                        GroupCode = item.GroupCode,
+                        UnitsetReferenceId = item.UnitsetReferenceId,
+                        UnitsetCode = item.UnitsetCode,
+                        UnitsetName = item.UnitsetName,
+                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                        SubUnitsetCode = item.SubUnitsetCode,
+                        SubUnitsetName = item.SubUnitsetName,
+                        StockQuantity = item.StockQuantity,
+                        VatRate = item.VatRate,
+                        IsVariant = item.IsVariant,
+                        LocTracking = item.LocTracking,
+                        TrackingType = item.TrackingType,
+                        VariantIcon = item.VariantIcon,
+                        LocTrackingIcon = item.LocTrackingIcon,
+                        TrackingTypeIcon = item.TrackingTypeIcon,
+                        InputQuantity = item.LocTracking == 0 ? 1 : 0
+                    };
 
-				var basketViewModel = _serviceProvider.GetRequiredService<ManuelReworkProcessBasketViewModel>();
-				_userDialogs.Loading("Seçilen ürünler sepete ekleniyor.");
+                    basketViewModel.ReworkBasketModel.ReworkInProducts.Add(reworkInProductModel);
+                }
 
-				foreach(var item in SelectedItems)
-				{
-					ReworkInProductModel reworkInProductModel = new()
-					{
-						ReferenceId = item.ReferenceId,
-						Code = item.Code,
-						Name = item.Name,
-						MainItemCode = item.Code,
-						MainItemName = item.Name,
-						MainItemReferenceId = item.ReferenceId,
-						Image = item.Image,
-						InWarehouseModel = InWarehouseModel,
-						BrandReferenceId = item.BrandReferenceId,
-						BrandCode = item.BrandCode,
-						BrandName = item.BrandName,
-						GroupCode = item.GroupCode,
-						UnitsetReferenceId = item.UnitsetReferenceId,
-						UnitsetCode = item.UnitsetCode,
-						UnitsetName = item.UnitsetName,
-						SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-						SubUnitsetCode = item.SubUnitsetCode,
-						SubUnitsetName = item.SubUnitsetName,
-						StockQuantity = item.StockQuantity,
-						VatRate = item.VatRate,
-						IsVariant = item.IsVariant,
-						LocTracking = item.LocTracking,
-						TrackingType = item.TrackingType,
-						VariantIcon = item.VariantIcon,
-						LocTrackingIcon = item.LocTrackingIcon,
-						TrackingTypeIcon = item.TrackingTypeIcon,
-					    InputQuantity = item.LocTracking == 0 ? 1 : 0
-					};
+                SelectedItems.ForEach(x => x.IsSelected = false);
+                SelectedItems.Clear();
 
-					basketViewModel.ReworkBasketModel.ReworkInProducts.Add(reworkInProductModel);
-				}
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+                await Shell.Current.GoToAsync("../..");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-				SelectedItems.ForEach(x => x.IsSelected = false);
-				SelectedItems.Clear();
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-				if (_userDialogs.IsHudShowing)
-					_userDialogs.HideHud();
-				await Shell.Current.GoToAsync("../..");
-			}
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
 
-		}
-		catch (Exception ex)
-		{
-			if(_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+            if (SelectedItems.Count > 0)
+            {
+                var confirm = await _userDialogs.ConfirmAsync("Seçtiğiniz ürünler silinecektir. Devam etmek istiyor musunuz?", "Bilgilendirme", "Evet", "Hayır");
+                if (!confirm)
+                    return;
 
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+                SelectedItems.ForEach(x => x.IsSelected = false);
+                SelectedItems.Clear();
+            }
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-	private async Task BackAsync()
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
-
-			if(SelectedItems.Count > 0)
-			{
-				var confirm = await _userDialogs.ConfirmAsync("Seçtiğiniz ürünler silinecektir. Devam etmek istiyor musunuz?", "Bilgilendirme", "Evet", "Hayır");
-				if (!confirm)
-					return;
-
-				SelectedItems.ForEach(x => x.IsSelected = false);
-				SelectedItems.Clear();
-			}
-			await Shell.Current.GoToAsync("..");
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
-
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 }

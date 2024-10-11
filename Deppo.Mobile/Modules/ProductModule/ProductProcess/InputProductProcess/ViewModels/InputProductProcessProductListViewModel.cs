@@ -106,6 +106,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
 
     [ObservableProperty]
     public SearchBar searchText;
+
     private async Task LoadItemsAsync()
     {
         if (IsBusy)
@@ -175,7 +176,6 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
 
     private async Task LoadMoreItemsAsync()
     {
-
         if (IsBusy)
             return;
         if (Items.Count < 18)
@@ -252,11 +252,8 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
 
             if (item is not null)
             {
-
-
                 if (!item.IsSelected)
                 {
-
                     if (item.IsVariant)
                     {
                         SelectedProduct = item;
@@ -294,14 +291,13 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                             IsVariant = item.IsVariant,
                             VariantIcon = item.VariantIcon,
                             LocTrackingIcon = item.LocTrackingIcon,
-                            TrackingTypeIcon = item.TrackingTypeIcon
+                            TrackingTypeIcon = item.TrackingTypeIcon,
+                            Image = item.ImageData,
                         };
 
                         SelectedProducts.Add(basketItem);
                         SelectedItems.Add(item);
                     }
-
-                   
                 }
                 else
                 {
@@ -314,9 +310,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                         SelectedItems.Remove(item);
                     }
                 }
-
             }
-
         }
         catch (Exception ex)
         {
@@ -351,10 +345,8 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
 
     private async Task LoadVariantItemsAsync(ProductModel item)
     {
-
         try
         {
-
             _userDialogs.Loading("Loading Variant Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _variantService
@@ -396,7 +388,6 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
 
         try
         {
-
             IsBusy = true;
 
             _userDialogs.Loading("Loading More Variant Items...");
@@ -445,8 +436,6 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
             var selectedItem = ItemVariants.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
             if (selectedItem != null)
                 selectedItem.IsSelected = true;
-
-            
         }
         catch (Exception ex)
         {
@@ -469,8 +458,6 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
 
             var item = ItemVariants.FirstOrDefault(x => x.IsSelected);
 
-           
-
             var basketItem = new InputProductBasketModel
             {
                 ItemReferenceId = item.ReferenceId,
@@ -491,6 +478,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                 TrackingType = item.TrackingType,
                 IsVariant = true,
                 LocTracking = item.LocTracking,
+                //Image = item.Image
             };
 
             SelectedProducts.Add(basketItem);
@@ -499,7 +487,6 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
             {
                 SelectedProduct.IsSelected = true;
                 SelectedItems.Add(SelectedProduct);
-
             }
 
             CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.Hidden;
@@ -615,15 +602,11 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                         IsVariant = item.IsVariant,
                         IsSelected = matchedItem != null ? matchedItem.IsSelected : false
                     });
-
-
                 }
             }
 
             _userDialogs.Loading().Hide();
-
         }
-
         catch (Exception ex)
         {
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -633,7 +616,6 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
 
     private async Task PerformEmptySearchAsync()
     {

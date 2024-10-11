@@ -51,13 +51,13 @@
                                  Spacing="10"
                                  VerticalOptions="Start">
                 <!--#region Image-->
-                <Border BackgroundColor="{StaticResource Secondary}"
-                        HeightRequest="100"
-                        StrokeShape="RoundRectangle 50"
+                <Border HeightRequest="100"
+                        StrokeShape="RoundRectangle 10"
                         StrokeThickness="0"
                         VerticalOptions="Center"
-                        WidthRequest="100">
-                    <Image Source="{Binding ProductDetailModel.Product.Image, Converter={StaticResource ByteArrayToImageSourceConverter}}" />
+                        WidthRequest="150">
+                    <Image Aspect="AspectFill"
+                           Source="{Binding ProductDetailModel.Product.ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}" />
                 </Border>
                 <!--#endregion-->
 
@@ -502,13 +502,13 @@
                                             <Border Padding="5"
                                                     WidthRequest="30"
                                                     Stroke="{StaticResource Primary}"
-                                                    BackgroundColor="{StaticResource White}"
+                                                    BackgroundColor="{StaticResource Primary}"
                                                     StrokeShape="RoundRectangle 4">
                                                 <Label HorizontalOptions="Center"
                                                        FontFamily="FAS"
                                                        FontSize="Medium"
                                                        Text="{x:Static fontAwesome:FontAwesomeIcons.RulerHorizontal}"
-                                                       TextColor="{StaticResource Primary}"
+                                                       TextColor="{StaticResource White}"
                                                        VerticalOptions="Center" />
                                             </Border>
                                             <Label VerticalOptions="Center"
@@ -593,13 +593,13 @@
                                             <Border Padding="5"
                                                     WidthRequest="30"
                                                     Stroke="{StaticResource Primary}"
-                                                    BackgroundColor="{StaticResource White}"
+                                                    BackgroundColor="{StaticResource Primary}"
                                                     StrokeShape="RoundRectangle 4">
                                                 <Label HorizontalOptions="Center"
                                                        FontFamily="FAS"
                                                        FontSize="Medium"
                                                        Text="{x:Static fontAwesome:FontAwesomeIcons.RulerVertical}"
-                                                       TextColor="{StaticResource Primary}"
+                                                       TextColor="{StaticResource White}"
                                                        VerticalOptions="Center" />
                                             </Border>
                                             <Label VerticalOptions="Center"
@@ -684,13 +684,13 @@
                                             <Border Padding="5"
                                                     WidthRequest="30"
                                                     Stroke="{StaticResource Primary}"
-                                                    BackgroundColor="{StaticResource White}"
+                                                    BackgroundColor="{StaticResource Primary}"
                                                     StrokeShape="RoundRectangle 4">
                                                 <Label HorizontalOptions="Center"
                                                        FontFamily="FAS"
                                                        FontSize="Medium"
                                                        Text="{x:Static fontAwesome:FontAwesomeIcons.RulerVertical}"
-                                                       TextColor="{StaticResource Primary}"
+                                                       TextColor="{StaticResource White}"
                                                        VerticalOptions="Center" />
                                             </Border>
                                             <Label VerticalOptions="Center"
@@ -775,13 +775,13 @@
                                             <Border Padding="5"
                                                     WidthRequest="30"
                                                     Stroke="{StaticResource Primary}"
-                                                    BackgroundColor="{StaticResource White}"
+                                                    BackgroundColor="{StaticResource Primary}"
                                                     StrokeShape="RoundRectangle 4">
                                                 <Label HorizontalOptions="Center"
                                                        FontFamily="FAS"
                                                        FontSize="Medium"
                                                        Text="{x:Static fontAwesome:FontAwesomeIcons.WeightHanging}"
-                                                       TextColor="{StaticResource Primary}"
+                                                       TextColor="{StaticResource White}"
                                                        VerticalOptions="Center" />
                                             </Border>
                                             <Label VerticalOptions="Center"
@@ -866,13 +866,13 @@
                                             <Border Padding="5"
                                                     WidthRequest="30"
                                                     Stroke="{StaticResource Primary}"
-                                                    BackgroundColor="{StaticResource White}"
+                                                    BackgroundColor="{StaticResource Primary}"
                                                     StrokeShape="RoundRectangle 4">
                                                 <Label HorizontalOptions="Center"
                                                        FontFamily="FAS"
                                                        FontSize="Medium"
                                                        Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
-                                                       TextColor="{StaticResource Primary}"
+                                                       TextColor="{StaticResource White}"
                                                        VerticalOptions="Center" />
                                             </Border>
                                             <Label VerticalOptions="Center"
@@ -949,7 +949,8 @@
                                 </Border>
                             </VerticalStackLayout>
                             <Button Grid.Row="2"
-                                    Text="Onayla"></Button>
+                                    Text="Güncelle"
+                                    IsVisible="{Binding IsEdit}"></Button>
                         </Grid>
                     </dx:BottomSheet>
                     <dx:BottomSheet x:Name="ficheTransactionBottomSheet"

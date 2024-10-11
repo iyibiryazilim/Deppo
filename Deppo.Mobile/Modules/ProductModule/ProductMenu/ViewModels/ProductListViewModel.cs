@@ -58,7 +58,6 @@ public partial class ProductListViewModel : BaseViewModel
             _userDialogs.Loading("Loading Items...");
             await Task.Delay(1000);
 
-
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, 0, 20);
             if (result.IsSuccess)
@@ -74,10 +73,9 @@ public partial class ProductListViewModel : BaseViewModel
             else
             {
                 if (_userDialogs.IsHudShowing)
-					_userDialogs.HideHud();
+                    _userDialogs.HideHud();
 
-				_userDialogs.Alert(message: result.Message, title: "Load Items");
-
+                _userDialogs.Alert(message: result.Message, title: "Load Items");
             }
         }
         catch (Exception ex)
@@ -125,7 +123,6 @@ public partial class ProductListViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-
             if (_userDialogs.IsHudShowing)
                 _userDialogs.Loading().Hide();
 
@@ -163,7 +160,10 @@ public partial class ProductListViewModel : BaseViewModel
 
             Items.Clear();
             foreach (var item in result.Data)
-                Items.Add(Mapping.Mapper.Map<Product>(item));
+            {
+                var itm = Mapping.Mapper.Map<Product>(item);
+                Items.Add(itm);
+            }
         }
         catch (System.Exception ex)
         {
@@ -177,12 +177,11 @@ public partial class ProductListViewModel : BaseViewModel
 
     private async Task PerformEmptySearchAsync()
     {
-		if (string.IsNullOrWhiteSpace(SearchText.Text))
-		{
-			await PerformSearchAsync();
-		}
-	}
-
+        if (string.IsNullOrWhiteSpace(SearchText.Text))
+        {
+            await PerformSearchAsync();
+        }
+    }
 
     private async Task ItemTappedAsync(Product product)
     {
@@ -199,13 +198,10 @@ public partial class ProductListViewModel : BaseViewModel
             ProductDetailModel productDetailModel = new();
             productDetailModel.Product = product;
 
-
-
             await Shell.Current.GoToAsync($"{nameof(ProductDetailView)}", new Dictionary<string, object>
             {
                 [nameof(ProductDetailModel)] = productDetailModel
             });
-
         }
         catch (Exception ex)
         {
@@ -215,8 +211,5 @@ public partial class ProductListViewModel : BaseViewModel
         {
             IsBusy = false;
         }
-
-
     }
-
 }
