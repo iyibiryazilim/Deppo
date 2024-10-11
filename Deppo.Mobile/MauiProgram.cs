@@ -329,6 +329,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IWarehouseOutputTransactionService, WarehouseOutputTransactionDataStore>();
         builder.Services.AddSingleton<IWarehouseDetailActionService, WarehouseDetailActionDataStore>();
         builder.Services.AddSingleton<IProcurementByCustomerService, ProcurementByCustomerDataStore>();
+        builder.Services.AddSingleton<IProcurementByCustomerProductService, ProcurementByCustomerProductDataStore>();
 
         #region Analysis Modules
 
@@ -490,6 +491,7 @@ public static class MauiProgram
         #region Müşteriye Göre Ürün Toplama
         builder.Services.AddTransientWithShellRoute<ProcurementByCustomerWarehouseListView, ProcurementByCustomerWarehouseListViewModel>(nameof(ProcurementByCustomerWarehouseListView));
         builder.Services.AddScopedWithShellRoute<ProcurementByCustomerListView, ProcurementByCustomerListViewModel>(nameof(ProcurementByCustomerListView));
+        builder.Services.AddScopedWithShellRoute<ProcurementByCustomerProductListView, ProcurementByCustomerProductListViewModel>(nameof(ProcurementByCustomerProductListView));
         #endregion
 
         #region Malzemeye Göre Ürün Toplama
