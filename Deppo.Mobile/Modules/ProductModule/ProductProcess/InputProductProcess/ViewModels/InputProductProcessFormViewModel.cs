@@ -329,7 +329,15 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
 			resultModel.IsSuccess = true;
 			resultModel.PageCountToBack = 4;
 
-			if (_userDialogs.IsHudShowing)
+			var viewModel= _serviceProvider.GetRequiredService<InputProductProcessBasketLocationListViewModel>();
+			viewModel.SelectedItems.Clear();
+			viewModel.Items.Clear();
+            foreach (var item in Items)
+			{
+				item.Details.Clear();
+			}
+
+            if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
