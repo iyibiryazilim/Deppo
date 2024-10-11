@@ -506,7 +506,8 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 		{
 			var wholeSalesDispatchTransactionLineDto = new WholeSalesDispatchTransactionLineInsert
 			{
-				ProductCode = item.ItemCode,
+				ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
+				VariantCode = item.IsVariant ? item.ItemCode : string.Empty,
 				WarehouseNumber = (short?)WarehouseModel.Number,
 				Quantity = item.Quantity,
 				ConversionFactor = 1,
@@ -606,7 +607,8 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 		{
 			var retailSalesDispatchTransactionLineDto = new RetailSalesDispatchTransactionLineInsert
 			{
-				ProductCode = item.ItemCode,
+				ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
+				VariantCode = item.IsVariant ? item.ItemCode : string.Empty,
 				WarehouseNumber = (short?)WarehouseModel.Number,
 				Quantity = item.Quantity,
 				ConversionFactor = 1,
