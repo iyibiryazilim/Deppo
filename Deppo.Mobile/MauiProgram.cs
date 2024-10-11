@@ -103,6 +103,11 @@ using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProce
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.ViewModels;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.ViewModels;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByLocationProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByProductProcess.ViewModels;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByProductProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.ViewModels;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.ViewModels;
@@ -323,6 +328,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IWarehouseInputTransactionService, WarehouseInputTransactionDataStore>();
         builder.Services.AddSingleton<IWarehouseOutputTransactionService, WarehouseOutputTransactionDataStore>();
         builder.Services.AddSingleton<IWarehouseDetailActionService, WarehouseDetailActionDataStore>();
+        builder.Services.AddSingleton<IProcurementByCustomerService, ProcurementByCustomerDataStore>();
 
         #region Analysis Modules
 
@@ -481,6 +487,20 @@ public static class MauiProgram
 
         #endregion İrsaliyeye Bağlı Satış İade İşlemleri
 
+        #region Müşteriye Göre Ürün Toplama
+        builder.Services.AddTransientWithShellRoute<ProcurementByCustomerWarehouseListView, ProcurementByCustomerWarehouseListViewModel>(nameof(ProcurementByCustomerWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<ProcurementByCustomerListView, ProcurementByCustomerListViewModel>(nameof(ProcurementByCustomerListView));
+        #endregion
+
+        #region Malzemeye Göre Ürün Toplama
+        builder.Services.AddTransientWithShellRoute<ProcurementByProductWarehouseListView, ProcurementByProductWarehouseListViewModel>(nameof(ProcurementByProductWarehouseListView));
+        #endregion
+
+        #region Stok Yerine (Rafa) Göre Ürün Toplama
+        builder.Services.AddTransientWithShellRoute<ProcurementByLocationWarehouseListView, ProcurementByCustomerWarehouseListViewModel>(nameof(ProcurementByLocationWarehouseListView));
+        #endregion
+
+
         #endregion Sales Modules
 
         #region Purchase Modules
@@ -637,9 +657,9 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
 
         #region Work Order Rework
         builder.Services.AddScopedWithShellRoute<WorkOrderReworkProcessProductListView, WorkOrderReworkProcessProductListViewModel>(nameof(WorkOrderReworkProcessProductListView));
-  	  	builder.Services.AddScopedWithShellRoute<WorkOrderReworkProcessBasketView, WorkOrderReworkProcessBasketViewModel>(nameof(WorkOrderReworkProcessBasketView));
-	  	  builder.Services.AddScopedWithShellRoute<WorkOrderReworkProcessFormView, WorkOrderReworkProcessFormViewModel>(nameof(WorkOrderReworkProcessFormView));
-		   #endregion
+        builder.Services.AddScopedWithShellRoute<WorkOrderReworkProcessBasketView, WorkOrderReworkProcessBasketViewModel>(nameof(WorkOrderReworkProcessBasketView));
+        builder.Services.AddScopedWithShellRoute<WorkOrderReworkProcessFormView, WorkOrderReworkProcessFormViewModel>(nameof(WorkOrderReworkProcessFormView));
+        #endregion
 
 
         #endregion Quickly Production Modules

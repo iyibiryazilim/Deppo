@@ -16,6 +16,7 @@ public class Warehouse : INotifyPropertyChanged, IDisposable
     private string _city = string.Empty;
     private string _country = string.Empty;
     private double _quantity;
+    private int _locationCount;
 
     public Warehouse()
     {
@@ -57,25 +58,25 @@ public class Warehouse : INotifyPropertyChanged, IDisposable
     }
 
     public string City
-	{
-		get => _city;
-		set
-		{
-			if (_city == value) return;
-			_city = value;
-			NotifyPropertyChanged();
-		}
-	}
+    {
+        get => _city;
+        set
+        {
+            if (_city == value) return;
+            _city = value;
+            NotifyPropertyChanged();
+        }
+    }
 
     public string Country
     {
         get => _country;
         set
-		{
-			if (_country == value) return;
-			_country = value;
-			NotifyPropertyChanged();
-		}
+        {
+            if (_country == value) return;
+            _country = value;
+            NotifyPropertyChanged();
+        }
     }
 
     public double Quantity
@@ -85,6 +86,17 @@ public class Warehouse : INotifyPropertyChanged, IDisposable
         {
             if (_quantity == value) return;
             _quantity = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public int LocationCount
+    {
+        get => _locationCount;
+        set
+        {
+            if (_locationCount == value) return;
+            _locationCount = value;
             NotifyPropertyChanged();
         }
     }
