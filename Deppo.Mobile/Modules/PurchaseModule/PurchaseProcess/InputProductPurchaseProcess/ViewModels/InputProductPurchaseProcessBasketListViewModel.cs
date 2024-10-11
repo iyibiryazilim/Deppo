@@ -203,7 +203,7 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
             _userDialogs.ShowLoading("Yükleniyor...");
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, item.ItemReferenceId,0, string.Empty, 0, 20);
+            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, item.ItemReferenceId, 0, string.Empty, 0, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is null)
@@ -323,7 +323,7 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
                 return;
             }
 
-            await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessOtherProductListView)}", new Dictionary<string, object>
+            await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseProcessFormView)}", new Dictionary<string, object>
             {
                 [nameof(WarehouseModel)] = WarehouseModel,
                 [nameof(Items)] = Items,
@@ -378,19 +378,18 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
         {
             IsBusy = true;
 
-			await Shell.Current.GoToAsync($"{nameof(CameraReaderView)}", new Dictionary<string, object>
-			{
-				["ComingPage"] = "InputProductPurchaseProcessBasket"
-			});
-
-		}
+            await Shell.Current.GoToAsync($"{nameof(CameraReaderView)}", new Dictionary<string, object>
+            {
+                ["ComingPage"] = "InputProductPurchaseProcessBasket"
+            });
+        }
         catch (Exception ex)
         {
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
-		}
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
         finally
         {
             IsBusy = false;

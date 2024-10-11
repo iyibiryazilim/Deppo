@@ -1,4 +1,4 @@
-﻿using AndroidX.Lifecycle;
+using AndroidX.Lifecycle;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.BaseModels;

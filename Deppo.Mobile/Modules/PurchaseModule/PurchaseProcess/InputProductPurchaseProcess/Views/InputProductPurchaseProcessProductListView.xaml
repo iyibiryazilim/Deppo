@@ -4,6 +4,7 @@
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:productModel="clr-namespace:Deppo.Mobile.Core.Models.ProductModels;assembly=Deppo.Mobile.Core"
+             xmlns:variantModel="clr-namespace:Deppo.Mobile.Core.Models.VariantModels;assembly=Deppo.Mobile.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views.InputProductPurchaseProcessProductListView"
              xmlns:viewModels="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels"
@@ -80,8 +81,8 @@
                                 StrokeShape="RoundRectangle 10"
                                 StrokeThickness="0.1">
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductPurchaseProcessProductListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}">
-                                    
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductPurchaseProcessProductListViewModel}}, Path=ItemTappedCommand}"
+                                                      CommandParameter="{Binding .}">
                                 </TapGestureRecognizer>
                             </Border.GestureRecognizers>
                             <Grid ColumnDefinitions="Auto,*"
@@ -151,26 +152,106 @@
 
         <dx:BottomSheet x:Name="variantBottomSheet"
                         Grid.Row="1"
+                        Padding="10,30,10,10"
                         AllowDismiss="True"
                         BackgroundColor="White"
                         CornerRadius="15"
-                        HalfExpandedRatio="0.3"
+                        HalfExpandedRatio="0.5"
                         IsModal="True"
                         ShowGrabber="True">
             <!--#region BottomSheetContent-->
-            <VerticalStackLayout Padding="10"
-                                 Spacing="10"
-                                 VerticalOptions="Center">
-                <VerticalStackLayout Spacing="5">
-                    <Label FontSize="Title"
-                           Text="Ayarlar" />
-                    <Entry FontSize="Subtitle"
-                           Placeholder="http://172.16.1.25:52789"
-                           Text="test" />
+            <Grid RowDefinitions="Auto, *"
+                  RowSpacing="20">
+                <VerticalStackLayout Grid.Row="0"
+                                     Spacing="5">
+                    <Label FontAttributes="Bold"
+                           FontSize="Subtitle"
+                           Text="Varyantlar " />
+                    <BoxView HeightRequest="2"
+                             Color="{StaticResource OffBlack}" />
                 </VerticalStackLayout>
-                <Button Text="Kaydet"
-                        VerticalOptions="End" />
-            </VerticalStackLayout>
+
+                <Grid Grid.Row="1"
+                      RowDefinitions="*, Auto"
+                      RowSpacing="10">
+
+                    <CollectionView Grid.Row="0"
+                                    ItemsSource="{Binding ItemVariants}"
+                                    RemainingItemsThreshold="2"
+                                    RemainingItemsThresholdReachedCommand="{Binding LoadMoreVariantItemsCommand}">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout ItemSpacing="5"
+                                               Orientation="Vertical" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="variantModel:VariantModel">
+                                <Border Padding="10"
+                                        BackgroundColor="Transparent"
+                                        StrokeShape="RoundRectangle 10"
+                                        StrokeThickness="0.1">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductPurchaseProcessProductListViewModel}}, Path=VariantTappedCommand}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <Grid ColumnDefinitions="Auto,*, Auto"
+                                          ColumnSpacing="10">
+                                        <Border BackgroundColor="{StaticResource Secondary}"
+                                                StrokeShape="RoundRectangle 5"
+                                                StrokeThickness="0.5">
+                                            <Image Grid.Column="0"
+                                                   HeightRequest="50"
+                                                   Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                                   WidthRequest="50" />
+                                        </Border>
+
+                                        <VerticalStackLayout Grid.Column="1"
+                                                             Spacing="2">
+
+                                            <Label FontAttributes="Bold"
+                                                   LineBreakMode="TailTruncation"
+                                                   Text="{Binding Code}" />
+                                            <Label LineBreakMode="TailTruncation"
+                                                   Text="{Binding Name}"
+                                                   TextColor="{StaticResource Gray600}" />
+
+                                            <Label TextColor="{StaticResource Gray600}"
+                                                   VerticalOptions="Center">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span FontAttributes="Bold"
+                                                              FontFamily="FAS"
+                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding SubUnitsetCode}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                    <Border.Triggers>
+                                        <DataTrigger Binding="{Binding IsSelected}"
+                                                     TargetType="Border"
+                                                     Value="True">
+                                            <Setter Property="BackgroundColor"
+                                                    Value="{StaticResource SecondaryLight}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <Button Grid.Row="1"
+                            Command="{Binding ConfirmVariantCommand}"
+                            Text="Tamam" />
+                </Grid>
+            </Grid>
 
             <!--#endregion-->
         </dx:BottomSheet>

@@ -33,7 +33,6 @@ public class Product : INotifyPropertyChanged, IDisposable
 
     public Product()
     {
-
     }
 
     [Key]
@@ -215,6 +214,19 @@ public class Product : INotifyPropertyChanged, IDisposable
         }
     }
 
+    public byte[] ImageData
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(Image))
+                return Array.Empty<byte>();
+            else
+            {
+                return Convert.FromBase64String(Image);
+            }
+        }
+    }
+
     [Browsable(false)]
     public int BrandReferenceId
     {
@@ -282,7 +294,6 @@ public class Product : INotifyPropertyChanged, IDisposable
     {
         Dispose(true);
         GC.SuppressFinalize(this);
-
     }
 
     protected virtual void Dispose(bool disposing)

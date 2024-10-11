@@ -12,5 +12,6 @@ public partial class InputProductPurchaseProcessProductListView : ContentPage
         _viewModel = viewModel;
         BindingContext = _viewModel;
         _viewModel.SearchText = searchBar;
+        _viewModel.CurrentPage = this;
     }
 }
