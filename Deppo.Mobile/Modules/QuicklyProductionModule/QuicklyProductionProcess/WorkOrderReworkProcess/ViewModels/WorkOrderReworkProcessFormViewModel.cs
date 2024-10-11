@@ -13,4 +13,6 @@ public partial class WorkOrderReworkProcessFormViewModel : BaseViewModel
     {
         Title = "Form Sayfası";
     }
+
+    public Page CurrentPage { get; set; } = null!;
 }
