@@ -133,6 +133,7 @@ public partial class ManuelReworkProcessFormViewModel : BaseViewModel
 
 			ResultModel resultModel = new(); // for Success and Failure page
 			var productionTransactionInsertResult = new DataResult<ResponseModel>();  // for ProductionTransaction insert result
+			var consumableTransactionResult = new DataResult<ResponseModel>(); // for ConsumableTransaction insert result
 
 			var groupByWarehouseList = ReworkBasketModel.ReworkInProducts.GroupBy(x => x.InWarehouseModel.Number).ToList();
 
@@ -152,7 +153,7 @@ public partial class ManuelReworkProcessFormViewModel : BaseViewModel
 
 			if(successCount == groupByWarehouseListCount)
 			{
-				DataResult<ResponseModel> consumableTransactionResult = await ConsumableTransactionInsert(httpClient, ReworkBasketModel);
+				 consumableTransactionResult = await ConsumableTransactionInsert(httpClient, ReworkBasketModel);
 
 				if(consumableTransactionResult.IsSuccess)
 				{
@@ -163,7 +164,14 @@ public partial class ManuelReworkProcessFormViewModel : BaseViewModel
 
 					await ClearFormAsync();
 
-					// Basket modeli tümüyle temizlenmeli detaylarıyla beraber
+                    // Basket modeli tümüyle temizlenmeli detaylarıyla beraber
+                    foreach (var item in ReworkBasketModel.ReworkInProducts)
+                    {
+						item.Details.Clear();
+                    }
+					ReworkBasketModel.ReworkInProducts.Clear();
+					ReworkBasketModel.ReworkOutProductModel.Details.Clear();
+					await ClearFormAsync();
 
 					if (_userDialogs.IsHudShowing)
 						_userDialogs.HideHud();
@@ -178,7 +186,7 @@ public partial class ManuelReworkProcessFormViewModel : BaseViewModel
 					if (_userDialogs.IsHudShowing)
 						_userDialogs.HideHud();
 
-					resultModel.Code = resultModel.Code;
+					resultModel.Code = productionTransactionInsertResult.Data.Code;
 					resultModel.Message = "Sarf fişi başarısız, Üretimden Giriş fişleri başarılı";
 					resultModel.PageTitle = "";
 					resultModel.PageCountToBack = 1;
@@ -190,7 +198,17 @@ public partial class ManuelReworkProcessFormViewModel : BaseViewModel
 			}
 			else
 			{
-				// İkiside başarısız olma durumu
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
+
+				resultModel.PageCountToBack = 1;
+				resultModel.Message = "Başarısız";
+				resultModel.ErrorMessage = $@"{productionTransactionInsertResult.Message} \n {consumableTransactionResult.Message}";
+
+				await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+				{
+					[nameof(ResultModel)] = resultModel
+				});
 			}
 
 		}

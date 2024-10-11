@@ -10,5 +10,6 @@ public partial class WorkOrderReworkProcessBasketView : ContentPage
 		InitializeComponent();
 		_viewModel = viewModel;
 		BindingContext = _viewModel;
+		_viewModel.CurrentPage = this;
 	}
 }

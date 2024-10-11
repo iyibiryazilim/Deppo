@@ -403,7 +403,7 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 			Code = "",
 			CurrentCode = SalesCustomer != null ? SalesCustomer.Code : "",
 			DriverFirstName = SelectedDriver != null ? SelectedDriver.Name : "",
-			ShipInfoCode = SelectedShipAddress != null ? SelectedShipAddress.Code : "",
+			ShipInfoCode = SalesCustomer?.ShipAddressReferenceId != 0 ? SalesCustomer?.ShipAddressCode : "",
 			DriverLastName = SelectedDriver != null ? SelectedDriver.Surname : "",
 			CarrierCode = SelectedCarrier != null ? SelectedCarrier.Code : "",
 			IdentityNumber = SelectedDriver != null ? SelectedDriver.IdentityNumber : "",
@@ -428,6 +428,7 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 			{
 				ProductCode = item.ItemCode,
 				WarehouseNumber = (short?)WarehouseModel.Number,
+				OrderReferenceId = item.OrderReferenceId,
 				Quantity = item.OutputQuantity,
 				ConversionFactor = 1,
 				OtherConversionFactor = 1,
@@ -507,7 +508,7 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 			CarrierCode = SelectedCarrier != null ? SelectedCarrier.Code : "",
 			IdentityNumber = SelectedDriver != null ? SelectedDriver.IdentityNumber : "",
 			Plaque = SelectedDriver != null ? SelectedDriver.PlateNumber : "",
-			ShipInfoCode = SalesCustomer != null ? SalesCustomer.ShipAddressCode : "",
+			ShipInfoCode = SalesCustomer?.ShipAddressReferenceId != 0 ? SalesCustomer?.ShipAddressCode : "",
 			IsEDispatch = 1,
 			DispatchType = 0,
 			DispatchStatus = 1,
@@ -528,6 +529,7 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 			{
 				ProductCode = item.ItemCode,
 				WarehouseNumber = (short?)WarehouseModel.Number,
+				OrderReferenceId = item.OrderReferenceId,
 				Quantity = item.OutputQuantity,
 				ConversionFactor = 1,
 				OtherConversionFactor = 1,

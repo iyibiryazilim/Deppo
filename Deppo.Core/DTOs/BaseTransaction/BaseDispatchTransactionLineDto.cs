@@ -13,7 +13,8 @@ public class BaseDispatchTransactionLineDto
         SeriLotTransactions = new List<Deppo.Core.DTOs.SeriLotTransactionDto.SeriLotTransactionDto>();
     }
     public string? ProductCode { get; set; }
-    public string? SubUnitsetCode { get; set; }
+	public string? VariantCode { get; set; }
+	public string? SubUnitsetCode { get; set; }
     public double? Quantity { get; set; }
     public double? UnitPrice { get; set; }
     public double? VatRate { get; set; }

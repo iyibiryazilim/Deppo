@@ -506,7 +506,8 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 		{
 			var wholeSalesDispatchTransactionLineDto = new WholeSalesDispatchTransactionLineInsert
 			{
-				ProductCode = item.ItemCode,
+				ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
+				VariantCode = item.IsVariant ? item.ItemCode : string.Empty,
 				WarehouseNumber = (short?)WarehouseModel.Number,
 				Quantity = item.Quantity,
 				ConversionFactor = 1,
@@ -554,6 +555,10 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 			basketViewModel.Items.Clear();
 			basketViewModel.SelectedLocationTransactions.Clear();
 			basketViewModel.SelectedSeriLotTransactions.Clear();
+			foreach (var item in Items)
+			{
+				item.Details.Clear();
+			}
 
 			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
 			{
@@ -606,7 +611,8 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 		{
 			var retailSalesDispatchTransactionLineDto = new RetailSalesDispatchTransactionLineInsert
 			{
-				ProductCode = item.ItemCode,
+				ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
+				VariantCode = item.IsVariant ? item.ItemCode : string.Empty,
 				WarehouseNumber = (short?)WarehouseModel.Number,
 				Quantity = item.Quantity,
 				ConversionFactor = 1,
@@ -654,6 +660,10 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 			basketViewModel.Items.Clear();
 			basketViewModel.SelectedLocationTransactions.Clear();
 			basketViewModel.SelectedSeriLotTransactions.Clear();
+			foreach (var item in Items)
+			{
+				item.Details.Clear();
+			}
 
 			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
 			{

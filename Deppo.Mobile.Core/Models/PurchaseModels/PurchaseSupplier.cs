@@ -31,7 +31,10 @@ public partial class PurchaseSupplier : ObservableObject
     [ObservableProperty]
     private string shipAddressCode = string.Empty;
 
-    [ObservableProperty]
+	[ObservableProperty]
+	private string shipAddressName = string.Empty;
+
+	[ObservableProperty]
     private int shipAddressCount;
 
     public string TitleName => Name?.Length > 2 ? Name.Substring(0, 2) : Name;
