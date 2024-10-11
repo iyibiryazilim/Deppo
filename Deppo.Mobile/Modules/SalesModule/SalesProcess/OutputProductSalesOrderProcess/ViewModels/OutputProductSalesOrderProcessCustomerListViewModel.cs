@@ -21,6 +21,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderP
 public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
+    private readonly IServiceProvider _serviceProvider;
     private readonly ISalesCustomerService _salesCustomerService;
     private readonly ISalesCustomerProductService _salesCustomerProductService;
     private readonly IShipAddressService _shipAddressService;
@@ -30,10 +31,10 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
     private WarehouseModel warehouseModel = null!;
 
     [ObservableProperty]
-    private SalesCustomer salesCustomer = null!;
+    private SalesCustomer? salesCustomer;
 
     [ObservableProperty]
-    private SalesCustomer? swipedSalesCustomer;  // Sipariş listesini göstermek için swipe edilen müşteriyi tutar.
+    private ShipAddressModel? selectedShipAddressModel;
 
     #region Collections
 
@@ -47,13 +48,15 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
     ISalesCustomerService salesCustomerService,
     IShipAddressService shipAddressService,
     IUserDialogs userDialogs,
-    ISalesCustomerProductService salesCustomerProductService)
+    ISalesCustomerProductService salesCustomerProductService,
+    IServiceProvider serviceProvider)
     {
         _httpClientService = httpClientService;
         _salesCustomerService = salesCustomerService;
         _shipAddressService = shipAddressService;
         _userDialogs = userDialogs;
         _salesCustomerProductService = salesCustomerProductService;
+        _serviceProvider = serviceProvider;
 
         Title = "Müşteriler";
 
@@ -69,6 +72,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 
         PerformSearchCommand = new Command(async () => await PerformSearchAsync());
         PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
+        BackCommand = new Command(async () => await BackAsyc());
     }
 
     public Page CurrentPage { get; set; } = null!;
@@ -90,6 +94,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 
     public Command PerformSearchCommand { get; }
     public Command PerformEmptySearchCommand { get; }
+    public Command BackCommand { get; }
 
     #endregion Commands
 
@@ -202,7 +207,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
             _userDialogs.ShowLoading("Loading Orders...");
             await Task.Delay(1000);
 
-            SwipedSalesCustomer = selectedItem;
+            SalesCustomer = selectedItem;
 
             if (selectedItem?.Products?.Count > 0)
             {
@@ -265,23 +270,22 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
         {
             IsBusy = true;
 
-            // Önceki seçimi kaldır
-            if (SalesCustomer is not null)
+            if (!item.IsSelected)
             {
-                SalesCustomer.IsSelected = false;
+                if (item.ShipAddressCount > 0)
+                {
+                    SalesCustomer = item;
+                    await LoadShipAddressesAsync(item);
+                    CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
+                }
+            }
+            else
+            {
                 SalesCustomer = null;
+                item.IsSelected = false;
+
             }
 
-            // Yeni öğeyi seç
-            SalesCustomer = item;
-            //SalesCustomer.IsSelected = true;
-
-            // Ship adresleri varsa, bottom sheet aç
-            if (item.ShipAddressCount > 0)
-            {
-                await LoadShipAddressesAsync(item);
-                CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
-            }
         }
         catch (Exception ex)
         {
@@ -343,24 +347,22 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
         {
             IsBusy = true;
 
-            ShipAddresses.ToList().ForEach(x => x.IsSelected = false);
-
-            var selectedItem = ShipAddresses.FirstOrDefault(x => x.ReferenceId == shipAddressModel.ReferenceId);
-            if (selectedItem != null)
-                selectedItem.IsSelected = true;
-
-            // Ship address seçildiğinde SalesCustomer'ı seç
-            //if (SalesCustomer != null)
-            //{
-            //    SalesCustomer.IsSelected = true;
-            //}
+            SelectedShipAddressModel = shipAddressModel;
+            if(shipAddressModel.IsSelected) {
+                SelectedShipAddressModel.IsSelected = false;
+                SelectedShipAddressModel = null;
+            } else {
+                ShipAddresses.ToList().ForEach(x => x.IsSelected = false);
+                SelectedShipAddressModel = shipAddressModel;
+                SelectedShipAddressModel.IsSelected = true;
+            }
         }
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
 
-            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
@@ -384,8 +386,9 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
                 SalesCustomer.ShipAddressName = selectedShipAddress.Name;
 
                 // Hem SalesCustomer hem de seçilen Ship Address'in seçildiğini işaretle
+                Items.ToList().ForEach(x => x.IsSelected = false);
+
                 SalesCustomer.IsSelected = true;
-                selectedShipAddress.IsSelected = true;
 
                 CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.Hidden;
             }
@@ -498,4 +501,13 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
             await PerformSearchAsync();
         }
     }
+
+    private async Task BackAsyc()
+    {
+        Items.Clear();
+        ShipAddresses.Clear();
+        SalesCustomer = null;
+        await Shell.Current.GoToAsync("..");
+    }
+
 }

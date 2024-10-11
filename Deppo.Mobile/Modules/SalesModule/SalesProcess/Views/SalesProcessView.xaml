@@ -24,463 +24,466 @@
             <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
-    <Grid RowDefinitions=".30*,.70*">
+    <ScrollView>
 
-        <Grid
-            Grid.Row="1"
-            RowDefinitions="Auto,Auto,Auto"
-            RowSpacing="20">
-            <VerticalStackLayout
-                Grid.Row="0"
-                Padding="5"
-                Spacing="5">
-                <Label
-                    FontAttributes="Bold"
-                    FontSize="20"
-                    Text="Giriş İşlemleri"
-                    TextColor="{StaticResource OffBlack}" />
+        <Grid RowDefinitions=".10*,.60*">
 
-                <Grid RowDefinitions="Auto,Auto" RowSpacing="2">
-
-                    <Border
-                        Grid.Row="0"
-                        Padding="5"
-                        HeightRequest="55"
-                        StrokeShape="RoundRectangle 5"
-                        StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
-                            <Grid
-                                Grid.Column="0"
-                                ColumnDefinitions="Auto,*"
-                                ColumnSpacing="10">
-                                <Grid.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding OutputProductSalesProcessCommand}" />
-                                </Grid.GestureRecognizers>
-                                <Border
-                                    Padding="5"
-                                    BackgroundColor="{StaticResource Primary}"
-                                    Stroke="{StaticResource Primary}"
-                                    StrokeShape="RoundRectangle 5"
-                                    WidthRequest="45">
-                                    <Label
-                                        FontFamily="FAS"
-                                        FontSize="25"
-                                        HorizontalOptions="Center"
-                                        Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
-                                        TextColor="{StaticResource White}"
-                                        VerticalOptions="Center" />
-                                </Border>
-                                <VerticalStackLayout Grid.Column="1" Spacing="2">
-                                    <Label
-                                        Margin="0,3,0,0"
-                                        FontAttributes="Bold"
-                                        FontSize="Subtitle"
-                                        Text="Sevk İşlemleri"
-                                        TextColor="{StaticResource Gray500}"
-                                        VerticalOptions="Center" />
-                                    <Label
-                                        Text="Lorem Ipsum... "
-                                        TextColor="{StaticResource Gray400}"
-                                        VerticalOptions="End" />
-                                </VerticalStackLayout>
-                            </Grid>
-
-                            <Border Grid.Column="1" StrokeThickness="0">
-                                <toolkit:AvatarView
-                                    Padding="2"
-                                    BorderColor="{StaticResource Primary}"
-                                    CornerRadius="15"
-                                    FontFamily="FAS"
-                                    FontSize="14"
-                                    HeightRequest="30"
-                                    HorizontalOptions="End"
-                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
-                                    TextColor="{StaticResource Primary}"
-                                    WidthRequest="30" />
-                            </Border>
-                        </Grid>
-                    </Border>
-                    <Border
-                        Grid.Row="1"
-                        Padding="5"
-                        HeightRequest="55"
-                        StrokeShape="RoundRectangle 5"
-                        StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
-                            <Grid
-                                Grid.Column="0"
-                                ColumnDefinitions="Auto,*"
-                                ColumnSpacing="10">
-                                <Grid.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding OutputProductSalesOrderProcessCommand}" />
-                                </Grid.GestureRecognizers>
-                                <Border
-                                    Padding="5"
-                                    BackgroundColor="{StaticResource Primary}"
-                                    Stroke="{StaticResource Primary}"
-                                    StrokeShape="RoundRectangle 5"
-                                    WidthRequest="45">
-                                    <Label
-                                        FontFamily="FAS"
-                                        FontSize="25"
-                                        HorizontalOptions="Center"
-                                        Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
-                                        TextColor="{StaticResource White}"
-                                        VerticalOptions="Center" />
-                                </Border>
-                                <VerticalStackLayout Grid.Column="1" Spacing="4">
-                                    <Label
-                                        FontAttributes="Bold"
-                                        FontSize="Subtitle"
-                                        Text="Siparişe Bağlı Sevk İşlemleri"
-                                        TextColor="{StaticResource Gray500}"
-                                        VerticalOptions="Center" />
-                                    <Label
-                                        Text="Lorem Ipsum... "
-                                        TextColor="{StaticResource Gray400}"
-                                        VerticalOptions="End" />
-                                </VerticalStackLayout>
-                            </Grid>
-
-                            <Border Grid.Column="1" StrokeThickness="0">
-                                <toolkit:AvatarView
-                                    Padding="2"
-                                    BorderColor="{StaticResource Primary}"
-                                    CornerRadius="15"
-                                    FontFamily="FAS"
-                                    FontSize="14"
-                                    HeightRequest="30"
-                                    HorizontalOptions="End"
-                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
-                                    TextColor="{StaticResource Primary}"
-                                    WidthRequest="30" />
-                            </Border>
-                        </Grid>
-                    </Border>
-                </Grid>
-            </VerticalStackLayout>
-            <VerticalStackLayout
+            <Grid
                 Grid.Row="1"
-                Padding="5"
-                Spacing="5">
-                <Label
-                    FontAttributes="Bold"
-                    FontSize="20"
-                    Text="Çıkış İşlemleri"
-                    TextColor="{StaticResource OffBlack}" />
+                RowDefinitions="Auto,Auto,Auto"
+                RowSpacing="20">
+                <VerticalStackLayout
+                    Grid.Row="0"
+                    Padding="5"
+                    Spacing="5">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="20"
+                        Text="Giriş İşlemleri"
+                        TextColor="{StaticResource OffBlack}" />
 
-                <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="2">
-                    <Border
-                        Grid.Row="0"
-                        Padding="5"
-                        HeightRequest="55"
-                        StrokeShape="RoundRectangle 5"
-                        StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
-                            <Grid
-                                Grid.Column="0"
-                                ColumnDefinitions="Auto,*"
-                                ColumnSpacing="10">
-                                <Grid.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding ReturnSalesProcessCommand}" />
-                                </Grid.GestureRecognizers>
-                                <Border
-                                    Padding="5"
-                                    BackgroundColor="{StaticResource Primary}"
-                                    Stroke="{StaticResource Primary}"
-                                    StrokeShape="RoundRectangle 5"
-                                    WidthRequest="45">
-                                    <Label
+                    <Grid RowDefinitions="Auto,Auto" RowSpacing="2">
+
+                        <Border
+                            Grid.Row="0"
+                            Padding="5"
+                            HeightRequest="55"
+                            StrokeShape="RoundRectangle 5"
+                            StrokeThickness="0.2">
+                            <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
+                                <Grid
+                                    Grid.Column="0"
+                                    ColumnDefinitions="Auto,*"
+                                    ColumnSpacing="10">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding OutputProductSalesProcessCommand}" />
+                                    </Grid.GestureRecognizers>
+                                    <Border
+                                        Padding="5"
+                                        BackgroundColor="{StaticResource Primary}"
+                                        Stroke="{StaticResource Primary}"
+                                        StrokeShape="RoundRectangle 5"
+                                        WidthRequest="45">
+                                        <Label
+                                            FontFamily="FAS"
+                                            FontSize="25"
+                                            HorizontalOptions="Center"
+                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                            TextColor="{StaticResource White}"
+                                            VerticalOptions="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                        <Label
+                                            Margin="0,3,0,0"
+                                            FontAttributes="Bold"
+                                            FontSize="Subtitle"
+                                            Text="Sevk İşlemleri"
+                                            TextColor="{StaticResource Gray500}"
+                                            VerticalOptions="Center" />
+                                        <Label
+                                            Text="Lorem Ipsum... "
+                                            TextColor="{StaticResource Gray400}"
+                                            VerticalOptions="End" />
+                                    </VerticalStackLayout>
+                                </Grid>
+
+                                <Border Grid.Column="1" StrokeThickness="0">
+                                    <toolkit:AvatarView
+                                        Padding="2"
+                                        BorderColor="{StaticResource Primary}"
+                                        CornerRadius="15"
                                         FontFamily="FAS"
-                                        FontSize="25"
-                                        HorizontalOptions="Center"
-                                        Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
-                                        TextColor="{StaticResource White}"
-                                        VerticalOptions="Center" />
+                                        FontSize="14"
+                                        HeightRequest="30"
+                                        HorizontalOptions="End"
+                                        Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
+                                        TextColor="{StaticResource Primary}"
+                                        WidthRequest="30" />
                                 </Border>
-                                <VerticalStackLayout Grid.Column="1" Spacing="4">
-                                    <Label
-                                        FontAttributes="Bold"
-                                        FontSize="Subtitle"
-                                        Text="Satış İade İşlemleri"
-                                        TextColor="{StaticResource Gray500}"
-                                        VerticalOptions="Center" />
-                                    <Label
-                                        Text="Lorem Ipsum... "
-                                        TextColor="{StaticResource Gray400}"
-                                        VerticalOptions="End" />
-                                </VerticalStackLayout>
                             </Grid>
+                        </Border>
+                        <Border
+                            Grid.Row="1"
+                            Padding="5"
+                            HeightRequest="55"
+                            StrokeShape="RoundRectangle 5"
+                            StrokeThickness="0.2">
+                            <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
+                                <Grid
+                                    Grid.Column="0"
+                                    ColumnDefinitions="Auto,*"
+                                    ColumnSpacing="10">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding OutputProductSalesOrderProcessCommand}" />
+                                    </Grid.GestureRecognizers>
+                                    <Border
+                                        Padding="5"
+                                        BackgroundColor="{StaticResource Primary}"
+                                        Stroke="{StaticResource Primary}"
+                                        StrokeShape="RoundRectangle 5"
+                                        WidthRequest="45">
+                                        <Label
+                                            FontFamily="FAS"
+                                            FontSize="25"
+                                            HorizontalOptions="Center"
+                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                            TextColor="{StaticResource White}"
+                                            VerticalOptions="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="Subtitle"
+                                            Text="Siparişe Bağlı Sevk İşlemleri"
+                                            TextColor="{StaticResource Gray500}"
+                                            VerticalOptions="Center" />
+                                        <Label
+                                            Text="Lorem Ipsum... "
+                                            TextColor="{StaticResource Gray400}"
+                                            VerticalOptions="End" />
+                                    </VerticalStackLayout>
+                                </Grid>
 
-                            <Border Grid.Column="1" StrokeThickness="0">
-                                <toolkit:AvatarView
-                                    Padding="2"
-                                    BorderColor="{StaticResource Primary}"
-                                    CornerRadius="15"
-                                    FontFamily="FAS"
-                                    FontSize="14"
-                                    HeightRequest="30"
-                                    HorizontalOptions="End"
-                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
-                                    TextColor="{StaticResource Primary}"
-                                    WidthRequest="30" />
-                            </Border>
-                        </Grid>
-                    </Border>
-                    <Border
-                        Grid.Row="1"
-                        Padding="5"
-                        HeightRequest="55"
-                        StrokeShape="RoundRectangle 5"
-                        StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
-                            <Grid
-                                Grid.Column="0"
-                                ColumnDefinitions="Auto,*"
-                                ColumnSpacing="10">
-                                <Grid.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding RetrunSalesDispatchProcessCommand}" />
-                                </Grid.GestureRecognizers>
-                                <Border
-                                    Padding="5"
-                                    BackgroundColor="{StaticResource Primary}"
-                                    Stroke="{StaticResource Primary}"
-                                    StrokeShape="RoundRectangle 5"
-                                    WidthRequest="45">
-                                    <Label
+                                <Border Grid.Column="1" StrokeThickness="0">
+                                    <toolkit:AvatarView
+                                        Padding="2"
+                                        BorderColor="{StaticResource Primary}"
+                                        CornerRadius="15"
                                         FontFamily="FAS"
-                                        FontSize="25"
-                                        HorizontalOptions="Center"
-                                        Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
-                                        TextColor="{StaticResource White}"
-                                        VerticalOptions="Center" />
+                                        FontSize="14"
+                                        HeightRequest="30"
+                                        HorizontalOptions="End"
+                                        Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
+                                        TextColor="{StaticResource Primary}"
+                                        WidthRequest="30" />
                                 </Border>
-                                <VerticalStackLayout Grid.Column="1" Spacing="4">
-                                    <Label
-                                        FontAttributes="Bold"
-                                        FontSize="Subtitle"
-                                        Text="İrsaliyeye Bağlı Satış İade İşlemleri"
-                                        TextColor="{StaticResource Gray500}"
-                                        VerticalOptions="Center" />
-                                    <Label
-                                        Text="Lorem Ipsum... "
-                                        TextColor="{StaticResource Gray400}"
-                                        VerticalOptions="End" />
-                                </VerticalStackLayout>
                             </Grid>
+                        </Border>
+                    </Grid>
+                </VerticalStackLayout>
+                <VerticalStackLayout
+                    Grid.Row="1"
+                    Padding="5"
+                    Spacing="5">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="20"
+                        Text="Çıkış İşlemleri"
+                        TextColor="{StaticResource OffBlack}" />
 
-                            <Border Grid.Column="1" StrokeThickness="0">
-                                <toolkit:AvatarView
-                                    Padding="2"
-                                    BorderColor="{StaticResource Primary}"
-                                    CornerRadius="15"
-                                    FontFamily="FAS"
-                                    FontSize="14"
-                                    HeightRequest="30"
-                                    HorizontalOptions="End"
-                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
-                                    TextColor="{StaticResource Primary}"
-                                    WidthRequest="30" />
-                            </Border>
-                        </Grid>
-                    </Border>
-                </Grid>
-            </VerticalStackLayout>
-            <VerticalStackLayout
-                Grid.Row="2"
-                Padding="5"
-                Spacing="5">
-                <Label
-                    FontAttributes="Bold"
-                    FontSize="20"
-                    Text="Ürün Toplama İşlemleri"
-                    TextColor="{StaticResource OffBlack}" />
+                    <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="2">
+                        <Border
+                            Grid.Row="0"
+                            Padding="5"
+                            HeightRequest="55"
+                            StrokeShape="RoundRectangle 5"
+                            StrokeThickness="0.2">
+                            <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
+                                <Grid
+                                    Grid.Column="0"
+                                    ColumnDefinitions="Auto,*"
+                                    ColumnSpacing="10">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding ReturnSalesProcessCommand}" />
+                                    </Grid.GestureRecognizers>
+                                    <Border
+                                        Padding="5"
+                                        BackgroundColor="{StaticResource Primary}"
+                                        Stroke="{StaticResource Primary}"
+                                        StrokeShape="RoundRectangle 5"
+                                        WidthRequest="45">
+                                        <Label
+                                            FontFamily="FAS"
+                                            FontSize="25"
+                                            HorizontalOptions="Center"
+                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                            TextColor="{StaticResource White}"
+                                            VerticalOptions="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="Subtitle"
+                                            Text="Satış İade İşlemleri"
+                                            TextColor="{StaticResource Gray500}"
+                                            VerticalOptions="Center" />
+                                        <Label
+                                            Text="Lorem Ipsum... "
+                                            TextColor="{StaticResource Gray400}"
+                                            VerticalOptions="End" />
+                                    </VerticalStackLayout>
+                                </Grid>
 
-                <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="2">
-                    <Border
-                        Grid.Row="0"
-                        Padding="5"
-                        HeightRequest="55"
-                        StrokeShape="RoundRectangle 5"
-                        StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
-                            <Grid
-                                Grid.Column="0"
-                                ColumnDefinitions="Auto,*"
-                                ColumnSpacing="10">
-                                <Grid.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding ReturnSalesProcessCommand}" />
-                                </Grid.GestureRecognizers>
-                                <Border
-                                    Padding="5"
-                                    BackgroundColor="{StaticResource Primary}"
-                                    Stroke="{StaticResource Primary}"
-                                    StrokeShape="RoundRectangle 5"
-                                    WidthRequest="45">
-                                    <Label
+                                <Border Grid.Column="1" StrokeThickness="0">
+                                    <toolkit:AvatarView
+                                        Padding="2"
+                                        BorderColor="{StaticResource Primary}"
+                                        CornerRadius="15"
                                         FontFamily="FAS"
-                                        FontSize="25"
-                                        HorizontalOptions="Center"
-                                        Text="{x:Static fontAwesome:FontAwesomeIcons.BasketShopping}"
-                                        TextColor="{StaticResource White}"
-                                        VerticalOptions="Center" />
+                                        FontSize="14"
+                                        HeightRequest="30"
+                                        HorizontalOptions="End"
+                                        Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
+                                        TextColor="{StaticResource Primary}"
+                                        WidthRequest="30" />
                                 </Border>
-                                <VerticalStackLayout Grid.Column="1" Spacing="4">
-                                    <Label
-                                        FontAttributes="Bold"
-                                        FontSize="Subtitle"
-                                        Text="Müşteriye GÖre Ürün Toplama"
-                                        TextColor="{StaticResource Gray500}"
-                                        VerticalOptions="Center" />
-                                    <Label
-                                        Text="Lorem Ipsum... "
-                                        TextColor="{StaticResource Gray400}"
-                                        VerticalOptions="End" />
-                                </VerticalStackLayout>
                             </Grid>
+                        </Border>
+                        <Border
+                            Grid.Row="1"
+                            Padding="5"
+                            HeightRequest="55"
+                            StrokeShape="RoundRectangle 5"
+                            StrokeThickness="0.2">
+                            <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
+                                <Grid
+                                    Grid.Column="0"
+                                    ColumnDefinitions="Auto,*"
+                                    ColumnSpacing="10">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding RetrunSalesDispatchProcessCommand}" />
+                                    </Grid.GestureRecognizers>
+                                    <Border
+                                        Padding="5"
+                                        BackgroundColor="{StaticResource Primary}"
+                                        Stroke="{StaticResource Primary}"
+                                        StrokeShape="RoundRectangle 5"
+                                        WidthRequest="45">
+                                        <Label
+                                            FontFamily="FAS"
+                                            FontSize="25"
+                                            HorizontalOptions="Center"
+                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                            TextColor="{StaticResource White}"
+                                            VerticalOptions="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="Subtitle"
+                                            Text="İrsaliyeye Bağlı Satış İade İşlemleri"
+                                            TextColor="{StaticResource Gray500}"
+                                            VerticalOptions="Center" />
+                                        <Label
+                                            Text="Lorem Ipsum... "
+                                            TextColor="{StaticResource Gray400}"
+                                            VerticalOptions="End" />
+                                    </VerticalStackLayout>
+                                </Grid>
 
-                            <Border Grid.Column="1" StrokeThickness="0">
-                                <toolkit:AvatarView
-                                    Padding="2"
-                                    BorderColor="{StaticResource Primary}"
-                                    CornerRadius="15"
-                                    FontFamily="FAS"
-                                    FontSize="14"
-                                    HeightRequest="30"
-                                    HorizontalOptions="End"
-                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
-                                    TextColor="{StaticResource Primary}"
-                                    WidthRequest="30" />
-                            </Border>
-
-                        </Grid>
-                    </Border>
-
-                    <Border
-                        Grid.Row="1"
-                        Padding="5"
-                        HeightRequest="55"
-                        StrokeShape="RoundRectangle 5"
-                        StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
-                            <Grid
-                                Grid.Column="0"
-                                ColumnDefinitions="Auto,*"
-                                ColumnSpacing="10">
-                                <Grid.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding ReturnSalesProcessCommand}" />
-                                </Grid.GestureRecognizers>
-                                <Border
-                                    Padding="5"
-                                    BackgroundColor="{StaticResource Primary}"
-                                    Stroke="{StaticResource Primary}"
-                                    StrokeShape="RoundRectangle 5"
-                                    WidthRequest="45">
-                                    <Label
+                                <Border Grid.Column="1" StrokeThickness="0">
+                                    <toolkit:AvatarView
+                                        Padding="2"
+                                        BorderColor="{StaticResource Primary}"
+                                        CornerRadius="15"
                                         FontFamily="FAS"
-                                        FontSize="25"
-                                        HorizontalOptions="Center"
-                                        Text="{x:Static fontAwesome:FontAwesomeIcons.BasketShopping}"
-                                        TextColor="{StaticResource White}"
-                                        VerticalOptions="Center" />
+                                        FontSize="14"
+                                        HeightRequest="30"
+                                        HorizontalOptions="End"
+                                        Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
+                                        TextColor="{StaticResource Primary}"
+                                        WidthRequest="30" />
                                 </Border>
-                                <VerticalStackLayout Grid.Column="1" Spacing="4">
-                                    <Label
-                                        FontAttributes="Bold"
-                                        FontSize="Subtitle"
-                                        Text="Malzemeye GÖre Ürün Toplama"
-                                        TextColor="{StaticResource Gray500}"
-                                        VerticalOptions="Center" />
-                                    <Label
-                                        Text="Lorem Ipsum... "
-                                        TextColor="{StaticResource Gray400}"
-                                        VerticalOptions="End" />
-                                </VerticalStackLayout>
                             </Grid>
+                        </Border>
+                    </Grid>
+                </VerticalStackLayout>
+                <VerticalStackLayout
+                    Grid.Row="2"
+                    Padding="5"
+                    Spacing="5">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="20"
+                        Text="Ürün Toplama İşlemleri"
+                        TextColor="{StaticResource OffBlack}" />
 
-                            <Border Grid.Column="1" StrokeThickness="0">
-                                <toolkit:AvatarView
-                                    Padding="2"
-                                    BorderColor="{StaticResource Primary}"
-                                    CornerRadius="15"
-                                    FontFamily="FAS"
-                                    FontSize="14"
-                                    HeightRequest="30"
-                                    HorizontalOptions="End"
-                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
-                                    TextColor="{StaticResource Primary}"
-                                    WidthRequest="30" />
-                            </Border>
+                    <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="2">
+                        <Border
+                            Grid.Row="0"
+                            Padding="5"
+                            HeightRequest="55"
+                            StrokeShape="RoundRectangle 5"
+                            StrokeThickness="0.2">
+                            <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
+                                <Grid
+                                    Grid.Column="0"
+                                    ColumnDefinitions="Auto,*"
+                                    ColumnSpacing="10">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding ProcurementByCustomerProcessCommand}" />
+                                    </Grid.GestureRecognizers>
+                                    <Border
+                                        Padding="5"
+                                        BackgroundColor="{StaticResource Secondary}"
+                                        Stroke="{StaticResource Secondary}"
+                                        StrokeShape="RoundRectangle 5"
+                                        WidthRequest="45">
+                                        <Label
+                                            FontFamily="FAS"
+                                            FontSize="25"
+                                            HorizontalOptions="Center"
+                                            Text="{x:Static fontAwesome:FontAwesomeIcons.User}"
+                                            TextColor="{StaticResource White}"
+                                            VerticalOptions="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="Subtitle"
+                                            Text="Müşteriye Göre Ürün Toplama"
+                                            TextColor="{StaticResource Gray500}"
+                                            VerticalOptions="Center" />
+                                        <Label
+                                            Text="Lorem Ipsum... "
+                                            TextColor="{StaticResource Gray400}"
+                                            VerticalOptions="End" />
+                                    </VerticalStackLayout>
+                                </Grid>
 
-                        </Grid>
-                    </Border>
-
-                    <Border
-                        Grid.Row="2"
-                        Padding="5"
-                        HeightRequest="55"
-                        StrokeShape="RoundRectangle 5"
-                        StrokeThickness="0.2">
-                        <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
-                            <Grid
-                                Grid.Column="0"
-                                ColumnDefinitions="Auto,*"
-                                ColumnSpacing="10">
-                                <Grid.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding ReturnSalesProcessCommand}" />
-                                </Grid.GestureRecognizers>
-                                <Border
-                                    Padding="5"
-                                    BackgroundColor="{StaticResource Primary}"
-                                    Stroke="{StaticResource Primary}"
-                                    StrokeShape="RoundRectangle 5"
-                                    WidthRequest="45">
-                                    <Label
+                                <Border Grid.Column="1" StrokeThickness="0">
+                                    <toolkit:AvatarView
+                                        Padding="2"
+                                        BorderColor="{StaticResource Primary}"
+                                        CornerRadius="15"
                                         FontFamily="FAS"
-                                        FontSize="25"
-                                        HorizontalOptions="Center"
-                                        Text="{x:Static fontAwesome:FontAwesomeIcons.BasketShopping}"
-                                        TextColor="{StaticResource White}"
-                                        VerticalOptions="Center" />
+                                        FontSize="14"
+                                        HeightRequest="30"
+                                        HorizontalOptions="End"
+                                        Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
+                                        TextColor="{StaticResource Primary}"
+                                        WidthRequest="30" />
                                 </Border>
-                                <VerticalStackLayout Grid.Column="1" Spacing="4">
-                                    <Label
-                                        FontAttributes="Bold"
-                                        FontSize="Subtitle"
-                                        Text="Stok Yerine (Raf) Göre Ürün Toplama"
-                                        TextColor="{StaticResource Gray500}"
-                                        VerticalOptions="Center" />
-                                    <Label
-                                        Text="Lorem Ipsum... "
-                                        TextColor="{StaticResource Gray400}"
-                                        VerticalOptions="End" />
-                                </VerticalStackLayout>
+
                             </Grid>
+                        </Border>
 
-                            <Border Grid.Column="1" StrokeThickness="0">
-                                <toolkit:AvatarView
-                                    Padding="2"
-                                    BorderColor="{StaticResource Primary}"
-                                    CornerRadius="15"
-                                    FontFamily="FAS"
-                                    FontSize="14"
-                                    HeightRequest="30"
-                                    HorizontalOptions="End"
-                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
-                                    TextColor="{StaticResource Primary}"
-                                    WidthRequest="30" />
-                            </Border>
+                        <Border
+                            Grid.Row="1"
+                            Padding="5"
+                            HeightRequest="55"
+                            StrokeShape="RoundRectangle 5"
+                            StrokeThickness="0.2">
+                            <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
+                                <Grid
+                                    Grid.Column="0"
+                                    ColumnDefinitions="Auto,*"
+                                    ColumnSpacing="10">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding ReturnSalesProcessCommand}" />
+                                    </Grid.GestureRecognizers>
+                                    <Border
+                                        Padding="5"
+                                        BackgroundColor="{StaticResource Secondary}"
+                                        Stroke="{StaticResource Secondary}"
+                                        StrokeShape="RoundRectangle 5"
+                                        WidthRequest="45">
+                                        <Label
+                                            FontFamily="FAS"
+                                            FontSize="25"
+                                            HorizontalOptions="Center"
+                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Cubes}"
+                                            TextColor="{StaticResource White}"
+                                            VerticalOptions="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="Subtitle"
+                                            Text="Malzemeye Göre Ürün Toplama"
+                                            TextColor="{StaticResource Gray500}"
+                                            VerticalOptions="Center" />
+                                        <Label
+                                            Text="Lorem Ipsum... "
+                                            TextColor="{StaticResource Gray400}"
+                                            VerticalOptions="End" />
+                                    </VerticalStackLayout>
+                                </Grid>
+
+                                <Border Grid.Column="1" StrokeThickness="0">
+                                    <toolkit:AvatarView
+                                        Padding="2"
+                                        BorderColor="{StaticResource Primary}"
+                                        CornerRadius="15"
+                                        FontFamily="FAS"
+                                        FontSize="14"
+                                        HeightRequest="30"
+                                        HorizontalOptions="End"
+                                        Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
+                                        TextColor="{StaticResource Primary}"
+                                        WidthRequest="30" />
+                                </Border>
+
+                            </Grid>
+                        </Border>
+
+                        <Border
+                            Grid.Row="2"
+                            Padding="5"
+                            HeightRequest="55"
+                            StrokeShape="RoundRectangle 5"
+                            StrokeThickness="0.2">
+                            <Grid ColumnDefinitions=".85*,.15*" ColumnSpacing="0">
+                                <Grid
+                                    Grid.Column="0"
+                                    ColumnDefinitions="Auto,*"
+                                    ColumnSpacing="10">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding ReturnSalesProcessCommand}" />
+                                    </Grid.GestureRecognizers>
+                                    <Border
+                                        Padding="5"
+                                        BackgroundColor="{StaticResource Secondary}"
+                                        Stroke="{StaticResource Secondary}"
+                                        StrokeShape="RoundRectangle 5"
+                                        WidthRequest="45">
+                                        <Label
+                                            FontFamily="FAS"
+                                            FontSize="25"
+                                            HorizontalOptions="Center"
+                                            Text="{x:Static fontAwesome:FontAwesomeIcons.LocationDot}"
+                                            TextColor="{StaticResource White}"
+                                            VerticalOptions="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="Subtitle"
+                                            Text="Stok Yerine (Raf) Göre Ürün Toplama"
+                                            TextColor="{StaticResource Gray500}"
+                                            VerticalOptions="Center" />
+                                        <Label
+                                            Text="Lorem Ipsum... "
+                                            TextColor="{StaticResource Gray400}"
+                                            VerticalOptions="End" />
+                                    </VerticalStackLayout>
+                                </Grid>
+
+                                <Border Grid.Column="1" StrokeThickness="0">
+                                    <toolkit:AvatarView
+                                        Padding="2"
+                                        BorderColor="{StaticResource Primary}"
+                                        CornerRadius="15"
+                                        FontFamily="FAS"
+                                        FontSize="14"
+                                        HeightRequest="30"
+                                        HorizontalOptions="End"
+                                        Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
+                                        TextColor="{StaticResource Primary}"
+                                        WidthRequest="30" />
+                                </Border>
 
 
 
 
-                        </Grid>
-                    </Border>
+                            </Grid>
+                        </Border>
 
 
-                </Grid>
-            </VerticalStackLayout>
+                    </Grid>
+                </VerticalStackLayout>
 
+            </Grid>
         </Grid>
-    </Grid>
+    </ScrollView>
 </ContentPage>      
