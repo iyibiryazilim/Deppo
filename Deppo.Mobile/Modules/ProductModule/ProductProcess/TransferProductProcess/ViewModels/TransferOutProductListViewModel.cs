@@ -421,7 +421,7 @@ public partial class TransferOutProductListViewModel : BaseViewModel
                 MainItemReferenceId = item.ProductReferenceId,
                 MainItemCode = item.ProductCode,
                 MainItemName = item.ProductName,
-                IsVariant = item.IsVariant,
+                IsVariant = true,
                 LocTracking = item.LocTracking,
                 TrackingType = item.TrackingType,
                 LocTrackingIcon = item.LocTrackingIcon,
