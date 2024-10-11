@@ -169,9 +169,18 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, ReturnSalesBasketModel.ItemReferenceId, 0,SearchText.Text, 0, 20);
+			var result = await _locationService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				warehouseNumber: WarehouseModel.Number,
+				productReferenceId: ReturnSalesBasketModel.IsVariant == true ? ReturnSalesBasketModel.MainItemReferenceId : ReturnSalesBasketModel.ItemReferenceId,
+				variantReferenceId: ReturnSalesBasketModel.IsVariant == true ? ReturnSalesBasketModel.ItemReferenceId : 0,
+				search: SearchText.Text,
+				skip: 0,
+				take: 20);
 
-            if (result.IsSuccess)
+			if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
@@ -204,17 +213,18 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
             _userDialogs.ShowLoading("Loading...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _locationService.GetObjects(
-                httpClient: httpClient,
-                firmNumber: _httpClientService.FirmNumber,
-                periodNumber: _httpClientService.PeriodNumber,
-                warehouseNumber: WarehouseModel.Number,
-                productReferenceId: ReturnSalesBasketModel.ItemReferenceId,
-                skip: Items.Count,
-                take: 20,
-                search: SearchText.Text);
+			var result = await _locationService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				warehouseNumber: WarehouseModel.Number,
+				productReferenceId: ReturnSalesBasketModel.IsVariant == true ? ReturnSalesBasketModel.MainItemReferenceId : ReturnSalesBasketModel.ItemReferenceId,
+				variantReferenceId: ReturnSalesBasketModel.IsVariant == true ? ReturnSalesBasketModel.ItemReferenceId : 0,
+                search: SearchText.Text,
+				skip: Items.Count,
+				take: 20);
 
-            if (result.IsSuccess)
+			if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
@@ -407,16 +417,19 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
             Items.Clear();
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _locationService.GetObjects(
-                httpClient: httpClient,
-                firmNumber: _httpClientService.FirmNumber,
-                periodNumber: _httpClientService.PeriodNumber,
-                warehouseNumber: WarehouseModel.Number,
-                productReferenceId: ReturnSalesBasketModel.ItemReferenceId,
-                skip: Items.Count,
-                take: 20,
-                search: SearchText.Text);
 
+			var result = await _locationService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				warehouseNumber: WarehouseModel.Number,
+				productReferenceId: ReturnSalesBasketModel.IsVariant == true ? ReturnSalesBasketModel.MainItemReferenceId : ReturnSalesBasketModel.ItemReferenceId,
+				variantReferenceId: ReturnSalesBasketModel.IsVariant == true ? ReturnSalesBasketModel.ItemReferenceId : 0,
+				search: SearchText.Text,
+				skip: Items.Count,
+				take: 20
+            );
+			
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -467,14 +480,16 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
             var result = await _locationService.GetObjects(
-                        httpClient: httpClient,
-                        firmNumber: _httpClientService.FirmNumber,
-                        periodNumber: _httpClientService.PeriodNumber,
-                        warehouseNumber: WarehouseModel.Number,
-                        productReferenceId: ReturnSalesBasketModel.ItemReferenceId,
-                        search: barcodeEntry.Text,
-                        skip: 0,
-                        take: 1);
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                warehouseNumber: WarehouseModel.Number,
+				productReferenceId: ReturnSalesBasketModel.IsVariant == true ? ReturnSalesBasketModel.MainItemReferenceId : ReturnSalesBasketModel.ItemReferenceId,
+				variantReferenceId: ReturnSalesBasketModel.IsVariant == true ? ReturnSalesBasketModel.ItemReferenceId : 0,
+				search: barcodeEntry.Text,
+                skip: 0,
+                take: 1
+            );
 
             if (result.IsSuccess)
             {
