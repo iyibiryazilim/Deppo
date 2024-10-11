@@ -1561,7 +1561,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					LocTracking = variantModel.LocTracking,
 					TrackingType = variantModel.TrackingType,
 					IsVariant = true,
-					Image = String.Empty
+					//Image = String.Empty
 				};
 
 				return basketItem;
@@ -2273,7 +2273,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 							LocTrackingIcon = productModel.LocTrackingIcon,
 							VariantIcon = productModel.VariantIcon,
 							TrackingTypeIcon = productModel.TrackingTypeIcon,
-							Image = productModel.Image,
+							//Image = productModel.Image,
 						};
 
 						if (viewModel.Items.Any(x => x.ItemCode == basketItem.ItemCode))
