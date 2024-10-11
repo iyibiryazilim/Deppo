@@ -14,6 +14,7 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.TransferProductProcess.ViewModels;
@@ -765,6 +766,19 @@ public partial class CameraReaderViewModel : BaseViewModel
 						_userDialogs.ShowToast($"Ürün Sepete Eklendi");
 					}					
 					break;
+				case "DemandProcessBasket":
+					var demandProcessBasketListViewModel = _serviceProvider.GetRequiredService<DemandProcessBasketListViewModel>();
+					var demandProcessBasketItem = await ConvertDemandProcessBasketAsync(productModel);
+					if (demandProcessBasketListViewModel.Items.Any(x => x.ItemCode == demandProcessBasketItem.ItemCode))
+					{
+						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
+					}
+					else
+					{
+						demandProcessBasketListViewModel.Items.Add(demandProcessBasketItem);
+						_userDialogs.ShowToast($"Ürün Sepete Eklendi");
+					}
+					break;
 			}
 
 			isFind = false;
@@ -901,6 +915,19 @@ public partial class CameraReaderViewModel : BaseViewModel
 					else
 					{
 						outputProductSalesOrderProcessBasketListViewModel.Items.Add(outputSalesOrderBasketItem);
+						_userDialogs.ShowToast($"Ürün Sepete Eklendi");
+					}
+					break;
+				case "DemandProcessBasket":
+					var demandProcessBasketListViewModel = _serviceProvider.GetRequiredService<DemandProcessBasketListViewModel>();
+					var demandProcessBasketItem = await ConvertDemandProcessBasketAsync(variantModel);
+					if (demandProcessBasketListViewModel.Items.Any(x => x.MainItemCode == demandProcessBasketItem.MainItemCode))
+					{
+						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
+					}
+					else
+					{
+						demandProcessBasketListViewModel.Items.Add(demandProcessBasketItem);
 						_userDialogs.ShowToast($"Ürün Sepete Eklendi");
 					}
 					break;
@@ -1212,6 +1239,47 @@ public partial class CameraReaderViewModel : BaseViewModel
 			throw;
 		}
 	}
+	private async Task<DemandProcessBasketModel> ConvertDemandProcessBasketAsync(ProductModel productModel)
+	{
+		try
+		{
+			return await Task.Run(() =>
+			{
+				var basketItem = new DemandProcessBasketModel
+				{
+					ItemReferenceId = productModel.ReferenceId,
+					ItemCode = productModel.Code,
+					ItemName = productModel.Name,
+					UnitsetReferenceId = productModel.UnitsetReferenceId,
+					UnitsetCode = productModel.UnitsetCode,
+					UnitsetName = productModel.UnitsetName,
+					SubUnitsetReferenceId = productModel.SubUnitsetReferenceId,
+					SubUnitsetCode = productModel.SubUnitsetCode,
+					SubUnitsetName = productModel.SubUnitsetName,
+					MainItemReferenceId = default,  //
+					MainItemCode = string.Empty,    //
+					MainItemName = string.Empty,    //
+					StockQuantity = productModel.StockQuantity,
+					IsSelected = false,   //
+					IsVariant = productModel.IsVariant,
+					LocTracking = productModel.LocTracking,
+					TrackingType = productModel.TrackingType,
+					//SafeLevel = item.SafeLevel,
+					//Quantity = item.SafeLevel - productModel.StockQuantity,
+					LocTrackingIcon = productModel.LocTrackingIcon,
+					VariantIcon = productModel.VariantIcon,
+					TrackingTypeIcon = productModel.TrackingTypeIcon,
+				};
+
+				return basketItem;
+			});
+		}
+		catch (Exception ex)
+		{
+
+			throw;
+		}
+	}
 
 
 
@@ -1494,6 +1562,44 @@ public partial class CameraReaderViewModel : BaseViewModel
 					TrackingType = variantModel.TrackingType,
 					IsVariant = true,
 					Image = String.Empty
+				};
+
+				return basketItem;
+			});
+		}
+		catch (Exception ex)
+		{
+
+			throw;
+		}
+	}
+	private async Task<DemandProcessBasketModel> ConvertDemandProcessBasketAsync(VariantModel variantModel)
+	{
+		try
+		{
+			return await Task.Run(() =>
+			{
+				var basketItem = new DemandProcessBasketModel
+				{
+					ItemReferenceId = variantModel.ReferenceId,
+					ItemCode = variantModel.Code,
+					ItemName = variantModel.Name,
+					UnitsetReferenceId = variantModel.UnitsetReferenceId,
+					UnitsetCode = variantModel.UnitsetCode,
+					UnitsetName = variantModel.UnitsetName,
+					SubUnitsetReferenceId = variantModel.SubUnitsetReferenceId,
+					SubUnitsetCode = variantModel.SubUnitsetCode,
+					SubUnitsetName = variantModel.SubUnitsetName,
+					MainItemReferenceId = variantModel.ProductReferenceId,
+					MainItemCode = variantModel.ProductCode,    
+					MainItemName = variantModel.ProductName,
+					StockQuantity = variantModel.StockQuantity,
+					IsSelected = false,   //
+					IsVariant = true,
+					LocTracking = variantModel.LocTracking,
+					TrackingType = variantModel.TrackingType,
+					//SafeLevel = item.SafeLevel,
+					//Quantity = item.SafeLevel - productModel.StockQuantity,
 				};
 
 				return basketItem;

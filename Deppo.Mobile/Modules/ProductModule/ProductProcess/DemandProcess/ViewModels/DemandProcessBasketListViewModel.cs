@@ -350,8 +350,8 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
 
                 await Shell.Current.GoToAsync($"{nameof(CameraReaderView)}", new Dictionary<string, object>
                 {
-                    ["ComingPage"] = "OutputProductProcessBasket"
-                });
+                    ["ComingPage"] = "DemandProcessBasket"
+				});
             }
             catch (Exception ex)
             {

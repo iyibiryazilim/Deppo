@@ -45,7 +45,7 @@ public class ReworkOutProductModel : INotifyPropertyChanged, IDisposable
 	private string _trackingTypeIcon;
 	private string _trackingTypeIconColor;
 
-	private double _outputQuantity;
+	private double _outputQuantity; // - (outputQuantity) + in Basket
 	private List<ReworkOutProductDetailModel> _details = new();
 
     public ReworkOutProductModel()

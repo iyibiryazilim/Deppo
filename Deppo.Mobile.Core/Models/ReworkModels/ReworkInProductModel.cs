@@ -39,7 +39,7 @@ public class ReworkInProductModel : INotifyPropertyChanged, IDisposable
 	private string _trackingTypeIcon;
 	private string _trackingTypeIconColor;
 
-	private double _inputQuantity;
+	private double _inputQuantity; // - (inputQuantity) + in Basket
 	private WarehouseModel _inWarehouseModel;
 	private List<ReworkInProductDetailModel> _details = new();
 
