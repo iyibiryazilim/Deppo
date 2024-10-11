@@ -76,7 +76,7 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
         VariantTappedCommand = new Command<VariantModel>(async (item) => await VariantTappedAsync(item));
         ConfirmVariantCommand = new Command(async () => await ConfirmVariantAsync());
     }
-    private Page CurrentPage { get; set; } = null!;
+    public Page CurrentPage { get; set; } = null!;
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
@@ -327,6 +327,7 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
                         previouseViewModel.Items.Add(item);
 
                 await Shell.Current.GoToAsync($"..");
+                SearchText.Text = string.Empty;
                 SelectedItems.Clear();
             }
         }
