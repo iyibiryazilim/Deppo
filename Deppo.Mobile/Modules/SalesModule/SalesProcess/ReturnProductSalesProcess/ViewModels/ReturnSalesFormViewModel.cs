@@ -39,6 +39,7 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
     private readonly IWholeSalesReturnDispatchTransactionService _wholeService;
     private readonly ISalesCustomerService _salesCustomerService;
     private readonly IShipAddressService _shipAddressService;
+    private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty]
     private WarehouseModel warehouseModel = null!;
@@ -75,13 +76,17 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
     [ObservableProperty]
     private ObservableCollection<ReturnSalesBasketModel> items = null!;
 
-    public ReturnSalesFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ISalesCustomerService salesCustomerService, IShipAddressService shipAddressService, IRetailSalesReturnDispatchTransactionService retailService, IWholeSalesReturnDispatchTransactionService wholeService)
+    public ReturnSalesFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ISalesCustomerService salesCustomerService, IShipAddressService shipAddressService, IRetailSalesReturnDispatchTransactionService retailService, IWholeSalesReturnDispatchTransactionService wholeService, IServiceProvider serviceProvider)
     {
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
         _salesCustomerService = salesCustomerService;
         _shipAddressService = shipAddressService;
-        Items = new();
+        _serviceProvider = serviceProvider;
+		_retailService = retailService;
+		_wholeService = wholeService;
+
+		Items = new();
         Title = "Satış İade Form İşlemi";
 
         LoadPageCommand = new Command(async () => await LoadPageAsync());
@@ -90,11 +95,7 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
         LoadShipAddressesCommand = new Command<SalesCustomer>(async (x) => await LoadShipAddressesAsync(x));
         SelectWholeCommand = new Command(async (x) => await SelectTransactionTypeAsync(SalesReturnEnumType.Whole));
         SelectRetailCommand = new Command(async (x) => await SelectTransactionTypeAsync(SalesReturnEnumType.Retail));
-
         SaveCommand = new Command(OpenBottomSheetAsync);
-
-        _retailService = retailService;
-        _wholeService = wholeService;
     }
 
     public Page CurrentPage { get; set; }
@@ -208,7 +209,8 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                 {
                     var line = new RetailSalesReturnDispatchTransactionLineInsert
                     {
-                        ProductCode = item.ItemCode,
+                        VariantCode = item.IsVariant ? item.ItemCode : string.Empty,
+                        ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
                         WarehouseNumber = (short)WarehouseModel.Number,
                         Quantity = item.Quantity,
                         ConversionFactor = 1,
@@ -255,8 +257,9 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                 {
                     var wholeSalesDispatchTransactionLineInsert = new WholeSalesReturnTransactionLineInsert
                     {
-                        ProductCode = item.ItemCode,
-                        WarehouseNumber = (short)WarehouseModel.Number,
+						VariantCode = item.IsVariant ? item.ItemCode : string.Empty,
+						ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
+						WarehouseNumber = (short)WarehouseModel.Number,
                         Quantity = item.Quantity,
                         ConversionFactor = 1,
                         OtherConversionFactor = 1,
@@ -305,6 +308,16 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                 FicheNo = string.Empty;
                 SelectedShipAddress = null;
                 SelectedCustomer = null;
+
+                var locationListViewModel = _serviceProvider.GetRequiredService<ReturnSalesBasketLocationListViewModel>();
+                locationListViewModel.SelectedItems.Clear();
+                locationListViewModel.Items.Clear();
+                foreach (var item in Items)
+                {
+                    item.Details.Clear();
+                    item.Dispatches.Clear();
+                }
+
                 Items.Clear();
 
             }
@@ -321,14 +334,6 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
                 {
                     [nameof(ResultModel)] = resultModel
                 });
-                DocumentNumber = string.Empty;
-                DocumentTrackingNumber = string.Empty;
-                SpecialCode = string.Empty;
-                Description = string.Empty;
-                FicheNo = string.Empty;
-                SelectedShipAddress = null;
-                SelectedCustomer = null;
-                Items.Clear();
             }
         }
         catch (Exception ex)
