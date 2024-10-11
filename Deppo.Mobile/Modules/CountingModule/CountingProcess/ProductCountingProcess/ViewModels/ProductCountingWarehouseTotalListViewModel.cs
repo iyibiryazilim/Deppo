@@ -15,7 +15,7 @@ using System.Diagnostics;
 
 namespace Deppo.Mobile.Modules.CountingModule.CountingProcess.ProductCountingProcess.ViewModels;
 
-[QueryProperty(nameof(ProductModel), nameof(ProductModel))]
+[QueryProperty(nameof(ProductCountingBasketModel), nameof(ProductCountingBasketModel))]
 public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
 {
     private readonly IUserDialogs _userDialogs;
@@ -40,7 +40,7 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
     public ProductCountingWarehouseModel selectedWarehouse;
 
     [ObservableProperty]
-    public ProductModel productModel;
+    public ProductCountingBasketModel productCountingBasketModel;
 
 
     public ObservableCollection<ProductCountingWarehouseModel> Items { get; } = new();
@@ -68,7 +68,7 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
 
            
 
-            var result = await _productCountingService.GetWarehouses(httpClient, _httpClientService.FirmNumber,_httpClientService.PeriodNumber,ProductModel.ReferenceId,string.Empty,0,20);
+            var result = await _productCountingService.GetWarehouses(httpClient, _httpClientService.FirmNumber,_httpClientService.PeriodNumber,productReferenceId:ProductCountingBasketModel.IsVariant ? ProductCountingBasketModel.MainItemReferenceId : ProductCountingBasketModel.ItemReferenceId ,string.Empty,0,20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
@@ -115,7 +115,7 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
             IsBusy = true;
             _userDialogs.Loading("Refreshing Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _productCountingService.GetWarehouses(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, ProductModel.ReferenceId, string.Empty, Items.Count, 20);
+            var result = await _productCountingService.GetWarehouses(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber,ProductCountingBasketModel.IsVariant ?  ProductCountingBasketModel.MainItemReferenceId : ProductCountingBasketModel.ItemReferenceId, string.Empty, Items.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
@@ -198,33 +198,12 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
             if (SelectedWarehouse is not null)
             {
 
-                var productCountingBasketModel = new ProductCountingBasketModel
-                {
-                    ProductReferenceId = ProductModel.ReferenceId,
-                    ProductCode = ProductModel.Code,
-                    ProductName = ProductModel.Name,
-                    Image = ProductModel.Image,
-                    StockQuantity = ProductModel.StockQuantity,
-                    OutputQuantity = ProductModel.StockQuantity,
-                    SubUnitsetReferenceId = ProductModel.SubUnitsetReferenceId,
-                    SubUnitsetName = ProductModel.SubUnitsetName,
-                    SubUnitsetCode = ProductModel.SubUnitsetCode,
-                    UnitsetReferenceId = ProductModel.UnitsetReferenceId,
-                    UnitsetName = ProductModel.UnitsetName,
-                    UnitsetCode = ProductModel.UnitsetCode,
-                    LocTracking = ProductModel.LocTracking,
-                    IsVariant = ProductModel.IsVariant,
-                    TrackingType = ProductModel.TrackingType,
-                    DifferenceQuantity = 0,
-                };
-
-
                 if (SelectedWarehouse.LocationCount > 0)
                 {
                     await Shell.Current.GoToAsync($"{nameof(ProductCountingLocationListView)}", new Dictionary<string, object>
                     {
                         [nameof(ProductCountingWarehouseModel)] = SelectedWarehouse,
-                        [nameof(ProductCountingBasketModel)] = productCountingBasketModel
+                        [nameof(ProductCountingBasketModel)] = ProductCountingBasketModel
                     });
                 }
                 else
@@ -232,7 +211,7 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
                     await Shell.Current.GoToAsync($"{nameof(ProductCountingBasketView)}", new Dictionary<string, object>
                     {
                         [nameof(ProductCountingWarehouseModel)] = SelectedWarehouse,
-                        [nameof(ProductModel)] = ProductModel
+                        [nameof(ProductCountingBasketModel)] = ProductCountingBasketModel
 
                     });
                 }

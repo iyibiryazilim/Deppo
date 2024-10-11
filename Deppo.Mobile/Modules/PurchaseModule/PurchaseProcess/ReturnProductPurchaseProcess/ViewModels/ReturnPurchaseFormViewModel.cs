@@ -383,7 +383,8 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
             {
                 var consumableTransactionLineDto = new PurchaseReturnDispatchTransactionLineDto
                 {
-                    ProductCode = item.ItemCode,
+                    ProductCode =item.IsVariant ? item.MainItemCode : item.ItemCode,
+                    VariantCode = item.IsVariant ? item.ItemCode : string.Empty,
                     WarehouseNumber = (short?)WarehouseModel.Number,
                     Quantity = item.Quantity,
                     ConversionFactor = 1,
