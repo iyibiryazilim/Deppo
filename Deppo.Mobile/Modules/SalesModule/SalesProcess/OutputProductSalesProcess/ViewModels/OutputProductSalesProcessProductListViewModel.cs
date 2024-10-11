@@ -4,8 +4,10 @@ using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
+using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.SalesModels.BasketModels;
+using Deppo.Mobile.Core.Models.VariantModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
@@ -20,7 +22,7 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 {
 	IHttpClientService _httpClientService;
 	IWarehouseTotalService _warehouseTotalService;
-	IVariantService _variantService;
+	IVariantWarehouseTotalService _variantWarehouseTotalService;
 	IServiceProvider _serviceProvider;
 	IUserDialogs _userDialogs;
 
@@ -36,11 +38,13 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
     [ObservableProperty]
 	public ObservableCollection<OutputSalesBasketModel> selectedProducts = new();
 
-	public OutputProductSalesProcessProductListViewModel(IHttpClientService httpClientService, IWarehouseTotalService warehouseTotalService, IVariantService variantService, IServiceProvider serviceProvider, IUserDialogs userDialogs)
+	public ObservableCollection<VariantWarehouseTotalModel> ItemVariants { get; } = new();
+
+	public OutputProductSalesProcessProductListViewModel(IHttpClientService httpClientService, IWarehouseTotalService warehouseTotalService, IVariantWarehouseTotalService variantWarehouseTotalService, IServiceProvider serviceProvider, IUserDialogs userDialogs)
 	{
 		_httpClientService = httpClientService;
 		_warehouseTotalService = warehouseTotalService;
-		_variantService = variantService;
+		_variantWarehouseTotalService = variantWarehouseTotalService;
 		_serviceProvider = serviceProvider;
 		_userDialogs = userDialogs;
 
@@ -51,6 +55,10 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 		BackCommand = new Command(async () => await BackAsync());
         PerformSearchCommand = new Command(async () => await PerformSearchAsync());
         PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
+
+		LoadMoreVariantItemsCommand = new Command(async () => await LoadMoreVariantItemsAsync());
+		VariantTappedCommand = new Command<VariantWarehouseTotalModel>(async (item) => await VariantTappedAsync(item));
+		ConfirmVariantCommand = new Command(async () => await ConfirmVariantAsync());
     }
 	public Page CurrentPage { get; set; }
 
@@ -60,7 +68,6 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 	public Command ConfirmCommand { get; }
 	public Command BackCommand { get; }
 
-	public Command LoadVariantItemsCommand { get; }
 	public Command LoadMoreVariantItemsCommand { get; }
 	public Command VariantTappedCommand { get; }
 	public Command ConfirmVariantCommand { get; }
@@ -231,6 +238,8 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 			{
 				if (item.IsVariant)
 				{
+					SelectedProduct = item;
+					await LoadVariantItemsAsync(item);
 					CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.HalfExpanded;
 				}
 				else
@@ -288,6 +297,191 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 				_userDialogs.Loading().Hide();
 
 			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task LoadVariantItemsAsync(WarehouseTotalModel item)
+	{
+
+		try
+		{
+
+			_userDialogs.Loading("Loading Variant Items...");
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _variantWarehouseTotalService.GetObjects(
+				httpClient: httpClient, 
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				warehouseNumber: WarehouseModel.Number,
+				productReferenceId: item.ProductReferenceId,
+				search: string.Empty,
+				skip: 0,
+				take: 20
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data == null)
+					return;
+				ItemVariants.Clear();
+				foreach (var variant in result.Data)
+				{
+					var obj = Mapping.Mapper.Map<VariantWarehouseTotalModel>(variant);
+					ItemVariants.Add(obj);
+				}
+			}
+
+			_userDialogs.Loading().Hide();
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			_userDialogs.Loading().Dispose();
+		}
+	}
+
+	private async Task LoadMoreVariantItemsAsync()
+	{
+		if (ItemVariants.Count < 18)
+			return;
+		if (IsBusy)
+			return;
+
+		try
+		{
+
+			IsBusy = true;
+
+			_userDialogs.Loading("Loading More Variant Items...");
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _variantWarehouseTotalService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				warehouseNumber: WarehouseModel.Number,
+				productReferenceId: SelectedProduct.ProductReferenceId,
+				search: string.Empty,
+				skip: ItemVariants.Count,
+				take: 20
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data == null)
+					return;
+
+				foreach (var variant in result.Data)
+				{
+					var obj = Mapping.Mapper.Map<VariantWarehouseTotalModel>(variant);
+					ItemVariants.Add(obj);
+				}
+			}
+
+			_userDialogs.Loading().Hide();
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.Loading().Hide();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+			_userDialogs.Loading().Dispose();
+		}
+	}
+
+	private async Task VariantTappedAsync(VariantWarehouseTotalModel item)
+	{
+		if (IsBusy)
+			return;
+
+		try
+		{
+			IsBusy = true;
+
+			ItemVariants.ToList().ForEach(x => x.IsSelected = false);
+			var selectedItem = ItemVariants.FirstOrDefault(x => x.VariantReferenceId == item.VariantReferenceId);
+			if (selectedItem != null)
+				selectedItem.IsSelected = true;
+
+
+		}
+		catch (Exception ex)
+		{
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task ConfirmVariantAsync()
+	{
+		if (IsBusy)
+			return;
+
+		try
+		{
+			IsBusy = true;
+
+			var item = ItemVariants.FirstOrDefault(x => x.IsSelected);
+			if (item is null)
+				return;
+
+			var basketItem = new OutputSalesBasketModel
+			{
+				ItemReferenceId = item.VariantReferenceId,
+				ItemCode = item.VariantCode,
+				ItemName = item.VariantName,
+				UnitsetReferenceId = item.UnitsetReferenceId,
+				UnitsetCode = item.UnitsetCode,
+				UnitsetName = item.UnitsetName,
+				SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+				SubUnitsetCode = item.SubUnitsetCode,
+				SubUnitsetName = item.SubUnitsetName,
+				IsSelected = false,
+				MainItemCode = item.ProductCode,
+				MainItemName = item.ProductName,
+				MainItemReferenceId = item.ProductReferenceId,
+				StockQuantity = item.StockQuantity,
+				LocTracking = item.LocTracking,
+				TrackingType = item.TrackingType,
+				IsVariant = true,
+				LocTrackingIcon = item.LocTrackingIcon,
+				VariantIcon = item.VariantIcon,
+				TrackingTypeIcon = item.TrackingTypeIcon,
+				Quantity = item.LocTracking == 0 ? 1 : 0,
+				//Image = item.Image,
+			};
+
+			SelectedProducts.Add(basketItem);
+
+			if (SelectedProduct is not null)
+			{
+				SelectedProduct.IsSelected = true;
+				SelectedItems.Add(SelectedProduct);
+
+			}
+
+			CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.Hidden;
+		}
+		catch (Exception ex)
+		{
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{

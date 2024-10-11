@@ -3,6 +3,7 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.SalesModels.BasketModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
@@ -185,7 +186,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 				CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.FullExpanded;
 
 			}
-			else if (outputSalesBasketModel.TrackingType == 1 || outputSalesBasketModel.LocTracking == 0)
+			else if (outputSalesBasketModel.TrackingType == 1 && outputSalesBasketModel.LocTracking == 0)
 			{
 				await LoadSeriLotTransactionsAsync();
 				CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.FullExpanded;
@@ -266,7 +267,16 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 			LocationTransactions.Clear();
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _locationTransactionService.GetInputObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, outputSalesBasketModel.ItemReferenceId, warehouseNumber: WarehouseModel.Number, 0, 20, "");
+			var result = await _locationTransactionService.GetInputObjectsAsync(
+				httpClient: httpClient, 
+				firmNumber: _httpClientService.FirmNumber, 
+				periodNumber: _httpClientService.PeriodNumber, 
+				productReferenceId: outputSalesBasketModel.IsVariant ? outputSalesBasketModel.MainItemReferenceId : outputSalesBasketModel.ItemReferenceId, 
+				variantReferenceId: outputSalesBasketModel.IsVariant ? outputSalesBasketModel.ItemReferenceId : 0,
+				warehouseNumber: WarehouseModel.Number, 
+				skip: 0, 
+				take: 20, 
+				search: "");
 			if (result.IsSuccess)
 			{
 				if (result.Data is null)
@@ -296,13 +306,16 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 			IsBusy = true;
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _locationTransactionService.GetInputObjectsAsync(httpClient: httpClient,
+			var result = await _locationTransactionService.GetInputObjectsAsync(
+				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
-				productReferenceId: SelectedItem.ItemReferenceId,
+				productReferenceId: SelectedItem.IsVariant ? SelectedItem.MainItemReferenceId : SelectedItem.ItemReferenceId,
+				variantReferenceId: SelectedItem.IsVariant ? SelectedItem.ItemReferenceId : 0,
 				warehouseNumber: WarehouseModel.Number,
 				skip: LocationTransactions.Count,
-				take: 20);
+				take: 20,
+				search: "");
 
 			if (result.IsSuccess)
 			{

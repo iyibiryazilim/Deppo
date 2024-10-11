@@ -5,6 +5,7 @@ using Deppo.Mobile.Core.Models.QuicklyModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrderReworkProcess.Views;
 using DevExpress.Data.Async.Helpers;
 using System.Collections.ObjectModel;
 
@@ -19,7 +20,7 @@ public partial class WorkOrderReworkProcessProductListViewModel : BaseViewModel
 	public ObservableCollection<QuicklyBOMProductModel> Items { get; } = new();
 
 	[ObservableProperty]
-	QuicklyBOMProductModel selectedItem;
+	QuicklyBOMProductModel? selectedItem;
 
 	[ObservableProperty]
 	public SearchBar searchText;
@@ -34,6 +35,8 @@ public partial class WorkOrderReworkProcessProductListViewModel : BaseViewModel
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
 		ItemTappedCommand = new Command<QuicklyBOMProductModel>(async (x) => await ItemTappedAsync(x));
+		BackCommand = new Command(async () => await BackAsync());
+		NextViewCommand = new Command(async () => await NextViewAsync());
 		PerformSearchCommand = new Command(async () => await PerformSearchAsync());
 		PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
 	}
@@ -183,6 +186,58 @@ public partial class WorkOrderReworkProcessProductListViewModel : BaseViewModel
 			IsBusy = false;
 		}
 	}
+	
+	private async Task NextViewAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			await Shell.Current.GoToAsync($"{nameof(WorkOrderReworkProcessBasketView)}");
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+
+		}
+	}
+
+	private async Task BackAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+			var confirm = await _userDialogs.ConfirmAsync("İşlemi iptal etmek istediğinize emin misiniz?", "İptal", "Evet", "Hayır");
+			if (!confirm)
+				return;
+			if (SelectedItem != null)
+			{
+				SelectedItem.IsSelected = false;
+				SelectedItem = null;
+			}
+
+			await Shell.Current.GoToAsync($"..");
+		}
+		catch (Exception ex)
+		{
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 
 	private async Task PerformSearchAsync()
 	{
@@ -233,7 +288,6 @@ public partial class WorkOrderReworkProcessProductListViewModel : BaseViewModel
 			IsBusy = false;
 		}
 	}
-
 
 	private async Task PerformEmptySearchAsync()
 	{
