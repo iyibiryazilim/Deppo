@@ -428,6 +428,7 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 			{
 				ProductCode = item.ItemCode,
 				WarehouseNumber = (short?)WarehouseModel.Number,
+				OrderReferenceId = item.OrderReferenceId,
 				Quantity = item.OutputQuantity,
 				ConversionFactor = 1,
 				OtherConversionFactor = 1,
@@ -528,6 +529,7 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 			{
 				ProductCode = item.ItemCode,
 				WarehouseNumber = (short?)WarehouseModel.Number,
+				OrderReferenceId = item.OrderReferenceId,
 				Quantity = item.OutputQuantity,
 				ConversionFactor = 1,
 				OtherConversionFactor = 1,
