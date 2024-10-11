@@ -38,7 +38,10 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
     [ObservableProperty]
     private PurchaseSupplier purchaseSupplier = null!;
 
-    public InputProductPurchaseOrderProcessSupplierListViewModel(IHttpClientService httpClientService,
+    [ObservableProperty]
+    ShipAddressModel selectedShipAddressModel;
+
+	public InputProductPurchaseOrderProcessSupplierListViewModel(IHttpClientService httpClientService,
 
     IUserDialogs userDialogs,
     IPurchaseSupplierService purchaseSupplierService,
@@ -156,9 +159,9 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
         }
     }
 
-    private async Task ItemTappedAsync(PurchaseSupplier purchaseSupplier)
+    private async Task ItemTappedAsync(PurchaseSupplier item)
     {
-        if (purchaseSupplier is null)
+        if (item is null)
             return;
         if (IsBusy)
             return;
@@ -166,24 +169,20 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
         try
         {
             IsBusy = true;
-
-            // Önceki seçimi kaldır
-            if (PurchaseSupplier is not null)
-            {
-                PurchaseSupplier.IsSelected = false;
-                PurchaseSupplier = null;
-            }
-
-            // Yeni öğeyi seç
-            PurchaseSupplier = purchaseSupplier;
-            PurchaseSupplier.IsSelected = true;
-
-            // Ship adresleri varsa, bottom sheet aç
-            if (purchaseSupplier.ShipAddressCount > 0)
-            {
-                await LoadShipAddressesAsync(purchaseSupplier);
-                CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
-            }
+			if (!item.IsSelected)
+			{
+				if (item.ShipAddressCount > 0)
+				{
+					PurchaseSupplier = item;
+					await LoadShipAddressesAsync(item);
+					CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
+				}
+			}
+			else
+			{
+				item.IsSelected = false;
+				PurchaseSupplier = null;
+			}
         }
         catch (Exception ex)
         {
@@ -249,18 +248,25 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
         {
             IsBusy = true;
 
-            ShipAddresses.ToList().ForEach(x => x.IsSelected = false);
-
-            var selectedItem = ShipAddresses.FirstOrDefault(x => x.ReferenceId == shipAddressModel.ReferenceId);
-            if (selectedItem != null)
-                selectedItem.IsSelected = true;
-        }
+			SelectedShipAddressModel = shipAddressModel;
+			if (shipAddressModel.IsSelected)
+			{
+				SelectedShipAddressModel.IsSelected = false;
+				SelectedShipAddressModel = null;
+			}
+			else
+			{
+				ShipAddresses.ToList().ForEach(x => x.IsSelected = false);
+				SelectedShipAddressModel = shipAddressModel;
+				SelectedShipAddressModel.IsSelected = true;
+			}
+		}
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
 
-            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+           await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
@@ -276,24 +282,31 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
         {
             IsBusy = true;
 
-            var selectedShipAddress = ShipAddresses.FirstOrDefault(x => x.IsSelected);
-            if (selectedShipAddress is not null)
-            {
-                PurchaseSupplier.ShipAddressReferenceId = selectedShipAddress.ReferenceId;
-                PurchaseSupplier.ShipAddressCode = selectedShipAddress.Code;
-                CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.Hidden;
-            }
-            else
-            {
-                _userDialogs.Alert("Lütfen bir adres seçiniz.", "Hata", "Tamam");
-            }
+			var selectedShipAddress = ShipAddresses.FirstOrDefault(x => x.IsSelected);
+			if (selectedShipAddress is not null)
+			{
+				PurchaseSupplier.ShipAddressReferenceId = selectedShipAddress.ReferenceId;
+				PurchaseSupplier.ShipAddressCode = selectedShipAddress.Code;
+				PurchaseSupplier.ShipAddressName = selectedShipAddress.Name;
+
+				// Hem SalesCustomer hem de seçilen Ship Address'in seçildiğini işaretle
+				Items.ToList().ForEach(x => x.IsSelected = false);
+
+				PurchaseSupplier.IsSelected = true;
+
+				CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.Hidden;
+			}
+			else
+			{
+				_userDialogs.Alert("Lütfen bir adres seçiniz.", "Hata", "Tamam");
+			}
         }
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
 
-            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {

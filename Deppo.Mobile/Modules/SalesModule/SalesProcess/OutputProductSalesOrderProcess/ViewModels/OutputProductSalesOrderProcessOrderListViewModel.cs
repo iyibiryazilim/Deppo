@@ -251,6 +251,7 @@ public partial class OutputProductSalesOrderProcessOrderListViewModel : BaseView
 
 					var outputSalesBasketModelItem = new OutputSalesBasketModel
 					{
+						OrderReferenceId = selectedItem.OrderReferenceId,
 						ItemReferenceId = selectedItem.ProductReferenceId,
 						ItemCode = selectedItem.ProductCode,
 						ItemName = selectedItem.ProductName,

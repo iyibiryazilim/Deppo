@@ -281,8 +281,8 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
             }
             else
             {
-                SalesCustomer = null;
                 item.IsSelected = false;
+                SalesCustomer = null;
 
             }
 
