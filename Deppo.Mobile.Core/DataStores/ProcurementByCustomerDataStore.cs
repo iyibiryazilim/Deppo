@@ -70,13 +70,12 @@ public class ProcurementByCustomerDataStore : IProcurementByCustomerService
     [ShipAddressCount]=ISNULL((SELECT COUNT(SHIP.LOGICALREF) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_SHIPINFO AS SHIP WHERE CLIENTREF = CLCARD.LOGICALREF),0),
     [Country] = CLCARD.COUNTRY,
     [City] = CLCARD.CITY
-FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
-LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD
-    ON ORFLINE.CLIENTREF = CLCARD.LOGICALREF
+FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE 
+LEFT JOIN LG_{firmNumber.ToString().PadLeft(3,'0')}_CLCARD AS CLCARD WITH(NOLOCK) ON ORFLINE.CLIENTREF = CLCARD.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_SHIPINFO AS SHIPADRESS ON CLCARD.LOGICALREF = SHIPADRESS.CLIENTREF
 WHERE ORFLINE.CLOSED = 0
     AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0
-    AND ORFLINE.TRCODE = 2 AND ORFLINE.SOURCEINDEX = {warehouseNumber}";
+    AND ORFLINE.TRCODE = 1 AND ORFLINE.SOURCEINDEX = {warehouseNumber}";
 
         if (!string.IsNullOrEmpty(search))
             baseQuery += $@" AND (CLCARD.CODE LIKE '{search}%' OR CLCARD.DEFINITION_ LIKE '%{search}%')";

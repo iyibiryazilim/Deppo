@@ -2,10 +2,10 @@ using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.Views;
 
-public partial class ProcurementByCustomerListView : ContentPage
+public partial class ProcurementByCustomerProductListView : ContentPage
 {
-	private readonly ProcurementByCustomerListViewModel _viewModel;
-	public ProcurementByCustomerListView(ProcurementByCustomerListViewModel viewModel)
+	private ProcurementByCustomerProductListViewModel _viewModel;
+	public ProcurementByCustomerProductListView(ProcurementByCustomerProductListViewModel viewModel)
 	{
 		InitializeComponent();
 		_viewModel = viewModel;

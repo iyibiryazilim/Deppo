@@ -2,47 +2,59 @@ using System;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
-using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.ProcurementModels.ByCustomerModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
+using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
-using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.Views;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.ViewModels;
 
-public partial class ProcurementByCustomerWarehouseListViewModel : BaseViewModel
+[QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
+[QueryProperty(name: nameof(ProcurementCustomerModel), queryId: nameof(ProcurementCustomerModel))]
+public partial class ProcurementByCustomerProductListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
-    private readonly IWarehouseService _warehouseService;
+    private readonly IProcurementByCustomerProductService _procurementByCustomerProductService;
     private readonly IUserDialogs _userDialogs;
 
     [ObservableProperty]
-    private WarehouseModel? selectedWarehouseModel;
+    WarehouseModel? warehouseModel;
 
-    public ProcurementByCustomerWarehouseListViewModel(
-        IHttpClientService httpClientService,
-        IWarehouseService warehouseService,
-        IUserDialogs userDialogs)
+    [ObservableProperty]
+    ProcurementCustomerModel procurementCustomerModel;
+
+    [ObservableProperty]
+    public SearchBar searchText;
+
+    public ProcurementByCustomerProductListViewModel(IHttpClientService httpClientService, IProcurementByCustomerProductService procurementByCustomerProductService, IUserDialogs userDialogs)
     {
         _httpClientService = httpClientService;
-        _warehouseService = warehouseService;
+        _procurementByCustomerProductService = procurementByCustomerProductService;
         _userDialogs = userDialogs;
 
-        Title = "Ambar Seçiniz";
+        Title = "Toplanabilir Ürünler";
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-        ItemTappedCommand = new Command<WarehouseModel>(ItemTappedAsync);
-        NextViewCommand = new Command(async () => await NextViewAsync());
+        ItemTappedCommand = new Command<ProcurementCustomerProductModel>(async (item) => await ItemTappedAsync(item));
     }
 
-    public ObservableCollection<WarehouseModel> Items { get; } = new();
+    public Page CurrentPage { get; set; }
+
+    public ObservableCollection<ProcurementCustomerProductModel> Items { get; } = new();
+    public ObservableCollection<ProcurementCustomerProductModel> SelectedItems { get; } = new();
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
-    public Command<WarehouseModel> ItemTappedCommand { get; }
+    public Command<ProcurementCustomerProductModel> ItemTappedCommand { get; }
+    public Command SelectAllCommand { get; }
+    public Command DeselectAllCommand { get; }
+    public Command PerformSearchCommand { get; }
+    public Command PerformEmptySearchCommand { get; }
     public Command NextViewCommand { get; }
+    public Command BackCommand { get; }
 
     private async Task LoadItemsAsync()
     {
@@ -57,10 +69,12 @@ public partial class ProcurementByCustomerWarehouseListViewModel : BaseViewModel
             Items.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseService.GetObjectsAsync(
+            var result = await _procurementByCustomerProductService.GetObjects(
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
+                warehouseNumber: WarehouseModel?.Number ?? 0,
+                customerReferenceId: ProcurementCustomerModel.ReferenceId,
                 search: string.Empty,
                 skip: 0,
                 take: 20
@@ -71,8 +85,8 @@ public partial class ProcurementByCustomerWarehouseListViewModel : BaseViewModel
                 if (result.Data is not null)
                     foreach (var item in result.Data)
                     {
-                        var warehouse = Mapping.Mapper.Map<WarehouseModel>(item);
-                        Items.Add(warehouse);
+                        var customer = Mapping.Mapper.Map<ProcurementCustomerProductModel>(item);
+                        Items.Add(customer);
                     }
             }
 
@@ -102,12 +116,15 @@ public partial class ProcurementByCustomerWarehouseListViewModel : BaseViewModel
         {
             IsBusy = true;
             _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseService.GetObjectsAsync(
+            var result = await _procurementByCustomerProductService.GetObjects(
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
+                warehouseNumber: WarehouseModel?.Number ?? 0,
+                customerReferenceId: ProcurementCustomerModel.ReferenceId,
                 search: string.Empty,
                 skip: Items.Count,
                 take: 20
@@ -118,8 +135,8 @@ public partial class ProcurementByCustomerWarehouseListViewModel : BaseViewModel
                 if (result.Data is not null)
                     foreach (var item in result.Data)
                     {
-                        var warehouse = Mapping.Mapper.Map<WarehouseModel>(item);
-                        Items.Add(warehouse);
+                        var customer = Mapping.Mapper.Map<ProcurementCustomerProductModel>(item);
+                        Items.Add(customer);
                     }
             }
 
@@ -140,7 +157,7 @@ public partial class ProcurementByCustomerWarehouseListViewModel : BaseViewModel
         }
     }
 
-    private void ItemTappedAsync(WarehouseModel warehouse)
+    private async Task ItemTappedAsync(ProcurementCustomerProductModel item)
     {
         if (IsBusy)
             return;
@@ -149,20 +166,23 @@ public partial class ProcurementByCustomerWarehouseListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            if (warehouse == SelectedWarehouseModel)
+            if (item is not null)
             {
-                SelectedWarehouseModel.IsSelected = false;
-                SelectedWarehouseModel = null;
-            }
-            else
-            {
-                if (SelectedWarehouseModel != null)
+                await Task.Run(() =>
                 {
-                    SelectedWarehouseModel.IsSelected = false;
-                }
+                    if (SelectedItems.Contains(item))
+                    {
+                        item.IsSelected = false;
+                        SelectedItems.Remove(item);
+                    }
+                    else
+                    {
+                        item.IsSelected = true;
+                        SelectedItems.Add(item);
+                    }
 
-                SelectedWarehouseModel = warehouse;
-                SelectedWarehouseModel.IsSelected = true;
+                });
+
             }
 
         }
@@ -176,30 +196,4 @@ public partial class ProcurementByCustomerWarehouseListViewModel : BaseViewModel
         }
     }
 
-    private async Task NextViewAsync()
-	{
-		if (IsBusy)
-			return;
-
-		try
-		{
-			IsBusy = true;
-
-			if (SelectedWarehouseModel is not null)
-			{
-				await Shell.Current.GoToAsync($"{nameof(ProcurementByCustomerListView)}", new Dictionary<string, object>
-				{
-					[nameof(WarehouseModel)] = SelectedWarehouseModel
-				});
-			}
-		}
-		catch (Exception ex)
-		{
-			_userDialogs.Alert(ex.Message);
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
 }
