@@ -69,6 +69,15 @@ public partial class ProcurementCustomerProductModel : ObservableObject
 	[ObservableProperty]
 	string image = string.Empty;
 
+	[ObservableProperty]
+	int _locationReferenceId;
+
+	[ObservableProperty]
+	string _locationCode = string.Empty;
+
+	[ObservableProperty]
+	string _locationName = string.Empty;
+
 	public byte[] ImageData
 	{
 		get
@@ -103,4 +112,8 @@ public partial class ProcurementCustomerProductModel : ObservableObject
 	string trackingTypeIcon = "box-archive";
 
 	public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
+
+	public string ProcurementText => StockQuantity >= WaitingQuantity ? "circle-check" : StockQuantity > 0 ? "triangle-exclamation" : "triangle-exclamation";
+	public string ProcurementTextColor => StockQuantity >= WaitingQuantity ? "Green" : StockQuantity > 0 ? "Gold" : "Red";
+	public string ProcurementToolTipText => StockQuantity >= WaitingQuantity ? "Stokta yeterli miktar var." : StockQuantity > 0 ? "Stokta kısmi miktar var." : "Stokta hiç miktar yok.";
 }

@@ -10,9 +10,9 @@ public class ProcurementByCustomerProductDataStore : IProcurementByCustomerProdu
 {
     private string postUrl = "/gateway/customQuery/CustomQuery";
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int customerReferenceId, string search = "", int skip = 0, int take = 20)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int orderWarehouseNumber,int customerReferenceId, string search = "", int skip = 0, int take = 20)
     {
-        var content = new StringContent(JsonConvert.SerializeObject(ProcurementByCustomerProductListQuery(firmNumber, periodNumber, warehouseNumber, customerReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(ProcurementByCustomerProductListQuery(firmNumber, periodNumber, warehouseNumber, orderWarehouseNumber,customerReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -60,7 +60,7 @@ public class ProcurementByCustomerProductDataStore : IProcurementByCustomerProdu
         }
     }
 
-    private string ProcurementByCustomerProductListQuery(int firmNumber, int periodNumber, int warehouseNumber, int customerReferenceId, string search = "", int skip = 0, int take = 20)
+    private string ProcurementByCustomerProductListQuery(int firmNumber, int periodNumber, int warehouseNumber,int orderWarehouseNumber, int customerReferenceId, string search = "", int skip = 0, int take = 20)
     {
         string baseQuery = $@"SELECT
 			[ItemReferenceId] = CASE WHEN ORFLINE.VARIANTREF <> 0 THEN VARIANT.LOGICALREF ELSE ITEMS.LOGICALREF END,
@@ -81,7 +81,7 @@ public class ProcurementByCustomerProductDataStore : IProcurementByCustomerProdu
             [Quantity] = SUM(ORFLINE.AMOUNT),
             [Image] = '',
             [ShippedQuantity] = SUM(ORFLINE.SHIPPEDAMOUNT),
-            [StockQuantity] = ISNULL((SELECT SUM(ONHAND) FROM LV_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STINVTOT AS STINVTOT WITH(NOLOCK) WHERE STINVTOT.STOCKREF = ITEMS.LOGICALREF),0),
+            [StockQuantity] = ISNULL((SELECT SUM(ONHAND) FROM LV_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STINVTOT AS STINVTOT WITH(NOLOCK) WHERE STINVTOT.STOCKREF = ITEMS.LOGICALREF AND STINVTOT.INVENNO = {warehouseNumber}),0),
 			[WaitingQuantity] = ISNULL(SUM((ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT)), 0)
 		FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE WITH(NOLOCK)
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFICHE AS ORFICHE WITH(NOLOCK) ON ORFLINE.ORDFICHEREF = ORFICHE.LOGICALREF
@@ -90,7 +90,7 @@ public class ProcurementByCustomerProductDataStore : IProcurementByCustomerProdu
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET WITH(NOLOCK) ON ORFLINE.UOMREF = SUBUNITSET.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET WITH(NOLOCK) ON ORFLINE.USREF = UNITSET.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT WITH(NOLOCK) ON ORFLINE.VARIANTREF = VARIANT.LOGICALREF
-		WHERE CLCARD.LOGICALREF = {customerReferenceId} AND ORFLINE.CLOSED = 0 AND ORFLINE.USREF <> 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 1 AND ORFLINE.SOURCEINDEX = {warehouseNumber}
+		WHERE CLCARD.LOGICALREF = {customerReferenceId} AND ORFLINE.CLOSED = 0 AND ORFLINE.USREF <> 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 1 AND ORFLINE.SOURCEINDEX = {orderWarehouseNumber}
 		";
 
         if (!string.IsNullOrEmpty(search))

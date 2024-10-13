@@ -93,5 +93,7 @@ public class MappingProfile : Profile
         CreateMap<SupplierDetailInputOutputModel, dynamic>();
         CreateMap<CustomerDetailInputOutputModel, dynamic>();
         CreateMap<ProcurementCustomerModel, dynamic>();
+        CreateMap<ProcurementCustomerBasketModel, dynamic>();
+        CreateMap<ProcurementCustomerBasketProductModel, dynamic>();
     }
 }

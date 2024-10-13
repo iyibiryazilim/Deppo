@@ -85,17 +85,28 @@
                                     <Setter Property="BackgroundColor" Value="Transparent" />
                                 </DataTrigger>
                             </Border.Triggers>
-                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
-                                <Border StrokeShape="RoundRectangle 5" StrokeThickness="0.5">
+                            <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="10">
+                                <Label
+                                    Grid.Column="0"
+                                        FontAttributes="Bold"
+                                        FontFamily="FAS"
+                                        FontSize="20"
+                                        HorizontalOptions="Center"
+                                        ToolTipProperties.Text="{Binding ProcurementToolTipText}"
+                                        Text="{Binding ProcurementText}"
+                                        TextColor="{Binding ProcurementTextColor}"
+                                        VerticalOptions="Center" />
+
+                                <Border Grid.Column="1" StrokeShape="RoundRectangle 5" StrokeThickness="0.5">
                                     <Image
-                                        Grid.Column="0"
+                                        
                                         Aspect="AspectFill"
                                         HeightRequest="50"
                                         Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                         WidthRequest="50" />
                                 </Border>
 
-                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <VerticalStackLayout Grid.Column="2" Spacing="2">
                                     <Label
                                         FontAttributes="Bold"
                                         LineBreakMode="TailTruncation"
@@ -139,16 +150,7 @@
                                     </Grid>
 
                                 </VerticalStackLayout>
-                                <Border
-                                    StrokeShape="RoundRectangle 10"
-                                    WidthRequest="50"
-                                    Stroke="Green"
-                                    VerticalOptions="Start"
-                                    Grid.Column="2"
-                                    Padding="5"
-                                    BackgroundColor="Green">
-                                    <Label Text="Hazır" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold" />
-                                </Border>
+                                 
                             </Grid>
                         </Border>
                     </DataTemplate>
@@ -160,7 +162,7 @@
             Grid.Row="1"
             Margin="5,10,5,20"
             Command="{Binding NextViewCommand}"
-            Text="İleri" />
+            Text="Başlat" />
     </Grid>
 
 </ContentPage>
