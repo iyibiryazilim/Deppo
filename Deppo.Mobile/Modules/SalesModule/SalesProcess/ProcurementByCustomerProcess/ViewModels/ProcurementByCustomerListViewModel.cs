@@ -410,9 +410,9 @@ public partial class ProcurementByCustomerListViewModel : BaseViewModel
     private async Task NextViewAsync()
     {
         if (SelectedCustomerModel is not null)
-            await Shell.Current.GoToAsync($"{nameof(ProcurementByCustomerProductListView)}", new Dictionary<string, object>
+            await Shell.Current.GoToAsync($"{nameof(ProcurementByCustomerProcurementWarehouseListView)}", new Dictionary<string, object>
             {
-                [nameof(WarehouseModel)] = WarehouseModel,
+                ["OrderWarehouseModel"] = WarehouseModel,
                 [nameof(ProcurementCustomerModel)] = SelectedCustomerModel
             });
     }

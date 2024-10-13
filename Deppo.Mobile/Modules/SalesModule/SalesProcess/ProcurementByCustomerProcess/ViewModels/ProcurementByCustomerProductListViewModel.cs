@@ -8,11 +8,13 @@ using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.Views;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.ViewModels;
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(ProcurementCustomerModel), queryId: nameof(ProcurementCustomerModel))]
+[QueryProperty(name: nameof(OrderWarehouseModel), queryId: nameof(OrderWarehouseModel))]
 public partial class ProcurementByCustomerProductListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -21,6 +23,9 @@ public partial class ProcurementByCustomerProductListViewModel : BaseViewModel
 
     [ObservableProperty]
     WarehouseModel? warehouseModel;
+
+    [ObservableProperty]
+    WarehouseModel? orderWarehouseModel;
 
     [ObservableProperty]
     ProcurementCustomerModel procurementCustomerModel;
@@ -39,12 +44,12 @@ public partial class ProcurementByCustomerProductListViewModel : BaseViewModel
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<ProcurementCustomerProductModel>(async (item) => await ItemTappedAsync(item));
+        NextViewCommand = new Command(async () => await NextViewAsync());
     }
 
     public Page CurrentPage { get; set; }
 
     public ObservableCollection<ProcurementCustomerProductModel> Items { get; } = new();
-    public ObservableCollection<ProcurementCustomerProductModel> SelectedItems { get; } = new();
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
@@ -74,6 +79,7 @@ public partial class ProcurementByCustomerProductListViewModel : BaseViewModel
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 warehouseNumber: WarehouseModel?.Number ?? 0,
+                orderWarehouseNumber: OrderWarehouseModel?.Number ?? 0,
                 customerReferenceId: ProcurementCustomerModel.ReferenceId,
                 search: string.Empty,
                 skip: 0,
@@ -124,6 +130,7 @@ public partial class ProcurementByCustomerProductListViewModel : BaseViewModel
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 warehouseNumber: WarehouseModel?.Number ?? 0,
+                orderWarehouseNumber: OrderWarehouseModel?.Number ?? 0,
                 customerReferenceId: ProcurementCustomerModel.ReferenceId,
                 search: string.Empty,
                 skip: Items.Count,
@@ -159,6 +166,45 @@ public partial class ProcurementByCustomerProductListViewModel : BaseViewModel
 
     private async Task ItemTappedAsync(ProcurementCustomerProductModel item)
     {
+        // if (IsBusy)
+        //     return;
+
+        // try
+        // {
+        //     IsBusy = true;
+
+        //     if (item is not null)
+        //     {
+        //         await Task.Run(() =>
+        //         {
+        //             if (SelectedItems.Contains(item))
+        //             {
+        //                 item.IsSelected = false;
+        //                 SelectedItems.Remove(item);
+        //             }
+        //             else
+        //             {
+        //                 item.IsSelected = true;
+        //                 SelectedItems.Add(item);
+        //             }
+
+        //         });
+
+        //     }
+
+        // }
+        // catch (System.Exception ex)
+        // {
+        //     _userDialogs.Alert($"{ex.Message}", "Hata", "Tamam");
+        // }
+        // finally
+        // {
+        //     IsBusy = false;
+        // }
+    }
+
+    public async Task NextViewAsync()
+    {
         if (IsBusy)
             return;
 
@@ -166,26 +212,18 @@ public partial class ProcurementByCustomerProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            if (item is not null)
+            if (Items.Count > 0)
             {
-                await Task.Run(() =>
+
+                var param = GetProcurementProductList(Items);
+
+                await Shell.Current.GoToAsync($"{nameof(ProcurementByCustomerBasketView)}", new Dictionary<string, object>
                 {
-                    if (SelectedItems.Contains(item))
-                    {
-                        item.IsSelected = false;
-                        SelectedItems.Remove(item);
-                    }
-                    else
-                    {
-                        item.IsSelected = true;
-                        SelectedItems.Add(item);
-                    }
-
+                    [nameof(ProcurementCustomerBasketModel)] = param
                 });
-
             }
-
         }
+
         catch (System.Exception ex)
         {
             _userDialogs.Alert($"{ex.Message}", "Hata", "Tamam");
@@ -194,6 +232,24 @@ public partial class ProcurementByCustomerProductListViewModel : BaseViewModel
         {
             IsBusy = false;
         }
+
+    }
+
+    /// <summary>
+    /// Kısmi veya tamamı toplanabilir ürünleri getirir.
+    /// </summary>
+    /// <param name="items"></param>
+    /// <returns></returns>
+    private ProcurementCustomerBasketModel GetProcurementProductList(ObservableCollection<ProcurementCustomerProductModel> items)
+    {
+        var procurementProductList = Items.Where(x => x.StockQuantity >= x.WaitingQuantity || x.StockQuantity > 0).ToList();
+
+        ProcurementCustomerBasketModel procurementCustomerBasketModel = new();
+        procurementCustomerBasketModel.ProcurementProductList = procurementProductList;
+        procurementCustomerBasketModel.WarehouseNumber = WarehouseModel?.Number ?? 0;
+        procurementCustomerBasketModel.WarehouseName = WarehouseModel?.Name ?? string.Empty;
+
+        return procurementCustomerBasketModel;
     }
 
 }
