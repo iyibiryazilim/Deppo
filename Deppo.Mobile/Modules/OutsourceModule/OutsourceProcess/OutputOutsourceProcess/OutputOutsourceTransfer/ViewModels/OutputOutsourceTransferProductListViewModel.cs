@@ -199,61 +199,60 @@ public partial class OutputOutsourceTransferProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-           
-            if (item.IsVariant)
+            SelectedProduct = item;
+
+            if(item.IsSelected)
             {
-                SelectedProduct = item;
-                await LoadVariantItemsAsync(item);
-                CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.HalfExpanded;
-            }
+                item.IsSelected = false;
+                SelectedItems.Remove(item);
+
+				var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ProductReferenceId);
+				if (selectedItem is not null)
+				{
+					SelectedProducts.Remove(selectedItem);
+				}
+			}
             else
             {
-                if (!item.IsSelected)
+                if(item.IsVariant)
                 {
-                    Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
-                    SelectedProduct = item;
-                    SelectedItems.Add(item);
-
-                    var basketItem = new OutputOutsourceTransferBasketModel
-                    {
-                        ItemReferenceId = item.ProductReferenceId,
-                        ItemCode = item.ProductCode,
-                        ItemName = item.ProductName,
-                        UnitsetReferenceId = item.UnitsetReferenceId,
-                        UnitsetCode = item.UnitsetCode,
-                        UnitsetName = item.UnitsetName,
-                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                        SubUnitsetCode = item.SubUnitsetCode,
-                        SubUnitsetName = item.SubUnitsetName,
-                        MainItemReferenceId = default,  //
-                        MainItemCode = string.Empty,    //
-                        MainItemName = string.Empty,    //
-                        StockQuantity = item.StockQuantity,
-                        IsSelected = false,   //
-                        IsVariant = item.IsVariant,
-                        LocTracking = item.LocTracking,
-                        TrackingType = item.TrackingType,
-                        Quantity = item.LocTracking == 0 ? 1 : 0,
-                        LocTrackingIcon = item.LocTrackingIcon,
-                        VariantIcon = item.VariantIcon,
-                        TrackingTypeIcon = item.TrackingTypeIcon,
-                    };
-
-                    SelectedProducts.Add(basketItem);
+                    await LoadVariantItemsAsync(item);
+                    CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.HalfExpanded;
                 }
                 else
                 {
-                    SelectedProduct.IsSelected = false;
-                    SelectedProduct = null;
-                    var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ProductReferenceId);
-                    if (selectedItem is not null)
-                    {
-                        SelectedProducts.Remove(selectedItem);
-                        Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
-                        SelectedItems.Remove(item);
-                    }
-                }
+                    item.IsSelected = true;
+                    SelectedItems.Add(item);
+
+					var basketItem = new OutputOutsourceTransferBasketModel
+					{
+						ItemReferenceId = item.ProductReferenceId,
+						ItemCode = item.ProductCode,
+						ItemName = item.ProductName,
+						UnitsetReferenceId = item.UnitsetReferenceId,
+						UnitsetCode = item.UnitsetCode,
+						UnitsetName = item.UnitsetName,
+						SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+						SubUnitsetCode = item.SubUnitsetCode,
+						SubUnitsetName = item.SubUnitsetName,
+						MainItemReferenceId = default,  //
+						MainItemCode = string.Empty,    //
+						MainItemName = string.Empty,    //
+						StockQuantity = item.StockQuantity,
+						IsSelected = false,   //
+						IsVariant = item.IsVariant,
+						LocTracking = item.LocTracking,
+						TrackingType = item.TrackingType,
+						Quantity = item.LocTracking == 0 ? 1 : 0,
+						LocTrackingIcon = item.LocTrackingIcon,
+						VariantIcon = item.VariantIcon,
+						TrackingTypeIcon = item.TrackingTypeIcon,
+					};
+
+					SelectedProducts.Add(basketItem);
+				}
             }
+           
         }
         catch (Exception ex)
         {
@@ -584,6 +583,40 @@ public partial class OutputOutsourceTransferProductListViewModel : BaseViewModel
         if (string.IsNullOrWhiteSpace(SearchText.Text))
         {
             await PerformSearchAsync();
+        }
+    }
+
+    public async Task ClearPageAsync()
+    {
+        try
+        {
+            await Task.Run(() =>
+            {
+                if(SelectedProduct is not null)
+                {
+					SelectedProduct.IsSelected = false;
+					SelectedProduct = null;
+				}
+
+                SelectedItems.Clear();
+				SelectedProducts.Clear();
+				Items.Clear();
+				ItemVariants.Clear();
+				SearchText.Text = string.Empty;
+               
+            });
+
+        }
+        catch (Exception ex)
+        {
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 

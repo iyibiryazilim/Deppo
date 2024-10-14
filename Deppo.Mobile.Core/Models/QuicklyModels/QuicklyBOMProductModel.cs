@@ -9,7 +9,11 @@ namespace Deppo.Mobile.Core.Models.QuicklyModels
 {
     public class QuicklyBOMProductModel : QuicklyBOMProduct
     {
-        private int _referenceId2;
+		private int _mainItemReferenceId;
+		private string _mainItemCode = string.Empty;
+		private string _mainItemName = string.Empty;
+
+		private int _referenceId2;
         private bool _isSelected;
         private string _locTrackingIcon;
         private string _locTrackingIconColor;
@@ -26,7 +30,38 @@ namespace Deppo.Mobile.Core.Models.QuicklyModels
         {
         }
 
+        public int MainItemReferenceId
+        {
+            get => _mainItemReferenceId;
+            set
+            {
+                if (_mainItemReferenceId == value) return;
+                _mainItemReferenceId = value;
+                NotifyPropertyChanged();
+            }
+        }
 
+        public string MainItemCode
+        {
+            get => _mainItemCode;
+            set
+            {
+                if (_mainItemCode == value) return;
+                _mainItemCode = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public string MainItemName
+        {
+            get => _mainItemName;
+            set
+			{
+				if (_mainItemName == value) return;
+				_mainItemName = value;
+				NotifyPropertyChanged();
+			}
+        }
 
         public double Amount 
         {
