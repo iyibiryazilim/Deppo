@@ -21,6 +21,7 @@ public class BOMSubProductModel : Product
     private int _warehouseNumber = default;
     private int _mainProductReferenceId = default;
     private string _mainProductCode = string.Empty;
+    private string _mainProductName = string.Empty;
 
 
 
@@ -77,7 +78,7 @@ public class BOMSubProductModel : Product
     
     public string MainProductCode
     {
-        get => _mainProductCode = _mainProductCode ?? string.Empty;
+        get => _mainProductCode;
         set
         {
             if (_mainProductCode == value) return;
@@ -85,6 +86,17 @@ public class BOMSubProductModel : Product
             NotifyPropertyChanged();
         }
     }
+
+    public string MainProductName
+	{
+		get => _mainProductName;
+		set
+		{
+			if (_mainProductName == value) return;
+			_mainProductName = value;
+			NotifyPropertyChanged();
+		}
+	}
     
     public bool IsSelected
     {
