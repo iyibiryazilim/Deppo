@@ -5,10 +5,14 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.OutsourceModels;
 using Deppo.Mobile.Core.Models.ProductModels;
+using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.Views;
+using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels;
 
@@ -17,6 +21,7 @@ public partial class OutsourceListViewModel : BaseViewModel
     private readonly IHttpClientService _httpClientService;
     private readonly IOutsourceService _outsourceService;
     private readonly IUserDialogs _userDialogs;
+
     public OutsourceListViewModel(IHttpClientService httpClientService, IOutsourceService outsourceService, IUserDialogs userDialogs)
     {
         _httpClientService = httpClientService;
@@ -42,6 +47,7 @@ public partial class OutsourceListViewModel : BaseViewModel
 
     [ObservableProperty]
     public SearchBar searchText;
+
     public async Task LoadItemsAsync()
     {
         if (IsBusy)
@@ -55,7 +61,7 @@ public partial class OutsourceListViewModel : BaseViewModel
             _userDialogs.Loading("Loading Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             await Task.Delay(1000);
-            var result = await _outsourceService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber,SearchText.Text, Items.Count, 20);
+            var result = await _outsourceService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, Items.Count, 20);
             if (result.IsSuccess)
             {
                 if (result.Data == null)
@@ -144,7 +150,7 @@ public partial class OutsourceListViewModel : BaseViewModel
                 return;
             }
             IsBusy = true;
-           
+
             Items.Clear();
             _userDialogs.Loading("Searching Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
@@ -169,9 +175,7 @@ public partial class OutsourceListViewModel : BaseViewModel
             }
 
             _userDialogs.Loading().Hide();
-
         }
-
         catch (Exception ex)
         {
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -181,7 +185,6 @@ public partial class OutsourceListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
 
     private async Task PerformEmptySearchAsync()
     {
@@ -203,7 +206,13 @@ public partial class OutsourceListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            
+            OutsourceDetailModel outsourceDetailModel = new();
+            outsourceDetailModel.Outsource = outsource;
+
+            await Shell.Current.GoToAsync($"{nameof(OutsourceDetailView)}", new Dictionary<string, object> { {
+                nameof(OutsourceDetailModel), outsourceDetailModel
+                }
+                });
         }
         catch (Exception ex)
         {
@@ -214,5 +223,4 @@ public partial class OutsourceListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
 }

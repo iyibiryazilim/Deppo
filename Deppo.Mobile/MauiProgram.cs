@@ -490,21 +490,26 @@ public static class MauiProgram
         #endregion İrsaliyeye Bağlı Satış İade İşlemleri
 
         #region Müşteriye Göre Ürün Toplama
+
         builder.Services.AddTransientWithShellRoute<ProcurementByCustomerWarehouseListView, ProcurementByCustomerWarehouseListViewModel>(nameof(ProcurementByCustomerWarehouseListView));
         builder.Services.AddScopedWithShellRoute<ProcurementByCustomerListView, ProcurementByCustomerListViewModel>(nameof(ProcurementByCustomerListView));
         builder.Services.AddScopedWithShellRoute<ProcurementByCustomerProcurementWarehouseListView, ProcurementByCustomerProcurementWarehouseListViewModel>(nameof(ProcurementByCustomerProcurementWarehouseListView));
         builder.Services.AddScopedWithShellRoute<ProcurementByCustomerProductListView, ProcurementByCustomerProductListViewModel>(nameof(ProcurementByCustomerProductListView));
         builder.Services.AddScopedWithShellRoute<ProcurementByCustomerBasketView, ProcurementByCustomerBasketViewModel>(nameof(ProcurementByCustomerBasketView));
-        #endregion
+
+        #endregion Müşteriye Göre Ürün Toplama
 
         #region Malzemeye Göre Ürün Toplama
+
         builder.Services.AddTransientWithShellRoute<ProcurementByProductWarehouseListView, ProcurementByProductWarehouseListViewModel>(nameof(ProcurementByProductWarehouseListView));
-        #endregion
+
+        #endregion Malzemeye Göre Ürün Toplama
 
         #region Stok Yerine (Rafa) Göre Ürün Toplama
-        builder.Services.AddTransientWithShellRoute<ProcurementByLocationWarehouseListView, ProcurementByCustomerWarehouseListViewModel>(nameof(ProcurementByLocationWarehouseListView));
-        #endregion
 
+        builder.Services.AddTransientWithShellRoute<ProcurementByLocationWarehouseListView, ProcurementByCustomerWarehouseListViewModel>(nameof(ProcurementByLocationWarehouseListView));
+
+        #endregion Stok Yerine (Rafa) Göre Ürün Toplama
 
         #endregion Sales Modules
 
@@ -658,14 +663,15 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddScopedWithShellRoute<ManuelReworkProcessAllProductListView, ManuelReworkProcessAllProductListViewModel>(nameof(ManuelReworkProcessAllProductListView));
         builder.Services.AddScopedWithShellRoute<ManuelReworkProcessFormView, ManuelReworkProcessFormViewModel>(nameof(ManuelReworkProcessFormView));
 
-        #endregion
+        #endregion Manuel Rework
 
         #region Work Order Rework
+
         builder.Services.AddScopedWithShellRoute<WorkOrderReworkProcessProductListView, WorkOrderReworkProcessProductListViewModel>(nameof(WorkOrderReworkProcessProductListView));
         builder.Services.AddScopedWithShellRoute<WorkOrderReworkProcessBasketView, WorkOrderReworkProcessBasketViewModel>(nameof(WorkOrderReworkProcessBasketView));
         builder.Services.AddScopedWithShellRoute<WorkOrderReworkProcessFormView, WorkOrderReworkProcessFormViewModel>(nameof(WorkOrderReworkProcessFormView));
-        #endregion
 
+        #endregion Work Order Rework
 
         #endregion Quickly Production Modules
 
@@ -692,6 +698,8 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         #region OutSource Panel
 
         builder.Services.AddScopedWithShellRoute<OutsourcePanelAllFicheListView, OutsourcePanelAllFicheListViewModel>(nameof(OutsourcePanelAllFicheListView));
+
+        // builder.Services.AddScopedWithShellRoute<OutsourceInputTransactionView, OutsourceInputTransactionViewModel>()nameof(OutsourceInputTransactionView));
 
         #endregion OutSource Panel
 
