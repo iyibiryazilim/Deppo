@@ -8,6 +8,7 @@ using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using DevExpress.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.ViewModels;
 
@@ -24,6 +25,10 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
     [ObservableProperty]
     int currentPosition;
 
+    [ObservableProperty]
+    int totalPosition;
+
+
     public ProcurementByCustomerBasketViewModel(
         IHttpClientService httpClientService,
         IProcurementByCustomerBasketService procurementByCustomerBasketService,
@@ -38,17 +43,24 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         NextPositionCommand = new Command(NextPositionAsync);
         PreviousPositionCommand = new Command(PreviousPositionAsync);
+        ProcurementInfoCommand = new Command(async () => await ProcurementInfoAsync());
 
 
     }
 
     public Page CurrentPage { get; set; }
+    public bool IsPreviousButtonVisible => CurrentPosition == 0 ? false : true;
+    public bool IsNextButtonVisible => CurrentPosition == TotalPosition ? false : true;
+    public bool IsCompleteButtonVisible => Items.Count > 0 && CurrentPosition == TotalPosition ? true : false;
+    public bool IsPageIndicatorVisible => !IsCompleteButtonVisible;
+
 
     public ObservableCollection<ProcurementCustomerBasketModel> Items { get; } = new();
 
     public Command LoadItemsCommand { get; }
     public Command NextPositionCommand { get; }
     public Command PreviousPositionCommand { get; }
+    public Command ProcurementInfoCommand { get; }
 
 
     private async Task LoadItemsAsync()
@@ -62,6 +74,7 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
             IsBusy = true;
 
             _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(1000);
             Items.Clear();
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
@@ -78,14 +91,16 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
             {
                 if (result.Data is not null)
                 {
-                    var groupByLocation = result.Data.GroupBy(x => new
-                    {
-                        LocationReferenceId = x.LocationReferenceId,
-                        LocationCode = x.LocationCode,
-                        LocationName = x.LocationName,
-                        WarehouseNumber = x.WarehouseNumber,
-                        WarehouseName = x.WarehouseName
-                    });
+                    var groupByLocation = result.Data
+                        .OrderBy(x => x.LocationName)
+                        .GroupBy(x => new
+                        {
+                            LocationReferenceId = x.LocationReferenceId,
+                            LocationCode = x.LocationCode,
+                            LocationName = x.LocationName,
+                            WarehouseNumber = x.WarehouseNumber,
+                            WarehouseName = x.WarehouseName
+                        });
 
                     foreach (var group in groupByLocation)
                     {
@@ -130,6 +145,8 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
                     }
 
                 }
+
+                TotalPosition = Items.Count - 1;
             }
 
             if (_userDialogs.IsHudShowing)
@@ -158,7 +175,8 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            CurrentPosition = CurrentPage.FindByName<CarouselView>("carouselView").Position + 1;
+            if (CurrentPosition != TotalPosition)
+                CurrentPosition = CurrentPage.FindByName<CarouselView>("carouselView").Position + 1;
         }
         catch (System.Exception)
         {
@@ -178,7 +196,7 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            
+
             if (CurrentPosition == 0)
                 return;
 
@@ -187,6 +205,30 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
         catch (System.Exception)
         {
             _userDialogs.Alert("Bir hata oluştu.", "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    public async Task ProcurementInfoAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            CurrentPage.FindByName<BottomSheet>("procurementInfoBottomSheet").State = BottomSheetState.HalfExpanded;
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {

@@ -6,6 +6,12 @@ namespace Deppo.Mobile.Core.Models.ProcurementModels.ByCustomerModels;
 
 public class ProcurementCustomerBasketModel : INotifyPropertyChanged, IDisposable
 {
+    private int _customerReferenceId;
+    private string _customerCode = string.Empty;
+    private string _customerName = string.Empty;
+    private int _shipAddressReferenceId;
+    private string _shipAddressCode = string.Empty;
+    private string _shipAddressName = string.Empty;
     private int _locationReferenceId;
     private string _locationCode = string.Empty;
     private string _locationName = string.Empty;
@@ -18,6 +24,80 @@ public class ProcurementCustomerBasketModel : INotifyPropertyChanged, IDisposabl
     public ProcurementCustomerBasketModel()
     {
         Products = new List<ProcurementCustomerBasketProductModel>();
+    }
+
+    [Browsable(false)]
+    public int CustomerReferenceId
+    {
+        get => _customerReferenceId;
+        set
+        {
+            if (_customerReferenceId == value) return;
+            _customerReferenceId = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    [DisplayName("Müşteri Kodu")]
+    public string CustomerCode
+    {
+        get => _customerCode;
+        set
+        {
+            if (_customerCode == value) return;
+            _customerCode = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+
+    [DisplayName("Müşteri Adı")]
+    public string CustomerName
+    {
+        get => _customerName;
+        set
+        {
+            if (_customerName == value) return;
+            _customerName = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    [Browsable(false)]
+    public int ShipAddressReferenceId
+    {
+        get => _shipAddressReferenceId;
+        set
+        {
+            if (_shipAddressReferenceId == value) return;
+            _shipAddressReferenceId = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    [DisplayName("Sevk Adresi Kodu")]
+    public string ShipAddressCode
+    {
+        get => _shipAddressCode;
+        set
+        {
+            if (_shipAddressCode == value) return;
+            _shipAddressCode = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+
+    [DisplayName("Sevk Adresi Adı")]
+    public string ShipAddressName
+    {
+        get => _shipAddressName;
+        set
+        {
+            if (_shipAddressName == value) return;
+            _shipAddressName = value;
+            NotifyPropertyChanged();
+        }
     }
 
     [Browsable(false)]

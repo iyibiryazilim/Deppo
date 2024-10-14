@@ -29,7 +29,7 @@ public partial class ProcurementByCustomerWarehouseListViewModel : BaseViewModel
         _warehouseService = warehouseService;
         _userDialogs = userDialogs;
 
-        Title = "Ambar Seçiniz";
+        Title = "Sipariş Ambarı Seçiniz";
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
