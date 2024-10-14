@@ -7,6 +7,8 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProcess.Views;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.Views;
+using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProcess.ViewModels;
@@ -42,6 +44,8 @@ public partial class WarehouseCountingWarehouseListViewModel : BaseViewModel
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
+
+    public Page CurrentPage { get; set; } = null!;
 
     private async Task LoadItemsAsync()
     {
@@ -161,6 +165,73 @@ public partial class WarehouseCountingWarehouseListViewModel : BaseViewModel
         {
             IsBusy = true;
 
+            if(SelectedWarehouse.LocationCount == 0)
+                CurrentPage.FindByName<BottomSheet>("productOrVariantBottomSheet").State = BottomSheetState.HalfExpanded;
+            else
+            {
+                await Shell.Current.GoToAsync($"{nameof(WarehouseCountingLocationListView)}", new Dictionary<string, object>
+                {
+                    [nameof(WarehouseCountingWarehouseModel)] = SelectedWarehouse,
+                });
+            }
+           
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task SelectProductsAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+            CurrentPage.FindByName<BottomSheet>("productTypeBottomSheet").State = BottomSheetState.Hidden;
+            if (SelectedWarehouse is not null)
+            {
+                if (SelectedWarehouse.LocationCount > 0)
+                {
+                   
+                }
+                else
+                {
+                    await Shell.Current.GoToAsync($"{nameof(WarehouseCountingProductListView)}", new Dictionary<string, object>
+                    {
+                        [nameof(WarehouseCountingWarehouseModel)] = SelectedWarehouse,
+                    });
+
+                }
+
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task SelectVariantsAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+            CurrentPage.FindByName<BottomSheet>("productTypeBottomSheet").State = BottomSheetState.Hidden;
             if (SelectedWarehouse is not null)
             {
                 if (SelectedWarehouse.LocationCount > 0)
@@ -178,12 +249,15 @@ public partial class WarehouseCountingWarehouseListViewModel : BaseViewModel
                     });
 
                 }
-              
+
             }
         }
         catch (Exception ex)
         {
-            _userDialogs.Alert(ex.Message);
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
         finally
         {

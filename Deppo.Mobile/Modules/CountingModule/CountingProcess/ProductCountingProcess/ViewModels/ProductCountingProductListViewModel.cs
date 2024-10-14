@@ -324,7 +324,9 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
+
             var item = ItemVariants.FirstOrDefault(x => x.IsSelected);
+            ProductCountingBasketModel = new();
             ProductCountingBasketModel.ItemReferenceId = item.ReferenceId;
             ProductCountingBasketModel.ItemCode = item.Code;
             ProductCountingBasketModel.ItemName = item.Name;
