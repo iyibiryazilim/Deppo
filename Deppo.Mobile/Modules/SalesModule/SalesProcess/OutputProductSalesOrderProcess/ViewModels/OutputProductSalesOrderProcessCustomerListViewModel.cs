@@ -278,6 +278,11 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
                     await LoadShipAddressesAsync(item);
                     CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
                 }
+                else
+                {
+                    item.IsSelected = true;
+                    SalesCustomer = item;
+                }
             }
             else
             {
