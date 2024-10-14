@@ -24,5 +24,6 @@ public class BaseDispatchTransactionLineDto
     public string? SpeCode { get; set; }
     public double? ConversionFactor { get; set; }
     public double? OtherConversionFactor { get; set; }
+
     public IList<Deppo.Core.DTOs.SeriLotTransactionDto.SeriLotTransactionDto> SeriLotTransactions { get; set; }
 }

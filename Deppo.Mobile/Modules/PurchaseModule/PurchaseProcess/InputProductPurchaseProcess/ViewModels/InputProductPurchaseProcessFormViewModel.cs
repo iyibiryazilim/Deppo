@@ -169,7 +169,9 @@ public partial class InputProductPurchaseProcessFormViewModel : BaseViewModel
             {
                 var purchaseDispatchTransactionLineDto = new PurchaseDispatchTransactionLineDto
                 {
-                    ProductCode = item.ItemCode,
+                    ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
+                    VariantCode = item.IsVariant ? item.ItemCode : "",
+        
                     WarehouseNumber = (short)WarehouseModel.Number,
                     Quantity = item.Quantity,
                     ConversionFactor = 1,

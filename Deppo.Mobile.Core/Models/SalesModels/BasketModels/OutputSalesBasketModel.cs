@@ -6,6 +6,7 @@ namespace Deppo.Mobile.Core.Models.SalesModels.BasketModels;
 public class OutputSalesBasketModel : INotifyPropertyChanged, IDisposable
 {
 	private Guid _referenceId;
+	private int _orderReferenceId;
 	private int _itemReferenceId;
 	private string _itemCode = string.Empty;
 	private string _itemName = string.Empty;
@@ -52,6 +53,18 @@ public class OutputSalesBasketModel : INotifyPropertyChanged, IDisposable
 		{
 			if (_referenceId == value) return;
 			_referenceId = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	[Browsable(false)]
+	public int OrderReferenceId
+	{
+		get => _orderReferenceId;
+		set
+		{
+			if (_orderReferenceId == value) return;
+			_orderReferenceId = value;
 			NotifyPropertyChanged();
 		}
 	}

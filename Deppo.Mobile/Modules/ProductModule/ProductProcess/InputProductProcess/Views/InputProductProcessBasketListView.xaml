@@ -21,8 +21,8 @@
         <ToolbarItem Command="{Binding CameraTappedCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="FAS"
-                   Glyph="{x:Static fontAwesome:FontAwesomeIcons.Camera}"
-                   Size="Large" />
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Camera}"
+                                 Size="Large" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
 
@@ -43,6 +43,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -115,14 +116,12 @@
                                     <Grid ColumnDefinitions=".20*,.80*"
                                           ColumnSpacing="10">
                                         <Border Grid.Column="0"
-                                                BackgroundColor="{StaticResource PrimaryLight}"
+                                                
                                                 Stroke="{StaticResource Primary}"
                                                 StrokeShape="RoundRectangle 5"
                                                 StrokeThickness="0.5">
-                                            <Image Grid.Column="0"
-                                                   HeightRequest="50"
-                                                   Source="dotnet_bot.png"
-                                                   WidthRequest="50" />
+                                            <Image Aspect="AspectFill"
+                                                   Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}" />
                                         </Border>
 
                                         <VerticalStackLayout Grid.Column="1">

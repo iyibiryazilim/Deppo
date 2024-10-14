@@ -12,62 +12,63 @@ namespace Deppo.Mobile.Core.Models.CountingModels.BasketModels;
 public partial class ProductCountingBasketModel : ObservableObject
 {
 
-	[ObservableProperty]
-	int itemReferenceId;
+    [ObservableProperty]
+    int itemReferenceId;
 
-	[ObservableProperty]
-	string itemCode = string.Empty;
+    [ObservableProperty]
+    string itemCode = string.Empty;
 
-	[ObservableProperty]
-	string itemName = string.Empty;
+    [ObservableProperty]
+    string itemName = string.Empty;
 
-	[ObservableProperty]
-	int mainItemReferenceId;
+    [ObservableProperty]
+    int mainItemReferenceId;
 
-	[ObservableProperty]
-	string mainItemCode = string.Empty;
+    [ObservableProperty]
+    string mainItemCode = string.Empty;
 
-	[ObservableProperty]
-	string mainItemName = string.Empty;
+    [ObservableProperty]
+    string mainItemName = string.Empty;
 
-	[ObservableProperty]
-	int subUnitsetReferenceId;
+    [ObservableProperty]
+    private int subUnitsetReferenceId;
 
-	[ObservableProperty]
-	string subUnitsetName = string.Empty;
+    [ObservableProperty]
+    private string subUnitsetName = string.Empty;
 
-	[ObservableProperty]
-	string subUnitsetCode = string.Empty;
+    [ObservableProperty]
+    private string subUnitsetCode = string.Empty;
 
-	[ObservableProperty]
-	int unitsetReferenceId;
-	[ObservableProperty]
-	string unitsetName = string.Empty;
-	[ObservableProperty]
-	string unitsetCode = string.Empty;
+    [ObservableProperty]
+    private int unitsetReferenceId;
 
-	[ObservableProperty]
-	double stockQuantity;
+    [ObservableProperty]
+    private string unitsetName = string.Empty;
 
-	[ObservableProperty]
-	double outputQuantity;
+    [ObservableProperty]
+    private string unitsetCode = string.Empty;
 
-	[ObservableProperty]
-	string? image;
+    [ObservableProperty]
+    private double stockQuantity;
 
-	[ObservableProperty]
-	bool isVariant;
+    [ObservableProperty]
+    private double outputQuantity;
 
-	[ObservableProperty]
-	int trackingType;
+    [ObservableProperty]
+    private byte[]? image;
 
-	[ObservableProperty]
-	int locTracking;
+    [ObservableProperty]
+    private bool isVariant;
 
-	[ObservableProperty]
-	ObservableCollection<LocationTransactionModel> locationTransactions = new();
+    [ObservableProperty]
+    private int trackingType;
 
-	[ObservableProperty]
-	double differenceQuantity = 0;
+    [ObservableProperty]
+    private int locTracking;
 
+    [ObservableProperty]
+    private ObservableCollection<LocationTransactionModel> locationTransactions = new();
+
+    [ObservableProperty]
+    private double differenceQuantity = 0;
 }

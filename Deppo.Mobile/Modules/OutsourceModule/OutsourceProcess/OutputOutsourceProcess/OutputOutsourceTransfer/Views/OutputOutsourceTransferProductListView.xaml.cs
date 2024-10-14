@@ -10,6 +10,7 @@ public partial class OutputOutsourceTransferProductListView : ContentPage
 		InitializeComponent();
 		_viewModel = viewModel;
 		BindingContext = _viewModel;
+		_viewModel.CurrentPage = this;
 		_viewModel.SearchText = searchBar;
 	}
 }

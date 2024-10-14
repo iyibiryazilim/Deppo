@@ -8,6 +8,7 @@ using Deppo.Mobile.Core.Models.CountingModels.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.LoginModels;
 using Deppo.Mobile.Core.Models.OutsourceModels;
+using Deppo.Mobile.Core.Models.ProcurementModels.ByCustomerModels;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.QuicklyModels;
@@ -91,5 +92,8 @@ public class MappingProfile : Profile
         CreateMap<InventoryTurnover, dynamic>();
         CreateMap<SupplierDetailInputOutputModel, dynamic>();
         CreateMap<CustomerDetailInputOutputModel, dynamic>();
+        CreateMap<ProcurementCustomerModel, dynamic>();
+        CreateMap<ProcurementCustomerBasketModel, dynamic>();
+        CreateMap<ProcurementCustomerBasketProductModel, dynamic>();
     }
 }

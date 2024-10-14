@@ -19,7 +19,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels
 {
     [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
@@ -52,7 +51,6 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
             ConfirmCommand = new Command(async () => await ConfirmAsync());
             PerformSearchCommand = new Command(async () => await PerformSearchAsync());
             PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
-
         }
 
         public Page CurrentPage { get; set; }
@@ -65,12 +63,15 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
         public Command PerformSearchCommand { get; }
         public Command PerformEmptySearchCommand { get; }
         public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
+
         //Arama İşlemi için kullanılan liste
         public ObservableCollection<WarehouseTotalModel> SelectedSearchItems { get; } = new();
+
         public ObservableCollection<WarehouseTotalModel> SelectedItems { get; } = new();
 
         [ObservableProperty]
         public SearchBar searchText;
+
         private async Task LoadItemsAsync()
         {
             if (IsBusy)
@@ -95,7 +96,6 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
                     skip: 0,
                     take: 20);
 
-
                 if (result.IsSuccess)
                 {
                     if (result.Data == null)
@@ -116,7 +116,6 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
 
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.Loading().Hide();
-
             }
             catch (Exception ex)
             {
@@ -155,7 +154,6 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
                     skip: Items.Count,
                     take: 20);
 
-
                 if (result.IsSuccess)
                 {
                     if (result.Data == null)
@@ -176,7 +174,6 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
 
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.Loading().Hide();
-
             }
             catch (Exception ex)
             {
@@ -219,9 +216,7 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
                         SelectedItems.Add(item);
                         SelectedSearchItems.Add(item);
                     }
-
                 }
-
             }
             catch (Exception ex)
             {
@@ -269,7 +264,7 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
                                     BrandCode = item.BrandCode,
                                     BrandName = item.BrandName,
                                     GroupCode = item.GroupCode,
-                                    Image = item.Image,
+                                    //Image = item.Image,
                                     BrandReferenceId = item.BrandReferenceId,
                                     IsSelected = false,
                                     LocTracking = item.LocTracking,
@@ -292,8 +287,6 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
                 }
                 SelectedSearchItems.Clear();
                 await Shell.Current.GoToAsync("../..");
-
-
             }
             catch (Exception ex)
             {
@@ -304,6 +297,7 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
                 IsBusy = false;
             }
         }
+
         private async Task PerformSearchAsync()
         {
             if (IsBusy)
@@ -331,7 +325,6 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
                     skip: 0,
                     take: 20);
 
-
                 if (result.IsSuccess)
                 {
                     if (result.Data == null)
@@ -351,9 +344,7 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
                 }
 
                 _userDialogs.Loading().Hide();
-
             }
-
             catch (Exception ex)
             {
                 await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -363,7 +354,6 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
                 IsBusy = false;
             }
         }
-
 
         private async Task PerformEmptySearchAsync()
         {

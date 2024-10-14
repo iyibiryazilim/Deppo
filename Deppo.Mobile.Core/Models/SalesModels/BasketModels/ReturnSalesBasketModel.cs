@@ -31,7 +31,7 @@ namespace Deppo.Mobile.Core.Models.SalesModels.BasketModels
         private int _trackingType;
         private int _locTracking;
         private bool _isSelected;
-        private string _image;
+        private byte[]? _image;
         private double _inputQuantity;
 
         private List<ReturnSalesBasketDispatchModel> _dispatches = new();
@@ -44,6 +44,7 @@ namespace Deppo.Mobile.Core.Models.SalesModels.BasketModels
         private string _trackingTypeIcon;
         private string _trackingTypeIconColor;
         private int? _dispatchReferenceId;
+
         public ReturnSalesBasketModel()
         {
             ReferenceId = Guid.NewGuid();
@@ -279,7 +280,7 @@ namespace Deppo.Mobile.Core.Models.SalesModels.BasketModels
             }
         }
 
-        public string Image
+        public byte[]? Image
         {
             get => _image;
             set
@@ -359,6 +360,7 @@ namespace Deppo.Mobile.Core.Models.SalesModels.BasketModels
                 NotifyPropertyChanged();
             }
         }
+
         public int? DispatchReferenceId
         {
             get => _dispatchReferenceId;

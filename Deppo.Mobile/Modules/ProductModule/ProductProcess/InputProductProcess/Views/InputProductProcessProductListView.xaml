@@ -91,12 +91,12 @@
                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessProductListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="Auto,*, Auto" ColumnSpacing="10">
-                            <Border BackgroundColor="{StaticResource Secondary}"
+                            <Border 
                                     StrokeShape="RoundRectangle 5"
                                     StrokeThickness="0.5">
                                 <Image Grid.Column="0"
                                        HeightRequest="50"
-                                       Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                       Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                        WidthRequest="50" />
                             </Border>
 

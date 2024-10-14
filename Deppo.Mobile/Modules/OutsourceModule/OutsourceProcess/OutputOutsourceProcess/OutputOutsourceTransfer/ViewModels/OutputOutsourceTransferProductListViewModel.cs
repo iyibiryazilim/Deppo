@@ -5,6 +5,7 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
@@ -18,19 +19,23 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 public partial class OutputOutsourceTransferProductListViewModel : BaseViewModel
 {
-    IHttpClientService _httpClientService;
-    IWarehouseTotalService _warehouseTotalService;
-    IVariantService _variantService;
-    IServiceProvider _serviceProvider;
-    IUserDialogs _userDialogs;
+	private readonly IHttpClientService _httpClientService;
+	private readonly IWarehouseTotalService _warehouseTotalService;
+	private readonly IVariantWarehouseTotalService _variantWarehouseTotalService;
+	private readonly IServiceProvider _serviceProvider;
+	private readonly IUserDialogs _userDialogs;
 
     [ObservableProperty]
     WarehouseModel warehouseModel = null!;
 
-    [ObservableProperty]
+	[ObservableProperty]
+	public SearchBar searchText;
+
+	[ObservableProperty]
     WarehouseTotalModel? selectedProduct;
 
-    public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
+	public ObservableCollection<VariantWarehouseTotalModel> ItemVariants { get; } = new();
+	public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
 
     //Arama İşleminde seçilenlerin tutulması için liste
     public ObservableCollection<WarehouseTotalModel> SelectedItems { get; } = new();
@@ -38,11 +43,11 @@ public partial class OutputOutsourceTransferProductListViewModel : BaseViewModel
     [ObservableProperty]
     public ObservableCollection<OutputOutsourceTransferBasketModel> selectedProducts = new();
 
-    public OutputOutsourceTransferProductListViewModel(IHttpClientService httpClientService, IWarehouseTotalService warehouseTotalService, IVariantService variantService, IServiceProvider serviceProvider, IUserDialogs userDialogs)
+	public OutputOutsourceTransferProductListViewModel(IHttpClientService httpClientService, IWarehouseTotalService warehouseTotalService, IVariantWarehouseTotalService variantWarehouseTotalService, IServiceProvider serviceProvider, IUserDialogs userDialogs)
     {
         _httpClientService = httpClientService;
         _warehouseTotalService = warehouseTotalService;
-        _variantService = variantService;
+        _variantWarehouseTotalService = variantWarehouseTotalService;
         _serviceProvider = serviceProvider;
         _userDialogs = userDialogs;
 
@@ -53,6 +58,10 @@ public partial class OutputOutsourceTransferProductListViewModel : BaseViewModel
         BackCommand = new Command(async () => await BackAsync());
         PerformSearchCommand = new Command(async () => await PerformSearchAsync());
         PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
+
+        LoadMoreVariantItemsCommand = new Command(async () => await LoadMoreVariantItemsAsync());
+        VariantTappedCommand = new Command<VariantWarehouseTotalModel>(async (item) => await VariantTappedAsync(item));
+        ConfirmVariantCommand = new Command(async () => await ConfirmVariantAsync());
     }
 
     public Page CurrentPage { get; set; }
@@ -70,8 +79,6 @@ public partial class OutputOutsourceTransferProductListViewModel : BaseViewModel
     public Command PerformSearchCommand { get; }
     public Command PerformEmptySearchCommand { get; }
 
-    [ObservableProperty]
-    public SearchBar searchText;
     private async Task LoadItemsAsync()
     {
         if (IsBusy)
@@ -184,63 +191,66 @@ public partial class OutputOutsourceTransferProductListViewModel : BaseViewModel
 
     private async Task ItemTappedAsync(WarehouseTotalModel item)
     {
+        if (item is null)
+            return;
         if (IsBusy) return;
 
         try
         {
             IsBusy = true;
 
-            if (item is not null)
+           
+            if (item.IsVariant)
             {
-                if (item.IsVariant)
+                SelectedProduct = item;
+                await LoadVariantItemsAsync(item);
+                CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.HalfExpanded;
+            }
+            else
+            {
+                if (!item.IsSelected)
                 {
-                    CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.HalfExpanded;
+                    Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
+                    SelectedProduct = item;
+                    SelectedItems.Add(item);
+
+                    var basketItem = new OutputOutsourceTransferBasketModel
+                    {
+                        ItemReferenceId = item.ProductReferenceId,
+                        ItemCode = item.ProductCode,
+                        ItemName = item.ProductName,
+                        UnitsetReferenceId = item.UnitsetReferenceId,
+                        UnitsetCode = item.UnitsetCode,
+                        UnitsetName = item.UnitsetName,
+                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                        SubUnitsetCode = item.SubUnitsetCode,
+                        SubUnitsetName = item.SubUnitsetName,
+                        MainItemReferenceId = default,  //
+                        MainItemCode = string.Empty,    //
+                        MainItemName = string.Empty,    //
+                        StockQuantity = item.StockQuantity,
+                        IsSelected = false,   //
+                        IsVariant = item.IsVariant,
+                        LocTracking = item.LocTracking,
+                        TrackingType = item.TrackingType,
+                        Quantity = item.LocTracking == 0 ? 1 : 0,
+                        LocTrackingIcon = item.LocTrackingIcon,
+                        VariantIcon = item.VariantIcon,
+                        TrackingTypeIcon = item.TrackingTypeIcon,
+                    };
+
+                    SelectedProducts.Add(basketItem);
                 }
                 else
                 {
-                    if (!item.IsSelected)
+                    SelectedProduct.IsSelected = false;
+                    SelectedProduct = null;
+                    var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ProductReferenceId);
+                    if (selectedItem is not null)
                     {
-                        Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
-                        SelectedProduct = item;
-                        SelectedItems.Add(item);
-
-                        var basketItem = new OutputOutsourceTransferBasketModel
-                        {
-                            ItemReferenceId = item.ProductReferenceId,
-                            ItemCode = item.ProductCode,
-                            ItemName = item.ProductName,
-                            UnitsetReferenceId = item.UnitsetReferenceId,
-                            UnitsetCode = item.UnitsetCode,
-                            UnitsetName = item.UnitsetName,
-                            SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                            SubUnitsetCode = item.SubUnitsetCode,
-                            SubUnitsetName = item.SubUnitsetName,
-                            MainItemReferenceId = default,  //
-                            MainItemCode = string.Empty,    //
-                            MainItemName = string.Empty,    //
-                            StockQuantity = item.StockQuantity,
-                            IsSelected = false,   //
-                            IsVariant = item.IsVariant,
-                            LocTracking = item.LocTracking,
-                            TrackingType = item.TrackingType,
-                            Quantity = item.LocTracking == 0 ? 1 : 0,
-                            LocTrackingIcon = item.LocTrackingIcon,
-                            VariantIcon = item.VariantIcon,
-                            TrackingTypeIcon = item.TrackingTypeIcon,
-                        };
-
-                        SelectedProducts.Add(basketItem);
-                    }
-                    else
-                    {
-                        SelectedProduct = null;
-                        var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ProductReferenceId);
-                        if (selectedItem is not null)
-                        {
-                            SelectedProducts.Remove(selectedItem);
-                            Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
-                            SelectedItems.Remove(item);
-                        }
+                        SelectedProducts.Remove(selectedItem);
+                        Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
+                        SelectedItems.Remove(item);
                     }
                 }
             }
@@ -297,7 +307,187 @@ public partial class OutputOutsourceTransferProductListViewModel : BaseViewModel
         }
     }
 
-    private async Task BackAsync()
+    private async Task LoadVariantItemsAsync(WarehouseTotalModel item)
+    {
+		try
+		{
+
+			_userDialogs.Loading("Loading Variant Items");
+			ItemVariants.Clear();
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _variantWarehouseTotalService.GetObjects(
+                httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                productReferenceId: item.ProductReferenceId, 
+                warehouseNumber: WarehouseModel.Number, 
+                skip: 0, 
+                take: 20
+            );
+
+			if (result.IsSuccess)
+			{
+				if (result.Data == null)
+					return;
+				foreach (var variant in result.Data)
+				{
+					var obj = Mapping.Mapper.Map<VariantWarehouseTotalModel>(variant);
+					ItemVariants.Add(obj);
+				}
+			}
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+	}
+
+	private async Task LoadMoreVariantItemsAsync()
+	{
+        if (IsBusy)
+            return;
+        if (ItemVariants.Count < 18)
+            return;
+		try
+		{
+            IsBusy = true;
+
+			_userDialogs.Loading("Loading More Variant Items");
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _variantWarehouseTotalService.GetObjects(
+				httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				productReferenceId: SelectedProduct.ProductReferenceId,
+				warehouseNumber: WarehouseModel.Number,
+				skip: ItemVariants.Count,
+				take: 20
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data == null)
+					return;
+				foreach (var variant in result.Data)
+				{
+					var obj = Mapping.Mapper.Map<VariantWarehouseTotalModel>(variant);
+					ItemVariants.Add(obj);
+				}
+			}
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+        finally
+        {
+            IsBusy = false;
+        }
+	}
+
+	private async Task VariantTappedAsync(VariantWarehouseTotalModel item)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+            if(item.IsSelected)
+            {
+                item.IsSelected = false;
+            }
+
+			ItemVariants.ToList().ForEach(x => x.IsSelected = false);
+			var selectedItem = ItemVariants.FirstOrDefault(x => x.VariantReferenceId == item.VariantReferenceId);
+			if (selectedItem != null)
+				selectedItem.IsSelected = true;
+		}
+		catch (Exception ex)
+		{
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task ConfirmVariantAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var item = ItemVariants.FirstOrDefault(x => x.IsSelected);
+
+
+			var basketItem = new OutputOutsourceTransferBasketModel
+			{
+				ItemReferenceId = item.VariantReferenceId,
+				ItemCode = item.VariantCode,
+				ItemName = item.VariantName,
+				UnitsetReferenceId = item.UnitsetReferenceId,
+				UnitsetCode = item.UnitsetCode,
+				UnitsetName = item.UnitsetName,
+				SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+				SubUnitsetCode = item.SubUnitsetCode,
+				SubUnitsetName = item.SubUnitsetName,
+				MainItemReferenceId = item.ProductReferenceId, 
+				MainItemCode = item.ProductCode,    
+				MainItemName = item.ProductName,    
+				StockQuantity = item.StockQuantity,
+				IsSelected = false,   
+				IsVariant = true,
+				LocTracking = item.LocTracking,
+				TrackingType = item.TrackingType,
+				Quantity = item.LocTracking == 0 ? 1 : 0,
+				LocTrackingIcon = item.LocTrackingIcon,
+				VariantIcon = item.VariantIcon,
+				TrackingTypeIcon = item.TrackingTypeIcon,
+			};
+
+			SelectedProducts.Add(basketItem);
+
+			if (SelectedProduct is not null)
+			{
+				SelectedProduct.IsSelected = true;
+				SelectedItems.Add(SelectedProduct);
+
+			}
+
+			CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.Hidden;
+
+		}
+		catch (Exception ex)
+		{
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+
+
+	private async Task BackAsync()
     {
         if (IsBusy)
             return;

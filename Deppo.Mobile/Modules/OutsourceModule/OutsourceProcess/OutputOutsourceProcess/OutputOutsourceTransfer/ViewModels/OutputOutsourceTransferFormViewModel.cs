@@ -428,8 +428,9 @@ public partial class OutputOutsourceTransferFormViewModel : BaseViewModel
             {
                 var transferTransactionLineDto = new TransferTransactionLineDto
                 {
-                    ProductCode = item.ItemCode,
-                    WarehouseNumber = WarehouseModel.Number,
+					ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
+					VariantCode = item.IsVariant ? item.ItemCode : "",
+					WarehouseNumber = WarehouseModel.Number,
                     DestinationWarehouseNumber = SelectedInWarehouse.Number,
                     Quantity = item.Quantity,
                     ConversionFactor = 1,
@@ -466,7 +467,7 @@ public partial class OutputOutsourceTransferFormViewModel : BaseViewModel
                 resultModel.Message = "Başarılı";
                 resultModel.Code = result.Data.Code;
                 resultModel.PageTitle = "Fason Çıkış Transferi";
-                resultModel.PageCountToBack = 7;
+                resultModel.PageCountToBack = 4;
 
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();

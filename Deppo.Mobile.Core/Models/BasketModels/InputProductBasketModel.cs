@@ -28,17 +28,17 @@ public class InputProductBasketModel : INotifyPropertyChanged, IDisposable
     private int _trackingType;
     private int _locTracking;
     private bool _isSelected;
-    private string _image;
+    private byte[]? _image;
     private List<InputProductBasketDetailModel> _details = new();
 
-	private string _locTrackingIcon;
-	private string _locTrackingIconColor;
-	private string _variantIcon;
-	private string _variantIconColor;
-	private string _trackingTypeIcon;
-	private string _trackingTypeIconColor;
+    private string _locTrackingIcon;
+    private string _locTrackingIconColor;
+    private string _variantIcon;
+    private string _variantIconColor;
+    private string _trackingTypeIcon;
+    private string _trackingTypeIconColor;
 
-	public InputProductBasketModel()
+    public InputProductBasketModel()
     {
         ReferenceId = Guid.NewGuid();
     }
@@ -67,7 +67,6 @@ public class InputProductBasketModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-
     [DisplayName("Ürün / Varyant Kodu")]
     public string ItemCode
     {
@@ -91,7 +90,6 @@ public class InputProductBasketModel : INotifyPropertyChanged, IDisposable
             NotifyPropertyChanged();
         }
     }
-
 
     [Browsable(false)]
     [Description("Ürün Varyantlı ise Varyant Reference Id, Vatyantlı değilse Ürün Reference Id")]
@@ -131,8 +129,6 @@ public class InputProductBasketModel : INotifyPropertyChanged, IDisposable
             NotifyPropertyChanged();
         }
     }
-
-
 
     [Browsable(false)]
     public int SubUnitsetReferenceId
@@ -266,7 +262,6 @@ public class InputProductBasketModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-
     public bool IsSelected
     {
         get => _isSelected;
@@ -278,7 +273,7 @@ public class InputProductBasketModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-    public string Image
+    public byte[]? Image
     {
         get => _image;
         set
@@ -300,48 +295,46 @@ public class InputProductBasketModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-	public string LocTrackingIcon
-	{
-		get => _locTrackingIcon = _locTrackingIcon ?? "location-dot";
-		set
-		{
-			if (_locTrackingIcon == value) return;
-			_locTrackingIcon = value;
-			NotifyPropertyChanged();
-		}
-	}
+    public string LocTrackingIcon
+    {
+        get => _locTrackingIcon = _locTrackingIcon ?? "location-dot";
+        set
+        {
+            if (_locTrackingIcon == value) return;
+            _locTrackingIcon = value;
+            NotifyPropertyChanged();
+        }
+    }
 
-	public string LocTrackingIconColor => LocTracking == 1 ? "#F5004F" : "#C8C8C8";
+    public string LocTrackingIconColor => LocTracking == 1 ? "#F5004F" : "#C8C8C8";
 
-	public string VariantIcon
-	{
-		get => _variantIcon = _variantIcon ?? "bookmark";
-		set
-		{
-			if (_variantIcon == value) return;
-			_variantIcon = value;
-			NotifyPropertyChanged();
-		}
-	}
+    public string VariantIcon
+    {
+        get => _variantIcon = _variantIcon ?? "bookmark";
+        set
+        {
+            if (_variantIcon == value) return;
+            _variantIcon = value;
+            NotifyPropertyChanged();
+        }
+    }
 
-	public string VariantIconColor => IsVariant ? "#F5004F" : "#C8C8C8";
+    public string VariantIconColor => IsVariant ? "#F5004F" : "#C8C8C8";
 
-	public string TrackingTypeIcon
-	{
-		get => _trackingTypeIcon = _trackingTypeIcon ?? "box-archive";
-		set
-		{
-			if (_trackingTypeIcon == value) return;
-			_trackingTypeIcon = value;
-			NotifyPropertyChanged();
-		}
-	}
+    public string TrackingTypeIcon
+    {
+        get => _trackingTypeIcon = _trackingTypeIcon ?? "box-archive";
+        set
+        {
+            if (_trackingTypeIcon == value) return;
+            _trackingTypeIcon = value;
+            NotifyPropertyChanged();
+        }
+    }
 
-	public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
+    public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 
-
-
-	public event PropertyChangedEventHandler? PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
     {
@@ -352,7 +345,6 @@ public class InputProductBasketModel : INotifyPropertyChanged, IDisposable
     {
         Dispose(true);
         GC.SuppressFinalize(this);
-
     }
 
     protected virtual void Dispose(bool disposing)
@@ -362,6 +354,4 @@ public class InputProductBasketModel : INotifyPropertyChanged, IDisposable
             PropertyChanged = null;
         }
     }
-
-
 }

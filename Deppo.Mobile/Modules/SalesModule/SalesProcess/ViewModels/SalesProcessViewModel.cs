@@ -4,6 +4,9 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByLocationProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByProductProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.Views;
 
@@ -25,6 +28,9 @@ public partial class SalesProcessViewModel : BaseViewModel
         OutputProductSalesOrderProcessCommand = new Command(async () => await OutputProductSalesOrderProcessAsync());
         ReturnSalesProcessCommand = new Command(async () => await ReturnSalesProcessAsync());
         RetrunSalesDispatchProcessCommand = new Command(async () => await RetrunSalesDispatchProcessAsync());
+        ProcurementByCustomerProcessCommand = new Command(async () => await ProcurementByCustomerProcessAsync());
+        ProcurementByProductProcessCommand = new Command(async () => await ProcurementByProductProcessAsync());
+        ProcurementByLocationProcessCommand = new Command(async () => await ProcurementByLocationProcessAsync());
     }
 
     #region Commands
@@ -34,6 +40,10 @@ public partial class SalesProcessViewModel : BaseViewModel
 
     public Command ReturnSalesProcessCommand { get; }
     public Command RetrunSalesDispatchProcessCommand { get; }
+
+    public Command ProcurementByCustomerProcessCommand { get; }
+    public Command ProcurementByProductProcessCommand { get; }
+    public Command ProcurementByLocationProcessCommand { get; }
 
     #endregion Commands
 
@@ -107,6 +117,69 @@ public partial class SalesProcessViewModel : BaseViewModel
             IsBusy = true;
 
             await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchWarehouseListView)}");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ProcurementByCustomerProcessAsync()
+    {
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(ProcurementByCustomerWarehouseListView)}");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ProcurementByProductProcessAsync()
+    {
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(ProcurementByProductWarehouseListView)}");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ProcurementByLocationProcessAsync()
+    {
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(ProcurementByLocationWarehouseListView)}");
         }
         catch (Exception ex)
         {
