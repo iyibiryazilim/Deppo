@@ -10,6 +10,7 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.CameraModule.Views;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcess.OutputOutsourceTransfer.Views;
 using DevExpress.Maui.Controls;
 
@@ -60,6 +61,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 		Items.Clear();
 
 		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
+		CameraTappedCommand = new Command(async () => await CameraTappedAsync());
 		IncreaseCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await DecreaseAsync(item));
 		DeleteItemCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await DeleteItemAsync(item));
@@ -83,6 +85,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 	public Page CurrentPage { get; set; }
 
 	public Command ShowProductViewCommand { get; }
+	public Command CameraTappedCommand { get; }
 	public Command<OutputOutsourceTransferBasketModel> IncreaseCommand { get; }
 	public Command<OutputOutsourceTransferBasketModel> DecreaseCommand { get; }
 	public Command<OutputOutsourceTransferBasketModel> DeleteItemCommand { get; }
@@ -146,6 +149,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 				}
 				if (SelectedItem == item)
 				{
+					SelectedItem.Details.Clear();
 					SelectedItem.IsSelected = false;
 					SelectedItem = null;
 				}
@@ -168,6 +172,8 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 
 	private async Task IncreaseAsync(OutputOutsourceTransferBasketModel outputOutsourceTransferBasketModel)
 	{
+		if (outputOutsourceTransferBasketModel is null)
+			return;
 		if (IsBusy)
 			return;
 
@@ -295,6 +301,15 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 
 				foreach (var item in result.Data)
 					LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+
+				foreach(var locationTransaction in LocationTransactions)
+				{
+					var matchingItem = SelectedItem.Details.FirstOrDefault(x => x.ReferenceId == locationTransaction.ReferenceId);
+					if(matchingItem is not null)
+					{
+						locationTransaction.OutputQuantity = matchingItem.Quantity;
+					}
+				}
 			}
 
 			_userDialogs.HideHud();
@@ -334,6 +349,15 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 				foreach (var item in result.Data)
 				{
 					LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+				}
+
+				foreach (var locationTransaction in LocationTransactions)
+				{
+					var matchingItem = SelectedItem.Details.FirstOrDefault(x => x.ReferenceId == locationTransaction.ReferenceId);
+					if (matchingItem is not null)
+					{
+						locationTransaction.OutputQuantity = matchingItem.Quantity;
+					}
 				}
 			}
 		}
@@ -751,9 +775,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 				if (!result)
 					return;
 
-				SelectedLocationTransactions.Clear();
-				SelectedSeriLotTransactions.Clear();
-				Items.Clear();
+				ClearPageAsync();
 				await Shell.Current.GoToAsync("..");
 			}
 			else
@@ -769,6 +791,59 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 		finally
 		{
 			IsBusy = false;
+		}
+	}
+
+	public async Task CameraTappedAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			await Shell.Current.GoToAsync($"{nameof(CameraReaderView)}", new Dictionary<string, object>
+			{
+				["ComingPage"] = "OutputOutsourceTransferBasket"
+			});
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	public async Task ClearPageAsync()
+	{
+		try
+		{
+			await Task.Run(() =>
+			{
+				SelectedLocationTransactions.Clear();
+				SelectedSeriLotTransactions.Clear();
+				LocationTransactions.Clear();
+				SeriLotTransactions.Clear();
+				SelectedItem?.Details.Clear();
+                foreach (var item in Items)
+                {
+					item.Details.Clear();
+                }
+                Items.Clear();
+			});
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 	}
 

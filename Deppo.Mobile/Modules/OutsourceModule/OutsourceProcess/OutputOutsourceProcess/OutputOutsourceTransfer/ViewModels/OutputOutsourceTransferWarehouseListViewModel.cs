@@ -191,4 +191,23 @@ public partial class OutputOutsourceTransferWarehouseListViewModel : BaseViewMod
 			IsBusy = false;
 		}
 	}
+
+	public async Task ClearPageAsync()
+	{
+		try
+		{
+			await Task.Run(() =>
+			{
+				SelectedWarehouseModel.IsSelected = false;
+				SelectedWarehouseModel = null;
+			});
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+	}
 }
