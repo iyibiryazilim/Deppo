@@ -254,7 +254,7 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
                     ProductCountingBasketModel.ItemReferenceId = SelectedProduct.ReferenceId;
                     ProductCountingBasketModel.ItemCode = SelectedProduct.Code;
                     ProductCountingBasketModel.ItemName = SelectedProduct.Name;
-                    ProductCountingBasketModel.Image = SelectedProduct.Image;
+                    //ProductCountingBasketModel.Image = SelectedProduct.Image;
                     ProductCountingBasketModel.MainItemReferenceId = default;
                     ProductCountingBasketModel.MainItemCode = string.Empty;
                     ProductCountingBasketModel.MainItemName = string.Empty;
@@ -330,7 +330,7 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
             ProductCountingBasketModel.ItemReferenceId = item.ReferenceId;
             ProductCountingBasketModel.ItemCode = item.Code;
             ProductCountingBasketModel.ItemName = item.Name;
-            ProductCountingBasketModel.Image = SelectedProduct.Image;
+            //ProductCountingBasketModel.Image = SelectedProduct.Image;
             ProductCountingBasketModel.MainItemReferenceId = SelectedProduct.ReferenceId;
             ProductCountingBasketModel.MainItemCode = SelectedProduct.Code;
             ProductCountingBasketModel.MainItemName =  SelectedProduct.Name;
