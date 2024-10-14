@@ -10,6 +10,7 @@ using Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProce
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.Views;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
+using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
 namespace Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProcess.ViewModels;
 
@@ -38,6 +39,8 @@ public partial class WarehouseCountingWarehouseListViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<WarehouseCountingWarehouseModel>(ItemTappedAsync);
         NextViewCommand = new Command(async () => await NextViewAsync());
+        SelectProductsCommand = new Command(async () => await SelectProductsAsync());
+        SelectVariantsCommand = new Command(async () => await SelectVariantsAsync());
     }
 
     public Command LoadItemsCommand { get; }
@@ -45,7 +48,13 @@ public partial class WarehouseCountingWarehouseListViewModel : BaseViewModel
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
 
+    public Command SelectProductsCommand { get; }
+    public Command SelectVariantsCommand { get; }
+
     public Page CurrentPage { get; set; } = null!;
+
+    [ObservableProperty]
+    ProductVariantType productVariantType;
 
     private async Task LoadItemsAsync()
     {
@@ -60,7 +69,7 @@ public partial class WarehouseCountingWarehouseListViewModel : BaseViewModel
             Items.Clear();
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseCountingService.GetWarehouses(httpClient,_httpClientService.FirmNumber,_httpClientService.PeriodNumber,string.Empty,0,20);
+            var result = await _warehouseCountingService.GetWarehouses(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, 0, 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -165,7 +174,7 @@ public partial class WarehouseCountingWarehouseListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            if(SelectedWarehouse.LocationCount == 0)
+            if (SelectedWarehouse.LocationCount == 0)
                 CurrentPage.FindByName<BottomSheet>("productOrVariantBottomSheet").State = BottomSheetState.HalfExpanded;
             else
             {
@@ -174,7 +183,7 @@ public partial class WarehouseCountingWarehouseListViewModel : BaseViewModel
                     [nameof(WarehouseCountingWarehouseModel)] = SelectedWarehouse,
                 });
             }
-           
+
         }
         catch (Exception ex)
         {
@@ -193,21 +202,15 @@ public partial class WarehouseCountingWarehouseListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            CurrentPage.FindByName<BottomSheet>("productTypeBottomSheet").State = BottomSheetState.Hidden;
+            CurrentPage.FindByName<BottomSheet>("productOrVariantBottomSheet").State = BottomSheetState.Hidden;
+            ProductVariantType = ProductVariantType.Product;
             if (SelectedWarehouse is not null)
             {
-                if (SelectedWarehouse.LocationCount > 0)
+                await Shell.Current.GoToAsync($"{nameof(WarehouseCountingProductListView)}", new Dictionary<string, object>
                 {
-                   
-                }
-                else
-                {
-                    await Shell.Current.GoToAsync($"{nameof(WarehouseCountingProductListView)}", new Dictionary<string, object>
-                    {
-                        [nameof(WarehouseCountingWarehouseModel)] = SelectedWarehouse,
-                    });
-
-                }
+                    [nameof(WarehouseCountingWarehouseModel)] = SelectedWarehouse,
+                    [nameof(ProductVariantType)] = ProductVariantType
+                });
 
             }
         }
@@ -231,21 +234,16 @@ public partial class WarehouseCountingWarehouseListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            CurrentPage.FindByName<BottomSheet>("productTypeBottomSheet").State = BottomSheetState.Hidden;
+            CurrentPage.FindByName<BottomSheet>("productOrVariantBottomSheet").State = BottomSheetState.Hidden;
+            ProductVariantType = ProductVariantType.Variant;
             if (SelectedWarehouse is not null)
             {
-                if (SelectedWarehouse.LocationCount > 0)
-                {
-                    await Shell.Current.GoToAsync($"{nameof(WarehouseCountingLocationListView)}", new Dictionary<string, object>
-                    {
-                        [nameof(WarehouseCountingWarehouseModel)] = SelectedWarehouse,
-                    });
-                }
-                else
+                if (SelectedWarehouse is not null)
                 {
                     await Shell.Current.GoToAsync($"{nameof(WarehouseCountingProductListView)}", new Dictionary<string, object>
                     {
                         [nameof(WarehouseCountingWarehouseModel)] = SelectedWarehouse,
+                        [nameof(ProductVariantType)] = ProductVariantType
                     });
 
                 }
