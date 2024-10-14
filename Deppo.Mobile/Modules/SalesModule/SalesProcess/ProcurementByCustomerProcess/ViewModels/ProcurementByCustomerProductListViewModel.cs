@@ -248,6 +248,12 @@ public partial class ProcurementByCustomerProductListViewModel : BaseViewModel
         procurementCustomerBasketModel.ProcurementProductList = procurementProductList;
         procurementCustomerBasketModel.WarehouseNumber = WarehouseModel?.Number ?? 0;
         procurementCustomerBasketModel.WarehouseName = WarehouseModel?.Name ?? string.Empty;
+        procurementCustomerBasketModel.CustomerReferenceId = ProcurementCustomerModel.ReferenceId;
+        procurementCustomerBasketModel.CustomerCode = ProcurementCustomerModel.Code;
+        procurementCustomerBasketModel.CustomerName = ProcurementCustomerModel.Name;
+        procurementCustomerBasketModel.ShipAddressReferenceId = ProcurementCustomerModel.ShipAddressReferenceId;
+        procurementCustomerBasketModel.ShipAddressCode = ProcurementCustomerModel.ShipAddressCode;
+        procurementCustomerBasketModel.ShipAddressName = ProcurementCustomerModel.ShipAddressName;
 
         return procurementCustomerBasketModel;
     }

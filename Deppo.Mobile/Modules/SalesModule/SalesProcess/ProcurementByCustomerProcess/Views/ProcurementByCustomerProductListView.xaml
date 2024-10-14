@@ -162,7 +162,7 @@
             Grid.Row="1"
             Margin="5,10,5,20"
             Command="{Binding NextViewCommand}"
-            Text="Başlat" />
+            Text="Rota Oluştur" />
     </Grid>
 
 </ContentPage>
