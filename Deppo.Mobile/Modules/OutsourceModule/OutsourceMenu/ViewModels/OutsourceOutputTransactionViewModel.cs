@@ -17,10 +17,10 @@ using System.Threading.Tasks;
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
 {
     [QueryProperty(name: nameof(OutsourceDetailModel), queryId: nameof(OutsourceDetailModel))]
-    public partial class OutsourceInputTransactionViewModel : BaseViewModel
+    public partial class OutsourceOutputTransactionViewModel : BaseViewModel
     {
         private readonly IHttpClientService _httpClientService;
-        private readonly IOutsourceDetailInputProductService _outsourceDetailInputProductService;
+        private readonly IOutsourceDetailOutputProductService _outsourceDetailOutputProductService;
         private readonly IUserDialogs _userDialogs;
 
         [ObservableProperty]
@@ -28,13 +28,13 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
 
         public ObservableCollection<ProductModel> Items { get; } = new();
 
-        public OutsourceInputTransactionViewModel(IHttpClientService httpClientService, IOutsourceDetailInputProductService outsourceDetailInputProductService, IUserDialogs userDialogs)
+        public OutsourceOutputTransactionViewModel(IHttpClientService httpClientService, IOutsourceDetailOutputProductService outsourceDetailOutputProductService, IUserDialogs userDialogs)
         {
             _httpClientService = httpClientService;
+            _outsourceDetailOutputProductService = outsourceDetailOutputProductService;
             _userDialogs = userDialogs;
-            _outsourceDetailInputProductService = outsourceDetailInputProductService;
 
-            Title = "Fason Giriş Hareketleri";
+            Title = "Müşteri Çıkış Hareketleri";
 
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
             LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
@@ -43,6 +43,9 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
 
         public Command LoadItemsCommand { get; }
         public Command LoadMoreItemsCommand { get; }
+
+        public Command PerformSearchCommand { get; }
+        public Command PerformEmptySearchCommand { get; }
         public Command GoToBackCommand { get; }
 
         private async Task LoadItemsAsync()
@@ -59,7 +62,15 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
 
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-                var result = await _outsourceDetailInputProductService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, OutsourceDetailModel.Outsource.ReferenceId, string.Empty, 0, 20);
+                var result = await _outsourceDetailOutputProductService.GetObjects(
+                    httpClient: httpClient,
+                    firmNumber: _httpClientService.FirmNumber,
+                    periodNumber: _httpClientService.PeriodNumber,
+                    outsourcereReferenceId: OutsourceDetailModel.Outsource.ReferenceId,
+                    search: string.Empty,
+                    skip: 0,
+                    take: 20
+                );
 
                 if (result.IsSuccess)
                 {
@@ -100,15 +111,15 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
 
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-                var result = await _outsourceDetailInputProductService.GetObjects(
+                var result = await _outsourceDetailOutputProductService.GetObjects(
                     httpClient: httpClient,
                     firmNumber: _httpClientService.FirmNumber,
                     periodNumber: _httpClientService.PeriodNumber,
-                    outsourceReferenceId: OutsourceDetailModel.Outsource.ReferenceId,
+                    outsourcereReferenceId: OutsourceDetailModel.Outsource.ReferenceId,
                     search: string.Empty,
                     skip: Items.Count,
                     take: 20
-                    );
+                );
 
                 if (result.IsSuccess)
                 {
@@ -147,7 +158,6 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
 
                 await Task.Delay(300);
                 await Shell.Current.GoToAsync("..");
-                //SearchText.Text = string.Empty;
             }
             catch (Exception ex)
             {

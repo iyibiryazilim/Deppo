@@ -82,7 +82,7 @@
                                        TextColor="{StaticResource WhiteSmoke}" />
                             </VerticalStackLayout>
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding .}" />
+                                <TapGestureRecognizer Command="{Binding InputQuantityTappedCommand}" />
                             </Border.GestureRecognizers>
                         </Border>
 
@@ -102,7 +102,7 @@
                                        TextColor="{StaticResource WhiteSmoke}" />
                             </VerticalStackLayout>
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding .}" />
+                                <TapGestureRecognizer Command="{Binding OutputQuantityTappedCommand}" />
                             </Border.GestureRecognizers>
                         </Border>
                     </Grid>

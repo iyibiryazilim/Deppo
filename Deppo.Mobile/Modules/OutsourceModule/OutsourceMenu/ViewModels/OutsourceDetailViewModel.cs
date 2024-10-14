@@ -8,6 +8,7 @@ using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.Views;
 using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels;
@@ -31,8 +32,8 @@ public partial class OutsourceDetailViewModel : BaseViewModel
         Title = "Fason Detayý";
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
-        //InputQuantityTappedCommand = new Command(async () => await InputQuantityTappedAsync());
-        //OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
+        InputQuantityTappedCommand = new Command(async () => await InputQuantityTappedAsync());
+        OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
         //OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
         //ItemTappedCommand = new Command<SalesFiche>(async (salesFiche) => await ItemTappedAsync(salesFiche));
         //AllFicheTappedCommand = new Command(async () => await AllFicheTappedAsync());
@@ -186,57 +187,57 @@ public partial class OutsourceDetailViewModel : BaseViewModel
         }
     }
 
-    //private async Task InputQuantityTappedAsync()
-    //{
-    //    if (IsBusy)
-    //        return;
-    //    try
-    //    {
-    //        IsBusy = true;
+    private async Task InputQuantityTappedAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
 
-    //        await Task.Delay(300);
-    //        await Shell.Current.GoToAsync($"{nameof(CustomerInputTransactionView)}", new Dictionary<string, object>
-    //        {
-    //            [nameof(CustomerDetailModel)] = CustomerDetailModel
-    //        });
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        if (_userDialogs.IsHudShowing)
-    //            _userDialogs.Loading().Hide();
+            await Task.Delay(300);
+            await Shell.Current.GoToAsync($"{nameof(OutsourceInputTransactionView)}", new Dictionary<string, object>
+            {
+                [nameof(OutsourceDetailModel)] = OutsourceDetailModel
+            });
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
 
-    //        _userDialogs.Alert(message: ex.Message, title: "Hata");
-    //    }
-    //    finally
-    //    {
-    //        IsBusy = false;
-    //    }
-    //}
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-    //private async Task OutputQuantityTappedAsync()
-    //{
-    //    if (IsBusy)
-    //        return;
-    //    try
-    //    {
-    //        IsBusy = true;
+    private async Task OutputQuantityTappedAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
 
-    //        await Task.Delay(300);
-    //        await Shell.Current.GoToAsync($"{nameof(CustomerOutputTransactionView)}", new Dictionary<string, object>
-    //        {
-    //            [nameof(CustomerDetailModel)] = CustomerDetailModel
-    //        });
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        if (_userDialogs.IsHudShowing)
-    //            _userDialogs.Loading().Hide();
+            await Task.Delay(300);
+            await Shell.Current.GoToAsync($"{nameof(OutsourceInputTransactionView)}", new Dictionary<string, object>
+            {
+                [nameof(OutsourceDetailModel)] = OutsourceDetailModel
+            });
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
 
-    //        _userDialogs.Alert(message: ex.Message, title: "Hata");
-    //    }
-    //    finally
-    //    {
-    //        IsBusy = false;
-    //    }
-    //}
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 }

@@ -13,6 +13,5 @@ public partial class OutsourceInputTransactionView : ContentPage
         InitializeComponent();
         _viewModel = viewModel;
         BindingContext = _viewModel;
-        _viewModel.CurrentPage = this;
     }
 }
