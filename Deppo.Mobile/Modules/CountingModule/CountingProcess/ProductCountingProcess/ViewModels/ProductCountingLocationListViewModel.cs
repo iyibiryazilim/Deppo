@@ -81,7 +81,7 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
 				warehouseNumber: ProductCountingWarehouseModel.Number,
-				productReferenceId: ProductCountingBasketModel.ProductReferenceId,
+				productReferenceId: ProductCountingBasketModel.IsVariant ? ProductCountingBasketModel.MainItemReferenceId : ProductCountingBasketModel.ItemReferenceId,
 				skip: 0,
 				take: 20,
 				search:SearchText.Text
@@ -127,7 +127,7 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
 				warehouseNumber: ProductCountingWarehouseModel.Number,
-                productReferenceId: ProductCountingBasketModel.ProductReferenceId,
+                productReferenceId: ProductCountingBasketModel.IsVariant ? ProductCountingBasketModel.MainItemReferenceId : ProductCountingBasketModel.ItemReferenceId,
                 skip: Items.Count,
 				take: 20,
                 search: SearchText.Text
@@ -205,31 +205,12 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 
 			if (SelectedLocation is not null)
 			{
-                var productCountingBasketModel = new ProductCountingBasketModel
-                {
-                    ProductReferenceId = ProductCountingBasketModel.ProductReferenceId,
-                    ProductCode = ProductCountingBasketModel.ProductCode,
-                    ProductName = ProductCountingBasketModel.ProductName,
-                    Image = ProductCountingBasketModel.Image,
-                    StockQuantity = SelectedLocation.StockQuantity,
-                    OutputQuantity = SelectedLocation.StockQuantity,
-                    SubUnitsetReferenceId = ProductCountingBasketModel.SubUnitsetReferenceId,
-                    SubUnitsetName = ProductCountingBasketModel.SubUnitsetName,
-                    SubUnitsetCode = ProductCountingBasketModel.SubUnitsetCode,
-                    UnitsetReferenceId = ProductCountingBasketModel.UnitsetReferenceId,
-                    UnitsetName = ProductCountingBasketModel.UnitsetName,
-                    UnitsetCode = ProductCountingBasketModel.UnitsetCode,
-                    LocTracking = ProductCountingBasketModel.LocTracking,
-                    IsVariant = ProductCountingBasketModel.IsVariant,
-                    TrackingType = ProductCountingBasketModel.TrackingType,
-                    DifferenceQuantity = 0,
-                };
 
                 await Shell.Current.GoToAsync($"{nameof(ProductCountingBasketView)}", new Dictionary<string, object>
 				{
 					[nameof(LocationModel)] = SelectedLocation,
 					[nameof(ProductCountingWarehouseModel)] = ProductCountingWarehouseModel,
-					[nameof(ProductCountingBasketModel)] = productCountingBasketModel
+					[nameof(ProductCountingBasketModel)] = ProductCountingBasketModel
                 });
 
 			}
@@ -291,7 +272,7 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 warehouseNumber: ProductCountingWarehouseModel.Number,
-                productReferenceId: ProductCountingBasketModel.ProductReferenceId,
+                productReferenceId: ProductCountingBasketModel.IsVariant ? ProductCountingBasketModel.MainItemReferenceId : ProductCountingBasketModel.ItemReferenceId,
                 skip: 0,
                 take: 20,
                 search: SearchText.Text

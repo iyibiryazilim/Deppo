@@ -11,14 +11,24 @@ namespace Deppo.Mobile.Core.Models.CountingModels.BasketModels;
 
 public partial class ProductCountingBasketModel : ObservableObject
 {
-    [ObservableProperty]
-    private int productReferenceId;
 
     [ObservableProperty]
-    private string productCode = string.Empty;
+    int itemReferenceId;
 
     [ObservableProperty]
-    private string productName = string.Empty;
+    string itemCode = string.Empty;
+
+    [ObservableProperty]
+    string itemName = string.Empty;
+
+    [ObservableProperty]
+    int mainItemReferenceId;
+
+    [ObservableProperty]
+    string mainItemCode = string.Empty;
+
+    [ObservableProperty]
+    string mainItemName = string.Empty;
 
     [ObservableProperty]
     private int subUnitsetReferenceId;

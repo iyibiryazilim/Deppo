@@ -204,7 +204,8 @@ public partial class ProductCountingFormViewModel : BaseViewModel
 
         var outCountingTransactionLineDto = new OutCountingTransactionLineDto
         {
-            ProductCode = ProductCountingBasketModel.ProductCode,
+            ProductCode = ProductCountingBasketModel.IsVariant ?  ProductCountingBasketModel.MainItemCode : ProductCountingBasketModel.ItemCode,
+            VariantCode = ProductCountingBasketModel.IsVariant ? ProductCountingBasketModel.ItemCode : string.Empty,
             WarehouseNumber = ProductCountingWarehouseModel.Number,
             Quantity = ProductCountingBasketModel.StockQuantity - ProductCountingBasketModel.OutputQuantity,
             ConversionFactor = 1,
@@ -292,7 +293,8 @@ public partial class ProductCountingFormViewModel : BaseViewModel
 
         var inCountingTransactionLineDto = new InCountingTransactionLineDto
         {
-            ProductCode = ProductCountingBasketModel.ProductCode,
+            ProductCode = ProductCountingBasketModel.IsVariant ? ProductCountingBasketModel.MainItemCode : ProductCountingBasketModel.ItemCode,
+            VariantCode = ProductCountingBasketModel.IsVariant ? ProductCountingBasketModel.ItemCode : string.Empty,
             WarehouseNumber = ProductCountingWarehouseModel.Number,
             Quantity = ProductCountingBasketModel.OutputQuantity - ProductCountingBasketModel.StockQuantity,
             ConversionFactor = 1,

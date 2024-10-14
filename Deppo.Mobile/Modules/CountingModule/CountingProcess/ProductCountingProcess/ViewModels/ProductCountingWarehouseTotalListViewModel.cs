@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
@@ -15,7 +15,7 @@ using System.Diagnostics;
 
 namespace Deppo.Mobile.Modules.CountingModule.CountingProcess.ProductCountingProcess.ViewModels;
 
-[QueryProperty(nameof(ProductModel), nameof(ProductModel))]
+[QueryProperty(nameof(ProductCountingBasketModel), nameof(ProductCountingBasketModel))]
 public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
 {
     private readonly IUserDialogs _userDialogs;
@@ -40,7 +40,8 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
     public ProductCountingWarehouseModel selectedWarehouse;
 
     [ObservableProperty]
-    public ProductModel productModel;
+    public ProductCountingBasketModel productCountingBasketModel;
+
 
     public ObservableCollection<ProductCountingWarehouseModel> Items { get; } = new();
 
@@ -60,31 +61,71 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
             IsBusy = true;
             Items.Clear();
 
+            if(ProductCountingBasketModel.IsVariant)
+                Title = "Varyant Ambar Toplamları";
+            else
+                Title = "Malzeme Ambar Toplamları";
+
+
             _userDialogs.Loading("Loading Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-
+          
             await Task.Delay(1000);
 
-            var result = await _productCountingService.GetWarehouses(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, ProductModel.ReferenceId, string.Empty, 0, 20);
-            if (result.IsSuccess)
+            if (ProductCountingBasketModel.IsVariant)
             {
-                if (result.Data == null)
-                    return;
-
-                foreach (var item in result.Data)
+                var result = await _productCountingService.GetWarehousesByVariant(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, variantReferenceId:ProductCountingBasketModel.ItemReferenceId, string.Empty, 0, 20);
+                if (result.IsSuccess)
                 {
-                    Items.Add(Mapping.Mapper.Map<ProductCountingWarehouseModel>(item));
+                    if (result.Data == null)
+                        return;
+
+                    foreach (var item in result.Data)
+                    {
+
+                        Items.Add(Mapping.Mapper.Map<ProductCountingWarehouseModel>(item));
+
+                    }
+                    _userDialogs.Loading().Hide();
                 }
-                _userDialogs.Loading().Hide();
+                else
+                {
+                    if (_userDialogs.IsHudShowing)
+                        _userDialogs.Loading().Hide();
+
+                    Debug.WriteLine(result.Message);
+                    _userDialogs.Alert(message: result.Message, title: "Load Items");
+
+                }
             }
             else
             {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
+                var result = await _productCountingService.GetWarehouses(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: ProductCountingBasketModel.ItemReferenceId , string.Empty, 0, 20);
+                if (result.IsSuccess)
+                {
+                    if (result.Data == null)
+                        return;
 
-                Debug.WriteLine(result.Message);
-                _userDialogs.Alert(message: result.Message, title: "Load Items");
+                    foreach (var item in result.Data)
+                    {
+
+                        Items.Add(Mapping.Mapper.Map<ProductCountingWarehouseModel>(item));
+
+                    }
+                    _userDialogs.Loading().Hide();
+                }
+                else
+                {
+                    if (_userDialogs.IsHudShowing)
+                        _userDialogs.Loading().Hide();
+
+                    Debug.WriteLine(result.Message);
+                    _userDialogs.Alert(message: result.Message, title: "Load Items");
+
+                }
             }
+
+           
         }
         catch (Exception ex)
         {
@@ -109,28 +150,68 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
             IsBusy = true;
             _userDialogs.Loading("Refreshing Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _productCountingService.GetWarehouses(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, ProductModel.ReferenceId, string.Empty, Items.Count, 20);
-            if (result.IsSuccess)
-            {
-                if (result.Data == null)
-                    return;
 
-                foreach (var item in result.Data)
+            if (ProductCountingBasketModel.IsVariant)
+            {
+                if (ProductCountingBasketModel.IsVariant)
                 {
-                    Items.Add(Mapping.Mapper.Map<ProductCountingWarehouseModel>(item));
-                }
-                _userDialogs.Loading().Hide();
-            }
-            else
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
+                    var result = await _productCountingService.GetWarehousesByVariant(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, variantReferenceId: ProductCountingBasketModel.ItemReferenceId, string.Empty, Items.Count, 20);
+                    if (result.IsSuccess)
+                    {
+                        if (result.Data == null)
+                            return;
 
-                _userDialogs.Alert(message: result.Message, title: "Load Items");
+                        foreach (var item in result.Data)
+                        {
+
+                            Items.Add(Mapping.Mapper.Map<ProductCountingWarehouseModel>(item));
+
+                        }
+                        _userDialogs.Loading().Hide();
+                    }
+                    else
+                    {
+                        if (_userDialogs.IsHudShowing)
+                            _userDialogs.Loading().Hide();
+
+                        Debug.WriteLine(result.Message);
+                        _userDialogs.Alert(message: result.Message, title: "Load Items");
+
+                    }
+                }
+                else
+                {
+                    var result = await _productCountingService.GetWarehouses(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: ProductCountingBasketModel.ItemReferenceId, string.Empty, Items.Count, 20);
+                    if (result.IsSuccess)
+                    {
+                        if (result.Data == null)
+                            return;
+
+                        foreach (var item in result.Data)
+                        {
+
+                            Items.Add(Mapping.Mapper.Map<ProductCountingWarehouseModel>(item));
+
+                        }
+                        _userDialogs.Loading().Hide();
+                    }
+                    else
+                    {
+                        if (_userDialogs.IsHudShowing)
+                            _userDialogs.Loading().Hide();
+
+                        Debug.WriteLine(result.Message);
+                        _userDialogs.Alert(message: result.Message, title: "Load Items");
+
+                    }
+                }
             }
+
+           
         }
         catch (Exception ex)
         {
+
             if (_userDialogs.IsHudShowing)
                 _userDialogs.Loading().Hide();
 
@@ -188,32 +269,13 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
 
             if (SelectedWarehouse is not null)
             {
-                var productCountingBasketModel = new ProductCountingBasketModel
-                {
-                    ProductReferenceId = ProductModel.ReferenceId,
-                    ProductCode = ProductModel.Code,
-                    ProductName = ProductModel.Name,
-                    Image = ProductModel.ImageData,
-                    StockQuantity = ProductModel.StockQuantity,
-                    OutputQuantity = ProductModel.StockQuantity,
-                    SubUnitsetReferenceId = ProductModel.SubUnitsetReferenceId,
-                    SubUnitsetName = ProductModel.SubUnitsetName,
-                    SubUnitsetCode = ProductModel.SubUnitsetCode,
-                    UnitsetReferenceId = ProductModel.UnitsetReferenceId,
-                    UnitsetName = ProductModel.UnitsetName,
-                    UnitsetCode = ProductModel.UnitsetCode,
-                    LocTracking = ProductModel.LocTracking,
-                    IsVariant = ProductModel.IsVariant,
-                    TrackingType = ProductModel.TrackingType,
-                    DifferenceQuantity = 0,
-                };
 
                 if (SelectedWarehouse.LocationCount > 0)
                 {
                     await Shell.Current.GoToAsync($"{nameof(ProductCountingLocationListView)}", new Dictionary<string, object>
                     {
                         [nameof(ProductCountingWarehouseModel)] = SelectedWarehouse,
-                        [nameof(ProductCountingBasketModel)] = productCountingBasketModel
+                        [nameof(ProductCountingBasketModel)] = ProductCountingBasketModel
                     });
                 }
                 else
@@ -221,9 +283,11 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
                     await Shell.Current.GoToAsync($"{nameof(ProductCountingBasketView)}", new Dictionary<string, object>
                     {
                         [nameof(ProductCountingWarehouseModel)] = SelectedWarehouse,
-                        [nameof(ProductModel)] = ProductModel
+                        [nameof(ProductCountingBasketModel)] = ProductCountingBasketModel
+
                     });
                 }
+
             }
             else
             {

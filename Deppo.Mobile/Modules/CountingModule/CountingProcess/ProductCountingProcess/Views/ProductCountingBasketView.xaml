@@ -54,9 +54,9 @@
                 <VerticalStackLayout Grid.Column="1">
                     <Label FontAttributes="Bold"
                            LineBreakMode="TailTruncation"
-                           Text="{Binding ProductCountingBasketModel.ProductCode}" />
+                           Text="{Binding ProductCountingBasketModel.ItemCode}" />
                     <Label LineBreakMode="TailTruncation"
-                           Text="{Binding ProductCountingBasketModel.ProductName}"
+                           Text="{Binding ProductCountingBasketModel.ItemName}"
                            TextColor="{StaticResource Gray600}" />
 
                     <Label TextColor="{StaticResource Gray600}"

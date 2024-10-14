@@ -168,7 +168,7 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
-                productReferenceId: ProductCountingBasketModel.ProductReferenceId,
+                productReferenceId:ProductCountingBasketModel.IsVariant ? ProductCountingBasketModel.MainItemReferenceId : ProductCountingBasketModel.ItemReferenceId,
                 warehouseNumber: ProductCountingWarehouseModel.Number,
                 locationRef: LocationModel.ReferenceId,
                 skip: 0,
