@@ -258,7 +258,8 @@ public partial class ManuelFormListViewModel : BaseViewModel
         {
             var consumableTransactionLineDto = new ConsumableTransactionLineDto
             {
-                ProductCode = item.ProductModel.Code,  // Doğru alanı ekledim
+                ProductCode = item.ProductModel.IsVariant ? item.ProductModel.MainProductCode : item.ProductModel.Code,
+                VariantCode = item.ProductModel.IsVariant ? item.ProductModel.Code: "",
                 WarehouseNumber = quicklyBomSubProductModel.FirstOrDefault()?.WarehouseModel.Number,
                 Quantity = item.SubBOMQuantity,
                 ConversionFactor = 1,
@@ -306,7 +307,8 @@ public partial class ManuelFormListViewModel : BaseViewModel
 
         var productionTransactionLineDto = new ProductionTransactionLineDto
         {
-            ProductCode = QuicklyBomProductBasketModel.QuicklyBomProduct.Code,
+            ProductCode = QuicklyBomProductBasketModel.QuicklyBomProduct.IsVariant ? QuicklyBomProductBasketModel.QuicklyBomProduct.MainItemCode : QuicklyBomProductBasketModel.QuicklyBomProduct.Code,
+			VariantCode = QuicklyBomProductBasketModel.QuicklyBomProduct.IsVariant ? QuicklyBomProductBasketModel.QuicklyBomProduct.Code : string.Empty,
             WarehouseNumber = QuicklyBomProductBasketModel.WarehouseNumber,
             Quantity = QuicklyBomProductBasketModel.BOMQuantity,
             ConversionFactor = 1,
