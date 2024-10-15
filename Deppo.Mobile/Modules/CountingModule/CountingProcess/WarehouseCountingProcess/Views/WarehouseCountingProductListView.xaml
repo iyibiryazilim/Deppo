@@ -187,7 +187,7 @@
 
         <Button Grid.Row="2"
                 Margin="5,10,5,20"
-                Command="{Binding NextCommand}"
+                Command="{Binding NextViewCommand}"
                 Text="İleri" />
     </Grid>
 

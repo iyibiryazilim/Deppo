@@ -6,6 +6,7 @@ using Deppo.Mobile.Core.Models.CountingModels.BasketModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProcess.Views;
 using System.Collections.ObjectModel;
 using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
@@ -26,7 +27,8 @@ public partial class WarehouseCountingProductListViewModel : BaseViewModel
     ProductVariantType productVariantType;
 
     public ObservableCollection<WarehouseCountingBasketModel> Items { get; } = new();
-    public WarehouseCountingProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IWarehouseCountingService warehouseCountingService)
+	public ObservableCollection<WarehouseCountingBasketModel> SelectedItems { get; } = new();
+	public WarehouseCountingProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IWarehouseCountingService warehouseCountingService)
     {
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
@@ -40,12 +42,13 @@ public partial class WarehouseCountingProductListViewModel : BaseViewModel
         DecreaseCommand = new Command<WarehouseCountingBasketModel>(async (item) => await DecreaseAsync(item));
         SwipeItemCommand = new Command<WarehouseCountingBasketModel>(async (item) => await SwipeItemAsync(item));
         BackCommand = new Command(async () => await BackAsync());
+        NextViewCommand = new Command(async () => await NextViewAsync());
     }
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command BackCommand { get; }
-    public Command NextCommand { get; }
+    public Command NextViewCommand { get; }
     public Command IncreaseCommand { get; }
     public Command DecreaseCommand { get; }
     public Command SwipeItemCommand { get; }
@@ -286,6 +289,50 @@ public partial class WarehouseCountingProductListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+    private async Task NextViewAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+			SelectedItems.Clear();
+			foreach (var item in Items.Where(x => (x.OutputQuantity - x.StockQuantity) != 0))
+			{
+				SelectedItems.Add(item);
+			}
+
+			if (SelectedItems.Count == 0)
+			{
+				await _userDialogs.AlertAsync("Sayım yapılacak ürün bulunamadı", "Uyarı", "Tamam");
+				return;
+			}
+
+			var confirm = await _userDialogs.ConfirmAsync("Miktarı sayılan ürünlerle sayım işlemine devam etmek istiyor musunuz?", "Onay", "Evet", "Hayır");
+			if (!confirm)
+				return;
+
+			await Shell.Current.GoToAsync($"{nameof(WarehouseCountingFormView)}", new Dictionary<string, object>
+            {
+                [nameof(WarehouseCountingWarehouseModel)] = WarehouseCountingWarehouseModel,
+                [nameof(WarehouseCountingBasketModel)] = SelectedItems
+			});
+        }
+        catch (Exception ex)
+        {
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }        
+    }
+
     private async Task BackAsync()
     {
         if (IsBusy)
@@ -294,7 +341,10 @@ public partial class WarehouseCountingProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
+            SelectedItems.Clear();
             await Shell.Current.GoToAsync("..");
+
+
         }
         catch (Exception ex)
         {
