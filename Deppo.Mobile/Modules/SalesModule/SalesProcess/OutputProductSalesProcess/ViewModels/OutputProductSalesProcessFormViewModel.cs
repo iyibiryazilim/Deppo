@@ -520,8 +520,8 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 				var serilotTransactionDto = new SeriLotTransactionDto
 				{
 					StockLocationCode = detail.LocationCode,
-					InProductTransactionLineReferenceId = detail.TransactionReferenceId,
-					OutProductTransactionLineReferenceId = detail.ReferenceId,
+					//InProductTransactionLineReferenceId = detail.TransactionReferenceId,
+					//OutProductTransactionLineReferenceId = detail.ReferenceId,
 					Quantity = detail.RemainingQuantity,
 					SubUnitsetCode = item.SubUnitsetCode,
 					DestinationStockLocationCode = string.Empty,

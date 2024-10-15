@@ -286,7 +286,7 @@
                                 <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="locationModels:LocationTransactionModel">
+                                <DataTemplate x:DataType="locationModels:GroupLocationTransactionModel">
                                     <Border Padding="10"
                                             BackgroundColor="{StaticResource WhiteSmoke}"
                                             StrokeShape="RoundRectangle 10"
