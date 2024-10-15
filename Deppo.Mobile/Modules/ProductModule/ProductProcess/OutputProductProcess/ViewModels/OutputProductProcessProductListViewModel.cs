@@ -150,6 +150,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
                         IsSelected = matchingItem != null ? matchingItem.IsSelected : false,
                         LocTrackingIcon = product.LocTrackingIcon,
                         VariantIcon = product.VariantIcon,
+                        Image=product.ImageData,
                         TrackingTypeIcon = product.TrackingTypeIcon,
                     });
                 }

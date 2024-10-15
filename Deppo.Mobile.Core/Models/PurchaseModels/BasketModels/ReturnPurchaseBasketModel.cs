@@ -25,11 +25,10 @@ public class ReturnPurchaseBasketModel : INotifyPropertyChanged, IDisposable
     private int _trackingType;
     private int _locTracking;
     private bool _isSelected;
-    private string _image;
-	private int _dispatchReferenceId;
+    private byte[]? _image;
+    private int _dispatchReferenceId;
 
-	private List<ReturnPurchaseBasketDetailModel> _details = new();
-   
+    private List<ReturnPurchaseBasketDetailModel> _details = new();
 
     private string _locTrackingIcon;
     private string _locTrackingIconColor;
@@ -67,7 +66,6 @@ public class ReturnPurchaseBasketModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-
     [DisplayName("Ürün / Varyant Kodu")]
     public string ItemCode
     {
@@ -91,7 +89,6 @@ public class ReturnPurchaseBasketModel : INotifyPropertyChanged, IDisposable
             NotifyPropertyChanged();
         }
     }
-
 
     [Browsable(false)]
     [Description("Ürün Varyantlı ise Varyant Reference Id, Varyantlı değilse Ürün Reference Id")]
@@ -131,8 +128,6 @@ public class ReturnPurchaseBasketModel : INotifyPropertyChanged, IDisposable
             NotifyPropertyChanged();
         }
     }
-
-
 
     [Browsable(false)]
     public int SubUnitsetReferenceId
@@ -266,7 +261,6 @@ public class ReturnPurchaseBasketModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-
     public bool IsSelected
     {
         get => _isSelected;
@@ -278,7 +272,7 @@ public class ReturnPurchaseBasketModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-    public string Image
+    public byte[]? Image
     {
         get => _image;
         set
@@ -291,14 +285,14 @@ public class ReturnPurchaseBasketModel : INotifyPropertyChanged, IDisposable
 
     public int DispatchReferenceId
     {
-		get => _dispatchReferenceId;
-		set
-		{
-			if (_dispatchReferenceId == value) return;
-			_dispatchReferenceId = value;
-			NotifyPropertyChanged();
-		}
-	}
+        get => _dispatchReferenceId;
+        set
+        {
+            if (_dispatchReferenceId == value) return;
+            _dispatchReferenceId = value;
+            NotifyPropertyChanged();
+        }
+    }
 
     public List<ReturnPurchaseBasketDetailModel> Details
     {
@@ -361,7 +355,6 @@ public class ReturnPurchaseBasketModel : INotifyPropertyChanged, IDisposable
     {
         Dispose(true);
         GC.SuppressFinalize(this);
-
     }
 
     protected virtual void Dispose(bool disposing)
@@ -371,5 +364,4 @@ public class ReturnPurchaseBasketModel : INotifyPropertyChanged, IDisposable
             PropertyChanged = null;
         }
     }
-
 }

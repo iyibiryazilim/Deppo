@@ -36,7 +36,6 @@ public class Variant : INotifyPropertyChanged, IDisposable
 
     public Variant()
     {
-
     }
 
     [Key]
@@ -236,6 +235,19 @@ public class Variant : INotifyPropertyChanged, IDisposable
         }
     }
 
+    public byte[] ImageData
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(Image))
+                return Array.Empty<byte>();
+            else
+            {
+                return Convert.FromBase64String(Image);
+            }
+        }
+    }
+
     [Browsable(false)]
     public int BrandReferenceId
     {
@@ -303,7 +315,6 @@ public class Variant : INotifyPropertyChanged, IDisposable
     {
         Dispose(true);
         GC.SuppressFinalize(this);
-
     }
 
     protected virtual void Dispose(bool disposing)
@@ -313,5 +324,4 @@ public class Variant : INotifyPropertyChanged, IDisposable
             PropertyChanged = null;
         }
     }
-
 }
