@@ -144,22 +144,30 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
 
         private void ItemTappedAsync(WarehouseModel item)
         {
-            if (IsBusy)
-                return;
+			if (IsBusy)
+				return;
 
-            try
-            {
-                IsBusy = true;
+			try
+			{
+				IsBusy = true;
 
-                Items.ToList().ForEach(x => x.IsSelected = false);
+				if (item == SelectedWarehouseModel)
+				{
+					SelectedWarehouseModel.IsSelected = false;
+					SelectedWarehouseModel = null;
+				}
+				else
+				{
+					if (SelectedWarehouseModel != null)
+					{
+						SelectedWarehouseModel.IsSelected = false;
+					}
 
-                var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-                if (selectedItem != null)
-                    selectedItem.IsSelected = true;
-
-                SelectedWarehouseModel = item;
-            }
-            catch (Exception ex)
+					SelectedWarehouseModel = item;
+					SelectedWarehouseModel.IsSelected = true;
+				}
+			}
+			catch (Exception ex)
             {
                 _userDialogs.Alert(ex.Message);
             }

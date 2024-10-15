@@ -165,7 +165,7 @@
         </CollectionView>
 
         <Button Grid.Row="4"
-                Margin="10,10,10,30"
+                Margin="10,10,10,20"
                 Command="{Binding ConfirmCommand}"
                 Text="Tamam" />
     </Grid>

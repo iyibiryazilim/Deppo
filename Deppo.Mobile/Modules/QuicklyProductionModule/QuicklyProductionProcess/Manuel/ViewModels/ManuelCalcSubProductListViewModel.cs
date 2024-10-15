@@ -207,6 +207,7 @@ public partial class ManuelCalcSubProductListViewModel : BaseViewModel
 		try
 		{
 			IsBusy = true;
+			var manuelCalcViewModel = _serviceProvider.GetRequiredService<ManuelCalcViewModel>();
 
 			SelectedWarehouseTotalModel = item;
 
@@ -215,6 +216,21 @@ public partial class ManuelCalcSubProductListViewModel : BaseViewModel
 				Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
 				SelectedItems.Remove(item);
 				SelectedSearchItems.Remove(item);
+
+				if (manuelCalcViewModel is not null)
+				{
+					if(item.IsVariant) {
+						var subProduct = manuelCalcViewModel.QuicklyBomProductBasketModel.SubProducts.FirstOrDefault(x => x.ProductModel.MainProductReferenceId == item.ProductReferenceId);
+						if (subProduct is not null)
+							manuelCalcViewModel.QuicklyBomProductBasketModel.SubProducts.Remove(subProduct);
+					}
+					else
+					{
+						var subProduct = manuelCalcViewModel.QuicklyBomProductBasketModel.SubProducts.FirstOrDefault(x => x.ProductModel.ReferenceId == item.ProductReferenceId);
+						if (subProduct is not null)
+							manuelCalcViewModel.QuicklyBomProductBasketModel.SubProducts.Remove(subProduct);
+					}
+				}
 			}
 			else
 			{
@@ -225,6 +241,46 @@ public partial class ManuelCalcSubProductListViewModel : BaseViewModel
 				}
 				else
 				{
+					manuelCalcViewModel.QuicklyBomProductBasketModel.SubProducts.Add(new QuicklyBomSubProductModel
+					{
+						WarehouseModel = WarehouseModel,
+						SubBOMQuantity = 0,
+						SubOutputQuantity = 0,
+						ProductModel = new BOMSubProductModel
+						{
+							ReferenceId = item.ProductReferenceId,
+							Code = item.ProductCode,
+							Name = item.ProductName,
+							UnitsetReferenceId = item.UnitsetReferenceId,
+							UnitsetCode = item.UnitsetCode,
+							UnitsetName = item.UnitsetName,
+							SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+							SubUnitsetCode = item.SubUnitsetCode,
+							SubUnitsetName = item.SubUnitsetName,
+							Amount = default,
+							BrandCode = item.BrandCode,
+							BrandName = item.BrandName,
+							GroupCode = item.GroupCode,
+							//Image = item.Image,
+							BrandReferenceId = item.BrandReferenceId,
+							IsSelected = false,
+							LocTracking = item.LocTracking,
+							LocTrackingIcon = item.LocTrackingIcon,
+							MainProductCode = item.ProductCode,
+							MainProductReferenceId = item.ProductReferenceId,
+							MainProductName = item.ProductName,
+							StockQuantity = item.StockQuantity,
+							TrackingType = item.TrackingType,
+							VariantIcon = item.VariantIcon,
+							TrackingTypeIcon = item.TrackingTypeIcon,
+							VatRate = default,
+							WarehouseName = WarehouseModel.Name,
+							WarehouseNumber = WarehouseModel.Number,
+							IsVariant = item.IsVariant
+						},
+						LocationTransactions = new()
+					});
+
 					Items.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
 					SelectedItems.Add(item);
 					SelectedSearchItems.Add(item);
@@ -250,55 +306,55 @@ public partial class ManuelCalcSubProductListViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
-			var manuelCalcViewModel = _serviceProvider.GetRequiredService<ManuelCalcViewModel>();
-			if (manuelCalcViewModel is not null)
-			{
-				foreach (var item in SelectedItems)
-				{
-					if (!manuelCalcViewModel.QuicklyBomProductBasketModel.SubProducts.Any(x => x.ProductModel.Code == item.ProductCode))
-					{
-						manuelCalcViewModel.QuicklyBomProductBasketModel.SubProducts.Add(new QuicklyBomSubProductModel
-						{
-							WarehouseModel = WarehouseModel,
-							SubBOMQuantity = 0,
-							SubOutputQuantity = 0,
-							ProductModel = new BOMSubProductModel
-							{
-								ReferenceId = item.ProductReferenceId,
-								Code = item.ProductCode,
-								Name = item.ProductName,
-								UnitsetReferenceId = item.UnitsetReferenceId,
-								UnitsetCode = item.UnitsetCode,
-								UnitsetName = item.UnitsetName,
-								SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-								SubUnitsetCode = item.SubUnitsetCode,
-								SubUnitsetName = item.SubUnitsetName,
-								Amount = default,
-								BrandCode = item.BrandCode,
-								BrandName = item.BrandName,
-								GroupCode = item.GroupCode,
-								//Image = item.Image,
-								BrandReferenceId = item.BrandReferenceId,
-								IsSelected = false,
-								LocTracking = item.LocTracking,
-								LocTrackingIcon = item.LocTrackingIcon,
-								MainProductCode = item.ProductCode,
-								MainProductReferenceId = item.ProductReferenceId,
-								StockQuantity = item.StockQuantity,
-								TrackingType = item.TrackingType,
-								VariantIcon = item.VariantIcon,
-								TrackingTypeIcon = item.TrackingTypeIcon,
-								VatRate = default,
-								WarehouseName = WarehouseModel.Name,
-								WarehouseNumber = WarehouseModel.Number,
-								IsVariant = item.IsVariant
-							},
-							LocationTransactions = new()
-						});
-					}
-				}
-			}
-			SelectedSearchItems.Clear();
+			//var manuelCalcViewModel = _serviceProvider.GetRequiredService<ManuelCalcViewModel>();
+			//if (manuelCalcViewModel is not null)
+			//{
+			//	foreach (var item in SelectedItems)
+			//	{
+			//		if (!manuelCalcViewModel.QuicklyBomProductBasketModel.SubProducts.Any(x => x.ProductModel.Code == item.ProductCode))
+			//		{
+			//			manuelCalcViewModel.QuicklyBomProductBasketModel.SubProducts.Add(new QuicklyBomSubProductModel
+			//			{
+			//				WarehouseModel = WarehouseModel,
+			//				SubBOMQuantity = 0,
+			//				SubOutputQuantity = 0,
+			//				ProductModel = new BOMSubProductModel
+			//				{
+			//					ReferenceId = item.ProductReferenceId,
+			//					Code = item.ProductCode,
+			//					Name = item.ProductName,
+			//					UnitsetReferenceId = item.UnitsetReferenceId,
+			//					UnitsetCode = item.UnitsetCode,
+			//					UnitsetName = item.UnitsetName,
+			//					SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+			//					SubUnitsetCode = item.SubUnitsetCode,
+			//					SubUnitsetName = item.SubUnitsetName,
+			//					Amount = default,
+			//					BrandCode = item.BrandCode,
+			//					BrandName = item.BrandName,
+			//					GroupCode = item.GroupCode,
+			//					//Image = item.Image,
+			//					BrandReferenceId = item.BrandReferenceId,
+			//					IsSelected = false,
+			//					LocTracking = item.LocTracking,
+			//					LocTrackingIcon = item.LocTrackingIcon,
+			//					MainProductCode = item.ProductCode,
+			//					MainProductReferenceId = item.ProductReferenceId,
+			//					StockQuantity = item.StockQuantity,
+			//					TrackingType = item.TrackingType,
+			//					VariantIcon = item.VariantIcon,
+			//					TrackingTypeIcon = item.TrackingTypeIcon,
+			//					VatRate = default,
+			//					WarehouseName = WarehouseModel.Name,
+			//					WarehouseNumber = WarehouseModel.Number,
+			//					IsVariant = item.IsVariant
+			//				},
+			//				LocationTransactions = new()
+			//			});
+			//		}
+			//	}
+			//}
+			//SelectedSearchItems.Clear();
 			await Shell.Current.GoToAsync("../..");
 		}
 		catch (Exception ex)
@@ -399,7 +455,7 @@ public partial class ManuelCalcSubProductListViewModel : BaseViewModel
 				if (result.Data is null)
 					return;
 
-				foreach (var itemVariant in ItemVariants)
+				foreach (var itemVariant in result.Data)
 				{
 					var obj = Mapping.Mapper.Map<VariantWarehouseTotalModel>(itemVariant);
 					ItemVariants.Add(obj);
@@ -446,7 +502,7 @@ public partial class ManuelCalcSubProductListViewModel : BaseViewModel
 				if (result.Data is null)
 					return;
 
-				foreach (var itemVariant in ItemVariants)
+				foreach (var itemVariant in result.Data)
 				{
 					var obj = Mapping.Mapper.Map<VariantWarehouseTotalModel>(itemVariant);
 					ItemVariants.Add(obj);
@@ -508,40 +564,46 @@ public partial class ManuelCalcSubProductListViewModel : BaseViewModel
 				return;
 			}
 
-			var newBOMSubProductModel = new BOMSubProductModel
-			{
-				ReferenceId = item.VariantReferenceId,
-				Code = item.VariantCode,
-				Name = item.VariantName,
-				UnitsetReferenceId = item.UnitsetReferenceId,
-				UnitsetCode = item.UnitsetCode,
-				UnitsetName = item.UnitsetName,
-				SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-				SubUnitsetCode = item.SubUnitsetCode,
-				SubUnitsetName = item.SubUnitsetName,
-				Amount = default,
-				BrandReferenceId = item.BrandReferenceId,
-				BrandCode = item.BrandCode,
-				BrandName = item.BrandName,
-				GroupCode = item.GroupCode,
-				//Image = item.Image,
-				IsSelected = false,
-				LocTracking = item.LocTracking,
-				LocTrackingIcon = item.LocTrackingIcon,
-				MainProductReferenceId = item.ProductReferenceId,
-				MainProductCode = item.ProductCode,
-				MainProductName = item.ProductName,
-				StockQuantity = item.StockQuantity,
-				TrackingType = item.TrackingType,
-				VariantIcon = item.VariantIcon,
-				TrackingTypeIcon = item.TrackingTypeIcon,
-				VatRate = default,
-				WarehouseName = WarehouseModel.Name,
-				WarehouseNumber = WarehouseModel.Number,
-				IsVariant = item.IsVariant
-			};
+			var manuelCalcViewModel = _serviceProvider.GetRequiredService<ManuelCalcViewModel>();
 
-			SelectedProducts.Add(newBOMSubProductModel);
+			manuelCalcViewModel?.QuicklyBomProductBasketModel.SubProducts.Add(new QuicklyBomSubProductModel
+			{
+				WarehouseModel = WarehouseModel,
+				SubBOMQuantity = 0,
+				SubOutputQuantity = 0,
+				ProductModel = new BOMSubProductModel
+				{
+					ReferenceId = item.VariantReferenceId,
+					Code = item.VariantCode,
+					Name = item.VariantName,
+					UnitsetReferenceId = item.UnitsetReferenceId,
+					UnitsetCode = item.UnitsetCode,
+					UnitsetName = item.UnitsetName,
+					SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+					SubUnitsetCode = item.SubUnitsetCode,
+					SubUnitsetName = item.SubUnitsetName,
+					Amount = default,
+					BrandCode = item.BrandCode,
+					BrandName = item.BrandName,
+					GroupCode = item.GroupCode,
+					//Image = item.Image,
+					BrandReferenceId = item.BrandReferenceId,
+					IsSelected = false,
+					LocTracking = item.LocTracking,
+					LocTrackingIcon = item.LocTrackingIcon,
+					MainProductCode = item.ProductCode,
+					MainProductReferenceId = item.ProductReferenceId,
+					StockQuantity = item.StockQuantity,
+					TrackingType = item.TrackingType,
+					VariantIcon = item.VariantIcon,
+					TrackingTypeIcon = item.TrackingTypeIcon,
+					VatRate = default,
+					WarehouseName = WarehouseModel.Name,
+					WarehouseNumber = WarehouseModel.Number,
+					IsVariant = true
+				},
+				LocationTransactions = new()
+			});
 
 			if (SelectedWarehouseTotalModel is not null)
 			{
@@ -549,6 +611,8 @@ public partial class ManuelCalcSubProductListViewModel : BaseViewModel
 				Items.FirstOrDefault(x => x.ProductReferenceId == SelectedWarehouseTotalModel.ProductReferenceId).IsSelected = true;
 
 			}
+
+			CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.Hidden;
 		}
 		catch (Exception ex)
 		{
