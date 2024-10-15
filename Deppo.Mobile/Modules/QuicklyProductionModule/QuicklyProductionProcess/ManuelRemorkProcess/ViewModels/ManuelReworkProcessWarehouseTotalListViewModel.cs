@@ -1,4 +1,4 @@
-﻿using Android.Icu.Util;
+using Android.Icu.Util;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;

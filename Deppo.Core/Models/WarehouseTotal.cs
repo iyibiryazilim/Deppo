@@ -236,6 +236,19 @@ public class WarehouseTotal : INotifyPropertyChanged, IDisposable
         }
     }
 
+    public byte[] ImageData
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(Image))
+                return Array.Empty<byte>();
+            else
+            {
+                return Convert.FromBase64String(Image);
+            }
+        }
+    }
+
     [Browsable(false)]
     public int BrandReferenceId
     {

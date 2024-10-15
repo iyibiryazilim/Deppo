@@ -30,7 +30,7 @@ public class InputPurchaseBasketModel : INotifyPropertyChanged, IDisposable
     private int _trackingType;
     private int _locTracking;
     private bool _isSelected;
-    private string _image;
+    private byte[]? _image;
     private double _inputQuantity;
 
     private List<InputPurchaseBasketOrderModel> _orders = new();
@@ -278,7 +278,7 @@ public class InputPurchaseBasketModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-    public string Image
+    public byte[]? Image
     {
         get => _image;
         set

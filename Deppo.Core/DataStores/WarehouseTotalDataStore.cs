@@ -14,7 +14,6 @@ public class WarehouseTotalDataStore : IWarehouseTotalService
 
     public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20)
     {
-
         var content = new StringContent(JsonConvert.SerializeObject(WarehouseTotalQuery(firmNumber, periodNumber, warehouseNumber, search, skip, take)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
@@ -32,7 +31,6 @@ public class WarehouseTotalDataStore : IWarehouseTotalService
                     dataResult.IsSuccess = true;
                     dataResult.Message = "success";
                     return dataResult;
-
                 }
                 else
                 {
@@ -43,7 +41,6 @@ public class WarehouseTotalDataStore : IWarehouseTotalService
                     dataResult.Message = "empty";
                     return dataResult;
                 }
-
             }
             else
             {
@@ -55,8 +52,6 @@ public class WarehouseTotalDataStore : IWarehouseTotalService
 
                 return dataResult;
             }
-
-
         }
         else
         {
@@ -69,7 +64,6 @@ public class WarehouseTotalDataStore : IWarehouseTotalService
 
     public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsByProduct(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
     {
-
         var content = new StringContent(JsonConvert.SerializeObject(WarehouseTotalByProductQuery(firmNumber, periodNumber, productReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
@@ -87,7 +81,6 @@ public class WarehouseTotalDataStore : IWarehouseTotalService
                     dataResult.IsSuccess = true;
                     dataResult.Message = "success";
                     return dataResult;
-
                 }
                 else
                 {
@@ -98,7 +91,6 @@ public class WarehouseTotalDataStore : IWarehouseTotalService
                     dataResult.Message = "empty";
                     return dataResult;
                 }
-
             }
             else
             {
@@ -110,8 +102,6 @@ public class WarehouseTotalDataStore : IWarehouseTotalService
 
                 return dataResult;
             }
-
-
         }
         else
         {
@@ -121,10 +111,10 @@ public class WarehouseTotalDataStore : IWarehouseTotalService
             return dataResult;
         }
     }
+
     public async Task<DataResult<IEnumerable<dynamic>>> TotalQuery(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
     {
-
-        var content = new StringContent(JsonConvert.SerializeObject(TotalQuery(firmNumber, periodNumber,  search, skip, take)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(TotalQuery(firmNumber, periodNumber, search, skip, take)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -141,7 +131,6 @@ public class WarehouseTotalDataStore : IWarehouseTotalService
                     dataResult.IsSuccess = true;
                     dataResult.Message = "success";
                     return dataResult;
-
                 }
                 else
                 {
@@ -152,7 +141,6 @@ public class WarehouseTotalDataStore : IWarehouseTotalService
                     dataResult.Message = "empty";
                     return dataResult;
                 }
-
             }
             else
             {
@@ -164,8 +152,6 @@ public class WarehouseTotalDataStore : IWarehouseTotalService
 
                 return dataResult;
             }
-
-
         }
         else
         {
@@ -178,7 +164,8 @@ public class WarehouseTotalDataStore : IWarehouseTotalService
 
     private string WarehouseTotalQuery(int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20)
     {
-        string baseQuery = $@"SELECT 
+        string baseQuery = $@"WITH BaseQuery AS (
+   SELECT
 [ReferenceId] = NEWID(),
 [ProductReferenceId] =  ITEMS.LOGICALREF,
 [ProductCode] = ITEMS.CODE,
@@ -207,27 +194,49 @@ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(N
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_MARK AS BRAND WITH(NOLOCK) ON ITEMS.MARKREF = BRAND.LOGICALREF
 LEFT JOIN L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON STINVTOT.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_INVDEF AS INVDEF WITH(NOLOCK) ON STINVTOT.INVENNO = INVDEF.INVENNO AND STINVTOT.STOCKREF = INVDEF.ITEMREF AND INVDEF.VARIANTREF = 0
+
 WHERE INVDEF.OUTCTRL <> 2
-";
-
-        if (!string.IsNullOrEmpty(search))
-            baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";
-
-        baseQuery += $@" GROUP BY STINVTOT.INVENNO, ITEMS.LOGICALREF,ITEMS.CODE,ITEMS.NAME,WHOUSE.LOGICALREF,WHOUSE.NR,WHOUSE.NAME,UNITSETF.LOGICALREF,UNITSETF.CODE,UNITSETF.NAME,UNITSETL.LOGICALREF,UNITSETL.CODE,UNITSETL.NAME, ITEMS.CANCONFIGURE, ITEMS.TRACKTYPE, ITEMS.LOCTRACKING,ITEMS.CARDTYPE,ITEMS.MOLD,BRAND.LOGICALREF,BRAND.CODE,BRAND.DESCR
+ GROUP BY STINVTOT.INVENNO, ITEMS.LOGICALREF,ITEMS.CODE,ITEMS.NAME,WHOUSE.LOGICALREF,WHOUSE.NR,WHOUSE.NAME,UNITSETF.LOGICALREF,UNITSETF.CODE,UNITSETF.NAME,UNITSETL.LOGICALREF,UNITSETL.CODE,UNITSETL.NAME, ITEMS.CANCONFIGURE, ITEMS.TRACKTYPE, ITEMS.LOCTRACKING,ITEMS.CARDTYPE,ITEMS.MOLD,BRAND.LOGICALREF,BRAND.CODE,BRAND.DESCR
  HAVING
-    STINVTOT.INVENNO = {warehouseNumber}
+    STINVTOT.INVENNO = 0
     AND ITEMS.CODE <> '�'
     AND ITEMS.CARDTYPE <> 4 AND ITEMS.MOLD = 0
     AND ISNULL(SUM(STINVTOT.ONHAND), 0) <> 0
 ORDER BY ITEMS.CODE DESC
-OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+OFFSET 0 ROWS FETCH NEXT 20 ROWS ONLY
+)
+SELECT
+    BQ.ReferenceId,
+    BQ.ProductReferenceId,
+    BQ.ProductCode,
+    BQ.ProductName,
+    BQ.WarehouseReferenceId,
+    BQ.WarehouseNumber,
+    BQ.WarehouseName,
+    BQ.UnitsetReferenceId,
+    BQ.UnitsetCode,
+	BQ.UnitsetName,
+    BQ.SubUnitsetReferenceId,
+	BQ.IsVariant,
+	BQ.TrackingType,
+	BQ.LocTracking,
+	BQ.BrandReferenceId,
+	BQ.BrandCode,
+	BQ.BrandName,
+    FIRMDOC.LDATA AS Image
+FROM
+    BaseQuery AS BQ
+    LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_FIRMDOC AS FIRMDOC ON FIRMDOC.INFOREF = BQ.ProductReferenceId AND FIRMDOC.INFOTYP = 20
+";
 
-
+        if (!string.IsNullOrEmpty(search))
+            baseQuery += $@" WHERE (BQ.ProductCode LIKE '{search}%' OR BQ.ProductName LIKE '%{search}%')";
         return baseQuery;
     }
+
     private string TotalQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
     {
-        string baseQuery = $@"SELECT 
+        string baseQuery = $@"SELECT
 [ReferenceId] = NEWID(),
 [ProductReferenceId] =  ITEMS.LOGICALREF,
 [ProductCode] = ITEMS.CODE,
@@ -266,13 +275,12 @@ LEFT JOIN L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON STINVTOT.INVENNO = WHOUSE.NR AN
 ORDER BY ITEMS.CODE DESC
 OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
-
         return baseQuery;
     }
 
     private string WarehouseTotalByProductQuery(int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
     {
-        string baseQuery = $@"SELECT 
+        string baseQuery = $@"SELECT
 [ReferenceId] = NEWID(),
 [ProductReferenceId] =  ITEMS.LOGICALREF,
 [ProductCode] = ITEMS.CODE,
@@ -315,10 +323,6 @@ LEFT JOIN L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON STINVTOT.INVENNO = WHOUSE.NR AN
 ORDER BY ITEMS.CODE DESC
 OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
-
         return baseQuery;
     }
-
-  
-
 }

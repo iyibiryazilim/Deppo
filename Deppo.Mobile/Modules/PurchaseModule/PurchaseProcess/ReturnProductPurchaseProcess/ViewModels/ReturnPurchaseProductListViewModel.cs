@@ -29,7 +29,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
     private readonly IUserDialogs _userDialogs;
 
     [ObservableProperty]
-    WarehouseModel warehouseModel = null!;
+    private WarehouseModel warehouseModel = null!;
 
     public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
     public ObservableCollection<WarehouseTotalModel> SelectedItems { get; } = new();
@@ -39,7 +39,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
     public ObservableCollection<ReturnPurchaseBasketModel> selectedProducts = new();
 
     [ObservableProperty]
-    WarehouseTotalModel selectedProduct = null!;
+    private WarehouseTotalModel selectedProduct = null!;
 
     public Page CurrentPage { get; set; } = null!;
 
@@ -90,6 +90,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
     }
 
     #region Commands
+
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
@@ -98,12 +99,12 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
     public Command PerformEmptySearchCommand { get; }
     public Command BackCommand { get; }
 
-
     public Command LoadVariantItemsCommand { get; }
     public Command LoadMoreVariantItemsCommand { get; }
     public Command VariantTappedCommand { get; }
     public Command ConfirmVariantCommand { get; }
-    #endregion
+
+    #endregion Commands
 
     [ObservableProperty]
     public SearchBar searchText;
@@ -130,7 +131,6 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
 
                 foreach (var product in result.Data)
                 {
-
                     var item = Mapping.Mapper.Map<WarehouseTotal>(product);
                     var matchedItem = SelectedItems.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
                     Items.Add(new WarehouseTotalModel
@@ -155,6 +155,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
                         LocTrackingIcon = product.LocTrackingIcon,
                         VariantIcon = product.VariantIcon,
                         TrackingTypeIcon = product.TrackingTypeIcon,
+                        Image = product.Image,
                     });
                 }
             }
@@ -217,6 +218,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
                         LocTrackingIcon = product.LocTrackingIcon,
                         VariantIcon = product.VariantIcon,
                         TrackingTypeIcon = product.TrackingTypeIcon,
+                        Image = product.Image,
                     });
                 }
             }
@@ -247,7 +249,6 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
 
             if (item is not null)
             {
-
                 if (!item.IsSelected)
                 {
                     if (item.IsVariant)
@@ -285,6 +286,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
                             LocTrackingIcon = item.LocTrackingIcon,
                             VariantIcon = item.VariantIcon,
                             TrackingTypeIcon = item.TrackingTypeIcon,
+                            Image = item.ImageData
                         };
 
                         SelectedProducts.Add(basketItem);
@@ -302,9 +304,6 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
                     }
                 }
             }
-
-
-
         }
         catch (Exception ex)
         {
@@ -318,10 +317,8 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
 
     private async Task LoadVariantItemsAsync()
     {
-
         try
         {
-
             _userDialogs.Loading("Loading Variant Items");
             ItemVariants.Clear();
             var httpClient = _httpClientService.GetOrCreateHttpClient();
@@ -340,7 +337,6 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
             }
 
             _userDialogs.Loading().Hide();
-
         }
         catch (Exception ex)
         {
@@ -351,7 +347,6 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
         }
         finally
         {
-
         }
     }
 
@@ -451,7 +446,6 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
             {
                 SelectedProduct.IsSelected = true;
                 SelectedItems.Add(SelectedProduct);
-
             }
 
             CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.Hidden;
@@ -526,7 +520,6 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
 
                 foreach (var product in result.Data)
                 {
-
                     var item = Mapping.Mapper.Map<WarehouseTotal>(product);
                     Items.Add(new WarehouseTotalModel
                     {
@@ -550,6 +543,7 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
                         LocTrackingIcon = product.LocTrackingIcon,
                         VariantIcon = product.VariantIcon,
                         TrackingTypeIcon = product.TrackingTypeIcon,
+                        Image = product.Image,
                     });
                 }
             }
@@ -576,8 +570,6 @@ public partial class ReturnPurchaseProductListViewModel : BaseViewModel
             await PerformSearchAsync();
         }
     }
-
-
 
     private async Task BackAsync()
     {
