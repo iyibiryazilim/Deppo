@@ -133,6 +133,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 		}
 	}
 
+	[Obsolete("Not used")]
 	private async Task ReadBarcodeAsync(BarcodeResult[] readBarcodes)
 	{
 		try
@@ -816,7 +817,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 				case "InputProductProcessBasket":
 					var inputProductProcessBasketListViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketListViewModel>();
 					var inputProductBasketItem = await ConvertInputProductBasketAsync(variantModel);
-					if (inputProductProcessBasketListViewModel.Items.Any(x => x.MainItemCode == inputProductBasketItem.MainItemCode))
+					if (inputProductProcessBasketListViewModel.Items.Any(x => x.ItemCode == inputProductBasketItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
@@ -830,7 +831,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					var outputProductProcessBasketListViewModel = _serviceProvider.GetRequiredService<OutputProductProcessBasketListViewModel>();
 					var outputProductBasketItem = await ConvertOutputProductBasketAsync(variantModel);
 
-					if (outputProductProcessBasketListViewModel.Items.Any(x => x.MainItemCode == outputProductBasketItem.MainItemCode))
+					if (outputProductProcessBasketListViewModel.Items.Any(x => x.ItemCode == outputProductBasketItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
@@ -856,7 +857,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 				case "OutputProductSalesProcessBasket":
 					var outputProductSalesProcessBasketListViewModel = _serviceProvider.GetRequiredService<OutputProductSalesProcessBasketListViewModel>();
 					var outputSalesBasketItem = await ConvertOutputSalesBasketAsync(variantModel);
-					if (outputProductSalesProcessBasketListViewModel.Items.Any(x => x.MainItemCode == outputSalesBasketItem.MainItemCode))
+					if (outputProductSalesProcessBasketListViewModel.Items.Any(x => x.ItemCode == outputSalesBasketItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
@@ -870,7 +871,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					var inputProductPurchaseProcessBasketListViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseProcessBasketListViewModel>();
 					var inputPurchaseBasketItem = await ConvertInputPurchaseBasketAsync(variantModel);
 
-					if (inputProductPurchaseProcessBasketListViewModel.Items.Any(x => x.MainItemCode == inputPurchaseBasketItem.MainItemCode))
+					if (inputProductPurchaseProcessBasketListViewModel.Items.Any(x => x.ItemCode == inputPurchaseBasketItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
@@ -884,7 +885,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					var returnPurchaseBasketViewModel = _serviceProvider.GetRequiredService<ReturnPurchaseBasketViewModel>();
 					var returnPurchaseBasketItem = await ConvertReturnPurchaseBasketAsync(variantModel);
 
-					if (returnPurchaseBasketViewModel.Items.Any(x => x.MainItemCode == returnPurchaseBasketItem.MainItemCode))
+					if (returnPurchaseBasketViewModel.Items.Any(x => x.ItemCode == returnPurchaseBasketItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
@@ -897,7 +898,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 				case "ReturnSalesBasket":
 					var returnSalesBasketViewModel = _serviceProvider.GetRequiredService<ReturnSalesBasketViewModel>();
 					var returnSalesBasketItem = await ConvertReturnSalesBasketAsync(variantModel);
-					if (returnSalesBasketViewModel.Items.Any(x => x.MainItemCode == returnSalesBasketItem.MainItemCode))
+					if (returnSalesBasketViewModel.Items.Any(x => x.ItemCode == returnSalesBasketItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
@@ -910,7 +911,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 				case "InputProductPurchaseOrderBasket":
 					var inputProductPurchaseOrderBasketListViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseOrderProcessBasketListViewModel>();
 					var inputPurchaseOrderBasketItem = await ConvertInputPurchaseBasketAsync(variantModel);
-					if (inputProductPurchaseOrderBasketListViewModel.Items.Any(x => x.MainItemCode == inputPurchaseOrderBasketItem.MainItemCode))
+					if (inputProductPurchaseOrderBasketListViewModel.Items.Any(x => x.ItemCode == inputPurchaseOrderBasketItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
@@ -923,7 +924,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 				case "OutputProductSalesOrderBasket":
 					var outputProductSalesOrderProcessBasketListViewModel = _serviceProvider.GetRequiredService<OutputProductSalesOrderProcessBasketListViewModel>();
 					var outputSalesOrderBasketItem = await ConvertOutputSalesBasketAsync(variantModel);
-					if (outputProductSalesOrderProcessBasketListViewModel.Items.Any(x => x.MainItemCode == outputSalesOrderBasketItem.MainItemCode))
+					if (outputProductSalesOrderProcessBasketListViewModel.Items.Any(x => x.ItemCode == outputSalesOrderBasketItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
@@ -936,13 +937,26 @@ public partial class CameraReaderViewModel : BaseViewModel
 				case "DemandProcessBasket":
 					var demandProcessBasketListViewModel = _serviceProvider.GetRequiredService<DemandProcessBasketListViewModel>();
 					var demandProcessBasketItem = await ConvertDemandProcessBasketAsync(variantModel);
-					if (demandProcessBasketListViewModel.Items.Any(x => x.MainItemCode == demandProcessBasketItem.MainItemCode))
+					if (demandProcessBasketListViewModel.Items.Any(x => x.ItemCode == demandProcessBasketItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
 					else
 					{
 						demandProcessBasketListViewModel.Items.Add(demandProcessBasketItem);
+						_userDialogs.ShowToast($"Ürün Sepete Eklendi");
+					}
+					break;
+				case "OutputOutsourceTransferBasket":
+					var outputOutsourceTransferBasketViewModel = _serviceProvider.GetRequiredService<OutputOutsourceTransferBasketListViewModel>();
+					var outputOutsourceTransferBasketItem = await ConvertOutputOutsourceTransferBasketAsync(variantModel);
+					if (outputOutsourceTransferBasketViewModel.Items.Any(x => x.ItemCode == outputOutsourceTransferBasketItem.ItemCode))
+					{
+						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
+					}
+					else
+					{
+						outputOutsourceTransferBasketViewModel.Items.Add(outputOutsourceTransferBasketItem);
 						_userDialogs.ShowToast($"Ürün Sepete Eklendi");
 					}
 					break;
