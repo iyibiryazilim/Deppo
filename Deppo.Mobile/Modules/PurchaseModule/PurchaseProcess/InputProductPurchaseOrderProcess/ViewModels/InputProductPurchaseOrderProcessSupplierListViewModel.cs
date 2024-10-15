@@ -14,6 +14,7 @@ using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views;
 using DevExpress.Maui.Controls;
+using DevExpress.Maui.Core.Internal;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -41,6 +42,12 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
     [ObservableProperty]
     ShipAddressModel selectedShipAddressModel;
 
+	public ObservableCollection<PurchaseSupplier> Items { get; } = new();
+	public ObservableCollection<ShipAddressModel> ShipAddresses { get; } = new();
+
+	[ObservableProperty]
+	public SearchBar searchText;
+
 	public InputProductPurchaseOrderProcessSupplierListViewModel(IHttpClientService httpClientService,
 
     IUserDialogs userDialogs,
@@ -58,6 +65,7 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<PurchaseSupplier>(async (x) => await ItemTappedAsync(x));
         NextViewCommand = new Command(async () => await NextViewAsync());
+        BackCommand = new Command(async () => await BackAsyc());
 
         ShipAddressTappedCommand = new Command<ShipAddressModel>(async (shipAddress) => await ShipAddressTappedAsync(shipAddress));
         ConfirmShipAddressCommand = new Command(async () => await ConfirmShipAddressAsync());
@@ -65,10 +73,6 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
         PerformSearchCommand = new Command(async () => await PerformSearchAsync());
         PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
     }
-
-    public ObservableCollection<PurchaseSupplier> Items { get; } = new();
-    public ObservableCollection<ShipAddressModel> ShipAddresses { get; } = new();
-
     public Page CurrentPage { get; set; } = null!;
 
     public Command LoadItemsCommand { get; }
@@ -77,13 +81,13 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
     public Command PerformEmptySearchCommand { get; }
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
+    public Command BackCommand { get; }
 
     public Command ConfirmShipAddressCommand { get; }
     public Command ShipAddressTappedCommand { get; }
     public Command ShipAddressCloseCommand { get; }
 
-    [ObservableProperty]
-    public SearchBar searchText;
+ 
     private async Task LoadItemsAsync()
     {
         if (IsBusy)
@@ -177,6 +181,11 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
 					await LoadShipAddressesAsync(item);
 					CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
 				}
+                else
+                {
+                    item.IsSelected = true;
+                    PurchaseSupplier = item;
+                }
 			}
 			else
 			{
@@ -289,7 +298,6 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
 				PurchaseSupplier.ShipAddressCode = selectedShipAddress.Code;
 				PurchaseSupplier.ShipAddressName = selectedShipAddress.Name;
 
-				// Hem SalesCustomer hem de seçilen Ship Address'in seçildiğini işaretle
 				Items.ToList().ForEach(x => x.IsSelected = false);
 
 				PurchaseSupplier.IsSelected = true;
@@ -323,19 +331,31 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
         {
             IsBusy = true;
 
-			Console.WriteLine(WarehouseModel);
-			Console.WriteLine(PurchaseSupplier);
+            if(PurchaseSupplier is null)
+            {
+			    _userDialogs.Alert("Lütfen bir tedarikçi seçiniz.", "Hata", "Tamam");
+			    return;
+			}
 
+            if(PurchaseSupplier.ShipAddressCount > 0 && PurchaseSupplier.ShipAddressReferenceId == 0)
+            {
+				await _userDialogs.AlertAsync("Lütfen bir sevk adresi seçiniz.", "Hata", "Tamam");
+				return;
+			}
+			
             await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessBasketListView)}", new Dictionary<string, object>
             {
                 [nameof(WarehouseModel)] = WarehouseModel,
                 [nameof(PurchaseSupplier)] = PurchaseSupplier
             });
         }
-        catch (System.Exception)
+        catch (Exception ex)
         {
-            throw;
-        }
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
         finally
         {
             IsBusy = false;
@@ -402,4 +422,73 @@ public partial class InputProductPurchaseOrderProcessSupplierListViewModel : Bas
             await PerformSearchAsync();
         }
     }
+
+	private async Task BackAsyc()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var confirm = await _userDialogs.ConfirmAsync("Verileriniz silinecektir! Devam etmek istediğinize emin misiniz?", "İptal", "Evet", "Hayır");
+			if (!confirm)
+				return;
+
+			Items.Clear();
+			ShipAddresses.Clear();
+			if (PurchaseSupplier is not null)
+			{
+				PurchaseSupplier.ShipAddressReferenceId = 0;
+				PurchaseSupplier.ShipAddressCode = string.Empty;
+				PurchaseSupplier.ShipAddressName = string.Empty;
+				PurchaseSupplier.IsSelected = false;
+			}
+			PurchaseSupplier = null;
+
+			Items.ForEach(x => x.IsSelected = false);
+
+			await Shell.Current.GoToAsync("..");
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	public async Task ClearPageAsync()
+	{
+		try
+		{
+			await Task.Run(() =>
+			{
+				ShipAddresses.Clear();
+				if (PurchaseSupplier is not null)
+				{
+					PurchaseSupplier.ShipAddressReferenceId = 0;
+					PurchaseSupplier.ShipAddressCode = string.Empty;
+					PurchaseSupplier.ShipAddressName = string.Empty;
+
+					PurchaseSupplier.IsSelected = false;
+				}
+				PurchaseSupplier = null;
+
+				Items.ForEach(x => x.IsSelected = false);
+			});
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+	}
 }
