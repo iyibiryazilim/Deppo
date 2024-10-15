@@ -86,6 +86,10 @@ namespace Deppo.Core.DataStores
         WHEN SUPPLIER.ACTIVE = 0 THEN 0
         ELSE 1
     END AS [IsActive],
+    CASE
+        WHEN SUPPLIER.ACCEPTEDESP = 0 THEN 0
+        ELSE 1
+    END AS [IsEDispatch],
 	[OrderReferenceCount] = ISNULL( (SELECT COUNT(DISTINCT ORFLINE.STOCKREF)
         FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
         WHERE ORFLINE.CLIENTREF = SUPPLIER.LOGICALREF

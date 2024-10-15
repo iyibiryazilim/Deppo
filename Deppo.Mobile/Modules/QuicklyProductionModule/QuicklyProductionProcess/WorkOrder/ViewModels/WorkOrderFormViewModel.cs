@@ -252,8 +252,9 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
             {
                 var consumableTransactionLineDto = new ConsumableTransactionLineDto
                 {
-                    ProductCode = item.ProductModel.Code,  // Doğru alanı ekledim
-                    WarehouseNumber = quicklyBomSubProductModel.FirstOrDefault().ProductModel.WarehouseNumber,
+                    ProductCode = item.ProductModel.IsVariant ? item.ProductModel.MainProductCode : item.ProductModel.Code,
+                    VariantCode = item.ProductModel.IsVariant ? item.ProductModel.Code : "",
+					WarehouseNumber = quicklyBomSubProductModel.FirstOrDefault().ProductModel.WarehouseNumber,
                     Quantity = item.SubBOMQuantity,
                     ConversionFactor = 1,
                     OtherConversionFactor = 1,
@@ -300,7 +301,8 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
 
             var productionTransactionLineDto = new ProductionTransactionLineDto
             {
-                ProductCode = QuicklyBomProductBasketModel.QuicklyBomProduct.Code,
+				ProductCode = QuicklyBomProductBasketModel.QuicklyBomProduct.IsVariant ? QuicklyBomProductBasketModel.QuicklyBomProduct.MainItemCode : QuicklyBomProductBasketModel.QuicklyBomProduct.Code,
+				VariantCode = QuicklyBomProductBasketModel.QuicklyBomProduct.IsVariant ? QuicklyBomProductBasketModel.QuicklyBomProduct.Code : "",
                 WarehouseNumber = QuicklyBomProductBasketModel.WarehouseNumber,
                 Quantity = QuicklyBomProductBasketModel.BOMQuantity,
                 ConversionFactor = 1,
@@ -310,7 +312,7 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
                 VatRate = 0,
             };
 
-            foreach (var detail in quicklyBomProductBasketModel.MainLocations)
+            foreach (var detail in QuicklyBomProductBasketModel.MainLocations)
             {
                 var seriLotTransactionDto = new SeriLotTransactionDto
                 {

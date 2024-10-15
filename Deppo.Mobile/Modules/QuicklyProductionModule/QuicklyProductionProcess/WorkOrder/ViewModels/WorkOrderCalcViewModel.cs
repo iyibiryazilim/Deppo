@@ -212,7 +212,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                 QuicklyBomProductBasketModel.BOMQuantity = 0;
                 LocationTransactions.Clear();
                 SelectedLocationTransactions.Clear();
-                selectedItem = null;
+                SelectedItem = null;
                 await Shell.Current.GoToAsync("..");
             }
             else
@@ -284,7 +284,14 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
             _userDialogs.Loading("Loading Items...");
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _quicklyBomService.GetObjectsWorkSubProducts(httpClient, firmNumber: _httpClientService.FirmNumber, mainProductReferenceId: QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId, periodNumber: _httpClientService.PeriodNumber, take: 1000);
+            var result = await _quicklyBomService.GetObjectsWorkSubProducts(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                mainProductReferenceId: QuicklyBomProductBasketModel.QuicklyBomProduct.IsVariant ? QuicklyBomProductBasketModel.QuicklyBomProduct.MainItemReferenceId : QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                search: "",
+                skip: 0,
+                take: 9000);
 
             if (result.IsSuccess)
             {
@@ -417,7 +424,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                     LocationTransactionModel model = Mapping.Mapper.Map<LocationTransactionModel>(item);
                     if (model != null)
                     {
-                        if (selectedItem.LocationTransactions.Any(x => x.LocationCode == model.LocationCode))
+                        if (SelectedItem.LocationTransactions.Any(x => x.LocationCode == model.LocationCode))
                         {
                             model.OutputQuantity = SelectedItem.LocationTransactions.FirstOrDefault(x => x.ReferenceId == model.ReferenceId).OutputQuantity;
                         }
@@ -465,7 +472,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                     LocationTransactionModel model = Mapping.Mapper.Map<LocationTransactionModel>(item);
                     if (model != null)
                     {
-                        if (selectedItem.LocationTransactions.Any(x => x.LocationCode == model.LocationCode))
+                        if (SelectedItem.LocationTransactions.Any(x => x.LocationCode == model.LocationCode))
                         {
                             model.OutputQuantity = SelectedItem.LocationTransactions.FirstOrDefault(x => x.LocationCode == model.LocationCode).OutputQuantity;
                         }
@@ -646,7 +653,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                     }
                     foreach (var location in Locations)
                     {
-                        var matchingItem = quicklyBomProductBasketModel.MainLocations.FirstOrDefault(item => item.ReferenceId == location.ReferenceId);
+                        var matchingItem = QuicklyBomProductBasketModel.MainLocations.FirstOrDefault(item => item.ReferenceId == location.ReferenceId);
                         if (matchingItem != null)
                         {
                             location.InputQuantity = matchingItem.InputQuantity;
@@ -684,7 +691,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                         Locations.Add(Mapping.Mapper.Map<LocationModel>(item));
                     foreach (var location in Locations)
                     {
-                        var matchingItem = quicklyBomProductBasketModel.MainLocations.FirstOrDefault(item => item.ReferenceId == location.ReferenceId);
+                        var matchingItem = QuicklyBomProductBasketModel.MainLocations.FirstOrDefault(item => item.ReferenceId == location.ReferenceId);
                         if (matchingItem != null)
                         {
                             location.InputQuantity = matchingItem.InputQuantity;

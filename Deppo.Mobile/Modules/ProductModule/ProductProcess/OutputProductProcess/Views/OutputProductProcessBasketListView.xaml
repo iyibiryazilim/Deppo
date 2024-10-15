@@ -295,7 +295,7 @@
                                                    Orientation="Vertical" />
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="locationModel:LocationTransactionModel">
+                                <DataTemplate x:DataType="locationModel:GroupLocationTransactionModel">
                                     <Border Padding="10"
                                             BackgroundColor="{StaticResource WhiteSmoke}"
                                             StrokeShape="RoundRectangle 10"

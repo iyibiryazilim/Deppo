@@ -8,6 +8,7 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
+using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -162,7 +163,11 @@ public partial class InputProductPurchaseProcessFormViewModel : BaseViewModel
                 TransactionDate = FicheDate,
                 FirmNumber = _httpClientService.FirmNumber,
                 WarehouseNumber = WarehouseModel.Number,
-                Description = Description
+                Description = Description,
+                IsEDispatch = (short?)((bool)SupplierModel?.IsEDispatch ? 1 : 0),
+                DispatchType = (short?)((bool)SupplierModel?.IsEDispatch ? 1 : 0),
+                DispatchStatus = 1,
+                EDispatchProfileId = (short?)((bool)SupplierModel?.IsEDispatch ? 1 : 0),
             };
 
             foreach (var item in Items)

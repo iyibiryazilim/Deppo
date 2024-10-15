@@ -243,7 +243,8 @@ public partial class ManuelReworkProcessFormViewModel : BaseViewModel
 
 		var consumableTransactionLineDto = new ConsumableTransactionLineDto
 		{
-			ProductCode = reworkBasketModel.ReworkOutProductModel.Code,
+			ProductCode = reworkBasketModel.ReworkOutProductModel.IsVariant ? reworkBasketModel.ReworkOutProductModel.MainItemCode : reworkBasketModel.ReworkOutProductModel.Code,
+			VariantCode = reworkBasketModel.ReworkOutProductModel.IsVariant ? reworkBasketModel.ReworkOutProductModel.Code : string.Empty,
 			WarehouseNumber = reworkBasketModel.OutWarehouseModel.Number,
 			Quantity = reworkBasketModel.ReworkOutProductModel.OutputQuantity,
 			ConversionFactor = 1,
@@ -295,7 +296,8 @@ public partial class ManuelReworkProcessFormViewModel : BaseViewModel
 		{
 			var productionTransactionLineDto = new ProductionTransactionLineDto
 			{
-				ProductCode = reworkInProductModel.Code,
+				ProductCode = reworkInProductModel.IsVariant ? reworkInProductModel.MainItemCode : reworkInProductModel.Code,
+				VariantCode = reworkInProductModel.IsVariant ? reworkInProductModel.Code : string.Empty,
 				WarehouseNumber = reworkInProductModel.InWarehouseModel.Number,
 				Quantity = reworkInProductModel.InputQuantity,
 				ConversionFactor = 1,

@@ -2,16 +2,21 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.DTOs.PurchaseDispatchTransaction;
 using Deppo.Core.DTOs.SeriLotTransactionDto;
+using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ResultModule;
 using Deppo.Mobile.Modules.ResultModule.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.ViewModels;
+using DevExpress.Data.Async.Helpers;
 using DevExpress.Maui.Controls;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.Controls.Shapes;
 using System;
 using System.Collections.Generic;
@@ -31,13 +36,26 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
 public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
-    private readonly IUserDialogs _userDialogs;
     private readonly IPurchaseDispatchTransactionService _purchaseDispatchTransactionService;
+    private readonly ICarrierService _carrierService;
+    private readonly IDriverService _driverService;
+    private readonly IUserDialogs _userDialogs;
+    private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty]
     private WarehouseModel warehouseModel = null!;
 
-    [ObservableProperty]
+	[ObservableProperty]
+	private PurchaseSupplier purchaseSupplier;
+
+	[ObservableProperty]
+	private ObservableCollection<InputPurchaseBasketModel> items = null!;
+
+	public ObservableCollection<Carrier> Carriers { get; } = new();
+	public ObservableCollection<Driver> Drivers { get; } = new();
+
+
+	[ObservableProperty]
     private DateTime ficheDate = DateTime.Now;
 
     [ObservableProperty]
@@ -52,34 +70,47 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
     [ObservableProperty]
     private string description = string.Empty;
 
-    [ObservableProperty]
-    private PurchaseSupplier purchaseSupplier;
+	[ObservableProperty]
+	string cargoTrackingNumber = string.Empty;
 
-    [ObservableProperty]
-    private ObservableCollection<InputPurchaseBasketModel> items = null!;
+	
 
-    public InputProductPurchaseOrderProcessFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IPurchaseDispatchTransactionService purchaseDispatchTransactionService)
-    {
-        _httpClientService = httpClientService;
-        _userDialogs = userDialogs;
-        _purchaseDispatchTransactionService = purchaseDispatchTransactionService;
-        Items = new();
+	[ObservableProperty]
+	Carrier? selectedCarrier;
+	[ObservableProperty]
+	Driver? selectedDriver;
 
-        Title = "Siparişe Bağlı Mal Kabul İşlemi";
+	public InputProductPurchaseOrderProcessFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IPurchaseDispatchTransactionService purchaseDispatchTransactionService, ICarrierService carrierService, IDriverService driverService, IServiceProvider serviceProvider)
+	{
+		_httpClientService = httpClientService;
+		_userDialogs = userDialogs;
+		_purchaseDispatchTransactionService = purchaseDispatchTransactionService;
+		_carrierService = carrierService;
+		_driverService = driverService;
+		Items = new();
 
-        LoadPageCommand = new Command(async () => await LoadPageAsync());
-        ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
-        SaveCommand = new Command(async () => await SaveAsync());
-    }
+		Title = "Siparişe Bağlı Mal Kabul İşlemi";
 
-    public Page CurrentPage { get; set; }
+		LoadPageCommand = new Command(async () => await LoadPageAsync());
+		ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
+		SaveCommand = new Command(async () => await SaveAsync());
+
+		LoadCarriersCommand = new Command(async () => await LoadCarriersAsync());
+		LoadDriversCommand = new Command(async () => await LoadDriversAsync());
+		_serviceProvider = serviceProvider;
+	}
+
+	public Page CurrentPage { get; set; }
 
     public Command LoadPageCommand { get; }
     public Command BackCommand { get; }
     public Command SaveCommand { get; }
     public Command ShowBasketItemCommand { get; }
 
-    private async Task ShowBasketItemAsync()
+	public Command LoadCarriersCommand { get; }
+	public Command LoadDriversCommand { get; }
+
+	private async Task ShowBasketItemAsync()
     {
         if (IsBusy)
             return;
@@ -90,10 +121,13 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
 
             CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
         }
-        catch (System.Exception)
+        catch (Exception ex)
         {
-            throw;
-        }
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
         finally
         {
             IsBusy = false;
@@ -109,12 +143,14 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
         {
             IsBusy = true;
 
-            // Title = GetEnumDescription(InputProductProcessType);
             CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
         }
-        catch (System.Exception)
+        catch (Exception ex)
         {
-            throw;
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
@@ -122,21 +158,94 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
         }
     }
 
-    public static string GetEnumDescription(Enum value)
+    private async Task LoadCarriersAsync()
     {
-        FieldInfo fi = value.GetType().GetField(value.ToString());
-
-        DescriptionAttribute[] attributes = fi.GetCustomAttributes(typeof(DescriptionAttribute), false) as DescriptionAttribute[];
-
-        if (attributes != null && attributes.Any())
+        if (IsBusy)
+            return;
+        try
         {
-            return attributes.First().Description;
-        }
+            IsBusy = true;
 
-        return value.ToString();
+            Carriers.Clear();
+            SelectedCarrier = null;
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			var result = await _carrierService.GetObjects(
+					httpClient: httpClient,
+					firmNumber: _httpClientService.FirmNumber
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+				{
+					Carriers.Add(Mapping.Mapper.Map<Carrier>(item));
+				}
+			}
+		}
+        catch (Exception ex)
+        {
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
     }
 
-    private async Task SaveAsync()
+	private async Task LoadDriversAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			Drivers.Clear();
+			SelectedDriver = null;
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			var result = await _driverService.GetObjects(
+					httpClient: httpClient
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+				{
+					Drivers.Add(Mapping.Mapper.Map<Driver>(item));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
+	}
+
+	private async Task SaveAsync()
     {
         if (IsBusy)
             return;
@@ -150,18 +259,27 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
 
             var purchaseDispatchDto = new PurchaseDispatchTransactionInsert
             {
-                SpeCode = SpecialCode,
-                CurrentCode = PurchaseSupplier.Code,
                 Code = string.Empty,
+                CurrentCode = PurchaseSupplier?.Code,
+                FirmNumber = _httpClientService.FirmNumber,
+                WarehouseNumber = WarehouseModel.Number,
+                CarrierCode = SelectedCarrier != null ? SelectedCarrier.Code : "",
+                DriverFirstName = SelectedDriver != null ? SelectedDriver.Name : "",
+                DriverLastName = SelectedDriver != null ? SelectedDriver.Surname : "",
+                Plaque = SelectedDriver != null ? SelectedDriver.PlateNumber : "",
+                ShipInfoCode = PurchaseSupplier?.ShipAddressReferenceId != 0 ? PurchaseSupplier?.ShipAddressCode : "",
+                SpeCode = SpecialCode,
                 DocTrackingNumber = DocumentTrackingNumber,
                 DoCode = DocumentNumber,
                 TransactionDate = FicheDate,
-                FirmNumber = _httpClientService.FirmNumber,
-                WarehouseNumber = WarehouseModel.Number,
-                Description = Description
+                Description = Description,
+                IsEDispatch = (short?)((bool)PurchaseSupplier?.IsEDispatch ? 1 : 0),
+                DispatchType = (short?)((bool)PurchaseSupplier?.IsEDispatch ? 1 : 0),
+                DispatchStatus = 1,
+                EDispatchProfileId = (short?)((bool)PurchaseSupplier?.IsEDispatch ? 1 : 0),
             };
 
-            foreach (var item in items.Where(x => x.Orders.Count > 0))
+            foreach (var item in Items.Where(x => x.Orders.Count > 0))
             {
                 var remainingQuantity = item.InputQuantity;
                 foreach (var orders in item.Orders.OrderBy(x => x.OrderDate))
@@ -239,7 +357,7 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
                 }
             }
 
-            foreach (var item in items.Where(x => x.Orders.Count == 0))
+            foreach (var item in Items.Where(x => x.Orders.Count == 0))
             {
                 var purchaseDispatchTransactionLineDto = new PurchaseDispatchTransactionLineDto
                 {
@@ -277,11 +395,18 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
             if (result.IsSuccess)
             {
                 resultModel.Message = "Başarılı";
-                resultModel.Code = result.Data.Code;
-                resultModel.PageTitle = Title;
+				resultModel.Code = result.Data.Code;
+				resultModel.PageTitle = Title;
                 resultModel.PageCountToBack = 5;
 
-                if (_userDialogs.IsHudShowing)
+				var basketViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseOrderProcessBasketListViewModel>();
+                foreach (var item in basketViewModel?.Items)
+				{
+					item.Details.Clear();
+				}
+				basketViewModel.Items.Clear();
+
+				if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();
 
                 await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
@@ -296,7 +421,7 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
 
                 resultModel.Message = "Başarısız";
                 resultModel.PageTitle = Title;
-                resultModel.PageCountToBack = 4;
+                resultModel.PageCountToBack = 1;
                 await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
                 {
                     [nameof(ResultModel)] = resultModel
@@ -307,6 +432,8 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
         {
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
-        finally { IsBusy = false; }
+        finally { 
+            IsBusy = false; 
+        }
     }
 }

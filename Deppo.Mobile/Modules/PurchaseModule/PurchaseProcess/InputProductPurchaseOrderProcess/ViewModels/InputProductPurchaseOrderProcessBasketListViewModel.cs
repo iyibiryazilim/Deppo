@@ -58,6 +58,8 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
         Title = "Satınalma Sepeti";
 
         IncreaseCommand = new Command<InputPurchaseBasketModel>(async (x) => await IncreaseAsync(x));
+        DecreaseCommand = new Command<InputPurchaseBasketModel>(async (x) => await DecreaseAsync(x));
+        DeleteItemCommand = new Command<InputPurchaseBasketModel>(async (x) => await DeleteItemAsync(x));
 
         LoadMoreWarehouseLocationsCommand = new Command(async () => await LoadMoreWarehouseLocationsAsync());
         //LocationIncreaseCommand = new Command<LocationModel>(LocationIncrease);
@@ -239,9 +241,10 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
 
     private async Task DeleteItemAsync(InputPurchaseBasketModel item)
     {
+        if (item is null)
+            return;
         if (IsBusy)
             return;
-
         try
         {
             IsBusy = true;
@@ -250,10 +253,15 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
             if (!result)
                 return;
 
+            item.Details.Clear();
+
             Items.Remove(item);
         }
         catch (Exception ex)
         {
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
@@ -592,6 +600,12 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
                 await _userDialogs.AlertAsync("Sepetinizde ürün bulunmamaktadır.", "Hata", "Tamam");
                 return;
             }
+            
+            if(Items.Any(x => x.InputQuantity == 0))
+            {
+                await _userDialogs.AlertAsync("Sepetinizde miktarı sıfır olan ürünler bulunmakta. Lütfen yeniden düzenleme yapınız", "Uyarı", "Tamam");
+                return;
+            }
 
             await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessFormView)}", new Dictionary<string, object>
             {
@@ -649,7 +663,11 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
                 if (!result)
                     return;
 
+                foreach (var item in Items)
+                    item.Details.Clear();
+
                 Items.Clear();
+
                 await Shell.Current.GoToAsync("..");
             }
             else

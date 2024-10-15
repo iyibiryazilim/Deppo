@@ -405,7 +405,8 @@ public partial class ManuelCalcViewModel : BaseViewModel
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
-                productReferenceId: SelectedItem.ProductModel.ReferenceId,
+                productReferenceId: SelectedItem.ProductModel.IsVariant ? SelectedItem.ProductModel.MainProductReferenceId : SelectedItem.ProductModel.ReferenceId,
+                variantReferenceId: SelectedItem.ProductModel.IsVariant ? SelectedItem.ProductModel.ReferenceId : 0,
                 warehouseNumber: SelectedItem.WarehouseModel.Number,
                 skip: 0,
                 take: 20
@@ -453,8 +454,9 @@ public partial class ManuelCalcViewModel : BaseViewModel
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
-                productReferenceId: SelectedItem.ProductModel.ReferenceId,
-                warehouseNumber: SelectedItem.WarehouseModel.Number,
+			    productReferenceId: SelectedItem.ProductModel.IsVariant ? SelectedItem.ProductModel.MainProductReferenceId : SelectedItem.ProductModel.ReferenceId,
+				variantReferenceId: SelectedItem.ProductModel.IsVariant ? SelectedItem.ProductModel.ReferenceId : 0,
+				warehouseNumber: SelectedItem.WarehouseModel.Number,
                 skip: LocationTransactions.Count,
                 take: 20
             );
@@ -632,7 +634,18 @@ public partial class ManuelCalcViewModel : BaseViewModel
             Locations.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, QuicklyBomProductBasketModel.WarehouseNumber, QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId,0, string.Empty, 0, 20);
+            var result = await _locationService.GetObjects(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                warehouseNumber: QuicklyBomProductBasketModel.WarehouseNumber, 
+                productReferenceId: QuicklyBomProductBasketModel.QuicklyBomProduct.IsVariant ? QuicklyBomProductBasketModel.QuicklyBomProduct.MainItemReferenceId : QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId,
+                variantReferenceId: QuicklyBomProductBasketModel.QuicklyBomProduct.IsVariant ? QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId : 0, 
+                search: string.Empty, 
+                skip: 0, 
+                take: 20
+            );
+
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -641,7 +654,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
                         Locations.Add(Mapping.Mapper.Map<LocationModel>(item));
                     foreach (var location in Locations)
                     {
-                        var matchingItem = quicklyBomProductBasketModel.MainLocations.FirstOrDefault(item => item.ReferenceId == location.ReferenceId);
+                        var matchingItem = QuicklyBomProductBasketModel.MainLocations.FirstOrDefault(item => item.ReferenceId == location.ReferenceId);
                         if (matchingItem != null)
                         {
                             location.InputQuantity = matchingItem.InputQuantity;
@@ -670,8 +683,18 @@ public partial class ManuelCalcViewModel : BaseViewModel
             _userDialogs.ShowLoading("Yükleniyor...");
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, QuicklyBomProductBasketModel.WarehouseNumber, QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId, 0,string.Empty, Locations.Count, 20);
-            if (result.IsSuccess)
+			var result = await _locationService.GetObjects(
+			   httpClient: httpClient,
+			   firmNumber: _httpClientService.FirmNumber,
+			   periodNumber: _httpClientService.PeriodNumber,
+			   warehouseNumber: QuicklyBomProductBasketModel.WarehouseNumber,
+			   productReferenceId: QuicklyBomProductBasketModel.QuicklyBomProduct.IsVariant ? QuicklyBomProductBasketModel.QuicklyBomProduct.MainItemReferenceId : QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId,
+			   variantReferenceId: QuicklyBomProductBasketModel.QuicklyBomProduct.IsVariant ? QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId : 0,
+			   search: string.Empty,
+			   skip: Locations.Count,
+			   take: 20
+		   );
+			if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
