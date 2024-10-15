@@ -28,6 +28,9 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
 
         public ObservableCollection<ProductModel> Items { get; } = new();
 
+        [ObservableProperty]
+        public SearchBar searchText;
+
         public OutsourceOutputTransactionViewModel(IHttpClientService httpClientService, IOutsourceDetailOutputProductService outsourceDetailOutputProductService, IUserDialogs userDialogs)
         {
             _httpClientService = httpClientService;
@@ -38,6 +41,8 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
 
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
             LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+            PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+            PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
             GoToBackCommand = new Command(async () => await GoToBackAsync());
         }
 
@@ -67,7 +72,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
                     firmNumber: _httpClientService.FirmNumber,
                     periodNumber: _httpClientService.PeriodNumber,
                     outsourcereReferenceId: OutsourceDetailModel.Outsource.ReferenceId,
-                    search: string.Empty,
+                    search: SearchText.Text,
                     skip: 0,
                     take: 20
                 );
@@ -116,7 +121,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
                     firmNumber: _httpClientService.FirmNumber,
                     periodNumber: _httpClientService.PeriodNumber,
                     outsourcereReferenceId: OutsourceDetailModel.Outsource.ReferenceId,
-                    search: string.Empty,
+                    search: SearchText.Text,
                     skip: Items.Count,
                     take: 20
                 );
@@ -145,6 +150,63 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
             finally
             {
                 IsBusy = false;
+            }
+        }
+
+        private async Task PerformSearchAsync()
+        {
+            if (IsBusy)
+                return;
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(SearchText.Text))
+                {
+                    await LoadItemsAsync();
+                    SearchText.Unfocus();
+                    return;
+                }
+                IsBusy = true;
+
+                var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+                var result = await _outsourceDetailOutputProductService.GetObjects(
+                    httpClient: httpClient,
+                    firmNumber: _httpClientService.FirmNumber,
+                    periodNumber: _httpClientService.PeriodNumber,
+                    outsourcereReferenceId: OutsourceDetailModel.Outsource.ReferenceId,
+                    search: SearchText.Text,
+                    skip: 0,
+                    take: 20
+                );
+
+                if (result.IsSuccess)
+                {
+                    if (result.Data is null)
+                        return;
+
+                    Items.Clear();
+                    foreach (var item in result.Data)
+                    {
+                        Items.Add(Mapping.Mapper.Map<ProductModel>(item));
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                _userDialogs.Alert(ex.Message, "Hata");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task PerformEmptySearchAsync()
+        {
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
+            {
+                await PerformSearchAsync();
             }
         }
 

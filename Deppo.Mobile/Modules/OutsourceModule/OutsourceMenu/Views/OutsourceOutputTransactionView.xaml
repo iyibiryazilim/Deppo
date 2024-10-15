@@ -70,10 +70,10 @@
                            PlaceholderColor="{StaticResource OffBlack}"
                            TextColor="{StaticResource OffBlack}">
                     <SearchBar.Behaviors>
-                        <!--<toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                        <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
                                                         EventName="SearchButtonPressed" />
                         <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}"
-                                                        EventName="TextChanged" />-->
+                                                        EventName="TextChanged" />
                     </SearchBar.Behaviors>
                 </SearchBar>
             </Border>
