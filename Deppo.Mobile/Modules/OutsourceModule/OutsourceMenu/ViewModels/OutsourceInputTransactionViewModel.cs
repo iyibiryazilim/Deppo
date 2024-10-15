@@ -28,6 +28,9 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
 
         public ObservableCollection<ProductModel> Items { get; } = new();
 
+        [ObservableProperty]
+        public SearchBar searchText;
+
         public OutsourceInputTransactionViewModel(IHttpClientService httpClientService, IOutsourceDetailInputProductService outsourceDetailInputProductService, IUserDialogs userDialogs)
         {
             _httpClientService = httpClientService;
@@ -39,10 +42,14 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
             LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
             GoToBackCommand = new Command(async () => await GoToBackAsync());
+            PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+            PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
         }
 
         public Command LoadItemsCommand { get; }
         public Command LoadMoreItemsCommand { get; }
+        public Command PerformSearchCommand { get; }
+        public Command PerformEmptySearchCommand { get; }
         public Command GoToBackCommand { get; }
 
         private async Task LoadItemsAsync()
@@ -59,7 +66,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
 
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-                var result = await _outsourceDetailInputProductService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, OutsourceDetailModel.Outsource.ReferenceId, string.Empty, 0, 20);
+                var result = await _outsourceDetailInputProductService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, OutsourceDetailModel.Outsource.ReferenceId, SearchText.Text, 0, 20);
 
                 if (result.IsSuccess)
                 {
@@ -105,7 +112,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
                     firmNumber: _httpClientService.FirmNumber,
                     periodNumber: _httpClientService.PeriodNumber,
                     outsourceReferenceId: OutsourceDetailModel.Outsource.ReferenceId,
-                    search: string.Empty,
+                    search: SearchText.Text,
                     skip: Items.Count,
                     take: 20
                     );
@@ -134,6 +141,63 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
             finally
             {
                 IsBusy = false;
+            }
+        }
+
+        private async Task PerformSearchAsync()
+        {
+            if (IsBusy)
+                return;
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(SearchText.Text))
+                {
+                    await LoadItemsAsync();
+                    SearchText.Unfocus();
+                    return;
+                }
+                IsBusy = true;
+
+                var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+                var result = await _outsourceDetailInputProductService.GetObjects(
+                    httpClient: httpClient,
+                    firmNumber: _httpClientService.FirmNumber,
+                    periodNumber: _httpClientService.PeriodNumber,
+                    outsourceReferenceId: OutsourceDetailModel.Outsource.ReferenceId,
+                    search: SearchText.Text,
+                    skip: 0,
+                    take: 20
+                );
+
+                if (result.IsSuccess)
+                {
+                    if (result.Data is null)
+                        return;
+
+                    Items.Clear();
+                    foreach (var item in result.Data)
+                    {
+                        Items.Add(Mapping.Mapper.Map<ProductModel>(item));
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                _userDialogs.Alert(ex.Message, "Hata");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task PerformEmptySearchAsync()
+        {
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
+            {
+                await PerformSearchAsync();
             }
         }
 

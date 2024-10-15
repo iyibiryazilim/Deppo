@@ -90,7 +90,9 @@ namespace Deppo.Core.DataStores
           AND STLINE.LINETYPE = 0 AND STLINE.CLIENTREF = {outsourceReferenceId}";
 
             if (!string.IsNullOrEmpty(search))
+            {
                 baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";
+            }
 
             baseQuery += $@"
         GROUP BY
@@ -109,7 +111,8 @@ namespace Deppo.Core.DataStores
         ORDER BY ITEMS.CODE DESC
         OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY
     ) AS subQuery
-    ORDER BY subQuery.StockQuantity DESC;";
+    ORDER BY subQuery.StockQuantity DESC
+OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
             return baseQuery;
         }
