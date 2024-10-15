@@ -12,6 +12,7 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.Views;
+using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views;
 using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels;
@@ -32,7 +33,9 @@ public partial class OutsourceListViewModel : BaseViewModel
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+
         ItemTappedCommand = new Command<Outsource>(async (outsource) => await ItemTappedAsync(outsource));
+
         PerformSearchCommand = new Command(async () => await PerformSearchAsync());
         PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
     }
@@ -196,12 +199,10 @@ public partial class OutsourceListViewModel : BaseViewModel
 
     private async Task ItemTappedAsync(Outsource outsource)
     {
-        if (outsource == null)
+        if (outsource is null)
             return;
-
         if (IsBusy)
             return;
-
         try
         {
             IsBusy = true;
@@ -209,10 +210,10 @@ public partial class OutsourceListViewModel : BaseViewModel
             OutsourceDetailModel outsourceDetailModel = new();
             outsourceDetailModel.Outsource = outsource;
 
-            await Shell.Current.GoToAsync($"{nameof(OutsourceDetailView)}", new Dictionary<string, object> { {
-                nameof(OutsourceDetailModel), outsourceDetailModel
-                }
-                });
+            await Shell.Current.GoToAsync($"{nameof(OutsourceDetailView)}", new Dictionary<string, object>
+            {
+                [nameof(OutsourceDetailModel)] = outsourceDetailModel
+            });
         }
         catch (Exception ex)
         {

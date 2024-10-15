@@ -13,6 +13,8 @@
     <ContentPage.Behaviors>
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
                                    StatusBarStyle="Default" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                        EventName="Loaded" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -235,7 +237,7 @@
                                 </Label.FormattedText>
                             </Label>
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding .}" />
+                                <TapGestureRecognizer Command="{Binding AllFicheTappedCommand}" />
                             </Border.GestureRecognizers>
                         </Border>
                     </Grid>
@@ -321,7 +323,7 @@
                         <CollectionView Grid.Row="1"
                                         ItemsSource="{Binding OutsourceDetailModel.LastTransactions}">
                             <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="model:CustomerTransaction">
+                                <DataTemplate x:DataType="model:OutsourceTransaction">
                                     <Border Padding="5"
                                             BackgroundColor="Transparent"
                                             StrokeThickness="0.1">
