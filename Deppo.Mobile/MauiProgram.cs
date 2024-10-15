@@ -332,6 +332,10 @@ public static class MauiProgram
         builder.Services.AddSingleton<IProcurementByCustomerProductService, ProcurementByCustomerProductDataStore>();
         builder.Services.AddSingleton<IProcurementByCustomerBasketService, ProcurementByCustomerBasketDataStore>();
 
+        builder.Services.AddSingleton<IOutsourceDetailInputProductService, OutsourceDetailInputProductDataStore>();
+        builder.Services.AddSingleton<IOutsourceDetailOutputProductService, OutsourceDetailOutputProductDataStore>();
+        builder.Services.AddSingleton<IOutsourceDetailAllFichesService, OutsourceDetailAllFichesDataStore>();
+
         #region Analysis Modules
 
         builder.Services.AddSingletonWithShellRoute<OverviewAnalysisView, OverviewAnalysisViewModel>(nameof(OverviewAnalysisView));
@@ -699,7 +703,9 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
 
         builder.Services.AddScopedWithShellRoute<OutsourcePanelAllFicheListView, OutsourcePanelAllFicheListViewModel>(nameof(OutsourcePanelAllFicheListView));
 
-        // builder.Services.AddScopedWithShellRoute<OutsourceInputTransactionView, OutsourceInputTransactionViewModel>()nameof(OutsourceInputTransactionView));
+        builder.Services.AddScopedWithShellRoute<OutsourceInputTransactionView, OutsourceInputTransactionViewModel>(nameof(OutsourceInputTransactionView));
+        builder.Services.AddScopedWithShellRoute<OutsourceOutputTransactionView, OutsourceOutputTransactionViewModel>(nameof(OutsourceOutputTransactionView));
+        builder.Services.AddScopedWithShellRoute<OutsourceDetailAllFichesView, OutsourceDetailAllFichesViewModel>(nameof(OutsourceDetailAllFichesView));
 
         #endregion OutSource Panel
 
