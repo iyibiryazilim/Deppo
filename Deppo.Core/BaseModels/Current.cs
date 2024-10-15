@@ -23,6 +23,7 @@ public class Current : INotifyPropertyChanged, IDisposable
     private string _taxOffice = string.Empty;
     private string _taxNumber = string.Empty;
     private bool _isActive;
+    private bool _isEDispatch;
 
     //
     private string _name = string.Empty;
@@ -206,6 +207,17 @@ public class Current : INotifyPropertyChanged, IDisposable
         {
             if (_isActive == value) return;
             _isActive = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public bool IsEDispatch
+    {
+        get => _isEDispatch;
+        set
+        {
+            if (_isEDispatch == value) return;
+            _isEDispatch = value;
             NotifyPropertyChanged();
         }
     }

@@ -39,20 +39,20 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 	OutputSalesBasketModel? selectedItem;
 
 	[ObservableProperty]
-	LocationTransactionModel? selectedLocationTransaction;
+    GroupLocationTransactionModel? selectedLocationTransaction;
 	[ObservableProperty]
 	SeriLotTransactionModel? selectedSeriLotTransaction;
 
 
 	[ObservableProperty]
-	public ObservableCollection<LocationTransactionModel> selectedLocationTransactions = new();
+	public ObservableCollection<GroupLocationTransactionModel> selectedLocationTransactions = new();
 	[ObservableProperty]
 	public ObservableCollection<SeriLotTransactionModel> selectedSeriLotTransactions = new();
 
-	public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
+	public ObservableCollection<GroupLocationTransactionModel> LocationTransactions { get; } = new();
 
 	//Arama yapıldığında kullanılan liste
-	public ObservableCollection<LocationTransactionModel> SelectedLocationTransactionItems { get; } = new();
+	public ObservableCollection<GroupLocationTransactionModel> SelectedLocationTransactionItems { get; } = new();
 	public ObservableCollection<SeriLotTransactionModel> SeriLotTransactions { get; } = new();
 
 	public OutputProductSalesOrderProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ILocationTransactionService locationTransactionService, ISeriLotTransactionService seriLotTransactionService)
@@ -75,8 +75,8 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 		NextViewCommand = new Command(async () => await NextViewAsync());
 
 		LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreWarehouseLocationTransactionsAsync());
-		LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
-		LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
+		LocationTransactionIncreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
+		LocationTransactionDecreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
 		LocationTransactionConfirmCommand = new Command(ConfirmLocationTransactionAsync);
 		LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
         LocationTransactionPerformSearchCommand = new Command(async () => await LocationTransactionPerformSearchAsync());
@@ -251,15 +251,22 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 			LocationTransactions.Clear();
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _locationTransactionService.GetInputObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SelectedItem.ItemReferenceId, warehouseNumber: WarehouseModel.Number, 0, 20, LocationTransactionSearchText.Text);
+			var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SelectedItem.ItemReferenceId, warehouseNumber: WarehouseModel.Number, 0, 20, LocationTransactionSearchText.Text);
 			if (result.IsSuccess)
 			{
 				if (result.Data is null)
 					return;
 
-				foreach (var item in result.Data)
-					LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
-			}
+                foreach (var item in result.Data)
+                {
+                    var obj = Mapping.Mapper.Map<GroupLocationTransactionModel>(item);
+                    var matchingItem = SelectedItem.Details.FirstOrDefault(x => x.LocationReferenceId == obj.LocationReferenceId);
+                    if (matchingItem != null)
+                        obj.OutputQuantity = matchingItem.Quantity;
+
+                    LocationTransactions.Add(Mapping.Mapper.Map<GroupLocationTransactionModel>(item));
+                }
+            }
 
 			_userDialogs.HideHud();
 		}
@@ -283,7 +290,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 			IsBusy = true;
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _locationTransactionService.GetInputObjectsAsync(httpClient: httpClient,
+			var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
 				productReferenceId: SelectedItem.ItemReferenceId,
@@ -299,7 +306,12 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 
 				foreach (var item in result.Data)
 				{
-					LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+					var obj = Mapping.Mapper.Map<GroupLocationTransactionModel>(item);
+					var matchingItem = SelectedItem.Details.FirstOrDefault(x => x.LocationReferenceId == obj.LocationReferenceId);
+                    if (matchingItem != null)
+						obj.OutputQuantity = matchingItem.Quantity;
+
+                    LocationTransactions.Add(Mapping.Mapper.Map<GroupLocationTransactionModel>(item));
 				}
 			}
 		}
@@ -313,7 +325,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 		}
 	}
 
-	private async Task LocationTransactionIncreaseAsync(LocationTransactionModel item)
+	private async Task LocationTransactionIncreaseAsync(GroupLocationTransactionModel item)
 	{
 		if (IsBusy)
 			return;
@@ -357,7 +369,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 		}
 	}
 
-	private async Task LocationTransactionDecreaseAsync(LocationTransactionModel item)
+	private async Task LocationTransactionDecreaseAsync(GroupLocationTransactionModel item)
 	{
 		if (IsBusy)
 			return;
@@ -416,7 +428,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 
                 foreach (var item in SelectedLocationTransactions)
 				{
-					var selectedLocationTransactionItem = SelectedItem.Details.FirstOrDefault(x => x.TransactionReferenceId == item.TransactionReferenceId);
+					var selectedLocationTransactionItem = SelectedItem.Details.FirstOrDefault(x => x.LocationReferenceId == item.LocationReferenceId);
 					if (selectedLocationTransactionItem is not null)
 					{
 						selectedLocationTransactionItem.Quantity = item.OutputQuantity;
@@ -425,14 +437,14 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 
 					SelectedItem.Details.Add(new OutputSalesBasketDetailModel
 					{
-						ReferenceId = item.ReferenceId,
+						//ReferenceId = item.ReferenceId,
 						LocationReferenceId = item.LocationReferenceId,
 						LocationCode = item.LocationCode,
 						LocationName = item.LocationName,
 						Quantity = item.OutputQuantity,
-						TransactionReferenceId = item.TransactionReferenceId,
-						TransactionFicheReferenceId = item.TransactionFicheReferenceId,
-						InTransactionReferenceId = item.InTransactionReferenceId,
+						//TransactionReferenceId = item.TransactionReferenceId,
+						//TransactionFicheReferenceId = item.TransactionFicheReferenceId,
+						//InTransactionReferenceId = item.InTransactionReferenceId,
 						RemainingQuantity = item.OutputQuantity,
 					});
 				}
@@ -503,7 +515,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 
                 foreach (var locationTransaction in LocationTransactions)
                 {
-                    var matchingItem = SelectedItem.Details.FirstOrDefault(item => item.ReferenceId == locationTransaction.ReferenceId);
+                    var matchingItem = SelectedItem.Details.FirstOrDefault(item => item.LocationReferenceId == locationTransaction.LocationReferenceId);
                     if (matchingItem != null)
                     {
                         locationTransaction.OutputQuantity = matchingItem.Quantity;

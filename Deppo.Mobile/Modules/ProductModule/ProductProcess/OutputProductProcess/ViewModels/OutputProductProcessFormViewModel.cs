@@ -156,7 +156,7 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
         {
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(
+            var result = await _locationTransactionService.GetInputObjectsAsync(
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
@@ -175,7 +175,7 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
                     return;
                 foreach (var item in result.Data)
                 {
-                    LocationTransactions.Add(Mapping.Mapper.Map<GroupLocationTransactionModel>(item));
+                    LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
                 }
 
             }
@@ -271,7 +271,7 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 
                 foreach (var locationTransaction in LocationTransactions)
                 {
-                    while(locationTransaction.RemainingQuantity > 0)
+                    while (locationTransaction.RemainingQuantity > 0 && item.Quantity > 0)
                     {
                         var serilotTransactionDto = new SeriLotTransactionDto
                         {
@@ -287,6 +287,8 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 
                         locationTransaction.RemainingQuantity -= (double)serilotTransactionDto.Quantity;
                         consumableTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+                        item.Quantity -= (double)serilotTransactionDto.Quantity;
+
 
                     }
 
@@ -372,7 +374,7 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 
                 foreach (var locationTransaction in LocationTransactions)
                 {
-                    while (locationTransaction.RemainingQuantity > 0)
+                    while (locationTransaction.RemainingQuantity > 0 && item.Quantity > 0)
                     {
                         var serilotTransactionDto = new SeriLotTransactionDto
                         {
@@ -388,6 +390,8 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 
                         locationTransaction.RemainingQuantity -= (double)serilotTransactionDto.Quantity;
                         wastageTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+                        item.Quantity -= (double)serilotTransactionDto.Quantity;
+
 
                     }
 
@@ -468,7 +472,7 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 
                 foreach (var locationTransaction in LocationTransactions)
                 {
-                    while (locationTransaction.RemainingQuantity > 0)
+                    while (locationTransaction.RemainingQuantity > 0 && item.Quantity > 0)
                     {
                         var serilotTransactionDto = new SeriLotTransactionDto
                         {
@@ -484,6 +488,7 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 
                         locationTransaction.RemainingQuantity -= (double)serilotTransactionDto.Quantity;
                         outCountingTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+                        item.Quantity -= (double)serilotTransactionDto.Quantity;
 
                     }
                 }
