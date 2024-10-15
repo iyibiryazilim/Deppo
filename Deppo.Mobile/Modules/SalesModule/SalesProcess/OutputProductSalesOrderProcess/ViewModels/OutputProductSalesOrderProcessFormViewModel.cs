@@ -24,7 +24,6 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderP
 public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
-	private readonly IShipAddressService _shipAddressService;
 	private readonly ICarrierService _carrierService;
 	private readonly IDriverService _driverService;
 	private readonly IRetailSalesDispatchTransactionService _retailSalesDispatchTransactionService;
@@ -41,12 +40,9 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 	[ObservableProperty]
 	ObservableCollection<OutputSalesBasketModel> items = null!;
 
-	public ObservableCollection<ShipAddressModel> ShipAddresses { get; } = new();
 	public ObservableCollection<Carrier> Carriers { get; } = new();
 	public ObservableCollection<Driver> Drivers { get; } = new();
 
-	[ObservableProperty]
-	ShipAddressModel? selectedShipAddress;
 	[ObservableProperty]
 	Carrier? selectedCarrier;
 	[ObservableProperty]
@@ -70,10 +66,10 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 	[ObservableProperty]
 	string cargoTrackingNumber = string.Empty;
 
-	public OutputProductSalesOrderProcessFormViewModel(IHttpClientService httpClientService, IShipAddressService shipAddressService, ICarrierService carrierService, IDriverService driverService, IUserDialogs userDialogs, IRetailSalesDispatchTransactionService retailSalesDispatchTransactionService, IWholeSalesDispatchTransactionService wholeSalesDispatchTransactionService, IServiceProvider serviceProvider)
+	public OutputProductSalesOrderProcessFormViewModel(IHttpClientService httpClientService, ICarrierService carrierService, IDriverService driverService, IUserDialogs userDialogs, IRetailSalesDispatchTransactionService retailSalesDispatchTransactionService, IWholeSalesDispatchTransactionService wholeSalesDispatchTransactionService, IServiceProvider serviceProvider)
 	{
 		_httpClientService = httpClientService;
-		_shipAddressService = shipAddressService;
+		
 		_carrierService = carrierService;
 		_driverService = driverService;
 		_userDialogs = userDialogs;
@@ -91,7 +87,6 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 		SelectRetailCommand = new Command(async () => await SelectRetailAsync());
 		BackCommand = new Command(async () => await BackAsync());
 
-		LoadShipAddressesCommand = new Command<SalesCustomer>(async (x) => await LoadShipAddressesAsync(x));
 		LoadCarriersCommand = new Command(async () => await LoadCarriersAsync());
 		LoadDriversCommand = new Command(async () => await LoadDriversAsync());
 	}
@@ -102,7 +97,7 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 	public Command BackCommand { get; }
 	public Command SaveCommand { get; }
 	public Command ShowBasketItemCommand { get; }
-	public Command<SalesCustomer> LoadShipAddressesCommand { get; }
+	
 	public Command LoadCarriersCommand { get; }
 	public Command LoadDriversCommand { get; }
 
@@ -157,68 +152,17 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 			IsBusy = false;
 		}
 	}
-	private async Task LoadShipAddressesAsync(SalesCustomer salesCustomer)
-	{
-		if (salesCustomer is null)
-		{
-			await _userDialogs.AlertAsync("Lütfen müşteri seçiniz.", "Uyarı", "Tamam");
-			return;
-		}
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
-
-			ShipAddresses.Clear();
-			SelectedShipAddress = null;
-
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
-
-			var result = await _shipAddressService.GetObjects(
-				httpClient: httpClient,
-				firmNumber: _httpClientService.FirmNumber,
-				periodNumber: _httpClientService.PeriodNumber,
-				currentReferenceId: salesCustomer.ReferenceId,
-				skip: 0,
-				take: 9999999,
-				search: ""
-			);
-
-			if (result.IsSuccess)
-			{
-				if (result.Data is null)
-					return;
-
-				foreach (var item in result.Data)
-				{
-					ShipAddresses.Add(Mapping.Mapper.Map<ShipAddressModel>(item));
-				}
-			}
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
-
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
-
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
-
+	
 	private async Task LoadCarriersAsync()
 	{
 		if (IsBusy)
 			return;
 		try
 		{
+			IsBusy = true;
+
 			Carriers.Clear();
 			SelectedCarrier = null;
-			IsBusy = true;
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
@@ -260,9 +204,10 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 			return;
 		try
 		{
+			IsBusy = true;
+
 			Drivers.Clear();
 			SelectedDriver = null;
-			IsBusy = true;
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
@@ -636,7 +581,6 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 			DocumentTrackingNumber = string.Empty;
 			Description = string.Empty;
 			CargoTrackingNumber = string.Empty;
-			SelectedShipAddress = null;
 			SelectedCarrier = null;
 			SelectedDriver = null;
 

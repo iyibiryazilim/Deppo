@@ -45,142 +45,151 @@
     </ContentPage.BackgroundImageSource>
 
     <Grid RowDefinitions="*,Auto" RowSpacing="10">
-        <VerticalStackLayout Grid.Row="0" Spacing="5">
-            <!--#region Fiş Bilgileri-->
-            <dx:FormGroupItem Header="Fiş Bilgileri"
-                              HeaderFontAttributes="Bold"
-                              HeaderFontSize="18">
-                <dx:FormItem>
-                    <dx:FormItem.ContentTemplate>
-                        <DataTemplate>
-                            <VerticalStackLayout>
-                                <dx:DateEdit Grid.Column="0"
-                                             BorderColor="{StaticResource PrimaryLight}"
-                                             Date="{Binding TransactionDate}"
-                                             FocusedBorderColor="{StaticResource Primary}"
-                                             LabelText="Fiş Tarihi"
-                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.CalendarDay}" />
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Grid.Row="0" Spacing="5">
+                <!--#region Fiş Bilgileri-->
+                <dx:FormGroupItem Header="Fiş Bilgileri"
+                                  HeaderFontAttributes="Bold"
+                                  HeaderFontSize="18">
+                    <dx:FormItem>
+                        <dx:FormItem.ContentTemplate>
+                            <DataTemplate>
+                                <VerticalStackLayout>
+                                    <dx:DateEdit Grid.Column="0"
+                                                 BorderColor="{StaticResource PrimaryLight}"
+                                                 Date="{Binding TransactionDate}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 LabelText="Fiş Tarihi"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.CalendarDay}" />
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 IsReadOnly="True"
+                                                 LabelText="Ambar"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Warehouse}"
+                                                 Text="{Binding WarehouseModel.Name}"
+                                                 ToolTipProperties.Text="{Binding WarehouseModel.Name}" />
 
-                                <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
-                                             FocusedBorderColor="{StaticResource Primary}"
-                                             IsReadOnly="True"
-                                             LabelText="Müşteri"
-                                             ToolTipProperties.Text="{Binding SalesCustomer.Name}"
-                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding SalesCustomer.Name}" />
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 IsReadOnly="True"
+                                                 LabelText="Müşteri"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding SalesCustomer.Name}"
+                                                 ToolTipProperties.Text="{Binding SalesCustomer.Name}" />
 
-                                <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
-                                             FocusedBorderColor="{StaticResource Primary}"
-                                             LabelText="Belge Numarası"
-                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding DocumentNumber}" />
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 LabelText="Belge Numarası"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding DocumentNumber}" />
 
-                                <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
-                                             FocusedBorderColor="{StaticResource Primary}"
-                                             LabelText="Doküman İzleme Numarası"
-                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding DocumentTrackingNumber}" />
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 LabelText="Doküman İzleme Numarası"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding DocumentTrackingNumber}" />
 
-                                <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
-                                             FocusedBorderColor="{StaticResource Primary}"
-                                             LabelText="Özel Kod"
-                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding SpecialCode}" />
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 LabelText="Özel Kod"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding SpecialCode}" />
 
-                                <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
-                                             FocusedBorderColor="{StaticResource Primary}"
-                                             LabelText="Açıklama"
-                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding Description}" />
-                            </VerticalStackLayout>
-                        </DataTemplate>
-                    </dx:FormItem.ContentTemplate>
-                </dx:FormItem>
-            </dx:FormGroupItem>
-            <!--#endregion-->
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 LabelText="Açıklama"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding Description}" />
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </dx:FormItem.ContentTemplate>
+                    </dx:FormItem>
+                </dx:FormGroupItem>
+                <!--#endregion-->
 
-            <!--#region Sevk Bilgileri-->
-            <dx:FormGroupItem Header="Sevk Bilgileri"
-                              HeaderFontAttributes="Bold"
-                              HeaderFontSize="18">
-                <dx:FormItem>
-                    <dx:FormItem.ContentTemplate>
-                        <DataTemplate>
-                            <VerticalStackLayout>
-                                <!--#region Sevk Adresi-->
-                                <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
-                                             FocusedBorderColor="{StaticResource Primary}"
-                                             IsReadOnly="True"
-                                             ToolTipProperties.Text="{Binding SalesCustomer.ShipAddressName}"
-                                             MaxCharacterCountOverflowMode="None"
-                                             LabelText="Sevk Adresi"
-                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.User}"
-                                             Text="{Binding SalesCustomer.ShipAddressName}" />
-                                <!--#endregion-->
+                <!--#region Sevk Bilgileri-->
+                <dx:FormGroupItem Header="Sevk Bilgileri"
+                                  HeaderFontAttributes="Bold"
+                                  HeaderFontSize="18">
+                    <dx:FormItem>
+                        <dx:FormItem.ContentTemplate>
+                            <DataTemplate>
+                                <VerticalStackLayout>
+                                    <!--#region Sevk Adresi-->
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 IsReadOnly="True"
+                                                 LabelText="Sevk Adresi"
+                                                 MaxCharacterCountOverflowMode="None"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.User}"
+                                                 Text="{Binding SalesCustomer.ShipAddressName, TargetNullValue='-', FallbackValue='-'}"
+                                                 ToolTipProperties.Text="{Binding SalesCustomer.ShipAddressName, TargetNullValue='-', FallbackValue='-'}" />
+                                    <!--#endregion-->
 
-                                <!--#region Carrier Picker-->
-                                <dx:FormListPickerItem InlineContent="Taşıyıcı"
-                                                       ItemsSource="{Binding Carriers}"
-                                                       PickerShowMode="BottomSheet"
-                                                       PickerTitle="Taşıyıcı Seçiniz"
-                                                       SelectedItem="{Binding SelectedCarrier}"
-                                                       TapCommand="{Binding LoadCarriersCommand}"
-                                                       Text="{Binding SelectedCarrier.Name}">
-                                    <dx:FormListPickerItem.ImageSource>
-                                        <FontImageSource FontFamily="FAS"
-                                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Truck}"
-                                                         Size="15"
-                                                         Color="{StaticResource White}" />
-                                    </dx:FormListPickerItem.ImageSource>
-                                    <dx:FormListPickerItem.ItemTemplate>
-                                        <DataTemplate x:DataType="coreModel:Carrier">
-                                            <Border Padding="15" StrokeShape="RoundRectangle 5">
-                                                <Label FontAttributes="Bold"
-                                                       LineBreakMode="TailTruncation"
-                                                       Text="{Binding Name}"
-                                                       TextColor="{StaticResource OffBlack}"
-                                                       VerticalOptions="Center" />
-                                            </Border>
-                                        </DataTemplate>
-                                    </dx:FormListPickerItem.ItemTemplate>
-                                </dx:FormListPickerItem>
-                                <!--#endregion-->
+                                    <!--#region Carrier Picker-->
+                                    <dx:FormListPickerItem InlineContent="Taşıyıcı"
+                                                           ItemsSource="{Binding Carriers}"
+                                                           PickerShowMode="BottomSheet"
+                                                           PickerTitle="Taşıyıcı Seçiniz"
+                                                           SelectedItem="{Binding SelectedCarrier}"
+                                                           TapCommand="{Binding LoadCarriersCommand}"
+                                                           Text="{Binding SelectedCarrier.Name}">
+                                        <dx:FormListPickerItem.ImageSource>
+                                            <FontImageSource FontFamily="FAS"
+                                                             Glyph="{x:Static fontAwesome:FontAwesomeIcons.Truck}"
+                                                             Size="15"
+                                                             Color="{StaticResource White}" />
+                                        </dx:FormListPickerItem.ImageSource>
+                                        <dx:FormListPickerItem.ItemTemplate>
+                                            <DataTemplate x:DataType="coreModel:Carrier">
+                                                <Border Padding="15" StrokeShape="RoundRectangle 5">
+                                                    <Label FontAttributes="Bold"
+                                                           LineBreakMode="TailTruncation"
+                                                           Text="{Binding Name}"
+                                                           TextColor="{StaticResource OffBlack}"
+                                                           VerticalOptions="Center" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </dx:FormListPickerItem.ItemTemplate>
+                                    </dx:FormListPickerItem>
+                                    <!--#endregion-->
 
 
-                                <!--#region Driver Picker-->
-                                <dx:FormListPickerItem InlineContent="Şoför"
-                                                       ItemsSource="{Binding Drivers}"
-                                                       PickerShowMode="BottomSheet"
-                                                       PickerTitle="Şoför Seçiniz"
-                                                       SelectedItem="{Binding SelectedDriver}"
-                                                       TapCommand="{Binding LoadDriversCommand}"
-                                                       Text="{Binding SelectedDriver.FullName}">
-                                    <dx:FormListPickerItem.ImageSource>
-                                        <FontImageSource FontFamily="FAS"
-                                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.IdCardClip}"
-                                                         Size="15"
-                                                         Color="{StaticResource White}" />
-                                    </dx:FormListPickerItem.ImageSource>
-                                    <dx:FormListPickerItem.ItemTemplate>
-                                        <DataTemplate x:DataType="coreModel:Driver">
-                                            <Border Padding="15" StrokeShape="RoundRectangle 5">
-                                                <Label FontAttributes="Bold"
-                                                       LineBreakMode="TailTruncation"
-                                                       Text="{Binding FullName}"
-                                                       TextColor="{StaticResource OffBlack}"
-                                                       VerticalOptions="Center" />
-                                            </Border>
-                                        </DataTemplate>
-                                    </dx:FormListPickerItem.ItemTemplate>
-                                </dx:FormListPickerItem>
-                                <!--#endregion-->
-                            </VerticalStackLayout>
-                        </DataTemplate>
-                    </dx:FormItem.ContentTemplate>
-                </dx:FormItem>
-            </dx:FormGroupItem>
-            <!--#endregion-->
-        </VerticalStackLayout>
+                                    <!--#region Driver Picker-->
+                                    <dx:FormListPickerItem InlineContent="Şoför"
+                                                           ItemsSource="{Binding Drivers}"
+                                                           PickerShowMode="BottomSheet"
+                                                           PickerTitle="Şoför Seçiniz"
+                                                           SelectedItem="{Binding SelectedDriver}"
+                                                           TapCommand="{Binding LoadDriversCommand}"
+                                                           Text="{Binding SelectedDriver.FullName}">
+                                        <dx:FormListPickerItem.ImageSource>
+                                            <FontImageSource FontFamily="FAS"
+                                                             Glyph="{x:Static fontAwesome:FontAwesomeIcons.IdCardClip}"
+                                                             Size="15"
+                                                             Color="{StaticResource White}" />
+                                        </dx:FormListPickerItem.ImageSource>
+                                        <dx:FormListPickerItem.ItemTemplate>
+                                            <DataTemplate x:DataType="coreModel:Driver">
+                                                <Border Padding="15" StrokeShape="RoundRectangle 5">
+                                                    <Label FontAttributes="Bold"
+                                                           LineBreakMode="TailTruncation"
+                                                           Text="{Binding FullName}"
+                                                           TextColor="{StaticResource OffBlack}"
+                                                           VerticalOptions="Center" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </dx:FormListPickerItem.ItemTemplate>
+                                    </dx:FormListPickerItem>
+                                    <!--#endregion-->
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </dx:FormItem.ContentTemplate>
+                    </dx:FormItem>
+                </dx:FormGroupItem>
+                <!--#endregion-->
+            </VerticalStackLayout>
+        </ScrollView>
 
         <Button Grid.Row="1"
                 Margin="5,10,5,20"

@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using AutoMapper.Execution;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.LocationModels;
@@ -65,6 +66,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 
 		IncreaseCommand = new Command<OutputSalesBasketModel>(async (outputSalesBasketModel) => await IncreaseAsync(outputSalesBasketModel));
 		DecreaseCommand = new Command<OutputSalesBasketModel>(async (outputSalesBasketModel) => await DecreaseAsync(outputSalesBasketModel));
+		DeleteItemCommand = new Command<OutputSalesBasketModel>(async (outputSalesBasketModel) => await DeleteItemAsync(outputSalesBasketModel));
 		BackCommand = new Command(async () => await BackAsync());
 		PlusTappedCommand = new Command(async () => await PlusTappedAsync());
 		ProductOptionTappedCommand = new Command(async () => await ProductOptionTappedAsync());
@@ -202,6 +204,36 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 				_userDialogs.HideHud();
 
 			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+	private async Task DeleteItemAsync(OutputSalesBasketModel outputSalesBasketModel)
+	{
+		if (outputSalesBasketModel is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var confirm = await _userDialogs.ConfirmAsync($"{outputSalesBasketModel.ItemCode}\n{outputSalesBasketModel.ItemName}\nİlgili ürün sepetinizden çıkarılacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+			if (!confirm)
+				return;
+
+			outputSalesBasketModel.Details.Clear();
+			Items.Remove(outputSalesBasketModel);
+
+		}
+		catch (Exception ex) 
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{
