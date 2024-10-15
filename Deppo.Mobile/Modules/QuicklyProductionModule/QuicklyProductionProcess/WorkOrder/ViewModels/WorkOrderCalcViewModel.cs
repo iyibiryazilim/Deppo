@@ -284,7 +284,14 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
             _userDialogs.Loading("Loading Items...");
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _quicklyBomService.GetObjectsWorkSubProducts(httpClient, firmNumber: _httpClientService.FirmNumber, mainProductReferenceId: QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId, periodNumber: _httpClientService.PeriodNumber, take: 1000);
+            var result = await _quicklyBomService.GetObjectsWorkSubProducts(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                mainProductReferenceId: QuicklyBomProductBasketModel.QuicklyBomProduct.IsVariant ? QuicklyBomProductBasketModel.QuicklyBomProduct.MainItemReferenceId : QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                search: "",
+                skip: 0,
+                take: 9000);
 
             if (result.IsSuccess)
             {

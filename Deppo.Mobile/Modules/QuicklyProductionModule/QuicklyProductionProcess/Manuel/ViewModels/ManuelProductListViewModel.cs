@@ -513,7 +513,7 @@ public partial class ManuelProductListViewModel : BaseViewModel
             };
 
             SelectedProduct = selectedProductWithVariant;
-            Items.FirstOrDefault(x => x.ReferenceId == SelectedProduct.MainItemReferenceId).IsSelected = true;
+            Items.FirstOrDefault(x => x.ReferenceId == SelectedProduct.ReferenceId).IsSelected = true;
             
             CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.Hidden;
         }
