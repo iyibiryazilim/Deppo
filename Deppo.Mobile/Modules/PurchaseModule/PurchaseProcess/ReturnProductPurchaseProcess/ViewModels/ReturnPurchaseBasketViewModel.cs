@@ -34,18 +34,18 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
     SeriLotTransactionModel? selectedSeriLotTransaction;
 
     [ObservableProperty]
-    LocationTransactionModel? selectedLocationTransaction;
+    GroupLocationTransactionModel? selectedLocationTransaction;
 
     [ObservableProperty]
     public ObservableCollection<SeriLotTransactionModel> selectedSeriLotTransactions = new();
 
     [ObservableProperty]
-    public ObservableCollection<LocationTransactionModel> selectedLocationTransactions = new();
+    public ObservableCollection<GroupLocationTransactionModel> selectedLocationTransactions = new();
 
     #region Collections
     public ObservableCollection<ReturnPurchaseBasketModel> Items { get; } = new();
     public ObservableCollection<SeriLotTransactionModel> SeriLotTransactions { get; } = new();
-    public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
+    public ObservableCollection<GroupLocationTransactionModel> LocationTransactions { get; } = new();
     #endregion
 
     public ReturnPurchaseBasketViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs)
@@ -71,8 +71,8 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
 
 
         LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
-        LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
-        LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
+        LocationTransactionIncreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
+        LocationTransactionDecreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
         ConfirmLocationTransactionCommand = new Command(ConfirmLocationTransactionAsync);
         LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
 
@@ -260,7 +260,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
             LocationTransactions.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationTransactionService.GetInputObjectsAsync(
+            var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
@@ -274,12 +274,12 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
                     return;
                 foreach (var item in result.Data)
                 {
-                    LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+                    LocationTransactions.Add(Mapping.Mapper.Map<GroupLocationTransactionModel>(item));
                 }
 
                 foreach (var locationTransaction in LocationTransactions)
                 {
-                    var matchingItem = SelectedItem.Details.FirstOrDefault(item => item.ReferenceId == locationTransaction.ReferenceId);
+                    var matchingItem = SelectedItem.Details.FirstOrDefault(item => item.LocationReferenceId == locationTransaction.LocationReferenceId);
                     if (matchingItem != null)
                     {
                         locationTransaction.OutputQuantity = matchingItem.Quantity;
@@ -310,7 +310,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationTransactionService.GetInputObjectsAsync(httpClient: httpClient,
+            var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 productReferenceId: SelectedItem.ItemReferenceId,
@@ -325,12 +325,12 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
 
                 foreach (var item in result.Data)
                 {
-                    LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+                    LocationTransactions.Add(Mapping.Mapper.Map<GroupLocationTransactionModel>(item));
                 }
 
                 foreach (var locationTransaction in LocationTransactions)
                 {
-                    var matchingItem = SelectedItem.Details.FirstOrDefault(item => item.ReferenceId == locationTransaction.ReferenceId);
+                    var matchingItem = SelectedItem.Details.FirstOrDefault(item => item.LocationReferenceId == locationTransaction.LocationReferenceId);
                     if (matchingItem != null)
                     {
                         locationTransaction.OutputQuantity = matchingItem.Quantity;
@@ -348,7 +348,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
         }
     }
 
-    private async Task LocationTransactionIncreaseAsync(LocationTransactionModel item)
+    private async Task LocationTransactionIncreaseAsync(GroupLocationTransactionModel item)
     {
         if (IsBusy)
             return;
@@ -394,7 +394,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
 
     }
 
-    private async Task LocationTransactionDecreaseAsync(LocationTransactionModel item)
+    private async Task LocationTransactionDecreaseAsync(GroupLocationTransactionModel item)
     {
         if (IsBusy)
             return;
@@ -456,25 +456,29 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
 
 				foreach (var item in SelectedLocationTransactions)
                 {
-                    var selectedLocationTransactionItem = SelectedItem.Details.FirstOrDefault(x => x.TransactionReferenceId == item.TransactionReferenceId);
+                    var selectedLocationTransactionItem = SelectedItem.Details.FirstOrDefault(x => x.LocationReferenceId == item.LocationReferenceId);
                     if (selectedLocationTransactionItem is not null)
                     {
                         selectedLocationTransactionItem.Quantity = item.OutputQuantity;
                     }
-
-
-                    SelectedItem.Details.Add(new ReturnPurchaseBasketDetailModel
+                    else
                     {
-                        ReferenceId = item.ReferenceId,
-                        LocationReferenceId = item.LocationReferenceId,
-                        LocationCode = item.LocationCode,
-                        LocationName = item.LocationName,
-                        TransactionReferenceId = item.TransactionReferenceId,
-                        TransactionFicheReferenceId = item.TransactionFicheReferenceId,
-                        InTransactionReferenceId = item.InTransactionReferenceId,
-                        Quantity = item.OutputQuantity,
-                        RemainingQuantity = item.OutputQuantity,
-                    });
+                        SelectedItem.Details.Add(new ReturnPurchaseBasketDetailModel
+                        {
+                            //ReferenceId = item.ReferenceId,
+                            LocationReferenceId = item.LocationReferenceId,
+                            LocationCode = item.LocationCode,
+                            LocationName = item.LocationName,
+                            //TransactionReferenceId = item.TransactionReferenceId,
+                            //TransactionFicheReferenceId = item.TransactionFicheReferenceId,
+                            //InTransactionReferenceId = item.InTransactionReferenceId,
+                            Quantity = item.OutputQuantity,
+                            RemainingQuantity = item.OutputQuantity,
+                        });
+                    }
+
+
+                   
                 }
 
 

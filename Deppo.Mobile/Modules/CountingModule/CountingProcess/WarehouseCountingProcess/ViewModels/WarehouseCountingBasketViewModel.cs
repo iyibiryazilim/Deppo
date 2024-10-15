@@ -13,11 +13,13 @@ using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProcess.Views;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
+using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
 namespace Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProcess.ViewModels;
 
 [QueryProperty(nameof(WarehouseCountingWarehouseModel), nameof(WarehouseCountingWarehouseModel))]
 [QueryProperty(nameof(LocationModel), nameof(LocationModel))]
+[QueryProperty(nameof(ProductVariantType), nameof(ProductVariantType))]
 public partial class WarehouseCountingBasketViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -34,6 +36,8 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
     [ObservableProperty]
     private WarehouseCountingBasketModel selectedItem = null!;
 
+    [ObservableProperty]
+    private ProductVariantType productVariantType;
 
     public WarehouseCountingBasketViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IWarehouseCountingService warehouseCountingService, ILocationTransactionService locationTransactionService)
     {
@@ -42,7 +46,7 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
         _warehouseCountingService = warehouseCountingService;
         _locationTransactionService = locationTransactionService;
 
-        Title = "Ürünler";
+        Title = "Ürün Sepeti";
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
@@ -90,19 +94,42 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
             Items.Clear();
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseCountingService.GetProductsByWarehouseAndLocation(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseCountingWarehouseModel.Number, LocationModel.ReferenceId, string.Empty, 0, 20);
-            if (result.IsSuccess)
+ 
+            if(ProductVariantType == ProductVariantType.Variant)
             {
-                if (result.Data is not null)
+                Title = "Varyant Sepeti";
+                var result = await _warehouseCountingService.GetVariantsByWarehouseAndLocation(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseCountingWarehouseModel.Number, LocationModel.ReferenceId, string.Empty, 0, 20);
+                if (result.IsSuccess)
                 {
-                    foreach (var item in result.Data)
+                    if (result.Data is not null)
                     {
-                        var obj = Mapping.Mapper.Map<WarehouseCountingBasketModel>(item);
-                        obj.OutputQuantity = obj.StockQuantity;
-                        Items.Add(obj);
+                        foreach (var item in result.Data)
+                        {
+                            var obj = Mapping.Mapper.Map<WarehouseCountingBasketModel>(item);
+                            obj.OutputQuantity = obj.StockQuantity;
+                            Items.Add(obj);
+                        }
                     }
                 }
             }
+            else
+            {
+                var result = await _warehouseCountingService.GetProductsByWarehouseAndLocation(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseCountingWarehouseModel.Number, LocationModel.ReferenceId, string.Empty, 0, 20);
+                if (result.IsSuccess)
+                {
+                    if (result.Data is not null)
+                    {
+                        foreach (var item in result.Data)
+                        {
+                            var obj = Mapping.Mapper.Map<WarehouseCountingBasketModel>(item);
+                            obj.OutputQuantity = obj.StockQuantity;
+                            Items.Add(obj);
+                        }
+                    }
+                }
+            }
+
+            
 
             _userDialogs.HideHud();
         }
@@ -130,19 +157,39 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
 
             _userDialogs.ShowLoading("Loading...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseCountingService.GetProductsByWarehouseAndLocation(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseCountingWarehouseModel.Number, LocationModel.ReferenceId, string.Empty, Items.Count, 20);
-            if (result.IsSuccess)
+            if (ProductVariantType == ProductVariantType.Variant)
             {
-                if (result.Data is not null)
+                var result = await _warehouseCountingService.GetVariantsByWarehouseAndLocation(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseCountingWarehouseModel.Number, LocationModel.ReferenceId, string.Empty, Items.Count, 20);
+                if (result.IsSuccess)
                 {
-                    foreach (var item in result.Data)
+                    if (result.Data is not null)
                     {
-                        var obj = Mapping.Mapper.Map<WarehouseCountingBasketModel>(item);
-                        obj.OutputQuantity = obj.StockQuantity;
-                        Items.Add(obj);
+                        foreach (var item in result.Data)
+                        {
+                            var obj = Mapping.Mapper.Map<WarehouseCountingBasketModel>(item);
+                            obj.OutputQuantity = obj.StockQuantity;
+                            Items.Add(obj);
+                        }
                     }
                 }
             }
+            else
+            {
+                var result = await _warehouseCountingService.GetProductsByWarehouseAndLocation(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseCountingWarehouseModel.Number, LocationModel.ReferenceId, string.Empty, Items.Count, 20);
+                if (result.IsSuccess)
+                {
+                    if (result.Data is not null)
+                    {
+                        foreach (var item in result.Data)
+                        {
+                            var obj = Mapping.Mapper.Map<WarehouseCountingBasketModel>(item);
+                            obj.OutputQuantity = obj.StockQuantity;
+                            Items.Add(obj);
+                        }
+                    }
+                }
+            }
+
 
             _userDialogs.HideHud();
         }
@@ -265,7 +312,8 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
-                productReferenceId: SelectedItem.ProductReferenceId,
+                productReferenceId:SelectedItem.IsVariant ? SelectedItem.MainItemReferenceId : SelectedItem.ItemReferenceId,
+                variantReferenceId: SelectedItem.IsVariant ? SelectedItem.ItemReferenceId : 0,
                 warehouseNumber: WarehouseCountingWarehouseModel.Number,
                 locationRef: LocationModel.ReferenceId,
                 skip: 0,

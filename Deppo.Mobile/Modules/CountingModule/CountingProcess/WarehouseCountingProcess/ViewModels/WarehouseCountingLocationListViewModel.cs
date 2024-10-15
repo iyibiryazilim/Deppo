@@ -8,7 +8,9 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProcess.Views;
+using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
+using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
 namespace Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProcess.ViewModels;
 
@@ -21,6 +23,9 @@ public partial class WarehouseCountingLocationListViewModel : BaseViewModel
 
     [ObservableProperty]
     private LocationModel selectedLocation = null!;
+
+    [ObservableProperty]
+    private ProductVariantType productVariantType;
 
     [ObservableProperty]
     private WarehouseCountingWarehouseModel warehouseCountingWarehouseModel = null!;
@@ -43,6 +48,8 @@ public partial class WarehouseCountingLocationListViewModel : BaseViewModel
         NextViewCommand = new Command(async () => await NextViewAsync());
         PerformSearchCommand = new Command(async () => await PerformSearchAsync());
         PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
+        SelectProductsCommand = new Command(async () => await SelectProductsAsync());
+        SelectVariantsCommand = new Command(async () => await SelectVariantsAsync());
     }
 
     public Command LoadItemsCommand { get; }
@@ -51,9 +58,13 @@ public partial class WarehouseCountingLocationListViewModel : BaseViewModel
     public Command NextViewCommand { get; }
     public Command PerformSearchCommand { get; }
     public Command PerformEmptySearchCommand { get; }
+    public Command SelectProductsCommand { get; }
+    public Command SelectVariantsCommand { get; }
 
     [ObservableProperty]
     public SearchBar searchText;
+
+    public Page CurrentPage { get; set; } = null!;
     private async Task LoadItemsAsync()
     {
         if (IsBusy)
@@ -172,20 +183,79 @@ public partial class WarehouseCountingLocationListViewModel : BaseViewModel
         {
             IsBusy = true;
 
+            CurrentPage.FindByName<BottomSheet>("productOrVariantBottomSheet").State = BottomSheetState.HalfExpanded;
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task SelectProductsAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+            CurrentPage.FindByName<BottomSheet>("productOrVariantBottomSheet").State = BottomSheetState.Hidden;
+            ProductVariantType = ProductVariantType.Product;
             if (SelectedLocation is not null)
             {
 
                 await Shell.Current.GoToAsync($"{nameof(WarehouseCountingBasketView)}", new Dictionary<string, object>
                 {
                     [nameof(LocationModel)] = SelectedLocation,
-                    [nameof(WarehouseCountingWarehouseModel)] = WarehouseCountingWarehouseModel
+                    [nameof(WarehouseCountingWarehouseModel)] = WarehouseCountingWarehouseModel,
+                    [nameof(ProductVariantType)] = ProductVariantType
                 });
 
             }
         }
         catch (Exception ex)
         {
-            _userDialogs.Alert(ex.Message);
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task SelectVariantsAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+            CurrentPage.FindByName<BottomSheet>("productOrVariantBottomSheet").State = BottomSheetState.Hidden;
+            ProductVariantType = ProductVariantType.Variant;
+            if (SelectedLocation is not null)
+            {
+
+                await Shell.Current.GoToAsync($"{nameof(WarehouseCountingBasketView)}", new Dictionary<string, object>
+                {
+                    [nameof(LocationModel)] = SelectedLocation,
+                    [nameof(WarehouseCountingWarehouseModel)] = WarehouseCountingWarehouseModel,
+                    [nameof(ProductVariantType)] = ProductVariantType
+                });
+
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
         finally
         {

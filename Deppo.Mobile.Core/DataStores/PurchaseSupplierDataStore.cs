@@ -122,6 +122,10 @@ public class PurchaseSupplierDataStore : IPurchaseSupplierService
     [ProductReferenceCount] = COUNT(DISTINCT ORFLINE.STOCKREF),
     [ShipAddressCount]=ISNULL((SELECT COUNT(SHIP.LOGICALREF) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_SHIPINFO AS SHIP WHERE CLIENTREF = CLCARD.LOGICALREF),0),
     [Country] = CLCARD.COUNTRY,
+    CASE
+       WHEN CLCARD.ACCEPTEDESP = 0 THEN 0
+       ELSE 1
+   END AS [IsEDispatch],
     [City] = CLCARD.CITY
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE AS ORFLINE
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD
@@ -134,7 +138,7 @@ WHERE ORFLINE.CLOSED = 0
         if (!string.IsNullOrEmpty(search))
             baseQuery += $@" AND (CLCARD.CODE LIKE '{search}%' OR CLCARD.DEFINITION_ LIKE '%{search}%')";
 
-        baseQuery += $@" GROUP BY CLCARD.LOGICALREF, CLCARD.CODE, CLCARD.DEFINITION_, CLCARD.COUNTRY, CLCARD.CITY
+        baseQuery += $@" GROUP BY CLCARD.LOGICALREF, CLCARD.CODE,CLCARD.ACCEPTEDESP, CLCARD.DEFINITION_, CLCARD.COUNTRY, CLCARD.CITY
 ORDER BY CLCARD.DEFINITION_ ASC
 OFFSET {skip} ROWS
 FETCH NEXT {take} ROWS ONLY";
@@ -150,7 +154,11 @@ FETCH NEXT {take} ROWS ONLY";
     [Name] = CLCARD.DEFINITION_,
     [ProductReferenceCount] = COUNT(DISTINCT STLINE.STOCKREF),
     [Country] = CLCARD.COUNTRY,
-    [City] = CLCARD.CITY
+    [City] = CLCARD.CITY,
+ CASE
+       WHEN CLCARD.ACCEPTEDESP = 0 THEN 0
+       ELSE 1
+   END AS [IsEDispatch]
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD
     ON STLINE.CLIENTREF = CLCARD.LOGICALREF
@@ -159,7 +167,7 @@ WHERE  STLINE.TRCODE = 1 AND STLINE.SOURCEINDEX = {warehouseNumber} AND CLCARD.L
         if (!string.IsNullOrEmpty(search))
             baseQuery += $@" AND (CLCARD.CODE LIKE '{search}%' OR CLCARD.DEFINITION_ LIKE '%{search}%')";
 
-        baseQuery += $@" GROUP BY CLCARD.LOGICALREF, CLCARD.CODE, CLCARD.DEFINITION_, CLCARD.COUNTRY, CLCARD.CITY
+        baseQuery += $@" GROUP BY CLCARD.LOGICALREF, CLCARD.CODE,CLCARD.ACCEPTEDESP, CLCARD.DEFINITION_, CLCARD.COUNTRY, CLCARD.CITY
 ORDER BY CLCARD.DEFINITION_ ASC
 OFFSET {skip} ROWS
 FETCH NEXT {take} ROWS ONLY";

@@ -46,5 +46,12 @@ public static class DeppoEnums
         [Description("Toptan İade")]
         Whole= 1
     }
+
+    public enum ProductVariantType
+    {
+        Product = 0,
+
+        Variant = 1,
+    }
    
 }

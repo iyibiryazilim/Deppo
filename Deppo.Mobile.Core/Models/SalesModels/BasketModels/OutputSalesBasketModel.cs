@@ -27,8 +27,6 @@ public class OutputSalesBasketModel : INotifyPropertyChanged, IDisposable
 	private bool _isSelected;
 	private string _image;
 	private double _outputQuantity;
-	private int _shipAddressReferenceId;
-	private string _shipAddressCode = string.Empty;
 
 	private List<OutputSalesBasketOrderModel> _orders = new();
 	private List<OutputSalesBasketDetailModel> _details = new();
@@ -313,30 +311,6 @@ public class OutputSalesBasketModel : INotifyPropertyChanged, IDisposable
 			NotifyPropertyChanged();
 		}
 	}
-
-	[Browsable(false)]
-	public int ShipAddressReferenceId
-	{
-		get => _shipAddressReferenceId;
-		set
-		{
-			if (_shipAddressReferenceId == value) return;
-			_shipAddressReferenceId = value;
-			NotifyPropertyChanged();
-		}
-	}
-
-	public string ShipAddressCode
-	{
-		get => _shipAddressCode;
-		set
-		{
-			if (_shipAddressCode == value) return;
-			_shipAddressCode = value;
-			NotifyPropertyChanged();
-		}
-	}
-
 
 	public List<OutputSalesBasketOrderModel> Orders
 	{

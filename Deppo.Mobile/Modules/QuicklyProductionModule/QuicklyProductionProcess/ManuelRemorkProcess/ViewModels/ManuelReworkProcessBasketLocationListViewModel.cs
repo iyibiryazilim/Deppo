@@ -405,7 +405,8 @@ public partial class ManuelReworkProcessBasketLocationListViewModel : BaseViewMo
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
 				warehouseNumber: SelectedReworkInProductModel.InWarehouseModel.Number,
-				productReferenceId: SelectedReworkInProductModel.ReferenceId,
+				productReferenceId: SelectedReworkInProductModel.IsVariant ? SelectedReworkInProductModel.MainItemReferenceId : SelectedReworkInProductModel.ReferenceId,
+				variantReferenceId: SelectedReworkInProductModel.IsVariant ? SelectedReworkInProductModel.ReferenceId : 0,
 				skip: 0,
 				take: 20);
 
@@ -450,7 +451,8 @@ public partial class ManuelReworkProcessBasketLocationListViewModel : BaseViewMo
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
 				warehouseNumber: SelectedReworkInProductModel.InWarehouseModel.Number,
-				productReferenceId: SelectedReworkInProductModel.ReferenceId,
+				productReferenceId: SelectedReworkInProductModel.IsVariant ? SelectedReworkInProductModel.MainItemReferenceId : SelectedReworkInProductModel.ReferenceId,
+				variantReferenceId: SelectedReworkInProductModel.IsVariant ? SelectedReworkInProductModel.ReferenceId : 0,
 				skip: Items.Count,
 				take: 20);
 

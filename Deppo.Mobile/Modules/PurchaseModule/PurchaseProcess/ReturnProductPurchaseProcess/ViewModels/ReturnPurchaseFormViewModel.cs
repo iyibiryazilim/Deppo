@@ -21,6 +21,8 @@ using Deppo.Mobile.Core.Models.ShipAddressModels;
 using Deppo.Core.Models;
 using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.MappingHelper;
+using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.Models.BasketModels;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseProcess.ViewModels;
 
@@ -38,6 +40,7 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
     private readonly ICarrierService _carrierService;
     private readonly IDriverService _driverService;
     private readonly IServiceProvider _serviceProvider;
+    private readonly ILocationTransactionService _locationTransactionService;
 
     [ObservableProperty]
     OutputProductProcessType outputProductProcessType;
@@ -62,6 +65,8 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
     [ObservableProperty]
     ObservableCollection<ReturnPurchaseBasketModel> items = null!;
 
+    ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
+
 
     [ObservableProperty]
     string documentNumber = string.Empty;
@@ -79,7 +84,7 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
     string specialCode = string.Empty;
 
 
-    public ReturnPurchaseFormViewModel(IHttpClientService httpClientService, IPurchaseReturnDispatchTransactionService purchaseReturnDispatchTransactionService, IUserDialogs userDialogs, IPurchaseSupplierService purchaseSupplierService, IShipAddressService shipAddressService, ICarrierService carrierService, IDriverService driverService, ISupplierService supplierService, IServiceProvider serviceProvider)
+    public ReturnPurchaseFormViewModel(IHttpClientService httpClientService, IPurchaseReturnDispatchTransactionService purchaseReturnDispatchTransactionService, IUserDialogs userDialogs, IPurchaseSupplierService purchaseSupplierService, IShipAddressService shipAddressService, ICarrierService carrierService, IDriverService driverService, ISupplierService supplierService, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService)
     {
         _httpClientService = httpClientService;
         _purchaseReturnDispatchTransactionService = purchaseReturnDispatchTransactionService;
@@ -90,6 +95,7 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
         _driverService = driverService;
         _supplierService = supplierService;
         _serviceProvider = serviceProvider;
+        _locationTransactionService = locationTransactionService;
         Items = new();
 
         Title = "Satınalma İade İrsaliyesi";
@@ -101,7 +107,6 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
         LoadDriversCommand = new Command(async () => await LoadDriversAsync());
         BackCommand = new Command(async () => await BackAsync());
         LoadShipAddressesCommand = new Command<PurchaseSupplier>(async (purchaseSupplier) => await LoadShipAddressesAsync(purchaseSupplier));
-        
     }
     public Page CurrentPage { get; set; }
 
@@ -341,6 +346,48 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
         }
     }
 
+    public async Task LoadLocationTransaction(ReturnPurchaseBasketModel returnPurchaseBasketModel, ReturnPurchaseBasketDetailModel returnPurchaseBasketDetailModel)
+    {
+        try
+        {
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _locationTransactionService.GetInputObjectsAsync(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                productReferenceId: returnPurchaseBasketModel.IsVariant ? returnPurchaseBasketModel.MainItemReferenceId : returnPurchaseBasketModel.ItemReferenceId,
+                variantReferenceId: returnPurchaseBasketModel.IsVariant ? returnPurchaseBasketModel.ItemReferenceId : 0,
+                warehouseNumber: WarehouseModel.Number,
+                locationRef: returnPurchaseBasketDetailModel.LocationReferenceId,
+                skip: 0,
+                take: 999999,
+                search: ""
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+                foreach (var item in result.Data)
+                {
+                    LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+                }
+
+            }
+
+            _userDialogs.Loading().Hide();
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
     private async Task SaveAsync()
     {
         if (IsBusy)
@@ -381,7 +428,7 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
 
             foreach (var item in Items)
             {
-                var consumableTransactionLineDto = new PurchaseReturnDispatchTransactionLineDto
+                var purchaseReturnDispatchTransactionLineDto = new PurchaseReturnDispatchTransactionLineDto
                 {
                     ProductCode =item.IsVariant ? item.MainItemCode : item.ItemCode,
                     VariantCode = item.IsVariant ? item.ItemCode : string.Empty,
@@ -394,22 +441,34 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
 
                 foreach (var detail in item.Details)
                 {
-                    var serilotTransactionDto = new SeriLotTransactionDto
-                    {
-                        StockLocationCode = detail.LocationCode,
-                        InProductTransactionLineReferenceId = detail.TransactionReferenceId,
-                        OutProductTransactionLineReferenceId = detail.ReferenceId,
-                        Quantity = detail.RemainingQuantity,
-                        SubUnitsetCode = item.SubUnitsetCode,
-                        DestinationStockLocationCode = string.Empty,
-                        ConversionFactor = 1,
-                        OtherConversionFactor = 1,
-                    };
+                    await LoadLocationTransaction(item, detail);
+                    LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
 
-                    consumableTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+                    foreach (var locationTransaction in LocationTransactions)
+                    {
+                        while (locationTransaction.RemainingQuantity > 0 && item.Quantity > 0)
+                        {
+                            var serilotTransactionDto = new SeriLotTransactionDto
+                            {
+                                StockLocationCode = detail.LocationCode,
+                                InProductTransactionLineReferenceId = locationTransaction.TransactionReferenceId,
+                                OutProductTransactionLineReferenceId = locationTransaction.ReferenceId,
+                                Quantity = item.Quantity > locationTransaction.RemainingQuantity ? locationTransaction.RemainingQuantity : item.Quantity,
+                                SubUnitsetCode = item.SubUnitsetCode,
+                                DestinationStockLocationCode = string.Empty,
+                                ConversionFactor = 1,
+                                OtherConversionFactor = 1,
+                            };
+                            purchaseReturnDispatchTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+                            locationTransaction.RemainingQuantity -= (double)serilotTransactionDto.Quantity;
+                            item.Quantity -= (double)serilotTransactionDto.Quantity;
+
+                        }
+                    }
+
                 }
 
-                dto.Lines.Add(consumableTransactionLineDto);
+                dto.Lines.Add(purchaseReturnDispatchTransactionLineDto);
             }
             Console.WriteLine(dto);
 

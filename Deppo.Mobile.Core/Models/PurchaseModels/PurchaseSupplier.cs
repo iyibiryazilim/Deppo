@@ -37,6 +37,9 @@ public partial class PurchaseSupplier : ObservableObject
 	[ObservableProperty]
     private int shipAddressCount;
 
+    [ObservableProperty]
+    private bool isEDispatch;
+
     public string TitleName => Name?.Length > 2 ? Name.Substring(0, 2) : Name;
 
     [ObservableProperty]

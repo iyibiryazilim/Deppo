@@ -4,6 +4,8 @@ using Deppo.Core.DTOs.SalesDispatchTransaction;
 using Deppo.Core.DTOs.SeriLotTransactionDto;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.BasketModels;
+using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.SalesModels.BasketModels;
 using Deppo.Mobile.Core.Models.ShipAddressModels;
@@ -32,6 +34,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 	private readonly IWholeSalesDispatchTransactionService _wholeSalesDispatchTransactionService;
 	private readonly IRetailSalesDispatchTransactionService _retailSalesDispatchTransactionService;
 	private readonly IServiceProvider _serviceProvider;
+	private readonly ILocationTransactionService _locationTransactionService;
 
 	[ObservableProperty]
 	WarehouseModel warehouseModel = null!;
@@ -44,7 +47,9 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 	public ObservableCollection<Carrier> Carriers { get; } = new();
 	public ObservableCollection<Driver> Drivers { get; } = new();
 
-	[ObservableProperty]
+	public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
+
+    [ObservableProperty]
 	CustomerModel? selectedCustomer;
 	[ObservableProperty]
 	ShipAddressModel? selectedShipAddress;
@@ -71,35 +76,36 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 	[ObservableProperty]
 	string cargoTrackingNumber = string.Empty;
 
-	public OutputProductSalesProcessFormViewModel(IHttpClientService httpClientService, IShipAddressService shipAddressService, IUserDialogs userDialogs, ICustomerService customerService, ICarrierService carrierService, IDriverService driverService, IWholeSalesDispatchTransactionService wholeSalesDispatchTransactionService, IRetailSalesDispatchTransactionService retailSalesDispatchTransactionService, IServiceProvider serviceProvider)
-	{
-		_httpClientService = httpClientService;
-		_shipAddressService = shipAddressService;
-		_userDialogs = userDialogs;
-		_customerService = customerService;
-		_carrierService = carrierService;
-		_driverService = driverService;
-		_wholeSalesDispatchTransactionService = wholeSalesDispatchTransactionService;
-		_retailSalesDispatchTransactionService = retailSalesDispatchTransactionService;
-		_serviceProvider = serviceProvider;
+    public OutputProductSalesProcessFormViewModel(IHttpClientService httpClientService, IShipAddressService shipAddressService, IUserDialogs userDialogs, ICustomerService customerService, ICarrierService carrierService, IDriverService driverService, IWholeSalesDispatchTransactionService wholeSalesDispatchTransactionService, IRetailSalesDispatchTransactionService retailSalesDispatchTransactionService, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService)
+    {
+        _httpClientService = httpClientService;
+        _shipAddressService = shipAddressService;
+        _userDialogs = userDialogs;
+        _customerService = customerService;
+        _carrierService = carrierService;
+        _driverService = driverService;
+        _wholeSalesDispatchTransactionService = wholeSalesDispatchTransactionService;
+        _retailSalesDispatchTransactionService = retailSalesDispatchTransactionService;
+        _serviceProvider = serviceProvider;
+        _locationTransactionService = locationTransactionService;
 
-		Title = "Sevk İşlemi";
+        Title = "Sevk İşlemi";
 
-		LoadPageCommand = new Command(async () => await LoadPageAsync());
-		SaveCommand = new Command(async () => await SaveAsync());
-		ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
-		BackCommand = new Command(async () => await BackAsync());
+        LoadPageCommand = new Command(async () => await LoadPageAsync());
+        SaveCommand = new Command(async () => await SaveAsync());
+        ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
+        BackCommand = new Command(async () => await BackAsync());
 
-		LoadCustomersCommand = new Command(async () => await LoadCustomersAsync());
-		LoadShipAddressesCommand = new Command<CustomerModel>(async (x) => await LoadShipAddressesAsync(x));
-		LoadCarriersCommand = new Command(async () => await LoadCarriersAsync());
-		LoadDriversCommand = new Command(async () => await LoadDriversAsync());
+        LoadCustomersCommand = new Command(async () => await LoadCustomersAsync());
+        LoadShipAddressesCommand = new Command<CustomerModel>(async (x) => await LoadShipAddressesAsync(x));
+        LoadCarriersCommand = new Command(async () => await LoadCarriersAsync());
+        LoadDriversCommand = new Command(async () => await LoadDriversAsync());
 
-		SelectWholeCommand = new Command(async () => await SelectWholeAsync());
-		SelectRetailCommand = new Command(async () => await SelectRetailAsync());
-	}
+        SelectWholeCommand = new Command(async () => await SelectWholeAsync());
+        SelectRetailCommand = new Command(async () => await SelectRetailAsync());
+    }
 
-	public Page CurrentPage { get; set; } = null!;
+    public Page CurrentPage { get; set; } = null!;
 
 	public Command LoadPageCommand { get; }
 	public Command BackCommand { get; }
@@ -476,7 +482,49 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 		}
 	}
 
-	private async Task WholeSalesDispatchTransactionInsertAsync(HttpClient httpClient)
+    public async Task LoadLocationTransaction(OutputSalesBasketModel outputSalesBasketModel, OutputSalesBasketDetailModel outputSalesBasketDetailModel)
+    {
+        try
+        {
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _locationTransactionService.GetInputObjectsAsync(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                productReferenceId: outputSalesBasketModel.IsVariant ? outputSalesBasketModel.MainItemReferenceId : outputSalesBasketModel.ItemReferenceId,
+                variantReferenceId: outputSalesBasketModel.IsVariant ? outputSalesBasketModel.ItemReferenceId : 0,
+                warehouseNumber: WarehouseModel.Number,
+                locationRef: outputSalesBasketDetailModel.LocationReferenceId,
+                skip: 0,
+                take: 999999,
+                search: ""
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+                foreach (var item in result.Data)
+                {
+                    LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+                }
+
+            }
+
+            _userDialogs.Loading().Hide();
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task WholeSalesDispatchTransactionInsertAsync(HttpClient httpClient)
 	{
 		var dto = new WholeSalesDispatchTransactionInsert
 		{
@@ -488,10 +536,10 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 			IdentityNumber = SelectedDriver != null ? SelectedDriver.IdentityNumber : "",
 			ShipInfoCode = SelectedShipAddress != null ? SelectedShipAddress.Code : "",
 			Plaque = SelectedDriver != null ? SelectedDriver.PlateNumber : "",
-			IsEDispatch = 1,
-			DispatchType = 0,
+			IsEDispatch = (short?)((bool)SelectedCustomer?.IsEDispatch ? 1 : 0),
+			DispatchType = (short?)((bool)SelectedCustomer?.IsEDispatch ? 1 : 0),
 			DispatchStatus = 1,
-			EDispatchProfileId = 1,
+			EDispatchProfileId = (short?)((bool)SelectedCustomer?.IsEDispatch ? 1 : 0),
 			Description = Description,
 			DoCode = DocumentNumber,
 			DocTrackingNumber = DocumentTrackingNumber,
@@ -499,6 +547,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 			FirmNumber = _httpClientService.FirmNumber,
 			SpeCode = SpecialCode,
 			WarehouseNumber = WarehouseModel.Number,
+			
 
 		};
 
@@ -515,24 +564,35 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 				SubUnitsetCode = item.SubUnitsetCode,
 			};
 
-			foreach (var detail in item.Details)
-			{
-				var serilotTransactionDto = new SeriLotTransactionDto
-				{
-					StockLocationCode = detail.LocationCode,
-					InProductTransactionLineReferenceId = detail.TransactionReferenceId,
-					OutProductTransactionLineReferenceId = detail.ReferenceId,
-					Quantity = detail.RemainingQuantity,
-					SubUnitsetCode = item.SubUnitsetCode,
-					DestinationStockLocationCode = string.Empty,
-					ConversionFactor = 1,
-					OtherConversionFactor = 1,
-				};
+            foreach (var detail in item.Details)
+            {
+                await LoadLocationTransaction(item, detail);
+                LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
 
-				wholeSalesDispatchTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
-			}
+                foreach (var locationTransaction in LocationTransactions)
+                {
+                    while (locationTransaction.RemainingQuantity > 0 && item.Quantity >0)
+                    {
+                        var serilotTransactionDto = new SeriLotTransactionDto
+                        {
+                            StockLocationCode = detail.LocationCode,
+                            InProductTransactionLineReferenceId = locationTransaction.TransactionReferenceId,
+                            OutProductTransactionLineReferenceId = locationTransaction.ReferenceId,
+                            Quantity = item.Quantity > locationTransaction.RemainingQuantity ? locationTransaction.RemainingQuantity : item.Quantity,
+                            SubUnitsetCode = item.SubUnitsetCode,
+                            DestinationStockLocationCode = string.Empty,
+                            ConversionFactor = 1,
+                            OtherConversionFactor = 1,
+                        };
+                        wholeSalesDispatchTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+                        locationTransaction.RemainingQuantity -= (double)serilotTransactionDto.Quantity;
+						item.Quantity -= (double)serilotTransactionDto.Quantity;
 
-			dto.Lines.Add(wholeSalesDispatchTransactionLineDto);
+                    }
+                }
+
+            }
+            dto.Lines.Add(wholeSalesDispatchTransactionLineDto);
 		}
 		Console.WriteLine(dto);
 
@@ -593,11 +653,11 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 			IdentityNumber = SelectedDriver != null ? SelectedDriver.IdentityNumber : "",
 			Plaque = SelectedDriver != null ? SelectedDriver.PlateNumber : "",
 			ShipInfoCode = SelectedShipAddress != null ? SelectedShipAddress.Code : "",
-			IsEDispatch = 1,
-			DispatchType = 0,
-			DispatchStatus = 1,
-			EDispatchProfileId = 1,
-			Description = Description,
+            IsEDispatch = (short?)((bool)SelectedCustomer?.IsEDispatch ? 1 : 0),
+            DispatchType = (short?)((bool)SelectedCustomer?.IsEDispatch ? 1 : 0),
+            DispatchStatus = 1,
+            EDispatchProfileId = (short?)((bool)SelectedCustomer?.IsEDispatch ? 1 : 0),
+            Description = Description,
 			DoCode = DocumentNumber,
 			DocTrackingNumber = DocumentTrackingNumber,
 			TransactionDate = TransactionDate,
@@ -622,19 +682,30 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 
 			foreach (var detail in item.Details)
 			{
-				var serilotTransactionDto = new SeriLotTransactionDto
-				{
-					StockLocationCode = detail.LocationCode,
-					InProductTransactionLineReferenceId = detail.TransactionReferenceId,
-					OutProductTransactionLineReferenceId = detail.ReferenceId,
-					Quantity = detail.RemainingQuantity,
-					SubUnitsetCode = item.SubUnitsetCode,
-					DestinationStockLocationCode = string.Empty,
-					ConversionFactor = 1,
-					OtherConversionFactor = 1,
-				};
+                await LoadLocationTransaction(item, detail);
+					LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
 
-				retailSalesDispatchTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+				foreach (var locationTransaction in LocationTransactions)
+				{
+					while (locationTransaction.RemainingQuantity > 0)
+					{
+						var serilotTransactionDto = new SeriLotTransactionDto
+						{
+							StockLocationCode = detail.LocationCode,
+							InProductTransactionLineReferenceId = detail.TransactionReferenceId,
+							OutProductTransactionLineReferenceId = detail.ReferenceId,
+							Quantity = item.Quantity > locationTransaction.RemainingQuantity ? locationTransaction.RemainingQuantity : item.Quantity ,
+							SubUnitsetCode = item.SubUnitsetCode,
+							DestinationStockLocationCode = string.Empty,
+							ConversionFactor = 1,
+							OtherConversionFactor = 1,
+						};
+                        retailSalesDispatchTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+						locationTransaction.RemainingQuantity -= (double)serilotTransactionDto.Quantity;
+
+                    }
+                }
+
 			}
 
 			dto.Lines.Add(retailSalesDispatchTransactionLineDto);
