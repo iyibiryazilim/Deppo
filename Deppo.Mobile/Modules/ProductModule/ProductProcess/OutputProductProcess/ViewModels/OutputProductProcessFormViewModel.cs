@@ -150,7 +150,7 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 		return value.ToString();
 	}
 
-    public async Task LoadLocationTransaction(OutputProductBasketModel outputProductBasketModel)
+    public async Task LoadLocationTransaction(OutputProductBasketModel outputProductBasketModel,OutputProductBasketDetailModel outputProductBasketDetailModel)
     {
         try
         {
@@ -163,6 +163,7 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
                 productReferenceId: outputProductBasketModel.IsVariant ? outputProductBasketModel.MainItemReferenceId : outputProductBasketModel.ItemReferenceId,
                 variantReferenceId: outputProductBasketModel.IsVariant ? outputProductBasketModel.ItemReferenceId : 0,
                 warehouseNumber: WarehouseModel.Number,
+                locationRef: outputProductBasketDetailModel.LocationReferenceId,
                 skip: 0,
                 take: 999999,
                 search: ""
@@ -265,7 +266,7 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 
             foreach (var detail in item.Details)
             {
-                await LoadLocationTransaction(item);
+                await LoadLocationTransaction(item,detail);
                     LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
 
                 foreach (var locationTransaction in LocationTransactions)
@@ -366,55 +367,68 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 
             foreach (var detail in item.Details)
             {
-                var serilotTransactionDto = new SeriLotTransactionDto
-                {
-                    StockLocationCode = detail.LocationCode,
-                    InProductTransactionLineReferenceId = detail.TransactionReferenceId,
-                  //  OutProductTransactionLineReferenceId = detail.ReferenceId,
-                    Quantity = detail.RemainingQuantity,
-                    SubUnitsetCode = item.SubUnitsetCode,
-                    DestinationStockLocationCode = string.Empty,
-                    ConversionFactor = 1,
-                    OtherConversionFactor = 1,
-                };
+                await LoadLocationTransaction(item,detail);
+                LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
 
-                wastageTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+                foreach (var locationTransaction in LocationTransactions)
+                {
+                    while (locationTransaction.RemainingQuantity > 0)
+                    {
+                        var serilotTransactionDto = new SeriLotTransactionDto
+                        {
+                            StockLocationCode = detail.LocationCode,
+                            InProductTransactionLineReferenceId = locationTransaction.TransactionReferenceId,
+                            OutProductTransactionLineReferenceId = locationTransaction.ReferenceId,
+                            Quantity = item.Quantity > locationTransaction.RemainingQuantity ? locationTransaction.RemainingQuantity : item.Quantity,
+                            SubUnitsetCode = item.SubUnitsetCode,
+                            DestinationStockLocationCode = string.Empty,
+                            ConversionFactor = 1,
+                            OtherConversionFactor = 1,
+                        };
+
+                        locationTransaction.RemainingQuantity -= (double)serilotTransactionDto.Quantity;
+                        wastageTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+
+                    }
+
+
+                }
+
+                wastageTransactionDto.Lines.Add(wastageTransactionLineDto);
             }
 
-            wastageTransactionDto.Lines.Add(wastageTransactionLineDto);
-        }
+            var result = await _wastageTransactionService.InsertWastageTransaction(httpClient, wastageTransactionDto, _httpClientService.FirmNumber);
 
-        var result = await _wastageTransactionService.InsertWastageTransaction(httpClient, wastageTransactionDto, _httpClientService.FirmNumber);
-
-        ResultModel resultModel = new();
-        if (result.IsSuccess)
-        {
-            resultModel.Message = "Başarılı";
-            resultModel.Code = result.Data.Code;
-            resultModel.PageTitle = Title;
-            resultModel.PageCountToBack = 4;
-
-            await ClearFormAsync();
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
-            await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
+            ResultModel resultModel = new();
+            if (result.IsSuccess)
             {
-                [nameof(ResultModel)] = resultModel
-            });
-        }
-        else
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
+                resultModel.Message = "Başarılı";
+                resultModel.Code = result.Data.Code;
+                resultModel.PageTitle = Title;
+                resultModel.PageCountToBack = 4;
 
-            resultModel.Message = "Başarısız";
-            resultModel.PageTitle = Title;
-            resultModel.PageCountToBack = 1;
-            await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+                await ClearFormAsync();
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
+                {
+                    [nameof(ResultModel)] = resultModel
+                });
+            }
+            else
             {
-                [nameof(ResultModel)] = resultModel
-            });
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                resultModel.Message = "Başarısız";
+                resultModel.PageTitle = Title;
+                resultModel.PageCountToBack = 1;
+                await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+                {
+                    [nameof(ResultModel)] = resultModel
+                });
+            }
         }
     }
 
@@ -449,21 +463,31 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 
             foreach (var detail in item.Details)
             {
-                var serilotTransactionDto = new SeriLotTransactionDto
+                await LoadLocationTransaction(item, detail);
+                LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
+
+                foreach (var locationTransaction in LocationTransactions)
                 {
-                    StockLocationCode = detail.LocationCode,
-                    InProductTransactionLineReferenceId = detail.TransactionReferenceId,
-                    //OutProductTransactionLineReferenceId = detail.ReferenceId,
-                    Quantity = detail.RemainingQuantity,
-                    SubUnitsetCode = item.SubUnitsetCode,
-                    DestinationStockLocationCode = string.Empty,
-                    ConversionFactor = 1,
-                    OtherConversionFactor = 1,
-                };
+                    while (locationTransaction.RemainingQuantity > 0)
+                    {
+                        var serilotTransactionDto = new SeriLotTransactionDto
+                        {
+                            StockLocationCode = detail.LocationCode,
+                            InProductTransactionLineReferenceId = locationTransaction.TransactionReferenceId,
+                            OutProductTransactionLineReferenceId = locationTransaction.ReferenceId,
+                            Quantity = item.Quantity > locationTransaction.RemainingQuantity ? locationTransaction.RemainingQuantity : item.Quantity,
+                            SubUnitsetCode = item.SubUnitsetCode,
+                            DestinationStockLocationCode = string.Empty,
+                            ConversionFactor = 1,
+                            OtherConversionFactor = 1,
+                        };
 
-                outCountingTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+                        locationTransaction.RemainingQuantity -= (double)serilotTransactionDto.Quantity;
+                        outCountingTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+
+                    }
+                }
             }
-
             outCountingTransactionDto.Lines.Add(outCountingTransactionLineDto);
         }
 
