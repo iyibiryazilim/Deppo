@@ -30,6 +30,8 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
         [ObservableProperty]
         public OutsourceFiche selectedItem;
 
+        public Page CurrentPage { get; set; }
+
         public ObservableCollection<OutsourceFiche> Items { get; } = new();
 
         public ObservableCollection<OutsourceTransactionModel> Transactions { get; } = new();
@@ -55,8 +57,6 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
         public Command NextViewCommand { get; }
         public Command LoadMoreTransactionsCommand { get; }
         public Command BackCommand { get; }
-
-        public Page CurrentPage { get; set; }
 
         private async Task LoadItemsAsync()
         {

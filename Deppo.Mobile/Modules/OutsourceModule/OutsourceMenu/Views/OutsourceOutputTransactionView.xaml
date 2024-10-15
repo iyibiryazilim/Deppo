@@ -39,7 +39,7 @@
 
             <VerticalStackLayout>
                 <Label FontSize="Title"
-                       Text="Müşteri Çıkış Hareketleri"
+                       Text="Fason Çıkış Hareketleri"
                        TextColor="{StaticResource White}" />
                 <Label Grid.Column="0"
                        FontSize="Subtitle"

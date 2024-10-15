@@ -116,7 +116,8 @@ public partial class WarehouseInputTransactionViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.HideHud();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
@@ -141,7 +142,9 @@ public partial class WarehouseInputTransactionViewModel : BaseViewModel
             IsBusy = true;
 
             _userDialogs.ShowLoading("Loading...");
+
             var httpClient = _httpClientService.GetOrCreateHttpClient();
+
             var result = await _warehouseInputTransactionService.GetWarehouseInputProducts(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, Warehouse.Number, "", Items.Count, 20);
             if (result.IsSuccess)
             {

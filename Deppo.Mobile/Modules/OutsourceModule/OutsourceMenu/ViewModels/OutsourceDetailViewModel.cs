@@ -4,12 +4,14 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.OutsourceModels;
+using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.Views;
 using Deppo.Mobile.Modules.SalesModule.CustomerMenu.Views;
+using DevExpress.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels;
 
@@ -21,7 +23,7 @@ public partial class OutsourceDetailViewModel : BaseViewModel
     private readonly IOutsourcePanelService _outsourcePanelService;
 
     [ObservableProperty]
-    private OutsourceDetailModel outsourceDetailModel = null;
+    private OutsourceDetailModel outsourceDetailModel = null!;
 
     public OutsourceDetailViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IOutsourcePanelService outsourcePanelService)
     {
@@ -32,12 +34,14 @@ public partial class OutsourceDetailViewModel : BaseViewModel
         Title = "Fason Detayý";
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+
         InputQuantityTappedCommand = new Command(async () => await InputQuantityTappedAsync());
         OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
-        //OutputQuantityTappedCommand = new Command(async () => await OutputQuantityTappedAsync());
-        //ItemTappedCommand = new Command<SalesFiche>(async (salesFiche) => await ItemTappedAsync(salesFiche));
-        //AllFicheTappedCommand = new Command(async () => await AllFicheTappedAsync());
-        //GetLastTransactionCommand = new Command<SalesFiche>(async (salesFiche) => await GetLastTransactionAsync(salesFiche));
+
+        ItemTappedCommand = new Command<OutsourceFiche>(async (outsourceFiche) => await ItemTappedAsync(outsourceFiche));
+
+        AllFicheTappedCommand = new Command(async () => await AllFicheTappedAsync());
+        GetLastTransactionCommand = new Command<OutsourceFiche>(async (outsourceFiche) => await GetLastTransactionAsync(outsourceFiche));
     }
 
     public Page CurrentPage { get; set; } = null!;
@@ -88,10 +92,14 @@ public partial class OutsourceDetailViewModel : BaseViewModel
 
             if (result.IsSuccess)
             {
-                if (result.Data is null)
+                if (result.Data == null)
                     return;
-                var obj = Mapping.Mapper.Map<OutsourceDetailModel>(result.Data);
-                OutsourceDetailModel.InputQuantity = obj.InputQuantity;
+
+                foreach (var item in result.Data)
+                {
+                    var value = Mapping.Mapper.Map<OutsourceDetailModel>(item);
+                    OutsourceDetailModel.InputQuantity = value.InputQuantity;
+                }
             }
         }
         catch (Exception ex)
@@ -223,7 +231,7 @@ public partial class OutsourceDetailViewModel : BaseViewModel
             IsBusy = true;
 
             await Task.Delay(300);
-            await Shell.Current.GoToAsync($"{nameof(OutsourceInputTransactionView)}", new Dictionary<string, object>
+            await Shell.Current.GoToAsync($"{nameof(OutsourceOutputTransactionView)}", new Dictionary<string, object>
             {
                 [nameof(OutsourceDetailModel)] = OutsourceDetailModel
             });
@@ -234,6 +242,87 @@ public partial class OutsourceDetailViewModel : BaseViewModel
                 _userDialogs.Loading().Hide();
 
             _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task AllFicheTappedAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(OutsourceDetailAllFichesView)}", new Dictionary<string, object> { {
+                nameof(OutsourceDetailModel), OutsourceDetailModel
+                }
+                });
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task GetLastTransactionAsync(OutsourceFiche outsourceFiche)
+    {
+        try
+        {
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _outsourcePanelService.GetLastOutsourceTransactions(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, outsourceFiche.ReferenceId);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+                OutsourceDetailModel.LastTransactions.Clear();
+
+                foreach (var item in result.Data)
+                    OutsourceDetailModel.LastTransactions.Add(Mapping.Mapper.Map<OutsourceTransaction>(item));
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+        }
+    }
+
+    private async Task ItemTappedAsync(OutsourceFiche outsourceFiche)
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+            _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(500);
+            await GetLastTransactionAsync(outsourceFiche);
+            CurrentPage.FindByName<BottomSheet>("ficheTransactionBottomSheet").State = BottomSheetState.HalfExpanded;
+
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
         finally
         {

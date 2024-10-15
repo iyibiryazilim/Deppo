@@ -34,7 +34,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
             _outsourceDetailOutputProductService = outsourceDetailOutputProductService;
             _userDialogs = userDialogs;
 
-            Title = "Müşteri Çıkış Hareketleri";
+            Title = "Fason Çıkış Hareketleri";
 
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
             LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
