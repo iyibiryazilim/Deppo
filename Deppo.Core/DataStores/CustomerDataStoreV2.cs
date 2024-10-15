@@ -83,6 +83,10 @@ namespace Deppo.Core.DataStores
 [PostalCode]=CUSTOMER.POSTCODE,
 [TaxOffice]=CUSTOMER.TAXOFFICE,
 [TaxNumber]=CUSTOMER.TAXNR,
+ CASE
+        WHEN CUSTOMER.ACCEPTEDESP = 0 THEN 0
+        ELSE 1
+    END AS [IsEDispatch],
 [OrderReferenceCount] = ISNULL((SELECT COUNT(DISTINCT STOCKREF) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE WHERE CLIENTREF = CUSTOMER.LOGICALREF AND (AMOUNT-SHIPPEDAMOUNT) > 0 AND CLOSED = 0  AND LINETYPE = 0 AND TRCODE = 1 ),0),
 [IsActive]=
        CASE

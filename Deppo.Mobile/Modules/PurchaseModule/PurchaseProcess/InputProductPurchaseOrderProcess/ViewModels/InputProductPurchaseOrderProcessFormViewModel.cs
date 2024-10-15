@@ -272,7 +272,11 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
                 DocTrackingNumber = DocumentTrackingNumber,
                 DoCode = DocumentNumber,
                 TransactionDate = FicheDate,
-                Description = Description
+                Description = Description,
+                IsEDispatch = (short?)((bool)PurchaseSupplier?.IsEDispatch ? 1 : 0),
+                DispatchType = (short?)((bool)PurchaseSupplier?.IsEDispatch ? 1 : 0),
+                DispatchStatus = 1,
+                EDispatchProfileId = (short?)((bool)PurchaseSupplier?.IsEDispatch ? 1 : 0),
             };
 
             foreach (var item in Items.Where(x => x.Orders.Count > 0))
