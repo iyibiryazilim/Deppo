@@ -19,6 +19,12 @@ using Deppo.Core.DTOs.ProductionTransaction;
 using Deppo.Core.DTOs.SeriLotTransactionDto;
 using Deppo.Mobile.Core.Models.QuicklyModels;
 using DevExpress.Maui.Controls;
+using Deppo.Core.Models;
+using Deppo.Mobile.Core.Models.BasketModels;
+using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.Models.WarehouseModels;
+using Deppo.Mobile.Helpers.MappingHelper;
+using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.Manuel.ViewModels;
 
@@ -31,11 +37,14 @@ public partial class ManuelFormListViewModel : BaseViewModel
     private readonly IProductionTransactionService _productionTransactionService;
 
     private readonly IConsumableTransactionService _consumableTransactionService;
+    private readonly ILocationTransactionService _locationTransactionService;
 
     private readonly IUserDialogs _userDialogs;
 
     [ObservableProperty]
     private QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
+
+    public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
 
     [ObservableProperty]
     private DateTime ficheDate = DateTime.Now;
@@ -52,7 +61,7 @@ public partial class ManuelFormListViewModel : BaseViewModel
     [ObservableProperty]
     private string description = string.Empty;
 
-    public ManuelFormListViewModel(IHttpClientService httpClientService, ITransferTransactionService transferTransactionService, IProductionTransactionService productionTransactionService, IConsumableTransactionService consumableTransactionService, IUserDialogs userDialogs)
+    public ManuelFormListViewModel(IHttpClientService httpClientService, ITransferTransactionService transferTransactionService, IProductionTransactionService productionTransactionService, IConsumableTransactionService consumableTransactionService, IUserDialogs userDialogs, ILocationTransactionService locationTransactionService)
     {
         Title = "Form Sayfası";
 
@@ -66,6 +75,7 @@ public partial class ManuelFormListViewModel : BaseViewModel
         _productionTransactionService = productionTransactionService;
         _consumableTransactionService = consumableTransactionService;
         _userDialogs = userDialogs;
+        _locationTransactionService = locationTransactionService;
     }
 
     public Page CurrentPage { get; set; }
@@ -173,7 +183,7 @@ public partial class ManuelFormListViewModel : BaseViewModel
                     resultModel.PageTitle = Title;
                     resultModel.PageCountToBack = 7;
                     QuicklyBomProductBasketModel.QuicklyBomProduct = null;
-                    QuicklyBomProductBasketModel.WarehouseNumber= default;
+                    QuicklyBomProductBasketModel.WarehouseNumber = default;
                     Cleans();
 
                     if (_userDialogs.IsHudShowing)
@@ -238,6 +248,48 @@ public partial class ManuelFormListViewModel : BaseViewModel
         QuicklyBomProductBasketModel.MainAmount = 0;
     }
 
+    public async Task LoadLocationTransaction(QuicklyBomSubProductModel quicklyBomSubProduct, GroupLocationTransactionModel groupLocationTransactionModel)
+    {
+        try
+        {
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _locationTransactionService.GetInputObjectsAsync(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                productReferenceId: quicklyBomSubProduct.ProductModel.IsVariant ? quicklyBomSubProduct.ProductModel.MainProductReferenceId : quicklyBomSubProduct.ProductModel.ReferenceId,
+                variantReferenceId: quicklyBomSubProduct.ProductModel.IsVariant ? quicklyBomSubProduct.ProductModel.ReferenceId : 0,
+                warehouseNumber: quicklyBomSubProduct.WarehouseModel.Number,
+                locationRef: groupLocationTransactionModel.LocationReferenceId,
+                skip: 0,
+                take: 999999,
+                search: ""
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+                foreach (var item in result.Data)
+                {
+                    LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+                }
+
+            }
+
+            _userDialogs.Loading().Hide();
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
 
     private async Task<DataResult<ResponseModel>> ConsumableInsert(HttpClient httpClient, List<QuicklyBomSubProductModel> quicklyBomSubProductModel)
     {
@@ -259,7 +311,7 @@ public partial class ManuelFormListViewModel : BaseViewModel
             var consumableTransactionLineDto = new ConsumableTransactionLineDto
             {
                 ProductCode = item.ProductModel.IsVariant ? item.ProductModel.MainProductCode : item.ProductModel.Code,
-                VariantCode = item.ProductModel.IsVariant ? item.ProductModel.Code: "",
+                VariantCode = item.ProductModel.IsVariant ? item.ProductModel.Code : "",
                 WarehouseNumber = quicklyBomSubProductModel.FirstOrDefault()?.WarehouseModel.Number,
                 Quantity = item.SubBOMQuantity,
                 ConversionFactor = 1,
@@ -269,19 +321,30 @@ public partial class ManuelFormListViewModel : BaseViewModel
 
             foreach (var detail in item.LocationTransactions)
             {
-                var serilotTransactionDto = new SeriLotTransactionDto
-                {
-                    StockLocationCode = detail.LocationCode,
-                    InProductTransactionLineReferenceId = detail.TransactionReferenceId,
-                    OutProductTransactionLineReferenceId = detail.ReferenceId,
-                    Quantity = detail.OutputQuantity,
-                    SubUnitsetCode = item.ProductModel.SubUnitsetCode,
-                    DestinationStockLocationCode = string.Empty,
-                    ConversionFactor = 1,
-                    OtherConversionFactor = 1,
-                };
+                await LoadLocationTransaction(item, detail);
+                LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
 
-                consumableTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+                foreach (var locationTransaction in LocationTransactions)
+                {
+                    while (locationTransaction.RemainingQuantity > 0 && item.SubBOMQuantity > 0)
+                    {
+                        var serilotTransactionDto = new SeriLotTransactionDto
+                        {
+                            StockLocationCode = detail.LocationCode,
+                            InProductTransactionLineReferenceId = locationTransaction.TransactionReferenceId,
+                            OutProductTransactionLineReferenceId = locationTransaction.ReferenceId,
+                            Quantity = item.SubBOMQuantity > locationTransaction.RemainingQuantity ? locationTransaction.RemainingQuantity : item.SubBOMQuantity,
+                            SubUnitsetCode = item.ProductModel.SubUnitsetCode,
+                            DestinationStockLocationCode = string.Empty,
+                            ConversionFactor = 1,
+                            OtherConversionFactor = 1,
+                        };
+                        consumableTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+                        locationTransaction.RemainingQuantity -= (double)serilotTransactionDto.Quantity;
+                        item.SubBOMQuantity -= (double)serilotTransactionDto.Quantity;
+                    }
+                }
+
             }
             consumableTransactionDto.Lines.Add(consumableTransactionLineDto);
         }
@@ -308,7 +371,7 @@ public partial class ManuelFormListViewModel : BaseViewModel
         var productionTransactionLineDto = new ProductionTransactionLineDto
         {
             ProductCode = QuicklyBomProductBasketModel.QuicklyBomProduct.IsVariant ? QuicklyBomProductBasketModel.QuicklyBomProduct.MainItemCode : QuicklyBomProductBasketModel.QuicklyBomProduct.Code,
-			VariantCode = QuicklyBomProductBasketModel.QuicklyBomProduct.IsVariant ? QuicklyBomProductBasketModel.QuicklyBomProduct.Code : string.Empty,
+            VariantCode = QuicklyBomProductBasketModel.QuicklyBomProduct.IsVariant ? QuicklyBomProductBasketModel.QuicklyBomProduct.Code : string.Empty,
             WarehouseNumber = QuicklyBomProductBasketModel.WarehouseNumber,
             Quantity = QuicklyBomProductBasketModel.BOMQuantity,
             ConversionFactor = 1,

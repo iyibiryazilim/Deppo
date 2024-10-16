@@ -37,9 +37,9 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
     private QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
 
     [ObservableProperty]
-    public ObservableCollection<LocationTransactionModel> selectedLocationTransactions = new();
+    public ObservableCollection<GroupLocationTransactionModel> selectedLocationTransactions = new();
 
-    public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
+    public ObservableCollection<GroupLocationTransactionModel> LocationTransactions { get; } = new();
 
     [ObservableProperty]
     public QuicklyBomSubProductModel selectedItem = new();
@@ -63,8 +63,8 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
         LoadItemsSubCommand = new Command(async () => await LoadItemsSubAsync());
 
         LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
-        LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
-        LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
+        LocationTransactionIncreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
+        LocationTransactionDecreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
         LocationTransactionConfirmCommand = new Command(async () => await LocationTransactionConfirmAsync());
         LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
 
@@ -95,8 +95,8 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
     //LocationTransaction
     public Command LoadMoreLocationTransactionsCommand { get; }
 
-    public Command<LocationTransactionModel> LocationTransactionIncreaseCommand { get; }
-    public Command<LocationTransactionModel> LocationTransactionDecreaseCommand { get; }
+    public Command<GroupLocationTransactionModel> LocationTransactionIncreaseCommand { get; }
+    public Command<GroupLocationTransactionModel> LocationTransactionDecreaseCommand { get; }
     public Command LocationTransactionConfirmCommand { get; }
     public Command LocationTransactionCloseCommand { get; }
 
@@ -405,7 +405,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
             LocationTransactions.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationTransactionService.GetInputObjectsAsync(
+            var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
@@ -421,12 +421,12 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                     return;
                 foreach (var item in result.Data)
                 {
-                    LocationTransactionModel model = Mapping.Mapper.Map<LocationTransactionModel>(item);
+                    GroupLocationTransactionModel model = Mapping.Mapper.Map<GroupLocationTransactionModel>(item);
                     if (model != null)
                     {
                         if (SelectedItem.LocationTransactions.Any(x => x.LocationCode == model.LocationCode))
                         {
-                            model.OutputQuantity = SelectedItem.LocationTransactions.FirstOrDefault(x => x.ReferenceId == model.ReferenceId).OutputQuantity;
+                            model.OutputQuantity = SelectedItem.LocationTransactions.FirstOrDefault(x => x.LocationReferenceId == model.LocationReferenceId).OutputQuantity;
                         }
                     }
                     LocationTransactions.Add(model);
@@ -453,7 +453,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
 
             _userDialogs.Loading("Load More Location Items");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationTransactionService.GetInputObjectsAsync(
+            var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
@@ -469,12 +469,12 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                     return;
                 foreach (var item in result.Data)
                 {
-                    LocationTransactionModel model = Mapping.Mapper.Map<LocationTransactionModel>(item);
+                    GroupLocationTransactionModel model = Mapping.Mapper.Map<GroupLocationTransactionModel>(item);
                     if (model != null)
                     {
                         if (SelectedItem.LocationTransactions.Any(x => x.LocationCode == model.LocationCode))
                         {
-                            model.OutputQuantity = SelectedItem.LocationTransactions.FirstOrDefault(x => x.LocationCode == model.LocationCode).OutputQuantity;
+                            model.OutputQuantity = SelectedItem.LocationTransactions.FirstOrDefault(x => x.LocationReferenceId == model.LocationReferenceId).OutputQuantity;
                         }
                     }
                     LocationTransactions.Add(model);
@@ -493,7 +493,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
         }
     }
 
-    public async Task LocationTransactionIncreaseAsync(LocationTransactionModel item)
+    public async Task LocationTransactionIncreaseAsync(GroupLocationTransactionModel item)
     {
         if (IsBusy)
             return;
@@ -512,7 +512,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                 }
                 else
                 {
-                    if (item.OutputQuantity < item.Quantity)
+                    if (item.OutputQuantity < item.RemainingQuantity)
                     {
                         item.OutputQuantity += 1;
                     }
@@ -537,7 +537,7 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
         }
     }
 
-    public async Task LocationTransactionDecreaseAsync(LocationTransactionModel item)
+    public async Task LocationTransactionDecreaseAsync(GroupLocationTransactionModel item)
     {
         if (IsBusy)
             return;
@@ -554,8 +554,8 @@ public partial class WorkOrderCalcViewModel : BaseViewModel
                 }
                 if (item.OutputQuantity == 0)
                 {
-                    LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId).OutputQuantity = 0;
-                    var Remove = SelectedItem.LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
+                    LocationTransactions.FirstOrDefault(x => x.LocationReferenceId == item.LocationReferenceId).OutputQuantity = 0;
+                    var Remove = SelectedItem.LocationTransactions.FirstOrDefault(x => x.LocationReferenceId == item.LocationReferenceId);
                     SelectedItem.LocationTransactions.Remove(Remove);
                 }
             }

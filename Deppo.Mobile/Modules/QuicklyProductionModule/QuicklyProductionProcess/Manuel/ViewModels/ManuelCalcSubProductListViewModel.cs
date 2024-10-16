@@ -147,7 +147,6 @@ public partial class ManuelCalcSubProductListViewModel : BaseViewModel
 		try
 		{
 			IsBusy = true;
-			Items.Clear();
 			SelectedItems.Clear();
 
 			_userDialogs.Loading("Loading Items...");

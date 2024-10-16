@@ -42,7 +42,7 @@
                         Text="Giriş İşlemleri"
                         TextColor="{StaticResource OffBlack}" />
 
-                    <Grid RowDefinitions="Auto,Auto" RowSpacing="2">
+                    <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="2">
 
                         <Border
                             Grid.Row="0"
@@ -156,6 +156,59 @@
                                         Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
                                         TextColor="{StaticResource Primary}"
                                         WidthRequest="30" />
+                                </Border>
+                            </Grid>
+                        </Border>
+                        <Border Grid.Row="2"
+                                Padding="5"
+                                HeightRequest="55"
+                                StrokeShape="RoundRectangle 5"
+                                StrokeThickness="0.2">
+                            <Grid ColumnDefinitions=".85*,.15*"
+                                  ColumnSpacing="0">
+                                <Grid Grid.Column="0"
+                                      ColumnDefinitions="Auto,*"
+                                      ColumnSpacing="10">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding ProcurementSalesProcessCommand}" />
+                                    </Grid.GestureRecognizers>
+                                    <Border Padding="5"
+                                            BackgroundColor="{StaticResource Secondary}"
+                                            Stroke="{StaticResource Secondary}"
+                                            StrokeShape="RoundRectangle 5"
+                                            WidthRequest="45">
+                                        <Label FontFamily="FAS"
+                                               FontSize="25"
+                                               HorizontalOptions="Center"
+                                               Text="{x:Static fontAwesome:FontAwesomeIcons.Truck}"
+                                               TextColor="{StaticResource White}"
+                                               VerticalOptions="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1"
+                                                         Spacing="4">
+                                        <Label FontAttributes="Bold"
+                                               FontSize="Subtitle"
+                                               Text="Toplanan Ürünlerin Sevk İşlemleri"
+                                               TextColor="{StaticResource Gray500}"
+                                               VerticalOptions="Center" />
+                                        <Label Text="Lorem Ipsum... "
+                                               TextColor="{StaticResource Gray400}"
+                                               VerticalOptions="End" />
+                                    </VerticalStackLayout>
+                                </Grid>
+
+                                <Border Grid.Column="1"
+                                        StrokeThickness="0">
+                                    <toolkit:AvatarView Padding="2"
+                                                        BorderColor="{StaticResource Primary}"
+                                                        CornerRadius="15"
+                                                        FontFamily="FAS"
+                                                        FontSize="14"
+                                                        HeightRequest="30"
+                                                        HorizontalOptions="End"
+                                                        Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
+                                                        TextColor="{StaticResource Primary}"
+                                                        WidthRequest="30" />
                                 </Border>
                             </Grid>
                         </Border>

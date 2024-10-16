@@ -564,6 +564,18 @@
 	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesProcess\Views\OutputProductSalesProcessWarehouseListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesProcessCustomerListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesProcessFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesProcessProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesProcessWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ReturnProductSalesDispatchProcess\Views\ReturnSalesDispatchBasketLocationListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

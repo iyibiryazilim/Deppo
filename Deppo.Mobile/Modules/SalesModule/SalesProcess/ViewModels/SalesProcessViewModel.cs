@@ -7,6 +7,7 @@ using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.Vi
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByLocationProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByProductProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.Views;
 
@@ -26,6 +27,7 @@ public partial class SalesProcessViewModel : BaseViewModel
 
         OutputProductSalesProcessCommand = new Command(async () => await OutputProductSalesProcessAsync());
         OutputProductSalesOrderProcessCommand = new Command(async () => await OutputProductSalesOrderProcessAsync());
+        ProcurementSalesProcessCommand = new Command(async () => await ProcurementSalesProcessAsync());
         ReturnSalesProcessCommand = new Command(async () => await ReturnSalesProcessAsync());
         RetrunSalesDispatchProcessCommand = new Command(async () => await RetrunSalesDispatchProcessAsync());
         ProcurementByCustomerProcessCommand = new Command(async () => await ProcurementByCustomerProcessAsync());
@@ -37,6 +39,7 @@ public partial class SalesProcessViewModel : BaseViewModel
 
     public Command OutputProductSalesProcessCommand { get; }
     public Command OutputProductSalesOrderProcessCommand { get; }
+    public Command ProcurementSalesProcessCommand { get; }
 
     public Command ReturnSalesProcessCommand { get; }
     public Command RetrunSalesDispatchProcessCommand { get; }
@@ -75,6 +78,27 @@ public partial class SalesProcessViewModel : BaseViewModel
             IsBusy = true;
 
             await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessWarehouseListView)}");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ProcurementSalesProcessAsync()
+    {
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(ProcurementSalesProcessWarehouseListView)}");
         }
         catch (Exception ex)
         {
