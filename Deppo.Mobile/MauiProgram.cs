@@ -108,6 +108,8 @@ using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByLocationProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByProductProcess.ViewModels;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByProductProcess.Views;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.ViewModels;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.ViewModels;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.ViewModels;
@@ -331,6 +333,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IProcurementByCustomerService, ProcurementByCustomerDataStore>();
         builder.Services.AddSingleton<IProcurementByCustomerProductService, ProcurementByCustomerProductDataStore>();
         builder.Services.AddSingleton<IProcurementByCustomerBasketService, ProcurementByCustomerBasketDataStore>();
+        builder.Services.AddSingleton<IProcurementSalesCustomerService, ProcurementSalesCustomerDataStore>();
 
         builder.Services.AddSingleton<IOutsourceDetailInputProductService, OutsourceDetailInputProductDataStore>();
         builder.Services.AddSingleton<IOutsourceDetailOutputProductService, OutsourceDetailOutputProductDataStore>();
@@ -467,6 +470,16 @@ public static class MauiProgram
         builder.Services.AddScopedWithShellRoute<OutputProductSalesOrderProcessFormView, OutputProductSalesOrderProcessFormViewModel>(nameof(OutputProductSalesOrderProcessFormView));
 
         #endregion Siparise Bagli Sevk Islemleri
+
+        #region Toplanan Urunlerin Sevk Islemleri
+
+        builder.Services.AddTransientWithShellRoute<ProcurementSalesProcessWarehouseListView, ProcurementSalesProcessWarehouseListViewModel>(nameof(ProcurementSalesProcessWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<ProcurementSalesProcessCustomerListView, ProcurementSalesProcessCustomerListViewModel>(nameof(ProcurementSalesProcessCustomerListView));
+        builder.Services.AddScopedWithShellRoute<ProcurementSalesProcessProductListView, ProcurementSalesProcessProductListViewModel>(nameof(ProcurementSalesProcessProductListView));
+        builder.Services.AddScopedWithShellRoute<ProcurementSalesProcessFormView, ProcurementSalesProcessFormViewModel>(nameof(ProcurementSalesProcessFormView));
+
+
+        #endregion Toplanan Urunlerin Sevk Islemleri
 
         #region Satış İade İşlemleri
 
