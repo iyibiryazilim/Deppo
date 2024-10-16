@@ -550,10 +550,10 @@ public partial class ManuelReworkProcessAllProductListViewModel : BaseViewModel
 				ReferenceId = selectedVariantItem.ReferenceId,
 				Code = selectedVariantItem.Code,
 				Name = selectedVariantItem.Name,
+				Image = selectedVariantItem.ImageData,
 				MainItemCode = selectedVariantItem.Code,
 				MainItemName = selectedVariantItem.Name,
 				MainItemReferenceId = selectedVariantItem.ReferenceId,
-				//Image = selectedVariantItem.Image,
 				InWarehouseModel = InWarehouseModel,
 				BrandReferenceId = selectedVariantItem.BrandReferenceId,
 				BrandCode = selectedVariantItem.BrandCode,
@@ -577,7 +577,7 @@ public partial class ManuelReworkProcessAllProductListViewModel : BaseViewModel
             var matchedItem = SelectedReworkInProductModels.FirstOrDefault(x => x.ReferenceId == reworkInProductModel.ReferenceId);
             if (matchedItem is not null)
 			{
-				await _userDialogs.AlertAsync("Seçtiğiniz varyant zaten seçili.", "Uyarı", "Tamam");
+				await _userDialogs.AlertAsync("Seçtiğiniz varyant zaten bulunmakta.", "Uyarı", "Tamam");
 				return;
 			}
 			SelectedReworkInProductModels.Add(reworkInProductModel);
@@ -600,6 +600,28 @@ public partial class ManuelReworkProcessAllProductListViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    public async Task ClearPageAsync()
+    {
+        try
+        {
+            await Task.Run(() =>
+            {
+				SelectedItems.ForEach(x => x.IsSelected = false);
+				SelectedItems.Clear();
+				SelectedReworkInProductModels.Clear();
+                SearchText.Text = string.Empty;
+
+			});
+        }
+        catch (Exception ex)
+        {
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
     }
 }

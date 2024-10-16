@@ -333,7 +333,15 @@ public partial class ManuelReworkProcessBasketViewModel : BaseViewModel
 		{
 			await Task.Run(() =>
 			{
-
+				if(SelectedReworkInProductModel is not null)
+				{
+					SelectedReworkInProductModel.Details.Clear();
+					SelectedReworkInProductModel = null;
+				}
+				if(ReworkBasketModel is not null)
+				{
+					ReworkBasketModel = null;
+				}
 			});
 		}
 		catch (Exception ex)

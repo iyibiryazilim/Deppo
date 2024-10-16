@@ -178,6 +178,8 @@ public partial class ManuelReworkProcessOutWarehouseListViewModel : BaseViewMode
 
 	private async Task NextViewAsync()
 	{
+		if (SelectedWarehouseModel is null)
+			return;
 		if (IsBusy)
 			return;
 		try
