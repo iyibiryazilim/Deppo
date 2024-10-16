@@ -216,11 +216,13 @@ public partial class ProcurementByCustomerProductListViewModel : BaseViewModel
             {
 
                 var param = GetProcurementProductList(Items);
-
-                await Shell.Current.GoToAsync($"{nameof(ProcurementByCustomerBasketView)}", new Dictionary<string, object>
-                {
-                    [nameof(ProcurementCustomerBasketModel)] = param
-                });
+                if (param.ProcurementProductList.Count != 0)
+                    await Shell.Current.GoToAsync($"{nameof(ProcurementByCustomerBasketView)}", new Dictionary<string, object>
+                    {
+                        [nameof(ProcurementCustomerBasketModel)] = param
+                    });
+                else
+                    _userDialogs.Alert("Toplanacak ürün bulunamadı.", "Hata", "Tamam");
             }
         }
 
