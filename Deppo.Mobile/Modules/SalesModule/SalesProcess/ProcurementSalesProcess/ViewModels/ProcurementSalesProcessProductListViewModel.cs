@@ -223,7 +223,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
         private async Task BackAsyc()
         {
             Items.Clear();
-            SelectedCustomerModel = null!;
+			ProcurementSalesCustomerModel = null!;
             await Shell.Current.GoToAsync("..");
         }
 
@@ -232,8 +232,8 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
             await Shell.Current.GoToAsync($"{nameof(ProcurementSalesProcessProductListView)}", new Dictionary<string, object>
             {
                 [nameof(WarehouseModel)] = WarehouseModel,
-                [nameof(ProcurementSalesCustomerModel)] = SelectedCustomerModel
-            });
+                [nameof(ProcurementSalesCustomerModel)] = ProcurementSalesCustomerModel
+			});
         }
     }
 }
