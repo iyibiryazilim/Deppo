@@ -22,6 +22,8 @@ public class Current : INotifyPropertyChanged, IDisposable
     private string _postalCode = string.Empty;
     private string _taxOffice = string.Empty;
     private string _taxNumber = string.Empty;
+    private int _orderReferenceCount;
+    private int _shipAddressCount;
     private bool _isActive;
 
     //
@@ -217,6 +219,28 @@ public class Current : INotifyPropertyChanged, IDisposable
         {
             if (_name == value) return;
             _name = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public int OrderReferenceCount
+    {
+        get => _orderReferenceCount;
+        set
+        {
+            if (_orderReferenceCount == value) return;
+            _orderReferenceCount = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public int ShipAddressCount
+    {
+        get => _shipAddressCount;
+        set
+        {
+            if (_shipAddressCount == value) return;
+            _shipAddressCount = value;
             NotifyPropertyChanged();
         }
     }

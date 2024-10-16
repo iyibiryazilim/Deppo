@@ -82,6 +82,9 @@ namespace Deppo.Core.DataStores
     SUPPLIER.POSTCODE AS [PostalCode],
     SUPPLIER.TAXOFFICE AS [TaxOffice],
     SUPPLIER.TAXNR AS [TaxNumber],
+    [ShipAddressCount] = ISNULL((SELECT COUNT(LOGICALREF) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_SHIPINFO WHERE CLIENTREF = SUPPLIER.LOGICALREF),0),
+    [OrderReferenceCount] = ISNULL((SELECT COUNT(DISTINCT STOCKREF) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFLINE WHERE CLIENTREF = CUSTOMER.LOGICALREF AND (AMOUNT-SHIPPEDAMOUNT) > 0 AND CLOSED = 0  AND LINETYPE = 0 AND TRCODE = 2 ),0),
+
     CASE
         WHEN SUPPLIER.ACTIVE = 0 THEN 0
         ELSE 1

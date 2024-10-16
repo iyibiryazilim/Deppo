@@ -118,6 +118,7 @@ using Deppo.Mobile.Modules.SalesModule.WaitingOrderMenu.ViewModels;
 using Deppo.Mobile.Modules.SalesModule.WaitingOrderMenu.Views;
 using DevExpress.Maui;
 using DotNet.Meteor.HotReload.Plugin;
+using Java.Lang;
 using Microsoft.Extensions.Logging;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using ZXing.Net.Maui.Controls;
@@ -331,6 +332,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IProcurementByCustomerService, ProcurementByCustomerDataStore>();
         builder.Services.AddSingleton<IProcurementByCustomerProductService, ProcurementByCustomerProductDataStore>();
         builder.Services.AddSingleton<IProcurementByCustomerBasketService, ProcurementByCustomerBasketDataStore>();
+        builder.Services.AddSingleton<IPackageProductService, PackageProductDataStore>();
 
         #region Analysis Modules
 
