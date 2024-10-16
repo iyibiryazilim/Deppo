@@ -15,7 +15,6 @@ using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.ViewModels;
 
-
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 public partial class OutputProductProcessProductListViewModel : BaseViewModel
 {
@@ -26,7 +25,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
     private readonly IUserDialogs _userDialogs;
 
     [ObservableProperty]
-    WarehouseModel warehouseModel = null!;
+    private WarehouseModel warehouseModel = null!;
 
     public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
     public ObservableCollection<WarehouseTotalModel> SelectedItems { get; } = new();
@@ -36,7 +35,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
     public ObservableCollection<OutputProductBasketModel> selectedProducts = new();
 
     [ObservableProperty]
-    WarehouseTotalModel selectedProduct = null!;
+    private WarehouseTotalModel selectedProduct = null!;
 
     public ContentPage CurrentPage { get; set; } = null!;
 
@@ -86,6 +85,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
     }
 
     #region Commands
+
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
@@ -94,16 +94,16 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
     public Command PerformEmptySearchCommand { get; }
     public Command BackCommand { get; }
 
-
     public Command LoadVariantItemsCommand { get; }
     public Command LoadMoreVariantItemsCommand { get; }
     public Command VariantTappedCommand { get; }
     public Command ConfirmVariantCommand { get; }
 
-    #endregion
+    #endregion Commands
 
     [ObservableProperty]
     public SearchBar searchText;
+
     private async Task LoadItemsAsync()
     {
         if (IsBusy)
@@ -125,7 +125,6 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 
                 foreach (var product in result.Data)
                 {
-
                     var item = Mapping.Mapper.Map<WarehouseTotal>(product);
 
                     var matchingItem = SelectedItems.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
@@ -150,7 +149,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
                         IsSelected = matchingItem != null ? matchingItem.IsSelected : false,
                         LocTrackingIcon = product.LocTrackingIcon,
                         VariantIcon = product.VariantIcon,
-                        Image=product.ImageData,
+                        Image = product.Image,
                         TrackingTypeIcon = product.TrackingTypeIcon,
                     });
                 }
@@ -213,6 +212,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
                         LocTrackingIcon = product.LocTrackingIcon,
                         VariantIcon = product.VariantIcon,
                         TrackingTypeIcon = product.TrackingTypeIcon,
+                        Image = item.Image
                     });
                 }
             }
@@ -243,8 +243,6 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 
             if (item is not null)
             {
-
-
                 if (!item.IsSelected)
                 {
                     if (item.IsVariant)
@@ -282,13 +280,12 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
                             LocTrackingIcon = item.LocTrackingIcon,
                             VariantIcon = item.VariantIcon,
                             TrackingTypeIcon = item.TrackingTypeIcon,
+                            Image = item.ImageData,
                         };
 
                         SelectedProducts.Add(basketItem);
                         SelectedItems.Add(item);
                     }
-
-                  
                 }
                 else
                 {
@@ -301,7 +298,6 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
                         SelectedItems.Remove(item);
                     }
                 }
-
             }
         }
         catch (Exception ex)
@@ -316,10 +312,8 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
 
     private async Task LoadVariantItemsAsync()
     {
-
         try
         {
-
             _userDialogs.Loading("Loading Variant Items");
             ItemVariants.Clear();
             var httpClient = _httpClientService.GetOrCreateHttpClient();
@@ -338,7 +332,6 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
             }
 
             _userDialogs.Loading().Hide();
-
         }
         catch (Exception ex)
         {
@@ -441,7 +434,8 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
                 Quantity = item.LocTracking == 0 ? 1 : 0,
                 TrackingType = item.TrackingType,
                 LocTracking = item.LocTracking,
-                IsVariant = true
+                IsVariant = true,
+                Image = item.ImageData
             };
 
             SelectedProducts.Add(basketItem);
@@ -450,11 +444,9 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
             {
                 SelectedProduct.IsSelected = true;
                 SelectedItems.Add(SelectedProduct);
-
             }
 
             CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.Hidden;
-
         }
         catch (Exception ex)
         {
@@ -550,15 +542,14 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
                         IsSelected = matchedItem != null ? matchedItem.IsSelected : false,
                         LocTrackingIcon = product.LocTrackingIcon,
                         VariantIcon = product.VariantIcon,
-                        TrackingTypeIcon = product.TrackingTypeIcon
+                        TrackingTypeIcon = product.TrackingTypeIcon,
+                        Image = product.Image,
                     });
                 }
             }
 
             _userDialogs.Loading().Hide();
         }
-
-
         catch (Exception ex)
         {
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");

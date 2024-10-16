@@ -106,7 +106,6 @@
                                         </Label>
                                     </SwipeItemView>
                                 </SwipeItems>
-
                             </SwipeView.LeftItems>
                             <Border Padding="10"
                                     BackgroundColor="Transparent"
@@ -118,12 +117,11 @@
                                 </Border.GestureRecognizers>
                                 <Grid ColumnDefinitions="Auto,*, Auto"
                                       ColumnSpacing="10">
-                                    <Border BackgroundColor="{StaticResource Primary}"
-                                            StrokeShape="RoundRectangle 5"
+                                    <Border StrokeShape="RoundRectangle 5"
                                             StrokeThickness="0.5">
                                         <Image Grid.Column="0"
                                                HeightRequest="50"
-                                               Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                               Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                                WidthRequest="50" />
                                     </Border>
 
@@ -199,7 +197,6 @@
                     Margin="10,10,10,20"
                     Command="{Binding ConfirmCommand}"
                     Text="{Binding SelectedProducts.Count, StringFormat='Sepete Ekle : {0}'}" />
-
         </Grid>
         <dx:BottomSheet x:Name="warehouseParameterBottomSheet"
                         AllowDismiss="True"
@@ -243,7 +240,6 @@
                                    MaxLines="1"
                                    Text="Asgari Stok : "
                                    VerticalOptions="End">
-
                             </Label>
 
                             <Label Grid.Column="2"
@@ -254,10 +250,8 @@
                                    Text="{Binding WarehouseParameterModel.MinLevel}"
                                    VerticalOptions="End"
                                    HorizontalOptions="Center">
-
                             </Label>
                         </Grid>
-
                     </Border>
                     <Border Padding="5"
                             BackgroundColor="Transparent"
@@ -279,7 +273,6 @@
                                    MaxLines="1"
                                    Text="Güvenli Stok : "
                                    VerticalOptions="End">
-
                             </Label>
 
                             <Label Grid.Column="2"
@@ -290,11 +283,8 @@
                                    Text="{Binding WarehouseParameterModel.SafeLevel}"
                                    VerticalOptions="End"
                                    HorizontalOptions="Center">
-
                             </Label>
                         </Grid>
-
-
                     </Border>
                     <Border Padding="5"
                             BackgroundColor="Transparent"
@@ -316,7 +306,6 @@
                                    MaxLines="1"
                                    Text="Azami Stok : "
                                    VerticalOptions="End">
-
                             </Label>
 
                             <Label Grid.Column="2"
@@ -327,10 +316,8 @@
                                    Text="{Binding WarehouseParameterModel.MaxLevel}"
                                    VerticalOptions="End"
                                    HorizontalOptions="Center">
-
                             </Label>
                         </Grid>
-
                     </Border>
                 </VerticalStackLayout>
             </Grid>

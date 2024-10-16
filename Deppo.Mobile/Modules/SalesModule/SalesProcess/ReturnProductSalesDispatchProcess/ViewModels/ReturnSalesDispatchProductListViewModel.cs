@@ -72,10 +72,8 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
     public Command PerformSearchCommand { get; }
     public Command PerformEmptySearchCommand { get; }
 
-
     [ObservableProperty]
     public SearchBar searchText;
-
 
     private async Task LoadItemsAsync()
     {
@@ -215,6 +213,7 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
                         VariantIcon = item.VariantIcon,
                         TrackingTypeIcon = item.TrackingTypeIcon,
                         DispatchReferenceId = item.ReferenceId,
+                        Image = item.Image
                     };
 
                     SelectedProducts.Add(basketItem);
@@ -282,6 +281,7 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
     }
+
     private async Task PerformSearchAsync()
     {
         if (IsBusy)
@@ -316,8 +316,6 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
                 _userDialogs.Alert(result.Message, "Hata");
                 return;
             }
-
-
         }
         catch (System.Exception ex)
         {

@@ -81,20 +81,25 @@ public partial class WarehouseOutputTransactionViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-
             _userDialogs.ShowLoading("Loading...");
-            Items.Clear();
-            await Task.Delay(1000);
+            Items.Clear(); // Mevcut öğeleri temizle
+            await Task.Delay(1000); // Yükleme gecikmesi (örnek için)
+
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _warehouseOutputTransactionService.GetWarehouseOutputProducts(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, Warehouse.Number, "", 0, 20);
-            if (result.IsSuccess)
-            {
-                if (result.Data is not null)
-                {
-                    foreach (var item in result.Data)
-                    {
-                        var warehouseProduct = Mapping.Mapper.Map<WarehouseTransactionModel>(item);
 
+            if (result.IsSuccess && result.Data is not null)
+            {
+                // Daha önce eklenmiş ürünlerin kontrolü için bir liste
+                var existingProductIds = Items.Select(p => p.ReferenceId).ToHashSet();
+
+                foreach (var item in result.Data)
+                {
+                    var warehouseProduct = Mapping.Mapper.Map<WarehouseTransactionModel>(item);
+
+                    // Eğer ürün daha önce eklenmemişse
+                    if (!existingProductIds.Contains(warehouseProduct.ProductReferenceId))
+                    {
                         Items.Add(new Product
                         {
                             ReferenceId = warehouseProduct.ProductReferenceId,
@@ -115,7 +120,8 @@ public partial class WarehouseOutputTransactionViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.HideHud();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
@@ -138,18 +144,23 @@ public partial class WarehouseOutputTransactionViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-
             _userDialogs.ShowLoading("Loading...");
+
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _warehouseOutputTransactionService.GetWarehouseOutputProducts(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, Warehouse.Number, "", Items.Count, 20);
-            if (result.IsSuccess)
-            {
-                if (result.Data is not null)
-                {
-                    foreach (var item in result.Data)
-                    {
-                        var warehouseProduct = Mapping.Mapper.Map<WarehouseTransactionModel>(item);
 
+            if (result.IsSuccess && result.Data is not null)
+            {
+                // Daha önce eklenmiş ürünlerin kontrolü için bir liste
+                var existingProductIds = Items.Select(p => p.ReferenceId).ToHashSet();
+
+                foreach (var item in result.Data)
+                {
+                    var warehouseProduct = Mapping.Mapper.Map<WarehouseTransactionModel>(item);
+
+                    // Eğer ürün daha önce eklenmemişse
+                    if (!existingProductIds.Contains(warehouseProduct.ProductReferenceId))
+                    {
                         Items.Add(new Product
                         {
                             ReferenceId = warehouseProduct.ProductReferenceId,

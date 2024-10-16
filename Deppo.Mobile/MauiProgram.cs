@@ -4,6 +4,7 @@ using Deppo.Core.DataStores;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.DataStores;
 using Deppo.Mobile.Core.Services;
+using Deppo.Mobile.Helpers.BarcodeHelper;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.ViewModels;
 using Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.Views;
@@ -31,6 +32,8 @@ using Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.Views;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.ViewModels;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.Views;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransfer.ViewModels;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransfer.Views;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcess.OutputOutsourceTransfer.ViewModels;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcess.OutputOutsourceTransfer.Views;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.ViewModels;
@@ -120,6 +123,7 @@ using Deppo.Mobile.Modules.SalesModule.WaitingOrderMenu.ViewModels;
 using Deppo.Mobile.Modules.SalesModule.WaitingOrderMenu.Views;
 using DevExpress.Maui;
 using DotNet.Meteor.HotReload.Plugin;
+using Java.Lang;
 using Microsoft.Extensions.Logging;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using ZXing.Net.Maui.Controls;
@@ -234,6 +238,7 @@ public static class MauiProgram
 #endif
 
         builder.Services.AddSingleton(UserDialogs.Instance);
+        builder.Services.AddSingleton<BarcodeSearchHelper>();
         builder.Services.AddSingleton<IHttpClientService, HttpClientService>();
         builder.Services.AddSingleton<IAuthenticationService, AuthenticateDataStore>();
         builder.Services.AddSingleton<ICustomQueryService, CustomQueryDataStore>();
@@ -334,6 +339,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IProcurementByCustomerProductService, ProcurementByCustomerProductDataStore>();
         builder.Services.AddSingleton<IProcurementByCustomerBasketService, ProcurementByCustomerBasketDataStore>();
         builder.Services.AddSingleton<IProcurementSalesCustomerService, ProcurementSalesCustomerDataStore>();
+        builder.Services.AddSingleton<IPackageProductService, PackageProductDataStore>();
 
         builder.Services.AddSingleton<IOutsourceDetailInputProductService, OutsourceDetailInputProductDataStore>();
         builder.Services.AddSingleton<IOutsourceDetailOutputProductService, OutsourceDetailOutputProductDataStore>();
@@ -711,6 +717,9 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferBasketListView, OutputOutsourceTransferBasketListViewModel>(nameof(OutputOutsourceTransferBasketListView));
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferProductListView, OutputOutsourceTransferProductListViewModel>(nameof(OutputOutsourceTransferProductListView));
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferFormView, OutputOutsourceTransferFormViewModel>(nameof(OutputOutsourceTransferFormView));
+
+        builder.Services.AddScopedWithShellRoute<InputOutsourceTransferWarehouseListView, InputOutsourceTransferWarehouseListViewModel>(nameof(InputOutsourceTransferWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<InputOutsourceTransferOutsourceSupplierListView, InputOutsourceTransferOutsourceSupplierListViewModel>(nameof(InputOutsourceTransferOutsourceSupplierListView));
 
         #region OutSource Panel
 

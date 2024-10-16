@@ -414,6 +414,13 @@ public partial class OutputOutsourceTransferFormViewModel : BaseViewModel
             {
                 SpeCode = SpecialCode,
                 CurrentCode = SelectedOutsource?.Code ?? string.Empty,
+                CarrierCode = SelectedCarrier?.Code ?? string.Empty,
+                DriverFirstName = SelectedDriver?.Name ?? string.Empty,
+                DriverLastName = SelectedDriver?.Surname ?? string.Empty,
+                Plaque = SelectedDriver?.PlateNumber ?? string.Empty,
+                ShipInfoCode = SelectedShipAddress?.Code ?? string.Empty,
+                IdentityNumber = SelectedDriver?.IdentityNumber ?? string.Empty,
+                IsEDispatch = (bool)SelectedOutsource?.IsEDispatch ? 1 : 0,
                 Code = string.Empty,
                 DocTrackingNumber = DocumentTrackingNumber,
                 DoCode = DocumentNumber,

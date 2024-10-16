@@ -24,7 +24,7 @@ public partial class ManuelReworkProcessInWarehouseListViewModel: BaseViewModel
 	public ObservableCollection<WarehouseModel> Items { get; } = new();
 
 	[ObservableProperty]
-	WarehouseModel selectedWarehouseModel = null!;
+	WarehouseModel? selectedWarehouseModel;
 
 	public ManuelReworkProcessInWarehouseListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IWarehouseService warehouseService)
 	{
@@ -203,6 +203,28 @@ public partial class ManuelReworkProcessInWarehouseListViewModel: BaseViewModel
 		finally
 		{
 			IsBusy = false;
+		}
+	}
+
+	public async Task ClearPageAsync()
+	{
+		try
+		{
+			await Task.Run(() =>
+			{
+				if(SelectedWarehouseModel is not null)
+				{
+					SelectedWarehouseModel.IsSelected = false;
+					SelectedWarehouseModel = null;
+				}
+			});
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 	}
 }

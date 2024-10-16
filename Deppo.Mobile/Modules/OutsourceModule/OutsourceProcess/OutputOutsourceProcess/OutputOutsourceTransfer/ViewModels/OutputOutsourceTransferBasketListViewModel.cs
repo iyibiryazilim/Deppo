@@ -7,6 +7,7 @@ using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
+using Deppo.Mobile.Helpers.BarcodeHelper;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -23,6 +24,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 	private readonly ILocationTransactionService _locationTransactionService;
 	private readonly ISeriLotTransactionService _seriLotTransactionService;
 	private readonly IUserDialogs _userDialogs;
+	private BarcodeSearchHelper _barcodeSearchHelper;
 
 	[ObservableProperty]
 	WarehouseModel warehouseModel = null!;
@@ -41,21 +43,25 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 	[ObservableProperty]
 	public ObservableCollection<SeriLotTransactionModel> selectedSeriLotTransactions = new();
 
-	public ObservableCollection<OutputOutsourceTransferBasketModel> Items { get; } = new();
+	public ObservableCollection<OutputOutsourceTransferBasketModel> Items { get; set; } = new();
 
 	public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
 	public ObservableCollection<SeriLotTransactionModel> SeriLotTransactions { get; } = new();
+
+	[ObservableProperty]
+	public Entry barcodeEntry;
 
 	public OutputOutsourceTransferBasketListViewModel(
 		IHttpClientService httpClientService,
 		IUserDialogs userDialogs,
 		ILocationTransactionService locationTransactionService,
-		ISeriLotTransactionService seriLotTransactionService)
+		ISeriLotTransactionService seriLotTransactionService, BarcodeSearchHelper barcodeSearchHelper)
 	{
 		_httpClientService = httpClientService;
 		_userDialogs = userDialogs;
 		_locationTransactionService = locationTransactionService;
 		_seriLotTransactionService = seriLotTransactionService;
+		_barcodeSearchHelper = barcodeSearchHelper;
 
 		Title = "Fason Çıkış Transfer Sepeti";
 		Items.Clear();
@@ -65,6 +71,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 		IncreaseCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await DecreaseAsync(item));
 		DeleteItemCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await DeleteItemAsync(item));
+		PerformSearchCommand = new Command<Entry>(async (x) => await PerformSearchAsync(x));
 
 		LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreWarehouseLocationTransactionsAsync());
 		LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
@@ -89,6 +96,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 	public Command<OutputOutsourceTransferBasketModel> IncreaseCommand { get; }
 	public Command<OutputOutsourceTransferBasketModel> DecreaseCommand { get; }
 	public Command<OutputOutsourceTransferBasketModel> DeleteItemCommand { get; }
+	public Command<Entry> PerformSearchCommand { get; }
 	public Command NextViewCommand { get; }
 	public Command BackCommand { get; }
 
@@ -130,6 +138,51 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 			IsBusy = false;
 		}
 	}
+
+	private async Task PerformSearchAsync(Entry barcodeEntry)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			if (string.IsNullOrEmpty(barcodeEntry.Text))
+				return;
+
+			IsBusy = true;
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			Console.WriteLine(Items);
+
+			if(_barcodeSearchHelper is not null)
+			{
+			  await _barcodeSearchHelper.BarcodeDetectedAsync(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				barcode: barcodeEntry.Text,
+				comingPage: "OutputOutsourceTransferBasketListViewModel"
+			);
+			}
+
+			await Task.Delay(500);
+
+			Console.WriteLine(Items);
+			Console.WriteLine(Items);
+			Console.WriteLine(Items);
+
+		}
+		catch (Exception)
+		{
+
+			throw;
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
 
 	private async Task DeleteItemAsync(OutputOutsourceTransferBasketModel item)
 	{
@@ -776,6 +829,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 					return;
 
 				ClearPageAsync();
+				BarcodeEntry.Text = string.Empty;
 				await Shell.Current.GoToAsync("..");
 			}
 			else

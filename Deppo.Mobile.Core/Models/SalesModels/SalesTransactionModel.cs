@@ -19,7 +19,7 @@ namespace Deppo.Mobile.Core.Models.SalesModels
         private string _variantIconColor;
         private string _trackingTypeIcon;
         private string _trackingTypeIconColor;
-        private string? _image;
+        private byte[]? _image;
 
         public SalesTransactionModel()
         {
@@ -108,7 +108,7 @@ namespace Deppo.Mobile.Core.Models.SalesModels
 
         public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 
-        public string? Image
+        public byte[]? Image
         {
             get => _image;
             set
