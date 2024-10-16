@@ -223,6 +223,7 @@ SELECT
 	BQ.BrandReferenceId,
 	BQ.BrandCode,
 	BQ.BrandName,
+    BQ.StockQuantity,
     FIRMDOC.LDATA AS Image
 FROM
     BaseQuery AS BQ

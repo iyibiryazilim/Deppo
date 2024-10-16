@@ -59,10 +59,16 @@
                     Stroke="{StaticResource Primary}"
                     StrokeShape="RoundRectangle 5"
                     StrokeThickness="0.5">
-                <SearchBar x:Name="searchBar"
+                <Entry x:Name="barcodeEntry"
                            Placeholder="Ara ..."
                            PlaceholderColor="{StaticResource OffBlack}"
-                           TextColor="{StaticResource OffBlack}" />
+                           TextColor="{StaticResource OffBlack}">
+                    <Entry.Behaviors>
+                        <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                            CommandParameter="{Binding ., Source={x:Reference barcodeEntry}}"
+                                                            EventName="TextChanged" />
+                    </Entry.Behaviors>
+                </Entry>
             </Border>
 
             <CollectionView Grid.Row="1" ItemsSource="{Binding Items}">

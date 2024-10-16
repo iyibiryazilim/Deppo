@@ -333,7 +333,6 @@ public partial class ManuelReworkProcessBasketLocationListViewModel : BaseViewMo
 	}
 
 
-
 	private async Task ShowLocationsAsync()
 	{
 		if (IsBusy)
@@ -545,6 +544,29 @@ public partial class ManuelReworkProcessBasketLocationListViewModel : BaseViewMo
 		finally
 		{
 			IsBusy = false;
+		}
+	}
+
+	public async Task ClearPageAsync()
+	{
+		try
+		{
+			await Task.Run(() =>
+			{
+				if(SelectedItem is not null)
+				{
+					SelectedItem.IsSelected = false;
+					SelectedItem = null;
+				}
+				SelectedItems.Clear();
+			});
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 	}
 }

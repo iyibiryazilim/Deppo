@@ -485,7 +485,11 @@ public partial class ManuelReworkProcessWarehouseTotalListViewModel : BaseViewMo
 		{
 			await Task.Run(() =>
 			{
-				ReworkBasketModel.ReworkOutProductModel = null;
+				if(ReworkBasketModel is not null)
+				{
+					ReworkBasketModel.OutWarehouseModel = null;
+					ReworkBasketModel.ReworkOutProductModel = null;
+				}
 				SearchText.Text = string.Empty;
 			});
 		}
