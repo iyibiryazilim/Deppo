@@ -192,6 +192,12 @@
 	  <MauiXaml Update="Modules\OutsourceModule\OutsourcePanel\Views\OutsourcePanelAllFicheListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\InputOutsourceProcess\InputOutsourceTransfer\Views\InputOutsourceTransferOutsourceSupplierListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\InputOutsourceProcess\InputOutsourceTransfer\Views\InputOutsourceTransferWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 
 	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ProductDetailAllFicheListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
@@ -603,13 +609,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/InputOutsourceProcess/" />
-	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/InputOutsourceProcess/InputOutsourceTransfer/" />
-	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/InputOutsourceProcess/InputOutsourceTransfer/ViewModels/" />
-	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/InputOutsourceProcess/InputOutsourceTransfer/Views/" />
-	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/InputOutsourceProcess/InputOutsourceWorkOrder/" />
-	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/InputOutsourceProcess/InputOutsourceWorkOrder/ViewModels/" />
-	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/InputOutsourceProcess/InputOutsourceWorkOrder/Views/" />
 	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/OutputOutsourceProcess/OutputOutsourceWorkOrder/" />
 	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/OutputOutsourceProcess/OutputOutsourceWorkOrder/ViewModels/" />
 	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/OutputOutsourceProcess/OutputOutsourceWorkOrder/Views/" />
