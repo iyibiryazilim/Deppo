@@ -478,7 +478,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                 TrackingType = item.TrackingType,
                 IsVariant = true,
                 LocTracking = item.LocTracking,
-                //Image = item.Image
+                Image = item.ImageData
             };
 
             SelectedProducts.Add(basketItem);

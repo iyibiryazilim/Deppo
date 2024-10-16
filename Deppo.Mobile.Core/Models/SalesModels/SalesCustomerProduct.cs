@@ -5,88 +5,98 @@ namespace Deppo.Mobile.Core.Models.SalesModels;
 
 public partial class SalesCustomerProduct : ObservableObject
 {
-	[ObservableProperty]
-	int referenceId;
+    [ObservableProperty]
+    private int referenceId;
 
-	[ObservableProperty]
-	int itemReferenceId;
+    [ObservableProperty]
+    private int itemReferenceId;
 
-	[ObservableProperty]
-	string itemCode = string.Empty;
+    [ObservableProperty]
+    private string itemCode = string.Empty;
 
-	[ObservableProperty]
-	string itemName = string.Empty;
+    [ObservableProperty]
+    private string itemName = string.Empty;
 
-	[ObservableProperty]
-	int mainItemReferenceId;
+    [ObservableProperty]
+    private int mainItemReferenceId;
 
-	[ObservableProperty]
-	string mainItemCode = string.Empty;
+    [ObservableProperty]
+    private string mainItemCode = string.Empty;
 
-	[ObservableProperty]
-	string mainItemName = string.Empty;
+    [ObservableProperty]
+    private string mainItemName = string.Empty;
 
-	[ObservableProperty]
-	bool isVariant;
+    [ObservableProperty]
+    private bool isVariant;
 
-	[ObservableProperty]
-	int unitsetReferenceId;
+    [ObservableProperty]
+    private int unitsetReferenceId;
 
-	[ObservableProperty]
-	string unitsetCode = string.Empty;
+    [ObservableProperty]
+    private string unitsetCode = string.Empty;
 
-	[ObservableProperty]
-	string unitsetName = string.Empty;
+    [ObservableProperty]
+    private string unitsetName = string.Empty;
 
-	[ObservableProperty]
-	int subUnitsetReferenceId;
+    [ObservableProperty]
+    private int subUnitsetReferenceId;
 
-	[ObservableProperty]
-	string subUnitsetCode = string.Empty;
+    [ObservableProperty]
+    private string subUnitsetCode = string.Empty;
 
-	[ObservableProperty]
-	string subUnitsetName = string.Empty;
+    [ObservableProperty]
+    private string subUnitsetName = string.Empty;
 
-	[ObservableProperty]
-	double quantity;
+    [ObservableProperty]
+    private double quantity;
 
-	[ObservableProperty]
-	double shippedQuantity;
+    [ObservableProperty]
+    private double shippedQuantity;
 
-	[ObservableProperty]
-	double waitingQuantity;
+    [ObservableProperty]
+    private double waitingQuantity;
 
-	[ObservableProperty]
-	bool isSelected;
+    [ObservableProperty]
+    private bool isSelected;
 
-	[ObservableProperty]
-	int locTracking;
+    [ObservableProperty]
+    private int locTracking;
 
-	[ObservableProperty]
-	int trackingType;
+    [ObservableProperty]
+    private int trackingType;
 
-	[ObservableProperty]
-	string image = string.Empty;
+    [ObservableProperty]
+    private double stockQuantity;
 
-	[ObservableProperty]
-	double stockQuantity;
+    [ObservableProperty]
+    public List<WaitingSalesOrder> orders = new();
 
-	[ObservableProperty]
-	public List<WaitingSalesOrder> orders = new();
+    [ObservableProperty]
+    private string locTrackingIcon = "location-dot";
 
+    public string LocTrackingIconColor => LocTracking == 1 ? "#F5004F" : "#C8C8C8";
 
-	[ObservableProperty]
-	string locTrackingIcon = "location-dot";
+    [ObservableProperty]
+    private string variantIcon = "bookmark";
 
-	public string LocTrackingIconColor => LocTracking == 1 ? "#F5004F" : "#C8C8C8";
+    public string VariantIconColor => IsVariant ? "#F5004F" : "#C8C8C8";
 
-	[ObservableProperty]
-	string variantIcon = "bookmark";
+    [ObservableProperty]
+    private string trackingTypeIcon = "box-archive";
 
-	public string VariantIconColor => IsVariant ? "#F5004F" : "#C8C8C8";
+    public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 
-	[ObservableProperty]
-	string trackingTypeIcon = "box-archive";
+    [ObservableProperty]
+    private string _image = string.Empty;
 
-	public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
+    public byte[] ImageData
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(Image))
+                return Array.Empty<byte>();
+            else
+                return Convert.FromBase64String(Image);
+        }
+    }
 }
