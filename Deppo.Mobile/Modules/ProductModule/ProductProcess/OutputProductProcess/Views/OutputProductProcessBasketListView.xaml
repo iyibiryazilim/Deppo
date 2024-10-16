@@ -116,7 +116,6 @@
                                 <Grid ColumnDefinitions=".20*,.80*"
                                       ColumnSpacing="10">
                                     <Border Grid.Column="0"
-                                            BackgroundColor="{StaticResource Secondary}"
                                             StrokeShape="RoundRectangle 5"
                                             StrokeThickness="0.5">
                                         <Image Grid.Column="0"

@@ -107,13 +107,12 @@
                                     <Grid ColumnDefinitions=".20*,.80*"
                                           ColumnSpacing="10">
                                         <Border Grid.Column="0"
-                                                BackgroundColor="{StaticResource PrimaryLight}"
                                                 Stroke="{StaticResource Primary}"
                                                 StrokeShape="RoundRectangle 5"
                                                 StrokeThickness="0.5">
                                             <Image Grid.Column="0"
                                                    HeightRequest="50"
-                                                   Source="dotnet_bot.png"
+                                                   Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                                    WidthRequest="50" />
                                         </Border>
 

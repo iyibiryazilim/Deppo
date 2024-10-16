@@ -31,6 +31,8 @@ using Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.Views;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.ViewModels;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourcePanel.Views;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransfer.ViewModels;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransfer.Views;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcess.OutputOutsourceTransfer.ViewModels;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcess.OutputOutsourceTransfer.Views;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.ViewModels;
@@ -700,6 +702,9 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferBasketListView, OutputOutsourceTransferBasketListViewModel>(nameof(OutputOutsourceTransferBasketListView));
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferProductListView, OutputOutsourceTransferProductListViewModel>(nameof(OutputOutsourceTransferProductListView));
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferFormView, OutputOutsourceTransferFormViewModel>(nameof(OutputOutsourceTransferFormView));
+
+        builder.Services.AddScopedWithShellRoute<InputOutsourceTransferWarehouseListView, InputOutsourceTransferWarehouseListViewModel>(nameof(InputOutsourceTransferWarehouseListView));
+        builder.Services.AddScopedWithShellRoute<InputOutsourceTransferOutsourceSupplierListView, InputOutsourceTransferOutsourceSupplierListViewModel>(nameof(InputOutsourceTransferOutsourceSupplierListView));
 
         #region OutSource Panel
 

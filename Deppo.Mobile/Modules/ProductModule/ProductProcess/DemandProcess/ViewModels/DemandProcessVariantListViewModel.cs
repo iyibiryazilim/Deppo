@@ -15,20 +15,20 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
     [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
     public partial class DemandProcessVariantListViewModel : BaseViewModel
     {
-        IHttpClientService _httpClientService;
-        IDemandProcessVariantService _demandProcessVariantService;
-        IWarehouseParameterService _warehouseParameterService;
-        IServiceProvider _serviceProvider;
-        IUserDialogs _userDialogs;
+        private IHttpClientService _httpClientService;
+        private IDemandProcessVariantService _demandProcessVariantService;
+        private IWarehouseParameterService _warehouseParameterService;
+        private IServiceProvider _serviceProvider;
+        private IUserDialogs _userDialogs;
 
         [ObservableProperty]
-        WarehouseModel warehouseModel = null!;
+        private WarehouseModel warehouseModel = null!;
 
         [ObservableProperty]
-        VariantWarehouseTotalModel? selectedVariant;
+        private VariantWarehouseTotalModel? selectedVariant;
 
         [ObservableProperty]
-        WarehouseParameterModel warehouseParameterModel = new();
+        private WarehouseParameterModel warehouseParameterModel = new();
 
         public ObservableCollection<VariantWarehouseTotalModel> Items { get; } = new();
         public ObservableCollection<VariantWarehouseTotalModel> SelectedItems { get; } = new();
@@ -52,6 +52,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
             PerformSearchCommand = new Command(async () => await PerformSearchAsync());
             PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
         }
+
         public Page CurrentPage { get; set; }
 
         public Command LoadItemsCommand { get; }
@@ -61,7 +62,6 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
         public Command BackCommand { get; }
         public Command PerformSearchCommand { get; }
         public Command PerformEmptySearchCommand { get; }
-
 
         [ObservableProperty]
         public SearchBar searchText;
@@ -102,7 +102,6 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
                             item.IsSelected = matchingItem.IsSelected;
                         else
                             item.IsSelected = false;
-
 
                         Items.Add(item);
                     }
@@ -157,7 +156,6 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
                             item.IsSelected = matchingItem.IsSelected;
                         else
                             item.IsSelected = false;
-
 
                         Items.Add(item);
                     }
@@ -239,12 +237,10 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
 
                 if (item is not null)
                 {
-
                     SelectedVariant = item;
                     await LoadWarehouseParameterAsync();
                     CurrentPage.FindByName<BottomSheet>("warehouseParameterBottomSheet").State = BottomSheetState.HalfExpanded;
                 }
-
             }
             catch (Exception ex)
             {
@@ -269,7 +265,6 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
 
                 if (item is not null)
                 {
-
                     if (!item.IsSelected)
                     {
                         Items.ToList().FirstOrDefault(x => x.VariantReferenceId == item.VariantReferenceId).IsSelected = true;
@@ -300,6 +295,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
                             LocTrackingIcon = item.LocTrackingIcon,
                             VariantIcon = item.VariantIcon,
                             TrackingTypeIcon = item.TrackingTypeIcon,
+                            Image = item.ImageData,
                         };
 
                         SelectedVariants.Add(basketItem);
@@ -316,7 +312,6 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
                         }
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -450,11 +445,9 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
                         else
                             item.IsSelected = false;
 
-
                         Items.Add(item);
                     }
                 }
-
             }
             catch (System.Exception ex)
             {

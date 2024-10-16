@@ -29,7 +29,7 @@ public partial class TransferOutProductListViewModel : BaseViewModel
     private readonly IUserDialogs _userDialogs;
 
     [ObservableProperty]
-    WarehouseModel warehouseModel = null!;
+    private WarehouseModel warehouseModel = null!;
 
     public ObservableCollection<WarehouseTotalModel> Items { get; } = new();
     public ObservableCollection<WarehouseTotalModel> SelectedItems { get; } = new();
@@ -39,10 +39,10 @@ public partial class TransferOutProductListViewModel : BaseViewModel
     public ObservableCollection<OutProductModel> selectedProducts = new();
 
     [ObservableProperty]
-    WarehouseTotalModel selectedProduct = null!;
+    private WarehouseTotalModel selectedProduct = null!;
 
     [ObservableProperty]
-    TransferBasketModel transferBasketModel = new();
+    private TransferBasketModel transferBasketModel = new();
 
     public ContentPage CurrentPage { get; set; } = null!;
 
@@ -92,6 +92,7 @@ public partial class TransferOutProductListViewModel : BaseViewModel
     }
 
     #region Commands
+
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
@@ -99,14 +100,19 @@ public partial class TransferOutProductListViewModel : BaseViewModel
     public Command LoadMoreVariantItemsCommand { get; }
     public Command VariantTappedCommand { get; }
     public Command ConfirmVariantCommand { get; }
+
     //public Command ConfirmCommand { get; }
     public Command PerformSearchCommand { get; }
+
     public Command PerformEmptySearchCommand { get; }
     public Command BackCommand { get; }
     public Command NextViewCommand { get; }
-    #endregion
+
+    #endregion Commands
+
     [ObservableProperty]
     public SearchBar searchText;
+
     private async Task LoadItemsAsync()
     {
         if (IsBusy)
@@ -210,7 +216,6 @@ public partial class TransferOutProductListViewModel : BaseViewModel
 
             if (item is not null)
             {
-
                 if (!item.IsSelected)
                 {
                     if (item.IsVariant)
@@ -229,7 +234,6 @@ public partial class TransferOutProductListViewModel : BaseViewModel
 
                         Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
                         SelectedProduct = item;
-
 
                         var outProductModel = new OutProductModel()
                         {
@@ -255,11 +259,11 @@ public partial class TransferOutProductListViewModel : BaseViewModel
                             TrackingTypeIcon = item.TrackingTypeIcon,
                             OutputQuantity = item.LocTracking == 0 ? 1 : 0,
                             IsSelected = item.IsSelected,
+                            Image = item.Image
                         };
 
                         TransferBasketModel.OutProducts.Add(outProductModel);
                         SelectedItems.Add(item);
-
                     }
 
                     //SelectedProducts.Add(basketItem);
@@ -271,7 +275,6 @@ public partial class TransferOutProductListViewModel : BaseViewModel
                     if (item.IsVariant)
                     {
                         selectedItem = TransferBasketModel.OutProducts.FirstOrDefault(x => x.MainItemReferenceId == item.ProductReferenceId);
-
                     }
                     else
                     {
@@ -284,7 +287,6 @@ public partial class TransferOutProductListViewModel : BaseViewModel
                         SelectedItems.Remove(item);
                     }
                 }
-
             }
         }
         catch (Exception ex)
@@ -299,11 +301,8 @@ public partial class TransferOutProductListViewModel : BaseViewModel
 
     private async Task LoadVariantItemsAsync()
     {
-
         try
         {
-
-
             _userDialogs.Loading("Loading Variant Items");
             ItemVariants.Clear();
             var httpClient = _httpClientService.GetOrCreateHttpClient();
@@ -321,7 +320,6 @@ public partial class TransferOutProductListViewModel : BaseViewModel
                 }
             }
             _userDialogs.Loading().Hide();
-
         }
         catch (Exception ex)
         {
@@ -332,7 +330,6 @@ public partial class TransferOutProductListViewModel : BaseViewModel
         }
         finally
         {
-
         }
     }
 
@@ -346,7 +343,6 @@ public partial class TransferOutProductListViewModel : BaseViewModel
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _variantWarehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, productReferenceId: SelectedProduct.ProductReferenceId, warehouseNumber: WarehouseModel.Number, skip: ItemVariants.Count(), take: 20);
-
 
             if (result.IsSuccess)
             {
@@ -429,6 +425,7 @@ public partial class TransferOutProductListViewModel : BaseViewModel
                 TrackingTypeIcon = item.TrackingTypeIcon,
                 OutputQuantity = item.LocTracking == 0 ? 1 : 0,
                 IsSelected = item.IsSelected,
+                Image = item.Image
             };
             TransferBasketModel.OutProducts.Add(basketItem);
             SelectedProducts.Add(basketItem);
@@ -436,7 +433,6 @@ public partial class TransferOutProductListViewModel : BaseViewModel
             {
                 SelectedProduct.IsSelected = true;
                 SelectedItems.Add(SelectedProduct);
-
             }
             CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.Hidden;
         }
@@ -510,12 +506,10 @@ public partial class TransferOutProductListViewModel : BaseViewModel
 
                 foreach (var product in result.Data)
                 {
-
                     var item = Mapping.Mapper.Map<WarehouseTotalModel>(product);
                     var matcedItem = SelectedItems.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
                     item.IsSelected = matcedItem is not null ? matcedItem.IsSelected : false;
                     Items.Add(item);
-
                 }
             }
             if (!result.IsSuccess)
@@ -542,7 +536,6 @@ public partial class TransferOutProductListViewModel : BaseViewModel
         }
     }
 
-
     private async Task BackAsync()
     {
         if (IsBusy)
@@ -553,7 +546,6 @@ public partial class TransferOutProductListViewModel : BaseViewModel
             foreach (var item in TransferBasketModel.OutProducts)
             {
                 item.IsSelected = false;
-
             }
             TransferBasketModel.OutProducts.Clear();
 

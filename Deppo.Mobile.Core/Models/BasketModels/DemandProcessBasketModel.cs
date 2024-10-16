@@ -25,7 +25,7 @@ namespace Deppo.Mobile.Core.Models.BasketModels
         private int _trackingType;
         private int _locTracking;
         private bool _isSelected;
-        private string _image;
+        private byte[]? _image;
 
         private string _locTrackingIcon;
         private string _locTrackingIconColor;
@@ -283,7 +283,7 @@ namespace Deppo.Mobile.Core.Models.BasketModels
             }
         }
 
-        public string Image
+        public byte[]? Image
         {
             get => _image;
             set
