@@ -4,6 +4,7 @@ using Deppo.Core.DataStores;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.DataStores;
 using Deppo.Mobile.Core.Services;
+using Deppo.Mobile.Helpers.BarcodeHelper;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.ViewModels;
 using Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.Views;
@@ -232,6 +233,7 @@ public static class MauiProgram
 #endif
 
         builder.Services.AddSingleton(UserDialogs.Instance);
+        builder.Services.AddSingleton<BarcodeSearchHelper>();
         builder.Services.AddSingleton<IHttpClientService, HttpClientService>();
         builder.Services.AddSingleton<IAuthenticationService, AuthenticateDataStore>();
         builder.Services.AddSingleton<ICustomQueryService, CustomQueryDataStore>();

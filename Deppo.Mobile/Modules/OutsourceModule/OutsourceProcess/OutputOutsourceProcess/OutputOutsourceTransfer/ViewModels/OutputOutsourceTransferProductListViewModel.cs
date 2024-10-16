@@ -13,6 +13,7 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using DevExpress.Maui.Controls;
+using DevExpress.Maui.Core.Internal;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcess.OutputOutsourceTransfer.ViewModels;
 
@@ -503,6 +504,9 @@ public partial class OutputOutsourceTransferProductListViewModel : BaseViewModel
                 {
                     return;
                 }
+                Items.ForEach(x => x.IsSelected = false);
+                SelectedItems.ForEach(x => x.IsSelected = false);
+                SelectedItems.Clear();
                 SelectedProducts.Clear();
             }
             await Shell.Current.GoToAsync("..");
@@ -597,8 +601,8 @@ public partial class OutputOutsourceTransferProductListViewModel : BaseViewModel
 					SelectedProduct.IsSelected = false;
 					SelectedProduct = null;
 				}
-
-                SelectedItems.Clear();
+				SelectedItems.ForEach(x => x.IsSelected = false);
+				SelectedItems.Clear();
 				SelectedProducts.Clear();
 				Items.Clear();
 				ItemVariants.Clear();

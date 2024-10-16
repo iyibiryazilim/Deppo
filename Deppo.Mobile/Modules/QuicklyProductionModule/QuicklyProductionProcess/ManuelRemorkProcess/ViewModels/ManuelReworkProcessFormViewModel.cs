@@ -184,7 +184,7 @@ public partial class ManuelReworkProcessFormViewModel : BaseViewModel
 					var basketLocationListViewModel = _serviceProvider.GetRequiredService<ManuelReworkProcessBasketLocationListViewModel>() ?? throw new InvalidOperationException("Service not found");
 					var basketViewModel = _serviceProvider.GetRequiredService<ManuelReworkProcessBasketViewModel>() ?? throw new InvalidOperationException("Service not found");
 
-					await Task.WhenAll(outWarehouseListViewModel.ClearPageAsync(), warehouseTotalListViewModel.ClearPageAsync(), inWarehouseListViewModel.ClearPageAsync(), allProductListViewModel.ClearPageAsync(), basketLocationListViewModel.ClearPageAsync(), basketViewModel.ClearPageAsync(), ClearFormAsync());
+					await Task.WhenAll(ClearFormAsync(), outWarehouseListViewModel.ClearPageAsync(), warehouseTotalListViewModel.ClearPageAsync(), inWarehouseListViewModel.ClearPageAsync(), allProductListViewModel.ClearPageAsync(), basketLocationListViewModel.ClearPageAsync(), basketViewModel.ClearPageAsync());
 
 
 					if (_userDialogs.IsHudShowing)
