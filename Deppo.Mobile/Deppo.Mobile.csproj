@@ -192,6 +192,9 @@
 	  <MauiXaml Update="Modules\OutsourceModule\OutsourcePanel\Views\OutsourcePanelAllFicheListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\InputOutsourceProcess\InputOutsourceTransfer\Views\InputOutsourceTransferOutsourceProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\InputOutsourceProcess\InputOutsourceTransfer\Views\InputOutsourceTransferOutsourceSupplierListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
