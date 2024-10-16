@@ -484,7 +484,6 @@ public static class MauiProgram
         builder.Services.AddScopedWithShellRoute<ProcurementSalesProcessProductListView, ProcurementSalesProcessProductListViewModel>(nameof(ProcurementSalesProcessProductListView));
         builder.Services.AddScopedWithShellRoute<ProcurementSalesProcessFormView, ProcurementSalesProcessFormViewModel>(nameof(ProcurementSalesProcessFormView));
 
-
         #endregion Toplanan Urunlerin Sevk Islemleri
 
         #region Satış İade İşlemleri
@@ -720,6 +719,7 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
 
         builder.Services.AddScopedWithShellRoute<InputOutsourceTransferWarehouseListView, InputOutsourceTransferWarehouseListViewModel>(nameof(InputOutsourceTransferWarehouseListView));
         builder.Services.AddScopedWithShellRoute<InputOutsourceTransferOutsourceSupplierListView, InputOutsourceTransferOutsourceSupplierListViewModel>(nameof(InputOutsourceTransferOutsourceSupplierListView));
+        builder.Services.AddScopedWithShellRoute<InputOutsourceTransferOutsourceProductListView, InputOutsourceTransferOutsourceProductListViewModel>(nameof(InputOutsourceTransferOutsourceProductListView));
 
         #region OutSource Panel
 
