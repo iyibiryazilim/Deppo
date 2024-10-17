@@ -719,8 +719,16 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferFormView, OutputOutsourceTransferFormViewModel>(nameof(OutputOutsourceTransferFormView));
 
         builder.Services.AddScopedWithShellRoute<InputOutsourceTransferWarehouseListView, InputOutsourceTransferWarehouseListViewModel>(nameof(InputOutsourceTransferWarehouseListView));
+
         builder.Services.AddScopedWithShellRoute<InputOutsourceTransferOutsourceSupplierListView, InputOutsourceTransferOutsourceSupplierListViewModel>(nameof(InputOutsourceTransferOutsourceSupplierListView));
+
         builder.Services.AddScopedWithShellRoute<InputOutsourceTransferOutsourceProductListView, InputOutsourceTransferOutsourceProductListViewModel>(nameof(InputOutsourceTransferOutsourceProductListView));
+
+        builder.Services.AddScopedWithShellRoute<InputOutsourceTransferOutsourceBasketListView, InputOutsourceTransferOutsourceBasketListViewModel>(nameof(InputOutsourceTransferOutsourceBasketListView));
+
+        builder.Services.AddScopedWithShellRoute<InputOutsourceTransferBasketLocationListView, InputOutsourceTransferBasketLocationListViewModel>(nameof(InputOutsourceTransferBasketLocationListView));
+
+        builder.Services.AddScopedWithShellRoute<InputOutsourceTransferOutsourceFormView, InputOutsourceTransferOutsourceFormViewModel>(nameof(InputOutsourceTransferOutsourceFormView));
 
         #region OutSource Panel
 

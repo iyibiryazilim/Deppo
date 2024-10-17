@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransfer.ViewModels
 {
-    public partial class InputOutsourceTransferOutsourceFormViewModel : BaseViewModel
+    public partial class InputOutsourceTransferBasketLocationListViewModel : BaseViewModel
     {
     }
 }
