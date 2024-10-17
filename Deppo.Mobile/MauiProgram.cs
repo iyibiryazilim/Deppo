@@ -238,7 +238,7 @@ public static class MauiProgram
 #endif
 
         builder.Services.AddSingleton(UserDialogs.Instance);
-        builder.Services.AddSingleton<BarcodeSearchHelper>();
+        builder.Services.AddSingleton<IBarcodeSearchHelper, BarcodeSearchHelper>();
         builder.Services.AddSingleton<IHttpClientService, HttpClientService>();
         builder.Services.AddSingleton<IAuthenticationService, AuthenticateDataStore>();
         builder.Services.AddSingleton<ICustomQueryService, CustomQueryDataStore>();
@@ -714,7 +714,7 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddSingletonWithShellRoute<OutsourceProcessView, OutsourceProcessViewModel>(nameof(OutsourceProcessView));
 
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferWarehouseListView, OutputOutsourceTransferWarehouseListViewModel>(nameof(OutputOutsourceTransferWarehouseListView));
-        builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferBasketListView, OutputOutsourceTransferBasketListViewModel>(nameof(OutputOutsourceTransferBasketListView));
+        builder.Services.AddSingletonWithShellRoute<OutputOutsourceTransferBasketListView, OutputOutsourceTransferBasketListViewModel>(nameof(OutputOutsourceTransferBasketListView));
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferProductListView, OutputOutsourceTransferProductListViewModel>(nameof(OutputOutsourceTransferProductListView));
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferFormView, OutputOutsourceTransferFormViewModel>(nameof(OutputOutsourceTransferFormView));
 

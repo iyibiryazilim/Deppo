@@ -21,10 +21,11 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
 public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
+	private readonly IBarcodeSearchService _barcodeSearchService;
 	private readonly ILocationTransactionService _locationTransactionService;
 	private readonly ISeriLotTransactionService _seriLotTransactionService;
 	private readonly IUserDialogs _userDialogs;
-	private BarcodeSearchHelper _barcodeSearchHelper;
+	private readonly IBarcodeSearchHelper _barcodeSearchHelper;
 
 	[ObservableProperty]
 	WarehouseModel warehouseModel = null!;
@@ -43,7 +44,8 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 	[ObservableProperty]
 	public ObservableCollection<SeriLotTransactionModel> selectedSeriLotTransactions = new();
 
-	public ObservableCollection<OutputOutsourceTransferBasketModel> Items { get; set; } = new();
+	[ObservableProperty]
+	public ObservableCollection<OutputOutsourceTransferBasketModel> items  = new();
 
 	public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
 	public ObservableCollection<SeriLotTransactionModel> SeriLotTransactions { get; } = new();
@@ -55,7 +57,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 		IHttpClientService httpClientService,
 		IUserDialogs userDialogs,
 		ILocationTransactionService locationTransactionService,
-		ISeriLotTransactionService seriLotTransactionService, BarcodeSearchHelper barcodeSearchHelper)
+		ISeriLotTransactionService seriLotTransactionService, IBarcodeSearchHelper barcodeSearchHelper)
 	{
 		_httpClientService = httpClientService;
 		_userDialogs = userDialogs;
@@ -152,7 +154,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			Console.WriteLine(Items);
+			Console.WriteLine(Items.GetHashCode());
 
 			if(_barcodeSearchHelper is not null)
 			{
@@ -165,10 +167,6 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 			);
 			}
 
-			await Task.Delay(500);
-
-			Console.WriteLine(Items);
-			Console.WriteLine(Items);
 			Console.WriteLine(Items);
 
 		}
@@ -179,6 +177,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 		}
 		finally
 		{
+			BarcodeEntry.Text = string.Empty;
 			IsBusy = false;
 		}
 	}
@@ -794,6 +793,8 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 				await _userDialogs.AlertAsync("Sepetinizde miktarı 0 olan ürünler bulunmaktadır.", "Uyarı", "Tamam");
 				return;
 			}
+
+			BarcodeEntry.Text = string.Empty;
 
 			await Shell.Current.GoToAsync($"{nameof(OutputOutsourceTransferFormView)}", new Dictionary<string, object>
 			{
