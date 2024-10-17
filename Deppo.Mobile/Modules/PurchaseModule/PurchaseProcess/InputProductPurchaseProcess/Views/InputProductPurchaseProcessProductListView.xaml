@@ -97,9 +97,6 @@
 
                                 <VerticalStackLayout Grid.Column="1"
                                                      Spacing="2">
-                                    <Label x:Name="itemReferenceId"
-                                           IsVisible="Hidden"
-                                           Text="{Binding ReferenceId}" />
                                     <Label FontAttributes="Bold"
                                            LineBreakMode="TailTruncation"
                                            Text="{Binding Code}"

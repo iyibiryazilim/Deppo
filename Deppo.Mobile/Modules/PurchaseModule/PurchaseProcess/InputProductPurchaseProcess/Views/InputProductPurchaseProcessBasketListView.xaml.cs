@@ -1,3 +1,4 @@
+using CommunityToolkit.Maui.Core.Platform;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels;
 
@@ -13,5 +14,8 @@ public partial class InputProductPurchaseProcessBasketListView : ContentPage
         _viewModel = viewModel;
         BindingContext = _viewModel;
         _viewModel.CurrentPage = this;
-    }
+		_viewModel.BarcodeEntry = barcodeEntry;
+        barcodeEntry.Focus();
+        barcodeEntry.HideKeyboardAsync();
+	}
 }

@@ -13,14 +13,12 @@
              x:DataType="viewModel:OutputProductSalesOrderProcessBasketListViewModel"
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
-                                   StatusBarStyle="Default" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android"
-                Value="artboard.png" />
+            <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
@@ -46,10 +44,15 @@
         <BackButtonBehavior Command="{Binding BackCommand}" />
     </Shell.BackButtonBehavior>
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <Grid RowDefinitions="*,Auto">
         <Grid RowDefinitions="*,Auto">
-            <Grid RowDefinitions="Auto,*,Auto"
-                  RowSpacing="10">
+            <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
                 <Border Grid.Row="0"
                         Margin="5,0,5,0"
                         Padding="0"
@@ -58,21 +61,19 @@
                         Stroke="{StaticResource Primary}"
                         StrokeShape="RoundRectangle 5"
                         StrokeThickness="0.5">
-                    <SearchBar x:Name="searchBar"
-                               Placeholder="Ara..."
-                               PlaceholderColor="{StaticResource OffBlack}"
-                               TextColor="{StaticResource OffBlack}">
-                        <!-- <SearchBar.Behaviors>
-                <toolkit:EventToCommandBehavior
-                    Command="{Binding PerformSearchCommand}"
-                    CommandParameter="{Binding Text, Source={x:Reference searchBar}}"
-                    EventName="SearchButtonPressed" />
-            </SearchBar.Behaviors>-->
-                    </SearchBar>
+                    <Entry x:Name="barcodeEntry"
+                           Placeholder="Barkod tara..."
+                           PlaceholderColor="{StaticResource OffBlack}"
+                           TextColor="{StaticResource OffBlack}">
+                        <Entry.Behaviors>
+                            <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                            CommandParameter="{Binding ., Source={x:Reference barcodeEntry}}"
+                                                            EventName="TextChanged" />
+                        </Entry.Behaviors>
+                    </Entry>
                 </Border>
 
-                <CollectionView Grid.Row="1"
-                                ItemsSource="{Binding Items}">
+                <CollectionView Grid.Row="1" ItemsSource="{Binding Items}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="basketModels:OutputSalesBasketModel">
                             <SwipeView Threshold="100">
@@ -105,8 +106,7 @@
                                 <Border Padding="10"
                                         BackgroundColor="Transparent"
                                         StrokeThickness="0.1">
-                                    <Grid ColumnDefinitions=".20*,.80*"
-                                          ColumnSpacing="10">
+                                    <Grid ColumnDefinitions=".20*,.80*" ColumnSpacing="10">
                                         <Border Grid.Column="0"
                                                 StrokeShape="RoundRectangle 5"
                                                 StrokeThickness="0.5">
@@ -153,8 +153,7 @@
                                                            TextColor="{StaticResource Secondary}" />
 
                                                     <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessBasketListViewModel}}, Path=DecreaseCommand}"
-                                                                              CommandParameter="{Binding .}" />
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessBasketListViewModel}}, Path=DecreaseCommand}" CommandParameter="{Binding .}" />
                                                     </Border.GestureRecognizers>
                                                 </Border>
                                                 <Label Grid.Column="1"
@@ -174,8 +173,7 @@
                                                            TextColor="{StaticResource White}" />
 
                                                     <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessBasketListViewModel}}, Path=IncreaseCommand}"
-                                                                              CommandParameter="{Binding .}" />
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessBasketListViewModel}}, Path=IncreaseCommand}" CommandParameter="{Binding .}" />
                                                     </Border.GestureRecognizers>
                                                 </Border>
                                             </Grid>
@@ -203,13 +201,10 @@
                             IsModal="True"
                             ShowGrabber="True">
                 <!--#region BottomSheetContent-->
-                <Grid RowDefinitions="Auto,*"
-                      RowSpacing="20">
+                <Grid RowDefinitions="Auto,*" RowSpacing="20">
 
-                    <VerticalStackLayout Grid.Row="0"
-                                         Spacing="5">
-                        <Grid ColumnDefinitions=".80*, .20*"
-                              ColumnSpacing="10">
+                    <VerticalStackLayout Grid.Row="0" Spacing="5">
+                        <Grid ColumnDefinitions=".80*, .20*" ColumnSpacing="10">
                             <Label Grid.Column="0"
                                    FontAttributes="Bold"
                                    FontSize="Medium"
@@ -228,8 +223,7 @@
                                 </ImageButton.Source>
                             </ImageButton>
                         </Grid>
-                        <BoxView HeightRequest="2"
-                                 Color="{StaticResource Primary}" />
+                        <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
                     </VerticalStackLayout>
 
                     <Grid Grid.Row="1"
@@ -247,19 +241,15 @@
                                        PlaceholderColor="{StaticResource OffBlack}"
                                        TextColor="{StaticResource OffBlack}">
                                 <SearchBar.Behaviors>
-                                    <toolkit:EventToCommandBehavior Command="{Binding LocationTransactionPerformSearchCommand}"
-                                                                    EventName="SearchButtonPressed" />
-                                    <toolkit:EventToCommandBehavior Command="{Binding LocationTransactionPerformEmptySearchCommand}"
-                                                                    EventName="TextChanged" />
+                                    <toolkit:EventToCommandBehavior Command="{Binding LocationTransactionPerformSearchCommand}" EventName="SearchButtonPressed" />
+                                    <toolkit:EventToCommandBehavior Command="{Binding LocationTransactionPerformEmptySearchCommand}" EventName="TextChanged" />
                                 </SearchBar.Behaviors>
                             </SearchBar>
                         </Border>
 
-                        <CollectionView Grid.Row="1"
-                                        ItemsSource="{Binding LocationTransactions}">
+                        <CollectionView Grid.Row="1" ItemsSource="{Binding LocationTransactions}">
                             <CollectionView.ItemsLayout>
-                                <LinearItemsLayout ItemSpacing="5"
-                                                   Orientation="Vertical" />
+                                <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="locationModels:GroupLocationTransactionModel">
@@ -267,8 +257,7 @@
                                             BackgroundColor="{StaticResource WhiteSmoke}"
                                             StrokeShape="RoundRectangle 10"
                                             StrokeThickness="0.1">
-                                        <Grid ColumnDefinitions="*,Auto"
-                                              ColumnSpacing="10">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
 
                                             <VerticalStackLayout Grid.Column="0">
                                                 <Label FontAttributes="Bold"
@@ -304,8 +293,7 @@
                                                         Stroke="{StaticResource Secondary}"
                                                         StrokeShape="RoundRectangle 2">
                                                     <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessBasketListViewModel}}, Path=LocationTransactionDecreaseCommand}"
-                                                                              CommandParameter="{Binding .}" />
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessBasketListViewModel}}, Path=LocationTransactionDecreaseCommand}" CommandParameter="{Binding .}" />
                                                     </Border.GestureRecognizers>
                                                     <Label FontFamily="FAS"
                                                            FontSize="Medium"
@@ -324,8 +312,7 @@
                                                         Stroke="{StaticResource Secondary}"
                                                         StrokeShape="RoundRectangle 2">
                                                     <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessBasketListViewModel}}, Path=LocationTransactionIncreaseCommand}"
-                                                                              CommandParameter="{Binding .}" />
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessBasketListViewModel}}, Path=LocationTransactionIncreaseCommand}" CommandParameter="{Binding .}" />
                                                     </Border.GestureRecognizers>
                                                     <Label FontFamily="FAS"
                                                            FontSize="Medium"
@@ -356,12 +343,9 @@
                         IsModal="True"
                         ShowGrabber="True">
             <!--#region BottomSheetContent-->
-            <Grid RowDefinitions="Auto, *"
-                  RowSpacing="20">
-                <VerticalStackLayout Grid.Row="0"
-                                     Spacing="5">
-                    <Grid ColumnDefinitions="*, Auto"
-                          ColumnSpacing="10">
+            <Grid RowDefinitions="Auto, *" RowSpacing="20">
+                <VerticalStackLayout Grid.Row="0" Spacing="5">
+                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
                         <Label Grid.Column="0"
                                FontAttributes="Bold"
                                FontSize="Medium"
@@ -404,8 +388,7 @@
                                     RemainingItemsThreshold="2"
                                     RemainingItemsThresholdReachedCommand="{Binding LoadMoreSeriLotTransactionsCommand}">
                         <CollectionView.ItemsLayout>
-                            <LinearItemsLayout ItemSpacing="5"
-                                               Orientation="Vertical" />
+                            <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="seriLotModels:SeriLotTransactionModel">
@@ -413,8 +396,7 @@
                                         BackgroundColor="{StaticResource WhiteSmoke}"
                                         StrokeShape="RoundRectangle 10"
                                         StrokeThickness="0.1">
-                                    <Grid ColumnDefinitions="*, Auto"
-                                          ColumnSpacing="10">
+                                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
                                         <VerticalStackLayout Grid.Column="0">
                                             <Label FontAttributes="Bold"
                                                    LineBreakMode="TailTruncation"
@@ -452,8 +434,7 @@
                                                     Stroke="{StaticResource Secondary}"
                                                     StrokeShape="RoundRectangle 2">
                                                 <Border.GestureRecognizers>
-                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessBasketListViewModel}}, Path=SeriLotTransactionDecreaseCommand}"
-                                                                          CommandParameter="{Binding .}" />
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessBasketListViewModel}}, Path=SeriLotTransactionDecreaseCommand}" CommandParameter="{Binding .}" />
                                                 </Border.GestureRecognizers>
                                                 <Label FontFamily="FAS"
                                                        FontSize="Medium"
@@ -476,8 +457,7 @@
                                                     Stroke="{StaticResource Secondary}"
                                                     StrokeShape="RoundRectangle 2">
                                                 <Border.GestureRecognizers>
-                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessBasketListViewModel}}, Path=SeriLotTransactionIncreaseCommand}"
-                                                                          CommandParameter="{Binding .}" />
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessBasketListViewModel}}, Path=SeriLotTransactionIncreaseCommand}" CommandParameter="{Binding .}" />
                                                 </Border.GestureRecognizers>
                                                 <Label FontFamily="FAS"
                                                        FontSize="Medium"
@@ -513,17 +493,14 @@
             <Grid Padding="10"
                   RowDefinitions="Auto,*"
                   RowSpacing="20">
-                <VerticalStackLayout Grid.Row="0"
-                                     Spacing="5">
+                <VerticalStackLayout Grid.Row="0" Spacing="5">
                     <Label Padding="10"
                            FontAttributes="Bold"
                            FontSize="Subtitle"
                            Text="Seçim Listesi" />
-                    <BoxView HeightRequest="2"
-                             Color="{StaticResource Primary}" />
+                    <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
                 </VerticalStackLayout>
-                <VerticalStackLayout Grid.Row="1"
-                                     Spacing="10">
+                <VerticalStackLayout Grid.Row="1" Spacing="10">
                     <Border Padding="10"
                             BackgroundColor="Transparent"
                             StrokeShape="RoundRectangle 10"
@@ -531,8 +508,7 @@
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ProductOptionTappedCommand}" />
                         </Border.GestureRecognizers>
-                        <Label TextColor="{StaticResource Gray600}"
-                               VerticalOptions="Center">
+                        <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
                             <Label.FormattedText>
                                 <FormattedString>
                                     <Span FontAttributes="Bold"
@@ -557,8 +533,7 @@
                             <TapGestureRecognizer Command="{Binding OrderOptionTappedCommand}" />
                         </Border.GestureRecognizers>
 
-                        <Label TextColor="{StaticResource Gray600}"
-                               VerticalOptions="Center">
+                        <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
                             <Label.FormattedText>
                                 <FormattedString>
                                     <Span FontAttributes="Bold"

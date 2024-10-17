@@ -7,6 +7,7 @@ using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.SalesModels.BasketModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
+using Deppo.Mobile.Helpers.BarcodeHelper;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -25,6 +26,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 	private readonly IUserDialogs _userDialogs;
 	private readonly ILocationTransactionService _locationTransactionService;
 	private readonly ISeriLotTransactionService _seriLotTransactionService;
+	private readonly IBarcodeSearchHelper _barcodeSearchHelper;
 
 	[ObservableProperty]
 	WarehouseModel warehouseModel = null!;
@@ -32,6 +34,11 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 	[ObservableProperty]
 	SalesCustomer salesCustomer = null!;
 
+	[ObservableProperty]
+	public Entry barcodeEntry;
+
+	[ObservableProperty]
+	public SearchBar locationTransactionSearchText;
 
 	public ObservableCollection<OutputSalesBasketModel> Items { get; } = new();
 
@@ -55,15 +62,17 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 	public ObservableCollection<GroupLocationTransactionModel> SelectedLocationTransactionItems { get; } = new();
 	public ObservableCollection<SeriLotTransactionModel> SeriLotTransactions { get; } = new();
 
-	public OutputProductSalesOrderProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ILocationTransactionService locationTransactionService, ISeriLotTransactionService seriLotTransactionService)
+	public OutputProductSalesOrderProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ILocationTransactionService locationTransactionService, ISeriLotTransactionService seriLotTransactionService, IBarcodeSearchHelper barcodeSearchHelper)
 	{
 		_httpClientService = httpClientService;
 		_userDialogs = userDialogs;
 		_locationTransactionService = locationTransactionService;
 		_seriLotTransactionService = seriLotTransactionService;
+		_barcodeSearchHelper = barcodeSearchHelper;
 
 		Title = "Satış Sepeti";
 
+		PerformSearchCommand = new Command<Entry>(async (x) => await PerformSearchAsync(x));
 		IncreaseCommand = new Command<OutputSalesBasketModel>(async (outputSalesBasketModel) => await IncreaseAsync(outputSalesBasketModel));
 		DecreaseCommand = new Command<OutputSalesBasketModel>(async (outputSalesBasketModel) => await DecreaseAsync(outputSalesBasketModel));
 		DeleteItemCommand = new Command<OutputSalesBasketModel>(async (outputSalesBasketModel) => await DeleteItemAsync(outputSalesBasketModel));
@@ -79,10 +88,10 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 		LocationTransactionDecreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
 		LocationTransactionConfirmCommand = new Command(ConfirmLocationTransactionAsync);
 		LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
-        LocationTransactionPerformSearchCommand = new Command(async () => await LocationTransactionPerformSearchAsync());
-        LocationTransactionPerformEmptySearchCommand = new Command(async () => await LocationTransactionPerformEmptySearchAsync());
+		LocationTransactionPerformSearchCommand = new Command(async () => await LocationTransactionPerformSearchAsync());
+		LocationTransactionPerformEmptySearchCommand = new Command(async () => await LocationTransactionPerformEmptySearchAsync());
 
-        LoadMoreSeriLotTransactionsCommand = new Command(async () => await LoadMoreSeriLotTransactionsAsync());
+		LoadMoreSeriLotTransactionsCommand = new Command(async () => await LoadMoreSeriLotTransactionsAsync());
 		SeriLotTransactionIncreaseCommand = new Command<SeriLotTransactionModel>(async (item) => SeriLotTransactionIncreaseAsync(item));
 		SeriLotTransactionDecreaseCommand = new Command<SeriLotTransactionModel>(async (item) => SeriLotTransactionDecreaseAsync(item));
 		SeriLotTransactionConfirmCommand = new Command(ConfirmSeriLotTransactionAsync);
@@ -91,6 +100,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 	public ContentPage CurrentPage { get; set; } = null!;
 
 	#region Commands
+	public Command PerformSearchCommand { get; }
 	public Command<OutputSalesBasketModel> IncreaseCommand { get; }
 	public Command<OutputSalesBasketModel> DecreaseCommand { get; }
 	public Command<OutputSalesBasketModel> DeleteItemCommand { get; }
@@ -121,11 +131,45 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
 
 	public Command BackCommand { get; }
 	public Command NextViewCommand { get; }
-    #endregion
+	#endregion
 
-    [ObservableProperty]
-    public SearchBar locationTransactionSearchText;
-    private async Task IncreaseAsync(OutputSalesBasketModel outputSalesBasketModel)
+	private async Task PerformSearchAsync(Entry barcodeEntry)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			if (string.IsNullOrEmpty(barcodeEntry.Text))
+				return;
+
+			IsBusy = true;
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			await _barcodeSearchHelper.BarcodeDetectedAsync(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				barcode: barcodeEntry.Text,
+				comingPage: "OutputProductSalesOrderProcessBasketListViewModel"
+			);
+
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			BarcodeEntry.Text = string.Empty;
+			IsBusy = false;
+		}
+	}
+
+	private async Task IncreaseAsync(OutputSalesBasketModel outputSalesBasketModel)
 	{
 		if (IsBusy)
 			return;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentPage x:Class="Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.Views.ReturnSalesBasketView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.Views.ReturnSalesBasketView"
              xmlns:basketModels="clr-namespace:Deppo.Mobile.Core.Models.BasketModels;assembly=Deppo.Mobile.Core"
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
@@ -20,8 +20,8 @@
         <ToolbarItem Command="{Binding CameraTappedCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="FAS"
-                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Camera}"
-                         Size="Medium" />
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Camera}"
+                                 Size="Medium" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
 
@@ -35,57 +35,54 @@
     </ContentPage.ToolbarItems>
 
     <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
-                                   StatusBarStyle="Default" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android"
-                Value="artboard.png" />
+            <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
     <Grid RowDefinitions="*,Auto">
 
-        <Grid RowDefinitions="Auto,*,Auto"
-              RowSpacing="10">
+        <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
             <Border Grid.Row="0"
-                    Padding="0"
                     Margin="5,0,5,0"
+                    Padding="0"
                     BackgroundColor="{StaticResource PrimaryLight}"
                     HeightRequest="35"
                     Stroke="{StaticResource Primary}"
                     StrokeShape="RoundRectangle 5"
                     StrokeThickness="0.5">
-                <SearchBar x:Name="searchBar"
-                           Placeholder="Ara ..."
-                           PlaceholderColor="{StaticResource OffBlack}"
-                           TextColor="{StaticResource OffBlack}">
-                    <!-- <SearchBar.Behaviors>
-       <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
-                                       CommandParameter="{Binding ., Source={x:Reference searchBar}}"
-                                       EventName="TextChanged" />
-   </SearchBar.Behaviors>-->
-                </SearchBar>
+                <Entry x:Name="barcodeEntry"
+                       Placeholder="Barkod tara..."
+                       PlaceholderColor="{StaticResource OffBlack}"
+                       TextColor="{StaticResource OffBlack}">
+                    <Entry.Behaviors>
+                        <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                        CommandParameter="{Binding ., Source={x:Reference barcodeEntry}}"
+                                                        EventName="TextChanged" />
+                    </Entry.Behaviors>
+                </Entry>
             </Border>
 
-            <CollectionView Grid.Row="1"
-                            ItemsSource="{Binding Items}">
+            <CollectionView Grid.Row="1" ItemsSource="{Binding Items}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="salesBasketModel:ReturnSalesBasketModel">
                         <SwipeView Threshold="100">
                             <SwipeView.LeftItems>
                                 <SwipeItems Mode="Execute">
-                                    <SwipeItemView  BackgroundColor="Red"
-                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnSalesBasketViewModel}}, Path=DeleteItemCommand}"
-                                                    CommandParameter="{Binding .}">
+                                    <SwipeItemView BackgroundColor="Red"
+                                                   Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnSalesBasketViewModel}}, Path=DeleteItemCommand}"
+                                                   CommandParameter="{Binding .}">
                                         <Label HorizontalOptions="Center"
                                                TextColor="White"
                                                VerticalOptions="Center">
@@ -110,15 +107,12 @@
                             <Border Padding="5"
                                     BackgroundColor="Transparent"
                                     StrokeThickness="0.1">
-                                <Grid ColumnDefinitions=".20*,.80*"
-                                      ColumnSpacing="10">
+                                <Grid ColumnDefinitions=".20*,.80*" ColumnSpacing="10">
                                     <Border Grid.Column="0"
-                                            BackgroundColor="{StaticResource Primary}"
                                             StrokeShape="RoundRectangle 5"
                                             StrokeThickness="0.5">
-                                        <Image Grid.Column="0"
-                                               HeightRequest="50"
-                                               Source="dotnet_bot.png"
+                                        <Image HeightRequest="50"
+                                               Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                                WidthRequest="50" />
                                     </Border>
 
@@ -159,8 +153,7 @@
                                                        TextColor="{StaticResource Secondary}" />
 
                                                 <Border.GestureRecognizers>
-                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnSalesBasketViewModel}}, Path=DecreaseCommand}"
-                                                                          CommandParameter="{Binding .}" />
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnSalesBasketViewModel}}, Path=DecreaseCommand}" CommandParameter="{Binding .}" />
                                                 </Border.GestureRecognizers>
                                             </Border>
                                             <Label Grid.Column="1"
@@ -180,8 +173,7 @@
                                                        TextColor="{StaticResource White}" />
 
                                                 <Border.GestureRecognizers>
-                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnSalesBasketViewModel}}, Path=IncreaseCommand}"
-                                                                          CommandParameter="{Binding .}" />
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnSalesBasketViewModel}}, Path=IncreaseCommand}" CommandParameter="{Binding .}" />
                                                 </Border.GestureRecognizers>
                                             </Border>
                                         </Grid>
@@ -208,7 +200,7 @@
                         HalfExpandedRatio="0.5"
                         IsModal="True"
                         ShowGrabber="True">
-            -->
+        -->
         <!--#region BottomSheetContent-->
         <!--
             <Grid RowDefinitions="Auto,*"
@@ -254,7 +246,7 @@
                                    Placeholder="Ara..."
                                    PlaceholderColor="{StaticResource OffBlack}"
                                    TextColor="{StaticResource OffBlack}">
-                            -->
+        -->
         <!-- <SearchBar.Behaviors>
     <toolkit:EventToCommandBehavior
         Command="{Binding PerformSearchCommand}"
@@ -355,7 +347,7 @@
                 </Grid>
             </Grid>
 
-            -->
+        -->
         <!--#endregion-->
         <!--
         </dx:BottomSheet>-->

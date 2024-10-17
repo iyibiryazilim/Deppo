@@ -40,6 +40,12 @@
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
             <On Platform="Android" Value="artboard.png" />
@@ -60,7 +66,7 @@
                     StrokeShape="RoundRectangle 5"
                     StrokeThickness="0.5">
                 <Entry x:Name="barcodeEntry"
-                           Placeholder="Ara ..."
+                           Placeholder="Barkod tara..."
                            PlaceholderColor="{StaticResource OffBlack}"
                            TextColor="{StaticResource OffBlack}">
                     <Entry.Behaviors>

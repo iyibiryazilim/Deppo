@@ -8,6 +8,7 @@ using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.SalesModels.BasketModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
+using Deppo.Mobile.Helpers.BarcodeHelper;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -25,6 +26,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 	private readonly ILocationTransactionService _locationTransactionService;
 	private readonly ISeriLotTransactionService _seriLotTransactionService;
 	private readonly IUserDialogs _userDialogs;
+	private readonly IBarcodeSearchHelper _barcodeSearchHelper;
 
 	[ObservableProperty]
 	WarehouseModel warehouseModel = null!;
@@ -45,21 +47,27 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 	[ObservableProperty]
 	public ObservableCollection<SeriLotTransactionModel> selectedSeriLotTransactions = new();
 
+	[ObservableProperty]
+	public Entry barcodeEntry;
+
 	public ObservableCollection<OutputSalesBasketModel> Items { get; } = new();
 
 	public ObservableCollection<GroupLocationTransactionModel> LocationTransactions { get; } = new();
 	public ObservableCollection<SeriLotTransactionModel> SeriLotTransactions { get; } = new();
 
-	public OutputProductSalesProcessBasketListViewModel(IHttpClientService httpClientService, ILocationTransactionService locationTransactionService, ISeriLotTransactionService seriLotTransactionService, IUserDialogs userDialogs)
+	public OutputProductSalesProcessBasketListViewModel(IHttpClientService httpClientService, ILocationTransactionService locationTransactionService, ISeriLotTransactionService seriLotTransactionService, IUserDialogs userDialogs, IBarcodeSearchHelper barcodeSearchHelper)
 	{
 		_httpClientService = httpClientService;
 		_locationTransactionService = locationTransactionService;
 		_seriLotTransactionService = seriLotTransactionService;
 		_userDialogs = userDialogs;
+		_barcodeSearchHelper = barcodeSearchHelper;
+
 		Title = "Sepet Listesi";
 		Items.Clear();
 
 		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
+		PerformSearchCommand = new Command<Entry>(async (x) => await PerformSearchAsync(x));
 		IncreaseCommand = new Command<OutputSalesBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<OutputSalesBasketModel>(async (item) => await DecreaseAsync(item));
 		DeleteItemCommand = new Command<OutputSalesBasketModel>(async (item) => await DeleteItemAsync(item));
@@ -84,6 +92,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 	public Page CurrentPage { get; set; } = null!;
 
 	public Command ShowProductViewCommand { get; }
+	public Command PerformSearchCommand { get; }
 	public Command<OutputSalesBasketModel> IncreaseCommand { get; }
 	public Command<OutputSalesBasketModel> DecreaseCommand { get; }
 	public Command<OutputSalesBasketModel> DeleteItemCommand { get; }
@@ -127,6 +136,42 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 		}
 		finally
 		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task PerformSearchAsync(Entry barcodeEntry)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			if (string.IsNullOrEmpty(barcodeEntry.Text))
+				return;
+
+			IsBusy = true;
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			await _barcodeSearchHelper.BarcodeDetectedAsync(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				barcode: barcodeEntry.Text,
+				comingPage: "OutputProductSalesProcessBasketListViewModel"
+			);
+
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			BarcodeEntry.Text = string.Empty;
 			IsBusy = false;
 		}
 	}

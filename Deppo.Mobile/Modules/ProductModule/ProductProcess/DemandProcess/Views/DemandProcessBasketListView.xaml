@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentPage x:Class="Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.Views.DemandProcessBasketListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.Views.DemandProcessBasketListView"
-             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewModels"
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:model="clr-namespace:Deppo.Mobile.Core.Models.BasketModels;assembly=Deppo.Mobile.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewModels"
              Title="{Binding Title}"
-             x:DataType="viewModel:DemandProcessBasketListViewModel"
              Padding="10"
+             x:DataType="viewModel:DemandProcessBasketListViewModel"
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
-                                   StatusBarStyle="Default" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -24,8 +23,7 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android"
-                Value="artboard.png" />
+            <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
@@ -63,21 +61,19 @@
                     Stroke="{StaticResource Primary}"
                     StrokeShape="RoundRectangle 5"
                     StrokeThickness="0.5">
-                <SearchBar x:Name="searchBar"
-                           Placeholder="Ara..."
-                           PlaceholderColor="{StaticResource OffBlack}"
-                           TextColor="{StaticResource OffBlack}">
-                    <!-- <SearchBar.Behaviors>
-    <toolkit:EventToCommandBehavior
-        Command="{Binding PerformSearchCommand}"
-        CommandParameter="{Binding Text, Source={x:Reference searchBar}}"
-        EventName="SearchButtonPressed" />
-</SearchBar.Behaviors>-->
-                </SearchBar>
+                <Entry x:Name="barcodeEntry"
+                       Placeholder="Barkod tara..."
+                       PlaceholderColor="{StaticResource OffBlack}"
+                       TextColor="{StaticResource OffBlack}">
+                    <Entry.Behaviors>
+                        <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                        CommandParameter="{Binding ., Source={x:Reference barcodeEntry}}"
+                                                        EventName="TextChanged" />
+                    </Entry.Behaviors>
+                </Entry>
             </Border>
 
-            <CollectionView Grid.Row="1"
-                            ItemsSource="{Binding Items}">
+            <CollectionView Grid.Row="1" ItemsSource="{Binding Items}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:DemandProcessBasketModel">
                         <SwipeView Threshold="100">
@@ -110,8 +106,7 @@
                             <Border Padding="5"
                                     BackgroundColor="Transparent"
                                     StrokeThickness="0.1">
-                                <Grid ColumnDefinitions=".20*,.80*"
-                                      ColumnSpacing="10">
+                                <Grid ColumnDefinitions=".20*,.80*" ColumnSpacing="10">
                                     <Border Grid.Column="0"
                                             BackgroundColor="{StaticResource Secondary}"
                                             StrokeShape="RoundRectangle 5"
@@ -146,22 +141,22 @@
                                                 </Label.FormattedText>
                                             </Label>
                                             <Label>
-                                                    <Label.FormattedText>
-                                                        <FormattedString>
-                                                            <Span FontAttributes="Bold"
-                                                                  FontFamily="FAS"
-                                                                  Text="{x:Static fontAwesome:FontAwesomeIcons.Shield}"
-                                                                  TextColor="{StaticResource Primary}" />
-                                                            <Span Text=" " />
-                                                            <Span FontAttributes="Bold"
-                                                                  Text="{Binding SafeLevel, StringFormat='{0:N2}'}"
-                                                                  TextColor="{StaticResource Primary}" />
-                                                        </FormattedString>
-                                                    </Label.FormattedText>
-                                                </Label>
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span FontAttributes="Bold"
+                                                              FontFamily="FAS"
+                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Shield}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding SafeLevel, StringFormat='{0:N2}'}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
 
                                         </HorizontalStackLayout>
-                                        
+
                                         <Grid ColumnDefinitions="Auto, *">
                                             <Grid Grid.Column="0"
                                                   ColumnDefinitions="Auto, Auto,Auto"
@@ -200,8 +195,7 @@
                                                            TextColor="{StaticResource Secondary}" />
 
                                                     <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:DemandProcessBasketListViewModel}}, Path=DecreaseCommand}"
-                                                                              CommandParameter="{Binding .}" />
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:DemandProcessBasketListViewModel}}, Path=DecreaseCommand}" CommandParameter="{Binding .}" />
                                                     </Border.GestureRecognizers>
                                                 </Border>
                                                 <Label Grid.Column="1"
@@ -221,8 +215,7 @@
                                                            TextColor="{StaticResource White}" />
 
                                                     <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:DemandProcessBasketListViewModel}}, Path=IncreaseCommand}"
-                                                                              CommandParameter="{Binding .}" />
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:DemandProcessBasketListViewModel}}, Path=IncreaseCommand}" CommandParameter="{Binding .}" />
                                                     </Border.GestureRecognizers>
                                                 </Border>
                                             </Grid>
@@ -242,9 +235,7 @@
                     Command="{Binding NextViewCommand}"
                     Text="İleri" />
         </Grid>
-        <VerticalStackLayout Grid.Row="1"
-                             Spacing="5">
-        </VerticalStackLayout>
+        <VerticalStackLayout Grid.Row="1" Spacing="5" />
         <dx:BottomSheet x:Name="productTypeBottomSheet"
                         AllowDismiss="True"
                         BackgroundColor="White"
@@ -255,17 +246,14 @@
             <Grid Padding="10"
                   RowDefinitions="Auto,*"
                   RowSpacing="20">
-                <VerticalStackLayout Grid.Row="0"
-                                     Spacing="5">
+                <VerticalStackLayout Grid.Row="0" Spacing="5">
                     <Label Padding="10"
                            FontAttributes="Bold"
                            FontSize="Subtitle"
                            Text="İşlem Türünü Seçiniz" />
-                    <BoxView HeightRequest="2"
-                             Color="{StaticResource Primary}" />
+                    <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
                 </VerticalStackLayout>
-                <VerticalStackLayout Grid.Row="1"
-                                     Spacing="10">
+                <VerticalStackLayout Grid.Row="1" Spacing="10">
                     <Border Padding="10"
                             BackgroundColor="Transparent"
                             StrokeShape="RoundRectangle 10"
@@ -274,8 +262,7 @@
                             <TapGestureRecognizer Command="{Binding SelectProductsCommand}" />
                         </Border.GestureRecognizers>
 
-                        <Label TextColor="{StaticResource Gray600}"
-                               VerticalOptions="Center">
+                        <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
                             <Label.FormattedText>
                                 <FormattedString>
                                     <Span FontAttributes="Bold"
@@ -299,8 +286,7 @@
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding SelectVariantsCommand}" />
                         </Border.GestureRecognizers>
-                        <Label TextColor="{StaticResource Gray600}"
-                               VerticalOptions="Center">
+                        <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
                             <Label.FormattedText>
                                 <FormattedString>
                                     <Span FontAttributes="Bold"

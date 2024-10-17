@@ -15,6 +15,7 @@ using DevExpress.Maui.Controls;
 using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 using System.Collections.ObjectModel;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.Views;
+using Deppo.Mobile.Helpers.BarcodeHelper;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewModels
 {
@@ -24,7 +25,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
         private readonly IHttpClientService _httpClientService;
         private readonly IUserDialogs _userDialogs;
         private readonly IServiceProvider _serviceProvider;
-
+        private readonly IBarcodeSearchHelper _barcodeSearchHelper;
 
         [ObservableProperty]
         WarehouseModel warehouseModel = null!;
@@ -32,39 +33,39 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
         [ObservableProperty]
         DemandProcessBasketModel? selectedItem;
 
+		[ObservableProperty]
+		public Entry barcodeEntry;
 
-        #region Collections
-        public ObservableCollection<DemandProcessBasketModel> Items { get; } = new();
+		#region Collections
+		public ObservableCollection<DemandProcessBasketModel> Items { get; } = new();
 
-        #endregion
+		#endregion
 
-        public DemandProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IServiceProvider serviceProvider)
-        {
-            _httpClientService = httpClientService;
+		public DemandProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IServiceProvider serviceProvider, IBarcodeSearchHelper barcodeSearchHelper)
+		{
+			_httpClientService = httpClientService;
+			_userDialogs = userDialogs;
+			_serviceProvider = serviceProvider;
+			_barcodeSearchHelper = barcodeSearchHelper;
 
-            _userDialogs = userDialogs;
-            _serviceProvider = serviceProvider;
+			Title = "Sepet Listesi";
 
-            Title = "Sepet Listesi";
+			ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
+            PerformSearchCommand = new Command<Entry>(async (barcodeEntry) => await PerformSearchAsync(barcodeEntry));
+			IncreaseCommand = new Command<DemandProcessBasketModel>(async (item) => await IncreaseAsync(item));
+			DecreaseCommand = new Command<DemandProcessBasketModel>(async (item) => await DecreaseAsync(item));
+			DeleteItemCommand = new Command<DemandProcessBasketModel>(async (item) => await DeleteItemAsync(item));
+			NextViewCommand = new Command(async () => await NextViewAsync());
+			BackCommand = new Command(async () => await BackAsync());
+			CameraTappedCommand = new Command(async () => await CameraTappedAsync());
+			SelectProductsCommand = new Command(async () => await SelectProductsAsync());
+			SelectVariantsCommand = new Command(async () => await SelectVariantsAsync());
+		}
 
-            ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
-            IncreaseCommand = new Command<DemandProcessBasketModel>(async (item) => await IncreaseAsync(item));
-            DecreaseCommand = new Command<DemandProcessBasketModel>(async (item) => await DecreaseAsync(item));
-            DeleteItemCommand = new Command<DemandProcessBasketModel>(async (item) => await DeleteItemAsync(item));
-            NextViewCommand = new Command(async () => await NextViewAsync());
-            BackCommand = new Command(async () => await BackAsync());
-            CameraTappedCommand = new Command(async () => await CameraTappedAsync());
-            SelectProductsCommand = new Command(async () => await SelectProductsAsync());
-            SelectVariantsCommand = new Command(async () => await SelectVariantsAsync());
-
-        }
-
-        #region Properties
-        public ContentPage CurrentPage { get; set; } = null!;
-
-        #endregion
+		public ContentPage CurrentPage { get; set; } = null!;
 
         #region Commands
+        public Command PerformSearchCommand { get; }
         public Command ShowProductViewCommand { get; }
         public Command IncreaseCommand { get; }
         public Command DecreaseCommand { get; }
@@ -74,10 +75,46 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
         public Command CameraTappedCommand { get; }
         public Command SelectProductsCommand { get; }
         public Command SelectVariantsCommand { get; }
-        #endregion
+		#endregion
 
 
-        private async Task ShowProductViewAsync()
+		private async Task PerformSearchAsync(Entry barcodeEntry)
+		{
+			if (IsBusy)
+				return;
+			try
+			{
+				if (string.IsNullOrEmpty(barcodeEntry.Text))
+					return;
+
+				IsBusy = true;
+
+				var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+				await _barcodeSearchHelper.BarcodeDetectedAsync(
+					httpClient: httpClient,
+					firmNumber: _httpClientService.FirmNumber,
+					periodNumber: _httpClientService.PeriodNumber,
+					barcode: barcodeEntry.Text,
+					comingPage: "DemandProcessBasketListViewModel"
+				);
+
+			}
+			catch (Exception ex)
+			{
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
+
+				await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+			}
+			finally
+			{
+				BarcodeEntry.Text = string.Empty;
+				IsBusy = false;
+			}
+		}
+
+		private async Task ShowProductViewAsync()
         {
             if (IsBusy)
                 return;
