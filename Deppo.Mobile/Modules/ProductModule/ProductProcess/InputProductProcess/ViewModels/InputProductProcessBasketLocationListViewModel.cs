@@ -529,6 +529,7 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
                 var inputTotalQuantity = SelectedItems.Sum(x => x.InputQuantity);
                 basketItem.Quantity = inputTotalQuantity;
             }
+            SelectedItems.Clear();
 
             await Shell.Current.GoToAsync("..");
             _userDialogs.HideHud();
