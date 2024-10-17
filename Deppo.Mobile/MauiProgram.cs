@@ -387,7 +387,7 @@ public static class MauiProgram
         #region ProductionInput Modules
 
         builder.Services.AddTransientWithShellRoute<InputProductProcessWarehouseListView, InputProductProcessWarehouseListViewModel>(nameof(InputProductProcessWarehouseListView));
-        builder.Services.AddScopedWithShellRoute<InputProductProcessBasketListView, InputProductProcessBasketListViewModel>(nameof(InputProductProcessBasketListView));
+        builder.Services.AddSingletonWithShellRoute<InputProductProcessBasketListView, InputProductProcessBasketListViewModel>(nameof(InputProductProcessBasketListView));
         builder.Services.AddScopedWithShellRoute<InputProductProcessBasketLocationListView, InputProductProcessBasketLocationListViewModel>(nameof(InputProductProcessBasketLocationListView));
         builder.Services.AddScopedWithShellRoute<InputProductProcessBasketSeriLotListView, InputProductProcessBasketSeriLotListViewModel>(nameof(InputProductProcessBasketSeriLotListView));
         builder.Services.AddTransientWithShellRoute<InputProductProcessProductListView, InputProductProcessProductListViewModel>(nameof(InputProductProcessProductListView));
@@ -398,7 +398,7 @@ public static class MauiProgram
         #region OutputProductProcess Modules
 
         builder.Services.AddTransientWithShellRoute<OutputProductProcessWarehouseListView, OutputProductProcessWarehouseListViewModel>(nameof(OutputProductProcessWarehouseListView));
-        builder.Services.AddScopedWithShellRoute<OutputProductProcessBasketListView, OutputProductProcessBasketListViewModel>(nameof(OutputProductProcessBasketListView));
+        builder.Services.AddSingletonWithShellRoute<OutputProductProcessBasketListView, OutputProductProcessBasketListViewModel>(nameof(OutputProductProcessBasketListView));
         builder.Services.AddScopedWithShellRoute<OutputProductProcessProductListView, OutputProductProcessProductListViewModel>(nameof(OutputProductProcessProductListView));
         builder.Services.AddTransientWithShellRoute<OutputProductProcessFormView, OutputProductProcessFormViewModel>(nameof(OutputProductProcessFormView));
 
@@ -407,7 +407,7 @@ public static class MauiProgram
         #region DemandProcess Modules
 
         builder.Services.AddTransientWithShellRoute<DemandProcessWarehouseListView, DemandProcessWarehouseListViewModel>(nameof(DemandProcessWarehouseListView));
-        builder.Services.AddScopedWithShellRoute<DemandProcessBasketListView, DemandProcessBasketListViewModel>(nameof(DemandProcessBasketListView));
+        builder.Services.AddSingletonWithShellRoute<DemandProcessBasketListView, DemandProcessBasketListViewModel>(nameof(DemandProcessBasketListView));
         builder.Services.AddScopedWithShellRoute<DemandProcessProductListView, DemandProcessProductListViewModel>(nameof(DemandProcessProductListView));
         builder.Services.AddScopedWithShellRoute<DemandProcessVariantListView, DemandProcessVariantListViewModel>(nameof(DemandProcessVariantListView));
         builder.Services.AddTransientWithShellRoute<DemandProcessFormView, DemandProcessFormViewModel>(nameof(DemandProcessFormView));
@@ -418,7 +418,7 @@ public static class MauiProgram
 
         builder.Services.AddTransientWithShellRoute<TransferOutWarehouseListView, TransferOutWarehouseListViewModel>(nameof(TransferOutWarehouseListView));
         builder.Services.AddScopedWithShellRoute<TransferOutProductListView, TransferOutProductListViewModel>(nameof(TransferOutProductListView));
-        builder.Services.AddScopedWithShellRoute<TransferOutBasketView, TransferOutBasketViewModel>(nameof(TransferOutBasketView));
+        builder.Services.AddSingletonWithShellRoute<TransferOutBasketView, TransferOutBasketViewModel>(nameof(TransferOutBasketView));
         builder.Services.AddScopedWithShellRoute<TransferInWarehouseView, TransferInWarehouseViewModel>(nameof(TransferInWarehouseView));
         builder.Services.AddScopedWithShellRoute<TransferInBasketView, TransferInBasketViewModel>(nameof(TransferInBasketView));
         builder.Services.AddScopedWithShellRoute<TransferFormView, TransferFormViewModel>(nameof(TransferFormView));
@@ -461,7 +461,7 @@ public static class MauiProgram
 
         builder.Services.AddTransientWithShellRoute<OutputProductSalesProcessWarehouseListView, OutputProductSalesProcessWarehouseListViewModel>(nameof(OutputProductSalesProcessWarehouseListView));
         builder.Services.AddScopedWithShellRoute<OutputProductSalesProcessCustomerListView, OutputProductSalesProcessCustomerListViewModel>(nameof(OutputProductSalesProcessCustomerListView));
-        builder.Services.AddScopedWithShellRoute<OutputProductSalesProcessBasketListView, OutputProductSalesProcessBasketListViewModel>(nameof(OutputProductSalesProcessBasketListView));
+        builder.Services.AddSingletonWithShellRoute<OutputProductSalesProcessBasketListView, OutputProductSalesProcessBasketListViewModel>(nameof(OutputProductSalesProcessBasketListView));
         builder.Services.AddScopedWithShellRoute<OutputProductSalesProcessProductListView, OutputProductSalesProcessProductListViewModel>(nameof(OutputProductSalesProcessProductListView));
         builder.Services.AddScopedWithShellRoute<OutputProductSalesProcessFormView, OutputProductSalesProcessFormViewModel>(nameof(OutputProductSalesProcessFormView));
 
@@ -473,7 +473,7 @@ public static class MauiProgram
         builder.Services.AddScopedWithShellRoute<OutputProductSalesOrderProcessCustomerListView, OutputProductSalesOrderProcessCustomerListViewModel>(nameof(OutputProductSalesOrderProcessCustomerListView));
         builder.Services.AddScopedWithShellRoute<OutputProductSalesOrderProcessProductListView, OutputProductSalesOrderProcessProductListViewModel>(nameof(OutputProductSalesOrderProcessProductListView));
         builder.Services.AddScopedWithShellRoute<OutputProductSalesOrderProcessOrderListView, OutputProductSalesOrderProcessOrderListViewModel>(nameof(OutputProductSalesOrderProcessOrderListView));
-        builder.Services.AddScopedWithShellRoute<OutputProductSalesOrderProcessBasketListView, OutputProductSalesOrderProcessBasketListViewModel>(nameof(OutputProductSalesOrderProcessBasketListView));
+        builder.Services.AddSingletonWithShellRoute<OutputProductSalesOrderProcessBasketListView, OutputProductSalesOrderProcessBasketListViewModel>(nameof(OutputProductSalesOrderProcessBasketListView));
         builder.Services.AddScopedWithShellRoute<OutputProductSalesOrderProcessFormView, OutputProductSalesOrderProcessFormViewModel>(nameof(OutputProductSalesOrderProcessFormView));
 
         #endregion Siparise Bagli Sevk Islemleri
@@ -491,7 +491,7 @@ public static class MauiProgram
 
         builder.Services.AddTransientWithShellRoute<ReturnSalesWarehouseListView, ReturnSalesWarehouseListViewModel>(nameof(ReturnSalesWarehouseListView));
 
-        builder.Services.AddScopedWithShellRoute<ReturnSalesBasketView, ReturnSalesBasketViewModel>(nameof(ReturnSalesBasketView));
+        builder.Services.AddSingletonWithShellRoute<ReturnSalesBasketView, ReturnSalesBasketViewModel>(nameof(ReturnSalesBasketView));
         builder.Services.AddScopedWithShellRoute<ReturnSalesProductListView, ReturnSalesProductListViewModel>(nameof(ReturnSalesProductListView));
         builder.Services.AddScopedWithShellRoute<ReturnSalesBasketLocationListView, ReturnSalesBasketLocationListViewModel>(nameof(ReturnSalesBasketLocationListView));
         builder.Services.AddScopedWithShellRoute<ReturnSalesBasketSeriLotListView, ReturnSalesBasketSeriLotListViewModel>(nameof(ReturnSalesBasketSeriLotListView));
@@ -561,7 +561,7 @@ public static class MauiProgram
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseProcessWarehouseListView, InputProductPurchaseProcessWarehouseListViewModel>(nameof(InputProductPurchaseProcessWarehouseListView));
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseProcessSupplierListView, InputProductPurchaseProcessSupplierListViewModel>(nameof(InputProductPurchaseProcessSupplierListView));
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseProcessProductListView, InputProductPurchaseProcessProductListViewModel>(nameof(InputProductPurchaseProcessProductListView));
-        builder.Services.AddScopedWithShellRoute<InputProductPurchaseProcessBasketListView, InputProductPurchaseProcessBasketListViewModel>(nameof(InputProductPurchaseProcessBasketListView));
+        builder.Services.AddSingletonWithShellRoute<InputProductPurchaseProcessBasketListView, InputProductPurchaseProcessBasketListViewModel>(nameof(InputProductPurchaseProcessBasketListView));
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseProcessBasketLocationListView,
 InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurchaseProcessBasketLocationListView));
 
@@ -576,7 +576,7 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessWarehouseListView, InputProductPurchaseOrderProcessWarehouseListViewModel>(nameof(InputProductPurchaseOrderProcessWarehouseListView));
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessSupplierListView, InputProductPurchaseOrderProcessSupplierListViewModel>(nameof(InputProductPurchaseOrderProcessSupplierListView));
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessProductListView, InputProductPurchaseOrderProcessProductListViewModel>(nameof(InputProductPurchaseOrderProcessProductListView));
-        builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessBasketListView, InputProductPurchaseOrderProcessBasketListViewModel>(nameof(InputProductPurchaseOrderProcessBasketListView));
+        builder.Services.AddSingletonWithShellRoute<InputProductPurchaseOrderProcessBasketListView, InputProductPurchaseOrderProcessBasketListViewModel>(nameof(InputProductPurchaseOrderProcessBasketListView));
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessOrderListView, InputProductPurchaseOrderProcessOrderListViewModel>(nameof(InputProductPurchaseOrderProcessOrderListView));
 
         builder.Services.AddScopedWithShellRoute<InputProductPurchaseOrderProcessBasketLocationListView, InputProductPurchaseOrderProcessBasketLocationListViewModel>(nameof(InputProductPurchaseOrderProcessBasketLocationListView));
@@ -593,7 +593,7 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
 
         builder.Services.AddTransientWithShellRoute<ReturnPurchaseWarehouseListView, ReturnPurchaseWarehouseListViewModel>(nameof(ReturnPurchaseWarehouseListView));
         builder.Services.AddScopedWithShellRoute<ReturnPurchaseProductListView, ReturnPurchaseProductListViewModel>(nameof(ReturnPurchaseProductListView));
-        builder.Services.AddScopedWithShellRoute<ReturnPurchaseBasketView, ReturnPurchaseBasketViewModel>(nameof(ReturnPurchaseBasketView));
+        builder.Services.AddSingletonWithShellRoute<ReturnPurchaseBasketView, ReturnPurchaseBasketViewModel>(nameof(ReturnPurchaseBasketView));
         builder.Services.AddScopedWithShellRoute<ReturnPurchaseFormView, ReturnPurchaseFormViewModel>(nameof(ReturnPurchaseFormView));
 
         #endregion Satınalma İade İşlemleri
