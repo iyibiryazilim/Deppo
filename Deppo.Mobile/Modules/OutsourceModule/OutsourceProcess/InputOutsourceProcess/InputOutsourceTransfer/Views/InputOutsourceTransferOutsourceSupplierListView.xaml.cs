@@ -11,5 +11,7 @@ public partial class InputOutsourceTransferOutsourceSupplierListView : ContentPa
         InitializeComponent();
         _viewModel = viewModel;
         BindingContext = _viewModel;
+        _viewModel.CurrentPage = this;
+        _viewModel.SearchText = searchBar;
     }
 }
