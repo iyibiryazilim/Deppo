@@ -574,7 +574,7 @@ namespace Deppo.Core.DataStores
             [FicheDate] = STFICHE.DATE_,
             [FicheTime] = dbo.LG_INTTOTIME(STFICHE.FTIME),
 			[DocumentNumber] =ISNULL (STFICHE.DOCODE , ''),
-			[DocumentDate] =  STFICHE.DOCDATE,
+			[DocumentDate] =  ISNULL(STFICHE.DOCDATE,''),
 			[SpecialCode] = ISNULL  ( STFICHE.SPECODE , ''),
 			[CurrentReferenceID] = ISNULL ( CLCARD.LOGICALREF, 0),
 			[CurrentCode] = ISNULL (CLCARD.CODE , '' ),

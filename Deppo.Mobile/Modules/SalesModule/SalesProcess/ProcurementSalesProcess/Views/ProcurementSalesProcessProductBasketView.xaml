@@ -53,21 +53,20 @@
                         Margin="5,0,5,0"
                         Padding="0"
                         BackgroundColor="{StaticResource PrimaryLight}"
-                        HeightRequest="35"
+                        HeightRequest="40"
                         Stroke="{StaticResource Primary}"
                         StrokeShape="RoundRectangle 5"
                         StrokeThickness="0.5">
-                    <SearchBar x:Name="searchBar"
-                               Placeholder="Ara..."
-                               PlaceholderColor="{StaticResource OffBlack}"
-                               TextColor="{StaticResource OffBlack}">
-                        <!-- <SearchBar.Behaviors>
-              <toolkit:EventToCommandBehavior
-                  Command="{Binding PerformSearchCommand}"
-                  CommandParameter="{Binding Text, Source={x:Reference searchBar}}"
-                  EventName="SearchButtonPressed" />
-          </SearchBar.Behaviors>-->
-                    </SearchBar>
+                    <Entry x:Name="barcodeEntry"
+                           Placeholder="Barkod tara..."
+                           PlaceholderColor="{StaticResource OffBlack}"
+                           TextColor="{StaticResource OffBlack}">
+                        <Entry.Behaviors>
+                            <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                            CommandParameter="{Binding ., Source={x:Reference barcodeEntry}}"
+                                                            EventName="TextChanged" />
+                        </Entry.Behaviors>
+                    </Entry>
                 </Border>
 
                 <CollectionView Grid.Row="1"
@@ -215,8 +214,8 @@
 
                 <Button Grid.Row="2"
                         Margin="5,10,5,10"
-                        Command="{Binding NextViewCommand}"
-                        Text="İleri" />
+                        Command="{Binding ConfirmCommand}"
+                        Text="Koliye Ekle" />
             </Grid>
 
         </Grid>

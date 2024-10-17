@@ -65,6 +65,10 @@ namespace Deppo.Core.DataStores
     [CustomerReferenceId] = CLCARD.LOGICALREF,
     [CustomerCode] = CLCARD.CODE,
     [CustomerName] = CLCARD.DEFINITION_,
+    CASE
+        WHEN CLCARD.ACCEPTEDESP = 0 THEN 0
+        ELSE 1
+    END AS [IsEDispatch],
     [ProductReferenceCount] = COUNT(DISTINCT STLINE.STOCKREF),
     [Country] = CLCARD.COUNTRY,
     [City] = CLCARD.CITY,
@@ -77,7 +81,7 @@ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().Pa
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_SHIPINFO AS SHIPADRESS ON STFICHE.SHIPINFOREF = SHIPADRESS.LOGICALREF
 WHERE
    STFICHE.TRCODE = 25 AND
-   CLCARD.SUBCONT = 0 AND CLCARD.ACCEPTEDESP = 0 AND CLCARD.LOGICALREF IS NOT NULL AND  STFICHE.SOURCEINDEX = {warehouseNumber}";
+   CLCARD.SUBCONT = 0 AND CLCARD.ACCEPTEDESP = 0 AND CLCARD.LOGICALREF IS NOT NULL AND  STFICHE.DESTINDEX = {warehouseNumber}";
 
             if (!string.IsNullOrEmpty(search))
                 baseQuery += $@" AND (CLCARD.CODE LIKE '{search}%' OR CLCARD.DEFINITION_ LIKE '%{search}%')";

@@ -8,6 +8,7 @@
              xmlns:model="clr-namespace:Deppo.Mobile.Core.Models.ProcurementModels.ProcurementSalesModels;assembly=Deppo.Mobile.Core"
              Title="{Binding Title}"
              x:DataType="viewModel:ProcurementSalesProcessBasketProductListViewModel"
+             Padding="10"
              Shell.TabBarIsVisible="False"
              Shell.PresentationMode="Modal">
     <ContentPage.Behaviors>
@@ -39,7 +40,7 @@
             <Label Grid.Column="0"
                    FontAttributes="Bold"
                    FontSize="Medium"
-                   Text="Ürün Listesi"
+                   Text="Koliye Eklenecek Ürünleri Seçiniz"
                    TextColor="{StaticResource WhiteSmoke}"
                    VerticalOptions="Center" />
 

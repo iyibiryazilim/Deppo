@@ -10,6 +10,8 @@ public partial class ProcurementSalesPackageBasketView : ContentPage
 		InitializeComponent();
         _viewModel = viewModel;
         BindingContext = _viewModel;
-        
+        _viewModel.CurrentPage = this;
+
+
     }
 }

@@ -41,7 +41,7 @@
             <Label Grid.Column="0"
                    FontAttributes="Bold"
                    FontSize="Medium"
-                   Text="Ürün Listesi"
+                   Text="Koli Listesi"
                    TextColor="{StaticResource WhiteSmoke}"
                    VerticalOptions="Center" />
 

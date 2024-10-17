@@ -1,12 +1,17 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.ProcurementModels.ProcurementSalesModels;
+using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.Views;
+using DevExpress.Maui.Controls;
+using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.ViewModels
@@ -19,18 +24,19 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
         private readonly IHttpClientService _httpClientService;
         private readonly IServiceProvider _serviceProvider;
 
+
         [ObservableProperty]
         private WarehouseModel warehouseModel = null!;
 
         [ObservableProperty]
-        private ProcurementPackageBasketModel? selectedPackageBasketModel;
+        public ProcurementPackageBasketModel? selectedPackageBasketModel = new();
 
         [ObservableProperty]
-        private ProcurementSalesCustomerModel procurementSalesCustomerModel = null!;
+        public ProcurementSalesCustomerModel procurementSalesCustomerModel = null!;
 
         public ObservableCollection<ProcurementPackageBasketModel> Items { get; } = new();
 
-        public ProcurementSalesPackageBasketViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, IServiceProvider serviceProvider)
+        public ProcurementSalesPackageBasketViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, IServiceProvider serviceProvider )
         {
             _userDialogs = userDialogs;
             _httpClientService = httpClientService;
@@ -43,6 +49,8 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
             NextViewCommand = new Command(async () => await NextViewAsync());
             BackCommand = new Command(async () => await BackAsync());
             ItemTappedCommand = new Command<ProcurementPackageBasketModel>(async (item) => await ItemTappedAsync(item));
+            SwipeItemCommand = new Command<ProcurementPackageBasketModel>(async (item) => await SwipeViewAsync(item));
+
 
             Items.Clear();
         }
@@ -56,6 +64,8 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
         public Command NextViewCommand { get; }
         public Command BackCommand { get; }
         public Command ItemTappedCommand { get; }
+        public Command SwipeItemCommand { get; }
+
 
         private async Task ShowProductViewAsync()
         {
@@ -90,6 +100,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
             {
                 IsBusy = true;
 
+                SelectedPackageBasketModel = item;
                 await Shell.Current.GoToAsync($"{nameof(ProcurementSalesProcessProductBasketView)}", new Dictionary<string, object>
                 {
                     {nameof(WarehouseModel), WarehouseModel},
@@ -152,16 +163,53 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
                     await _userDialogs.AlertAsync("Sepetinizde ürün bulunmamaktadır.", "Hata", "Tamam");
                     return;
                 }
+                if (Items.All(item => item.PackageProducts.Count == 0))
+                {
+                    await _userDialogs.AlertAsync("Kolilerin içinde ürün bulunmamaktadır.", "Hata", "Tamam");
+                    return;
+                }
 
-                await Shell.Current.GoToAsync($"{nameof(InputProductProcessFormView)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"{nameof(ProcurementSalesProcessFormView)}", new Dictionary<string, object>
                 {
                     [nameof(WarehouseModel)] = WarehouseModel,
-                    [nameof(Items)] = Items
+                    [nameof(ProcurementSalesCustomerModel)] = ProcurementSalesCustomerModel,
+                    [nameof(Items)] = Items.Where(x => x.PackageProducts.Count > 0).ToList()
                 });
             }
             catch (Exception ex)
             {
                 await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task SwipeViewAsync(ProcurementPackageBasketModel item)
+        {
+            if (IsBusy)
+                return;
+
+            try
+            {
+                IsBusy = true;
+
+
+                await Task.Delay(200);
+                SelectedPackageBasketModel = item;
+
+                CurrentPage.FindByName<BottomSheet>("productsBottomSheet").State = BottomSheetState.HalfExpanded;
+
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+            }
+            catch (System.Exception)
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                _userDialogs.Alert("Bir hata oluştu. Lütfen tekrar deneyiniz.", "Hata", "Tamam");
             }
             finally
             {
@@ -198,6 +246,8 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
                 IsBusy = false;
             }
         }
+
+       
 
     }
 }
