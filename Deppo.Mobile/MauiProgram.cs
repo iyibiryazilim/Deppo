@@ -340,6 +340,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IProcurementByCustomerBasketService, ProcurementByCustomerBasketDataStore>();
         builder.Services.AddSingleton<IProcurementSalesCustomerService, ProcurementSalesCustomerDataStore>();
         builder.Services.AddSingleton<IPackageProductService, PackageProductDataStore>();
+        builder.Services.AddSingleton<IProcurementSalesProductService, ProcurementSalesProductDataStore>();
 
         builder.Services.AddSingleton<IOutsourceDetailInputProductService, OutsourceDetailInputProductDataStore>();
         builder.Services.AddSingleton<IOutsourceDetailOutputProductService, OutsourceDetailOutputProductDataStore>();

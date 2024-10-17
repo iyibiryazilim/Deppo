@@ -19,6 +19,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -63,97 +64,69 @@
                             RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="procurementSalesCustomerModel:ProcurementSalesCustomerModel">
-                        <SwipeView Threshold="100">
-                            <SwipeView.RightItems>
-                                <SwipeItems Mode="Execute">
-                                    <SwipeItemView BackgroundColor="{StaticResource SecondaryLight}"
-                                                   Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementSalesProcessCustomerListViewModel}}, Path=SwipeItemCommand}"
-                                                   CommandParameter="{Binding .}">
-                                        <Label HorizontalOptions="Center"
-                                               TextColor="White"
-                                               VerticalOptions="Center">
+                        <Border StrokeShape="RoundRectangle 10"
+                                StrokeThickness="0.1">
+                            <Grid Padding="10"
+                                  ColumnDefinitions="Auto,*"
+                                  ColumnSpacing="10">
+                                <toolkit:AvatarView Background="{StaticResource PrimaryLight}"
+                                                    BorderColor="{StaticResource Primary}"
+                                                    CornerRadius="200"
+                                                    FontAttributes="Bold"
+                                                    FontSize="16"
+                                                    HeightRequest="50"
+                                                    Text="{Binding TitleName}"
+                                                    TextColor="{StaticResource OffBlack}"
+                                                    VerticalOptions="Start"
+                                                    WidthRequest="50" />
 
-                                            <Label.FormattedText>
-                                                <FormattedString>
-                                                    <Span FontAttributes="Bold"
-                                                          FontFamily="FAS"
-                                                          FontSize="Medium"
-                                                          Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                                                          TextColor="White" />
-                                                    <Span Text=" " />
-                                                    <Span FontSize="Medium"
-                                                          Text="Siparişler"
-                                                          TextColor="White" />
-                                                </FormattedString>
-                                            </Label.FormattedText>
-                                        </Label>
-                                    </SwipeItemView>
-                                </SwipeItems>
-                            </SwipeView.RightItems>
-                            <Border StrokeShape="RoundRectangle 10"
-                                    StrokeThickness="0.1">
-                                <Grid Padding="10"
-                                      ColumnDefinitions="Auto,*"
-                                      ColumnSpacing="10">
-                                    <toolkit:AvatarView Background="{StaticResource PrimaryLight}"
-                                                        BorderColor="{StaticResource Primary}"
-                                                        CornerRadius="200"
-                                                        FontAttributes="Bold"
-                                                        FontSize="16"
-                                                        HeightRequest="50"
-                                                        Text="{Binding TitleName}"
-                                                        TextColor="{StaticResource OffBlack}"
-                                                        VerticalOptions="Start"
-                                                        WidthRequest="50" />
+                                <VerticalStackLayout Grid.Column="1"
+                                                     Spacing="2">
+                                    <Label FontAttributes="Bold"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="1"
+                                           Text="{Binding CustomerName}" />
 
-                                    <VerticalStackLayout Grid.Column="1"
-                                                         Spacing="2">
-                                        <Label FontAttributes="Bold"
-                                               LineBreakMode="TailTruncation"
-                                               MaxLines="1"
-                                               Text="{Binding Name}" />
+                                    <Label>
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{Binding ShipAddressCode}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
 
-                                        <Label>
-                                            <Label.FormattedText>
-                                                <FormattedString>
-                                                    <Span Text="{Binding ShipAddressCode}" />
-                                                </FormattedString>
-                                            </Label.FormattedText>
-                                        </Label>
+                                    <Label>
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span FontFamily="FAS"
+                                                      Text="{x:Static fontAwesome:FontAwesomeIcons.Box}" />
+                                                <Span Text=" " />
+                                                <Span Text="{Binding ProductReferenceCount}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </VerticalStackLayout>
+                            </Grid>
+                            <Border.Triggers>
+                                <DataTrigger Binding="{Binding IsSelected}"
+                                             TargetType="Border"
+                                             Value="True">
+                                    <Setter Property="BackgroundColor"
+                                            Value="{StaticResource SecondaryLight}" />
+                                </DataTrigger>
 
-                                        <Label>
-                                            <Label.FormattedText>
-                                                <FormattedString>
-                                                    <Span FontFamily="FAS"
-                                                          Text="{x:Static fontAwesome:FontAwesomeIcons.Box}" />
-                                                    <Span Text=" " />
-                                                    <Span Text="{Binding ProductReferenceCount}" />
-                                                </FormattedString>
-                                            </Label.FormattedText>
-                                        </Label>
-                                    </VerticalStackLayout>
-                                </Grid>
-                                <Border.Triggers>
-                                    <DataTrigger Binding="{Binding IsSelected}"
-                                                 TargetType="Border"
-                                                 Value="True">
-                                        <Setter Property="BackgroundColor"
-                                                Value="{StaticResource SecondaryLight}" />
-                                    </DataTrigger>
-
-                                    <DataTrigger Binding="{Binding IsSelected}"
-                                                 TargetType="Border"
-                                                 Value="False">
-                                        <Setter Property="BackgroundColor"
-                                                Value="Transparent" />
-                                    </DataTrigger>
-                                </Border.Triggers>
-                                <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementSalesProcessCustomerListViewModel}}, Path=ItemTappedCommand}"
-                                                          CommandParameter="{Binding .}" />
-                                </Border.GestureRecognizers>
-                            </Border>
-                        </SwipeView>
+                                <DataTrigger Binding="{Binding IsSelected}"
+                                             TargetType="Border"
+                                             Value="False">
+                                    <Setter Property="BackgroundColor"
+                                            Value="Transparent" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementSalesProcessCustomerListViewModel}}, Path=ItemTappedCommand}"
+                                                      CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                        </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>

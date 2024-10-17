@@ -4,15 +4,17 @@ namespace Deppo.Mobile.Core.Models.ProcurementModels.ProcurementSalesModels
 {
     public partial class ProcurementSalesCustomerModel : ObservableObject
     {
-
         [ObservableProperty]
         private int referenceId;
 
         [ObservableProperty]
-        private string code = string.Empty;
+        private int customerReferenceId;
 
         [ObservableProperty]
-        private string name = string.Empty;
+        private string customerCode = string.Empty;
+
+        [ObservableProperty]
+        private string customerName = string.Empty;
 
         [ObservableProperty]
         private int productReferenceCount;
@@ -31,7 +33,7 @@ namespace Deppo.Mobile.Core.Models.ProcurementModels.ProcurementSalesModels
         [ObservableProperty]
         private string shipAddressName = string.Empty;
 
-        public string TitleName => Name?.Length > 2 ? Name.Substring(0, 2) : Name;
+        public string TitleName => CustomerName?.Length > 2 ? CustomerName.Substring(0, 2) : CustomerName;
 
         [ObservableProperty]
         private bool isSelected;
