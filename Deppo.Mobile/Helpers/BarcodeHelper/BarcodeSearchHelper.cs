@@ -422,6 +422,7 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 
 				var basketItem = new InputProductBasketModel
 				{
+					ReferenceId = Guid.NewGuid(),
 					ItemReferenceId = productModel.ReferenceId,
 					ItemCode = productModel.Code,
 					ItemName = productModel.Name,
@@ -470,6 +471,7 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 
 				var basketItem = new InputProductBasketModel
 				{
+					ReferenceId = Guid.NewGuid(),
 					ItemReferenceId = variantModel.ProductReferenceId,
 					ItemCode = variantModel.ProductCode,
 					ItemName = variantModel.ProductName,
@@ -518,6 +520,7 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 			{
 				var basketItem = new OutputProductBasketModel
 				{
+					ReferenceId = Guid.NewGuid(),
 					ItemReferenceId = productModel.ReferenceId,
 					ItemCode = productModel.Code,
 					ItemName = productModel.Name,
@@ -1028,10 +1031,11 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 			{
 				var basketItem = new OutputOutsourceTransferBasketModel
 				{
+					ReferenceId = new Guid(),
 					ItemReferenceId = productModel.ReferenceId,
 					ItemCode = productModel.Code,
 					ItemName = productModel.Name,
-					//Image = productModel.ImageData,
+					Image = productModel.ImageData,
 					UnitsetReferenceId = productModel.UnitsetReferenceId,
 					UnitsetCode = productModel.UnitsetCode,
 					UnitsetName = productModel.UnitsetName,

@@ -5,7 +5,7 @@ namespace Deppo.Mobile.Core.Models.BasketModels
 {
     public class DemandProcessBasketModel : INotifyPropertyChanged, IDisposable
     {
-        private Guid _referenceId;
+        private Guid? _referenceId;
         private int _itemReferenceId;
         private string _itemCode = string.Empty;
         private string _itemName = string.Empty;
@@ -40,7 +40,7 @@ namespace Deppo.Mobile.Core.Models.BasketModels
         }
 
         [Browsable(false)]
-        public Guid ReferenceId
+        public Guid? ReferenceId
         {
             get => _referenceId;
             set

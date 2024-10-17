@@ -11,6 +11,7 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcess.OutputOutsourceTransfer.ViewModels"
              Title="{Binding Title}"
+             x:DataType="viewModel:OutputOutsourceTransferBasketListViewModel"
              Shell.TabBarIsVisible="False">
 
     <Shell.BackButtonBehavior>
@@ -45,7 +46,7 @@
             <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
-    
+
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
             <On Platform="Android" Value="artboard.png" />
@@ -66,18 +67,20 @@
                     StrokeShape="RoundRectangle 5"
                     StrokeThickness="0.5">
                 <Entry x:Name="barcodeEntry"
-                           Placeholder="Barkod tara..."
-                           PlaceholderColor="{StaticResource OffBlack}"
-                           TextColor="{StaticResource OffBlack}">
+                       Placeholder="Barkod tara..."
+                       PlaceholderColor="{StaticResource OffBlack}"
+                       TextColor="{StaticResource OffBlack}">
                     <Entry.Behaviors>
                         <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
-                                                            CommandParameter="{Binding ., Source={x:Reference barcodeEntry}}"
-                                                            EventName="TextChanged" />
+                                                        CommandParameter="{Binding ., Source={x:Reference barcodeEntry}}"
+                                                        EventName="TextChanged" />
                     </Entry.Behaviors>
                 </Entry>
             </Border>
 
-            <CollectionView Grid.Row="1" ItemsSource="{Binding Items}">
+            <CollectionView x:Name="CollectionName"
+                            Grid.Row="1"
+                            ItemsSource="{Binding Items}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="basketModels:OutputOutsourceTransferBasketModel">
                         <SwipeView Threshold="100">
@@ -113,19 +116,37 @@
                                     StrokeThickness="0.1">
                                 <Grid ColumnDefinitions=".20*,.80*" ColumnSpacing="10">
                                     <Border Grid.Column="0"
-                                            BackgroundColor="{StaticResource Primary}"
                                             StrokeShape="RoundRectangle 5"
                                             StrokeThickness="0.5">
                                         <Image Grid.Column="0"
                                                HeightRequest="50"
-                                               Source="dotnet_bot.png"
+                                               Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                                WidthRequest="50" />
                                     </Border>
 
                                     <VerticalStackLayout Grid.Column="1">
-                                        <Label FontAttributes="Bold"
-                                               LineBreakMode="TailTruncation"
-                                               Text="{Binding ItemCode}" />
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <Label Grid.Column="0"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="Start"
+                                                   LineBreakMode="TailTruncation"
+                                                   Text="{Binding ItemCode}" />
+
+                                            <Image Grid.Column="1">
+                                                <Image.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferBasketListViewModel}}, Path=UnitActionTappedCommand}" CommandParameter="{Binding .}" />
+                                                </Image.GestureRecognizers>
+                                                <Image.Source>
+                                                    <FontImageSource FontFamily="FAS"
+                                                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.Ellipsis}"
+                                                                     Size="Medium"
+                                                                     Color="{StaticResource Gray600}" />
+                                                </Image.Source>
+                                            </Image>
+
+
+                                        </Grid>
+
                                         <Label LineBreakMode="TailTruncation"
                                                Text="{Binding ItemName}"
                                                TextColor="{StaticResource Gray600}" />
@@ -140,6 +161,9 @@
                                                     <Span Text=" " />
                                                     <Span FontAttributes="Bold"
                                                           Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                                          TextColor="{StaticResource Primary}" />
+                                                    <Span FontAttributes="Bold"
+                                                          Text="{Binding SubUnitsetCode, StringFormat='{0:N2}'}"
                                                           TextColor="{StaticResource Primary}" />
                                                 </FormattedString>
                                             </Label.FormattedText>
@@ -168,6 +192,7 @@
                                                        TextColor="{Binding TrackingTypeIconColor}" />
                                             </Grid>
 
+
                                             <Grid Grid.Column="1"
                                                   ColumnDefinitions="Auto,Auto,Auto"
                                                   ColumnSpacing="10"
@@ -179,8 +204,10 @@
                                                         StrokeShape="RoundRectangle 2">
                                                     <Label FontFamily="FAS"
                                                            FontSize="Medium"
+                                                           HorizontalOptions="Center"
                                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
-                                                           TextColor="{StaticResource Secondary}" />
+                                                           TextColor="{StaticResource Secondary}"
+                                                           VerticalOptions="Center" />
 
                                                     <Border.GestureRecognizers>
                                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferBasketListViewModel}}, Path=DecreaseCommand}" CommandParameter="{Binding .}" />
@@ -189,6 +216,7 @@
                                                 <Label Grid.Column="1"
                                                        FontAttributes="Bold"
                                                        FontSize="Large"
+                                                       HorizontalOptions="Center"
                                                        Text="{Binding Quantity}"
                                                        TextColor="{StaticResource OffBlack}"
                                                        VerticalOptions="Center" />
@@ -199,8 +227,10 @@
                                                         StrokeShape="RoundRectangle 2">
                                                     <Label FontFamily="FAS"
                                                            FontSize="Medium"
+                                                           HorizontalOptions="Center"
                                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
-                                                           TextColor="{StaticResource White}" />
+                                                           TextColor="{StaticResource White}"
+                                                           VerticalOptions="Center" />
 
                                                     <Border.GestureRecognizers>
                                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferBasketListViewModel}}, Path=IncreaseCommand}" CommandParameter="{Binding .}" />
@@ -208,9 +238,6 @@
                                                 </Border>
                                             </Grid>
                                         </Grid>
-
-
-
                                     </VerticalStackLayout>
                                 </Grid>
                             </Border>
@@ -531,6 +558,79 @@
                 </Grid>
 
                 <!--#endregion-->
+            </dx:BottomSheet>
+
+            <dx:BottomSheet x:Name="subUnitsetBottomSheet"
+                            Grid.Row="1"
+                            Padding="10,30,10,10"
+                            AllowDismiss="True"
+                            BackgroundColor="{StaticResource Gray100}"
+                            CornerRadius="10"
+                            HalfExpandedRatio="0.5"
+                            IsModal="True"
+                            ShowGrabber="True">
+                <Grid RowDefinitions="Auto, Auto, *" RowSpacing="10">
+                    <VerticalStackLayout Grid.Row="0" Spacing="5">
+
+                        <Label Grid.Column="0"
+                               FontAttributes="Bold"
+                               FontSize="Medium"
+                               HorizontalOptions="Start"
+                               Text="{Binding SelectedItem.ItemCode, StringFormat='{0} Ürünü'}" />
+
+                        <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
+                    </VerticalStackLayout>
+                    <Grid Grid.Row="1"
+                          Padding="0,5,0,10"
+                          RowDefinitions="Auto, Auto"
+                          RowSpacing="10">
+                        <Grid Grid.Row="0" ColumnDefinitions=".40*, .25*, .25*">
+                            <Label Grid.Column="0"
+                                   FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   Text="Alt Birim" />
+                            <Label Grid.Column="1"
+                                   FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   Text="Çevrim" />
+                            <Label Grid.Column="2"
+                                   FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   Text="Katsayı" />
+                        </Grid>
+                        <BoxView Grid.Row="1"
+                                 HeightRequest="2"
+                                 Color="{StaticResource Primary}" />
+                    </Grid>
+
+                    <VerticalStackLayout Grid.Row="2" Spacing="10">
+                        <Grid ColumnDefinitions=".40*,.25*,.25*">
+                            <Label Grid.Column="0" Text="KG" />
+                            <Label Grid.Column="1" Text="1 Adet" />
+                            <Label Grid.Column="2" Text="1000 KG" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions=".40*,.25*,.25*">
+                            <Label Grid.Column="0" Text="GR" />
+                            <Label Grid.Column="1" Text="1 Adet" />
+                            <Label Grid.Column="2" Text="1000 GR" />
+                        </Grid>
+                    </VerticalStackLayout>
+                    <!--<CollectionView Grid.Row="2">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions=".40*,.25*,.25*">
+                                    <Label Grid.Column="0" Text="KG" />
+                                    <Label Grid.Column="1" Text="1 Adet" />
+                                    <Label Grid.Column="2" Text="1000 KG" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>-->
+                </Grid>
             </dx:BottomSheet>
         </VerticalStackLayout>
         <!--#endregion-->

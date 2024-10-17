@@ -234,6 +234,7 @@ public partial class OutputOutsourceTransferProductListViewModel : BaseViewModel
 						UnitsetCode = item.UnitsetCode,
 						UnitsetName = item.UnitsetName,
 						SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                        Image = item.ImageData,
 						SubUnitsetCode = item.SubUnitsetCode,
 						SubUnitsetName = item.SubUnitsetName,
 						MainItemReferenceId = default,  //
