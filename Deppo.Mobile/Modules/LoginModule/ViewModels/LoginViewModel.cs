@@ -61,7 +61,7 @@ public partial class LoginViewModel : BaseViewModel
                 return;
             }
 
-            _userDialogs.Loading("Oturum açýlýyor..");
+            _userDialogs.Loading("Oturum aï¿½ï¿½lï¿½yor..");
             await Task.Delay(1000);
             var sysLogged = await AuthenticateSysAsync();
             if (sysLogged)
@@ -69,14 +69,15 @@ public partial class LoginViewModel : BaseViewModel
                 var helixLogged = await AuthenticateHelixAsync();
                 if (helixLogged)
                 {
+                    _httpClientSysService.UserName = UserName;
                     var companyListViewModel = IPlatformApplication.Current.Services.GetRequiredService<CompanyListViewModel>();
                     Application.Current.MainPage = new CompanyListView(companyListViewModel);
                 }
                 else
-                    _userDialogs.Alert("Sunucu ile baðlantý baþarýsýz..", "Helix Hata");
+                    _userDialogs.Alert("Sunucu ile baï¿½lantï¿½ baï¿½arï¿½sï¿½z..", "Helix Hata");
             }
             else
-                _userDialogs.Alert("Kullanýcý adýnýz veya parolanýz geçersiz..", "Oturum Açma Hata");
+                _userDialogs.Alert("Kullanï¿½cï¿½ adï¿½nï¿½z veya parolanï¿½z geï¿½ersiz..", "Oturum Aï¿½ma Hata");
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
@@ -127,7 +128,7 @@ public partial class LoginViewModel : BaseViewModel
         {
             SecureStorage.RemoveAll();
 
-            _userDialogs.Loading("Oturum kapatýlýyor...");
+            _userDialogs.Loading("Oturum kapatï¿½lï¿½yor...");
             await Task.Delay(1000);
             Application.Current.MainPage = new LoginView(this);
 

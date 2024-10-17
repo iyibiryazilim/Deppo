@@ -2,67 +2,154 @@
 <ContentPage
     x:Class="Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.Views.OverviewAnalysisView"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.ViewModels"
     Title="{Binding Title}"
     x:DataType="viewModel:OverviewAnalysisViewModel">
 
 
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior EventName="Loaded"
-                                        Command="{Binding LoadItemsCommand}" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
     </ContentPage.Behaviors>
 
-    <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="10">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid
+        Padding="10"
+        RowDefinitions="Auto,Auto,*"
+        RowSpacing="20">
         <Grid
             Grid.Row="0"
-            ColumnDefinitions="*,*"
+            Padding="5"
+            ColumnDefinitions="Auto,*,*"
             ColumnSpacing="10"
-            RowDefinitions="Auto,Auto"
-            RowSpacing="10">
+            RowDefinitions="Auto,Auto">
 
-            <Border
+
+            <toolkit:AvatarView
                 Grid.Row="0"
                 Grid.RowSpan="2"
                 Grid.Column="0"
-                BackgroundColor="{StaticResource PrimaryLight}"
-                Stroke="{StaticResource Primary}"
-                StrokeShape="RoundRectangle 10"
-                StrokeThickness="0.2">
-                <VerticalStackLayout VerticalOptions="End">
-                    <Label FontSize="Subtitle" Text="762" />
-                    <Label FontSize="20" Text="Total Product" />
-                </VerticalStackLayout>
-            </Border>
+                BorderColor="White"
+                CornerRadius="25"
+                HeightRequest="50"
+                HorizontalOptions="Start"
+                ImageSource="{Binding CurrentUser.Image.MediaData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                VerticalOptions="Center" />
 
-            <Border
+            <Label
                 Grid.Row="0"
                 Grid.Column="1"
-                BackgroundColor="{StaticResource PrimaryLight}"
-                Stroke="{StaticResource Primary}"
-                StrokeShape="RoundRectangle 10"
-                StrokeThickness="0.2">
-                <VerticalStackLayout VerticalOptions="End">
-                    <Label FontSize="Subtitle" Text="762" />
-                    <Label FontSize="20" Text="Input Product" />
-                </VerticalStackLayout>
-            </Border>
+                FontAttributes="Bold"
+                FontSize="Subtitle"
+                HorizontalOptions="Start"
+                Text="Hoşgeldiniz"
+                TextColor="White"
+                VerticalOptions="Center" />
 
-            <Border
+            <Label
                 Grid.Row="1"
                 Grid.Column="1"
-                BackgroundColor="{StaticResource PrimaryLight}"
-                Stroke="{StaticResource Primary}"
-                StrokeShape="RoundRectangle 10"
-                StrokeThickness="0.2">
-                <VerticalStackLayout VerticalOptions="End">
-                    <Label FontSize="Subtitle" Text="762" />
-                    <Label FontSize="20" Text="Input Product" />
-                </VerticalStackLayout>
-            </Border>
+                HorizontalOptions="Start"
+                Text="Volkan Sunuk"
+                TextColor="White"
+                VerticalOptions="Center" />
 
 
+            <Label
+                Grid.Row="0"
+                Grid.RowSpan="2"
+                Grid.Column="2"
+                FontAttributes="Bold"
+                FontFamily="FAS"
+                FontSize="30"
+                HorizontalOptions="End"
+                Text="{x:Static fontAwesome:FontAwesomeIcons.Bell}"
+                TextColor="{StaticResource Secondary}"
+                VerticalOptions="Center" />
+
+
+
+        </Grid>
+
+        <VerticalStackLayout Grid.Row="1" Spacing="10">
+            <Label
+                Grid.Row="0"
+                FontAttributes="Bold"
+                FontSize="Subtitle"
+                Text="İşlem Özeti"
+                TextColor="{StaticResource OffBlack}" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <Border
+                    Grid.Column="1"
+                    Padding="10"
+                    BackgroundColor="{StaticResource Primary}"
+                    Stroke="{StaticResource Primary}"
+                    StrokeShape="RoundRectangle 10"
+                    StrokeThickness="0.2">                  
+                    <VerticalStackLayout Spacing="10" VerticalOptions="End">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="45"
+                            HorizontalTextAlignment="Start"
+                            Text="16"
+                            TextColor="White"
+                            VerticalTextAlignment="End" />
+                        <Label Text="Çıkış İşlem Sayısı" TextColor="{StaticResource White}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border
+                    Grid.Column="0"
+                    Padding="10"
+                    BackgroundColor="{StaticResource Primary}"
+                    Stroke="{StaticResource Primary}"
+                    StrokeShape="RoundRectangle 10"
+                    StrokeThickness="0.2">                  
+                    <VerticalStackLayout Spacing="10" VerticalOptions="End">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="45"
+                            HorizontalTextAlignment="Start"
+                            Text="8"
+                            TextColor="White"
+                            VerticalTextAlignment="End" />
+                        <Label Text="Giriş İşlem Sayısı" TextColor="{StaticResource White}" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+        </VerticalStackLayout>
+
+        <Grid Grid.Row="2" RowDefinitions="Auto,*" RowSpacing="10">
+            <Label
+                Grid.Row="0"
+                FontAttributes="Bold"
+                FontSize="Subtitle"
+                Text="Performans Analizi"
+                TextColor="{StaticResource OffBlack}" />
+
+                <CollectionView
+                    Grid.Row="1"
+                    ItemsSource="{Binding Items}">                    
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Label Text="Kullanıcı Bilgileri" />
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
         </Grid>
 
     </Grid>

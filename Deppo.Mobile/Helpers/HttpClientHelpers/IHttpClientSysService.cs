@@ -14,4 +14,5 @@ public interface IHttpClientSysService
     string Token { get; set; }
     int FirmNumber { get; set; }
     int PeriodNumber { get; set; }
+    string UserName { get; set; }
 }
