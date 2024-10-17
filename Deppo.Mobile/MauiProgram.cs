@@ -358,6 +358,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<ITransactionAuditService, TransactionAuditDataStore>();
         builder.Services.AddSingleton<IWarehouseProcessParameterService, WarehouseProcessParameterDataStore>();
         builder.Services.AddSingleton<Deppo.Sys.Service.Services.IWarehouseService, Deppo.Sys.Service.DataStores.WarehouseDataStore>();
+        builder.Services.AddSingleton<IApplicationUserService, ApplicationUserDataStore>();
 
         #region Analysis Modules
 

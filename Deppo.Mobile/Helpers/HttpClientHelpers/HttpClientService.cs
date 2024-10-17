@@ -20,6 +20,7 @@ public class HttpClientService : IHttpClientService
     public string BaseUri { get; set; } = string.Empty;
     public int FirmNumber { get; set; }
     public int PeriodNumber { get; set; }
+    public string UserName { get; set; } = string.Empty;
     public HttpClient GetOrCreateHttpClient()
     {
         var httpClient = _httpClient.Value;
