@@ -7,6 +7,8 @@ public class PackageProductModel : PackageProduct
 {
     private bool _isSelected;
     private double _outputQuantity;
+    private double _volume;
+    private double _weight;
 
     public PackageProductModel()
     {
@@ -31,6 +33,28 @@ public class PackageProductModel : PackageProduct
         {
             if (_outputQuantity == value) return;
             _outputQuantity = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public double Volume
+    {
+        get => _volume;
+        set
+        {
+            if (_volume == value) return;
+            _volume = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public double Weight
+    {
+        get => _weight;
+        set
+        {
+            if (_weight == value) return;
+            _weight = value;
             NotifyPropertyChanged();
         }
     }

@@ -39,7 +39,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
             _userDialogs = userDialogs;
             _serviceProvider = serviceProvider;
 
-            Title = "Sevk Edilebilir Ürünler";
+            Title = "Koliye Eklencek Ürünleri Seçiniz";
 
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
             LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());

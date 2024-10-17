@@ -38,6 +38,9 @@ namespace Deppo.Mobile.Core.Models.ProcurementModels.ProcurementSalesModels
         [ObservableProperty]
         private bool isSelected;
 
+        [ObservableProperty]
+        private bool isEDispatch;
+
 
     }
 }

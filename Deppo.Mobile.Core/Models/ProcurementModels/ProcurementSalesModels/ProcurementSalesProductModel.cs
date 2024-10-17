@@ -59,6 +59,9 @@ namespace Deppo.Mobile.Core.Models.ProcurementModels.ProcurementSalesModels
         private double quantity;
 
         [ObservableProperty]
+        private string barcode;
+
+        [ObservableProperty]
         private string image = string.Empty;
 
         [ObservableProperty]

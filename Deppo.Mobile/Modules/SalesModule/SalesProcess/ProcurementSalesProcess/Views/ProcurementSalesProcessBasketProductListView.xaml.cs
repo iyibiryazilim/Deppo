@@ -11,5 +11,6 @@ public partial class ProcurementSalesProcessBasketProductListView : ContentPage
         _viewModel = viewModel;
         BindingContext = _viewModel;
         _viewModel.SearchText = searchBar;
+
     }
 }
