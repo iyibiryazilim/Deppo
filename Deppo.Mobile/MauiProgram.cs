@@ -1,4 +1,5 @@
 using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Markup;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.DataStores;
 using Deppo.Core.Services;
@@ -153,6 +154,9 @@ public static class MauiProgram
             .UseDevExpressEditors()
             .UseDevExpress()
             .UseBarcodeReader()
+            .UseMauiCommunityToolkitMarkup()
+            .UseMauiCommunityToolkitCamera()
+            .UseMauiCommunityToolkitMediaElement()
             .UseUserDialogs(() =>
             {
                 #region AlertConfig
@@ -340,6 +344,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IProcurementByCustomerBasketService, ProcurementByCustomerBasketDataStore>();
         builder.Services.AddSingleton<IProcurementSalesCustomerService, ProcurementSalesCustomerDataStore>();
         builder.Services.AddSingleton<IPackageProductService, PackageProductDataStore>();
+        builder.Services.AddSingleton<IProductPictureService, ProductPictureDataStore>();
         builder.Services.AddSingleton<IProcurementSalesProductService, ProcurementSalesProductDataStore>();
 
         builder.Services.AddSingleton<IOutsourceDetailInputProductService, OutsourceDetailInputProductDataStore>();
@@ -383,6 +388,7 @@ public static class MauiProgram
         builder.Services.AddTransientWithShellRoute<WarehouseDetailAllFicheListView, WarehouseDetailAllFicheListViewModel>(nameof(WarehouseDetailAllFicheListView));
         builder.Services.AddScopedWithShellRoute<WarehouseDetailWarehouseTotalListView, WarehouseDetailWarehouseTotalListViewModel>(nameof(WarehouseDetailWarehouseTotalListView));
         builder.Services.AddScopedWithShellRoute<WarehouseDetailLocationListView, WarehouseDetailLocationListViewModel>(nameof(WarehouseDetailLocationListView));
+        builder.Services.AddScopedWithShellRoute<ProductPictureView, ProductPictureViewModel>(nameof(ProductPictureView));
 
         #region ProductionInput Modules
 

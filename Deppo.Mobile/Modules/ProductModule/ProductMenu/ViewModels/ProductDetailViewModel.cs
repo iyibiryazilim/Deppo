@@ -80,6 +80,8 @@ public partial class ProductDetailViewModel : BaseViewModel
 
         VolumeIncreaseCommand = new Command(async () => await VolumeIncreaseAsync());
         VolumeDecreaseCommand = new Command(async () => await VolumeDecreaseAsync());
+
+        TakePictureCommand = new Command(async () => await TakePictureAsync());
     }
 
     #region Commands
@@ -130,6 +132,7 @@ public partial class ProductDetailViewModel : BaseViewModel
     public Command VolumeDecreaseCommand { get; }
 
     #endregion Commands
+    public Command TakePictureCommand { get; set; }
 
     private async Task LoadItemsAsync()
     {
@@ -1152,5 +1155,14 @@ public partial class ProductDetailViewModel : BaseViewModel
         {
             IsBusy = false;
         }
+    }
+
+    private async Task TakePictureAsync()
+    {
+        await Shell.Current.GoToAsync($"{nameof(ProductPictureView)}", new Dictionary<string, object>
+        {
+            ["Product"] = ProductDetailModel.Product
+        });
+
     }
 }
