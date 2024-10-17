@@ -10,7 +10,7 @@ using ZXing.Net.Maui;
 
 namespace Deppo.Mobile.Helpers.BarcodeHelper;
 
-public class BarcodeSearchHelper
+public class BarcodeSearchHelper : IBarcodeSearchHelper
 {
 	private readonly IBarcodeSearchService _barcodeSearchService;
 	private readonly IServiceProvider _serviceProvider;
@@ -79,30 +79,36 @@ public class BarcodeSearchHelper
 				case "OutputOutsourceTransferBasketListViewModel":
 					var outputOutsourceTransferBasketListViewModel = _serviceProvider.GetRequiredService<OutputOutsourceTransferBasketListViewModel>();
 					var outputOutsourceTransferBasketItem = await ConvertOutputOutsourceTransferBasketAsync(productModel);
+
 					if (outputOutsourceTransferBasketListViewModel.Items.Any(x => x.ItemCode == outputOutsourceTransferBasketItem.ItemCode))
 					{
-						//_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
+						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
 					else
 					{
-							outputOutsourceTransferBasketListViewModel.Items.Add(outputOutsourceTransferBasketItem);
-							await _userDialogs.AlertAsync($"Ürün Sepete Eklendi");
-							if (_userDialogs.IsHudShowing)
-								_userDialogs.HideHud();
-
-						await _userDialogs.AlertAsync(outputOutsourceTransferBasketListViewModel.Items.Count.ToString());
-						
-						
-						
+						outputOutsourceTransferBasketListViewModel.Items.Add(outputOutsourceTransferBasketItem);
+						await _userDialogs.AlertAsync($"Ürün Sepete Eklendi");		
 					}
 					break;
 				default:
 					await _userDialogs.AlertAsync("Sayfa bulunamadı");
 					break;
-
 			}
 
 			isFind = false;
+		}
+		catch (Exception)
+		{
+
+			throw;
+		}
+	}
+
+	public async Task SendVariantBasketPageAsync(VariantModel variantModel, string comingPage)
+	{
+		try
+		{
+
 		}
 		catch (Exception)
 		{
@@ -138,9 +144,9 @@ public class BarcodeSearchHelper
 					LocTracking = productModel.LocTracking,
 					TrackingType = productModel.TrackingType,
 					Quantity = productModel.LocTracking == 0 ? 1 : 0,
-					LocTrackingIcon = productModel.LocTrackingIcon,
-					VariantIcon = productModel.VariantIcon,
-					TrackingTypeIcon = productModel.TrackingTypeIcon,
+					//LocTrackingIcon = productModel.LocTrackingIcon,
+					//VariantIcon = productModel.VariantIcon,
+					//TrackingTypeIcon = productModel.TrackingTypeIcon,
 				};
 
 				return basketItem;
@@ -153,12 +159,12 @@ public class BarcodeSearchHelper
 	}
 
 
+
+
 	private async Task SearchByProductCodeAsync(HttpClient httpClient, int firmNumber, int periodNumber, string barcode, string comingPage)
 	{
 		try
 		{
-			Console.WriteLine(comingPage, barcode, isFind);
-
 			if(!isFind) {
 				var result = await _barcodeSearchService.SearchByProductCode(httpClient, firmNumber, periodNumber, barcode);
 
