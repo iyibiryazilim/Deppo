@@ -277,6 +277,7 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
                             MainItemCode = string.Empty,
                             MainItemName = string.Empty,
                             MainItemReferenceId = default,
+                            Image = item.ImageData,
                             StockQuantity = item.StockQuantity,
                             Quantity = item.LocTracking == 0 ? 1 : 0,
                             InputQuantity = item.LocTracking == 0 ? 1 : 0,
