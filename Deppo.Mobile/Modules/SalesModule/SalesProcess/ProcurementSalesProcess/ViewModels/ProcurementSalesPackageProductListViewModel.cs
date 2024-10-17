@@ -31,7 +31,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
         private PackageProductModel? selectedProduct;
 
         [ObservableProperty]
-        private ObservableCollection<InputProductBasketModel> selectedProducts = new();
+        private ObservableCollection<ProcurementPackageBasketModel> selectedProducts = new();
 
         public ObservableCollection<PackageProductModel> Items { get; } = new();
         public ObservableCollection<PackageProductModel> SelectedItems { get; } = new();
@@ -191,40 +191,20 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
 
                         SelectedProduct = item;
 
-                        //var basketItem = new InputProductBasketModel
-                        //{
-                        //    ItemReferenceId = item.ReferenceId,
-                        //    ItemCode = item.Code,
-                        //    ItemName = item.Name,
-                        //    UnitsetReferenceId = item.UnitsetReferenceId,
-                        //    UnitsetCode = item.UnitsetCode,
-                        //    UnitsetName = item.UnitsetName,
-                        //    SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                        //    SubUnitsetCode = item.SubUnitsetCode,
-                        //    SubUnitsetName = item.SubUnitsetName,
-                        //    IsSelected = false,
-                        //    MainItemCode = string.Empty,
-                        //    MainItemName = string.Empty,
-                        //    MainItemReferenceId = default,
-                        //    StockQuantity = item.StockQuantity,
-                        //    Quantity = item.LocTracking == 0 ? 1 : 0,
-                        //    LocTracking = item.LocTracking,
-                        //    TrackingType = item.TrackingType,
-                        //    IsVariant = item.IsVariant,
-                        //    VariantIcon = item.VariantIcon,
-                        //    LocTrackingIcon = item.LocTrackingIcon,
-                        //    TrackingTypeIcon = item.TrackingTypeIcon,
-                        //    Image = item.ImageData,
-                        //};
+                        var basketItem = new ProcurementPackageBasketModel
+                        {
+                            PackageProductModel = item,
+                        };
+                       
 
-                       // SelectedProducts.Add(basketItem);
+                        SelectedProducts.Add(basketItem);
                         SelectedItems.Add(item);
 
                     }
                     else
                     {
                         SelectedProduct = null;
-                        var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ReferenceId);
+                        var selectedItem = SelectedProducts.FirstOrDefault(x => x.PackageProductModel.ReferenceId == item.ReferenceId);
                         if (selectedItem != null)
                         {
                             SelectedProducts.Remove(selectedItem);
@@ -256,13 +236,14 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
                 var previouseViewModel = _serviceProvider.GetRequiredService<ProcurementSalesPackageBasketViewModel>();
                 if (previouseViewModel is not null)
                 {
-                    //foreach (var item in SelectedProducts)
-                    //    if (!previouseViewModel.Items.Any(x => x.ItemCode == item.ItemCode))
-                    //        previouseViewModel.Items.Add(item);
+                    foreach (var item in SelectedProducts)
+                        if (!previouseViewModel.Items.Any(x => x.PackageProductModel.ReferenceId == item.PackageProductModel.ReferenceId))
+                            previouseViewModel.Items.Add(item);
 
                     await Shell.Current.GoToAsync($"..");
                 }
                 SelectedItems.Clear();
+                SelectedProducts.Clear();
             }
             catch (Exception ex)
             {

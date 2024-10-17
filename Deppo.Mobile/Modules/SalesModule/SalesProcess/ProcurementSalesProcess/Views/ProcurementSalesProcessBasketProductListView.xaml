@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.Views.ProcurementSalesPackageProductListView"
+             x:Class="Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.Views.ProcurementSalesProcessBasketProductListView"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.ViewModels"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
-             xmlns:productModel="clr-namespace:Deppo.Mobile.Core.Models.PackageProductModels;assembly=Deppo.Mobile.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:model="clr-namespace:Deppo.Mobile.Core.Models.ProcurementModels.ProcurementSalesModels;assembly=Deppo.Mobile.Core"
              Title="{Binding Title}"
-             x:DataType="viewModel:ProcurementSalesPackageProductListViewModel"
-             Padding="10"
-             Shell.PresentationMode="Modal"
+             x:DataType="viewModel:ProcurementSalesProcessBasketProductListViewModel"
              Shell.TabBarIsVisible="False"
-             >
+             Shell.PresentationMode="Modal">
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
                                         EventName="Loaded" />
@@ -83,13 +81,13 @@
                         RemainingItemsThreshold="2"
                         RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="productModel:PackageProductModel">
+                <DataTemplate x:DataType="model:ProcurementSalesProductModel">
                     <Border Padding="10"
                             BackgroundColor="Transparent"
                             StrokeShape="RoundRectangle 10"
                             StrokeThickness="0.1">
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementSalesPackageProductListViewModel}}, Path=ItemTappedCommand}"
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementSalesProcessBasketProductListViewModel}}, Path=ItemTappedCommand}"
                                                   CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="Auto,*, Auto"
@@ -106,12 +104,12 @@
                                                  Spacing="2">
                                 <Label x:Name="itemReferenceId"
                                        IsVisible="Hidden"
-                                       Text="{Binding ReferenceId}" />
+                                       Text="{Binding ItemReferenceId}" />
                                 <Label FontAttributes="Bold"
                                        LineBreakMode="TailTruncation"
-                                       Text="{Binding Code}" />
+                                       Text="{Binding ItemCode}" />
                                 <Label LineBreakMode="TailTruncation"
-                                       Text="{Binding Name}"
+                                       Text="{Binding ItemName}"
                                        TextColor="{StaticResource Gray600}" />
 
                                 <Label TextColor="{StaticResource Gray600}"
@@ -124,7 +122,7 @@
                                                   TextColor="{StaticResource Primary}" />
                                             <Span Text=" " />
                                             <Span FontAttributes="Bold"
-                                                  Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                                  Text="{Binding Quantity, StringFormat='{0:N2}'}"
                                                   TextColor="{StaticResource Primary}" />
                                             <Span Text=" " />
                                             <Span FontAttributes="Bold"
@@ -174,5 +172,7 @@
         <Button Grid.Row="3"
                 Command="{Binding ConfirmCommand}"
                 Text="{Binding SelectedProducts.Count, StringFormat='Sepete Ekle : {0}'}" />
+
+       
     </Grid>
 </ContentPage>

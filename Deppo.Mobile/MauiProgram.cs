@@ -483,6 +483,10 @@ public static class MauiProgram
         builder.Services.AddTransientWithShellRoute<ProcurementSalesProcessWarehouseListView, ProcurementSalesProcessWarehouseListViewModel>(nameof(ProcurementSalesProcessWarehouseListView));
         builder.Services.AddScopedWithShellRoute<ProcurementSalesProcessCustomerListView, ProcurementSalesProcessCustomerListViewModel>(nameof(ProcurementSalesProcessCustomerListView));
         builder.Services.AddScopedWithShellRoute<ProcurementSalesProcessProductListView, ProcurementSalesProcessProductListViewModel>(nameof(ProcurementSalesProcessProductListView));
+        builder.Services.AddScopedWithShellRoute<ProcurementSalesPackageBasketView, ProcurementSalesPackageBasketViewModel>(nameof(ProcurementSalesPackageBasketView));
+        builder.Services.AddScopedWithShellRoute<ProcurementSalesPackageProductListView, ProcurementSalesPackageProductListViewModel>(nameof(ProcurementSalesPackageProductListView));
+        builder.Services.AddScopedWithShellRoute<ProcurementSalesProcessProductBasketView, ProcurementSalesProcessProductBasketViewModel>(nameof(ProcurementSalesProcessProductBasketView));
+        builder.Services.AddScopedWithShellRoute<ProcurementSalesProcessBasketProductListView, ProcurementSalesProcessBasketProductListViewModel>(nameof(ProcurementSalesProcessBasketProductListView));
         builder.Services.AddScopedWithShellRoute<ProcurementSalesProcessFormView, ProcurementSalesProcessFormViewModel>(nameof(ProcurementSalesProcessFormView));
 
         #endregion Toplanan Urunlerin Sevk Islemleri
