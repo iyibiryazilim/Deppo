@@ -122,6 +122,8 @@ using Deppo.Mobile.Modules.SalesModule.SalesProcess.ViewModels;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.WaitingOrderMenu.ViewModels;
 using Deppo.Mobile.Modules.SalesModule.WaitingOrderMenu.Views;
+using Deppo.Sys.Service.DataStores;
+using Deppo.Sys.Service.Services;
 using DevExpress.Maui;
 using DotNet.Meteor.HotReload.Plugin;
 using Java.Lang;
@@ -244,10 +246,11 @@ public static class MauiProgram
         builder.Services.AddSingleton(UserDialogs.Instance);
         builder.Services.AddSingleton<IBarcodeSearchHelper, BarcodeSearchHelper>();
         builder.Services.AddSingleton<IHttpClientService, HttpClientService>();
+        builder.Services.AddSingleton<IHttpClientSysService, HttpClientSysService>();
         builder.Services.AddSingleton<IAuthenticationService, AuthenticateDataStore>();
         builder.Services.AddSingleton<ICustomQueryService, CustomQueryDataStore>();
         builder.Services.AddSingleton<IProductService, ProductDataStoreV2>();
-        builder.Services.AddSingleton<IWarehouseService, WarehouseDataStore>();
+        builder.Services.AddSingleton<Deppo.Core.Services.IWarehouseService, Deppo.Core.DataStores.WarehouseDataStore>();
         builder.Services.AddSingleton<ICustomerService, CustomerDataStoreV2>();
         builder.Services.AddSingleton<IWaitingSalesOrderService, WaitingSalesOrderDataStore>();
         builder.Services.AddSingleton<ISupplierService, SupplierDataStoreV2>();
@@ -350,6 +353,11 @@ public static class MauiProgram
         builder.Services.AddSingleton<IOutsourceDetailInputProductService, OutsourceDetailInputProductDataStore>();
         builder.Services.AddSingleton<IOutsourceDetailOutputProductService, OutsourceDetailOutputProductDataStore>();
         builder.Services.AddSingleton<IOutsourceDetailAllFichesService, OutsourceDetailAllFichesDataStore>();
+
+        builder.Services.AddSingleton<IAuthenticateSysService, AuthenticateSysDataStore>();
+        builder.Services.AddSingleton<ITransactionAuditService, TransactionAuditDataStore>();
+        builder.Services.AddSingleton<IWarehouseProcessParameterService, WarehouseProcessParameterDataStore>();
+        builder.Services.AddSingleton<Deppo.Sys.Service.Services.IWarehouseService, Deppo.Sys.Service.DataStores.WarehouseDataStore>();
 
         #region Analysis Modules
 
