@@ -521,7 +521,7 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 					ItemReferenceId = productModel.ReferenceId,
 					ItemCode = productModel.Code,
 					ItemName = productModel.Name,
-					//Image = productModel.ImageData,
+					Image = productModel.ImageData,
 					UnitsetReferenceId = productModel.UnitsetReferenceId,
 					UnitsetCode = productModel.UnitsetCode,
 					UnitsetName = productModel.UnitsetName,
