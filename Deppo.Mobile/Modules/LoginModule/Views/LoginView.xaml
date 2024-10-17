@@ -72,7 +72,7 @@
                         Command="{Binding LoginCommand}"
                         CornerRadius="10"
                         FontSize="Subtitle"
-                        Text="Oturum Açma" />
+                        Text="Oturum Aç" />
                 </VerticalStackLayout>
 
 
