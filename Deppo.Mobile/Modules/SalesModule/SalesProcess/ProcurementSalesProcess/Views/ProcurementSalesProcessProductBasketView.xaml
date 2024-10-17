@@ -185,7 +185,7 @@
                                                     <Label Grid.Column="1"
                                                            FontAttributes="Bold"
                                                            FontSize="Large"
-                                                           Text="{Binding Quantity}"
+                                                           Text="{Binding OutputQuantity}"
                                                            TextColor="{StaticResource OffBlack}"
                                                            VerticalOptions="Center" />
                                                     <Border Grid.Column="2"
