@@ -327,5 +327,29 @@ public partial class ManuelReworkProcessBasketViewModel : BaseViewModel
 		}
 	}
 
-	
+	public async Task ClearPageAsync()
+	{
+		try
+		{
+			await Task.Run(() =>
+			{
+				if(SelectedReworkInProductModel is not null)
+				{
+					SelectedReworkInProductModel.Details.Clear();
+					SelectedReworkInProductModel = null;
+				}
+				if(ReworkBasketModel is not null)
+				{
+					ReworkBasketModel = null;
+				}
+			});
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+	}
 }

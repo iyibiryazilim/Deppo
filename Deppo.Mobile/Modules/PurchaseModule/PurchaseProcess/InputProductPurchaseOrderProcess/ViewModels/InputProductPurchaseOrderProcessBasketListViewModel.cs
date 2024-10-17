@@ -8,6 +8,7 @@ using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
+using Deppo.Mobile.Helpers.BarcodeHelper;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -34,6 +35,7 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
     private readonly ILocationService _locationService;
     private readonly ISeriLotService _seriLotService;
     private readonly IServiceProvider _serviceProvider;
+    private readonly IBarcodeSearchHelper _barcodeSearchHelper;
 
     [ObservableProperty]
     WarehouseModel warehouseModel = null!;
@@ -47,47 +49,54 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
     [ObservableProperty]
     public ObservableCollection<InputPurchaseBasketModel> items = new();
 
-    public InputProductPurchaseOrderProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider)
-    {
-        _httpClientService = httpClientService;
-        _userDialogs = userDialogs;
-        _locationService = locationService;
-        _seriLotService = seriLotService;
-        _serviceProvider = serviceProvider;
+	[ObservableProperty]
+	public Entry barcodeEntry;
 
-        Title = "Satınalma Sepeti";
+	public InputProductPurchaseOrderProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider, IBarcodeSearchHelper barcodeSearchHelper)
+	{
+		_httpClientService = httpClientService;
+		_userDialogs = userDialogs;
+		_locationService = locationService;
+		_seriLotService = seriLotService;
+		_serviceProvider = serviceProvider;
+		_barcodeSearchHelper = barcodeSearchHelper;
 
-        IncreaseCommand = new Command<InputPurchaseBasketModel>(async (x) => await IncreaseAsync(x));
+		Title = "Satınalma Sepeti";
 
-        LoadMoreWarehouseLocationsCommand = new Command(async () => await LoadMoreWarehouseLocationsAsync());
-        //LocationIncreaseCommand = new Command<LocationModel>(LocationIncrease);
-        //LocationDecreaseCommand = new Command<LocationModel>(LocationDecrease);
-        //LocationConfirmCommand = new Command(LocationConfirm);
-        LocationCloseCommand = new Command(async () => await LocationCloseAsync());
+        PerformSearchCommand = new Command<Entry>(async (x) => await PerformSearchAsync(x));
+		IncreaseCommand = new Command<InputPurchaseBasketModel>(async (x) => await IncreaseAsync(x));
+		DecreaseCommand = new Command<InputPurchaseBasketModel>(async (x) => await DecreaseAsync(x));
+		DeleteItemCommand = new Command<InputPurchaseBasketModel>(async (x) => await DeleteItemAsync(x));
 
-        LoadMoreSeriLotsCommand = new Command(async () => await LoadMoreSeriLotAsync());
-        SeriLotIncreaseCommand = new Command<SeriLotModel>(SeriLotIncrease);
-        SeriLotDecreaseCommand = new Command<SeriLotModel>(SeriLotDecrease);
-        SeriLotConfirmCommand = new Command(SeriLotConfirm);
-        SeriLotCloseCommand = new Command(async () => await SeriLotCloseAsync());
+		LoadMoreWarehouseLocationsCommand = new Command(async () => await LoadMoreWarehouseLocationsAsync());
+		//LocationIncreaseCommand = new Command<LocationModel>(LocationIncrease);
+		//LocationDecreaseCommand = new Command<LocationModel>(LocationDecrease);
+		//LocationConfirmCommand = new Command(LocationConfirm);
+		LocationCloseCommand = new Command(async () => await LocationCloseAsync());
 
-        NextViewCommand = new Command(async () => await NextViewAsync());
-        BackCommand = new Command(async () => await BackAsync());
+		LoadMoreSeriLotsCommand = new Command(async () => await LoadMoreSeriLotAsync());
+		SeriLotIncreaseCommand = new Command<SeriLotModel>(SeriLotIncrease);
+		SeriLotDecreaseCommand = new Command<SeriLotModel>(SeriLotDecrease);
+		SeriLotConfirmCommand = new Command(SeriLotConfirm);
+		SeriLotCloseCommand = new Command(async () => await SeriLotCloseAsync());
+
+		NextViewCommand = new Command(async () => await NextViewAsync());
+		BackCommand = new Command(async () => await BackAsync());
 		PlusTappedCommand = new Command(async () => await PlusTappedAsync());
 		ProductOptionTappedCommand = new Command(async () => await ProductOptionTappedAsync());
 		OrderOptionTappedCommand = new Command(async () => await OrderOptionTappedAsync());
 		CameraTappedCommand = new Command(async () => await CameraTappedAsync());
 
 		ShowOtherProductCommand = new Command(async () => await ShowOtherProductAsync());
-    }
+	}
 
-    public Page CurrentPage { get; set; }
+	public Page CurrentPage { get; set; }
 
     public ObservableCollection<LocationModel> Locations { get; } = new();
     public ObservableCollection<SeriLotModel> SeriLots { get; } = new();
 
     #region Commands
-
+    public Command PerformSearchCommand { get; }
     public Command<InputPurchaseBasketModel> DeleteItemCommand { get; }
     public Command<InputPurchaseBasketModel> IncreaseCommand { get; }
     public Command<InputPurchaseBasketModel> DecreaseCommand { get; }
@@ -139,7 +148,43 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
         }
     }
 
-    private async Task IncreaseAsync(InputPurchaseBasketModel inputPurchaseBasketModel)
+	private async Task PerformSearchAsync(Entry barcodeEntry)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			if (string.IsNullOrEmpty(barcodeEntry.Text))
+				return;
+
+			IsBusy = true;
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			await _barcodeSearchHelper.BarcodeDetectedAsync(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				barcode: barcodeEntry.Text,
+				comingPage: "InputProductPurchaseOrderProcessBasketListViewModel"
+			);
+
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			BarcodeEntry.Text = string.Empty;
+			IsBusy = false;
+		}
+	}
+
+	private async Task IncreaseAsync(InputPurchaseBasketModel inputPurchaseBasketModel)
     {
         if (IsBusy)
             return;
@@ -239,9 +284,10 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
 
     private async Task DeleteItemAsync(InputPurchaseBasketModel item)
     {
+        if (item is null)
+            return;
         if (IsBusy)
             return;
-
         try
         {
             IsBusy = true;
@@ -250,10 +296,15 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
             if (!result)
                 return;
 
+            item.Details.Clear();
+
             Items.Remove(item);
         }
         catch (Exception ex)
         {
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
@@ -592,6 +643,12 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
                 await _userDialogs.AlertAsync("Sepetinizde ürün bulunmamaktadır.", "Hata", "Tamam");
                 return;
             }
+            
+            if(Items.Any(x => x.InputQuantity == 0))
+            {
+                await _userDialogs.AlertAsync("Sepetinizde miktarı sıfır olan ürünler bulunmakta. Lütfen yeniden düzenleme yapınız", "Uyarı", "Tamam");
+                return;
+            }
 
             await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseOrderProcessFormView)}", new Dictionary<string, object>
             {
@@ -649,7 +706,11 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
                 if (!result)
                     return;
 
+                foreach (var item in Items)
+                    item.Details.Clear();
+
                 Items.Clear();
+
                 await Shell.Current.GoToAsync("..");
             }
             else

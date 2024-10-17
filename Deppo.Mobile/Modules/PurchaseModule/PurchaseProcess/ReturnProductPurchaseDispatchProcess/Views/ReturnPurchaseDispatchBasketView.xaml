@@ -232,94 +232,78 @@
                                 <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="locationModels:LocationTransactionModel">
+                                <DataTemplate x:DataType="locationModels:GroupLocationTransactionModel">
                                     <Border Padding="10"
-                                        BackgroundColor="{StaticResource WhiteSmoke}"
-                                        StrokeShape="RoundRectangle 10"
-                                        StrokeThickness="0.1">
-                                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
-                                            <Border Grid.Column="0"
-                                                    Padding="8,8,8,8"
-                                                    BackgroundColor="{StaticResource Secondary}"
-                                                    StrokeShape="RoundRectangle 10">
-                                                <VerticalStackLayout Grid.Column="0"
-                                                                     Spacing="1"
-                                                                     VerticalOptions="Center">
-                                                    <Label FontAttributes="Bold"
-                                                           FontSize="Large"
-                                                           HorizontalOptions="Center"
-                                                           Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
-                                                           TextColor="{StaticResource OffBlack}" />
-                                                    <Label FontSize="Medium"
-                                                           HorizontalOptions="Center"
-                                                           Text="{Binding TransactionDate, StringFormat='{0:MM/yyyy}'}"
-                                                           TextColor="{StaticResource OffBlack}" />
-                                                </VerticalStackLayout>
-                                            </Border>
-                                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                            BackgroundColor="{StaticResource WhiteSmoke}"
+                                            StrokeShape="RoundRectangle 10"
+                                            StrokeThickness="0.1">
+                                        <Grid ColumnDefinitions="*, Auto"
+                                              ColumnSpacing="10">
+                                            <VerticalStackLayout Grid.Column="0">
                                                 <Label FontAttributes="Bold"
-                                                   LineBreakMode="TailTruncation"
-                                                   Text="{Binding LocationCode}" />
+                                                       LineBreakMode="TailTruncation"
+                                                       Text="{Binding LocationCode}" />
                                                 <Label LineBreakMode="TailTruncation"
-                                                   Text="{Binding LocationName}"
-                                                   TextColor="{StaticResource Gray600}" />
+                                                       Text="{Binding LocationName}"
+                                                       TextColor="{StaticResource Gray600}" />
 
                                                 <Label>
                                                     <Label.FormattedText>
                                                         <FormattedString>
                                                             <Span FontAttributes="Bold"
-                                                              FontFamily="FAS"
-                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                                                              TextColor="{StaticResource Primary}" />
+                                                                  FontFamily="FAS"
+                                                                  Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                                  TextColor="{StaticResource Primary}" />
                                                             <Span Text=" " />
                                                             <Span FontAttributes="Bold"
-                                                              Text="{Binding RemainingQuantity, StringFormat='{0:N2}'}"
-                                                              TextColor="{StaticResource Primary}" />
+                                                                  Text="{Binding RemainingQuantity, StringFormat='{0:N2}'}"
+                                                                  TextColor="{StaticResource Primary}" />
                                                         </FormattedString>
                                                     </Label.FormattedText>
                                                 </Label>
-
-
                                             </VerticalStackLayout>
-                                            <Grid Grid.Column="2"
-                                              ColumnDefinitions="Auto,Auto,Auto"
-                                              ColumnSpacing="10"
-                                              HorizontalOptions="EndAndExpand"
-                                              VerticalOptions="Center">
+                                            <Grid Grid.Column="1"
+                                                  ColumnDefinitions="Auto,Auto,Auto"
+                                                  ColumnSpacing="10"
+                                                  HorizontalOptions="EndAndExpand"
+                                                  VerticalOptions="Center">
                                                 <Border Grid.Column="0"
-                                                    Padding="5"
-                                                    BackgroundColor="Transparent"
-                                                    Stroke="{StaticResource Secondary}"
-                                                    StrokeShape="RoundRectangle 2">
-                                                    <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnPurchaseDispatchBasketViewModel}}, Path=LocationTransactionDecreaseCommand}" CommandParameter="{Binding .}" />
-                                                    </Border.GestureRecognizers>
+                                                        Padding="5"
+                                                        BackgroundColor="Transparent"
+                                                        Stroke="{StaticResource Secondary}"
+                                                        StrokeShape="RoundRectangle 2">
                                                     <Label FontFamily="FAS"
-                                                       FontSize="Medium"
-                                                       Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
-                                                       TextColor="{StaticResource Secondary}" />
+                                                           FontSize="Medium"
+                                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                                           TextColor="{StaticResource Secondary}" />
+
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnPurchaseDispatchBasketViewModel}}, Path=LocationTransactionDecreaseCommand}"
+                                                                              CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
                                                 </Border>
                                                 <Label Grid.Column="1"
-                                                   FontAttributes="Bold"
-                                                   FontSize="Large"
-                                                   Text="{Binding OutputQuantity, StringFormat='{0:N2}'}"
-                                                   TextColor="{StaticResource OffBlack}"
-                                                   VerticalOptions="Center" />
+                                                       FontAttributes="Bold"
+                                                       FontSize="Large"
+                                                       Text="{Binding OutputQuantity}"
+                                                       TextColor="{StaticResource OffBlack}"
+                                                       VerticalOptions="Center" />
                                                 <Border Grid.Column="2"
-                                                    Padding="5"
-                                                    BackgroundColor="{StaticResource Secondary}"
-                                                    Stroke="{StaticResource Secondary}"
-                                                    StrokeShape="RoundRectangle 2">
-                                                    <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnPurchaseDispatchBasketViewModel}}, Path=LocationTransactionIncreaseCommand}" CommandParameter="{Binding .}" />
-                                                    </Border.GestureRecognizers>
+                                                        Padding="5"
+                                                        BackgroundColor="{StaticResource Secondary}"
+                                                        Stroke="{StaticResource Secondary}"
+                                                        StrokeShape="RoundRectangle 2">
                                                     <Label FontFamily="FAS"
-                                                       FontSize="Medium"
-                                                       Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
-                                                       TextColor="{StaticResource White}" />
+                                                           FontSize="Medium"
+                                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                                           TextColor="{StaticResource White}" />
+
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnPurchaseDispatchBasketViewModel}}, Path=LocationTransactionIncreaseCommand}"
+                                                                              CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
                                                 </Border>
                                             </Grid>
-
                                         </Grid>
                                     </Border>
                                 </DataTemplate>

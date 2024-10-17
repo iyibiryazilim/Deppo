@@ -19,6 +19,10 @@ using Deppo.Core.DTOs.ProductionTransaction;
 using Deppo.Core.DTOs.SeriLotTransactionDto;
 using Deppo.Mobile.Core.Models.QuicklyModels;
 using DevExpress.Maui.Controls;
+using System.Collections.ObjectModel;
+using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Core.Models;
+using Deppo.Mobile.Helpers.MappingHelper;
 
 namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.WorkOrder.ViewModels
 {
@@ -29,9 +33,12 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
         private readonly IHttpClientService _httpClientService;
         private readonly IConsumableTransactionService _consumableTransactionService;
         private readonly IProductionTransactionService _productionTransactionService;
+        private readonly ILocationTransactionService _locationTransactionService;
 
         [ObservableProperty]
         private QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
+
+        public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
 
         [ObservableProperty]
         private DateTime ficheDate = DateTime.Now;
@@ -48,7 +55,7 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
         [ObservableProperty]
         private string description = string.Empty;
 
-        public WorkOrderFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IConsumableTransactionService consumableTransactionService, IProductionTransactionService productionTransactionService)
+        public WorkOrderFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IConsumableTransactionService consumableTransactionService, IProductionTransactionService productionTransactionService, ILocationTransactionService locationTransactionService)
         {
             Title = "Form Sayfası";
 
@@ -60,6 +67,7 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
             SaveCommand = new Command(async () => await SaveAsync());
             _consumableTransactionService = consumableTransactionService;
             _productionTransactionService = productionTransactionService;
+            _locationTransactionService = locationTransactionService;
         }
 
         public Page CurrentPage { get; set; }
@@ -225,12 +233,54 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
         private void Cleans()
         {
             QuicklyBomProductBasketModel.MainLocations.Clear();
-          //  QuicklyBomProductBasketModel.SubProducts.Select(x => x.ProductModel).ToList().Clear();
-          //  QuicklyBomProductBasketModel.SubProducts.Select(x => x.LocationTransactions).ToList().Clear();
+            //  QuicklyBomProductBasketModel.SubProducts.Select(x => x.ProductModel).ToList().Clear();
+            //  QuicklyBomProductBasketModel.SubProducts.Select(x => x.LocationTransactions).ToList().Clear();
             QuicklyBomProductBasketModel.SubProducts.Clear();
             QuicklyBomProductBasketModel.QuicklyBomProduct = null;
             QuicklyBomProductBasketModel.BOMQuantity = 0;
             QuicklyBomProductBasketModel.MainAmount = 0;
+        }
+
+        public async Task LoadLocationTransaction(QuicklyBomSubProductModel quicklyBomSubProduct, GroupLocationTransactionModel groupLocationTransactionModel)
+        {
+            try
+            {
+
+                var httpClient = _httpClientService.GetOrCreateHttpClient();
+                var result = await _locationTransactionService.GetInputObjectsAsync(
+                    httpClient: httpClient,
+                    firmNumber: _httpClientService.FirmNumber,
+                    periodNumber: _httpClientService.PeriodNumber,
+                    productReferenceId: quicklyBomSubProduct.ProductModel.IsVariant ? quicklyBomSubProduct.ProductModel.MainProductReferenceId : quicklyBomSubProduct.ProductModel.ReferenceId,
+                    variantReferenceId: quicklyBomSubProduct.ProductModel.IsVariant ? quicklyBomSubProduct.ProductModel.ReferenceId : 0,
+                    warehouseNumber: quicklyBomSubProduct.WarehouseModel.Number,
+                    locationRef: groupLocationTransactionModel.LocationReferenceId,
+                    skip: 0,
+                    take: 999999,
+                    search: ""
+                );
+
+                if (result.IsSuccess)
+                {
+                    if (result.Data is null)
+                        return;
+                    foreach (var item in result.Data)
+                    {
+                        LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+                    }
+
+                }
+
+                _userDialogs.Loading().Hide();
+            }
+            catch (Exception ex)
+            {
+                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private async Task<DataResult<ResponseModel>> ConsumableInsert(HttpClient httpClient, List<QuicklyBomSubProductModel> quicklyBomSubProductModel)
@@ -252,7 +302,8 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
             {
                 var consumableTransactionLineDto = new ConsumableTransactionLineDto
                 {
-                    ProductCode = item.ProductModel.Code,  // Doğru alanı ekledim
+                    ProductCode = item.ProductModel.IsVariant ? item.ProductModel.MainProductCode : item.ProductModel.Code,
+                    VariantCode = item.ProductModel.IsVariant ? item.ProductModel.Code : "",
                     WarehouseNumber = quicklyBomSubProductModel.FirstOrDefault().ProductModel.WarehouseNumber,
                     Quantity = item.SubBOMQuantity,
                     ConversionFactor = 1,
@@ -262,19 +313,31 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
 
                 foreach (var detail in item.LocationTransactions)
                 {
-                    var serilotTransactionDto = new SeriLotTransactionDto
-                    {
-                        StockLocationCode = detail.LocationCode,
-                        InProductTransactionLineReferenceId = detail.TransactionReferenceId,
-                        OutProductTransactionLineReferenceId = detail.ReferenceId,
-                        Quantity = detail.OutputQuantity,
-                        SubUnitsetCode = item.ProductModel.SubUnitsetCode,
-                        DestinationStockLocationCode = string.Empty,
-                        ConversionFactor = 1,
-                        OtherConversionFactor = 1,
-                    };
+                    await LoadLocationTransaction(item, detail);
+                    LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
 
-                    consumableTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+                    foreach (var locationTransaction in LocationTransactions)
+                    {
+                        while (locationTransaction.RemainingQuantity > 0 && item.SubBOMQuantity > 0)
+                        {
+                            var serilotTransactionDto = new SeriLotTransactionDto
+                            {
+                                StockLocationCode = detail.LocationCode,
+                                InProductTransactionLineReferenceId = locationTransaction.TransactionReferenceId,
+                                OutProductTransactionLineReferenceId = locationTransaction.ReferenceId,
+                                Quantity = item.SubBOMQuantity > locationTransaction.RemainingQuantity ? locationTransaction.RemainingQuantity : item.SubBOMQuantity,
+                                SubUnitsetCode = item.ProductModel.SubUnitsetCode,
+                                DestinationStockLocationCode = string.Empty,
+                                ConversionFactor = 1,
+                                OtherConversionFactor = 1,
+                            };
+
+                            consumableTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+                            locationTransaction.RemainingQuantity -= (double)serilotTransactionDto.Quantity;
+                            item.SubBOMQuantity -= (double)serilotTransactionDto.Quantity;
+                        }
+                    }
+
                 }
                 consumableTransactionDto.Lines.Add(consumableTransactionLineDto);
             }
@@ -300,7 +363,8 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
 
             var productionTransactionLineDto = new ProductionTransactionLineDto
             {
-                ProductCode = QuicklyBomProductBasketModel.QuicklyBomProduct.Code,
+                ProductCode = QuicklyBomProductBasketModel.QuicklyBomProduct.IsVariant ? QuicklyBomProductBasketModel.QuicklyBomProduct.MainItemCode : QuicklyBomProductBasketModel.QuicklyBomProduct.Code,
+                VariantCode = QuicklyBomProductBasketModel.QuicklyBomProduct.IsVariant ? QuicklyBomProductBasketModel.QuicklyBomProduct.Code : "",
                 WarehouseNumber = QuicklyBomProductBasketModel.WarehouseNumber,
                 Quantity = QuicklyBomProductBasketModel.BOMQuantity,
                 ConversionFactor = 1,
@@ -310,7 +374,7 @@ namespace Deppo.Mobile.Modules.QuicklyProductionModule.QuicklyProductionProcess.
                 VatRate = 0,
             };
 
-            foreach (var detail in quicklyBomProductBasketModel.MainLocations)
+            foreach (var detail in QuicklyBomProductBasketModel.MainLocations)
             {
                 var seriLotTransactionDto = new SeriLotTransactionDto
                 {

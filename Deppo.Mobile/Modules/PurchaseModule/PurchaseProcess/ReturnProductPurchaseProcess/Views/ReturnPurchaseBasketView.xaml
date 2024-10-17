@@ -37,8 +37,8 @@
         <ToolbarItem Command="{Binding CameraTappedCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="FAS"
-                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Camera}"
-                         Size="Medium" />
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Camera}"
+                                 Size="Medium" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
 
@@ -63,17 +63,16 @@
                     Stroke="{StaticResource Primary}"
                     StrokeShape="RoundRectangle 5"
                     StrokeThickness="0.5">
-                <SearchBar x:Name="searchBar"
-                           Placeholder="Ara..."
-                           PlaceholderColor="{StaticResource OffBlack}"
-                           TextColor="{StaticResource OffBlack}">
-                    <!-- <SearchBar.Behaviors>
-    <toolkit:EventToCommandBehavior
-        Command="{Binding PerformSearchCommand}"
-        CommandParameter="{Binding Text, Source={x:Reference searchBar}}"
-        EventName="SearchButtonPressed" />
-</SearchBar.Behaviors>-->
-                </SearchBar>
+                <Entry x:Name="barcodeEntry"
+                       Placeholder="Barkod tara..."
+                       PlaceholderColor="{StaticResource OffBlack}"
+                       TextColor="{StaticResource OffBlack}">
+                    <Entry.Behaviors>
+                        <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                        CommandParameter="{Binding ., Source={x:Reference barcodeEntry}}"
+                                                        EventName="TextChanged" />
+                    </Entry.Behaviors>
+                </Entry>
             </Border>
 
             <CollectionView Grid.Row="1" ItemsSource="{Binding Items}">
@@ -287,31 +286,13 @@
                                 <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="locationModel:LocationTransactionModel">
+                                <DataTemplate x:DataType="locationModel:GroupLocationTransactionModel">
                                     <Border Padding="10"
                                             BackgroundColor="{StaticResource WhiteSmoke}"
                                             StrokeShape="RoundRectangle 10"
                                             StrokeThickness="0.1">
-                                        <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="10">
-                                            <Border Grid.Column="0"
-                                                    Padding="8,8,8,8"
-                                                    BackgroundColor="{StaticResource Secondary}"
-                                                    StrokeShape="RoundRectangle 10">
-                                                <VerticalStackLayout Grid.Column="0"
-                                                                     Spacing="1"
-                                                                     VerticalOptions="Center">
-                                                    <Label FontAttributes="Bold"
-                                                           FontSize="Large"
-                                                           HorizontalOptions="Center"
-                                                           Text="{Binding TransactionDate, StringFormat='{0:dd}'}"
-                                                           TextColor="{StaticResource OffBlack}" />
-                                                    <Label FontSize="Medium"
-                                                           HorizontalOptions="Center"
-                                                           Text="{Binding TransactionDate, StringFormat='{0:MM/yyyy}'}"
-                                                           TextColor="{StaticResource OffBlack}" />
-                                                </VerticalStackLayout>
-                                            </Border>
-                                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                        <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                                            <VerticalStackLayout Grid.Column="0">
                                                 <Label FontAttributes="Bold"
                                                        LineBreakMode="TailTruncation"
                                                        Text="{Binding LocationCode}" />
@@ -334,7 +315,7 @@
                                                     </Label.FormattedText>
                                                 </Label>
                                             </VerticalStackLayout>
-                                            <Grid Grid.Column="2"
+                                            <Grid Grid.Column="1"
                                                   ColumnDefinitions="Auto,Auto,Auto"
                                                   ColumnSpacing="10"
                                                   HorizontalOptions="EndAndExpand"

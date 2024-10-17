@@ -45,5 +45,8 @@ public partial class SalesCustomer : ObservableObject
     [ObservableProperty]
     private int ficheType = default;
 
+    [ObservableProperty]
+    private bool isEDispatch;
+
     public string ShipAddressIcon => ShipAddressCount > 0 ? "truck" : "";
 }

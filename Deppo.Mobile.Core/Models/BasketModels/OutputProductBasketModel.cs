@@ -6,7 +6,7 @@ namespace Deppo.Mobile.Core.Models.BasketModels;
 
 public class OutputProductBasketModel : INotifyPropertyChanged, IDisposable
 {
-    private Guid _referenceId;
+    private Guid? _referenceId;
     private int _itemReferenceId;
     private string _itemCode = string.Empty;
     private string _itemName = string.Empty;
@@ -25,7 +25,7 @@ public class OutputProductBasketModel : INotifyPropertyChanged, IDisposable
     private int _trackingType;
     private int _locTracking;
     private bool _isSelected;
-    private string _image;
+    private byte[]? _image;
 
     private List<OutputProductBasketDetailModel> _details = new();
 
@@ -42,7 +42,7 @@ public class OutputProductBasketModel : INotifyPropertyChanged, IDisposable
     }
 
     [Browsable(false)]
-    public Guid ReferenceId
+    public Guid? ReferenceId
     {
         get => _referenceId;
         set
@@ -276,7 +276,7 @@ public class OutputProductBasketModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-    public string Image
+    public byte[]? Image
     {
         get => _image;
         set

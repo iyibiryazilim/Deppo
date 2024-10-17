@@ -60,7 +60,7 @@ namespace Deppo.Core.DataStores
 
         private string GetCarriers(int firmNumber)
         {
-            string baseQuery = $@"SELECT LOGICALREF AS [ReferenceId],CODE AS [Code], TITLE AS [Name] FROM L_SHPAGENT WHERE FIRMTYPE = {firmNumber}";
+            string baseQuery = $@"SELECT LOGICALREF AS [ReferenceId],CODE AS [Code], TITLE AS [Name] FROM L_SHPAGENT";
 
             return baseQuery;
         }

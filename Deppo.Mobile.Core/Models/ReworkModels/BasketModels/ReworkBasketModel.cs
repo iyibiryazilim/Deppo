@@ -17,13 +17,13 @@ namespace Deppo.Mobile.Core.Models.ReworkModels.BasketModels;
 public partial class ReworkBasketModel : ObservableObject
 {
 	[ObservableProperty]
-	WarehouseModel outWarehouseModel = null!; // Çıkış ambarı
+	WarehouseModel? outWarehouseModel; // Çıkış ambarı
 
 	[ObservableProperty]
-	ReworkOutProductModel reworkOutProductModel = null!; // Sarf edilecek ürün
+	ReworkOutProductModel? reworkOutProductModel; // Sarf edilecek ürün
 
 	[ObservableProperty]
-	WarehouseModel inWarehouseModel = null!;  // Giriş Ambarı
+	WarehouseModel? inWarehouseModel;  // Giriş Ambarı
 
 	[ObservableProperty]
 	ObservableCollection<ReworkInProductModel> reworkInProducts = new(); // Girdi ürünleri

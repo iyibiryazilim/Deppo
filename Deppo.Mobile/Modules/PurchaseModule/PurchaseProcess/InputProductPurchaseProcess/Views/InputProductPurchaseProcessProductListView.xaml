@@ -87,20 +87,16 @@
                             </Border.GestureRecognizers>
                             <Grid ColumnDefinitions="Auto,*"
                                   ColumnSpacing="10">
-                                <Border BackgroundColor="{StaticResource Primary}"
-                                        StrokeShape="RoundRectangle 5"
+                                <Border StrokeShape="RoundRectangle 5"
                                         StrokeThickness="0.5">
                                     <Image Grid.Column="0"
                                            HeightRequest="50"
-                                           Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                           Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                            WidthRequest="50" />
                                 </Border>
 
                                 <VerticalStackLayout Grid.Column="1"
                                                      Spacing="2">
-                                    <Label x:Name="itemReferenceId"
-                                           IsVisible="Hidden"
-                                           Text="{Binding ReferenceId}" />
                                     <Label FontAttributes="Bold"
                                            LineBreakMode="TailTruncation"
                                            Text="{Binding Code}"

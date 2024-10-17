@@ -194,8 +194,7 @@
                                     StrokeThickness="0.1">
                                 <Grid ColumnDefinitions="Auto,*, Auto"
                                       ColumnSpacing="10">
-                                    <Border BackgroundColor="{StaticResource Secondary}"
-                                            StrokeShape="RoundRectangle 5"
+                                    <Border StrokeShape="RoundRectangle 5"
                                             StrokeThickness="0.5">
                                         <Image Grid.Column="0"
                                                HeightRequest="50"

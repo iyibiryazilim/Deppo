@@ -36,8 +36,7 @@
     </ContentPage.ToolbarItems>
 
     <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
-                                   StatusBarStyle="Default" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -49,15 +48,13 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android"
-                Value="artboard.png" />
+            <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
     <Grid RowDefinitions="*,Auto">
         <Grid RowDefinitions="*,Auto">
-            <Grid RowDefinitions="Auto,*,Auto"
-                  RowSpacing="10">
+            <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
                 <Border Grid.Row="0"
                         Margin="5,0,5,0"
                         Padding="0"
@@ -66,21 +63,19 @@
                         Stroke="{StaticResource Primary}"
                         StrokeShape="RoundRectangle 5"
                         StrokeThickness="0.5">
-                    <SearchBar x:Name="searchBar"
-                               Placeholder="Ara..."
-                               PlaceholderColor="{StaticResource OffBlack}"
-                               TextColor="{StaticResource OffBlack}">
-                        <!-- <SearchBar.Behaviors>
-                    <toolkit:EventToCommandBehavior
-                        Command="{Binding PerformSearchCommand}"
-                        CommandParameter="{Binding Text, Source={x:Reference searchBar}}"
-                        EventName="SearchButtonPressed" />
-                </SearchBar.Behaviors>-->
-                    </SearchBar>
+                    <Entry x:Name="barcodeEntry"
+                           Placeholder="Barkod tara..."
+                           PlaceholderColor="{StaticResource OffBlack}"
+                           TextColor="{StaticResource OffBlack}">
+                        <Entry.Behaviors>
+                            <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                            CommandParameter="{Binding ., Source={x:Reference barcodeEntry}}"
+                                                            EventName="TextChanged" />
+                        </Entry.Behaviors>
+                    </Entry>
                 </Border>
 
-                <CollectionView Grid.Row="1"
-                                ItemsSource="{Binding Items}">
+                <CollectionView Grid.Row="1" ItemsSource="{Binding Items}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="basketModel:InputProductBasketModel">
                             <SwipeView Threshold="100">
@@ -113,15 +108,12 @@
                                 <Border Padding="10"
                                         BackgroundColor="Transparent"
                                         StrokeThickness="0.1">
-                                    <Grid ColumnDefinitions=".20*,.80*"
-                                          ColumnSpacing="10">
+                                    <Grid ColumnDefinitions=".20*,.80*" ColumnSpacing="10">
                                         <Border Grid.Column="0"
-                                                
                                                 Stroke="{StaticResource Primary}"
                                                 StrokeShape="RoundRectangle 5"
                                                 StrokeThickness="0.5">
-                                            <Image Aspect="AspectFill"
-                                                   Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}" />
+                                            <Image Aspect="AspectFill" Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}" />
                                         </Border>
 
                                         <VerticalStackLayout Grid.Column="1">
@@ -158,23 +150,23 @@
                                                       VerticalOptions="End">
                                                     <Label Grid.Column="0"
                                                            FontFamily="FAS"
+                                                           FontSize="10"
                                                            Text="{Binding VariantIcon}"
-                                                           TextColor="{Binding VariantIconColor}"
-                                                           FontSize="10" />
+                                                           TextColor="{Binding VariantIconColor}" />
                                                     <Label Grid.Column="1"
                                                            FontFamily="FAS"
+                                                           FontSize="10"
                                                            Text="{Binding LocTrackingIcon}"
-                                                           TextColor="{Binding LocTrackingIconColor}"
-                                                           FontSize="10" />
+                                                           TextColor="{Binding LocTrackingIconColor}" />
                                                     <Label Grid.Column="2"
                                                            FontFamily="FAS"
+                                                           FontSize="10"
                                                            Text="{Binding TrackingTypeIcon}"
-                                                           TextColor="{Binding TrackingTypeIconColor}"
-                                                           FontSize="10" />
+                                                           TextColor="{Binding TrackingTypeIconColor}" />
                                                 </Grid>
 
-                                                <Grid ColumnDefinitions="Auto,Auto,Auto"
-                                                      Grid.Column="1"
+                                                <Grid Grid.Column="1"
+                                                      ColumnDefinitions="Auto,Auto,Auto"
                                                       ColumnSpacing="10"
                                                       HorizontalOptions="EndAndExpand">
                                                     <Border Grid.Column="0"
@@ -188,8 +180,7 @@
                                                                TextColor="{StaticResource Secondary}" />
 
                                                         <Border.GestureRecognizers>
-                                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessBasketListViewModel}}, Path=DecreaseCommand}"
-                                                                                  CommandParameter="{Binding .}" />
+                                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessBasketListViewModel}}, Path=DecreaseCommand}" CommandParameter="{Binding .}" />
                                                         </Border.GestureRecognizers>
                                                     </Border>
                                                     <Label Grid.Column="1"
@@ -209,8 +200,7 @@
                                                                TextColor="{StaticResource White}" />
 
                                                         <Border.GestureRecognizers>
-                                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessBasketListViewModel}}, Path=IncreaseCommand}"
-                                                                                  CommandParameter="{Binding .}" />
+                                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessBasketListViewModel}}, Path=IncreaseCommand}" CommandParameter="{Binding .}" />
                                                         </Border.GestureRecognizers>
                                                     </Border>
                                                 </Grid>
@@ -239,13 +229,10 @@
                             IsModal="True"
                             ShowGrabber="True">
                 <!--#region BottomSheetContent-->
-                <Grid RowDefinitions="Auto,*"
-                      RowSpacing="20">
+                <Grid RowDefinitions="Auto,*" RowSpacing="20">
 
-                    <VerticalStackLayout Grid.Row="0"
-                                         Spacing="5">
-                        <Grid ColumnDefinitions="*,*"
-                              ColumnSpacing="10">
+                    <VerticalStackLayout Grid.Row="0" Spacing="5">
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                             <Label Grid.Column="0"
                                    FontAttributes="Bold"
                                    FontSize="Medium"
@@ -264,8 +251,7 @@
                                 </ImageButton.Source>
                             </ImageButton>
                         </Grid>
-                        <BoxView HeightRequest="2"
-                                 Color="{StaticResource Primary}" />
+                        <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
                     </VerticalStackLayout>
 
                     <Grid Grid.Row="1"
@@ -296,8 +282,7 @@
                                         RemainingItemsThreshold="2"
                                         RemainingItemsThresholdReachedCommand="{Binding LoadMoreLocationsCommand}">
                             <CollectionView.ItemsLayout>
-                                <LinearItemsLayout ItemSpacing="5"
-                                                   Orientation="Vertical" />
+                                <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="locationModel:LocationModel">
@@ -305,8 +290,7 @@
                                             BackgroundColor="{StaticResource WhiteSmoke}"
                                             StrokeShape="RoundRectangle 10"
                                             StrokeThickness="0.1">
-                                        <Grid ColumnDefinitions="*,Auto"
-                                              ColumnSpacing="10">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
 
                                             <VerticalStackLayout Grid.Column="0">
                                                 <Label FontAttributes="Bold"
@@ -346,8 +330,7 @@
                                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
                                                            TextColor="{StaticResource Secondary}" />
                                                     <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessBasketListViewModel}}, Path=LocationDecreaseCommand}"
-                                                                              CommandParameter="{Binding .}" />
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessBasketListViewModel}}, Path=LocationDecreaseCommand}" CommandParameter="{Binding .}" />
                                                     </Border.GestureRecognizers>
                                                 </Border>
                                                 <Label Grid.Column="1"
@@ -366,8 +349,7 @@
                                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
                                                            TextColor="{StaticResource White}" />
                                                     <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessBasketListViewModel}}, Path=LocationIncreaseCommand}"
-                                                                              CommandParameter="{Binding .}" />
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductProcessBasketListViewModel}}, Path=LocationIncreaseCommand}" CommandParameter="{Binding .}" />
                                                     </Border.GestureRecognizers>
                                                 </Border>
                                             </Grid>
@@ -399,14 +381,12 @@
                                  Spacing="10"
                                  VerticalOptions="Center">
                 <VerticalStackLayout Spacing="5">
-                    <Label FontSize="Title"
-                           Text="Ayarlar" />
+                    <Label FontSize="Title" Text="Ayarlar" />
                     <Entry FontSize="Subtitle"
                            Placeholder="http://172.16.1.25:52789"
                            Text="test" />
                 </VerticalStackLayout>
-                <Button Text="Kaydet"
-                        VerticalOptions="End" />
+                <Button Text="Kaydet" VerticalOptions="End" />
             </VerticalStackLayout>
 
             <!--#endregion-->

@@ -25,6 +25,7 @@ public partial class ManuelReworkProcessFormViewModel : BaseViewModel
 	private readonly IUserDialogs _userDialogs;
 	private readonly IProductionTransactionService _productionTransactionService;
 	private readonly IConsumableTransactionService _consumableTransactionService;
+	private readonly IServiceProvider _serviceProvider;
 
 	[ObservableProperty]
 	ReworkBasketModel reworkBasketModel = null!;
@@ -45,12 +46,13 @@ public partial class ManuelReworkProcessFormViewModel : BaseViewModel
 	[ObservableProperty]
 	string specialCode = string.Empty;
 
-	public ManuelReworkProcessFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IProductionTransactionService productionTransactionService, IConsumableTransactionService consumableTransactionService)
+	public ManuelReworkProcessFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IProductionTransactionService productionTransactionService, IConsumableTransactionService consumableTransactionService, IServiceProvider serviceProvider)
 	{
 		_httpClientService = httpClientService;
 		_userDialogs = userDialogs;
 		_productionTransactionService = productionTransactionService;
 		_consumableTransactionService = consumableTransactionService;
+		_serviceProvider = serviceProvider;
 
 		Title = "Form Sayfası";
 
@@ -169,9 +171,21 @@ public partial class ManuelReworkProcessFormViewModel : BaseViewModel
                     {
 						item.Details.Clear();
                     }
-					ReworkBasketModel.ReworkInProducts.Clear();
-					ReworkBasketModel.ReworkOutProductModel.Details.Clear();
-					await ClearFormAsync();
+					if(ReworkBasketModel is not null)
+					{
+						ReworkBasketModel.ReworkInProducts?.Clear();
+						ReworkBasketModel.ReworkOutProductModel?.Details?.Clear();
+					}
+
+					var outWarehouseListViewModel = _serviceProvider.GetRequiredService<ManuelReworkProcessOutWarehouseListViewModel>() ?? throw new InvalidOperationException("Service not found");
+					var warehouseTotalListViewModel = _serviceProvider.GetRequiredService<ManuelReworkProcessWarehouseTotalListViewModel>() ?? throw new InvalidOperationException("Service not found"); 
+					var inWarehouseListViewModel = _serviceProvider.GetRequiredService<ManuelReworkProcessInWarehouseListViewModel>() ?? throw new InvalidOperationException("Service not found");
+					var allProductListViewModel = _serviceProvider.GetRequiredService<ManuelReworkProcessAllProductListViewModel>() ?? throw new InvalidOperationException("Service not found");
+					var basketLocationListViewModel = _serviceProvider.GetRequiredService<ManuelReworkProcessBasketLocationListViewModel>() ?? throw new InvalidOperationException("Service not found");
+					var basketViewModel = _serviceProvider.GetRequiredService<ManuelReworkProcessBasketViewModel>() ?? throw new InvalidOperationException("Service not found");
+
+					await Task.WhenAll(ClearFormAsync(), outWarehouseListViewModel.ClearPageAsync(), warehouseTotalListViewModel.ClearPageAsync(), inWarehouseListViewModel.ClearPageAsync(), allProductListViewModel.ClearPageAsync(), basketLocationListViewModel.ClearPageAsync(), basketViewModel.ClearPageAsync());
+
 
 					if (_userDialogs.IsHudShowing)
 						_userDialogs.HideHud();
@@ -243,7 +257,8 @@ public partial class ManuelReworkProcessFormViewModel : BaseViewModel
 
 		var consumableTransactionLineDto = new ConsumableTransactionLineDto
 		{
-			ProductCode = reworkBasketModel.ReworkOutProductModel.Code,
+			ProductCode = reworkBasketModel.ReworkOutProductModel.IsVariant ? reworkBasketModel.ReworkOutProductModel.MainItemCode : reworkBasketModel.ReworkOutProductModel.Code,
+			VariantCode = reworkBasketModel.ReworkOutProductModel.IsVariant ? reworkBasketModel.ReworkOutProductModel.Code : string.Empty,
 			WarehouseNumber = reworkBasketModel.OutWarehouseModel.Number,
 			Quantity = reworkBasketModel.ReworkOutProductModel.OutputQuantity,
 			ConversionFactor = 1,
@@ -295,7 +310,8 @@ public partial class ManuelReworkProcessFormViewModel : BaseViewModel
 		{
 			var productionTransactionLineDto = new ProductionTransactionLineDto
 			{
-				ProductCode = reworkInProductModel.Code,
+				ProductCode = reworkInProductModel.IsVariant ? reworkInProductModel.MainItemCode : reworkInProductModel.Code,
+				VariantCode = reworkInProductModel.IsVariant ? reworkInProductModel.Code : string.Empty,
 				WarehouseNumber = reworkInProductModel.InWarehouseModel.Number,
 				Quantity = reworkInProductModel.InputQuantity,
 				ConversionFactor = 1,

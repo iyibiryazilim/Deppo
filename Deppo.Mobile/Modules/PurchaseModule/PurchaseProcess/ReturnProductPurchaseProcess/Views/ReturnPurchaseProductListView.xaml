@@ -14,10 +14,11 @@
              Shell.PresentationMode="Modal"
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                        EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
     </ContentPage.Behaviors>
-
 
     <Shell.BackButtonBehavior>
         <BackButtonBehavior Command="{Binding BackCommand}" />
@@ -31,14 +32,16 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android" Value="artboard.png" />
+            <On Platform="Android"
+                Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
     <Grid RowDefinitions="*, Auto">
         <Grid Grid.Row="0"
               RowDefinitions="Auto,Auto,*,Auto"
               RowSpacing="10">
-            <Grid Grid.Row="0" Padding="10,10,0,0"
+            <Grid Grid.Row="0"
+                  Padding="10,10,0,0"
                   ColumnDefinitions="*, Auto"
                   ColumnSpacing="10">
                 <Label Grid.Column="0"
@@ -93,10 +96,12 @@
                                 StrokeShape="RoundRectangle 10"
                                 StrokeThickness="0.1">
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnPurchaseProductListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnPurchaseProductListViewModel}}, Path=ItemTappedCommand}"
+                                                      CommandParameter="{Binding .}" />
                             </Border.GestureRecognizers>
-                            <Grid ColumnDefinitions="Auto,*, Auto" ColumnSpacing="10">
-                                <Border BackgroundColor="{StaticResource Secondary}"
+                            <Grid ColumnDefinitions="Auto,*, Auto"
+                                  ColumnSpacing="10">
+                                <Border BackgroundColor="Transparent"
                                         StrokeShape="RoundRectangle 5"
                                         StrokeThickness="0.5">
                                     <Image Grid.Column="0"
@@ -105,7 +110,8 @@
                                            WidthRequest="50" />
                                 </Border>
 
-                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <VerticalStackLayout Grid.Column="1"
+                                                     Spacing="2">
                                     <Label FontAttributes="Bold"
                                            LineBreakMode="TailTruncation"
                                            Text="{Binding ProductCode}" />
@@ -113,7 +119,8 @@
                                            Text="{Binding ProductName}"
                                            TextColor="{StaticResource Gray600}" />
 
-                                    <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
+                                    <Label TextColor="{StaticResource Gray600}"
+                                           VerticalOptions="Center">
                                         <Label.FormattedText>
                                             <FormattedString>
                                                 <Span FontAttributes="Bold"
@@ -154,19 +161,17 @@
                                            Text="{Binding TrackingTypeIcon}"
                                            TextColor="{Binding TrackingTypeIconColor}" />
                                 </Grid>
-
                             </Grid>
 
                             <Border.Triggers>
                                 <DataTrigger Binding="{Binding IsSelected}"
                                              TargetType="Border"
                                              Value="True">
-                                    <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
+                                    <Setter Property="BackgroundColor"
+                                            Value="{StaticResource SecondaryLight}" />
                                 </DataTrigger>
                             </Border.Triggers>
-
                         </Border>
-
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
@@ -261,8 +266,6 @@
                                                 </Label.FormattedText>
                                             </Label>
                                         </VerticalStackLayout>
-
-
                                     </Grid>
                                     <Border.Triggers>
                                         <DataTrigger Binding="{Binding IsSelected}"
@@ -272,19 +275,15 @@
                                                     Value="{StaticResource SecondaryLight}" />
                                         </DataTrigger>
                                     </Border.Triggers>
-
                                 </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
-
-
                     </CollectionView>
                     <Button Grid.Row="1"
                             Command="{Binding ConfirmVariantCommand}"
                             Text="Tamam" />
                 </Grid>
             </Grid>
-
 
             <!--#endregion-->
         </dx:BottomSheet>

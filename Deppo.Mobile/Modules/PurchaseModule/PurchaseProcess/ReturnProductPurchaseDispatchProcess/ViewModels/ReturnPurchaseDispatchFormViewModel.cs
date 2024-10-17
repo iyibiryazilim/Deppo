@@ -4,6 +4,8 @@ using Deppo.Core.DTOs.PurchaseReturnDispatchTransaction;
 using Deppo.Core.DTOs.SeriLotTransactionDto;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.BasketModels;
+using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
@@ -27,58 +29,62 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurch
 
 public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 {
-	private readonly IHttpClientService _httpClientService;
-	private readonly IPurchaseReturnDispatchTransactionService _purchaseReturnDispatchTransactionService;
-	private readonly IUserDialogs _userDialogs;
-	private readonly ICarrierService _carrierService;
-	private readonly IDriverService _driverService;
-	private readonly IServiceProvider _serviceProvider;
+    private readonly IHttpClientService _httpClientService;
+    private readonly IPurchaseReturnDispatchTransactionService _purchaseReturnDispatchTransactionService;
+    private readonly IUserDialogs _userDialogs;
+    private readonly ICarrierService _carrierService;
+    private readonly IDriverService _driverService;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly ILocationTransactionService _locationTransactionService;
 
 
-	[ObservableProperty]
-	WarehouseModel warehouseModel = null!;
+    [ObservableProperty]
+    WarehouseModel warehouseModel = null!;
 
-	[ObservableProperty]
-	PurchaseSupplier purchaseSupplier = null!;
+    [ObservableProperty]
+    PurchaseSupplier purchaseSupplier = null!;
 
-	[ObservableProperty]
-	PurchaseFicheModel purchaseFicheModel = null!;
+    [ObservableProperty]
+    PurchaseFicheModel purchaseFicheModel = null!;
 
-	[ObservableProperty]
-	public ObservableCollection<PurchaseTransactionModel> selectedPurchaseTransactions;
-	[ObservableProperty]
-	public ObservableCollection<ReturnPurchaseBasketModel> items = null!;
+    [ObservableProperty]
+    public ObservableCollection<PurchaseTransactionModel> selectedPurchaseTransactions;
+    [ObservableProperty]
+    public ObservableCollection<ReturnPurchaseBasketModel> items = null!;
 
-
-	[ObservableProperty]
-	Carrier? selectedCarrier;
-	[ObservableProperty]
-	Driver? selectedDriver;
-
-	public ObservableCollection<Carrier> Carriers { get; } = new();
-	public ObservableCollection<Driver> Drivers { get; } = new();
+    public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
 
 
-	[ObservableProperty]
-	string documentNumber = string.Empty;
+    [ObservableProperty]
+    Carrier? selectedCarrier;
+    [ObservableProperty]
+    Driver? selectedDriver;
 
-	[ObservableProperty]
-	DateTime transactionDate = DateTime.Now;
+    public ObservableCollection<Carrier> Carriers { get; } = new();
+    public ObservableCollection<Driver> Drivers { get; } = new();
 
-	[ObservableProperty]
-	string description = string.Empty;
 
-	[ObservableProperty]
-	string documentTrackingNumber = string.Empty;
+    [ObservableProperty]
+    string documentNumber = string.Empty;
 
-	[ObservableProperty]
-	string specialCode = string.Empty;
+    [ObservableProperty]
+    DateTime transactionDate = DateTime.Now;
 
-    public ReturnPurchaseDispatchFormViewModel(IHttpClientService httpClientService, IPurchaseReturnDispatchTransactionService purchaseReturnDispatchTransactionService, IUserDialogs userDialogs, ICarrierService carrierService, IDriverService driverService, IServiceProvider serviceProvider)
+    [ObservableProperty]
+    string description = string.Empty;
+
+    [ObservableProperty]
+    string documentTrackingNumber = string.Empty;
+
+    [ObservableProperty]
+    string specialCode = string.Empty;
+
+    public ReturnPurchaseDispatchFormViewModel(IHttpClientService httpClientService, IPurchaseReturnDispatchTransactionService purchaseReturnDispatchTransactionService, IUserDialogs userDialogs, ICarrierService carrierService, IDriverService driverService, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService)
     {
         _httpClientService = httpClientService;
         _purchaseReturnDispatchTransactionService = purchaseReturnDispatchTransactionService;
         _userDialogs = userDialogs;
+        _locationTransactionService = locationTransactionService;
         Items = new();
 
         Title = "Satınalma İade İrsaliyesi";
@@ -94,144 +100,186 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
     }
     public Page CurrentPage { get; set; }
 
-	public Command SaveCommand { get; }
-	public Command LoadPageCommand { get; }
-	public Command LoadCarriersCommand { get; }
-	public Command LoadDriversCommand { get; }
+    public Command SaveCommand { get; }
+    public Command LoadPageCommand { get; }
+    public Command LoadCarriersCommand { get; }
+    public Command LoadDriversCommand { get; }
 
-	public Command BackCommand { get; }
+    public Command BackCommand { get; }
 
-	private async Task LoadPageAsync()
-	{
-		if (IsBusy)
-			return;
+    private async Task LoadPageAsync()
+    {
+        if (IsBusy)
+            return;
 
-		try
-		{
-			IsBusy = true;
+        try
+        {
+            IsBusy = true;
 
 
-			CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
-		}
-		catch (Exception ex)
-		{
-			if(_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+            CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-	public static string GetEnumDescription(Enum value)
-	{
-		FieldInfo fi = value.GetType().GetField(value.ToString());
+    public static string GetEnumDescription(Enum value)
+    {
+        FieldInfo fi = value.GetType().GetField(value.ToString());
 
-		DescriptionAttribute[] attributes = fi.GetCustomAttributes(typeof(DescriptionAttribute), false) as DescriptionAttribute[];
+        DescriptionAttribute[] attributes = fi.GetCustomAttributes(typeof(DescriptionAttribute), false) as DescriptionAttribute[];
 
-		if (attributes != null && attributes.Any())
-		{
-			return attributes.First().Description;
-		}
+        if (attributes != null && attributes.Any())
+        {
+            return attributes.First().Description;
+        }
 
-		return value.ToString();
-	}
+        return value.ToString();
+    }
 
-	private async Task LoadCarriersAsync()
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			Carriers.Clear();
-			SelectedCarrier = null;
-			IsBusy = true;
+    private async Task LoadCarriersAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            Carriers.Clear();
+            SelectedCarrier = null;
+            IsBusy = true;
 
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			var result = await _carrierService.GetObjects(
-					httpClient: httpClient,
-					firmNumber: _httpClientService.FirmNumber
+            var result = await _carrierService.GetObjects(
+                    httpClient: httpClient,
+                    firmNumber: _httpClientService.FirmNumber
 
-			);
+            );
 
-			if (result.IsSuccess)
-			{
-				if (result.Data is null)
-					return;
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
 
-				foreach (var item in result.Data)
-				{
-					Carriers.Add(Mapping.Mapper.Map<Carrier>(item));
-				}
-			}
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+                foreach (var item in result.Data)
+                {
+                    Carriers.Add(Mapping.Mapper.Map<Carrier>(item));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
         }
-	}
+    }
 
-	private async Task LoadDriversAsync()
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			Drivers.Clear();
-			SelectedDriver = null;
-			IsBusy = true;
+    private async Task LoadDriversAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            Drivers.Clear();
+            SelectedDriver = null;
+            IsBusy = true;
 
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			var result = await _driverService.GetObjects(
-					httpClient: httpClient
-			);
+            var result = await _driverService.GetObjects(
+                    httpClient: httpClient
+            );
 
-			if (result.IsSuccess)
-			{
-				if (result.Data is null)
-					return;
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
 
-				foreach (var item in result.Data)
-				{
-					Drivers.Add(Mapping.Mapper.Map<Driver>(item));
-				}
-			}
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+                foreach (var item in result.Data)
+                {
+                    Drivers.Add(Mapping.Mapper.Map<Driver>(item));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
         }
-	}
-	private async Task SaveAsync()
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
+    }
+
+    public async Task LoadLocationTransaction(ReturnPurchaseBasketModel returnPurchaseBasketModel, ReturnPurchaseBasketDetailModel returnPurchaseBasketDetailModel)
+    {
+        try
+        {
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _locationTransactionService.GetInputObjectsAsync(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                productReferenceId: returnPurchaseBasketModel.IsVariant ? returnPurchaseBasketModel.MainItemReferenceId : returnPurchaseBasketModel.ItemReferenceId,
+                variantReferenceId: returnPurchaseBasketModel.IsVariant ? returnPurchaseBasketModel.ItemReferenceId : 0,
+                warehouseNumber: WarehouseModel.Number,
+                locationRef: returnPurchaseBasketDetailModel.LocationReferenceId,
+                skip: 0,
+                take: 999999,
+                search: ""
+            );
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+                foreach (var item in result.Data)
+                {
+                    LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+                }
+
+            }
+
+            _userDialogs.Loading().Hide();
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+    private async Task SaveAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
 
             var confirm = await _userDialogs.ConfirmAsync("Satınalma İade İrsaliyesi oluşturulacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
             if (!confirm)
@@ -239,123 +287,135 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 
 
             _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
-			await Task.Delay(1000);
+            await Task.Delay(1000);
 
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			var dto = new PurchaseReturnDispatchTransactionInsert
-			{
-				Code = "",
-				CurrentCode = PurchaseSupplier.Code,
-				DriverFirstName = SelectedDriver != null ? SelectedDriver.Name : "",
-				DriverLastName = SelectedDriver != null ? SelectedDriver.Surname : "",
-				CarrierCode = SelectedCarrier != null ? SelectedCarrier.Code : "",
-				IdentityNumber = SelectedDriver != null ? SelectedDriver.IdentityNumber : "",
-				Plaque = SelectedDriver != null ? SelectedDriver.PlateNumber : "",
-				IsEDispatch = 1,
-				DispatchType = 0,
-				DispatchStatus = 1,
-				EDispatchProfileId = 1,
-				Description = Description,
-				DoCode = DocumentNumber,
-				DocTrackingNumber = DocumentTrackingNumber,
-				TransactionDate = TransactionDate,
-				FirmNumber = _httpClientService.FirmNumber,
-				SpeCode = SpecialCode,
-				WarehouseNumber = WarehouseModel.Number,
+            var dto = new PurchaseReturnDispatchTransactionInsert
+            {
+                Code = "",
+                CurrentCode = PurchaseSupplier.Code,
+                DriverFirstName = SelectedDriver != null ? SelectedDriver.Name : "",
+                DriverLastName = SelectedDriver != null ? SelectedDriver.Surname : "",
+                CarrierCode = SelectedCarrier != null ? SelectedCarrier.Code : "",
+                IdentityNumber = SelectedDriver != null ? SelectedDriver.IdentityNumber : "",
+                Plaque = SelectedDriver != null ? SelectedDriver.PlateNumber : "",
+                IsEDispatch = 1,
+                DispatchType = 0,
+                DispatchStatus = 1,
+                EDispatchProfileId = 1,
+                Description = Description,
+                DoCode = DocumentNumber,
+                DocTrackingNumber = DocumentTrackingNumber,
+                TransactionDate = TransactionDate,
+                FirmNumber = _httpClientService.FirmNumber,
+                SpeCode = SpecialCode,
+                WarehouseNumber = WarehouseModel.Number,
 
-			};
+            };
 
-			foreach (var item in Items)
-			{
-				var purchaseReturnDispatchTransactionLineDto = new PurchaseReturnDispatchTransactionLineDto
-				{
-					ProductCode = item.ItemCode,
-					WarehouseNumber = (short?)WarehouseModel.Number,
-					Quantity = item.Quantity,
-					DispatchReferenceId = item.DispatchReferenceId,
-					ConversionFactor = 1,
-					OtherConversionFactor = 1,
-					SubUnitsetCode = item.SubUnitsetCode,
-				};
+            foreach (var item in Items)
+            {
+                var purchaseReturnDispatchTransactionLineDto = new PurchaseReturnDispatchTransactionLineDto
+                {
+                    ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
+                    VariantCode = item.IsVariant ? item.ItemCode : string.Empty,
+                    WarehouseNumber = (short?)WarehouseModel.Number,
+                    Quantity = item.Quantity,
+                    DispatchReferenceId = item.DispatchReferenceId,
+                    ConversionFactor = 1,
+                    OtherConversionFactor = 1,
+                    SubUnitsetCode = item.SubUnitsetCode,
+                };
 
-				foreach (var detail in item.Details)
-				{
-					var serilotTransactionDto = new SeriLotTransactionDto
-					{
-						StockLocationCode = detail.LocationCode,
-						InProductTransactionLineReferenceId = detail.TransactionReferenceId,
-						OutProductTransactionLineReferenceId = detail.ReferenceId,
-						Quantity = detail.RemainingQuantity,
-						SubUnitsetCode = item.SubUnitsetCode,
-						DestinationStockLocationCode = string.Empty,
-						ConversionFactor = 1,
-						OtherConversionFactor = 1,
-					};
+                foreach (var detail in item.Details)
+                {
+                    await LoadLocationTransaction(item, detail);
+                    LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
 
-					purchaseReturnDispatchTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
-				}
+                    foreach (var locationTransaction in LocationTransactions)
+                    {
+                        while (locationTransaction.RemainingQuantity > 0 && item.Quantity > 0)
+                        {
+                            var serilotTransactionDto = new SeriLotTransactionDto
+                            {
+                                StockLocationCode = detail.LocationCode,
+                                InProductTransactionLineReferenceId = locationTransaction.TransactionReferenceId,
+                                OutProductTransactionLineReferenceId = locationTransaction.ReferenceId,
+                                Quantity = item.Quantity > locationTransaction.RemainingQuantity ? locationTransaction.RemainingQuantity : item.Quantity,
+                                SubUnitsetCode = item.SubUnitsetCode,
+                                DestinationStockLocationCode = string.Empty,
+                                ConversionFactor = 1,
+                                OtherConversionFactor = 1,
+                            };
+                            purchaseReturnDispatchTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+                            locationTransaction.RemainingQuantity -= (double)serilotTransactionDto.Quantity;
+                            item.Quantity -= (double)serilotTransactionDto.Quantity;
+                        }
+                    }
 
-				dto.Lines.Add(purchaseReturnDispatchTransactionLineDto);
-			}
-			Console.WriteLine(dto);
+                }
 
-			var result = await _purchaseReturnDispatchTransactionService.InsertPurchaseReturnDispatchTransaction(httpClient, _httpClientService.FirmNumber, dto);
+                dto.Lines.Add(purchaseReturnDispatchTransactionLineDto);
+            }
+            Console.WriteLine(dto);
 
-			ResultModel resultModel = new();
-			if (result.IsSuccess)
-			{
-				resultModel.Message = "Başarılı";
-				resultModel.Code = result.Data.Code;
-				resultModel.PageTitle = Title;
-				resultModel.PageCountToBack = 7;
+            var result = await _purchaseReturnDispatchTransactionService.InsertPurchaseReturnDispatchTransaction(httpClient, _httpClientService.FirmNumber, dto);
 
-				if (_userDialogs.IsHudShowing)
-					_userDialogs.HideHud();
+            ResultModel resultModel = new();
+            if (result.IsSuccess)
+            {
+                resultModel.Message = "Başarılı";
+                resultModel.Code = result.Data.Code;
+                resultModel.PageTitle = Title;
+                resultModel.PageCountToBack = 7;
 
-				await ClearFormAsync();
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                await ClearFormAsync();
 
                 var basketViewModel = _serviceProvider.GetRequiredService<ReturnPurchaseDispatchBasketViewModel>();
-			    basketViewModel.Items.Clear();
-				basketViewModel.SelectedPurchaseTransactions.Clear();
-				basketViewModel.SelectedLocationTransactions.Clear();
-				basketViewModel.SelectedSeriLotTransactions.Clear();
+                basketViewModel.Items.Clear();
+                basketViewModel.SelectedPurchaseTransactions.Clear();
+                basketViewModel.SelectedLocationTransactions.Clear();
+                basketViewModel.SelectedSeriLotTransactions.Clear();
 
-				await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
-				{
-					[nameof(ResultModel)] = resultModel
-				});
-			}
-			else
-			{
-				if (_userDialogs.IsHudShowing)
-					_userDialogs.HideHud();
+                await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
+                {
+                    [nameof(ResultModel)] = resultModel
+                });
+            }
+            else
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
 
-				resultModel.Message = "Başarısız";
-				resultModel.PageTitle = Title;
-				resultModel.ErrorMessage = result.Message;
-				resultModel.PageCountToBack = 1;
-				await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
-				{
-					[nameof(ResultModel)] = resultModel
-				});
-			}
+                resultModel.Message = "Başarısız";
+                resultModel.PageTitle = Title;
+                resultModel.ErrorMessage = result.Message;
+                resultModel.PageCountToBack = 1;
+                await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+                {
+                    [nameof(ResultModel)] = resultModel
+                });
+            }
 
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
         }
-	}
+    }
 
     private async Task BackAsync()
     {
@@ -390,10 +450,10 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
         }
     }
 
-	private async Task ClearFormAsync()
-	{
-		try
-		{
+    private async Task ClearFormAsync()
+    {
+        try
+        {
             DocumentNumber = string.Empty;
             SpecialCode = string.Empty;
             DocumentTrackingNumber = string.Empty;
@@ -403,9 +463,9 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 
         }
         catch (Exception ex)
-		{
+        {
 
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
-	}
+    }
 }

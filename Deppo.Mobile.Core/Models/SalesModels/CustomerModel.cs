@@ -5,8 +5,7 @@ namespace Deppo.Mobile.Core.Models.SalesModels;
 public class CustomerModel : Customer
 {
 	private bool _isSelected;
-	private int _orderReferenceCount;
-
+	
 	public CustomerModel()
 	{
 	}
@@ -17,16 +16,6 @@ public class CustomerModel : Customer
 		set
 		{
 			_isSelected = value;
-			NotifyPropertyChanged();
-		}
-	}
-
-	public int OrderReferenceCount
-	{
-		get => _orderReferenceCount;
-		set
-		{
-			_orderReferenceCount = value;
 			NotifyPropertyChanged();
 		}
 	}

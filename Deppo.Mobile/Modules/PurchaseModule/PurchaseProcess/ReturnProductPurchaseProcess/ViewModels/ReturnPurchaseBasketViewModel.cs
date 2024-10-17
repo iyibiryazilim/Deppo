@@ -5,6 +5,7 @@ using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
+using Deppo.Mobile.Helpers.BarcodeHelper;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -23,6 +24,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
     private readonly ISeriLotTransactionService _serilotTransactionService;
     private readonly ILocationTransactionService _locationTransactionService;
     private readonly IUserDialogs _userDialogs;
+    private readonly IBarcodeSearchHelper _barcodeSearchHelper;
 
     [ObservableProperty]
     WarehouseModel warehouseModel = null!;
@@ -34,55 +36,61 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
     SeriLotTransactionModel? selectedSeriLotTransaction;
 
     [ObservableProperty]
-    LocationTransactionModel? selectedLocationTransaction;
+    GroupLocationTransactionModel? selectedLocationTransaction;
 
     [ObservableProperty]
     public ObservableCollection<SeriLotTransactionModel> selectedSeriLotTransactions = new();
 
     [ObservableProperty]
-    public ObservableCollection<LocationTransactionModel> selectedLocationTransactions = new();
+    public ObservableCollection<GroupLocationTransactionModel> selectedLocationTransactions = new();
 
-    #region Collections
-    public ObservableCollection<ReturnPurchaseBasketModel> Items { get; } = new();
+	[ObservableProperty]
+	public Entry barcodeEntry;
+
+	#region Collections
+	public ObservableCollection<ReturnPurchaseBasketModel> Items { get; } = new();
     public ObservableCollection<SeriLotTransactionModel> SeriLotTransactions { get; } = new();
-    public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
-    #endregion
+    public ObservableCollection<GroupLocationTransactionModel> LocationTransactions { get; } = new();
+	#endregion
 
-    public ReturnPurchaseBasketViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs)
-    {
-        _httpClientService = httpClientService;
-        _serilotTransactionService = serilotTransactionService;
-        _locationTransactionService = locationTransactionService;
-        _userDialogs = userDialogs;
+	public ReturnPurchaseBasketViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs, IBarcodeSearchHelper barcodeSearchHelper)
+	{
+		_httpClientService = httpClientService;
+		_serilotTransactionService = serilotTransactionService;
+		_locationTransactionService = locationTransactionService;
+		_userDialogs = userDialogs;
+		_barcodeSearchHelper = barcodeSearchHelper;
 
-        Title = "Sepet Listesi";
+		Title = "Sepet Listesi";
 
-        ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
-        IncreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await IncreaseAsync(item));
-        DecreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DecreaseAsync(item));
-        DeleteItemCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DeleteItemAsync(item));
-
-
-        LoadMoreSeriLotTransactionsCommand = new Command(async () => await LoadMoreSeriLotTransactionsAsync());
-        SeriLotTransactionIncreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionIncreaseAsync(item));
-        SeriLotTransactionDecreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionDecreaseAsync(item));
-        ConfirmSeriLotTransactionCommand = new Command(ConfirmSeriLotTransactionAsync);
-        SeriLotTransactionCloseCommand = new Command(async () => await SeriLotTransactionCloseAsync());
+		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
+        PerformSearchCommand = new Command<Entry>(async (x) => await PerformSearchAsync(x));
+		IncreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await IncreaseAsync(item));
+		DecreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DecreaseAsync(item));
+		DeleteItemCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DeleteItemAsync(item));
 
 
-        LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
-        LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
-        LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
-        ConfirmLocationTransactionCommand = new Command(ConfirmLocationTransactionAsync);
-        LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
+		LoadMoreSeriLotTransactionsCommand = new Command(async () => await LoadMoreSeriLotTransactionsAsync());
+		SeriLotTransactionIncreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionIncreaseAsync(item));
+		SeriLotTransactionDecreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionDecreaseAsync(item));
+		ConfirmSeriLotTransactionCommand = new Command(ConfirmSeriLotTransactionAsync);
+		SeriLotTransactionCloseCommand = new Command(async () => await SeriLotTransactionCloseAsync());
 
-        NextViewCommand = new Command(async () => await NextViewAsync());
-        BackCommand = new Command(async () => await BackAsync());
-        CameraTappedCommand = new Command(async () => await CameraTappedAsync());
-    }
 
-    #region Commands
-    public Command ShowProductViewCommand { get; }
+		LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
+		LocationTransactionIncreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
+		LocationTransactionDecreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
+		ConfirmLocationTransactionCommand = new Command(ConfirmLocationTransactionAsync);
+		LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
+
+		NextViewCommand = new Command(async () => await NextViewAsync());
+		BackCommand = new Command(async () => await BackAsync());
+		CameraTappedCommand = new Command(async () => await CameraTappedAsync());
+	}
+
+	#region Commands
+	public Command ShowProductViewCommand { get; }
+    public Command PerformSearchCommand { get; }
     public Command IncreaseCommand { get; }
     public Command DecreaseCommand { get; }
     public Command DeleteItemCommand { get; }
@@ -136,7 +144,44 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
         }
     }
 
-    private async Task IncreaseAsync(ReturnPurchaseBasketModel item)
+	private async Task PerformSearchAsync(Entry barcodeEntry)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			if (string.IsNullOrEmpty(barcodeEntry.Text))
+				return;
+
+			IsBusy = true;
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			await _barcodeSearchHelper.BarcodeDetectedAsync(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				barcode: barcodeEntry.Text,
+				comingPage: "ReturnPurchaseBasketViewModel"
+			);
+
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+			BarcodeEntry.Text = string.Empty;
+            barcodeEntry.Text = string.Empty;
+		}
+	}
+
+	private async Task IncreaseAsync(ReturnPurchaseBasketModel item)
     {
         if (IsBusy)
             return;
@@ -260,7 +305,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
             LocationTransactions.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationTransactionService.GetInputObjectsAsync(
+            var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
@@ -274,12 +319,12 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
                     return;
                 foreach (var item in result.Data)
                 {
-                    LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+                    LocationTransactions.Add(Mapping.Mapper.Map<GroupLocationTransactionModel>(item));
                 }
 
                 foreach (var locationTransaction in LocationTransactions)
                 {
-                    var matchingItem = SelectedItem.Details.FirstOrDefault(item => item.ReferenceId == locationTransaction.ReferenceId);
+                    var matchingItem = SelectedItem.Details.FirstOrDefault(item => item.LocationReferenceId == locationTransaction.LocationReferenceId);
                     if (matchingItem != null)
                     {
                         locationTransaction.OutputQuantity = matchingItem.Quantity;
@@ -310,7 +355,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationTransactionService.GetInputObjectsAsync(httpClient: httpClient,
+            var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 productReferenceId: SelectedItem.ItemReferenceId,
@@ -325,12 +370,12 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
 
                 foreach (var item in result.Data)
                 {
-                    LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+                    LocationTransactions.Add(Mapping.Mapper.Map<GroupLocationTransactionModel>(item));
                 }
 
                 foreach (var locationTransaction in LocationTransactions)
                 {
-                    var matchingItem = SelectedItem.Details.FirstOrDefault(item => item.ReferenceId == locationTransaction.ReferenceId);
+                    var matchingItem = SelectedItem.Details.FirstOrDefault(item => item.LocationReferenceId == locationTransaction.LocationReferenceId);
                     if (matchingItem != null)
                     {
                         locationTransaction.OutputQuantity = matchingItem.Quantity;
@@ -348,7 +393,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
         }
     }
 
-    private async Task LocationTransactionIncreaseAsync(LocationTransactionModel item)
+    private async Task LocationTransactionIncreaseAsync(GroupLocationTransactionModel item)
     {
         if (IsBusy)
             return;
@@ -394,7 +439,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
 
     }
 
-    private async Task LocationTransactionDecreaseAsync(LocationTransactionModel item)
+    private async Task LocationTransactionDecreaseAsync(GroupLocationTransactionModel item)
     {
         if (IsBusy)
             return;
@@ -456,25 +501,29 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
 
 				foreach (var item in SelectedLocationTransactions)
                 {
-                    var selectedLocationTransactionItem = SelectedItem.Details.FirstOrDefault(x => x.TransactionReferenceId == item.TransactionReferenceId);
+                    var selectedLocationTransactionItem = SelectedItem.Details.FirstOrDefault(x => x.LocationReferenceId == item.LocationReferenceId);
                     if (selectedLocationTransactionItem is not null)
                     {
                         selectedLocationTransactionItem.Quantity = item.OutputQuantity;
                     }
-
-
-                    SelectedItem.Details.Add(new ReturnPurchaseBasketDetailModel
+                    else
                     {
-                        ReferenceId = item.ReferenceId,
-                        LocationReferenceId = item.LocationReferenceId,
-                        LocationCode = item.LocationCode,
-                        LocationName = item.LocationName,
-                        TransactionReferenceId = item.TransactionReferenceId,
-                        TransactionFicheReferenceId = item.TransactionFicheReferenceId,
-                        InTransactionReferenceId = item.InTransactionReferenceId,
-                        Quantity = item.OutputQuantity,
-                        RemainingQuantity = item.OutputQuantity,
-                    });
+                        SelectedItem.Details.Add(new ReturnPurchaseBasketDetailModel
+                        {
+                            //ReferenceId = item.ReferenceId,
+                            LocationReferenceId = item.LocationReferenceId,
+                            LocationCode = item.LocationCode,
+                            LocationName = item.LocationName,
+                            //TransactionReferenceId = item.TransactionReferenceId,
+                            //TransactionFicheReferenceId = item.TransactionFicheReferenceId,
+                            //InTransactionReferenceId = item.InTransactionReferenceId,
+                            Quantity = item.OutputQuantity,
+                            RemainingQuantity = item.OutputQuantity,
+                        });
+                    }
+
+
+                   
                 }
 
 

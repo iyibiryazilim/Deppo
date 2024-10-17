@@ -13,6 +13,7 @@ using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.Views;
 using DevExpress.Maui.Controls;
+using DevExpress.Maui.Core.Internal;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.ViewModels;
@@ -278,6 +279,11 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
                     await LoadShipAddressesAsync(item);
                     CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
                 }
+                else
+                {
+                    item.IsSelected = true;
+                    SalesCustomer = item;
+                }
             }
             else
             {
@@ -385,7 +391,6 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
                 SalesCustomer.ShipAddressCode = selectedShipAddress.Code;
                 SalesCustomer.ShipAddressName = selectedShipAddress.Name;
 
-                // Hem SalesCustomer hem de seçilen Ship Address'in seçildiğini işaretle
                 Items.ToList().ForEach(x => x.IsSelected = false);
 
                 SalesCustomer.IsSelected = true;
@@ -402,7 +407,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
 
-            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
@@ -418,19 +423,26 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
         {
             IsBusy = true;
 
-            if (SalesCustomer is not null)
-            {
-                await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessBasketListView)}", new Dictionary<string, object>
-                {
-                    [nameof(SalesCustomer)] = SalesCustomer,
-                    [nameof(WarehouseModel)] = WarehouseModel,
-                });
-            }
-            else
-            {
-                _userDialogs.Alert("Lütfen bir müşteri seçiniz.", "Hata", "Tamam");
-            }
-        }
+			// Müşteri kontrolü
+			if (SalesCustomer is null)
+			{
+				await _userDialogs.AlertAsync("Lütfen bir müşteri seçiniz.", "Hata", "Tamam");
+				return;
+			}
+
+			// Sevk adresi seçilmiş mi kontrolü
+			if (SalesCustomer.ShipAddressCount > 0 && SalesCustomer.ShipAddressReferenceId == 0)
+			{
+				await _userDialogs.AlertAsync("Lütfen bir sevk adresi seçiniz.", "Hata", "Tamam");
+				return;
+			}
+
+			await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessBasketListView)}", new Dictionary<string, object>
+			{
+				[nameof(SalesCustomer)] = SalesCustomer,
+				[nameof(WarehouseModel)] = WarehouseModel,
+			});
+		}
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
@@ -504,10 +516,71 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 
     private async Task BackAsyc()
     {
-        Items.Clear();
-        ShipAddresses.Clear();
-        SalesCustomer = null;
-        await Shell.Current.GoToAsync("..");
+        if (IsBusy)
+			return;
+        try
+        {
+            IsBusy = true;
+
+            var confirm = await _userDialogs.ConfirmAsync("Verileriniz silinecektir! Devam etmek istediğinize emin misiniz?", "İptal", "Evet", "Hayır");
+            if (!confirm)
+                return;
+
+			Items.Clear();
+			ShipAddresses.Clear();
+			if (SalesCustomer is not null)
+			{
+				SalesCustomer.ShipAddressReferenceId = 0;
+				SalesCustomer.ShipAddressCode = string.Empty;
+				SalesCustomer.ShipAddressName = string.Empty;
+				SalesCustomer.IsSelected = false;
+			}
+			SalesCustomer = null;
+			Items.ForEach(x => x.IsSelected = false);
+
+			await Shell.Current.GoToAsync("..");
+		}
+        catch (Exception ex)
+        {
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+       
+    }
+
+    public async Task ClearPageAsync()
+    {
+        try
+        {
+            await Task.Run(() =>
+            {
+				ShipAddresses.Clear();
+				if (SalesCustomer is not null)
+				{
+					SalesCustomer.ShipAddressReferenceId = 0;
+					SalesCustomer.ShipAddressCode = string.Empty;
+					SalesCustomer.ShipAddressName = string.Empty;
+
+					SalesCustomer.IsSelected = false;
+				}
+				SalesCustomer = null;
+
+				Items.ForEach(x => x.IsSelected = false);
+			});
+        }
+        catch (Exception ex)
+        {
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
     }
 
 }

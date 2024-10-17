@@ -333,7 +333,6 @@ public partial class ManuelReworkProcessBasketLocationListViewModel : BaseViewMo
 	}
 
 
-
 	private async Task ShowLocationsAsync()
 	{
 		if (IsBusy)
@@ -405,7 +404,8 @@ public partial class ManuelReworkProcessBasketLocationListViewModel : BaseViewMo
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
 				warehouseNumber: SelectedReworkInProductModel.InWarehouseModel.Number,
-				productReferenceId: SelectedReworkInProductModel.ReferenceId,
+				productReferenceId: SelectedReworkInProductModel.IsVariant ? SelectedReworkInProductModel.MainItemReferenceId : SelectedReworkInProductModel.ReferenceId,
+				variantReferenceId: SelectedReworkInProductModel.IsVariant ? SelectedReworkInProductModel.ReferenceId : 0,
 				skip: 0,
 				take: 20);
 
@@ -450,7 +450,8 @@ public partial class ManuelReworkProcessBasketLocationListViewModel : BaseViewMo
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
 				warehouseNumber: SelectedReworkInProductModel.InWarehouseModel.Number,
-				productReferenceId: SelectedReworkInProductModel.ReferenceId,
+				productReferenceId: SelectedReworkInProductModel.IsVariant ? SelectedReworkInProductModel.MainItemReferenceId : SelectedReworkInProductModel.ReferenceId,
+				variantReferenceId: SelectedReworkInProductModel.IsVariant ? SelectedReworkInProductModel.ReferenceId : 0,
 				skip: Items.Count,
 				take: 20);
 
@@ -543,6 +544,29 @@ public partial class ManuelReworkProcessBasketLocationListViewModel : BaseViewMo
 		finally
 		{
 			IsBusy = false;
+		}
+	}
+
+	public async Task ClearPageAsync()
+	{
+		try
+		{
+			await Task.Run(() =>
+			{
+				if(SelectedItem is not null)
+				{
+					SelectedItem.IsSelected = false;
+					SelectedItem = null;
+				}
+				SelectedItems.Clear();
+			});
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 	}
 }

@@ -25,7 +25,7 @@ public class OutputOutsourceTransferBasketModel : INotifyPropertyChanged, IDispo
     private int _trackingType;
     private int _locTracking;
     private bool _isSelected;
-    private string _image;
+    private string? _image;
     private double _outputQuantity;
     private int _shipAddressReferenceId;
     private string _shipAddressCode = string.Empty;
@@ -279,7 +279,7 @@ public class OutputOutsourceTransferBasketModel : INotifyPropertyChanged, IDispo
         }
     }
 
-    public string Image
+    public string? Image
     {
         get => _image;
         set

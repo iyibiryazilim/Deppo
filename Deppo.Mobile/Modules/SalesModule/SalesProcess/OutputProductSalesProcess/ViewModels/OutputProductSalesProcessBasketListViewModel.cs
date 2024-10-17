@@ -8,6 +8,7 @@ using Deppo.Mobile.Core.Models.SalesModels;
 using Deppo.Mobile.Core.Models.SalesModels.BasketModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
+using Deppo.Mobile.Helpers.BarcodeHelper;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -25,6 +26,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 	private readonly ILocationTransactionService _locationTransactionService;
 	private readonly ISeriLotTransactionService _seriLotTransactionService;
 	private readonly IUserDialogs _userDialogs;
+	private readonly IBarcodeSearchHelper _barcodeSearchHelper;
 
 	[ObservableProperty]
 	WarehouseModel warehouseModel = null!;
@@ -34,39 +36,45 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 
 
 	[ObservableProperty]
-	LocationTransactionModel? selectedLocationTransaction;
+	GroupLocationTransactionModel? selectedLocationTransaction;
 	
 	[ObservableProperty]
 	SeriLotTransactionModel? selectedSeriLotTransaction;
 
 
 	[ObservableProperty]
-	public ObservableCollection<LocationTransactionModel> selectedLocationTransactions = new();
+	public ObservableCollection<GroupLocationTransactionModel> selectedLocationTransactions = new();
 	[ObservableProperty]
 	public ObservableCollection<SeriLotTransactionModel> selectedSeriLotTransactions = new();
 
+	[ObservableProperty]
+	public Entry barcodeEntry;
+
 	public ObservableCollection<OutputSalesBasketModel> Items { get; } = new();
 
-	public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
+	public ObservableCollection<GroupLocationTransactionModel> LocationTransactions { get; } = new();
 	public ObservableCollection<SeriLotTransactionModel> SeriLotTransactions { get; } = new();
 
-	public OutputProductSalesProcessBasketListViewModel(IHttpClientService httpClientService, ILocationTransactionService locationTransactionService, ISeriLotTransactionService seriLotTransactionService, IUserDialogs userDialogs)
+	public OutputProductSalesProcessBasketListViewModel(IHttpClientService httpClientService, ILocationTransactionService locationTransactionService, ISeriLotTransactionService seriLotTransactionService, IUserDialogs userDialogs, IBarcodeSearchHelper barcodeSearchHelper)
 	{
 		_httpClientService = httpClientService;
 		_locationTransactionService = locationTransactionService;
 		_seriLotTransactionService = seriLotTransactionService;
 		_userDialogs = userDialogs;
+		_barcodeSearchHelper = barcodeSearchHelper;
+
 		Title = "Sepet Listesi";
 		Items.Clear();
 
 		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
+		PerformSearchCommand = new Command<Entry>(async (x) => await PerformSearchAsync(x));
 		IncreaseCommand = new Command<OutputSalesBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<OutputSalesBasketModel>(async (item) => await DecreaseAsync(item));
 		DeleteItemCommand = new Command<OutputSalesBasketModel>(async (item) => await DeleteItemAsync(item));
 
 		LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreWarehouseLocationTransactionsAsync());
-		LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
-		LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
+		LocationTransactionIncreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
+		LocationTransactionDecreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
 		LocationTransactionConfirmCommand = new Command(async () => await LocationTransactionConfirmAsync());
 		LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
 
@@ -84,6 +92,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 	public Page CurrentPage { get; set; } = null!;
 
 	public Command ShowProductViewCommand { get; }
+	public Command PerformSearchCommand { get; }
 	public Command<OutputSalesBasketModel> IncreaseCommand { get; }
 	public Command<OutputSalesBasketModel> DecreaseCommand { get; }
 	public Command<OutputSalesBasketModel> DeleteItemCommand { get; }
@@ -131,6 +140,42 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 		}
 	}
 
+	private async Task PerformSearchAsync(Entry barcodeEntry)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			if (string.IsNullOrEmpty(barcodeEntry.Text))
+				return;
+
+			IsBusy = true;
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			await _barcodeSearchHelper.BarcodeDetectedAsync(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				barcode: barcodeEntry.Text,
+				comingPage: "OutputProductSalesProcessBasketListViewModel"
+			);
+
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			BarcodeEntry.Text = string.Empty;
+			IsBusy = false;
+		}
+	}
+
 	private async Task DeleteItemAsync(OutputSalesBasketModel item)
 	{
 		if (IsBusy)
@@ -150,6 +195,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 				if(SelectedItem == item)
 				{
 					SelectedItem.IsSelected = false;
+					SelectedItem.Details.Clear();
 					SelectedItem = null;
 				}
 
@@ -267,7 +313,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 			LocationTransactions.Clear();
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _locationTransactionService.GetInputObjectsAsync(
+			var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(
 				httpClient: httpClient, 
 				firmNumber: _httpClientService.FirmNumber, 
 				periodNumber: _httpClientService.PeriodNumber, 
@@ -283,7 +329,14 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 					return;
 
 				foreach (var item in result.Data)
-					LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+				{
+					var obj = Mapping.Mapper.Map<GroupLocationTransactionModel>(item);
+					var matchedItem = outputSalesBasketModel.Details.FirstOrDefault(x => x.LocationReferenceId == obj.LocationReferenceId);
+                    if (matchedItem is not null)
+						obj.OutputQuantity = matchedItem.Quantity;
+
+                    LocationTransactions.Add(obj);
+                }
 			}
 
 			_userDialogs.HideHud();
@@ -306,7 +359,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 			IsBusy = true;
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _locationTransactionService.GetInputObjectsAsync(
+			var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
@@ -322,11 +375,16 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 				if (result.Data is null)
 					return;
 
-				foreach (var item in result.Data)
-				{
-					LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
-				}
-			}
+                foreach (var item in result.Data)
+                {
+                    var obj = Mapping.Mapper.Map<GroupLocationTransactionModel>(item);
+                    var matchedItem = SelectedItem.Details.FirstOrDefault(x => x.LocationReferenceId == obj.LocationReferenceId);
+                    if (matchedItem is not null)
+                        obj.OutputQuantity = matchedItem.Quantity;
+
+                    LocationTransactions.Add(obj);
+                }
+            }
 		}
 		catch (Exception ex)
 		{
@@ -338,7 +396,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 		}
 	}
 
-	private async Task LocationTransactionIncreaseAsync(LocationTransactionModel item)
+	private async Task LocationTransactionIncreaseAsync(GroupLocationTransactionModel item)
 	{
 		if (IsBusy)
 			return;
@@ -380,7 +438,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 		}
 	}
 
-	private async Task LocationTransactionDecreaseAsync(LocationTransactionModel item)
+	private async Task LocationTransactionDecreaseAsync(GroupLocationTransactionModel item)
 	{
 		if (IsBusy)
 			return;
@@ -440,25 +498,25 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 
                 foreach (var item in SelectedLocationTransactions)
                 {
-					var selectedLocationTransactionItem = SelectedItem.Details.FirstOrDefault(x => x.TransactionReferenceId == item.TransactionReferenceId);
+					var selectedLocationTransactionItem = SelectedItem.Details.FirstOrDefault(x => x.LocationReferenceId == item.LocationReferenceId);
 					if(selectedLocationTransactionItem is not null)
 					{
 						selectedLocationTransactionItem.Quantity = item.OutputQuantity;
 					}
-
-					SelectedItem.Details.Add(new OutputSalesBasketDetailModel
+					else
 					{
-						ReferenceId = item.ReferenceId,
-						LocationReferenceId  = item.LocationReferenceId,
-						LocationCode = item.LocationCode,
-						LocationName = item.LocationName,
-						TransactionReferenceId = item.TransactionReferenceId,
-						TransactionFicheReferenceId = item.TransactionFicheReferenceId, 
-						InSerilotTransactionReferenceId = item.InSerilotTransactionReferenceId,
-						InTransactionReferenceId = item.InTransactionReferenceId,
-						Quantity = item.OutputQuantity,
-						RemainingQuantity = item.OutputQuantity,
-					});
+                        SelectedItem.Details.Add(new OutputSalesBasketDetailModel
+                        {
+                            //ReferenceId = item.ReferenceId,
+                            LocationReferenceId = item.LocationReferenceId,
+                            LocationCode = item.LocationCode,
+                            LocationName = item.LocationName,
+                            Quantity = item.OutputQuantity,
+                            RemainingQuantity = item.OutputQuantity,
+                        });
+                    }
+
+					
                 }
 
 
@@ -741,9 +799,13 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 				var result = await _userDialogs.ConfirmAsync("Sepetinizdeki ürünler silinecektir. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
 				if (!result)
 					return;
-
+			
 				SelectedLocationTransactions.Clear();
 				SelectedSeriLotTransactions.Clear();
+				foreach (var item in Items)
+				{
+					item.Details.Clear();
+				}
 				Items.Clear();
 				await Shell.Current.GoToAsync("..");
 			}

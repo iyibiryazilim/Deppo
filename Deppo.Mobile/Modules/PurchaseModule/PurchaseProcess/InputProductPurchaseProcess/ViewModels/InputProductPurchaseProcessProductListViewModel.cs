@@ -269,7 +269,8 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
                             IsVariant = item.IsVariant,
                             VariantIcon = item.VariantIcon,
                             LocTrackingIcon = item.LocTrackingIcon,
-                            TrackingTypeIcon = item.TrackingTypeIcon
+                            TrackingTypeIcon = item.TrackingTypeIcon,
+                            Image = item.ImageData,
                         };
 
                         SelectedProducts.Add(basketItem);
@@ -551,6 +552,7 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
                         TrackingType = item.TrackingType,
                         LocTracking = item.LocTracking,
                         IsVariant = item.IsVariant,
+                        Image = item.Image,
                         IsSelected = matchedItem != null ? matchedItem.IsSelected : false
                     });
                 }

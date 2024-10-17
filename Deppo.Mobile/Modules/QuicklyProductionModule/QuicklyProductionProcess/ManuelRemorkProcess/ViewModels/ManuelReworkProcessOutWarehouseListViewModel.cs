@@ -19,7 +19,7 @@ public partial class ManuelReworkProcessOutWarehouseListViewModel : BaseViewMode
 	public ObservableCollection<WarehouseModel> Items { get; } = new();
 
 	[ObservableProperty]
-	WarehouseModel selectedWarehouseModel = null!;
+	WarehouseModel? selectedWarehouseModel;
 
 	public ManuelReworkProcessOutWarehouseListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IWarehouseService warehouseService)
 	{
@@ -33,6 +33,7 @@ public partial class ManuelReworkProcessOutWarehouseListViewModel : BaseViewMode
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
 		ItemTappedCommand = new Command<WarehouseModel>(async (x) => await ItemTappedAsync(x));
 		NextViewCommand = new Command(async () => await NextViewAsync());
+		BackCommand = new Command(async () => await BackAsync());
 	}
 
 	public Command LoadItemsCommand { get; }
@@ -177,6 +178,8 @@ public partial class ManuelReworkProcessOutWarehouseListViewModel : BaseViewMode
 
 	private async Task NextViewAsync()
 	{
+		if (SelectedWarehouseModel is null)
+			return;
 		if (IsBusy)
 			return;
 		try
@@ -201,6 +204,56 @@ public partial class ManuelReworkProcessOutWarehouseListViewModel : BaseViewMode
 		finally
 		{
 			IsBusy = false;
+		}
+	}
+
+	private async Task BackAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var confirm = await _userDialogs.ConfirmAsync("İşlemi iptal etmek istediğinize emin misiniz?", "Uyarı", "Evet", "Hayır");
+			if (!confirm)
+				return;
+
+			await ClearPageAsync();
+			await Shell.Current.GoToAsync("..");
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	public async Task ClearPageAsync()
+	{
+		try
+		{
+			await Task.Run(() =>
+			{
+				if (SelectedWarehouseModel is not null)
+				{
+					SelectedWarehouseModel.IsSelected = false;
+					SelectedWarehouseModel = null;
+				}
+			});
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 	}
 

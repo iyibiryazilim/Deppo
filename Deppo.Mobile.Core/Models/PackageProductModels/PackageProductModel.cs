@@ -6,6 +6,7 @@ namespace Deppo.Mobile.Core.Models.PackageProductModels;
 public class PackageProductModel : PackageProduct
 {
     private bool _isSelected;
+    private double _outputQuantity;
 
     public PackageProductModel()
     {
@@ -19,6 +20,17 @@ public class PackageProductModel : PackageProduct
         {
             if (_isSelected == value) return;
             _isSelected = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public double OutputQuantity
+    {
+        get => _outputQuantity;
+        set
+        {
+            if (_outputQuantity == value) return;
+            _outputQuantity = value;
             NotifyPropertyChanged();
         }
     }

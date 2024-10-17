@@ -14,7 +14,13 @@ namespace Deppo.Core.DTOs.TransferTransaction
             Lines = new List<TransferTransactionLineDto>();
         }
         public int DestinationWarehouseNumber { get; set; }
-        public string CurrentCode { get; set; } = string.Empty;
+		public string? CarrierCode { get; set; } = string.Empty;
+		public string? DriverFirstName { get; set; } = string.Empty;
+		public string? DriverLastName { get; set; } = string.Empty;
+		public string? IdentityNumber { get; set; } = string.Empty;
+		public string? Plaque { get; set; } = string.Empty;
+		public int? IsEDispatch { get; set; }
+		public string? ShipInfoCode { get; set; } = string.Empty;
         public List<TransferTransactionLineDto> Lines { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using Deppo.Core.BaseModels;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
+using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.SalesModels.BasketModels;
@@ -14,6 +15,7 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcess.OutputOutsourceTransfer.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.ViewModels;
@@ -131,6 +133,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 		}
 	}
 
+	[Obsolete("Not used")]
 	private async Task ReadBarcodeAsync(BarcodeResult[] readBarcodes)
 	{
 		try
@@ -779,6 +782,19 @@ public partial class CameraReaderViewModel : BaseViewModel
 						_userDialogs.ShowToast($"Ürün Sepete Eklendi");
 					}
 					break;
+				case "OutputOutsourceTransferBasket":
+					var outputOutsourceTransferBasketViewModel = _serviceProvider.GetRequiredService<OutputOutsourceTransferBasketListViewModel>();
+					var outputOutsourceTransferBasketItem = await ConvertOutputOutsourceTransferBasketAsync(productModel);
+					if (outputOutsourceTransferBasketViewModel.Items.Any(x => x.ItemCode == outputOutsourceTransferBasketItem.ItemCode))
+					{
+						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
+					}
+					else
+					{
+						outputOutsourceTransferBasketViewModel.Items.Add(outputOutsourceTransferBasketItem);
+						_userDialogs.ShowToast($"Ürün Sepete Eklendi");
+					}
+					break;
 			}
 
 			isFind = false;
@@ -801,7 +817,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 				case "InputProductProcessBasket":
 					var inputProductProcessBasketListViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketListViewModel>();
 					var inputProductBasketItem = await ConvertInputProductBasketAsync(variantModel);
-					if (inputProductProcessBasketListViewModel.Items.Any(x => x.MainItemCode == inputProductBasketItem.MainItemCode))
+					if (inputProductProcessBasketListViewModel.Items.Any(x => x.ItemCode == inputProductBasketItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
@@ -815,7 +831,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					var outputProductProcessBasketListViewModel = _serviceProvider.GetRequiredService<OutputProductProcessBasketListViewModel>();
 					var outputProductBasketItem = await ConvertOutputProductBasketAsync(variantModel);
 
-					if (outputProductProcessBasketListViewModel.Items.Any(x => x.MainItemCode == outputProductBasketItem.MainItemCode))
+					if (outputProductProcessBasketListViewModel.Items.Any(x => x.ItemCode == outputProductBasketItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
@@ -841,7 +857,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 				case "OutputProductSalesProcessBasket":
 					var outputProductSalesProcessBasketListViewModel = _serviceProvider.GetRequiredService<OutputProductSalesProcessBasketListViewModel>();
 					var outputSalesBasketItem = await ConvertOutputSalesBasketAsync(variantModel);
-					if (outputProductSalesProcessBasketListViewModel.Items.Any(x => x.MainItemCode == outputSalesBasketItem.MainItemCode))
+					if (outputProductSalesProcessBasketListViewModel.Items.Any(x => x.ItemCode == outputSalesBasketItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
@@ -855,7 +871,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					var inputProductPurchaseProcessBasketListViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseProcessBasketListViewModel>();
 					var inputPurchaseBasketItem = await ConvertInputPurchaseBasketAsync(variantModel);
 
-					if (inputProductPurchaseProcessBasketListViewModel.Items.Any(x => x.MainItemCode == inputPurchaseBasketItem.MainItemCode))
+					if (inputProductPurchaseProcessBasketListViewModel.Items.Any(x => x.ItemCode == inputPurchaseBasketItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
@@ -869,7 +885,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					var returnPurchaseBasketViewModel = _serviceProvider.GetRequiredService<ReturnPurchaseBasketViewModel>();
 					var returnPurchaseBasketItem = await ConvertReturnPurchaseBasketAsync(variantModel);
 
-					if (returnPurchaseBasketViewModel.Items.Any(x => x.MainItemCode == returnPurchaseBasketItem.MainItemCode))
+					if (returnPurchaseBasketViewModel.Items.Any(x => x.ItemCode == returnPurchaseBasketItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
@@ -882,7 +898,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 				case "ReturnSalesBasket":
 					var returnSalesBasketViewModel = _serviceProvider.GetRequiredService<ReturnSalesBasketViewModel>();
 					var returnSalesBasketItem = await ConvertReturnSalesBasketAsync(variantModel);
-					if (returnSalesBasketViewModel.Items.Any(x => x.MainItemCode == returnSalesBasketItem.MainItemCode))
+					if (returnSalesBasketViewModel.Items.Any(x => x.ItemCode == returnSalesBasketItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
@@ -895,7 +911,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 				case "InputProductPurchaseOrderBasket":
 					var inputProductPurchaseOrderBasketListViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseOrderProcessBasketListViewModel>();
 					var inputPurchaseOrderBasketItem = await ConvertInputPurchaseBasketAsync(variantModel);
-					if (inputProductPurchaseOrderBasketListViewModel.Items.Any(x => x.MainItemCode == inputPurchaseOrderBasketItem.MainItemCode))
+					if (inputProductPurchaseOrderBasketListViewModel.Items.Any(x => x.ItemCode == inputPurchaseOrderBasketItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
@@ -908,7 +924,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 				case "OutputProductSalesOrderBasket":
 					var outputProductSalesOrderProcessBasketListViewModel = _serviceProvider.GetRequiredService<OutputProductSalesOrderProcessBasketListViewModel>();
 					var outputSalesOrderBasketItem = await ConvertOutputSalesBasketAsync(variantModel);
-					if (outputProductSalesOrderProcessBasketListViewModel.Items.Any(x => x.MainItemCode == outputSalesOrderBasketItem.MainItemCode))
+					if (outputProductSalesOrderProcessBasketListViewModel.Items.Any(x => x.ItemCode == outputSalesOrderBasketItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
@@ -921,13 +937,26 @@ public partial class CameraReaderViewModel : BaseViewModel
 				case "DemandProcessBasket":
 					var demandProcessBasketListViewModel = _serviceProvider.GetRequiredService<DemandProcessBasketListViewModel>();
 					var demandProcessBasketItem = await ConvertDemandProcessBasketAsync(variantModel);
-					if (demandProcessBasketListViewModel.Items.Any(x => x.MainItemCode == demandProcessBasketItem.MainItemCode))
+					if (demandProcessBasketListViewModel.Items.Any(x => x.ItemCode == demandProcessBasketItem.ItemCode))
 					{
 						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
 					}
 					else
 					{
 						demandProcessBasketListViewModel.Items.Add(demandProcessBasketItem);
+						_userDialogs.ShowToast($"Ürün Sepete Eklendi");
+					}
+					break;
+				case "OutputOutsourceTransferBasket":
+					var outputOutsourceTransferBasketViewModel = _serviceProvider.GetRequiredService<OutputOutsourceTransferBasketListViewModel>();
+					var outputOutsourceTransferBasketItem = await ConvertOutputOutsourceTransferBasketAsync(variantModel);
+					if (outputOutsourceTransferBasketViewModel.Items.Any(x => x.ItemCode == outputOutsourceTransferBasketItem.ItemCode))
+					{
+						_userDialogs.ShowToast($"Ürün Sepette Zaten Var");
+					}
+					else
+					{
+						outputOutsourceTransferBasketViewModel.Items.Add(outputOutsourceTransferBasketItem);
 						_userDialogs.ShowToast($"Ürün Sepete Eklendi");
 					}
 					break;
@@ -959,6 +988,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					ItemReferenceId = productModel.ReferenceId,
 					ItemCode = productModel.Code,
 					ItemName = productModel.Name,
+					Image = productModel.ImageData,
 					UnitsetReferenceId = productModel.UnitsetReferenceId,
 					UnitsetCode = productModel.UnitsetCode,
 					UnitsetName = productModel.UnitsetName,
@@ -1004,6 +1034,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					ItemReferenceId = productModel.ReferenceId,
 					ItemCode = productModel.Code,
 					ItemName = productModel.Name,
+					//Image = productModel.ImageData,
 					UnitsetReferenceId = productModel.UnitsetReferenceId,
 					UnitsetCode = productModel.UnitsetCode,
 					UnitsetName = productModel.UnitsetName,
@@ -1046,6 +1077,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					ItemReferenceId = productModel.ReferenceId,
 					ItemCode = productModel.Code,
 					ItemName = productModel.Name,
+					//Image = productModel.ImageData,
 					UnitsetReferenceId = productModel.UnitsetReferenceId,
 					UnitsetCode = productModel.UnitsetCode,
 					UnitsetName = productModel.UnitsetName,
@@ -1083,6 +1115,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					ItemReferenceId = productModel.ReferenceId,
 					ItemCode = productModel.Code,
 					ItemName = productModel.Name,
+					//Image = productModel.ImageData,
 					UnitsetReferenceId = productModel.UnitsetReferenceId,
 					UnitsetCode = productModel.UnitsetCode,
 					UnitsetName = productModel.UnitsetName,
@@ -1125,6 +1158,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					ItemReferenceId = productModel.ReferenceId,
 					ItemCode = productModel.Code,
 					ItemName = productModel.Name,
+					Image = productModel.ImageData,
 					UnitsetReferenceId = productModel.UnitsetReferenceId,
 					UnitsetCode = productModel.UnitsetCode,
 					UnitsetName = productModel.UnitsetName,
@@ -1167,6 +1201,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					ItemReferenceId = productModel.ReferenceId,
 					ItemCode = productModel.Code,
 					ItemName = productModel.Name,
+					Image = productModel.ImageData,
 					UnitsetReferenceId = productModel.UnitsetReferenceId,
 					UnitsetCode = productModel.UnitsetCode,
 					UnitsetName = productModel.UnitsetName,
@@ -1208,6 +1243,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					ItemReferenceId = productModel.ReferenceId,
 					ItemCode = productModel.Code,
 					ItemName = productModel.Name,
+					Image = productModel.ImageData,
 					UnitsetReferenceId = productModel.UnitsetReferenceId,
 					UnitsetCode = productModel.UnitsetCode,
 					UnitsetName = productModel.UnitsetName,
@@ -1227,7 +1263,6 @@ public partial class CameraReaderViewModel : BaseViewModel
 					LocTrackingIcon = productModel.LocTrackingIcon,
 					VariantIcon = productModel.VariantIcon,
 					TrackingTypeIcon = productModel.TrackingTypeIcon,
-					//Image = productModel.Image,
 				};
 
 				return basketItem;
@@ -1250,6 +1285,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					ItemReferenceId = productModel.ReferenceId,
 					ItemCode = productModel.Code,
 					ItemName = productModel.Name,
+					//Image = productModel.ImageData,
 					UnitsetReferenceId = productModel.UnitsetReferenceId,
 					UnitsetCode = productModel.UnitsetCode,
 					UnitsetName = productModel.UnitsetName,
@@ -1280,7 +1316,46 @@ public partial class CameraReaderViewModel : BaseViewModel
 			throw;
 		}
 	}
+	private async Task<OutputOutsourceTransferBasketModel> ConvertOutputOutsourceTransferBasketAsync(ProductModel productModel)
+	{
+		try
+		{
+			return await Task.Run(() =>
+			{
+				var basketItem = new OutputOutsourceTransferBasketModel
+				{
+					ItemReferenceId = productModel.ReferenceId,
+					ItemCode = productModel.Code,
+					ItemName = productModel.Name,
+					//Image = productModel.ImageData,
+					UnitsetReferenceId = productModel.UnitsetReferenceId,
+					UnitsetCode = productModel.UnitsetCode,
+					UnitsetName = productModel.UnitsetName,
+					SubUnitsetReferenceId = productModel.SubUnitsetReferenceId,
+					SubUnitsetCode = productModel.SubUnitsetCode,
+					SubUnitsetName = productModel.SubUnitsetName,
+					MainItemReferenceId = default,  //
+					MainItemCode = string.Empty,    //
+					MainItemName = string.Empty,    //
+					StockQuantity = productModel.StockQuantity,
+					IsSelected = false,   //
+					IsVariant = productModel.IsVariant,
+					LocTracking = productModel.LocTracking,
+					TrackingType = productModel.TrackingType,
+					Quantity = productModel.LocTracking == 0 ? 1 : 0,
+					LocTrackingIcon = productModel.LocTrackingIcon,
+					VariantIcon = productModel.VariantIcon,
+					TrackingTypeIcon = productModel.TrackingTypeIcon,
+				};
 
+				return basketItem;
+			});
+		}
+		catch (Exception ex)
+		{
+			throw;
+		}
+	}
 
 
 	private async Task<InputProductBasketModel> ConvertInputProductBasketAsync(VariantModel variantModel)
@@ -1296,6 +1371,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					ItemReferenceId = variantModel.ProductReferenceId,
 					ItemCode = variantModel.ProductCode,
 					ItemName = variantModel.ProductName,
+					Image = variantModel.ImageData,
 					UnitsetReferenceId = variantModel.UnitsetReferenceId,
 					UnitsetCode = variantModel.UnitsetCode,
 					UnitsetName = variantModel.UnitsetName,
@@ -1341,6 +1417,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					ItemReferenceId = variantModel.ProductReferenceId,
 					ItemCode = variantModel.ProductCode,
 					ItemName = variantModel.ProductName,
+					//Image = variantModel.ImageData,
 					UnitsetReferenceId = variantModel.UnitsetReferenceId,
 					UnitsetCode = variantModel.UnitsetCode,
 					UnitsetName = variantModel.UnitsetName,
@@ -1385,7 +1462,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					MainItemReferenceId = variantModel.ProductReferenceId,
 					MainItemCode = variantModel.ProductCode,
 					MainItemName = variantModel.ProductName,
-                    Image = "",
+                   // Image = variantModel.ImageData,
 					//VatRate = variantModel.VatRate,
 					UnitsetReferenceId = variantModel.UnitsetReferenceId,
 					UnitsetCode = variantModel.UnitsetCode,
@@ -1424,6 +1501,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					ItemReferenceId = variantModel.ProductReferenceId,
 					ItemCode = variantModel.ProductCode,
 					ItemName = variantModel.ProductName,
+					//Image = variantModel.ImageData,
 					UnitsetReferenceId = variantModel.UnitsetReferenceId,
 					UnitsetCode = variantModel.UnitsetCode,
 					UnitsetName = variantModel.UnitsetName,
@@ -1466,7 +1544,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					ItemReferenceId = variantModel.ProductReferenceId,
 					ItemCode = variantModel.ProductCode,
 					ItemName = variantModel.ProductName,
-					Image = "",
+					Image = variantModel.ImageData,
 					UnitsetReferenceId = variantModel.UnitsetReferenceId,
 					UnitsetCode = variantModel.UnitsetCode,
 					UnitsetName = variantModel.UnitsetName,
@@ -1506,6 +1584,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					ItemReferenceId = variantModel.ProductReferenceId,
 					ItemCode = variantModel.ProductCode,
 					ItemName = variantModel.ProductName,
+					Image = variantModel.ImageData,
 					UnitsetReferenceId = variantModel.UnitsetReferenceId,
 					UnitsetCode = variantModel.UnitsetCode,
 					UnitsetName = variantModel.UnitsetName,
@@ -1518,7 +1597,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					StockQuantity = variantModel.StockQuantity,
 					IsSelected = false,   
 					IsVariant = true,
-					Image = string.Empty,
+					//Image = string.Empty,
 					LocTracking = variantModel.LocTracking,
 					TrackingType = variantModel.TrackingType,
 					Quantity = variantModel.LocTracking == 0 ? 1 : 0,
@@ -1545,6 +1624,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					ItemReferenceId = variantModel.ProductReferenceId,
 					ItemCode = variantModel.ProductCode,
 					ItemName = variantModel.ProductName,
+					Image = variantModel.ImageData,
 					UnitsetReferenceId = variantModel.UnitsetReferenceId,
 					UnitsetCode = variantModel.UnitsetCode,
 					UnitsetName = variantModel.UnitsetName,
@@ -1561,7 +1641,6 @@ public partial class CameraReaderViewModel : BaseViewModel
 					LocTracking = variantModel.LocTracking,
 					TrackingType = variantModel.TrackingType,
 					IsVariant = true,
-					//Image = String.Empty
 				};
 
 				return basketItem;
@@ -1584,6 +1663,7 @@ public partial class CameraReaderViewModel : BaseViewModel
 					ItemReferenceId = variantModel.ReferenceId,
 					ItemCode = variantModel.Code,
 					ItemName = variantModel.Name,
+					//Image = variantModel.ImageData,
 					UnitsetReferenceId = variantModel.UnitsetReferenceId,
 					UnitsetCode = variantModel.UnitsetCode,
 					UnitsetName = variantModel.UnitsetName,
@@ -1608,6 +1688,44 @@ public partial class CameraReaderViewModel : BaseViewModel
 		catch (Exception ex)
 		{
 
+			throw;
+		}
+	}
+	private async Task<OutputOutsourceTransferBasketModel> ConvertOutputOutsourceTransferBasketAsync(VariantModel variantModel)
+	{
+		try
+		{
+			return await Task.Run(() =>
+			{
+				var basketItem = new OutputOutsourceTransferBasketModel
+				{
+					ItemReferenceId = variantModel.ReferenceId,
+					ItemCode = variantModel.Code,
+					ItemName = variantModel.Name,
+					//Image = variantModel.ImageData,
+					UnitsetReferenceId = variantModel.UnitsetReferenceId,
+					UnitsetCode = variantModel.UnitsetCode,
+					UnitsetName = variantModel.UnitsetName,
+					SubUnitsetReferenceId = variantModel.SubUnitsetReferenceId,
+					SubUnitsetCode = variantModel.SubUnitsetCode,
+					SubUnitsetName = variantModel.SubUnitsetName,
+					MainItemReferenceId = variantModel.ProductReferenceId, 
+					MainItemCode = variantModel.ProductCode,   
+					MainItemName = variantModel.ProductName,    
+					StockQuantity = variantModel.StockQuantity,
+					IsSelected = false,   //
+					IsVariant = true,
+					LocTracking = variantModel.LocTracking,
+					//Image = variantModel.Image,
+					TrackingType = variantModel.TrackingType,
+					Quantity = variantModel.LocTracking == 0 ? 1 : 0,
+				};
+
+				return basketItem;
+			});
+		}
+		catch (Exception ex)
+		{
 			throw;
 		}
 	}

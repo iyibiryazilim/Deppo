@@ -183,7 +183,34 @@
 	  <MauiXaml Update="Modules\LoginModule\Views\CompanyListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceMenu\Views\OutsourceDetailAllFichesView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceMenu\Views\OutsourceInputTransactionView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceMenu\Views\OutsourceOutputTransactionView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\OutsourceModule\OutsourcePanel\Views\OutsourcePanelAllFicheListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\InputOutsourceProcess\InputOutsourceTransfer\Views\InputOutsourceTransferBasketLocationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\InputOutsourceProcess\InputOutsourceTransfer\Views\InputOutsourceTransferOutsourceBasketListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\InputOutsourceProcess\InputOutsourceTransfer\Views\InputOutsourceTransferOutsourceFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\InputOutsourceProcess\InputOutsourceTransfer\Views\InputOutsourceTransferOutsourceProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\InputOutsourceProcess\InputOutsourceTransfer\Views\InputOutsourceTransferOutsourceSupplierListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\InputOutsourceProcess\InputOutsourceTransfer\Views\InputOutsourceTransferWarehouseListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 
@@ -552,6 +579,30 @@
 	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesProcess\Views\OutputProductSalesProcessWarehouseListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesPackageBasketView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesPackageProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesProcessBasketProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesProcessCustomerListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesProcessFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesProcessProductBasketView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesProcessProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesProcessWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ReturnProductSalesDispatchProcess\Views\ReturnSalesDispatchBasketLocationListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -597,13 +648,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/InputOutsourceProcess/" />
-	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/InputOutsourceProcess/InputOutsourceTransfer/" />
-	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/InputOutsourceProcess/InputOutsourceTransfer/ViewModels/" />
-	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/InputOutsourceProcess/InputOutsourceTransfer/Views/" />
-	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/InputOutsourceProcess/InputOutsourceWorkOrder/" />
-	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/InputOutsourceProcess/InputOutsourceWorkOrder/ViewModels/" />
-	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/InputOutsourceProcess/InputOutsourceWorkOrder/Views/" />
 	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/OutputOutsourceProcess/OutputOutsourceWorkOrder/" />
 	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/OutputOutsourceProcess/OutputOutsourceWorkOrder/ViewModels/" />
 	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/OutputOutsourceProcess/OutputOutsourceWorkOrder/Views/" />

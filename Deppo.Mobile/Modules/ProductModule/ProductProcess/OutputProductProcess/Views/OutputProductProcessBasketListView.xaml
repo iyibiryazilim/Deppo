@@ -21,6 +21,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -38,8 +39,8 @@
         <ToolbarItem Command="{Binding CameraTappedCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="FAS"
-                          Glyph="{x:Static fontAwesome:FontAwesomeIcons.Camera}"
-                          Size="Medium" />
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Camera}"
+                                 Size="Medium" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
 
@@ -64,17 +65,16 @@
                     Stroke="{StaticResource Primary}"
                     StrokeShape="RoundRectangle 5"
                     StrokeThickness="0.5">
-                <SearchBar x:Name="searchBar"
-                           Placeholder="Ara..."
-                           PlaceholderColor="{StaticResource OffBlack}"
-                           TextColor="{StaticResource OffBlack}">
-                    <!-- <SearchBar.Behaviors>
-    <toolkit:EventToCommandBehavior
-        Command="{Binding PerformSearchCommand}"
-        CommandParameter="{Binding Text, Source={x:Reference searchBar}}"
-        EventName="SearchButtonPressed" />
-</SearchBar.Behaviors>-->
-                </SearchBar>
+                <Entry x:Name="barcodeEntry"
+                       Placeholder="Barkod tara..."
+                       PlaceholderColor="{StaticResource OffBlack}"
+                       TextColor="{StaticResource OffBlack}">
+                    <Entry.Behaviors>
+                        <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                        CommandParameter="{Binding ., Source={x:Reference barcodeEntry}}"
+                                                        EventName="TextChanged" />
+                    </Entry.Behaviors>
+                </Entry>
             </Border>
 
             <CollectionView Grid.Row="1" ItemsSource="{Binding Items}">
@@ -112,12 +112,11 @@
                                     StrokeThickness="0.1">
                                 <Grid ColumnDefinitions=".20*,.80*" ColumnSpacing="10">
                                     <Border Grid.Column="0"
-                                            BackgroundColor="{StaticResource Secondary}"
                                             StrokeShape="RoundRectangle 5"
                                             StrokeThickness="0.5">
                                         <Image Grid.Column="0"
                                                HeightRequest="50"
-                                               Source="dotnet_bot.png"
+                                               Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                                WidthRequest="50" />
                                     </Border>
 
@@ -207,13 +206,10 @@
                                                 </Border>
                                             </Grid>
                                         </Grid>
-
-
                                     </VerticalStackLayout>
                                 </Grid>
                             </Border>
                         </SwipeView>
-
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
@@ -272,10 +268,8 @@
                                        PlaceholderColor="{StaticResource OffBlack}"
                                        TextColor="{StaticResource OffBlack}">
                                 <SearchBar.Behaviors>
-                                    <toolkit:EventToCommandBehavior Command="{Binding LocationTransactionPerformSearchCommand}"
-                                                                    EventName="SearchButtonPressed" />
-                                    <toolkit:EventToCommandBehavior Command="{Binding LocationTransactionPerformEmptySearchCommand}"
-                                                                    EventName="TextChanged" />
+                                    <toolkit:EventToCommandBehavior Command="{Binding LocationTransactionPerformSearchCommand}" EventName="SearchButtonPressed" />
+                                    <toolkit:EventToCommandBehavior Command="{Binding LocationTransactionPerformEmptySearchCommand}" EventName="TextChanged" />
                                 </SearchBar.Behaviors>
                             </SearchBar>
                         </Border>
@@ -287,7 +281,7 @@
                                 <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="locationModel:LocationTransactionModel">
+                                <DataTemplate x:DataType="locationModel:GroupLocationTransactionModel">
                                     <Border Padding="10"
                                             BackgroundColor="{StaticResource WhiteSmoke}"
                                             StrokeShape="RoundRectangle 10"
@@ -360,15 +354,12 @@
                                     </Border>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
-
-
                         </CollectionView>
                         <Button Grid.Row="2"
                                 Command="{Binding ConfirmLocationTransactionCommand}"
                                 Text="Tamam" />
                     </Grid>
                 </Grid>
-
 
                 <!--#endregion-->
             </dx:BottomSheet>
@@ -520,8 +511,5 @@
             </dx:BottomSheet>
             <!--#endregion-->
         </VerticalStackLayout>
-
     </Grid>
-
-
 </ContentPage>

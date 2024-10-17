@@ -14,9 +14,12 @@ namespace Deppo.Mobile.Core.Models.PurchaseModels
         private string _variantIconColor;
         private string _trackingTypeIcon;
         private string _trackingTypeIconColor;
+        private byte[]? _image;
+
         public PurchaseTransactionModel()
-        {          
+        {
         }
+
         public bool IsSelected
         {
             get => _isSelected;
@@ -100,7 +103,15 @@ namespace Deppo.Mobile.Core.Models.PurchaseModels
 
         public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 
-
-
+        public byte[]? Image
+        {
+            get => _image;
+            set
+            {
+                if (_image == value) return;
+                _image = value;
+                NotifyPropertyChanged();
+            }
+        }
     }
 }

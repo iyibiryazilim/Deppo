@@ -12,6 +12,8 @@ public partial class OutputProductProcessBasketListView : ContentPage
 		BindingContext = _viewModel;
 		_viewModel.CurrentPage = this;
 		_viewModel.LocationTransactionSearchText = locationTransactionSearchBar;
+		_viewModel.BarcodeEntry = barcodeEntry;
+		_viewModel.BarcodeEntry.Focus();
 
-    }
+	}
 }

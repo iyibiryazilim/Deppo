@@ -112,14 +112,14 @@ public class OutsourceDataStore : IOutsourceService
 
     private string OutsourceWarehouseQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
     {
-        string baseQuery = $@"SELECT 
+        string baseQuery = $@"SELECT
 [ReferenceId] = WAREHOUSE.LOGICALREF,
 [Number] = WAREHOUSE.NR,
 [Name] = WAREHOUSE.NAME,
 [City] = WAREHOUSE.CITY,
 [County] = WAREHOUSE.TOWN,
 [Quantity] = 0
-FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS OUTSOURCE WITH(NOLOCK) 
+FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS OUTSOURCE WITH(NOLOCK)
 LEFT JOIN L_CAPIWHOUSE AS WAREHOUSE WITH(NOLOCK) ON (OUTSOURCE.OUTINVENNR = WAREHOUSE.NR) AND WAREHOUSE.FIRMNR = {firmNumber}
 WHERE SUBCONT = 1
 GROUP BY WAREHOUSE.LOGICALREF,WAREHOUSE.NR,WAREHOUSE.NAME,WAREHOUSE.CITY,WAREHOUSE.TOWN";
@@ -135,40 +135,48 @@ GROUP BY WAREHOUSE.LOGICALREF,WAREHOUSE.NR,WAREHOUSE.NAME,WAREHOUSE.CITY,WAREHOU
     private string OutsourceQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
     {
         string baseQuery = $@"SELECT
-[ReferenceId]=CUSTOMER.LOGICALREF,
-[Code]=CUSTOMER.CODE,
-[Title]=CUSTOMER.DEFINITION_,
+[ReferenceId] = CUSTOMER.LOGICALREF,
+[Code] = CUSTOMER.CODE,
+[Title] = CUSTOMER.DEFINITION_,
 [IsPersonal] =
         CASE
-            WHEN CUSTOMER.ISPERSCOMP= 0 THEN 0
+            WHEN CUSTOMER.ISPERSCOMP = 0 THEN 0
             ELSE 1
         END,
-[Name]=CUSTOMER.DEFINITION_,
-[Email]=CUSTOMER.EMAILADDR,
-[Telephone]=CUSTOMER.TELNRS1+' '+ CUSTOMER.TELNRS2,
-[Address]=CUSTOMER.ADDR1,
-[City]=CUSTOMER.CITY,
-[Country]=CUSTOMER.COUNTRY,
-[PostalCode]=CUSTOMER.POSTCODE,
-[TaxOffice]=CUSTOMER.TAXOFFICE,
-[TaxNumber]=CUSTOMER.TAXNR,
+[Name] = CUSTOMER.DEFINITION_,
+[Email] = CUSTOMER.EMAILADDR,
+[Telephone] = CUSTOMER.TELNRS1 + ' ' + CUSTOMER.TELNRS2,
+[Address] = CUSTOMER.ADDR1,
+[City] = CUSTOMER.CITY,
+[Country] = CUSTOMER.COUNTRY,
+[PostalCode] = CUSTOMER.POSTCODE,
+[TaxOffice] = CUSTOMER.TAXOFFICE,
+[TaxNumber] = CUSTOMER.TAXNR,
 [OrderReferenceCount] = 0,
-[ShipAddressCount] = ISNULL((SELECT COUNT(LOGICALREF) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_SHIPINFO WHERE CLIENTREF = SUPPLIER.LOGICALREF),0),
-[IsActive]=
+[ShipAddressCount] = ISNULL((SELECT COUNT(LOGICALREF)
+                            FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_SHIPINFO
+                            WHERE CLIENTREF = CUSTOMER.LOGICALREF), 0),
+[IsActive] =
        CASE
-	      WHEN CUSTOMER.ACTIVE=0 THEN 0
+	      WHEN CUSTOMER.ACTIVE = 0 THEN 0
 		  ELSE 1
-END
+        END,
+[IsEDispatch] = CASE
+        WHEN CUSTOMER.ACCEPTEDESP = 0 THEN 0
+        ELSE 1
+    END
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CUSTOMER
-WHERE CUSTOMER.SUBCONT = 1 AND CUSTOMER.CODE <> 'ÿ' AND CUSTOMER.ACTIVE = 0";
+WHERE CUSTOMER.SUBCONT = 1
+  AND CUSTOMER.CODE <> 'ÿ'
+  AND CUSTOMER.ACTIVE = 0";
 
         if (!string.IsNullOrEmpty(search))
-            baseQuery += $@" AND (CUSTOMER.CODE LIKE '{search}%' OR CUSTOMER.NAME LIKE '%{search}%')";
+            baseQuery += $@" AND (CUSTOMER.CODE LIKE '{search}%'
+                        OR CUSTOMER.DEFINITION_ LIKE '%{search}%')";
 
-        baseQuery += $@" ORDER BY CUSTOMER.CODE DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+        baseQuery += $@" ORDER BY CUSTOMER.CODE DESC
+                    OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
         return baseQuery;
     }
 }
-
-

@@ -161,19 +161,16 @@ public partial class ManuelCalcOutWarehouseListViewModel : BaseViewModel
             {
                 SelectedWarehouseModel.IsSelected = false;
                 SelectedWarehouseModel = null;
-                //Items.FirstOrDefault(x => x.Number == item.Number).IsSelected = false;
             }
             else
             {
                 if (SelectedWarehouseModel != null)
                 {
                     SelectedWarehouseModel.IsSelected = false;
-                    //Items.FirstOrDefault(x => x.Number == SelectedWarehouseModel.Number).IsSelected = false;
                 }
 
                 SelectedWarehouseModel = item;
                 SelectedWarehouseModel.IsSelected = true;
-                //Items.FirstOrDefault(x => x.Number == item.Number).IsSelected = true;
             }
         }
         catch (Exception ex)

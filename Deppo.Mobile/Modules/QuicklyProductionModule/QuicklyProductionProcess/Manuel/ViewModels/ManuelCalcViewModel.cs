@@ -36,9 +36,9 @@ public partial class ManuelCalcViewModel : BaseViewModel
     private QuicklyBomProductBasketModel quicklyBomProductBasketModel = null!;
 
     [ObservableProperty]
-    public ObservableCollection<LocationTransactionModel> selectedLocationTransactions = new();
+    public ObservableCollection<GroupLocationTransactionModel> selectedLocationTransactions = new();
 
-    public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
+    public ObservableCollection<GroupLocationTransactionModel> LocationTransactions { get; } = new();
 
     [ObservableProperty]
     public QuicklyBomSubProductModel selectedItem = new();
@@ -66,8 +66,8 @@ public partial class ManuelCalcViewModel : BaseViewModel
         AddConsumableItemCommand = new Command(async () => await AddConsumableItemAsync());
 
         LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
-        LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
-        LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
+        LocationTransactionIncreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
+        LocationTransactionDecreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
         LocationTransactionConfirmCommand = new Command(async () => await LocationTransactionConfirmAsync());
         LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
         DeleteItemCommand = new Command<QuicklyBomSubProductModel>(async (item) => await DeleteItemAsync(item));
@@ -98,8 +98,8 @@ public partial class ManuelCalcViewModel : BaseViewModel
     //LocationTransaction
     public Command LoadMoreLocationTransactionsCommand { get; }
 
-    public Command<LocationTransactionModel> LocationTransactionIncreaseCommand { get; }
-    public Command<LocationTransactionModel> LocationTransactionDecreaseCommand { get; }
+    public Command<GroupLocationTransactionModel> LocationTransactionIncreaseCommand { get; }
+    public Command<GroupLocationTransactionModel> LocationTransactionDecreaseCommand { get; }
     public Command LocationTransactionConfirmCommand { get; }
     public Command LocationTransactionCloseCommand { get; }
 
@@ -401,11 +401,12 @@ public partial class ManuelCalcViewModel : BaseViewModel
             LocationTransactions.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationTransactionService.GetInputObjectsAsync(
+            var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
-                productReferenceId: SelectedItem.ProductModel.ReferenceId,
+                productReferenceId: SelectedItem.ProductModel.IsVariant ? SelectedItem.ProductModel.MainProductReferenceId : SelectedItem.ProductModel.ReferenceId,
+                variantReferenceId: SelectedItem.ProductModel.IsVariant ? SelectedItem.ProductModel.ReferenceId : 0,
                 warehouseNumber: SelectedItem.WarehouseModel.Number,
                 skip: 0,
                 take: 20
@@ -417,12 +418,12 @@ public partial class ManuelCalcViewModel : BaseViewModel
                     return;
                 foreach (var item in result.Data)
                 {
-                    LocationTransactionModel model = Mapping.Mapper.Map<LocationTransactionModel>(item);
+                    GroupLocationTransactionModel model = Mapping.Mapper.Map<GroupLocationTransactionModel>(item);
                     if (model != null)
                     {
-                        if (selectedItem.LocationTransactions.Any(x => x.LocationCode == model.LocationCode))
+                        if (selectedItem.LocationTransactions.Any(x => x.LocationReferenceId == model.LocationReferenceId))
                         {
-                            model.OutputQuantity = SelectedItem.LocationTransactions.FirstOrDefault(x => x.ReferenceId == model.ReferenceId).OutputQuantity;
+                            model.OutputQuantity = SelectedItem.LocationTransactions.FirstOrDefault(x => x.LocationReferenceId == model.LocationReferenceId).OutputQuantity;
                         }
                     }
                     LocationTransactions.Add(model);
@@ -449,12 +450,13 @@ public partial class ManuelCalcViewModel : BaseViewModel
 
             _userDialogs.Loading("Load More Location Items");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationTransactionService.GetInputObjectsAsync(
+            var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
-                productReferenceId: SelectedItem.ProductModel.ReferenceId,
-                warehouseNumber: SelectedItem.WarehouseModel.Number,
+			    productReferenceId: SelectedItem.ProductModel.IsVariant ? SelectedItem.ProductModel.MainProductReferenceId : SelectedItem.ProductModel.ReferenceId,
+				variantReferenceId: SelectedItem.ProductModel.IsVariant ? SelectedItem.ProductModel.ReferenceId : 0,
+				warehouseNumber: SelectedItem.WarehouseModel.Number,
                 skip: LocationTransactions.Count,
                 take: 20
             );
@@ -465,12 +467,12 @@ public partial class ManuelCalcViewModel : BaseViewModel
                     return;
                 foreach (var item in result.Data)
                 {
-                    LocationTransactionModel model = Mapping.Mapper.Map<LocationTransactionModel>(item);
+                    GroupLocationTransactionModel model = Mapping.Mapper.Map<GroupLocationTransactionModel>(item);
                     if (model != null)
                     {
-                        if (selectedItem.LocationTransactions.Any(x => x.LocationCode == model.LocationCode))
+                        if (selectedItem.LocationTransactions.Any(x => x.LocationReferenceId == model.LocationReferenceId))
                         {
-                            model.OutputQuantity = SelectedItem.LocationTransactions.FirstOrDefault(x => x.LocationCode == model.LocationCode).OutputQuantity;
+                            model.OutputQuantity = SelectedItem.LocationTransactions.FirstOrDefault(x => x.LocationReferenceId == model.LocationReferenceId).OutputQuantity;
                         }
                     }
                     LocationTransactions.Add(model);
@@ -489,7 +491,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
         }
     }
 
-    public async Task LocationTransactionIncreaseAsync(LocationTransactionModel item)
+    public async Task LocationTransactionIncreaseAsync(GroupLocationTransactionModel item)
     {
         if (IsBusy)
             return;
@@ -508,7 +510,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
                 }
                 else
                 {
-                    if (item.OutputQuantity < item.Quantity)
+                    if (item.OutputQuantity < item.RemainingQuantity)
                     {
                         item.OutputQuantity += 1;
                     }
@@ -528,7 +530,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
         }
     }
 
-    public async Task LocationTransactionDecreaseAsync(LocationTransactionModel item)
+    public async Task LocationTransactionDecreaseAsync(GroupLocationTransactionModel item)
     {
         if (IsBusy)
             return;
@@ -546,7 +548,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
                 if (item.OutputQuantity == 0)
                 {
                     LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId).OutputQuantity = 0;
-                    var Remove = SelectedItem.LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
+                    var Remove = SelectedItem.LocationTransactions.FirstOrDefault(x => x.LocationReferenceId == item.LocationReferenceId);
                     SelectedItem.LocationTransactions.Remove(Remove);
                 }
             }
@@ -581,9 +583,9 @@ public partial class ManuelCalcViewModel : BaseViewModel
                 {
                     foreach (var item in LocationTransactions.Where(x => x.OutputQuantity > 0))
                     {
-                        if (SelectedItem.LocationTransactions.Any(x => x.ReferenceId == item.ReferenceId))
+                        if (SelectedItem.LocationTransactions.Any(x => x.LocationReferenceId == item.LocationReferenceId))
                         {
-                            SelectedItem.LocationTransactions.FirstOrDefault(x => x.ReferenceId == item.ReferenceId).OutputQuantity = item.OutputQuantity;
+                            SelectedItem.LocationTransactions.FirstOrDefault(x => x.LocationReferenceId == item.LocationReferenceId).OutputQuantity = item.OutputQuantity;
                         }
                         else
                             SelectedItem.LocationTransactions.Add(item);
@@ -632,7 +634,18 @@ public partial class ManuelCalcViewModel : BaseViewModel
             Locations.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, QuicklyBomProductBasketModel.WarehouseNumber, QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId,0, string.Empty, 0, 20);
+            var result = await _locationService.GetObjects(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                warehouseNumber: QuicklyBomProductBasketModel.WarehouseNumber, 
+                productReferenceId: QuicklyBomProductBasketModel.QuicklyBomProduct.IsVariant ? QuicklyBomProductBasketModel.QuicklyBomProduct.MainItemReferenceId : QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId,
+                variantReferenceId: QuicklyBomProductBasketModel.QuicklyBomProduct.IsVariant ? QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId : 0, 
+                search: string.Empty, 
+                skip: 0, 
+                take: 20
+            );
+
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -641,7 +654,7 @@ public partial class ManuelCalcViewModel : BaseViewModel
                         Locations.Add(Mapping.Mapper.Map<LocationModel>(item));
                     foreach (var location in Locations)
                     {
-                        var matchingItem = quicklyBomProductBasketModel.MainLocations.FirstOrDefault(item => item.ReferenceId == location.ReferenceId);
+                        var matchingItem = QuicklyBomProductBasketModel.MainLocations.FirstOrDefault(item => item.ReferenceId == location.ReferenceId);
                         if (matchingItem != null)
                         {
                             location.InputQuantity = matchingItem.InputQuantity;
@@ -670,8 +683,18 @@ public partial class ManuelCalcViewModel : BaseViewModel
             _userDialogs.ShowLoading("Yükleniyor...");
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, QuicklyBomProductBasketModel.WarehouseNumber, QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId, 0,string.Empty, Locations.Count, 20);
-            if (result.IsSuccess)
+			var result = await _locationService.GetObjects(
+			   httpClient: httpClient,
+			   firmNumber: _httpClientService.FirmNumber,
+			   periodNumber: _httpClientService.PeriodNumber,
+			   warehouseNumber: QuicklyBomProductBasketModel.WarehouseNumber,
+			   productReferenceId: QuicklyBomProductBasketModel.QuicklyBomProduct.IsVariant ? QuicklyBomProductBasketModel.QuicklyBomProduct.MainItemReferenceId : QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId,
+			   variantReferenceId: QuicklyBomProductBasketModel.QuicklyBomProduct.IsVariant ? QuicklyBomProductBasketModel.QuicklyBomProduct.ReferenceId : 0,
+			   search: string.Empty,
+			   skip: Locations.Count,
+			   take: 20
+		   );
+			if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
