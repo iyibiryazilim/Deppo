@@ -61,9 +61,10 @@ namespace Deppo.Core.DataStores
         private string CustomerQuery(int firmNumber, int periodNumber, int warehouseNumber,string search = "", int skip = 0, int take = 20)
         {
             string baseQuery = $@"SELECT
-    [ReferenceId] = CLCARD.LOGICALREF,
-    [Code] = CLCARD.CODE,
-    [Name] = CLCARD.DEFINITION_,
+    [ReferenceId] = STFICHE.LOGICALREF,
+    [CustomerReferenceId] = CLCARD.LOGICALREF,
+    [CustomerCode] = CLCARD.CODE,
+    [CustomerName] = CLCARD.DEFINITION_,
     [ProductReferenceCount] = COUNT(DISTINCT STLINE.STOCKREF),
     [Country] = CLCARD.COUNTRY,
     [City] = CLCARD.CITY,
@@ -81,7 +82,7 @@ WHERE
             if (!string.IsNullOrEmpty(search))
                 baseQuery += $@" AND (CLCARD.CODE LIKE '{search}%' OR CLCARD.DEFINITION_ LIKE '%{search}%')";
 
-            baseQuery += $@" GROUP BY CLCARD.LOGICALREF, CLCARD.CODE, CLCARD.DEFINITION_, CLCARD.COUNTRY, CLCARD.CITY,CLCARD.ACCEPTEDESP,STFICHE.SHIPINFOREF, SHIPADRESS.CODE,SHIPADRESS.NAME, SHIPADRESS.ADDR1,SHIPADRESS.CITY,SHIPADRESS.COUNTRY
+            baseQuery += $@" GROUP BY CLCARD.LOGICALREF, CLCARD.CODE, CLCARD.DEFINITION_, CLCARD.COUNTRY, CLCARD.CITY,CLCARD.ACCEPTEDESP,STFICHE.SHIPINFOREF, SHIPADRESS.CODE,SHIPADRESS.NAME, STFICHE.LOGICALREF,SHIPADRESS.ADDR1,SHIPADRESS.CITY,SHIPADRESS.COUNTRY
 ORDER BY CLCARD.DEFINITION_ ASC
 OFFSET {skip} ROWS
 FETCH NEXT {take} ROWS ONLY";

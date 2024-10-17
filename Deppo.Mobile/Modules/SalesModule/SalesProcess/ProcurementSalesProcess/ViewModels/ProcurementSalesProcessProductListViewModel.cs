@@ -78,7 +78,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
                     firmNumber: _httpClientService.FirmNumber,
                     periodNumber: _httpClientService.PeriodNumber,
                     ficheReferenceId: ProcurementSalesCustomerModel.ReferenceId,
-                    search: SearchText.Text,
+                    search: string.Empty,
                     skip: 0,
                     take: 20
                 );
@@ -130,7 +130,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
                     firmNumber: _httpClientService.FirmNumber,
                     periodNumber: _httpClientService.PeriodNumber,
                     ficheReferenceId: ProcurementSalesCustomerModel.ReferenceId,
-                    search: SearchText.Text,
+                    search: string.Empty,
                     skip: Items.Count,
                     take: 20
                 );
@@ -186,7 +186,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
                     ficheReferenceId: ProcurementSalesCustomerModel.ReferenceId,
                     skip: 0,
                     take: 20,
-                    search: SearchText.Text);
+                    search: string.Empty);
 
                 if (result.IsSuccess)
                 {

@@ -57,5 +57,21 @@ namespace Deppo.Mobile.Core.Models.ProcurementModels.ProcurementSalesModels
 
         [ObservableProperty]
         private double quantity;
+
+        [ObservableProperty]
+        private string image = string.Empty;
+
+        public byte[] ImageData
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Image))
+                    return Array.Empty<byte>();
+                else
+                {
+                    return Convert.FromBase64String(Image);
+                }
+            }
+        }
     }
 }
