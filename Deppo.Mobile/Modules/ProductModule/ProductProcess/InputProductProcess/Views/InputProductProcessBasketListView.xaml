@@ -64,7 +64,7 @@
                         StrokeShape="RoundRectangle 5"
                         StrokeThickness="0.5">
                     <Entry x:Name="barcodeEntry"
-                           Placeholder="Ara ..."
+                           Placeholder="Barkod tara..."
                            PlaceholderColor="{StaticResource OffBlack}"
                            TextColor="{StaticResource OffBlack}">
                         <Entry.Behaviors>

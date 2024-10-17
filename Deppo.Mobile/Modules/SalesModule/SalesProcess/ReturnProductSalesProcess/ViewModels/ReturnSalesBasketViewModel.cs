@@ -60,6 +60,7 @@ public partial class ReturnSalesBasketViewModel : BaseViewModel
 		Title = "Sepet Listesi";
 
 		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
+        PerformSearchCommand = new Command<Entry>(async (barcodeEntry) => await PerformSearchAsync(barcodeEntry));
 
 		DeleteItemCommand = new Command<ReturnSalesBasketModel>(async (item) => await DeleteItemAsync(item));
 		IncreaseCommand = new Command<ReturnSalesBasketModel>(async (item) => await IncreaseAsync(item));
@@ -155,8 +156,9 @@ public partial class ReturnSalesBasketViewModel : BaseViewModel
 		}
 		finally
 		{
-			BarcodeEntry.Text = string.Empty;
 			IsBusy = false;
+			BarcodeEntry.Text = string.Empty;
+            barcodeEntry.Text = string.Empty;
 		}
 	}
 

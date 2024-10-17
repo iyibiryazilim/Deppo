@@ -59,18 +59,18 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 			Task searchBySupplierVariantCodeTask = SearchBySupplierVariantCodeAsync(httpClient, firmNumber, periodNumber, barcode, comingPage);
 
 			await Task.WhenAll(
-				searchByProductCodeTask
-				//searchByVariantCodeTask,
-				//searchByProductMainBarcodeTask,
-				//searchByVariantMainBarcodeTask,
-				//searchByProductSubBarcodeTask,
-				//searchByVariantSubBarcodeTask,
-				//searchByProductSeriNumberTask,
-				//searchByVariantSeriNumberTask,
-				//searchByProductLotNumberTask,
-				//searchByVariantLotNumberTask,
-				//searchBySupplierProductCodeTask,
-				//searchBySupplierVariantCodeTask
+				searchByProductCodeTask,
+				searchByVariantCodeTask,
+				searchByProductMainBarcodeTask,
+				searchByVariantMainBarcodeTask,
+				searchByProductSubBarcodeTask,
+				searchByVariantSubBarcodeTask,
+				searchByProductSeriNumberTask,
+				searchByVariantSeriNumberTask,
+				searchByProductLotNumberTask,
+				searchByVariantLotNumberTask,
+				searchBySupplierProductCodeTask,
+				searchBySupplierVariantCodeTask
 			);
 		}
 		catch (Exception ex)
@@ -237,9 +237,6 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 						await _userDialogs.AlertAsync($"Ürün Sepete Eklendi");		
 					}
 					break;
-				default:
-					await _userDialogs.AlertAsync("Geçersiz İşlem", "Hata", "Tamam");
-					break;
 			}
 
 			isFind = false;
@@ -402,9 +399,6 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 						outputOutsourceTransferBasketViewModel.Items.Add(outputOutsourceTransferBasketItem);
 						_userDialogs.ShowToast($"Ürün Sepete Eklendi");
 					}
-					break;
-				default:
-					await _userDialogs.AlertAsync("Geçersiz İşlem", "Hata", "Tamam");
 					break;
 			}
 
@@ -1237,7 +1231,7 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 						var variantModel = variantModelList.First();
 
 						isFind = true;
-						//await SendVariantBasketPageAsync(variantModel);
+						await SendVariantBasketPageAsync(variantModel, comingPage);
 					}
 				}
 			}
@@ -1266,7 +1260,7 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 						var productModel = productModelList.First();
 
 						isFind = true;
-						//await SendProductBasketPageAsync(productModel);
+						await SendProductBasketPageAsync(productModel, comingPage);
 					}
 				}
 			}
@@ -1296,7 +1290,7 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 						var variantModel = variantModelList.First();
 
 						isFind = true;
-						//await SendVariantBasketPageAsync(variantModel);
+						await SendVariantBasketPageAsync(variantModel, comingPage);
 					}
 				}
 			}
@@ -1325,8 +1319,8 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 
 						var productModel = productModelList.First();
 
-						//isFind = true;
-						//await SendProductBasketPageAsync(productModel);
+						isFind = true;
+						await SendProductBasketPageAsync(productModel, comingPage);
 					}
 				}
 			}
@@ -1356,7 +1350,7 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 						var variantModel = variantModelList.First();
 
 						isFind = true;
-						//await SendVariantBasketPageAsync(variantModel);
+						await SendVariantBasketPageAsync(variantModel, comingPage);
 					}
 				}
 			}
@@ -1386,7 +1380,7 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 						var productModel = productModelList.First();
 
 						isFind = true;
-						//await SendProductBasketPageAsync(productModel);
+						await SendProductBasketPageAsync(productModel, comingPage);
 					}
 				}
 			}
@@ -1416,7 +1410,7 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 						var variantModel = variantModelList.First();
 
 						isFind = true;
-						//await SendVariantBasketPageAsync(variantModel);
+						await SendVariantBasketPageAsync(variantModel, comingPage);
 					}
 				}
 			}
@@ -1446,7 +1440,7 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 						var productModel = productModelList.First();
 
 						isFind = true;
-						//await SendProductBasketPageAsync(productModel);
+						await SendProductBasketPageAsync(productModel, comingPage);
 					}
 				}
 			}
@@ -1477,7 +1471,7 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 						var variantModel = variantModelList.First();
 
 						isFind = true;
-						//await SendVariantBasketPageAsync(variantModel);
+						await SendVariantBasketPageAsync(variantModel, comingPage);
 					}
 				}
 			}
@@ -1508,7 +1502,7 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 						var productModel = productModelList.First();
 
 						isFind = true;
-						//await SendProductBasketPageAsync(productModel);
+						await SendProductBasketPageAsync(productModel, barcode);
 					}
 				}
 			}
@@ -1538,7 +1532,7 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 						var variantModel = variantModelList.First();
 
 						isFind = true;
-						//await SendVariantBasketPageAsync(variantModel);
+						await SendVariantBasketPageAsync(variantModel, comingPage);
 					}
 				}
 			}

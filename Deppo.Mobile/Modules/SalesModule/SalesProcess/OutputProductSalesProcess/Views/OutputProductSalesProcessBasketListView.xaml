@@ -45,6 +45,12 @@
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <Grid RowDefinitions="*, Auto">
         <!--#region Main Content-->
         <Grid Grid.Row="0"
@@ -111,7 +117,7 @@
                                             StrokeThickness="0.5">
                                         <Image Grid.Column="0"
                                                HeightRequest="50"
-                                               Source="dotnet_bot.png"
+                                               Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                                WidthRequest="50" />
                                     </Border>
 

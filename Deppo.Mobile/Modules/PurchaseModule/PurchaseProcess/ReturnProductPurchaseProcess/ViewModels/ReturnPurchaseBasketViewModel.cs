@@ -175,8 +175,9 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
 		}
 		finally
 		{
-			BarcodeEntry.Text = string.Empty;
 			IsBusy = false;
+			BarcodeEntry.Text = string.Empty;
+            barcodeEntry.Text = string.Empty;
 		}
 	}
 

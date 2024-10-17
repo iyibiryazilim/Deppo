@@ -40,6 +40,12 @@
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
             <On Platform="Android" Value="artboard.png" />

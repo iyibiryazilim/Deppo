@@ -44,6 +44,12 @@
         <BackButtonBehavior Command="{Binding BackCommand}" />
     </Shell.BackButtonBehavior>
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <Grid RowDefinitions="*,Auto">
         <Grid RowDefinitions="*,Auto">
             <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
