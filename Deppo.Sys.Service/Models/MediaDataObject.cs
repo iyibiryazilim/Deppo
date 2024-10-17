@@ -9,5 +9,5 @@ namespace Deppo.Sys.Service.Models;
 public class MediaDataObject
 {
     public Guid Oid { get; set; }
-    public byte[] MediaData = new byte[0];
+    public byte[] MediaData { get; set; } = new byte[0];
 }

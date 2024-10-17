@@ -69,7 +69,7 @@ public partial class OverviewAnalysisViewModel : BaseViewModel
             await Task.Delay(1000);
             var httpClient = _httpClientSysService.GetOrCreateHttpClient();
 
-            string filter = $"expand=Image&$orderby=TransactionDate desc&$top=20";
+            string filter = $"expand=ApplicationUser($expand=Image)&$orderby=TransactionDate desc&$top=20";
             var result = await _transactionAuditService.GetAllAsync(httpClient,filter);
             if(result.Any())
             {
@@ -105,7 +105,7 @@ public partial class OverviewAnalysisViewModel : BaseViewModel
         try
         {
             var httpClient = _httpClientSysService.GetOrCreateHttpClient();
-            string filter = $"filter=UserName eq '{_httpClientSysService.UserName}'";
+            string filter = $"filter=UserName eq '{_httpClientSysService.UserName}'&$expand=Image";
             var result = await _applicationUserService.GetAllAsync(httpClient,filter);
 
             if(result.Any())            

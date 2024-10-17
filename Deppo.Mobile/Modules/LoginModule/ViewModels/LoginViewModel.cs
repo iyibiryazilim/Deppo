@@ -17,14 +17,22 @@ public partial class LoginViewModel : BaseViewModel
     private readonly IAuthenticationService _authenticationService;
     private readonly IHttpClientSysService _httpClientSysService;
     private readonly IAuthenticateSysService _authenticateSysService;
+    private readonly IServiceProvider _serviceProvider;
 
-    public LoginViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IAuthenticationService authenticationService, IHttpClientSysService httpClientSysService, IAuthenticateSysService authenticateSysService)
+    public LoginViewModel(
+        IHttpClientService httpClientService, 
+        IUserDialogs userDialogs, 
+        IAuthenticationService authenticationService, 
+        IHttpClientSysService httpClientSysService, 
+        IAuthenticateSysService authenticateSysService,
+        IServiceProvider serviceProvider)
     {
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
         _authenticationService = authenticationService;
         _httpClientSysService = httpClientSysService;
         _authenticateSysService = authenticateSysService;
+        _serviceProvider = serviceProvider;
 
         LoginCommand = new Command(async () => await LoginAsync());
         ShowParameterCommand = new Command<BottomSheet>(ShowParameterAsync);
@@ -61,7 +69,7 @@ public partial class LoginViewModel : BaseViewModel
                 return;
             }
 
-            _userDialogs.Loading("Oturum a��l�yor..");
+            _userDialogs.Loading("Oturum açılıyor..");
             await Task.Delay(1000);
             var sysLogged = await AuthenticateSysAsync();
             if (sysLogged)
@@ -74,10 +82,10 @@ public partial class LoginViewModel : BaseViewModel
                     Application.Current.MainPage = new CompanyListView(companyListViewModel);
                 }
                 else
-                    _userDialogs.Alert("Sunucu ile ba�lant� ba�ar�s�z..", "Helix Hata");
+                    _userDialogs.Alert("Sunucu ile bağlantı başarısız..", "Helix Hata");
             }
             else
-                _userDialogs.Alert("Kullan�c� ad�n�z veya parolan�z ge�ersiz..", "Oturum A�ma Hata");
+                _userDialogs.Alert("Kullanıcı adınız veya parolanız geçersiz..", "Oturum Açma Hata");
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
@@ -85,6 +93,10 @@ public partial class LoginViewModel : BaseViewModel
         catch (Exception ex)
         {
             _userDialogs.Alert($"{ex.Message}");
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 
@@ -126,11 +138,11 @@ public partial class LoginViewModel : BaseViewModel
             return;
         try
         {
-            SecureStorage.RemoveAll();
+            //SecureStorage.RemoveAll();
 
-            _userDialogs.Loading("Oturum kapat�l�yor...");
+            _userDialogs.Loading("Oturum kapatılıyor...");
             await Task.Delay(1000);
-            Application.Current.MainPage = new LoginView(this);
+            Application.Current.MainPage = _serviceProvider.GetRequiredService<LoginView>();
 
             _userDialogs.HideHud();
         }
@@ -162,7 +174,11 @@ public partial class LoginViewModel : BaseViewModel
             var httpClient = _httpClientSysService.GetOrCreateHttpClient();
             var token = await _authenticateSysService.AuthenticateAsync(httpClient, UserName, Password);
             if (!string.IsNullOrEmpty(token))
+            {
+                _httpClientSysService.Token = token;
                 isLoggedIn = true;
+            }
+
         }
         catch (Exception ex)
         {

@@ -19,4 +19,6 @@ public class ApplicationUser
     public string ClientMachineName { get; set; } = string.Empty;
     public string LogoUserName { get; set; } = string.Empty;
     public MediaDataObject? Image { get; set; }
+
+    public string FullName => $"{FirstName} {LastName}";
 }
