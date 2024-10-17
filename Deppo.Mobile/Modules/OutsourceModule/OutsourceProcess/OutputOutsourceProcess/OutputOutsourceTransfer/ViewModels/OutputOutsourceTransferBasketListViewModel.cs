@@ -14,6 +14,7 @@ using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.CameraModule.Views;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcess.OutputOutsourceTransfer.Views;
 using DevExpress.Maui.Controls;
+using Microsoft.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcess.OutputOutsourceTransfer.ViewModels;
 
@@ -69,6 +70,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 		Items.Clear();
 
 		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
+		UnitActionTappedCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await UnitActionTappedAsync(item));
 		CameraTappedCommand = new Command(async () => await CameraTappedAsync());
 		IncreaseCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await DecreaseAsync(item));
@@ -94,6 +96,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 	public Page CurrentPage { get; set; }
 
 	public Command ShowProductViewCommand { get; }
+	public Command UnitActionTappedCommand { get; }
 	public Command CameraTappedCommand { get; }
 	public Command<OutputOutsourceTransferBasketModel> IncreaseCommand { get; }
 	public Command<OutputOutsourceTransferBasketModel> DecreaseCommand { get; }
@@ -177,6 +180,31 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 		}
 	}
 
+
+	private async Task UnitActionTappedAsync(OutputOutsourceTransferBasketModel item)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			SelectedItem = item;
+			// Load SubUnitsets method
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.HalfExpanded;
+		}
+		catch (Exception ex) 
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 
 	private async Task DeleteItemAsync(OutputOutsourceTransferBasketModel item)
 	{

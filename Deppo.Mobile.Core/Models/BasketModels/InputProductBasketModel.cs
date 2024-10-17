@@ -9,7 +9,7 @@ namespace Deppo.Mobile.Core.Models.BasketModels;
 
 public class InputProductBasketModel : INotifyPropertyChanged, IDisposable
 {
-    private Guid _referenceId;
+    private Guid? _referenceId;
     private int _itemReferenceId;
     private string _itemCode = string.Empty;
     private string _itemName = string.Empty;
@@ -44,7 +44,7 @@ public class InputProductBasketModel : INotifyPropertyChanged, IDisposable
     }
 
     [Browsable(false)]
-    public Guid ReferenceId
+    public Guid? ReferenceId
     {
         get => _referenceId;
         set
