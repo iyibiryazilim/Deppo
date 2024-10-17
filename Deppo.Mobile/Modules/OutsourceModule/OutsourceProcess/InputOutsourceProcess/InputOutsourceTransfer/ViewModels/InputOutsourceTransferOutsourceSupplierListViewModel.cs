@@ -5,10 +5,13 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.OutsourceModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.ShipAddressModels;
+using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.Views;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransfer.Views;
+using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views;
 using DevExpress.Maui.Controls;
 using DevExpress.Maui.Core.Internal;
 using System;
@@ -20,6 +23,7 @@ using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransfer.ViewModels
 {
+    [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
     public partial class InputOutsourceTransferOutsourceSupplierListViewModel : BaseViewModel
     {
         private readonly IHttpClientService _httpClientService;
@@ -28,7 +32,13 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourcePr
         private readonly IShipAddressService _shipAddressService;
 
         [ObservableProperty]
+        private WarehouseModel warehouseModel = null!;
+
+        [ObservableProperty]
         private ShipAddressModel selectedShipAddressModel;
+
+        [ObservableProperty]
+        private OutsourceModel selectedOutsource = null!;
 
         public InputOutsourceTransferOutsourceSupplierListViewModel(IHttpClientService httpClientService, IOutsourceService outsourceService, IUserDialogs userDialogs, IShipAddressService shipAddressService)
         {
@@ -51,6 +61,8 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourcePr
             ShipAddressTappedCommand = new Command<ShipAddressModel>(async (shipAddress) => await ShipAddressTappedAsync(shipAddress));
             ConfirmShipAddressCommand = new Command(async () => await ConfirmShipAddressAsync());
             ShipAddressCloseCommand = new Command(async () => await ShipAddressCloseAsync());
+
+            NextViewCommand = new Command(async () => await NextViewAsync());
         }
 
         public Page CurrentPage { get; set; }
@@ -229,24 +241,33 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourcePr
             try
             {
                 IsBusy = true;
+
+                // Eğer outsourceModel zaten seçilmediyse, önce eski seçili öğeyi sıfırla
                 if (!outsourceModel.IsSelected)
                 {
+                    // Daha önce seçilmiş olan varsa, seçimini kaldır
+                    if (SelectedOutsource != null)
+                    {
+                        SelectedOutsource.IsSelected = false;
+                    }
+
+                    // Yeni seçilen öğeyi true yap
                     if (outsourceModel.ShipAddressCount > 0)
                     {
-                        //PurchaseSupplier = item;
                         await LoadShipAddressesAsync(outsourceModel);
                         CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
                     }
                     else
                     {
                         outsourceModel.IsSelected = true;
-                        // PurchaseSupplier = item;
+                        SelectedOutsource = outsourceModel;
                     }
                 }
                 else
                 {
+                    // Eğer zaten seçiliyse seçimi kaldır
                     outsourceModel.IsSelected = false;
-                    //PurchaseSupplier = null;
+                    SelectedOutsource = null;
                 }
             }
             catch (Exception ex)
@@ -419,6 +440,31 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourcePr
                     _userDialogs.HideHud();
 
                 await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task NextViewAsync()
+        {
+            if (IsBusy)
+                return;
+
+            try
+            {
+                IsBusy = true;
+
+                await Shell.Current.GoToAsync($"{nameof(InputOutsourceTransferOutsourceBasketListView)}", new Dictionary<string, object>
+                {
+                    [nameof(WarehouseModel)] = WarehouseModel,
+                    [nameof(OutsourceModel)] = SelectedOutsource
+                });
+            }
+            catch (Exception ex)
+            {
+                _userDialogs.Alert(ex.Message);
             }
             finally
             {
