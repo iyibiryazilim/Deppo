@@ -79,7 +79,7 @@
                                            TextColor="{StaticResource Gray500}"
                                            VerticalOptions="Center" />
                                     <Label VerticalOptions="End"
-                                           Text="Lorem Ipsum... "
+                                           Text="Ambara göre sayım işlemi yapabilirsiniz."
                                            TextColor="{StaticResource Gray400}">
 
                                     </Label>
@@ -152,7 +152,7 @@
                                            TextColor="{StaticResource Gray500}"
                                            VerticalOptions="Center" />
                                     <Label VerticalOptions="End"
-                                           Text="Lorem Ipsum... "
+                                           Text="Ürüne göre sayım işlemi yapabilirsiniz."
                                            TextColor="{StaticResource Gray400}">
 
                                     </Label>

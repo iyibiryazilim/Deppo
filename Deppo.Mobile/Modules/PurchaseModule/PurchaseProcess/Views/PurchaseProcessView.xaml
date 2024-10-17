@@ -70,7 +70,7 @@
                                            TextColor="{StaticResource Gray500}"
                                            VerticalOptions="Center" />
                                     <Label VerticalOptions="End"
-                                           Text="Lorem Ipsum... "
+                                           Text="Satınalma İrsaliyesi ile mal kabul işlemi yapabilirsiniz."
                                            TextColor="{StaticResource Gray400}">
                                     </Label>
                                 </VerticalStackLayout>
@@ -124,7 +124,7 @@
                                            TextColor="{StaticResource Gray500}"
                                            VerticalOptions="Center" />
                                     <Label VerticalOptions="End"
-                                           Text="Lorem Ipsum... "
+                                           Text="Satınalma Siparişine bağlı  mal kabul işlemi yapabilirsiniz."
                                            TextColor="{StaticResource Gray400}">
                                     </Label>
                                 </VerticalStackLayout>
@@ -193,7 +193,7 @@
                                            TextColor="{StaticResource Gray500}"
                                            VerticalOptions="Center" />
                                     <Label VerticalOptions="End"
-                                           Text="Lorem Ipsum... "
+                                           Text="Satınalma İade İrsaliyesi ile satınalma iade işlemi yapabilirsiniz."
                                            TextColor="{StaticResource Gray400}">
                                     </Label>
                                 </VerticalStackLayout>
@@ -248,7 +248,7 @@
                                            TextColor="{StaticResource Gray500}"
                                            VerticalOptions="Center" />
                                     <Label VerticalOptions="End"
-                                           Text="Lorem Ipsum... "
+                                           Text="Satınalma İrsaliyesine bağlı satınalma iade işlemi yapabilirsiniz."
                                            TextColor="{StaticResource Gray400}">
                                     </Label>
                                 </VerticalStackLayout>
