@@ -39,7 +39,7 @@
                     <Label
                         FontAttributes="Bold"
                         FontSize="20"
-                        Text="Giriş İşlemleri"
+                        Text="Çıkış İşlemleri"
                         TextColor="{StaticResource OffBlack}" />
 
                     <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="2">
@@ -81,7 +81,7 @@
                                             TextColor="{StaticResource Gray500}"
                                             VerticalOptions="Center" />
                                         <Label
-                                            Text="Lorem Ipsum... "
+                                            Text="Satış İrsaliyesi ile sevk işlemi yapabilirsiniz."
                                             TextColor="{StaticResource Gray400}"
                                             VerticalOptions="End" />
                                     </VerticalStackLayout>
@@ -138,7 +138,7 @@
                                             TextColor="{StaticResource Gray500}"
                                             VerticalOptions="Center" />
                                         <Label
-                                            Text="Lorem Ipsum... "
+                                            Text="Satış Siparişine bağlı sevk işlemi yapabilirsiniz."
                                             TextColor="{StaticResource Gray400}"
                                             VerticalOptions="End" />
                                     </VerticalStackLayout>
@@ -191,7 +191,7 @@
                                                Text="Toplanan Ürünlerin Sevk İşlemleri"
                                                TextColor="{StaticResource Gray500}"
                                                VerticalOptions="Center" />
-                                        <Label Text="Lorem Ipsum... "
+                                        <Label Text="Raftan toplanan ürünlere ait sevk işlemi yapabilirsiniz."
                                                TextColor="{StaticResource Gray400}"
                                                VerticalOptions="End" />
                                     </VerticalStackLayout>
@@ -221,7 +221,7 @@
                     <Label
                         FontAttributes="Bold"
                         FontSize="20"
-                        Text="Çıkış İşlemleri"
+                        Text="Giriş İşlemleri"
                         TextColor="{StaticResource OffBlack}" />
 
                     <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="2">
@@ -261,7 +261,7 @@
                                             TextColor="{StaticResource Gray500}"
                                             VerticalOptions="Center" />
                                         <Label
-                                            Text="Lorem Ipsum... "
+                                            Text="Satış İade İrsaliyesi ile satış iade işlemi yapabilirsiniz."
                                             TextColor="{StaticResource Gray400}"
                                             VerticalOptions="End" />
                                     </VerticalStackLayout>
@@ -318,7 +318,7 @@
                                             TextColor="{StaticResource Gray500}"
                                             VerticalOptions="Center" />
                                         <Label
-                                            Text="Lorem Ipsum... "
+                                            Text="Satış İrsaliyesine bağlı satış iade işlemi yapabilirsiniz."
                                             TextColor="{StaticResource Gray400}"
                                             VerticalOptions="End" />
                                     </VerticalStackLayout>
@@ -388,7 +388,7 @@
                                             TextColor="{StaticResource Gray500}"
                                             VerticalOptions="Center" />
                                         <Label
-                                            Text="Lorem Ipsum... "
+                                            Text="Müşteriye göre gruplayarak raftan ürün toplama işlemi yapabilirsiniz."
                                             TextColor="{StaticResource Gray400}"
                                             VerticalOptions="End" />
                                     </VerticalStackLayout>
@@ -447,7 +447,7 @@
                                             TextColor="{StaticResource Gray500}"
                                             VerticalOptions="Center" />
                                         <Label
-                                            Text="Lorem Ipsum... "
+                                            Text="Malzemeye göre gruplayarak raftan ürün toplama işlemi yapabilirsiniz."
                                             TextColor="{StaticResource Gray400}"
                                             VerticalOptions="End" />
                                     </VerticalStackLayout>
@@ -506,7 +506,7 @@
                                             TextColor="{StaticResource Gray500}"
                                             VerticalOptions="Center" />
                                         <Label
-                                            Text="Lorem Ipsum... "
+                                            Text="Raf yerine göre gruplayarak raftan ürün toplama işlemi yapabilirsiniz."
                                             TextColor="{StaticResource Gray400}"
                                             VerticalOptions="End" />
                                     </VerticalStackLayout>

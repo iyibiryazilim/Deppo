@@ -67,7 +67,7 @@
                                            Text="Manuel Hızlı Üretim"
                                            TextColor="{StaticResource Gray500}"
                                            VerticalOptions="Center" />
-                                    <Label Text="Lorem Ipsum... "
+                                    <Label Text="Ürünleri seçerek hızlı üretim işlemi yapabilirsiniz."
                                            TextColor="{StaticResource Gray400}"
                                            VerticalOptions="End" />
                                 </VerticalStackLayout>
@@ -118,7 +118,7 @@
                                            Text="Manuel Rework"
                                            TextColor="{StaticResource Gray500}"
                                            VerticalOptions="Center" />
-                                    <Label Text="Lorem Ipsum... "
+                                    <Label Text="Ürünleri seçerek hızlı üretim boz işlemi yapabilirsiniz."
                                            TextColor="{StaticResource Gray400}"
                                            VerticalOptions="End" />
                                 </VerticalStackLayout>
@@ -149,7 +149,7 @@
                 <Label Padding="5"
                        FontAttributes="Bold"
                        FontSize="20"
-                       Text="Ürün Sayım İşlemleri"
+                       Text="Hızlı Üretim İşlemleri"
                        TextColor="{StaticResource OffBlack}" />
 
                 <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="0">
@@ -181,7 +181,7 @@
                                            Text="İş Emrine Bağlı Hızlı Üretim"
                                            TextColor="{StaticResource Gray500}"
                                            VerticalOptions="Center" />
-                                    <Label Text="Lorem Ipsum..."
+                                    <Label Text="Alt malzeme tanımı ile hızlı üretim işlemi yapabilirsiniz."
                                            TextColor="{StaticResource Gray400}"
                                            VerticalOptions="End" />
                                 </VerticalStackLayout>
@@ -232,7 +232,7 @@
                                            Text="İş Emrine Bağlı Rework"
                                            TextColor="{StaticResource Gray500}"
                                            VerticalOptions="Center" />
-                                    <Label Text="Lorem Ipsum..."
+                                    <Label Text="Alt malzeme tanımı ile hızlı üretim boz işlemi yapabilirsiniz."
                                            TextColor="{StaticResource Gray400}"
                                            VerticalOptions="End" />
                                 </VerticalStackLayout>

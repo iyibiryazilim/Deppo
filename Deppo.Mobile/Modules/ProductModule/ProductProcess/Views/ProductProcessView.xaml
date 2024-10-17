@@ -73,7 +73,7 @@
                                                FontSize="Subtitle"
                                                Text="Üretimden Giriş İşlemleri"
                                                TextColor="{StaticResource Gray500}" />
-                                        <Label Text="Üretimden giriş fişi ile stok girişi yapabilirsiniz."
+                                        <Label Text="Üretimden Giriş Fişi ile stok girişi yapabilirsiniz."
                                                TextColor="{StaticResource Gray400}">
                                         </Label>
                                     </VerticalStackLayout>
@@ -131,7 +131,7 @@
                                                TextColor="{StaticResource Gray500}"
                                                VerticalOptions="Center" />
                                         <Label VerticalOptions="End"
-                                               Text="Sayım fazlası fişi ile stok girişi yapabilirsiniz."
+                                               Text="Sayım Fazlası Fişi ile stok girişi yapabilirsiniz."
                                                TextColor="{StaticResource Gray400}">
                                         </Label>
                                     </VerticalStackLayout>
@@ -205,7 +205,7 @@
                                                TextColor="{StaticResource Gray500}"
                                                VerticalOptions="Center" />
                                         <Label VerticalOptions="End"
-                                               Text="Sarf işlemi ile stok çıkışı yapabilirsiniz."
+                                               Text="Sarf Fişi ile stok çıkışı yapabilirsiniz."
                                                TextColor="{StaticResource Gray400}">
                                         </Label>
                                     </VerticalStackLayout>
@@ -265,7 +265,7 @@
                                                Text="Sayım Eksiği İşlemleri"
                                                TextColor="{StaticResource Gray500}" />
                                         <Label VerticalOptions="End"
-                                               Text="Sayım eksiği ile stok çıkışı yapabilirsiniz."
+                                               Text="Sayım Eksiği Fişi ile stok çıkışı yapabilirsiniz."
                                                TextColor="{StaticResource Gray400}">
                                         </Label>
                                     </VerticalStackLayout>
@@ -325,7 +325,7 @@
                                                TextColor="{StaticResource Gray500}"
                                                VerticalOptions="Center" />
                                         <Label VerticalOptions="End"
-                                               Text="Fire işlemi ile stok çıkışı yapabilirsiniz."
+                                               Text="Fire Fişi ile stok çıkışı yapabilirsiniz."
                                                TextColor="{StaticResource Gray400}">
                                         </Label>
                                     </VerticalStackLayout>
