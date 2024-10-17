@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Deppo.Sys.Service.Models;
+﻿namespace Deppo.Sys.Service.Models;
 
 public class ApplicationUser
 {
@@ -24,5 +18,5 @@ public class ApplicationUser
     public string EMail { get; set; } = string.Empty;
     public string ClientMachineName { get; set; } = string.Empty;
     public string LogoUserName { get; set; } = string.Empty;
-    public MediaDataObject Image { get; set; } = string.Empty;
+    public MediaDataObject? Image { get; set; }
 }

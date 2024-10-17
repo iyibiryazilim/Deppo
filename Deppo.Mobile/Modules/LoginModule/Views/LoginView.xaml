@@ -58,7 +58,7 @@
                         LabelText="Kullanıcı Adı"
                         Text="{Binding UserName}" />
 
-                    <dx:TextEdit
+                    <dx:PasswordEdit
                         BackgroundColor="{StaticResource White}"
                         Keyboard="Default"
                         LabelText="Şifre"
