@@ -84,6 +84,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Deppo.Core\Deppo.Core.csproj" />
 		<ProjectReference Include="..\Deppo.Mobile.Core\Deppo.Mobile.Core.csproj" />
+		<ProjectReference Include="..\Deppo.Sys.Service\Deppo.Sys.Service.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
