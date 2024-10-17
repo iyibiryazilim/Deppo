@@ -42,6 +42,8 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
             DeleteItemCommand = new Command<ProcurementSalesProductModel>(async (item) => await DeleteItemAsync(item));
             NextViewCommand = new Command(async () => await NextViewAsync());
             BackCommand = new Command(async () => await BackAsync());
+            IncreaseCommand = new Command<ProcurementSalesProductModel>(async (item) => await IncreaseAsync(item));
+            DecreaseCommand = new Command<ProcurementSalesProductModel>(async (item) => await DecreaseAsync(item));
 
             Items.Clear();
         }
@@ -54,6 +56,8 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
 
         public Command NextViewCommand { get; }
         public Command BackCommand { get; }
+        public Command IncreaseCommand { get; }
+        public Command DecreaseCommand { get; }
 
         private async Task ShowProductViewAsync()
         {
