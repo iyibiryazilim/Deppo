@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.BasketModels;
+using Deppo.Mobile.Core.Models.PackageProductModels;
 using Deppo.Mobile.Core.Models.ProcurementModels.ProcurementSalesModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
@@ -13,11 +15,12 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
 {
     [QueryProperty(nameof(WarehouseModel), nameof(WarehouseModel))]
     [QueryProperty(nameof(ProcurementSalesCustomerModel), nameof(ProcurementSalesCustomerModel))]
-    public partial class ProcurementSalesProcessProductListViewModel : BaseViewModel
+    public partial class ProcurementSalesProcessBasketProductListViewModel : BaseViewModel
     {
         private readonly IHttpClientService _httpClientService;
         private readonly IProcurementSalesProductService _procurementSalesProductService;
         private readonly IUserDialogs _userDialogs;
+        private readonly IServiceProvider _serviceProvider;
 
         [ObservableProperty]
         WarehouseModel? warehouseModel;
@@ -25,18 +28,16 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
         [ObservableProperty]
         ProcurementSalesCustomerModel procurementSalesCustomerModel;
 
-
-        [ObservableProperty]
-        public SearchBar searchText;
-
-        public ProcurementSalesProcessProductListViewModel(
+        public ProcurementSalesProcessBasketProductListViewModel(
             IHttpClientService httpClientService,
             IProcurementSalesProductService procurementSalesProductService,
-            IUserDialogs userDialogs)
+            IUserDialogs userDialogs,
+            IServiceProvider serviceProvider)
         {
             _httpClientService = httpClientService;
             _procurementSalesProductService = procurementSalesProductService;
             _userDialogs = userDialogs;
+            _serviceProvider = serviceProvider;
 
             Title = "Sevk Edilebilir Ürünler";
 
@@ -44,20 +45,26 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
             LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
             PerformSearchCommand = new Command(async () => await PerformSearchAsync());
             PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
-            NextViewCommand = new Command(async () => await NextViewAsync());
             BackCommand = new Command(async () => await BackAsyc());
-
+            ItemTappedCommand = new Command<ProcurementSalesProductModel>(async (item) => await ItemTappedAsync(item));
+            ConfirmCommand = new Command(async () => await ConfirmAsync());
         }
 
-
+        [ObservableProperty]
+        ProcurementSalesProductModel selectedProduct;
         public ObservableCollection<ProcurementSalesProductModel> Items { get; } = new();
+        public ObservableCollection<ProcurementSalesProductModel> SelectedProducts { get; } = new();
+        public ObservableCollection<ProcurementSalesProductModel> SelectedItems { get; } = new();
 
         public Command LoadItemsCommand { get; }
         public Command LoadMoreItemsCommand { get; }
         public Command PerformSearchCommand { get; }
         public Command PerformEmptySearchCommand { get; }
-        public Command NextViewCommand { get; }
+        public Command ConfirmCommand { get; }
+        public Command ItemTappedCommand { get; }
         public Command BackCommand { get; }
+
+        public SearchBar SearchText { get; set; }
 
 
         private async Task LoadItemsAsync()
@@ -78,7 +85,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
                     firmNumber: _httpClientService.FirmNumber,
                     periodNumber: _httpClientService.PeriodNumber,
                     ficheReferenceId: ProcurementSalesCustomerModel.ReferenceId,
-                    search: string.Empty,
+                    search: SearchText.Text,
                     skip: 0,
                     take: 20
                 );
@@ -130,7 +137,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
                     firmNumber: _httpClientService.FirmNumber,
                     periodNumber: _httpClientService.PeriodNumber,
                     ficheReferenceId: ProcurementSalesCustomerModel.ReferenceId,
-                    search: string.Empty,
+                    search: SearchText.Text,
                     skip: Items.Count,
                     take: 20
                 );
@@ -162,6 +169,87 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
             }
         }
 
+
+        private async Task ItemTappedAsync(ProcurementSalesProductModel procurementSalesProductModel)
+        {
+            if (IsBusy)
+                return;
+
+            try
+            {
+                IsBusy = true;
+
+                ProcurementSalesProductModel item = Items.FirstOrDefault(x => x.ItemReferenceId == procurementSalesProductModel.ItemReferenceId);
+
+                if (item is not null)
+                {
+                    if (!item.IsSelected)
+                    {
+
+                        var tappedItem = Items.ToList().FirstOrDefault(x => x.ItemReferenceId == item.ItemReferenceId);
+                        if (tappedItem != null)
+                            tappedItem.IsSelected = true;
+
+                        SelectedProduct = item;
+
+                        SelectedProducts.Add(item);
+                        SelectedItems.Add(item);
+
+                    }
+                    else
+                    {
+                        SelectedProduct = null;
+                        var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId== item.ItemReferenceId);
+                        if (selectedItem != null)
+                        {
+                            SelectedProducts.Remove(selectedItem);
+                            Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = false;
+                            SelectedItems.Remove(item);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task ConfirmAsync()
+        {
+            if (IsBusy)
+                return;
+
+            try
+            {
+                IsBusy = true;
+
+                var previouseViewModel = _serviceProvider.GetRequiredService<ProcurementSalesProcessProductBasketViewModel>();
+                if (previouseViewModel is not null)
+                {
+                    foreach (var item in SelectedProducts)
+                        if (!previouseViewModel.Items.Any(x => x.ItemReferenceId== item.ItemReferenceId))
+                            previouseViewModel.Items.Add(item);
+
+                    await Shell.Current.GoToAsync($"..");
+                }
+                SelectedItems.Clear();
+                SelectedProducts.Clear();
+            }
+            catch (Exception ex)
+            {
+                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
         private async Task PerformSearchAsync()
         {
             if (IsBusy)
@@ -186,7 +274,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
                     ficheReferenceId: ProcurementSalesCustomerModel.ReferenceId,
                     skip: 0,
                     take: 20,
-                    search: string.Empty);
+                    search: SearchText.Text);
 
                 if (result.IsSuccess)
                 {
@@ -223,17 +311,9 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
         private async Task BackAsyc()
         {
             Items.Clear();
-			ProcurementSalesCustomerModel = null!;
+            ProcurementSalesCustomerModel = null!;
             await Shell.Current.GoToAsync("..");
         }
 
-        private async Task NextViewAsync()
-        {
-            await Shell.Current.GoToAsync($"{nameof(ProcurementSalesPackageBasketView)}", new Dictionary<string, object>
-            {
-                [nameof(WarehouseModel)] = WarehouseModel,
-                [nameof(ProcurementSalesCustomerModel)] = ProcurementSalesCustomerModel
-			});
-        }
     }
 }

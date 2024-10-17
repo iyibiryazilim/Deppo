@@ -61,6 +61,30 @@ namespace Deppo.Mobile.Core.Models.ProcurementModels.ProcurementSalesModels
         [ObservableProperty]
         private string image = string.Empty;
 
+        [ObservableProperty]
+        private bool _isVariant;
+
+        [ObservableProperty]
+        private int _trackingType;
+
+        [ObservableProperty]
+        private int _locTracking;
+
+        [ObservableProperty]
+        private string _locTrackingIcon = "location-dot";
+
+        [ObservableProperty]
+        private string _variantIcon = "bookmark";
+
+        [ObservableProperty]
+        private string _trackingTypeIcon = "box-archive";
+
+        public string LocTrackingIconColor => LocTracking == 1 ? "#F5004F" : "#C8C8C8";
+
+        public string VariantIconColor => IsVariant ? "#F5004F" : "#C8C8C8";
+
+        public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
+
         public byte[] ImageData
         {
             get
@@ -73,5 +97,11 @@ namespace Deppo.Mobile.Core.Models.ProcurementModels.ProcurementSalesModels
                 }
             }
         }
+
+        [ObservableProperty]
+        private bool isSelected;
+
+        [ObservableProperty]
+        private double outputQuantity;
     }
 }

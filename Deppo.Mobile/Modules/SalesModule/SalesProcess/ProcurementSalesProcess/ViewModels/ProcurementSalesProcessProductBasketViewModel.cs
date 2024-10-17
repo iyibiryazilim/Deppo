@@ -5,44 +5,43 @@ using Deppo.Mobile.Core.Models.ProcurementModels.ProcurementSalesModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.Views;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.ViewModels
 {
-    [QueryProperty(nameof(WarehouseModel), nameof(WarehouseModel))]
     [QueryProperty(nameof(ProcurementSalesCustomerModel), nameof(ProcurementSalesCustomerModel))]
-    public partial class ProcurementSalesPackageBasketViewModel : BaseViewModel
+    public partial class ProcurementSalesProcessProductBasketViewModel : BaseViewModel
     {
         private readonly IUserDialogs _userDialogs;
         private readonly IHttpClientService _httpClientService;
         private readonly IServiceProvider _serviceProvider;
 
         [ObservableProperty]
-        private WarehouseModel warehouseModel = null!;
+        private ProcurementPackageBasketModel? procurementPackageBasketModel;
 
         [ObservableProperty]
-        private ProcurementPackageBasketModel? selectedPackageBasketModel;
+        ProcurementSalesCustomerModel procurementSalesCustomerModel = null!;
 
         [ObservableProperty]
-        private ProcurementSalesCustomerModel procurementSalesCustomerModel = null!;
+        private ProcurementSalesProductModel selectedSalesProductModel;
 
-        public ObservableCollection<ProcurementPackageBasketModel> Items { get; } = new();
+        public ObservableCollection<ProcurementSalesProductModel> Items { get; } = new();
 
-        public ProcurementSalesPackageBasketViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, IServiceProvider serviceProvider)
+        public ProcurementSalesProcessProductBasketViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, IServiceProvider serviceProvider)
         {
             _userDialogs = userDialogs;
             _httpClientService = httpClientService;
             _serviceProvider = serviceProvider;
 
-            Title = "Koli Sepet Listesi";
+            Title = "Sepet Listesi";
 
             ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
-            DeleteItemCommand = new Command<ProcurementPackageBasketModel>(async (item) => await DeleteItemAsync(item));
+            DeleteItemCommand = new Command<ProcurementSalesProductModel>(async (item) => await DeleteItemAsync(item));
             NextViewCommand = new Command(async () => await NextViewAsync());
             BackCommand = new Command(async () => await BackAsync());
-            ItemTappedCommand = new Command<ProcurementPackageBasketModel>(async (item) => await ItemTappedAsync(item));
 
             Items.Clear();
         }
@@ -51,11 +50,10 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
 
         public Command ShowProductViewCommand { get; }
 
-        public Command<ProcurementPackageBasketModel> DeleteItemCommand { get; }
+        public Command<ProcurementSalesProductModel> DeleteItemCommand { get; }
 
         public Command NextViewCommand { get; }
         public Command BackCommand { get; }
-        public Command ItemTappedCommand { get; }
 
         private async Task ShowProductViewAsync()
         {
@@ -66,35 +64,12 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
             {
                 IsBusy = true;
 
-                await Shell.Current.GoToAsync($"{nameof(ProcurementSalesPackageProductListView)}", new Dictionary<string, object>
+
+                await Shell.Current.GoToAsync($"{nameof(ProcurementSalesProcessBasketProductListView)}", new Dictionary<string, object>
                 {
-                    {nameof(WarehouseModel), WarehouseModel}
-                });
-            }
-            catch (Exception ex)
-            {
-                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
-
-        private async Task ItemTappedAsync(ProcurementPackageBasketModel item)
-        {
-            if (IsBusy)
-                return;
-
-            try
-            {
-                IsBusy = true;
-
-                await Shell.Current.GoToAsync($"{nameof(ProcurementSalesProcessProductBasketView)}", new Dictionary<string, object>
-                {
-                    {nameof(WarehouseModel), WarehouseModel},
                     {nameof(ProcurementSalesCustomerModel), ProcurementSalesCustomerModel}
                 });
+
             }
             catch (Exception ex)
             {
@@ -106,7 +81,8 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
             }
         }
 
-        private async Task DeleteItemAsync(ProcurementPackageBasketModel item)
+
+        private async Task DeleteItemAsync(ProcurementSalesProductModel item)
         {
             if (IsBusy)
                 return;
@@ -115,22 +91,67 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
             {
                 IsBusy = true;
 
-                var result = await _userDialogs.ConfirmAsync($"{item.PackageProductModel.Code}\n{item.PackageProductModel.Name}\nİlgili koli ürünleri ile sepetinizden çıkarılacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+                var result = await _userDialogs.ConfirmAsync($"{item.ItemCode}\n{item.ItemName}\nİlgili koli ürünleri ile sepetinizden çıkarılacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
                 if (!result)
                     return;
 
-                foreach (var basketItem in Items)
-                {
-                    if (basketItem.PackageProductModel.ReferenceId == item.PackageProductModel.ReferenceId)
-                    {
-                        basketItem.PackageProducts.Clear();
-                    }
-                    Items.Remove(basketItem);
-                }
+
+                Items.Remove(item);
+
             }
             catch (Exception ex)
             {
                 await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task IncreaseAsync(ProcurementSalesProductModel procurementSalesProductModel)
+        {
+            if (IsBusy)
+                return;
+
+            try
+            {
+                IsBusy = true;
+
+                SelectedSalesProductModel = procurementSalesProductModel;
+
+                if(SelectedSalesProductModel.Quantity > SelectedSalesProductModel.OutputQuantity)
+                    SelectedSalesProductModel.OutputQuantity++;
+                
+            }
+            catch (Exception ex)
+            {
+                await _userDialogs.AlertAsync(ex.Message);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task DecreaseAsync(ProcurementSalesProductModel procurementSalesProductModel)
+        {
+            if (IsBusy)
+                return;
+
+            try
+            {
+                IsBusy = true;
+
+                SelectedSalesProductModel = procurementSalesProductModel;
+
+                if (SelectedSalesProductModel.OutputQuantity > 0)
+                    SelectedSalesProductModel.OutputQuantity--;
+
+            }
+            catch (Exception ex)
+            {
+                await _userDialogs.AlertAsync(ex.Message);
             }
             finally
             {
@@ -153,11 +174,11 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
                     return;
                 }
 
-                await Shell.Current.GoToAsync($"{nameof(InputProductProcessFormView)}", new Dictionary<string, object>
-                {
-                    [nameof(WarehouseModel)] = WarehouseModel,
-                    [nameof(Items)] = Items
-                });
+                //await Shell.Current.GoToAsync($"{nameof(InputProductProcessFormView)}", new Dictionary<string, object>
+                //{
+                //    [nameof(WarehouseModel)] = WarehouseModel,
+                //    [nameof(Items)] = Items
+                //});
             }
             catch (Exception ex)
             {
@@ -198,6 +219,5 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
                 IsBusy = false;
             }
         }
-
     }
 }
