@@ -11,5 +11,7 @@ public partial class ReturnSalesBasketView : ContentPage
         InitializeComponent();
         _viewModel = viewModel;
         BindingContext = _viewModel;
-    }
+		_viewModel.BarcodeEntry = barcodeEntry;
+		_viewModel.BarcodeEntry.Focus();
+	}
 }

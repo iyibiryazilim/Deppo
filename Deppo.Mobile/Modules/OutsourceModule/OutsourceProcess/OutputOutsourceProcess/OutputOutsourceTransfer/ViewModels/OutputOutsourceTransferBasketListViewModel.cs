@@ -154,26 +154,21 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			Console.WriteLine(Items.GetHashCode());
-
-			if(_barcodeSearchHelper is not null)
-			{
-			  await _barcodeSearchHelper.BarcodeDetectedAsync(
+			await _barcodeSearchHelper.BarcodeDetectedAsync(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
 				barcode: barcodeEntry.Text,
 				comingPage: "OutputOutsourceTransferBasketListViewModel"
 			);
-			}
-
-			Console.WriteLine(Items);
-
+			
 		}
-		catch (Exception)
+		catch (Exception ex)
 		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 
-			throw;
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{

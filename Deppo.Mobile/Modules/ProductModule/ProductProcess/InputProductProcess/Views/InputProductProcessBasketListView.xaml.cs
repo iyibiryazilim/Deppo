@@ -11,5 +11,7 @@ public partial class InputProductProcessBasketListView : ContentPage
 		_viewModel = viewModel;
 		BindingContext = _viewModel;
 		_viewModel.CurrentPage = this;
+		_viewModel.BarcodeEntry = barcodeEntry;
+		_viewModel.BarcodeEntry.Focus();
 	}
 }

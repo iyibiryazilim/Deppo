@@ -12,8 +12,7 @@
              x:DataType="viewModel:TransferOutBasketViewModel"
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
-                                   StatusBarStyle="Default" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <Shell.BackButtonBehavior>
@@ -39,8 +38,7 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android"
-                Value="artboard.png" />
+            <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
@@ -57,21 +55,19 @@
                     Stroke="{StaticResource Primary}"
                     StrokeShape="RoundRectangle 5"
                     StrokeThickness="0.5">
-                <SearchBar x:Name="searchBar"
-                           Placeholder="Ara..."
-                           PlaceholderColor="{StaticResource OffBlack}"
-                           TextColor="{StaticResource OffBlack}">
-                    <!-- <SearchBar.Behaviors>
-    <toolkit:EventToCommandBehavior
-        Command="{Binding PerformSearchCommand}"
-        CommandParameter="{Binding Text, Source={x:Reference searchBar}}"
-        EventName="SearchButtonPressed" />
-</SearchBar.Behaviors>-->
-                </SearchBar>
+                <Entry x:Name="barcodeEntry"
+                       Placeholder="Barkod tara..."
+                       PlaceholderColor="{StaticResource OffBlack}"
+                       TextColor="{StaticResource OffBlack}">
+                    <Entry.Behaviors>
+                        <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                        CommandParameter="{Binding ., Source={x:Reference barcodeEntry}}"
+                                                        EventName="TextChanged" />
+                    </Entry.Behaviors>
+                </Entry>
             </Border>
 
-            <CollectionView Grid.Row="1"
-                            ItemsSource="{Binding TransferBasketModel.OutProducts}">
+            <CollectionView Grid.Row="1" ItemsSource="{Binding TransferBasketModel.OutProducts}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="transferModel:OutProductModel">
                         <SwipeView Threshold="100">
@@ -104,8 +100,7 @@
                             <Border Padding="5"
                                     BackgroundColor="Transparent"
                                     StrokeThickness="0.1">
-                                <Grid ColumnDefinitions=".20*,.80*"
-                                      ColumnSpacing="10">
+                                <Grid ColumnDefinitions=".20*,.80*" ColumnSpacing="10">
                                     <Border Grid.Column="0"
                                             StrokeShape="RoundRectangle 5"
                                             StrokeThickness="0.5">
@@ -176,8 +171,7 @@
                                                            TextColor="{StaticResource Secondary}" />
 
                                                     <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:TransferOutBasketViewModel}}, Path=DecreaseCommand}"
-                                                                              CommandParameter="{Binding .}" />
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:TransferOutBasketViewModel}}, Path=DecreaseCommand}" CommandParameter="{Binding .}" />
                                                     </Border.GestureRecognizers>
                                                 </Border>
                                                 <Label Grid.Column="1"
@@ -197,8 +191,7 @@
                                                            TextColor="{StaticResource White}" />
 
                                                     <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:TransferOutBasketViewModel}}, Path=IncreaseCommand}"
-                                                                              CommandParameter="{Binding .}" />
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:TransferOutBasketViewModel}}, Path=IncreaseCommand}" CommandParameter="{Binding .}" />
                                                     </Border.GestureRecognizers>
                                                 </Border>
                                             </Grid>
@@ -212,8 +205,8 @@
             </CollectionView>
 
             <Button Grid.Row="2"
-                    Command="{Binding NextViewCommand}"
                     Margin="5,10,5,20"
+                    Command="{Binding NextViewCommand}"
                     Text="İleri" />
         </Grid>
         <!--#endregion-->
@@ -231,12 +224,9 @@
                             IsModal="True"
                             ShowGrabber="True">
                 <!--#region BottomSheetContent-->
-                <Grid RowDefinitions="Auto, *"
-                      RowSpacing="20">
-                    <VerticalStackLayout Grid.Row="0"
-                                         Spacing="5">
-                        <Grid ColumnDefinitions="*, Auto"
-                              ColumnSpacing="10">
+                <Grid RowDefinitions="Auto, *" RowSpacing="20">
+                    <VerticalStackLayout Grid.Row="0" Spacing="5">
+                        <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
                             <Label Grid.Column="0"
                                    FontAttributes="Bold"
                                    FontSize="Medium"
@@ -284,8 +274,7 @@
                                         RemainingItemsThreshold="2"
                                         RemainingItemsThresholdReachedCommand="{Binding LoadMoreLocationTransactionsCommand}">
                             <CollectionView.ItemsLayout>
-                                <LinearItemsLayout ItemSpacing="5"
-                                                   Orientation="Vertical" />
+                                <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="locationModel:LocationTransactionModel">
@@ -293,8 +282,7 @@
                                             BackgroundColor="{StaticResource WhiteSmoke}"
                                             StrokeShape="RoundRectangle 10"
                                             StrokeThickness="0.1">
-                                        <Grid ColumnDefinitions="Auto, *, Auto"
-                                              ColumnSpacing="10">
+                                        <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="10">
                                             <Border Grid.Column="0"
                                                     Padding="8,8,8,8"
                                                     BackgroundColor="{StaticResource Secondary}"
@@ -313,8 +301,7 @@
                                                            TextColor="{StaticResource OffBlack}" />
                                                 </VerticalStackLayout>
                                             </Border>
-                                            <VerticalStackLayout Grid.Column="1"
-                                                                 VerticalOptions="Center">
+                                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
                                                 <Label FontAttributes="Bold"
                                                        LineBreakMode="TailTruncation"
                                                        Text="{Binding LocationCode}" />
@@ -353,8 +340,7 @@
                                                            TextColor="{StaticResource Secondary}" />
 
                                                     <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:TransferOutBasketViewModel}}, Path=LocationTransactionDecreaseCommand}"
-                                                                              CommandParameter="{Binding .}" />
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:TransferOutBasketViewModel}}, Path=LocationTransactionDecreaseCommand}" CommandParameter="{Binding .}" />
                                                     </Border.GestureRecognizers>
                                                 </Border>
                                                 <Label Grid.Column="1"
@@ -374,8 +360,7 @@
                                                            TextColor="{StaticResource White}" />
 
                                                     <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:TransferOutBasketViewModel}}, Path=LocationTransactionIncreaseCommand}"
-                                                                              CommandParameter="{Binding .}" />
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:TransferOutBasketViewModel}}, Path=LocationTransactionIncreaseCommand}" CommandParameter="{Binding .}" />
                                                     </Border.GestureRecognizers>
                                                 </Border>
                                             </Grid>

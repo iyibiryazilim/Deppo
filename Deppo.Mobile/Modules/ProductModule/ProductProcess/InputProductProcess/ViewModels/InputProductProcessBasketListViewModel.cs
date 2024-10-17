@@ -5,6 +5,7 @@ using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
+using Deppo.Mobile.Helpers.BarcodeHelper;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -25,6 +26,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 	private readonly ILocationService _locationService;
 	private readonly ISeriLotService _seriLotService;
 	private readonly IServiceProvider _serviceProvider;
+	private readonly IBarcodeSearchHelper _barcodeSearchHelper;
 
 	[ObservableProperty]
 	private WarehouseModel warehouseModel = null!;
@@ -39,17 +41,22 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 	public ObservableCollection<LocationModel> Locations { get; } = new();
 	public ObservableCollection<SeriLotModel> SeriLots { get; } = new();
 
-	public InputProductProcessBasketListViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider)
+	[ObservableProperty]
+	public Entry barcodeEntry;
+
+	public InputProductProcessBasketListViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider, IBarcodeSearchHelper barcodeSearchHelper)
 	{
 		_userDialogs = userDialogs;
 		_httpClientService = httpClientService;
 		_locationService = locationService;
 		_seriLotService = seriLotService;
 		_serviceProvider = serviceProvider;
+		_barcodeSearchHelper = barcodeSearchHelper;
 
 		Title = "Sepet Listesi";
 
 		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
+		PerformSearchCommand = new Command<Entry>(async (barcodeEntry) => await PerformSearchAsync(barcodeEntry));
 		IncreaseCommand = new Command<InputProductBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<InputProductBasketModel>(async (item) => await DecreaseAsync(item));
 
@@ -70,6 +77,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 	public Page CurrentPage { get; set; } = null!;
 
 	public Command ShowProductViewCommand { get; }
+	public Command PerformSearchCommand { get; }
 
 	public Command<InputProductBasketModel> DeleteItemCommand { get; }
 	public Command<InputProductBasketModel> IncreaseCommand { get; }
@@ -114,6 +122,42 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 			IsBusy = false;
 		}
 	}
+
+	private async Task PerformSearchAsync(Entry barcodeEntry)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			if (string.IsNullOrEmpty(barcodeEntry.Text))
+				return;
+
+			IsBusy = true;
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			await _barcodeSearchHelper.BarcodeDetectedAsync(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				barcode: barcodeEntry.Text,
+				comingPage: "InputProductProcessBasketListViewModel"
+			);
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			BarcodeEntry.Text = string.Empty;
+			IsBusy = false;
+		}
+	}
+
 
 	private async Task IncreaseAsync(InputProductBasketModel inputProductBasketModel)
 	{

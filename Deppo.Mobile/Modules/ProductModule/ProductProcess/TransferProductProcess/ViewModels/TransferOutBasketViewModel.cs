@@ -15,6 +15,7 @@ using System.Collections.ObjectModel;
 using Deppo.Mobile.Core.Models.TransferModels;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.TransferProductProcess.Views;
 using Deppo.Mobile.Modules.CameraModule.Views;
+using Deppo.Mobile.Helpers.BarcodeHelper;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.TransferProductProcess.ViewModels;
 
@@ -26,6 +27,7 @@ public partial class TransferOutBasketViewModel : BaseViewModel
     private readonly ILocationTransactionService _locationTransactionService;
     private readonly IUserDialogs _userDialogs;
     private readonly IServiceProvider _serviceProvider;
+    private readonly IBarcodeSearchHelper _barcodeSearchHelper;
 
     [ObservableProperty]
     TransferBasketModel transferBasketModel;
@@ -45,52 +47,57 @@ public partial class TransferOutBasketViewModel : BaseViewModel
     [ObservableProperty]
     public ObservableCollection<LocationTransactionModel> selectedLocationTransactions = new();
 
-    #region Collections
-    public ObservableCollection<SeriLotTransactionModel> SeriLotTransactions { get; } = new();
+	[ObservableProperty]
+	public Entry barcodeEntry;
+
+	#region Collections
+	public ObservableCollection<SeriLotTransactionModel> SeriLotTransactions { get; } = new();
     public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
-    #endregion
+	#endregion
 
-    public TransferOutBasketViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs, IServiceProvider serviceProvider)
-    {
-        _httpClientService = httpClientService;
-        _serilotTransactionService = serilotTransactionService;
-        _locationTransactionService = locationTransactionService;
-        _userDialogs = userDialogs;
-        _serviceProvider = serviceProvider;
+	public TransferOutBasketViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs, IServiceProvider serviceProvider, IBarcodeSearchHelper barcodeSearchHelper)
+	{
+		_httpClientService = httpClientService;
+		_serilotTransactionService = serilotTransactionService;
+		_locationTransactionService = locationTransactionService;
+		_userDialogs = userDialogs;
+		_serviceProvider = serviceProvider;
+		_barcodeSearchHelper = barcodeSearchHelper;
 
+		Title = "Sepet Listesi";
 
-        Title = "Sepet Listesi";
-
-        // ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
-        IncreaseCommand = new Command<OutProductModel>(async (item) => await IncreaseAsync(item));
-        DecreaseCommand = new Command<OutProductModel>(async (item) => await DecreaseAsync(item));
-        DeleteItemCommand = new Command<OutProductModel>(async (item) => await DeleteItemAsync(item));
-
-
-        LoadMoreSeriLotTransactionsCommand = new Command(async () => await LoadMoreSeriLotTransactionsAsync());
-        SeriLotTransactionIncreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionIncreaseAsync(item));
-        SeriLotTransactionDecreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionDecreaseAsync(item));
-        SeriLotTransactionCloseCommand = new Command(async () => await SeriLotTransactionCloseAsync());
+		// ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
+        PerformSearchCommand = new Command<Entry>(async (barcodeEntry) => await PerformSearchAsync(barcodeEntry));
+		IncreaseCommand = new Command<OutProductModel>(async (item) => await IncreaseAsync(item));
+		DecreaseCommand = new Command<OutProductModel>(async (item) => await DecreaseAsync(item));
+		DeleteItemCommand = new Command<OutProductModel>(async (item) => await DeleteItemAsync(item));
 
 
-        LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
-        LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
-        LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
-        ConfirmLocationTransactionCommand = new Command(ConfirmLocationTransactionAsync);
-        LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
+		LoadMoreSeriLotTransactionsCommand = new Command(async () => await LoadMoreSeriLotTransactionsAsync());
+		SeriLotTransactionIncreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionIncreaseAsync(item));
+		SeriLotTransactionDecreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionDecreaseAsync(item));
+		SeriLotTransactionCloseCommand = new Command(async () => await SeriLotTransactionCloseAsync());
 
-        NextViewCommand = new Command(async () => await NextViewAsync());
-        BackCommand = new Command(async () => await BackAsync());
-        CameraTappedCommand = new Command(async () => await CameraTappedAsync());
-    }
 
-    #region Properties
-    public ContentPage CurrentPage { get; set; } = null!;
+		LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
+		LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
+		LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
+		ConfirmLocationTransactionCommand = new Command(ConfirmLocationTransactionAsync);
+		LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
+
+		NextViewCommand = new Command(async () => await NextViewAsync());
+		BackCommand = new Command(async () => await BackAsync());
+		CameraTappedCommand = new Command(async () => await CameraTappedAsync());
+	}
+
+	#region Properties
+	public ContentPage CurrentPage { get; set; } = null!;
 
     #endregion
 
     #region Commands
     //public Command ShowProductViewCommand { get; }
+    public Command PerformSearchCommand { get; }
     public Command IncreaseCommand { get; }
     public Command DecreaseCommand { get; }
     public Command DeleteItemCommand { get; }
@@ -113,10 +120,45 @@ public partial class TransferOutBasketViewModel : BaseViewModel
     public Command NextViewCommand { get; }
     public Command BackCommand { get; }
     public Command CameraTappedCommand { get;}
-    #endregion
+	#endregion
 
-    
-    private async Task IncreaseAsync(OutProductModel item)
+	private async Task PerformSearchAsync(Entry barcodeEntry)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			if (string.IsNullOrEmpty(barcodeEntry.Text))
+				return;
+
+			IsBusy = true;
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			await _barcodeSearchHelper.BarcodeDetectedAsync(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				barcode: barcodeEntry.Text,
+				comingPage: "TransferOutBasketViewModel"
+			);
+
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			BarcodeEntry.Text = string.Empty;
+			IsBusy = false;
+		}
+	}
+
+	private async Task IncreaseAsync(OutProductModel item)
     {
         if (IsBusy)
             return;

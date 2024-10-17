@@ -24,7 +24,6 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
-            <selectConverter:SelectProductConverter x:Key="selectProductConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
