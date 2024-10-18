@@ -31,14 +31,17 @@ public partial class PurchaseSupplier : ObservableObject
     [ObservableProperty]
     private string shipAddressCode = string.Empty;
 
-	[ObservableProperty]
-	private string shipAddressName = string.Empty;
+    [ObservableProperty]
+    private string shipAddressName = string.Empty;
 
-	[ObservableProperty]
+    [ObservableProperty]
     private int shipAddressCount;
 
     [ObservableProperty]
     private bool isEDispatch;
+
+    [ObservableProperty]
+    private bool isAsctive;
 
     public string TitleName => Name?.Length > 2 ? Name.Substring(0, 2) : Name;
 
