@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
@@ -35,12 +36,13 @@ public partial class ReturnSalesBasketViewModel : BaseViewModel
     private readonly ISeriLotService _seriLotService;
     private readonly IServiceProvider _serviceProvider;
     private readonly IBarcodeSearchHelper _barcodeSearchHelper;
+    private readonly ISubUnitsetService _subUnitsetService;
 
     [ObservableProperty]
     private WarehouseModel warehouseModel = null!;
 
     [ObservableProperty]
-    private ReturnSalesBasketModel? selectedInputProductBasketModel;
+    private ReturnSalesBasketModel? selectedReturnSalesBasketModel;
 
 	public ObservableCollection<ReturnSalesBasketModel> Items { get; } = new();
 	public ObservableCollection<LocationModel> Locations { get; }
@@ -48,7 +50,7 @@ public partial class ReturnSalesBasketViewModel : BaseViewModel
 	[ObservableProperty]
 	public Entry barcodeEntry;
 
-	public ReturnSalesBasketViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IHttpClientService httpClientService2, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider, IBarcodeSearchHelper barcodeSearchHelper)
+	public ReturnSalesBasketViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IHttpClientService httpClientService2, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider, IBarcodeSearchHelper barcodeSearchHelper, ISubUnitsetService subUnitsetService)
 	{
 		_httpClientService = httpClientService;
 		_userDialogs = userDialogs;
@@ -56,11 +58,14 @@ public partial class ReturnSalesBasketViewModel : BaseViewModel
 		_seriLotService = seriLotService;
 		_serviceProvider = serviceProvider;
 		_barcodeSearchHelper = barcodeSearchHelper;
+		_subUnitsetService = subUnitsetService;
 
 		Title = "Sepet Listesi";
 
 		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
-        PerformSearchCommand = new Command<Entry>(async (barcodeEntry) => await PerformSearchAsync(barcodeEntry));
+		PerformSearchCommand = new Command<Entry>(async (barcodeEntry) => await PerformSearchAsync(barcodeEntry));
+        UnitActionTappedCommand = new Command<ReturnSalesBasketModel>(async (item) => await UnitActionTappedAsync(item));
+        SubUnitsetTapppedCommand = new Command<SubUnitset>(async (subUnitset) => await SubUnitsetTappedAsync(subUnitset));
 
 		DeleteItemCommand = new Command<ReturnSalesBasketModel>(async (item) => await DeleteItemAsync(item));
 		IncreaseCommand = new Command<ReturnSalesBasketModel>(async (item) => await IncreaseAsync(item));
@@ -84,7 +89,9 @@ public partial class ReturnSalesBasketViewModel : BaseViewModel
 
     public Command ShowProductViewCommand { get; }
     public Command PerformSearchCommand { get; }
-    public Command<ReturnSalesBasketModel> DeleteItemCommand { get; }
+	public Command UnitActionTappedCommand { get; }
+	public Command SubUnitsetTapppedCommand { get; }
+	public Command<ReturnSalesBasketModel> DeleteItemCommand { get; }
     public Command<ReturnSalesBasketModel> IncreaseCommand { get; }
     public Command<ReturnSalesBasketModel> DecreaseCommand { get; }
 
@@ -162,6 +169,99 @@ public partial class ReturnSalesBasketViewModel : BaseViewModel
 		}
 	}
 
+	private async Task LoadSubUnitsetsAsync(ReturnSalesBasketModel item)
+	{
+		if (item is null)
+			return;
+		try
+		{
+			item.SubUnitsets.Clear();
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _subUnitsetService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				productReferenceId: item.ItemReferenceId
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var subUnitset in result.Data)
+				{
+					item.SubUnitsets.Add(Mapping.Mapper.Map<SubUnitset>(subUnitset));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+	}
+
+	private async Task SubUnitsetTappedAsync(SubUnitset subUnitset)
+	{
+		if (subUnitset is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			if (SelectedReturnSalesBasketModel is not null)
+			{
+				SelectedReturnSalesBasketModel.SubUnitsetReferenceId = subUnitset.ReferenceId;
+				SelectedReturnSalesBasketModel.SubUnitsetName = subUnitset.Name;
+				SelectedReturnSalesBasketModel.SubUnitsetCode = subUnitset.Code;
+			}
+
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.Hidden;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task UnitActionTappedAsync(ReturnSalesBasketModel item)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			SelectedReturnSalesBasketModel = item;
+			await LoadSubUnitsetsAsync(item);
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.HalfExpanded;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
 	private async Task DeleteItemAsync(ReturnSalesBasketModel item)
     {
         if (IsBusy)
@@ -195,16 +295,23 @@ public partial class ReturnSalesBasketViewModel : BaseViewModel
         {
             IsBusy = true;
 
+            SelectedReturnSalesBasketModel = item;
+
             if (item.LocTracking == 1)
             {
                 var nextViewModel = _serviceProvider.GetRequiredService<ReturnSalesBasketLocationListViewModel>();
 
-                await Shell.Current.GoToAsync($"{nameof(ReturnSalesBasketLocationListView)}", new Dictionary<string, object>
-            {
-                {nameof(WarehouseModel), WarehouseModel},
-                {nameof(ReturnSalesBasketModel), item}
-            });
-                await nextViewModel.LoadSelectedItemsAsync();
+                if(nextViewModel.ReturnSalesBasketModel is null)
+                {
+                    nextViewModel.ReturnSalesBasketModel = item;
+                }
+				await nextViewModel.LoadSelectedItemsAsync();
+
+				await Shell.Current.GoToAsync($"{nameof(ReturnSalesBasketLocationListView)}", new Dictionary<string, object>
+                {
+                    {nameof(WarehouseModel), WarehouseModel},
+                    {nameof(ReturnSalesBasketModel), item}
+                });
             }
             else
                 item.Quantity++;
@@ -344,7 +451,7 @@ public partial class ReturnSalesBasketViewModel : BaseViewModel
                         totalInputQuantity += location.InputQuantity;
                     }
                 }
-                SelectedInputProductBasketModel.Quantity = totalInputQuantity;
+                SelectedReturnSalesBasketModel.Quantity = totalInputQuantity;
 
                 CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
             }

@@ -217,6 +217,8 @@ SELECT
     BQ.UnitsetCode,
 	BQ.UnitsetName,
     BQ.SubUnitsetReferenceId,
+    BQ.SubUnitsetCode,
+    BQ.SubUnitsetName,
 	BQ.IsVariant,
 	BQ.TrackingType,
 	BQ.LocTracking,

@@ -1,4 +1,6 @@
+using Deppo.Core.Models;
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -31,6 +33,7 @@ public class OutputOutsourceTransferBasketModel : INotifyPropertyChanged, IDispo
     private string _shipAddressCode = string.Empty;
 
     private List<OutputOutsourceTransferBasketDetailModel> _details = new();
+    private ObservableCollection<SubUnitset> _subUnitsets = new();
 
     private string _locTrackingIcon;
     private string _locTrackingIconColor;
@@ -334,6 +337,17 @@ public class OutputOutsourceTransferBasketModel : INotifyPropertyChanged, IDispo
             NotifyPropertyChanged();
         }
     }
+
+    public ObservableCollection<SubUnitset> SubUnitsets
+	{
+		get => _subUnitsets;
+		set
+		{
+			if (_subUnitsets == value) return;
+			_subUnitsets = value;
+			NotifyPropertyChanged();
+		}
+	}
 
     public string LocTrackingIcon
     {

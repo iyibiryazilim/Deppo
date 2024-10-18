@@ -95,5 +95,6 @@ public class MappingProfile : Profile
         CreateMap<ProcurementCustomerModel, dynamic>();
         CreateMap<ProcurementCustomerBasketModel, dynamic>();
         CreateMap<ProcurementCustomerBasketProductModel, dynamic>();
+        CreateMap<SubUnitset, dynamic>();
     }
 }

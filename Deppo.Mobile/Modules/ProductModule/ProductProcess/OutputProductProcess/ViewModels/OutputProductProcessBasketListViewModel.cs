@@ -5,6 +5,7 @@ using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.BarcodeHelper;
@@ -29,6 +30,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	private readonly IUserDialogs _userDialogs;
 	private readonly IServiceProvider _serviceProvider;
 	private readonly IBarcodeSearchHelper _barcodeSearchHelper;
+	private readonly ISubUnitsetService _subUnitsetService;
 
     [ObservableProperty]
 	OutputProductProcessType outputProductProcessType;
@@ -63,7 +65,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	public ObservableCollection<GroupLocationTransactionModel> LocationTransactions { get; } = new();
 	#endregion
 
-	public OutputProductProcessBasketListViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs, IServiceProvider serviceProvider, IBarcodeSearchHelper barcodeSearchHelper)
+	public OutputProductProcessBasketListViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs, IServiceProvider serviceProvider, IBarcodeSearchHelper barcodeSearchHelper, ISubUnitsetService subUnitsetService)
 	{
 		_httpClientService = httpClientService;
 		_serilotTransactionService = serilotTransactionService;
@@ -71,11 +73,15 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		_userDialogs = userDialogs;
 		_serviceProvider = serviceProvider;
 		_barcodeSearchHelper = barcodeSearchHelper;
+		_subUnitsetService = subUnitsetService;
 
 		Title = "Sepet Listesi";
 
 		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
 		PerformSearchCommand = new Command<Entry>(async (x) => await PerformSearchAsync(x));
+		UnitActionTappedCommand = new Command<OutputProductBasketModel>(async (item) => await UnitActionTappedAsync(item));
+		SubUnitsetTapppedCommand = new Command<SubUnitset>(async (item) => await SubUnitsetTappedAsync(item));
+
 		IncreaseCommand = new Command<OutputProductBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<OutputProductBasketModel>(async (item) => await DecreaseAsync(item));
 		DeleteItemCommand = new Command<OutputProductBasketModel>(async (item) => await DeleteItemAsync(item));
@@ -109,6 +115,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	#region Commands
 	public Command ShowProductViewCommand { get; }
 	public Command PerformSearchCommand { get; }
+	public Command UnitActionTappedCommand { get; }
+	public Command SubUnitsetTapppedCommand { get; }
 	public Command IncreaseCommand { get; }
 	public Command DecreaseCommand { get; }
 	public Command DeleteItemCommand { get; }
@@ -194,6 +202,99 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		finally
 		{
 			BarcodeEntry.Text = string.Empty;
+			IsBusy = false;
+		}
+	}
+
+	private async Task LoadSubUnitsetsAsync(OutputProductBasketModel item)
+	{
+		if (item is null)
+			return;
+		try
+		{
+			item.SubUnitsets.Clear();
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _subUnitsetService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				productReferenceId: item.ItemReferenceId
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var subUnitset in result.Data)
+				{
+					item.SubUnitsets.Add(Mapping.Mapper.Map<SubUnitset>(subUnitset));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+	}
+
+	private async Task SubUnitsetTappedAsync(SubUnitset subUnitset)
+	{
+		if (subUnitset is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			if (SelectedItem is not null)
+			{
+				SelectedItem.SubUnitsetReferenceId = subUnitset.ReferenceId;
+				SelectedItem.SubUnitsetName = subUnitset.Name;
+				SelectedItem.SubUnitsetCode = subUnitset.Code;
+			}
+
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.Hidden;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task UnitActionTappedAsync(OutputProductBasketModel item)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			SelectedItem = item;
+			await LoadSubUnitsetsAsync(item);
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.HalfExpanded;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
 			IsBusy = false;
 		}
 	}

@@ -135,12 +135,13 @@
                                                               CommandParameter="{Binding .}" />
                                     </Border.GestureRecognizers>
 
-                                    <Grid RowDefinitions="Auto,*" RowSpacing="5" ColumnDefinitions=".20*,.80*"
+                                    <Grid RowDefinitions="Auto,*" RowSpacing="5" ColumnDefinitions="Auto,*"
                                           ColumnSpacing="10">
                                         <Border BackgroundColor="{StaticResource Secondary}"
                                                 Grid.Column="1"
-                                                WidthRequest="80"
-                                                
+                                                StrokeThickness="0"
+                                                WidthRequest="150"
+                                                Padding="5"
                                                 StrokeShape="RoundRectangle 7"
                                                 HorizontalOptions="End">
                                             <Label HorizontalOptions="Center"
@@ -148,14 +149,14 @@
                                                    VerticalOptions="Center">
                                             <Label.FormattedText>
                                                 <FormattedString>
-                                                    <Span 
-                                                          FontFamily="FAS"
                                                         
-                                                          FontSize="Small"
+                                                        <Span 
+                                                          FontFamily="FAS"
                                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
                                                               TextColor="{StaticResource Black}" />
                                                     <Span Text=" " />
-                                                    <Span FontSize="Medium"
+                                                        <Span Text="Kutu İçerik: " />
+                                                        <Span FontSize="Medium"
                                                           FontAttributes="Bold"
                                                           Text="{Binding PackageProducts.Count}"
                                                               TextColor="{StaticResource Black}" />
@@ -165,20 +166,14 @@
                                         </Border>
                                         <Border Grid.Row="1"
                                                 Grid.Column="0"
-                                                Stroke="{StaticResource Primary}"
                                                 StrokeShape="RoundRectangle 5"
-                                                StrokeThickness="0.5">
-                                            <Image Aspect="AspectFill" >
-                                            <Image.Source>
-                                                <FontImageSource FontFamily="FAS"
-                                                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                                                                 Color="{AppThemeBinding Light={StaticResource Primary},
-                                                                                                                         Dark={StaticResource Primary}}" />
-                                            </Image.Source>
+                                                StrokeThickness="0">
+                                            <Image Source="box.png" HeightRequest="100" WidthRequest="100">
+                                            
                                             </Image>
                                         </Border>
 
-                                        <VerticalStackLayout Grid.Row="1" Grid.Column="1">
+                                        <VerticalStackLayout Grid.Row="1" Grid.Column="1" VerticalOptions="Center">
                                             <Label x:Name="itemReference"
                                                    IsVisible="Hidden"
                                                    Text="{Binding PackageProductModel.ReferenceId}" />

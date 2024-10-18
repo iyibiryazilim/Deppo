@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
@@ -27,6 +28,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 	private readonly ISeriLotService _seriLotService;
 	private readonly IServiceProvider _serviceProvider;
 	private readonly IBarcodeSearchHelper _barcodeSearchHelper;
+	private readonly ISubUnitsetService _subUnitsetService;
 
 	[ObservableProperty]
 	private WarehouseModel warehouseModel = null!;
@@ -44,7 +46,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 	[ObservableProperty]
 	public Entry barcodeEntry;
 
-	public InputProductProcessBasketListViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider, IBarcodeSearchHelper barcodeSearchHelper)
+	public InputProductProcessBasketListViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider, IBarcodeSearchHelper barcodeSearchHelper, ISubUnitsetService subUnitsetService)
 	{
 		_userDialogs = userDialogs;
 		_httpClientService = httpClientService;
@@ -52,13 +54,19 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		_seriLotService = seriLotService;
 		_serviceProvider = serviceProvider;
 		_barcodeSearchHelper = barcodeSearchHelper;
+		_subUnitsetService = subUnitsetService;
 
 		Title = "Sepet Listesi";
 
 		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
 		PerformSearchCommand = new Command<Entry>(async (barcodeEntry) => await PerformSearchAsync(barcodeEntry));
+
+		UnitActionTappedCommand = new Command<InputProductBasketModel>(async (item) => await UnitActionTappedAsync(item));
+		SubUnitsetTappedCommand = new Command<SubUnitset>(async (subUnitset) => await SubUnitsetTappedAsync(subUnitset));
+
 		IncreaseCommand = new Command<InputProductBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<InputProductBasketModel>(async (item) => await DecreaseAsync(item));
+		DeleteItemCommand = new Command<InputProductBasketModel>(async (item) => await DeleteItemAsync(item));
 
 		LoadMoreLocationsCommand = new Command(async () => await LoadMoreWarehouseLocationsAsync());
 		LocationCloseCommand = new Command(async () => await LocationCloseAsync());
@@ -66,7 +74,6 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		LocationIncreaseCommand = new Command<LocationModel>(async (locationModel) => await LocationIncreaseAsync(locationModel));
 		LocationDecreaseCommand = new Command<LocationModel>(async (LocationModel) => await LocationDecreaseAsync(LocationModel));
 
-		DeleteItemCommand = new Command<InputProductBasketModel>(async (item) => await DeleteItemAsync(item));
 		NextViewCommand = new Command(async () => await NextViewAsync());
 		BackCommand = new Command(async () => await BackAsync());
 		CameraTappedCommand = new Command(async () => await CameraTappedAsync());
@@ -78,6 +85,9 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 
 	public Command ShowProductViewCommand { get; }
 	public Command PerformSearchCommand { get; }
+
+	public Command SubUnitsetTappedCommand { get; }
+	public Command UnitActionTappedCommand { get; }
 
 	public Command<InputProductBasketModel> DeleteItemCommand { get; }
 	public Command<InputProductBasketModel> IncreaseCommand { get; }
@@ -159,6 +169,99 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
+	private async Task LoadSubUnitsetsAsync(InputProductBasketModel item)
+	{
+		if (item is null)
+			return;
+		try
+		{
+			item.SubUnitsets.Clear();
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _subUnitsetService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				productReferenceId: item.ItemReferenceId
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var subUnitset in result.Data)
+				{
+					item.SubUnitsets.Add(Mapping.Mapper.Map<SubUnitset>(subUnitset));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+	}
+
+	private async Task SubUnitsetTappedAsync(SubUnitset subUnitset)
+	{
+		if (subUnitset is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			if (SelectedInputProductBasketModel is not null)
+			{
+				SelectedInputProductBasketModel.SubUnitsetReferenceId = subUnitset.ReferenceId;
+				SelectedInputProductBasketModel.SubUnitsetName = subUnitset.Name;
+				SelectedInputProductBasketModel.SubUnitsetCode = subUnitset.Code;
+			}
+
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.Hidden;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task UnitActionTappedAsync(InputProductBasketModel item)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			SelectedInputProductBasketModel = item;
+			await LoadSubUnitsetsAsync(item);
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.HalfExpanded;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
 
 	private async Task IncreaseAsync(InputProductBasketModel inputProductBasketModel)
 	{
@@ -229,7 +332,12 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 					if (inputProductBasketModel.LocTracking == 1)
 					{
 						var nextViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketLocationListViewModel>();
-                        await nextViewModel.LoadSelectedItemsAsync();
+						if (nextViewModel.InputProductBasketModel is null)
+						{
+							nextViewModel.InputProductBasketModel = inputProductBasketModel;
+						}
+						await nextViewModel.LoadSelectedItemsAsync();
+						
                         await Shell.Current.GoToAsync($"{nameof(InputProductProcessBasketLocationListView)}", new Dictionary<string, object>
 						{
 							{nameof(WarehouseModel), WarehouseModel},

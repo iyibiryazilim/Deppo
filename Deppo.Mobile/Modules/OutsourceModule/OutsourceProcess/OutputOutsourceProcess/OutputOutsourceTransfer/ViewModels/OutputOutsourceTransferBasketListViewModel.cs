@@ -1,7 +1,6 @@
-using System;
-using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
@@ -14,7 +13,7 @@ using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.CameraModule.Views;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcess.OutputOutsourceTransfer.Views;
 using DevExpress.Maui.Controls;
-using Microsoft.Maui.Controls;
+using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcess.OutputOutsourceTransfer.ViewModels;
 
@@ -22,11 +21,11 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
 public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
-	private readonly IBarcodeSearchService _barcodeSearchService;
 	private readonly ILocationTransactionService _locationTransactionService;
 	private readonly ISeriLotTransactionService _seriLotTransactionService;
 	private readonly IUserDialogs _userDialogs;
 	private readonly IBarcodeSearchHelper _barcodeSearchHelper;
+	private readonly ISubUnitsetService _subUnitsetService;
 
 	[ObservableProperty]
 	WarehouseModel warehouseModel = null!;
@@ -46,7 +45,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 	public ObservableCollection<SeriLotTransactionModel> selectedSeriLotTransactions = new();
 
 	[ObservableProperty]
-	public ObservableCollection<OutputOutsourceTransferBasketModel> items  = new();
+	public ObservableCollection<OutputOutsourceTransferBasketModel> items = new();
 
 	public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
 	public ObservableCollection<SeriLotTransactionModel> SeriLotTransactions { get; } = new();
@@ -58,19 +57,20 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 		IHttpClientService httpClientService,
 		IUserDialogs userDialogs,
 		ILocationTransactionService locationTransactionService,
-		ISeriLotTransactionService seriLotTransactionService, IBarcodeSearchHelper barcodeSearchHelper)
+		ISeriLotTransactionService seriLotTransactionService, IBarcodeSearchHelper barcodeSearchHelper, ISubUnitsetService subUnitsetService)
 	{
 		_httpClientService = httpClientService;
 		_userDialogs = userDialogs;
 		_locationTransactionService = locationTransactionService;
 		_seriLotTransactionService = seriLotTransactionService;
 		_barcodeSearchHelper = barcodeSearchHelper;
+		_subUnitsetService = subUnitsetService;
 
 		Title = "Fason Çıkış Transfer Sepeti";
-		Items.Clear();
 
 		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
 		UnitActionTappedCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await UnitActionTappedAsync(item));
+		SubUnitsetTapppedCommand = new Command<SubUnitset>(async (item) => await SubUnitsetTappedAsync(item));
 		CameraTappedCommand = new Command(async () => await CameraTappedAsync());
 		IncreaseCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await DecreaseAsync(item));
@@ -97,6 +97,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 
 	public Command ShowProductViewCommand { get; }
 	public Command UnitActionTappedCommand { get; }
+	public Command SubUnitsetTapppedCommand { get; }
 	public Command CameraTappedCommand { get; }
 	public Command<OutputOutsourceTransferBasketModel> IncreaseCommand { get; }
 	public Command<OutputOutsourceTransferBasketModel> DecreaseCommand { get; }
@@ -164,7 +165,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 				barcode: barcodeEntry.Text,
 				comingPage: "OutputOutsourceTransferBasketListViewModel"
 			);
-			
+
 		}
 		catch (Exception ex)
 		{
@@ -181,6 +182,74 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 	}
 
 
+	private async Task LoadSubUnitsetsAsync(OutputOutsourceTransferBasketModel item)
+	{
+		if (item is null)
+			return;
+		try
+		{
+			item.SubUnitsets.Clear();
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _subUnitsetService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				productReferenceId: item.ItemReferenceId
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var subUnitset in result.Data)
+				{
+					item.SubUnitsets.Add(Mapping.Mapper.Map<SubUnitset>(subUnitset));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+	}
+
+	private async Task SubUnitsetTappedAsync(SubUnitset subUnitset)
+	{
+		if (subUnitset is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			if(SelectedItem is not null)
+			{
+				SelectedItem.SubUnitsetReferenceId = subUnitset.ReferenceId;
+				SelectedItem.SubUnitsetName = subUnitset.Name;
+				SelectedItem.SubUnitsetCode = subUnitset.Code;
+			}
+
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.Hidden;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
 	private async Task UnitActionTappedAsync(OutputOutsourceTransferBasketModel item)
 	{
 		if (IsBusy)
@@ -190,12 +259,12 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 			IsBusy = true;
 
 			SelectedItem = item;
-			// Load SubUnitsets method
+			await LoadSubUnitsetsAsync(item);
 			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.HalfExpanded;
 		}
-		catch (Exception ex) 
+		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -257,7 +326,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 			IsBusy = true;
 
 			SelectedItem = outputOutsourceTransferBasketModel;
-			
+
 			if (outputOutsourceTransferBasketModel.LocTracking == 1 && outputOutsourceTransferBasketModel.TrackingType == 0)
 			{
 				// Sadece Stok Yeri Takipli olma durumu
@@ -360,14 +429,14 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			var result = await _locationTransactionService.GetInputObjectsAsync(
-				httpClient: httpClient, 
-				firmNumber: _httpClientService.FirmNumber, 
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
 				productReferenceId: SelectedItem.IsVariant ? SelectedItem.MainItemReferenceId : SelectedItem.ItemReferenceId,
 				variantReferenceId: SelectedItem.IsVariant ? SelectedItem.ItemReferenceId : 0,
 				warehouseNumber: WarehouseModel.Number,
-				skip: 0, 
-				take: 20, 
+				skip: 0,
+				take: 20,
 				search: "");
 			if (result.IsSuccess)
 			{
@@ -377,10 +446,10 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 				foreach (var item in result.Data)
 					LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
 
-				foreach(var locationTransaction in LocationTransactions)
+				foreach (var locationTransaction in LocationTransactions)
 				{
 					var matchingItem = SelectedItem.Details.FirstOrDefault(x => x.ReferenceId == locationTransaction.ReferenceId);
-					if(matchingItem is not null)
+					if (matchingItem is not null)
 					{
 						locationTransaction.OutputQuantity = matchingItem.Quantity;
 					}
@@ -887,7 +956,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -909,11 +978,11 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 				LocationTransactions.Clear();
 				SeriLotTransactions.Clear();
 				SelectedItem?.Details.Clear();
-                foreach (var item in Items)
-                {
+				foreach (var item in Items)
+				{
 					item.Details.Clear();
-                }
-                Items.Clear();
+				}
+				Items.Clear();
 			});
 		}
 		catch (Exception ex)
