@@ -33,6 +33,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
         private readonly IServiceProvider _serviceProvider;
         private readonly IUserDialogs _userDialogs;
         private readonly ILocationTransactionService _locationTransactionService;
+        private readonly ITransferTransactionService _transferTransactionService;
 
         [ObservableProperty]
         WarehouseModel warehouseModel = null!;
@@ -71,7 +72,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
         [ObservableProperty]
         string cargoTrackingNumber = string.Empty;
 
-        public ProcurementSalesProcessFormViewModel(IHttpClientService httpClientService, ICarrierService carrierService, IDriverService driverService, IUserDialogs userDialogs, IRetailSalesDispatchTransactionService retailSalesDispatchTransactionService, IWholeSalesDispatchTransactionService wholeSalesDispatchTransactionService, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService)
+        public ProcurementSalesProcessFormViewModel(IHttpClientService httpClientService, ICarrierService carrierService, IDriverService driverService, IUserDialogs userDialogs, IRetailSalesDispatchTransactionService retailSalesDispatchTransactionService, IWholeSalesDispatchTransactionService wholeSalesDispatchTransactionService, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService, ITransferTransactionService transferTransactionService)
         {
             _httpClientService = httpClientService;
 
@@ -81,6 +82,8 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
             _retailSalesDispatchTransactionService = retailSalesDispatchTransactionService;
             _wholeSalesDispatchTransactionService = wholeSalesDispatchTransactionService;
             _serviceProvider = serviceProvider;
+            _transferTransactionService = transferTransactionService;
+            _locationTransactionService = locationTransactionService;
 
 
             Title = "Sevk İşlemi";
@@ -94,7 +97,6 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
 
             LoadCarriersCommand = new Command(async () => await LoadCarriersAsync());
             LoadDriversCommand = new Command(async () => await LoadDriversAsync());
-            _locationTransactionService = locationTransactionService;
         }
 
         public Page CurrentPage { get; set; } = null!;
@@ -143,7 +145,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
             {
                 IsBusy = true;
 
-                CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
+               // CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
 
             }
             catch (Exception ex)
@@ -273,6 +275,24 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
             }
         }
 
+       
+
+        private async Task UpdateTransferTransaction(string ficheNumber)
+        {
+            try
+            {
+                var httpClient = _httpClientService.GetOrCreateHttpClient();
+                var result = await _transferTransactionService.UpdateDocumentTrackingNumber(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, ficheNumber, ProcurementSalesCustomerModel.ReferenceId);
+            }
+            catch (Exception ex)
+            {
+
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+            }
+        }
         private async Task SelectWholeAsync()
         {
             if (IsBusy)
@@ -287,15 +307,13 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
                     await CloseInsertOptionsAsync();
                     return;
                 }
-
+                await CloseInsertOptionsAsync();
 
                 _userDialogs.Loading("İşlem tamamlanıyor...");
-                await Task.Delay(1000);
 
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
                 await WholeSalesDispatchTransactionInsertAsync(httpClient);
 
-                _userDialogs.HideHud();
             }
             catch (Exception ex)
             {
@@ -324,14 +342,13 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
                     await CloseInsertOptionsAsync();
                     return;
                 }
+                await CloseInsertOptionsAsync();
 
                 _userDialogs.Loading("İşlem tamamlanıyor...");
-                await Task.Delay(1000);
 
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
                 await RetailSalesDispatchTransactionInsertAsync(httpClient);
 
-                _userDialogs.HideHud();
             }
             catch (Exception ex)
             {
@@ -467,18 +484,21 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
             ResultModel resultModel = new();
             if (result.IsSuccess)
             {
+                await UpdateTransferTransaction(result.Data.Code);
+
                 resultModel.Message = "Başarılı";
                 resultModel.Code = result.Data.Code;
                 resultModel.PageTitle = Title;
                 resultModel.PageCountToBack = 6;
 
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.HideHud();
-
+               
                 await ClearFormAsync();
 
                 var basketViewModel = _serviceProvider.GetRequiredService<ProcurementSalesPackageBasketViewModel>();
                 basketViewModel.Items.Clear();
+
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
 
 
                 await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
@@ -582,18 +602,22 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
             ResultModel resultModel = new();
             if (result.IsSuccess)
             {
+                await UpdateTransferTransaction(result.Data.Code);
+
                 resultModel.Message = "Başarılı";
                 resultModel.Code = result.Data.Code;
                 resultModel.PageTitle = Title;
                 resultModel.PageCountToBack = 6;
 
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.HideHud();
-
+            
                 await ClearFormAsync();
 
                 var basketViewModel = _serviceProvider.GetRequiredService<ProcurementSalesPackageBasketViewModel>();
                 basketViewModel.Items.Clear();
+
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
 
                 await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
                 {
