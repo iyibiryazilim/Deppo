@@ -250,6 +250,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IAuthenticationService, AuthenticateDataStore>();
         builder.Services.AddSingleton<ICustomQueryService, CustomQueryDataStore>();
         builder.Services.AddSingleton<IProductService, ProductDataStoreV2>();
+        builder.Services.AddSingleton<ISubUnitsetService, SubUnitsetDataStore>();
         builder.Services.AddSingleton<Deppo.Core.Services.IWarehouseService, Deppo.Core.DataStores.WarehouseDataStore>();
         builder.Services.AddSingleton<ICustomerService, CustomerDataStoreV2>();
         builder.Services.AddSingleton<IWaitingSalesOrderService, WaitingSalesOrderDataStore>();
