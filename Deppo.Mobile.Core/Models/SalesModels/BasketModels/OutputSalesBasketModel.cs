@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using Deppo.Core.Models;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Deppo.Mobile.Core.Models.SalesModels.BasketModels;
@@ -30,6 +32,7 @@ public class OutputSalesBasketModel : INotifyPropertyChanged, IDisposable
 
     private List<OutputSalesBasketOrderModel> _orders = new();
     private List<OutputSalesBasketDetailModel> _details = new();
+    private ObservableCollection<SubUnitset> _subUnitsets = new();
 
     private string _locTrackingIcon;
     private string _locTrackingIconColor;
@@ -328,6 +331,17 @@ public class OutputSalesBasketModel : INotifyPropertyChanged, IDisposable
             NotifyPropertyChanged();
         }
     }
+
+    public ObservableCollection<SubUnitset> SubUnitsets
+	{
+		get => _subUnitsets;
+		set
+		{
+			if (_subUnitsets == value) return;
+			_subUnitsets = value;
+			NotifyPropertyChanged();
+		}
+	}
 
     public string LocTrackingIcon
     {

@@ -1,4 +1,6 @@
+using Deppo.Core.Models;
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -28,6 +30,7 @@ public class OutputProductBasketModel : INotifyPropertyChanged, IDisposable
     private byte[]? _image;
 
     private List<OutputProductBasketDetailModel> _details = new();
+    private ObservableCollection<SubUnitset> _subUnitsets = new();
 
 	private string _locTrackingIcon;
 	private string _locTrackingIconColor;
@@ -297,6 +300,17 @@ public class OutputProductBasketModel : INotifyPropertyChanged, IDisposable
             NotifyPropertyChanged();
         }
     }
+
+    public ObservableCollection<SubUnitset> SubUnitsets
+	{
+		get => _subUnitsets;
+		set
+		{
+			if (_subUnitsets == value) return;
+			_subUnitsets = value;
+			NotifyPropertyChanged();
+		}
+	}
 
 	public string LocTrackingIcon
 	{

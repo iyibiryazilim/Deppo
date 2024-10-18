@@ -26,6 +26,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
         private readonly IUserDialogs _userDialogs;
         private readonly IServiceProvider _serviceProvider;
         private readonly IBarcodeSearchHelper _barcodeSearchHelper;
+        private readonly ISubUnitsetService _subUnitsetService;
 
         [ObservableProperty]
         WarehouseModel warehouseModel = null!;
@@ -41,17 +42,18 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
 
 		#endregion
 
-		public DemandProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IServiceProvider serviceProvider, IBarcodeSearchHelper barcodeSearchHelper)
+		public DemandProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IServiceProvider serviceProvider, IBarcodeSearchHelper barcodeSearchHelper, ISubUnitsetService subUnitsetService)
 		{
 			_httpClientService = httpClientService;
 			_userDialogs = userDialogs;
 			_serviceProvider = serviceProvider;
 			_barcodeSearchHelper = barcodeSearchHelper;
+			_subUnitsetService = subUnitsetService;
 
 			Title = "Sepet Listesi";
 
 			ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
-            PerformSearchCommand = new Command<Entry>(async (barcodeEntry) => await PerformSearchAsync(barcodeEntry));
+			PerformSearchCommand = new Command<Entry>(async (barcodeEntry) => await PerformSearchAsync(barcodeEntry));
 			IncreaseCommand = new Command<DemandProcessBasketModel>(async (item) => await IncreaseAsync(item));
 			DecreaseCommand = new Command<DemandProcessBasketModel>(async (item) => await DecreaseAsync(item));
 			DeleteItemCommand = new Command<DemandProcessBasketModel>(async (item) => await DeleteItemAsync(item));
