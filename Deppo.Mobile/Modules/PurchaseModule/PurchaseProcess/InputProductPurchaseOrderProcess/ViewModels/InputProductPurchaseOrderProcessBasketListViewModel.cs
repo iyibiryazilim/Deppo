@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Core.Platform;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
@@ -180,6 +181,8 @@ public partial class InputProductPurchaseOrderProcessBasketListViewModel : BaseV
 		finally
 		{
 			BarcodeEntry.Text = string.Empty;
+            barcodeEntry.Text = string.Empty;
+            barcodeEntry.Focus();
 			IsBusy = false;
 		}
 	}

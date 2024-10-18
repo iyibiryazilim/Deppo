@@ -112,6 +112,8 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
 			finally
 			{
 				BarcodeEntry.Text = string.Empty;
+                barcodeEntry.Text = string.Empty;
+                barcodeEntry.Focus();
 				IsBusy = false;
 			}
 		}
@@ -132,7 +134,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();
 
-                _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
             }
             finally
             {

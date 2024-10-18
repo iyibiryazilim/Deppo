@@ -203,6 +203,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		{
 			BarcodeEntry.Text = string.Empty;
 			IsBusy = false;
+			barcodeEntry.Focus();
 		}
 	}
 
