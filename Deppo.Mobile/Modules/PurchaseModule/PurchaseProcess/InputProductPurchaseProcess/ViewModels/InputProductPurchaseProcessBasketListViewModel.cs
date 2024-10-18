@@ -6,6 +6,7 @@ using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
+using Deppo.Mobile.Core.Models.ShipAddressModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.BarcodeHelper;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
@@ -31,6 +32,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(SupplierModel), queryId: nameof(SupplierModel))]
+[QueryProperty(name: nameof(ShipAddressModel), queryId: nameof(ShipAddressModel))]
 public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -47,42 +49,45 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
     private SupplierModel supplierModel = null!;
 
     [ObservableProperty]
+    private ShipAddressModel shipAddressModel = null!;
+
+    [ObservableProperty]
     private InputPurchaseBasketModel? selectedInputProductBasketModel;
 
-	[ObservableProperty]
-	public Entry barcodeEntry;
+    [ObservableProperty]
+    public Entry barcodeEntry;
 
-	public InputProductPurchaseProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IHttpClientService httpClientService2, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider, IBarcodeSearchHelper barcodeSearchHelper)
-	{
-		_httpClientService = httpClientService;
-		_userDialogs = userDialogs;
-		_locationService = locationService;
-		_seriLotService = seriLotService;
-		_serviceProvider = serviceProvider;
-		_barcodeSearchHelper = barcodeSearchHelper;
+    public InputProductPurchaseProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IHttpClientService httpClientService2, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider, IBarcodeSearchHelper barcodeSearchHelper)
+    {
+        _httpClientService = httpClientService;
+        _userDialogs = userDialogs;
+        _locationService = locationService;
+        _seriLotService = seriLotService;
+        _serviceProvider = serviceProvider;
+        _barcodeSearchHelper = barcodeSearchHelper;
 
-		Title = "Sepet Listesi";
+        Title = "Sepet Listesi";
 
-		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
+        ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
         PerformSearchCommand = new Command<Entry>(async (barcodeEntry) => await PerformSearchAsync(barcodeEntry));
 
-		DeleteItemCommand = new Command<InputPurchaseBasketModel>(async (item) => await DeleteItemAsync(item));
-		IncreaseCommand = new Command<InputPurchaseBasketModel>(async (item) => await IncreaseAsync(item));
-		DecreaseCommand = new Command<InputPurchaseBasketModel>(async (item) => await DecreaseAsync(item));
+        DeleteItemCommand = new Command<InputPurchaseBasketModel>(async (item) => await DeleteItemAsync(item));
+        IncreaseCommand = new Command<InputPurchaseBasketModel>(async (item) => await IncreaseAsync(item));
+        DecreaseCommand = new Command<InputPurchaseBasketModel>(async (item) => await DecreaseAsync(item));
 
-		LocationCloseCommand = new Command(async () => await LocationCloseAsync());
-		LocationConfirmCommand = new Command<LocationModel>(async (locationModel) => await LocationConfirmAsync(locationModel));
-		LocationIncreaseCommand = new Command<LocationModel>(async (locationModel) => await LocationIncreaseAsync(locationModel));
-		LocationDecreaseCommand = new Command<LocationModel>(async (LocationModel) => await LocationDecreaseAsync(LocationModel));
+        LocationCloseCommand = new Command(async () => await LocationCloseAsync());
+        LocationConfirmCommand = new Command<LocationModel>(async (locationModel) => await LocationConfirmAsync(locationModel));
+        LocationIncreaseCommand = new Command<LocationModel>(async (locationModel) => await LocationIncreaseAsync(locationModel));
+        LocationDecreaseCommand = new Command<LocationModel>(async (LocationModel) => await LocationDecreaseAsync(LocationModel));
 
-		NextViewCommand = new Command(async () => await NextViewAsync());
-		BackCommand = new Command(async () => await BackAsync());
-		CameraTappedCommand = new Command(async () => await CameraTappedAsync());
+        NextViewCommand = new Command(async () => await NextViewAsync());
+        BackCommand = new Command(async () => await BackAsync());
+        CameraTappedCommand = new Command(async () => await CameraTappedAsync());
 
-		Items.Clear();
-	}
+        Items.Clear();
+    }
 
-	public Page CurrentPage { get; set; } = null!;
+    public Page CurrentPage { get; set; } = null!;
 
     public Command ShowProductViewCommand { get; }
     public Command PerformSearchCommand { get; }
@@ -126,43 +131,42 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
         }
     }
 
-	private async Task PerformSearchAsync(Entry barcodeEntry)
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			if (string.IsNullOrEmpty(barcodeEntry.Text))
-				return;
+    private async Task PerformSearchAsync(Entry barcodeEntry)
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            if (string.IsNullOrEmpty(barcodeEntry.Text))
+                return;
 
-			IsBusy = true;
+            IsBusy = true;
 
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			await _barcodeSearchHelper.BarcodeDetectedAsync(
-				httpClient: httpClient,
-				firmNumber: _httpClientService.FirmNumber,
-				periodNumber: _httpClientService.PeriodNumber,
-				barcode: barcodeEntry.Text,
-				comingPage: "InputProductPurchaseProcessBasketListViewModel"
-			);
+            await _barcodeSearchHelper.BarcodeDetectedAsync(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                barcode: barcodeEntry.Text,
+                comingPage: "InputProductPurchaseProcessBasketListViewModel"
+            );
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            BarcodeEntry.Text = string.Empty;
+            IsBusy = false;
+        }
+    }
 
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			BarcodeEntry.Text = string.Empty;
-			IsBusy = false;
-		}
-	}
-
-	private async Task DeleteItemAsync(InputPurchaseBasketModel item)
+    private async Task DeleteItemAsync(InputPurchaseBasketModel item)
     {
         if (IsBusy)
             return;
@@ -195,16 +199,33 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
         {
             IsBusy = true;
 
+            //if (item.LocTracking == 1)
+            //{
+            //    var nextViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseProcessBasketLocationListViewModel>();
+
+            //    await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseProcessBasketLocationListView)}", new Dictionary<string, object>
+            //    {
+            //        {nameof(WarehouseModel), WarehouseModel},
+            //        {nameof(InputPurchaseBasketModel), item}
+            //    });
+            //    await nextViewModel.LoadSelectedItemsAsync();
+
+            SelectedInputProductBasketModel = item;
             if (item.LocTracking == 1)
             {
                 var nextViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseProcessBasketLocationListViewModel>();
+
+                if (nextViewModel.InputPurchaseBasketModel is null)
+                {
+                    nextViewModel.InputPurchaseBasketModel = item;
+                }
+                await nextViewModel.LoadSelectedItemsAsync();
 
                 await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseProcessBasketLocationListView)}", new Dictionary<string, object>
                 {
                     {nameof(WarehouseModel), WarehouseModel},
                     {nameof(InputPurchaseBasketModel), item}
                 });
-                await nextViewModel.LoadSelectedItemsAsync();
             }
             else
                 item.Quantity++;

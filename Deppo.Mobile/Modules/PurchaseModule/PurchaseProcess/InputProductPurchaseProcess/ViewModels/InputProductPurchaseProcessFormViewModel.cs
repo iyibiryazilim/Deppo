@@ -9,6 +9,7 @@ using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.SalesModels;
+using Deppo.Mobile.Core.Models.ShipAddressModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -31,6 +32,7 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurcha
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(Items), queryId: nameof(Items))]
 [QueryProperty(name: nameof(SupplierModel), queryId: nameof(SupplierModel))]
+[QueryProperty(name: nameof(ShipAddressModel), queryId: nameof(ShipAddressModel))]
 public partial class InputProductPurchaseProcessFormViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -42,6 +44,9 @@ public partial class InputProductPurchaseProcessFormViewModel : BaseViewModel
 
     [ObservableProperty]
     private SupplierModel supplierModel = null!;
+
+    [ObservableProperty]
+    private ShipAddressModel shipAddressModel = null!;
 
     [ObservableProperty]
     private DateTime ficheDate = DateTime.Now;
@@ -176,7 +181,7 @@ public partial class InputProductPurchaseProcessFormViewModel : BaseViewModel
                 {
                     ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
                     VariantCode = item.IsVariant ? item.ItemCode : "",
-        
+
                     WarehouseNumber = (short)WarehouseModel.Number,
                     Quantity = item.Quantity,
                     ConversionFactor = 1,
