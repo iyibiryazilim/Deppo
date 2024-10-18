@@ -177,6 +177,8 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 		finally
 		{
 			BarcodeEntry.Text = string.Empty;
+			barcodeEntry.Text = string.Empty;
+			barcodeEntry.Focus();
 			IsBusy = false;
 		}
 	}

@@ -178,6 +178,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
 			IsBusy = false;
 			BarcodeEntry.Text = string.Empty;
             barcodeEntry.Text = string.Empty;
+            barcodeEntry.Focus();
 		}
 	}
 
