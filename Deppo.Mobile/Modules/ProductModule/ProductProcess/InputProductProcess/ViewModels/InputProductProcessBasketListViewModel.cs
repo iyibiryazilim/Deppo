@@ -229,7 +229,12 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 					if (inputProductBasketModel.LocTracking == 1)
 					{
 						var nextViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketLocationListViewModel>();
-                        await nextViewModel.LoadSelectedItemsAsync();
+						if (nextViewModel.InputProductBasketModel is null)
+						{
+							nextViewModel.InputProductBasketModel = inputProductBasketModel;
+						}
+						await nextViewModel.LoadSelectedItemsAsync();
+						
                         await Shell.Current.GoToAsync($"{nameof(InputProductProcessBasketLocationListView)}", new Dictionary<string, object>
 						{
 							{nameof(WarehouseModel), WarehouseModel},
