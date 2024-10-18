@@ -35,6 +35,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
         public ProcurementSalesCustomerModel procurementSalesCustomerModel = null!;
 
         public ObservableCollection<ProcurementPackageBasketModel> Items { get; } = new();
+        public ObservableCollection<ProcurementPackageBasketModel> SelectedItems { get; } = new();
 
         public ProcurementSalesPackageBasketViewModel(IUserDialogs userDialogs, IHttpClientService httpClientService, IServiceProvider serviceProvider )
         {
@@ -169,11 +170,17 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
                     return;
                 }
 
+                foreach (var item in Items)
+                {
+                    if(item.PackageProducts.Count>0)
+                        SelectedItems.Add(item);
+                }
+
                 await Shell.Current.GoToAsync($"{nameof(ProcurementSalesProcessFormView)}", new Dictionary<string, object>
                 {
                     [nameof(WarehouseModel)] = WarehouseModel,
                     [nameof(ProcurementSalesCustomerModel)] = ProcurementSalesCustomerModel,
-                    [nameof(Items)] = Items.Where(x => x.PackageProducts.Count > 0).ToList()
+                    [nameof(Items)] = SelectedItems
                 });
             }
             catch (Exception ex)
