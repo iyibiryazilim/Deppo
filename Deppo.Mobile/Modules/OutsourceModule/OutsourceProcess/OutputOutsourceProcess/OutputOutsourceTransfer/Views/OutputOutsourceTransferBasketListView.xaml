@@ -6,6 +6,7 @@
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:locationModels="clr-namespace:Deppo.Mobile.Core.Models.LocationModels;assembly=Deppo.Mobile.Core"
+             xmlns:models="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              xmlns:salesBasketModel="clr-namespace:Deppo.Mobile.Core.Models.SalesModels.BasketModels;assembly=Deppo.Mobile.Core"
              xmlns:seriLotModels="clr-namespace:Deppo.Mobile.Core.Models.SeriLotModels;assembly=Deppo.Mobile.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -162,8 +163,9 @@
                                                     <Span FontAttributes="Bold"
                                                           Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
                                                           TextColor="{StaticResource Primary}" />
+                                                    <Span Text=" " />
                                                     <Span FontAttributes="Bold"
-                                                          Text="{Binding SubUnitsetCode, StringFormat='{0:N2}'}"
+                                                          Text="{Binding SubUnitsetCode}"
                                                           TextColor="{StaticResource Primary}" />
                                                 </FormattedString>
                                             </Label.FormattedText>
@@ -564,7 +566,7 @@
                             Grid.Row="1"
                             Padding="10,30,10,10"
                             AllowDismiss="True"
-                            BackgroundColor="{StaticResource Gray100}"
+                            BackgroundColor="{StaticResource WhiteSmoke}"
                             CornerRadius="10"
                             HalfExpandedRatio="0.5"
                             IsModal="True"
@@ -603,7 +605,7 @@
                                  Color="{StaticResource Primary}" />
                     </Grid>
 
-                    <VerticalStackLayout Grid.Row="2" Spacing="10">
+                    <!--<VerticalStackLayout Grid.Row="2" Spacing="10">
                         <Grid ColumnDefinitions=".40*,.25*,.25*">
                             <Label Grid.Column="0" Text="KG" />
                             <Label Grid.Column="1" Text="1 Adet" />
@@ -615,21 +617,24 @@
                             <Label Grid.Column="1" Text="1 Adet" />
                             <Label Grid.Column="2" Text="1000 GR" />
                         </Grid>
-                    </VerticalStackLayout>
-                    <!--<CollectionView Grid.Row="2">
+                    </VerticalStackLayout>-->
+                    <CollectionView Grid.Row="2" ItemsSource="{Binding SelectedItem.SubUnitsets}">
                         <CollectionView.ItemsLayout>
-                            <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
+                            <LinearItemsLayout ItemSpacing="10" Orientation="Vertical" />
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
-                            <DataTemplate>
+                            <DataTemplate x:DataType="models:SubUnitset">
                                 <Grid ColumnDefinitions=".40*,.25*,.25*">
-                                    <Label Grid.Column="0" Text="KG" />
-                                    <Label Grid.Column="1" Text="1 Adet" />
-                                    <Label Grid.Column="2" Text="1000 KG" />
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferBasketListViewModel}}, Path=SubUnitsetTapppedCommand}" CommandParameter="{Binding .}" />
+                                    </Grid.GestureRecognizers>
+                                    <Label Grid.Column="0" Text="{Binding Code}" />
+                                    <!--<Label Grid.Column="1" Text="1 Adet" />
+                                    <Label Grid.Column="2" Text="1000 KG" />-->
                                 </Grid>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
-                    </CollectionView>-->
+                    </CollectionView>
                 </Grid>
             </dx:BottomSheet>
         </VerticalStackLayout>
