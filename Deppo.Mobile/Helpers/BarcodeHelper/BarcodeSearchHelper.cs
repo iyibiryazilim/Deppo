@@ -45,6 +45,8 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 	{
 		try
 		{
+			var cts = new CancellationTokenSource();
+
 			Task searchByProductCodeTask = SearchByProductCodeAsync(httpClient, firmNumber, periodNumber, barcode, comingPage);
 			Task searchByVariantCodeTask = SearchByVariantCodeAsync(httpClient, firmNumber, periodNumber, barcode, comingPage);
 			Task searchByProductMainBarcodeTask = SearchByProductMainBarcodeAsync(httpClient, firmNumber, periodNumber, barcode, comingPage);
@@ -69,8 +71,8 @@ public class BarcodeSearchHelper : IBarcodeSearchHelper
 				searchByVariantSeriNumberTask,
 				searchByProductLotNumberTask,
 				searchByVariantLotNumberTask,
-				searchBySupplierProductCodeTask,
-				searchBySupplierVariantCodeTask
+				searchBySupplierProductCodeTask
+				//searchBySupplierVariantCodeTask
 			);
 		}
 		catch (Exception ex)

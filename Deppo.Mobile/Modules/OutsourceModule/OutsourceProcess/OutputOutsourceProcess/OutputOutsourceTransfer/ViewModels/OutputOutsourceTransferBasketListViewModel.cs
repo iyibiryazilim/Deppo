@@ -22,7 +22,6 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
 public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
-	private readonly IBarcodeSearchService _barcodeSearchService;
 	private readonly ILocationTransactionService _locationTransactionService;
 	private readonly ISeriLotTransactionService _seriLotTransactionService;
 	private readonly IUserDialogs _userDialogs;
@@ -67,7 +66,6 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 		_barcodeSearchHelper = barcodeSearchHelper;
 
 		Title = "Fason Çıkış Transfer Sepeti";
-		Items.Clear();
 
 		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
 		UnitActionTappedCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await UnitActionTappedAsync(item));
