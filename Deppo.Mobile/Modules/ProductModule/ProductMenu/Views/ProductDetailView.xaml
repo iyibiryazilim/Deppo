@@ -54,14 +54,13 @@
                 <Border
                     HeightRequest="100"
                     StrokeShape="RoundRectangle 10"
-                    StrokeThickness="1
-                    "
+                    StrokeThickness="1                     "
                     VerticalOptions="Center"
                     WidthRequest="150">
                     <Image Aspect="AspectFill" Source="{Binding ProductDetailModel.Product.ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}" />
 
                     <Border.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding TakePictureCommand}" />
+                        <TapGestureRecognizer Command="{Binding ImageOptionCommand}" />
                     </Border.GestureRecognizers>
                 </Border>
                 <!--#endregion-->
@@ -1093,6 +1092,54 @@
                                 </CollectionView.ItemTemplate>
                             </CollectionView>
                         </Grid>
+
+                        <!--#endregion-->
+                    </dx:BottomSheet>
+
+                    <dx:BottomSheet
+                        x:Name="imageOptionBottomSheet"
+                        AllowDismiss="True"
+                        BackgroundColor="White"
+                        CornerRadius="15"
+                        HalfExpandedRatio="0.3"
+                        IsModal="True"
+                        ShowGrabber="True">
+                        <!--#region BottomSheetContent-->
+
+                        <VerticalStackLayout>
+                            <Border Padding="10" StrokeShape="RoundRectangle 10">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="Subtitle"
+                                    Text="Resim Çek" />
+
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding CaptureImageCommand}" />
+                                </Border.GestureRecognizers>
+                            </Border>
+
+                            <Border Padding="10" StrokeShape="RoundRectangle 10">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="Subtitle"
+                                    Text="Galeriden Seç" />
+
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PickImageCommand}" />
+                                </Border.GestureRecognizers>
+                            </Border>
+
+                            <Border Padding="10" StrokeShape="RoundRectangle 10">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="Subtitle"
+                                    Text="Temizle" />
+
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ClearImageCommand}" />
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </VerticalStackLayout>
 
                         <!--#endregion-->
                     </dx:BottomSheet>

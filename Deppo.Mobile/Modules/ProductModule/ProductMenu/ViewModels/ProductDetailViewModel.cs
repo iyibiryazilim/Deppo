@@ -81,7 +81,9 @@ public partial class ProductDetailViewModel : BaseViewModel
         VolumeIncreaseCommand = new Command(async () => await VolumeIncreaseAsync());
         VolumeDecreaseCommand = new Command(async () => await VolumeDecreaseAsync());
 
-        TakePictureCommand = new Command(async () => await TakePictureAsync());
+        ImageOptionCommand = new Command(async () => await ImageOptionAsync());
+
+
     }
 
     #region Commands
@@ -133,6 +135,10 @@ public partial class ProductDetailViewModel : BaseViewModel
 
     #endregion Commands
     public Command TakePictureCommand { get; set; }
+    public Command ImageOptionCommand { get; set; }
+    public Command CaptureImageCommand { get; set; }
+    public Command PickImageCommand { get; set; }
+    public Command ClearImageCommand { get; set; }
 
     private async Task LoadItemsAsync()
     {
@@ -1157,6 +1163,63 @@ public partial class ProductDetailViewModel : BaseViewModel
         }
     }
 
+    private async Task ImageOptionAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+            _userDialogs.ShowLoading("Yükleniyor...");
+            await Task.Delay(500);
+            var result = await _userDialogs.ActionSheetAsync(
+                            message: "",
+                            title: "Malzeme Resmi",
+                            cancel: "Vazgeç",
+                            destructive: "Temizle",
+                            icon:null,
+                            useBottomSheet: true,
+                            cancelToken: default,
+                            "Kamerayı Kullan",
+                            "Kütüphane"
+                            );
+
+            if (result == "Kamerayı Kullan")
+            {
+                await TakePictureAsync();
+            }
+            else if (result == "Kütüphane")
+            {
+                await PickImageAsync();
+            }
+            else if(result == "Temizle")
+            {
+                //await ClearImageAsync();
+            }
+            else
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+            }
+            
+
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
     private async Task TakePictureAsync()
     {
         await Shell.Current.GoToAsync($"{nameof(ProductPictureView)}", new Dictionary<string, object>
@@ -1164,5 +1227,28 @@ public partial class ProductDetailViewModel : BaseViewModel
             ["Product"] = ProductDetailModel.Product
         });
 
+    }
+
+    private async Task CaptureImageAsync()
+    {
+        await Shell.Current.GoToAsync($"{nameof(ProductPictureView)}", new Dictionary<string, object>
+        {
+            ["Product"] = ProductDetailModel.Product
+        });
+    }
+
+    private async Task PickImageAsync()
+    {
+        FileResult? photo = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions
+        {
+            Title = "Select your photo"
+        });
+
+        if (photo is not null)
+        {
+            var stream = await photo.OpenReadAsync();
+            var image = ImageSource.FromStream(() => stream);
+            //image.Source = ImageSource.FromStream(() => stream);
+        }
     }
 }
