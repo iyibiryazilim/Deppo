@@ -65,7 +65,7 @@ public partial class ReturnSalesBasketViewModel : BaseViewModel
 		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
 		PerformSearchCommand = new Command<Entry>(async (barcodeEntry) => await PerformSearchAsync(barcodeEntry));
         UnitActionTappedCommand = new Command<ReturnSalesBasketModel>(async (item) => await UnitActionTappedAsync(item));
-        SubUnitsetTapppedCommand = new Command<SubUnitset>(async (subUnitset) => await SubUnitsetTappedAsync(subUnitset));
+        SubUnitsetTappedCommand = new Command<SubUnitset>(async (subUnitset) => await SubUnitsetTappedAsync(subUnitset));
 
 		DeleteItemCommand = new Command<ReturnSalesBasketModel>(async (item) => await DeleteItemAsync(item));
 		IncreaseCommand = new Command<ReturnSalesBasketModel>(async (item) => await IncreaseAsync(item));
@@ -90,7 +90,7 @@ public partial class ReturnSalesBasketViewModel : BaseViewModel
     public Command ShowProductViewCommand { get; }
     public Command PerformSearchCommand { get; }
 	public Command UnitActionTappedCommand { get; }
-	public Command SubUnitsetTapppedCommand { get; }
+	public Command SubUnitsetTappedCommand { get; }
 	public Command<ReturnSalesBasketModel> DeleteItemCommand { get; }
     public Command<ReturnSalesBasketModel> IncreaseCommand { get; }
     public Command<ReturnSalesBasketModel> DecreaseCommand { get; }

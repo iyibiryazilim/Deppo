@@ -73,7 +73,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 		PerformSearchCommand = new Command<Entry>(async (x) => await PerformSearchAsync(x));
 
 		UnitActionTappedCommand = new Command<OutputSalesBasketModel>(async (item) => await UnitActionTappedAsync(item));
-		SubUnitsetTapppedCommand = new Command<SubUnitset>(async (item) => await SubUnitsetTappedAsync(item));
+		SubUnitsetTappedCommand = new Command<SubUnitset>(async (item) => await SubUnitsetTappedAsync(item));
 
 		IncreaseCommand = new Command<OutputSalesBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<OutputSalesBasketModel>(async (item) => await DecreaseAsync(item));
@@ -101,7 +101,7 @@ public partial class OutputProductSalesProcessBasketListViewModel : BaseViewMode
 	public Command ShowProductViewCommand { get; }
 	public Command PerformSearchCommand { get; }
 	public Command UnitActionTappedCommand { get; }
-	public Command SubUnitsetTapppedCommand { get; }
+	public Command SubUnitsetTappedCommand { get; }
 
 	public Command<OutputSalesBasketModel> IncreaseCommand { get; }
 	public Command<OutputSalesBasketModel> DecreaseCommand { get; }
