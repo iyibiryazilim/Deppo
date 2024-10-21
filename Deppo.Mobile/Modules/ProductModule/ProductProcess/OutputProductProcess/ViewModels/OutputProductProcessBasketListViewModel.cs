@@ -80,7 +80,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
 		PerformSearchCommand = new Command<Entry>(async (x) => await PerformSearchAsync(x));
 		UnitActionTappedCommand = new Command<OutputProductBasketModel>(async (item) => await UnitActionTappedAsync(item));
-		SubUnitsetTapppedCommand = new Command<SubUnitset>(async (item) => await SubUnitsetTappedAsync(item));
+		SubUnitsetTappedCommand = new Command<SubUnitset>(async (item) => await SubUnitsetTappedAsync(item));
 
 		IncreaseCommand = new Command<OutputProductBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<OutputProductBasketModel>(async (item) => await DecreaseAsync(item));
@@ -116,7 +116,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	public Command ShowProductViewCommand { get; }
 	public Command PerformSearchCommand { get; }
 	public Command UnitActionTappedCommand { get; }
-	public Command SubUnitsetTapppedCommand { get; }
+	public Command SubUnitsetTappedCommand { get; }
 	public Command IncreaseCommand { get; }
 	public Command DecreaseCommand { get; }
 	public Command DeleteItemCommand { get; }

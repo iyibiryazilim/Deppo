@@ -70,7 +70,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 
 		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
 		UnitActionTappedCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await UnitActionTappedAsync(item));
-		SubUnitsetTapppedCommand = new Command<SubUnitset>(async (item) => await SubUnitsetTappedAsync(item));
+		SubUnitsetTappedCommand = new Command<SubUnitset>(async (item) => await SubUnitsetTappedAsync(item));
 		CameraTappedCommand = new Command(async () => await CameraTappedAsync());
 		IncreaseCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await DecreaseAsync(item));
@@ -97,7 +97,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 
 	public Command ShowProductViewCommand { get; }
 	public Command UnitActionTappedCommand { get; }
-	public Command SubUnitsetTapppedCommand { get; }
+	public Command SubUnitsetTappedCommand { get; }
 	public Command CameraTappedCommand { get; }
 	public Command<OutputOutsourceTransferBasketModel> IncreaseCommand { get; }
 	public Command<OutputOutsourceTransferBasketModel> DecreaseCommand { get; }

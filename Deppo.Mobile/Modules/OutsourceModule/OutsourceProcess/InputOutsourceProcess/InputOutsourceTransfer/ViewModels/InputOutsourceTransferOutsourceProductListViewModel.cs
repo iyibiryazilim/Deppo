@@ -13,6 +13,7 @@ using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProces
 using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels;
 using DevExpress.Maui.Controls;
+using DevExpress.Maui.Core.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -484,6 +485,8 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourcePr
 
                     await Shell.Current.GoToAsync($"..");
                 }
+                SelectedProducts.ForEach(x => x.IsSelected = false);
+                SelectedProducts.Clear();
                 SelectedItems.Clear();
             }
             catch (Exception ex)

@@ -6,6 +6,7 @@
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:locationModel="clr-namespace:Deppo.Mobile.Core.Models.LocationModels;assembly=Deppo.Mobile.Core"
+             xmlns:models="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              xmlns:seriLotModel="clr-namespace:Deppo.Mobile.Core.Models.SeriLotModels;assembly=Deppo.Mobile.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseProcess.ViewModels"
@@ -24,6 +25,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -110,19 +112,36 @@
                                     StrokeThickness="0.1">
                                 <Grid ColumnDefinitions=".20*,.80*" ColumnSpacing="10">
                                     <Border Grid.Column="0"
-                                            BackgroundColor="{StaticResource Secondary}"
                                             StrokeShape="RoundRectangle 5"
                                             StrokeThickness="0.5">
                                         <Image Grid.Column="0"
                                                HeightRequest="50"
-                                               Source="dotnet_bot.png"
+                                               Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                                WidthRequest="50" />
                                     </Border>
 
                                     <VerticalStackLayout Grid.Column="1">
-                                        <Label FontAttributes="Bold"
-                                               LineBreakMode="TailTruncation"
-                                               Text="{Binding ItemCode}" />
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <Label Grid.Column="0"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="Start"
+                                                   LineBreakMode="TailTruncation"
+                                                   Text="{Binding ItemCode}" />
+
+                                            <Image Grid.Column="1">
+                                                <Image.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnPurchaseBasketViewModel}}, Path=UnitActionTappedCommand}" CommandParameter="{Binding .}" />
+                                                </Image.GestureRecognizers>
+                                                <Image.Source>
+                                                    <FontImageSource FontFamily="FAS"
+                                                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.Ellipsis}"
+                                                                     Size="Medium"
+                                                                     Color="{StaticResource Gray600}" />
+                                                </Image.Source>
+                                            </Image>
+
+
+                                        </Grid>
                                         <Label LineBreakMode="TailTruncation"
                                                Text="{Binding ItemName}"
                                                TextColor="{StaticResource Gray600}" />
@@ -137,6 +156,10 @@
                                                     <Span Text=" " />
                                                     <Span FontAttributes="Bold"
                                                           Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                                          TextColor="{StaticResource Primary}" />
+                                                    <Span Text=" " />
+                                                    <Span FontAttributes="Bold"
+                                                          Text="{Binding SubUnitsetCode}"
                                                           TextColor="{StaticResource Primary}" />
                                                 </FormattedString>
                                             </Label.FormattedText>
@@ -516,6 +539,81 @@
                 </Grid>
 
                 <!--#endregion-->
+            </dx:BottomSheet>
+            <!--#endregion-->
+
+            <!--#region SubUnitset bottomsheet-->
+            <dx:BottomSheet x:Name="subUnitsetBottomSheet"
+                            Grid.Row="1"
+                            Padding="10,30,10,10"
+                            AllowDismiss="True"
+                            BackgroundColor="{StaticResource WhiteSmoke}"
+                            CornerRadius="10"
+                            HalfExpandedRatio="0.5"
+                            IsModal="True"
+                            ShowGrabber="True">
+                <Grid RowDefinitions="Auto, Auto, *" RowSpacing="10">
+                    <VerticalStackLayout Grid.Row="0" Spacing="5">
+
+                        <Label Grid.Column="0"
+                               FontAttributes="Bold"
+                               FontSize="Medium"
+                               HorizontalOptions="Start"
+                               Text="{Binding SelectedItem.ItemCode, StringFormat='{0} Ürünü'}" />
+
+                        <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
+                    </VerticalStackLayout>
+                    <Grid Grid.Row="1"
+                          Padding="0,5,0,10"
+                          RowDefinitions="Auto, Auto"
+                          RowSpacing="10">
+                        <Grid Grid.Row="0" ColumnDefinitions=".40*, .25*, .25*">
+                            <Label Grid.Column="0"
+                                   FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   Text="Alt Birim" />
+                            <Label Grid.Column="1"
+                                   FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   HorizontalOptions="Center"
+                                   Text="Çevrim" />
+                            <Label Grid.Column="2"
+                                   FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   HorizontalOptions="Center"
+                                   Text="Katsayı" />
+                        </Grid>
+                        <BoxView Grid.Row="1"
+                                 HeightRequest="2"
+                                 Color="{StaticResource Primary}" />
+                    </Grid>
+                    <CollectionView Grid.Row="2" ItemsSource="{Binding SelectedItem.SubUnitsets}">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:SubUnitset">
+                                <Border Padding="10"
+                                        BackgroundColor="WhiteSmoke"
+                                        StrokeShape="RoundRectangle 5">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnPurchaseBasketViewModel}}, Path=SubUnitsetTappedCommand}" CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <Grid ColumnDefinitions=".40*,.25*,.25*">
+                                        <Label Grid.Column="0" Text="{Binding Code}" />
+                                        <Label Grid.Column="1"
+                                               HorizontalOptions="Center"
+                                               Text="{Binding ConversionValue}" />
+                                        <Label Grid.Column="2"
+                                               HorizontalOptions="Center"
+                                               Text="{Binding OtherConversionValue}" />
+                                    </Grid>
+                                </Border>
+
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Grid>
             </dx:BottomSheet>
             <!--#endregion-->
         </VerticalStackLayout>

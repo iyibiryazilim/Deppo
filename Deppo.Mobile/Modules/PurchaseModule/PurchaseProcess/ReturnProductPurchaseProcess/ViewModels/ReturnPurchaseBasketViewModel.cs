@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
@@ -25,6 +27,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
     private readonly ILocationTransactionService _locationTransactionService;
     private readonly IUserDialogs _userDialogs;
     private readonly IBarcodeSearchHelper _barcodeSearchHelper;
+    private readonly ISubUnitsetService _subUnitsetService;
 
     [ObservableProperty]
     WarehouseModel warehouseModel = null!;
@@ -53,18 +56,21 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
     public ObservableCollection<GroupLocationTransactionModel> LocationTransactions { get; } = new();
 	#endregion
 
-	public ReturnPurchaseBasketViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs, IBarcodeSearchHelper barcodeSearchHelper)
+	public ReturnPurchaseBasketViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs, IBarcodeSearchHelper barcodeSearchHelper, ISubUnitsetService subUnitsetService)
 	{
 		_httpClientService = httpClientService;
 		_serilotTransactionService = serilotTransactionService;
 		_locationTransactionService = locationTransactionService;
 		_userDialogs = userDialogs;
 		_barcodeSearchHelper = barcodeSearchHelper;
+		_subUnitsetService = subUnitsetService;
 
 		Title = "Sepet Listesi";
 
 		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
-        PerformSearchCommand = new Command<Entry>(async (x) => await PerformSearchAsync(x));
+        UnitActionTappedCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await UnitActionTappedAsync(item));
+        SubUnitsetTappedCommand = new Command<SubUnitset>(async (item) => await SubUnitsetTappedAsync(item));
+		PerformSearchCommand = new Command<Entry>(async (x) => await PerformSearchAsync(x));
 		IncreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DecreaseAsync(item));
 		DeleteItemCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DeleteItemAsync(item));
@@ -87,9 +93,12 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
 		BackCommand = new Command(async () => await BackAsync());
 		CameraTappedCommand = new Command(async () => await CameraTappedAsync());
 	}
+	public ContentPage CurrentPage { get; set; } = null!;
 
 	#region Commands
 	public Command ShowProductViewCommand { get; }
+    public Command SubUnitsetTappedCommand { get; }
+    public Command UnitActionTappedCommand { get; }
     public Command PerformSearchCommand { get; }
     public Command IncreaseCommand { get; }
     public Command DecreaseCommand { get; }
@@ -115,12 +124,6 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
     public Command CameraTappedCommand { get; }
     #endregion
 
-    #region Properties
-    public ContentPage CurrentPage { get; set; } = null!;
-
-    #endregion
-
-
     private async Task ShowProductViewAsync()
     {
         if (IsBusy)
@@ -143,6 +146,100 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+	private async Task LoadSubUnitsetsAsync(ReturnPurchaseBasketModel item)
+	{
+		if (item is null)
+			return;
+		try
+		{
+			item.SubUnitsets.Clear();
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _subUnitsetService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				productReferenceId: item.ItemReferenceId
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var subUnitset in result.Data)
+				{
+					item.SubUnitsets.Add(Mapping.Mapper.Map<SubUnitset>(subUnitset));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+	}
+
+	private async Task SubUnitsetTappedAsync(SubUnitset subUnitset)
+	{
+		if (subUnitset is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			if (SelectedItem is not null)
+			{
+				SelectedItem.SubUnitsetReferenceId = subUnitset.ReferenceId;
+				SelectedItem.SubUnitsetName = subUnitset.Name;
+				SelectedItem.SubUnitsetCode = subUnitset.Code;
+			}
+
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.Hidden;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task UnitActionTappedAsync(ReturnPurchaseBasketModel item)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			SelectedItem = item;
+			await LoadSubUnitsetsAsync(item);
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.HalfExpanded;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
 
 	private async Task PerformSearchAsync(Entry barcodeEntry)
 	{

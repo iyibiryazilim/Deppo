@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Deppo.Core.Models;
 using Deppo.Mobile.Core.Models.LocationModels;
 using System;
 using System.Collections.Generic;
@@ -59,15 +60,27 @@ public partial class ProductCountingBasketModel : ObservableObject
 
     [ObservableProperty]
     private bool isVariant;
+	[ObservableProperty]
+	private string _variantIcon = "bookmark";
+	public string VariantIconColor => IsVariant ? "#F5004F" : "#C8C8C8";
 
-    [ObservableProperty]
+	[ObservableProperty]
     private int trackingType;
+	[ObservableProperty]
+	private string _trackingTypeIcon = "box-archive";
+	public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 
-    [ObservableProperty]
+	[ObservableProperty]
     private int locTracking;
+	[ObservableProperty]
+	private string _locTrackingIcon = "location-dot";
+	public string LocTrackingIconColor => LocTracking == 1 ? "#F5004F" : "#C8C8C8";
+
+	[ObservableProperty]
+    private ObservableCollection<LocationTransactionModel> locationTransactions = new();
 
     [ObservableProperty]
-    private ObservableCollection<LocationTransactionModel> locationTransactions = new();
+    private ObservableCollection<SubUnitset> subUnitsets = new();
 
     [ObservableProperty]
     private double differenceQuantity = 0;
