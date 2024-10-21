@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,6 +21,7 @@ public class HttpClientSysService : IHttpClientSysService
 
    , LazyThreadSafetyMode.None);
 
+    public Guid Oid { get; set; }
     public string Token { get; set; } = string.Empty;
     public string BaseUri { get; set; } = string.Empty;
     public int FirmNumber { get; set; }
