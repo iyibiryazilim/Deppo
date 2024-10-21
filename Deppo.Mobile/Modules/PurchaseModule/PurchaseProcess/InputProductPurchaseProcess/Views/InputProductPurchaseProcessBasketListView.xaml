@@ -57,7 +57,7 @@
             <Border Grid.Row="0"
                     Padding="0"
                     BackgroundColor="{StaticResource PrimaryLight}"
-                    HeightRequest="35"
+                    HeightRequest="40"
                     Stroke="{StaticResource Primary}"
                     StrokeShape="RoundRectangle 5"
                     StrokeThickness="0.5">

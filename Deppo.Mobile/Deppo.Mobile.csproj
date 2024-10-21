@@ -65,6 +65,7 @@
 		<PackageReference Include="CommunityToolkit.Maui.Camera" Version="1.0.5" />
 		<PackageReference Include="CommunityToolkit.Maui.Markup" Version="4.2.0" />
 		<PackageReference Include="CommunityToolkit.Maui.MediaElement" Version="4.1.2" />
+		<PackageReference Include="DevExpress.Data" Version="24.1.6" />
 		<PackageReference Include="DotNetMeteor.HotReload.Plugin" Version="3.3.0" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="9.0.2" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
