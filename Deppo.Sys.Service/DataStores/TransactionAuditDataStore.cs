@@ -17,7 +17,9 @@ namespace Deppo.Sys.Service.DataStores
 
         public async Task<TransactionAudit> CreateAsync(HttpClient httpClient, TransactionAuditDto dto)
         {
-            var content = new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
+            var json = JsonSerializer.Serialize(dto);
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await httpClient.PostAsync(RequestUrl, content);
             if (response.IsSuccessStatusCode)
             {
@@ -28,6 +30,7 @@ namespace Deppo.Sys.Service.DataStores
                 }
                 else
                 {
+                    var responseContent = await response.Content.ReadAsStringAsync();
                     return null!;
                 }
             }

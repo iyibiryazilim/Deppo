@@ -97,10 +97,12 @@ public class Startup
         services
             .AddXafWebApi(Configuration, options =>
             {
+                options.BusinessObject<PermissionPolicyUser>();
                 options.BusinessObject<ApplicationUser>();
                 options.BusinessObject<TransactionAudit>();
                 options.BusinessObject<Warehouse>();
                 options.BusinessObject<WarehouseProcessParameter>();
+                options.BusinessObject<DomainObject1>();
             })
             .AddXpoServices();
         services

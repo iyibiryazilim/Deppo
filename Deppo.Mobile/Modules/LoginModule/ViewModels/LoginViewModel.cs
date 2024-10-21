@@ -5,6 +5,7 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.LoginModule.Views;
+using Deppo.Sys.Service.Models;
 using Deppo.Sys.Service.Services;
 using DevExpress.Maui.Controls;
 
@@ -18,14 +19,16 @@ public partial class LoginViewModel : BaseViewModel
     private readonly IHttpClientSysService _httpClientSysService;
     private readonly IAuthenticateSysService _authenticateSysService;
     private readonly IServiceProvider _serviceProvider;
+    private readonly IApplicationUserService _applicationUserService;
 
     public LoginViewModel(
-        IHttpClientService httpClientService, 
-        IUserDialogs userDialogs, 
-        IAuthenticationService authenticationService, 
-        IHttpClientSysService httpClientSysService, 
+        IHttpClientService httpClientService,
+        IUserDialogs userDialogs,
+        IAuthenticationService authenticationService,
+        IHttpClientSysService httpClientSysService,
         IAuthenticateSysService authenticateSysService,
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        IApplicationUserService applicationUserService)
     {
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
@@ -33,6 +36,7 @@ public partial class LoginViewModel : BaseViewModel
         _httpClientSysService = httpClientSysService;
         _authenticateSysService = authenticateSysService;
         _serviceProvider = serviceProvider;
+        _applicationUserService = applicationUserService;
 
         LoginCommand = new Command(async () => await LoginAsync());
         ShowParameterCommand = new Command<BottomSheet>(ShowParameterAsync);
@@ -176,9 +180,10 @@ public partial class LoginViewModel : BaseViewModel
             if (!string.IsNullOrEmpty(token))
             {
                 _httpClientSysService.Token = token;
+                var currentUser = await GetCurrentUserAsync(UserName);
+                _httpClientSysService.UserOid = currentUser.Oid;
                 isLoggedIn = true;
             }
-
         }
         catch (Exception ex)
         {
@@ -186,6 +191,29 @@ public partial class LoginViewModel : BaseViewModel
         }
 
         return isLoggedIn;
+    }
+
+    private async Task<ApplicationUser> GetCurrentUserAsync(string userName)
+    {
+        try
+        {
+            var httpClient = _httpClientSysService.GetOrCreateHttpClient();
+            string filter = $"filter=UserName eq '{userName}'&$expand=Image";
+            var result = await _applicationUserService.GetAllAsync(httpClient, filter);
+
+            if (result.Any())
+                return result.FirstOrDefault();
+            else
+                return new ApplicationUser();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+            return new ApplicationUser();
+        }
     }
 
     private async Task<bool> AuthenticateHelixAsync()

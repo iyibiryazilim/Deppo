@@ -14,13 +14,15 @@ using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Helpers.TransactionAuditHelpers;
 using Deppo.Mobile.Modules.ResultModule;
 using Deppo.Mobile.Modules.ResultModule.Views;
+using Deppo.Sys.Service.DTOs;
+using Deppo.Sys.Service.Services;
 using DevExpress.Maui.Controls;
 using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
-
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(InputProductProcessType), queryId: nameof(InputProductProcessType))]
@@ -30,51 +32,55 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
     private readonly IHttpClientService _httpClientService;
     private readonly IProductionTransactionService _productionTransactionService;
     private readonly IInCountingTransactionService _inCountingTransactionService;
-	private readonly IServiceProvider _serviceProvider;
+    private readonly IServiceProvider _serviceProvider;
     private readonly IUserDialogs _userDialogs;
-
+    private readonly ITransactionAuditService _transactionAuditService;
+    private readonly IHttpClientSysService _httpClientSysService;
+    private readonly ITransactionAuditHelperService _transactionAuditHelperService;
 
     [ObservableProperty]
-    WarehouseModel warehouseModel = null!;
+    private WarehouseModel warehouseModel = null!;
 
     [ObservableProperty]
     private InputProductProcessType inputProductProcessType;
 
     [ObservableProperty]
-    DateTime ficheDate = DateTime.Now;
+    private DateTime ficheDate = DateTime.Now;
 
     [ObservableProperty]
-    string documentNumber = string.Empty;
+    private string documentNumber = string.Empty;
 
     [ObservableProperty]
-    string documentTrackingNumber = string.Empty;
+    private string documentTrackingNumber = string.Empty;
 
     [ObservableProperty]
-    string specialCode = string.Empty;
+    private string specialCode = string.Empty;
 
     [ObservableProperty]
-    string description = string.Empty;
+    private string description = string.Empty;
 
     [ObservableProperty]
-    ObservableCollection<InputProductBasketModel> items = null!;
+    private ObservableCollection<InputProductBasketModel> items = null!;
 
+    public InputProductProcessFormViewModel(IHttpClientService httpClientService, IProductionTransactionService productionTransactionService, IUserDialogs userDialogs, IInCountingTransactionService inCountingTransactionService, IServiceProvider serviceProvider, ITransactionAuditHelperService transactionAuditHelperService, IHttpClientSysService httpClientSysService)
+    {
+        _httpClientService = httpClientService;
+        _productionTransactionService = productionTransactionService;
+        _inCountingTransactionService = inCountingTransactionService;
+        _userDialogs = userDialogs;
+        _serviceProvider = serviceProvider;
+        _transactionAuditHelperService = transactionAuditHelperService;
+        _httpClientSysService = httpClientSysService;
 
-	public InputProductProcessFormViewModel(IHttpClientService httpClientService, IProductionTransactionService productionTransactionService, IUserDialogs userDialogs, IInCountingTransactionService inCountingTransactionService, IServiceProvider serviceProvider)
-	{
-		_httpClientService = httpClientService;
-		_productionTransactionService = productionTransactionService;
-		_inCountingTransactionService = inCountingTransactionService;
-		_userDialogs = userDialogs;
-		_serviceProvider = serviceProvider;
-		Items = new();
+        Items = new();
 
-		LoadPageCommand = new Command(async () => await LoadPageAsync());
-		ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
-		SaveCommand = new Command(async () => await SaveAsync());
-		BackCommand = new Command(async () => await BackAsync());
-	}
+        LoadPageCommand = new Command(async () => await LoadPageAsync());
+        ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
+        SaveCommand = new Command(async () => await SaveAsync());
+        BackCommand = new Command(async () => await BackAsync());
+    }
 
-	public Page CurrentPage { get; set; }
+    public Page CurrentPage { get; set; }
 
     public Command LoadPageCommand { get; }
     public Command BackCommand { get; }
@@ -94,11 +100,11 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
-		}
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
         finally
         {
             IsBusy = false;
@@ -116,16 +122,14 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
 
             Title = GetEnumDescription(InputProductProcessType);
             CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
-
-
         }
         catch (Exception ex)
         {
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
-		}
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
         finally
         {
             IsBusy = false;
@@ -150,249 +154,278 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
     {
         if (IsBusy)
             return;
-		try
-		{
-			IsBusy = true;
+        try
+        {
+            IsBusy = true;
 
-			var confirm = await _userDialogs.ConfirmAsync("Fiş oluşturulacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
-			if (!confirm)
-				return;
+            var confirm = await _userDialogs.ConfirmAsync("Fiş oluşturulacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+            if (!confirm)
+                return;
 
-			_userDialogs.Loading("İşlem tamamlanıyor");
-			await Task.Delay(1000);
+            _userDialogs.Loading("İşlem tamamlanıyor");
+            await Task.Delay(1000);
 
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			switch(InputProductProcessType)
-			{
-				case InputProductProcessType.ProductionInputProcess:
-					await ProductionTransactionInsertAsync(httpClient);
-					break;
-				case InputProductProcessType.OverCountProcess:
-					await InCountingTransactionInsertAsync(httpClient);
-					break;
-			}
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            switch (InputProductProcessType)
+            {
+                case InputProductProcessType.ProductionInputProcess:
+                    await ProductionTransactionInsertAsync(httpClient);
+                    break;
 
-			if(_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+                case InputProductProcessType.OverCountProcess:
+                    await InCountingTransactionInsertAsync(httpClient);
+                    break;
+            }
 
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     private async Task ProductionTransactionInsertAsync(HttpClient httpClient)
     {
         var productionTransactionDto = new ProductionTransactionInsert
-		{
-			SpeCode = SpecialCode,
-			CurrentCode = string.Empty,
-			Code = string.Empty,
-			DocTrackingNumber = DocumentTrackingNumber,
-			DoCode = DocumentNumber,
-			TransactionDate = FicheDate,
-			FirmNumber = _httpClientService.FirmNumber,
-			WarehouseNumber = WarehouseModel.Number,
-			Description = Description,
-		};
+        {
+            SpeCode = SpecialCode,
+            CurrentCode = string.Empty,
+            Code = string.Empty,
+            DocTrackingNumber = DocumentTrackingNumber,
+            DoCode = DocumentNumber,
+            TransactionDate = FicheDate,
+            FirmNumber = _httpClientService.FirmNumber,
+            WarehouseNumber = WarehouseModel.Number,
+            Description = Description,
+        };
 
-		foreach (var item in Items)
-		{
-			var productionTransactionLineDto = new ProductionTransactionLineDto
-			{
-				ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
-				VariantCode = item.IsVariant ? item.ItemCode : "",
-				WarehouseNumber = WarehouseModel.Number,
-				Quantity = item.Quantity,
-				ConversionFactor = 1,
-				OtherConversionFactor = 1,
-				SubUnitsetCode = item.SubUnitsetCode,
-			};
+        foreach (var item in Items)
+        {
+            var productionTransactionLineDto = new ProductionTransactionLineDto
+            {
+                ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
+                VariantCode = item.IsVariant ? item.ItemCode : "",
+                WarehouseNumber = WarehouseModel.Number,
+                Quantity = item.Quantity,
+                ConversionFactor = 1,
+                OtherConversionFactor = 1,
+                SubUnitsetCode = item.SubUnitsetCode,
+            };
 
-			foreach (var detail in item.Details)
-			{
-				var seriLotTransactionDto = new SeriLotTransactionDto
-				{
-					StockLocationCode = detail.LocationCode,
-					Quantity = detail.Quantity,
-					ConversionFactor = 1,
-					OtherConversionFactor = 1,
-					DestinationStockLocationCode = string.Empty,
-				};
+            foreach (var detail in item.Details)
+            {
+                var seriLotTransactionDto = new SeriLotTransactionDto
+                {
+                    StockLocationCode = detail.LocationCode,
+                    Quantity = detail.Quantity,
+                    ConversionFactor = 1,
+                    OtherConversionFactor = 1,
+                    DestinationStockLocationCode = string.Empty,
+                };
 
-				productionTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
-			}
+                productionTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
+            }
 
-			productionTransactionDto.Lines.Add(productionTransactionLineDto);
-		}
+            productionTransactionDto.Lines.Add(productionTransactionLineDto);
+        }
 
-		var result = await _productionTransactionService.InsertProductionTransaction(httpClient, productionTransactionDto, _httpClientService.FirmNumber);
+        var result = await _productionTransactionService.InsertProductionTransaction(httpClient, productionTransactionDto, _httpClientService.FirmNumber);
 
-		ResultModel resultModel = new();
-		if (result.IsSuccess)
-		{
-			resultModel.Message = "Başarılı";
-			resultModel.Code = result.Data.Code;
-			resultModel.PageTitle = Title;
+        ResultModel resultModel = new();
+        if (result.IsSuccess)
+        {
+            resultModel.Message = "Başarılı";
+            resultModel.Code = result.Data.Code;
+            resultModel.PageTitle = Title;
             resultModel.IsSuccess = true;
-			resultModel.PageCountToBack = 4;
+            resultModel.PageCountToBack = 4;
 
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+            await _transactionAuditHelperService.InsertProducTransactionAuditAsync(
+                    firmNumber: _httpClientService.FirmNumber,
+                    periodNumber: _httpClientService.PeriodNumber,
+                    ioType: 1,
+                    transactionType: 13,
+                    transactionDate: FicheDate,
+                    transactionReferenceId: result.Data.ReferenceId,
+                    transactionNumber: result.Data.Code,
+                    documentNumber: DocumentNumber,
+                    warehouseNumber: WarehouseModel.Number,
+                    warehouseName: WarehouseModel.Name,
+                    productReferenceCount: Items.Count
 
-			var basketViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketListViewModel>();
-			basketViewModel.Items.Clear();
+            );
 
-			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
-			{
-				[nameof(ResultModel)] = resultModel
-			});	
-		}
-		else
-		{
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+            var basketViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketListViewModel>();
+            basketViewModel.Items.Clear();
 
-			resultModel.Message = "Başarısız";
-			resultModel.PageTitle = Title;
+            await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
+            {
+                [nameof(ResultModel)] = resultModel
+            });
+        }
+        else
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            resultModel.Message = "Başarısız";
+            resultModel.PageTitle = Title;
             resultModel.ErrorMessage = result.Message;
             resultModel.IsSuccess = false;
-			resultModel.PageCountToBack = 1;
-			await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
-			{
-				[nameof(ResultModel)] = resultModel
-			});
-		}
-	}
+            resultModel.PageCountToBack = 1;
+            await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+            {
+                [nameof(ResultModel)] = resultModel
+            });
+        }
+    }
 
     private async Task InCountingTransactionInsertAsync(HttpClient httpClient)
     {
         var inCountingTransactionDto = new InCountingTransactionInsert
         {
-			SpeCode = SpecialCode,
-			CurrentCode = string.Empty,
-			Code = string.Empty,
-			DocTrackingNumber = DocumentTrackingNumber,
-			DoCode = DocumentNumber,
-			TransactionDate = FicheDate,
-			FirmNumber = _httpClientService.FirmNumber,
-			WarehouseNumber = WarehouseModel.Number,
-			Description = Description,
-		};
+            SpeCode = SpecialCode,
+            CurrentCode = string.Empty,
+            Code = string.Empty,
+            DocTrackingNumber = DocumentTrackingNumber,
+            DoCode = DocumentNumber,
+            TransactionDate = FicheDate,
+            FirmNumber = _httpClientService.FirmNumber,
+            WarehouseNumber = WarehouseModel.Number,
+            Description = Description,
+        };
 
-		foreach (var item in Items)
-		{
-			var inCountingTransactionLineDto = new InCountingTransactionLineDto
-			{
+        foreach (var item in Items)
+        {
+            var inCountingTransactionLineDto = new InCountingTransactionLineDto
+            {
                 ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
                 VariantCode = item.IsVariant ? item.ItemCode : "",
                 WarehouseNumber = WarehouseModel.Number,
-				Quantity = item.Quantity,
-				ConversionFactor = 1,
-				OtherConversionFactor = 1,
-				SubUnitsetCode = item.SubUnitsetCode,
-			};
+                Quantity = item.Quantity,
+                ConversionFactor = 1,
+                OtherConversionFactor = 1,
+                SubUnitsetCode = item.SubUnitsetCode,
+            };
 
-			foreach (var detail in item.Details)
-			{
-				var seriLotTransactionDto = new SeriLotTransactionDto
-				{
-					StockLocationCode = detail.LocationCode,
-					Quantity = detail.Quantity,
-					ConversionFactor = 1,
-					OtherConversionFactor = 1,
-					DestinationStockLocationCode = string.Empty,
-				};
+            foreach (var detail in item.Details)
+            {
+                var seriLotTransactionDto = new SeriLotTransactionDto
+                {
+                    StockLocationCode = detail.LocationCode,
+                    Quantity = detail.Quantity,
+                    ConversionFactor = 1,
+                    OtherConversionFactor = 1,
+                    DestinationStockLocationCode = string.Empty,
+                };
 
-				inCountingTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
-			}
+                inCountingTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
+            }
 
-			inCountingTransactionDto.Lines.Add(inCountingTransactionLineDto);
-		}
+            inCountingTransactionDto.Lines.Add(inCountingTransactionLineDto);
+        }
 
         var result = await _inCountingTransactionService.InsertInCountingTransaction(httpClient, inCountingTransactionDto, _httpClientService.FirmNumber);
 
-		ResultModel resultModel = new();
-		if (result.IsSuccess)
-		{
-			resultModel.Message = "Başarılı";
-			resultModel.Code = result.Data.Code;
-			resultModel.PageTitle = Title;
-			resultModel.IsSuccess = true;
-			resultModel.PageCountToBack = 4;
+        ResultModel resultModel = new();
+        if (result.IsSuccess)
+        {
+            resultModel.Message = "Başarılı";
+            resultModel.Code = result.Data.Code;
+            resultModel.PageTitle = Title;
+            resultModel.IsSuccess = true;
+            resultModel.PageCountToBack = 4;
 
-			var viewModel= _serviceProvider.GetRequiredService<InputProductProcessBasketLocationListViewModel>();
-			viewModel.SelectedItems.Clear();
-			viewModel.Items.Clear();
+            await _transactionAuditHelperService.InsertProducTransactionAuditAsync(
+                    firmNumber: _httpClientService.FirmNumber,
+                    periodNumber: _httpClientService.PeriodNumber,
+                    ioType: 1,
+                    transactionType: 51,
+                    transactionDate: FicheDate,
+                    transactionReferenceId: result.Data.ReferenceId,
+                    transactionNumber: result.Data.Code,
+                    documentNumber: DocumentNumber,
+                    warehouseNumber: WarehouseModel.Number,
+                    warehouseName: WarehouseModel.Name,
+                    productReferenceCount: Items.Count
+
+            );
+
+            var viewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketLocationListViewModel>();
+            viewModel.SelectedItems.Clear();
+            viewModel.Items.Clear();
             foreach (var item in Items)
-			{
-				item.Details.Clear();
-			}
+            {
+                item.Details.Clear();
+            }
 
             if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+                _userDialogs.HideHud();
 
-			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
-			{
-				[nameof(ResultModel)] = resultModel
-			});
-		}
-		else
-		{
+            await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
+            {
+                [nameof(ResultModel)] = resultModel
+            });
+        }
+        else
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+            resultModel.Message = "Başarısız";
+            resultModel.PageTitle = Title;
+            resultModel.ErrorMessage = result.Message;
+            resultModel.IsSuccess = false;
+            resultModel.PageCountToBack = 1;
+            await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+            {
+                [nameof(ResultModel)] = resultModel
+            });
+        }
+    }
 
-			resultModel.Message = "Başarısız";
-			resultModel.PageTitle = Title;
-			resultModel.ErrorMessage = result.Message;
-			resultModel.IsSuccess = false;
-			resultModel.PageCountToBack = 1;
-			await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
-			{
-				[nameof(ResultModel)] = resultModel
-			});
-		}
-	}
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
 
-	private async Task BackAsync()
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
+            var confirm = await _userDialogs.ConfirmAsync("Form verileriniz silinecektir. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+            if (!confirm)
+                return;
 
-			var confirm = await _userDialogs.ConfirmAsync("Form verileriniz silinecektir. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
-			if (!confirm)
-				return;
+            DocumentNumber = string.Empty;
+            DocumentTrackingNumber = string.Empty;
+            Description = string.Empty;
+            SpecialCode = string.Empty;
+            FicheDate = DateTime.Now;
 
-			DocumentNumber = string.Empty;
-			DocumentTrackingNumber = string.Empty;
-			Description = string.Empty;
-			SpecialCode = string.Empty;
-			FicheDate = DateTime.Now;
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			await Shell.Current.GoToAsync("..");
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
-
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 }
