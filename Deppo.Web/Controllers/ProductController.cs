@@ -3,61 +3,60 @@ using Deppo.Core.DataResultModel;
 using Deppo.Core.Services;
 using Deppo.Web.Helpers.MappingHelper;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
 using System.Net.Http.Headers;
 
-namespace Deppo.Web.Controllers;
-
-public class ProductController : Controller
+namespace Deppo.Web.Controllers
 {
-	private readonly IHttpClientFactory _httpClientFactory;
-	private readonly IProductService _productService;
-	private readonly IAuthenticationService _authenticationService;
-
-	public ProductController(IHttpClientFactory httpClientFactory, IProductService productService, IAuthenticationService authenticationService)
+	public class ProductController : Controller
 	{
-		_httpClientFactory = httpClientFactory;
-		_productService = productService;
-		_authenticationService = authenticationService;
-	}
+		private readonly IHttpClientFactory _httpClientFactory;
+		private readonly IProductService _productService;
+		private readonly IAuthenticationService _authenticationService;
 
-	public ActionResult Index()
-	{
-		return View();	
-	}
-
-	[HttpPost]
-	public async Task<JsonResult> GetProductJsonResult()
-	{
-		var products = new List<Product>();
-
-		try
+		public ProductController(IHttpClientFactory httpClientFactory, IProductService productService, IAuthenticationService authenticationService)
 		{
-			var httpClient = _httpClientFactory.CreateClient("helix");
-			var token = await _authenticationService.Authenticate(httpClient, "Admin", "");
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            var result = await _productService.GetObjects(httpClient, 1, 2, string.Empty, 0, 9999999);
-
-
-			if (result.IsSuccess && result.Data != null)
-			{
-				products.AddRange(Mapping.Mapper.Map<IEnumerable<Product>>(result.Data));
-			}
-			else
-			{
-				return Json(new { success = false, message = result.Message ?? "Ürünler yüklenemedi." });
-			}
-		}
-		catch (Exception ex)
-		{
-			return Json(new { success = false, message = $"Bir hata oluþtu: {ex.Message}" });
+			_httpClientFactory = httpClientFactory;
+			_productService = productService;
+			_authenticationService = authenticationService;
 		}
 
-		return Json(new { success = true, data = products });
+		public ActionResult Index()
+		{
+			return View();
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> GetProductJsonResult([FromForm] int draw, [FromForm] int start, [FromForm] int length)
+		{
+			try
+			{
+				var httpClient = _httpClientFactory.CreateClient("helix");
+				var token = await _authenticationService.Authenticate(httpClient, "Admin", "");
+				httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+				// Alýnan ürünleri filtrele ve sayfalara ayýr
+				var result = await _productService.GetObjects(httpClient, 1, 2, string.Empty, start, length);
+
+				if (result.IsSuccess && result.Data != null)
+				{
+					var mappedProducts = Mapping.Mapper.Map<IEnumerable<Product>>(result.Data);
+					return Json(new
+					{
+						draw = draw,
+						
+						data = mappedProducts
+					});
+				}
+				else
+				{
+					throw new Exception(result.Message ?? "Ürünler yüklenemedi.");
+				}
+			}
+			catch (Exception ex)
+			{
+				return Json(new { success = false, message = $"Bir hata oluþtu: {ex.Message}" });
+			}
+		}
+
 	}
-
-
 }
-
-

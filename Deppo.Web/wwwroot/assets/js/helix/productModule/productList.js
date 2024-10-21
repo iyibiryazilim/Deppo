@@ -9,6 +9,7 @@ var productList = function () {
 
 
     var getData = async function () {
+        document.getElementById("loadingIndicator").style.display = "block";
 
         const getItem = async () => {
             var postUrl =
@@ -22,14 +23,14 @@ var productList = function () {
             });
 
             arrayData = await data.json();
-            console.log(arrayData);
-
             initDatatable();
             console.log(arrayData);
+            document.getElementById("loadingIndicator").style.display = "none";
 
         };
         await getItem();
     };
+    // Private functions
     var initDatatable = function () {
 
 
@@ -42,19 +43,26 @@ var productList = function () {
             info: false,
             order: [],
             pageLength: 10,
-            "bProcessing": true,
-            oLanguage: {
-                sLoadingRecords: '<img src="assets/media/avatars/Refresh.gif">'
+            serverSide: true, 
+            ajax: {
+                url: "Product/GetProductJsonResult",
+                type: "POST",
+                data: function (d) {
+                    return {
+                        draw: d.draw,
+                        start: d.start,
+                        length: d.length
+                    };
+                }
             },
-            data: arrayData.data,
             columns: [
-                { data: 'vehicle' },
-                { data: 'dateOfIssuance' },
-                { data: 'total' },
-                { data: 'discountedTotal' },
-                { data: 'dateOfNotification' },
-                { data: 'invoicedOn' },
-                { data: 'oid' },
+                { data: 'code' },
+                { data: 'stockQuantity' },
+                { data: 'unitsetCode' },
+                { data: 'subUnitsetCode' },
+                { data: 'brandName' },
+                { data: 'isVariant' },
+                { data: 'trackingType' },
 
             ],
 
@@ -65,61 +73,48 @@ var productList = function () {
                     className: 'text-start pe-0',
                     render: function (data, type, full, meta) {
                         var output;
-                        output = `                        
-                        
-							<div class="d-flex align-items-center">
-								 <div class="symbol symbol-40px mb-1" style="margin-right: 6%;">
-                                <img src="data:image/jpg;base64,`+ full.vehicle.brand.brandImage + `" alt="image" />
-                            </div>
-								<div class="d-flex justify-content-start flex-column">
-									<a  href="../Vehicle/Detail/?VehicleOid=`+ full.vehicle.oid + `" class="text-dark fw-bold text-hover-primary mb-1 fs-6">` + full.vehicle.code + `</a>
-									<span class="text-muted fw-semibold text-muted d-block fs-7">`+ full.vehicle.brand.name + ` ` + full.vehicle.model.name + `</span>
-								</div>
-							</div>
-						
-                        `
+                        var defaultImageUrl = "/assets/media/images/notfound.png"; // Correct path to your default image
+
+                        // Check if imageData is empty or null and use the default image if so
+                        var imageSrc = full.imageData ? `data:image/jpg;base64,${full.imageData}` : defaultImageUrl;
+
+                        output = `
+            <div class="d-flex align-items-center">
+                <div class="symbol symbol-40px mb-1" style="margin-right: 2%;"> <!-- Adjusted the margin-right -->
+                    <img src="${imageSrc}" alt="image" />
+                </div>
+                <div class="d-flex justify-content-start flex-column">
+                    <a href="../Vehicle/Detail/?VehicleOid=${full.referenceId}" class="text-dark fw-bold text-hover-primary mb-1 fs-6">${full.code}</a>
+                    <span class="text-muted fw-semibold text-muted d-block fs-7">${full.name}</span>
+                </div>
+            </div>
+        `;
 
                         return output;
                     },
                 },
+
+
                 {
                     orderable: true,
                     targets: 1,
-                    className: 'text-start pe-0',
+                    className: 'text-center pe-0',
                     render: function (data, type, full, meta) {
 
                         var output;
-
-                        var parsedDate = new Date(full.dateOfIssuance);
-                        var newDate = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
-                        if (type == 'display') {
-
-                            let formattedDate = newDate.toLocaleString('tr-TR', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric'
-                            });
-
-
-                            output = ` <span class="fw-bold">` + formattedDate + `</span>`
-                        } else {
-                            var orderableDate = parsedDate.toISOString();
-                            return orderableDate;
-                        }
-
+                        output = `<span class="fw-bold">` + full.stockQuantity.toLocaleString('tr-TR') + `</span>`
 
                         return output;
-
                     },
                 },
                 {
                     orderable: true,
                     targets: 2,
-                    className: 'text-start pe-0',
+                    className: 'text-center pe-0',
                     render: function (data, type, full, meta) {
 
                         var output;
-                        output = `<span class="fw-bold">` + `₺` + full.total.toLocaleString('tr-TR') + `</span>`
+                        output = `<span class="fw-bold">` + full.unitsetCode + `</span>`
 
                         return output;
                     },
@@ -127,11 +122,11 @@ var productList = function () {
                 {
                     orderable: true,
                     targets: 3,
-                    className: 'text-start pe-0',
+                    className: 'text-center pe-0',
                     render: function (data, type, full, meta) {
 
                         var output;
-                        output = `<span class="fw-bold">` + `₺` + full.discountedTotal.toLocaleString('tr-TR') + `</span>`
+                        output = `<span class="fw-bold">` + full.subUnitsetCode + `</span>`
 
                         return output;
                     },
@@ -139,67 +134,23 @@ var productList = function () {
                 {
                     orderable: true,
                     targets: 4,
-                    className: 'text-start pe-0',
+                    className: 'text-center pe-0',
                     render: function (data, type, full, meta) {
-                        var parsedDate = new Date(full.dateOfNotification);
 
                         var output;
-
-                        var parsedDate = new Date(full.dateOfNotification);
-                        var newDate = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
-                        if (type == 'display') {
-
-                            let formattedDate = newDate.toLocaleString('tr-TR', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric'
-                            });
-
-
-                            output = ` <span class="fw-bold">` + formattedDate + `</span>`
-                        } else {
-                            var orderableDate = parsedDate.toISOString();
-                            return orderableDate;
-                        }
-
+                        output = `<span class="fw-bold">` + full.brandName + `</span>`
 
                         return output;
-
                     },
                 },
                 {
                     orderable: true,
                     targets: 5,
-                    className: 'text-start pe-0',
+                    className: 'text-center pe-0',
                     render: function (data, type, full, meta) {
                         var output;
-                        var date = "-";
-                        if (full.invoicedOn != null) {
-                            var parsedDate = new Date(full.invoicedOn);
-                            var newDate = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
-                            if (type == 'display') {
-
-                                let formattedDate = newDate.toLocaleString('tr-TR', {
-                                    day: '2-digit',
-                                    month: '2-digit',
-                                    year: 'numeric'
-                                });
-
-
-                                output = ` <span class="fw-bold">` + formattedDate + `</span>`
-                            } else {
-                                var orderableDate = parsedDate.toISOString();
-                                return orderableDate;
-                            }
-                        } else {
-                            output = ` <span class="fw-bold">` + date + `</span>`
-                        }
-
-
-
+                        output = `<input type="checkbox" ${full.isVariant ? 'checked' : ''} onclick="return false;" tabindex="-1" />`;
                         return output;
-
-
                     },
                 },
                 {
@@ -207,20 +158,13 @@ var productList = function () {
                     targets: 6,
                     className: 'text-center pe-0',
                     render: function (data, type, full, meta) {
-                        var value = "";
-                        if (full.county != null) {
-                            value = full.county;
-                        }
                         var output;
-                        output = `
-                      <a href="../TrafficFee/DownloadPdfs?oid=`+ full.oid + `" class="" data-kt-menu-trigger="click" style="margin-right: 10px;">
-    <i class="bi bi-filetype-pdf fs-1"></i>
-</a>
-                        `
-
+                        output = `<input type="checkbox" ${full.locTracking ? 'checked' : ''} onclick="return false;" tabindex="-1" />`;
                         return output;
                     },
                 },
+
+               
 
             ]
         });

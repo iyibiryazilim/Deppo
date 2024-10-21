@@ -1540,13 +1540,13 @@
 					</div>
 					<!--end::Sidebar-->
 					<!--begin::Main-->
-					<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
-						<!--begin::Content wrapper-->
-						<div class="d-flex flex-column flex-column-fluid">
-							<!--begin::Content-->
-                                @RenderBody()
-                            <!--end::Content-->
-						</div>
+				<div class="content d-flex flex-column flex-column-fluid" id="kt_content">
+					<!--begin::Container-->
+					<div class="container-xxl" id="kt_content_container">
+						@RenderBody()
+					</div>
+					<!--end::Container-->
+				</div>
 						<!--end::Content wrapper-->
 						<!--begin::Footer-->
 						<partial name="/Views/Shared/Footer/_Footer.cshtml" />
@@ -4994,35 +4994,35 @@
 		<!--end::Modals-->
 		<!--begin::Javascript-->
 		<script>var hostUrl = "~/assets/";</script>
-		<!--begin::Global Javascript Bundle(mandatory for all pages)-->
-		<script src="~/assets/plugins/global/plugins.bundle.js"></script>
-		<script src="~/assets/js/scripts.bundle.js"></script>
-		<!--end::Global Javascript Bundle-->
-		<!--begin::Vendors Javascript(used for this page only)-->
-		<script src="~/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/radar.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/map.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/geodata/worldLow.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/geodata/continentsLow.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/geodata/usaLow.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/geodata/worldTimeZonesLow.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/geodata/worldTimeZoneAreasLow.js"></script>
-		<script src="~/assets/plugins/custom/datatables/datatables.bundle.js"></script>
-		<!--end::Vendors Javascript-->
-		<!--begin::Custom Javascript(used for this page only)-->
-		<script src="~/assets/js/widgets.bundle.js"></script>
-		<script src="~/assets/js/custom/widgets.js"></script>
-		<script src="~/assets/js/custom/apps/chat/chat.js"></script>
-		<script src="~/assets/js/custom/utilities/modals/upgrade-plan.js"></script>
-		<script src="~/assets/js/custom/utilities/modals/users-search.js"></script>
-        <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    <!--begin::Global Javascript Bundle(mandatory for all pages)-->
+    <script src="~/assets/plugins/global/plugins.bundle.js"></script>
+    <script src="~/assets/js/scripts.bundle.js"></script>
+    <!--end::Global Javascript Bundle-->
+    <!--begin::Vendors Javascript(used for this page only)-->
+    <script src="~/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/radar.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/map.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/geodata/worldLow.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/geodata/continentsLow.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/geodata/usaLow.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/geodata/worldTimeZonesLow.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/geodata/worldTimeZoneAreasLow.js"></script>
+    <script src="~/assets/plugins/custom/datatables/datatables.bundle.js"></script>
+    <!--end::Vendors Javascript-->
+    <!--begin::Custom Javascript(used for this page only)-->
+    <script src="~/assets/js/widgets.bundle.js"></script>
+    <script src="~/assets/js/custom/widgets.js"></script>
+    <script src="~/assets/js/custom/account/settings/profile-details.js"></script>
+    <script src="~/assets/js/custom/account/settings/signin-methods.js"></script>
+    <script src="~/assets/js/custom/apps/chat/chat.js"></script>
+    <script src="~/assets/js/custom/utilities/modals/upgrade-plan.js"></script>
+    <script src="~/assets/js/custom/utilities/modals/create-app.js"></script>
+    <script src="~/assets/js/custom/utilities/modals/users-search.js"></script>
+	@await RenderSectionAsync("Scripts", required: false)
 		<!--end::Custom Javascript-->
 		<!--end::Javascript-->
 	</body>
