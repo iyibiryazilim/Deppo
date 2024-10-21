@@ -60,6 +60,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 
 		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
 		PerformSearchCommand = new Command<Entry>(async (barcodeEntry) => await PerformSearchAsync(barcodeEntry));
+		QuantityTappedCommand = new Command<InputProductBasketModel>(async (item) => await QuantityTappedAsync(item));
 
 		UnitActionTappedCommand = new Command<InputProductBasketModel>(async (item) => await UnitActionTappedAsync(item));
 		SubUnitsetTappedCommand = new Command<SubUnitset>(async (subUnitset) => await SubUnitsetTappedAsync(subUnitset));
@@ -89,6 +90,7 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 	public Command SubUnitsetTappedCommand { get; }
 	public Command UnitActionTappedCommand { get; }
 
+	public Command<InputProductBasketModel> QuantityTappedCommand { get; }
 	public Command<InputProductBasketModel> DeleteItemCommand { get; }
 	public Command<InputProductBasketModel> IncreaseCommand { get; }
 	public Command<InputProductBasketModel> DecreaseCommand { get; }
@@ -263,6 +265,41 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 		}
 	}
 
+	private async Task QuantityTappedAsync(InputProductBasketModel inputProductBasketModel)
+	{
+		if (inputProductBasketModel is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var result = await CurrentPage.DisplayPromptAsync(
+				title: inputProductBasketModel.ItemCode,
+				message: "Miktarı giriniz",
+				cancel: "Vazgeç",
+				accept: "Tamam",
+				initialValue: inputProductBasketModel.Quantity.ToString(),
+				keyboard: Keyboard.Numeric);
+
+			if (string.IsNullOrEmpty(result))
+				return;
+
+			inputProductBasketModel.Quantity = Convert.ToDouble(result);
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 
 	private async Task IncreaseAsync(InputProductBasketModel inputProductBasketModel)
 	{

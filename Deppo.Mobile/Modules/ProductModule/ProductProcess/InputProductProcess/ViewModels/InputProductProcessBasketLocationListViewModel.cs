@@ -40,6 +40,7 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
         _serviceProvider = serviceProvider;
 
         LoadSelectedItemsCommand = new Command(async () => await LoadSelectedItemsAsync());
+        QuantityTappedCommand = new Command<LocationModel>(async (locationModel) => await QuantityTappedAsync(locationModel));
         ShowLocationsCommand = new Command(async () => await ShowLocationsAsync());
         PerformSearchCommand = new Command<Entry>(async (searchBar) => await PerformSearchAsync(searchBar));
         IncreaseCommand = new Command<LocationModel>(async (locationModel) => await IncreaseAsync(locationModel));
@@ -69,6 +70,7 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
     public Page CurrentPage { get; set; }
 
     public Command LoadSelectedItemsCommand { get; }
+    public Command<LocationModel> QuantityTappedCommand { get; }
     public Command<LocationModel> IncreaseCommand { get; }
     public Command<LocationModel> DecreaseCommand { get; }
     public Command<Entry> PerformSearchCommand { get; }
@@ -343,6 +345,42 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
         catch (Exception ex)
         {
             _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task QuantityTappedAsync(LocationModel locationModel)
+    {
+        if (locationModel is null)
+            return;
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            var result = await CurrentPage.DisplayPromptAsync(
+                title: locationModel.Code, 
+                message: "Miktarı giriniz", 
+                cancel: "Vazgeç",
+                accept: "Tamam",
+                initialValue: locationModel.InputQuantity.ToString(), 
+                keyboard: Keyboard.Numeric);
+            
+            if (string.IsNullOrEmpty(result))
+				return;
+
+            locationModel.InputQuantity = Convert.ToDouble(result);
+		}
+        catch (Exception ex)
+        {
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
