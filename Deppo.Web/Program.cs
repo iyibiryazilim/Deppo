@@ -13,6 +13,9 @@ builder.Services.AddHttpClient("helix", c =>
 
 builder.Services.AddSingleton<IAuthenticationService, AuthenticateDataStore>();
 builder.Services.AddTransient<IProductService, ProductDataStoreV2>();
+builder.Services.AddTransient<ICustomerService, CustomerDataStoreV2>();
+builder.Services.AddTransient<ISupplierService, SupplierDataStoreV2>();
+
 
 var app = builder.Build();
 

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Deppo.Core.BaseModels;
+using Deppo.Core.Models;
 
 namespace Deppo.Web.Helpers.MappingHelper
 {
@@ -8,6 +9,9 @@ namespace Deppo.Web.Helpers.MappingHelper
         public MappingProfile()
         {
 			CreateMap<Product, dynamic>();
+			CreateMap<Customer, dynamic>();
+			CreateMap<Supplier, dynamic>();
+
 		}
-    }
+	}
 }
