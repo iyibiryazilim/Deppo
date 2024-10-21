@@ -649,7 +649,10 @@ UNION All ";
         private string GetSalesQuantityQuery(int firmNumber, int periodNumber, int productReferenceId)
         {
             string baseQuery = $@"SELECT ISNULL(SUM(AMOUNT),0) SalesQuantity FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE 
-WHERE STOCKREF = {productReferenceId} AND YEAR(DATE_) = YEAR(GETDATE()) AND TRCODE IN (7,8)";
+WHERE STOCKREF = {productReferenceId} AND YEAR(DATE_) = YEAR(GETDATE()) AND (
+    TRCODE IN (7, 8, 11, 12, 51, 4) 
+    OR (TRCODE = 25 AND CLIENTREF > 0 AND IOCODE = 3)
+)";
 
             return baseQuery;
         }
