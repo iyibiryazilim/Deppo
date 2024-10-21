@@ -50,9 +50,27 @@
                 </Border>
 
                 <VerticalStackLayout Grid.Column="1">
-                    <Label FontAttributes="Bold"
-                           LineBreakMode="TailTruncation"
-                           Text="{Binding ProductCountingBasketModel.ItemCode}" />
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0"
+                               FontAttributes="Bold"
+                               HorizontalOptions="Start"
+                               LineBreakMode="TailTruncation"
+                               Text="{Binding ProductCountingBasketModel.ItemCode}" />
+
+                        <Image Grid.Column="1">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding UnitActionTappedCommand}" />
+                            </Image.GestureRecognizers>
+                            <Image.Source>
+                                <FontImageSource FontFamily="FAS"
+                                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Ellipsis}"
+                                                 Size="Medium"
+                                                 Color="{StaticResource Gray600}" />
+                            </Image.Source>
+                        </Image>
+
+
+                    </Grid>
                     <Label LineBreakMode="TailTruncation"
                            Text="{Binding ProductCountingBasketModel.ItemName}"
                            TextColor="{StaticResource Gray600}" />
