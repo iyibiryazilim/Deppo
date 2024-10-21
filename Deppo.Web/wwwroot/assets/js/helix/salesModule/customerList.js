@@ -1,7 +1,7 @@
 ﻿"use strict";
 
 // Class definition
-var productList = function () {
+var customerList = function () {
     // Shared variables
     var table;
     var datatable;
@@ -19,27 +19,30 @@ var productList = function () {
             info: false,
             order: [],
             pageLength: 10,
-            serverSide: true, 
+            serverSide: true,
             ajax: {
-                url: "Product/GetObjectsJsonResult",
+                url: "Customer/GetObjectsJsonResult",
                 type: "POST",
                 data: function (d) {
                     return {
                         draw: d.draw,
                         start: d.start,
                         length: d.length,
-                        searchText: $('#productSearchInput').val()
+                        searchText: $('#customerSearchInput').val()
                     };
                 }
             },
             columns: [
                 { data: 'code' },
-                { data: 'stockQuantity' },
-                { data: 'unitsetCode' },
-                { data: 'subUnitsetCode' },
-                { data: 'brandName' },
-                { data: 'isVariant' },
-                { data: 'trackingType' },
+                { data: 'email' },
+                { data: 'telephone' },
+                { data: 'tckn' },
+                { data: 'taxOffice' },
+                { data: 'taxNumber' },
+                { data: 'city' },
+                { data: 'country' },
+                { data: 'isPersonal' },
+
 
             ],
 
@@ -53,16 +56,16 @@ var productList = function () {
                         var defaultImageUrl = "/assets/media/images/notfound.png"; // Correct path to your default image
 
                         // Check if imageData is empty or null and use the default image if so
-                        var imageSrc = full.imageData ? `data:image/jpg;base64,${full.imageData}` : defaultImageUrl;
+                        //var imageSrc = full.imageData ? `data:image/jpg;base64,${full.imageData}` : defaultImageUrl;
 
                         output = `
             <div class="d-flex align-items-center">
                 <div class="symbol symbol-40px mb-1" style="margin-right: 2%;"> <!-- Adjusted the margin-right -->
-                    <img src="${imageSrc}" alt="image" />
+                    <img src="${defaultImageUrl}" alt="image" />
                 </div>
                 <div class="d-flex justify-content-start flex-column">
                     <a href="../Vehicle/Detail/?VehicleOid=${full.referenceId}" class="text-dark fw-bold text-hover-primary mb-1 fs-6">${full.code}</a>
-                    <span class="text-muted fw-semibold text-muted d-block fs-7">${full.name}</span>
+                    <span class="text-muted fw-semibold text-muted d-block fs-7">${full.title}</span>
                 </div>
             </div>
         `;
@@ -75,11 +78,11 @@ var productList = function () {
                 {
                     orderable: true,
                     targets: 1,
-                    className: 'text-center pe-0',
+                    className: 'text-start pe-0',
                     render: function (data, type, full, meta) {
 
                         var output;
-                        output = `<span class="fw-bold">` + full.stockQuantity.toLocaleString('tr-TR') + `</span>`
+                        output = `<span class="fw-bold">` + full.email + `</span>`
 
                         return output;
                     },
@@ -87,11 +90,11 @@ var productList = function () {
                 {
                     orderable: true,
                     targets: 2,
-                    className: 'text-center pe-0',
+                    className: 'text-start pe-0',
                     render: function (data, type, full, meta) {
 
                         var output;
-                        output = `<span class="fw-bold">` + full.unitsetCode + `</span>`
+                        output = `<span class="fw-bold">` + full.telephone + `</span>`
 
                         return output;
                     },
@@ -99,11 +102,13 @@ var productList = function () {
                 {
                     orderable: true,
                     targets: 3,
-                    className: 'text-center pe-0',
+                    className: 'text-start pe-0',
                     render: function (data, type, full, meta) {
 
+                        if (full.tckn == null)
+                            full.tckn = "";
                         var output;
-                        output = `<span class="fw-bold">` + full.subUnitsetCode + `</span>`
+                        output = `<span class="fw-bold">` + full.tckn + `</span>`
 
                         return output;
                     },
@@ -111,11 +116,11 @@ var productList = function () {
                 {
                     orderable: true,
                     targets: 4,
-                    className: 'text-center pe-0',
+                    className: 'text-start pe-0',
                     render: function (data, type, full, meta) {
 
                         var output;
-                        output = `<span class="fw-bold">` + full.brandName + `</span>`
+                        output = `<span class="fw-bold">` + full.taxOffice + `</span>`
 
                         return output;
                     },
@@ -123,25 +128,52 @@ var productList = function () {
                 {
                     orderable: true,
                     targets: 5,
-                    className: 'text-center pe-0',
+                    className: 'text-start pe-0',
                     render: function (data, type, full, meta) {
+
                         var output;
-                        output = `<input type="checkbox" ${full.isVariant ? 'checked' : ''} onclick="return false;" tabindex="-1" />`;
+                        output = `<span class="fw-bold">` + full.taxNumber + `</span>`
+
                         return output;
                     },
                 },
                 {
                     orderable: true,
                     targets: 6,
-                    className: 'text-center pe-0',
+                    className: 'text-start pe-0',
+                    render: function (data, type, full, meta) {
+
+                        var output;
+                        output = `<span class="fw-bold">` + full.city + `</span>`
+
+                        return output;
+                    },
+                },
+                {
+                    orderable: true,
+                    targets: 7,
+                    className: 'text-start pe-0',
+                    render: function (data, type, full, meta) {
+
+                        console.log(full)
+                        var output;
+                        output = `<span class="fw-bold">` + full.country + `</span>`
+
+                        return output;
+                    },
+                },
+                {
+                    orderable: true,
+                    targets: 8,
+                    className: 'text-start pe-0',
                     render: function (data, type, full, meta) {
                         var output;
-                        output = `<input type="checkbox" ${full.locTracking ? 'checked' : ''} onclick="return false;" tabindex="-1" />`;
+                        output = `<input type="checkbox" ${full.isPersonel ? 'checked' : ''} onclick="return false;" tabindex="-1" />`;
                         return output;
                     },
                 },
 
-               
+
 
             ]
         });
@@ -154,11 +186,12 @@ var productList = function () {
 
     // Search Datatable --- official docs reference: https://datatables.net/reference/api/search()
     var handleSearchDatatable = () => {
-        const filterSearch = document.querySelector('[product_list_table="search"]');
+        const filterSearch = document.querySelector('[customer_list_table="search"]');
         filterSearch.addEventListener('keyup', function (e) {
             datatable.ajax.reload();
         });
     }
+
 
     // Handle status filter dropdown
     var handleStatusFilter = () => {
@@ -273,7 +306,7 @@ var productList = function () {
     // Public methods
     return {
         init: async function () {
-            table = document.querySelector('#product_list_table');
+            table = document.querySelector('#customer_list_table');
 
             if (!table) {
                 return;
@@ -289,5 +322,5 @@ var productList = function () {
 
 // On document ready
 KTUtil.onDOMContentLoaded(function () {
-    productList.init();
+    customerList.init();
 });
