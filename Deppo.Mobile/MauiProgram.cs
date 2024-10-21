@@ -128,6 +128,7 @@ using DevExpress.Maui;
 using DotNet.Meteor.HotReload.Plugin;
 using Java.Lang;
 using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Controls.Compatibility.Platform.Android;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using ZXing.Net.Maui.Controls;
 
@@ -237,10 +238,18 @@ public static class MauiProgram
 #endif
         });
 
-        #endregion Remove Underline from SearchBar
+		#endregion Remove Underline from SearchBar
+
+		
+#if ANDROID
+		Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoUnderline", (h, v) => {
+			h.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToAndroid());
+            });
+#endif
+
 
 #if DEBUG
-        builder.Logging.AddDebug();
+			builder.Logging.AddDebug();
 #endif
 
         builder.Services.AddSingleton(UserDialogs.Instance);

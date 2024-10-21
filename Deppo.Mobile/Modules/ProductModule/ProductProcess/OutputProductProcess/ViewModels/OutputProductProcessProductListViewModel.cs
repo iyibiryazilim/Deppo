@@ -178,6 +178,8 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
+            _userDialogs.Loading("Loading More Items...");
+
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, SearchText.Text, skip: Items.Count, take: 20);
 
