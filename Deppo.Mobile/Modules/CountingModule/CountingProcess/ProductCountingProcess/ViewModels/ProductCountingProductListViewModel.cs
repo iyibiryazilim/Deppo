@@ -23,28 +23,29 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
     private readonly IVariantService _variantService;
     private readonly IHttpClientService _httpClientService;
 
-    public ProductCountingProductListViewModel(IProductService productService, IUserDialogs userDialogs, IHttpClientService httpClientService, IVariantService variantService)
-    {
-        _productService = productService;
-        _userDialogs = userDialogs;
-        _httpClientService = httpClientService;
-        _variantService = variantService;
 
-        Title = "Malzemeler";
+	public ProductCountingProductListViewModel(IProductService productService, IUserDialogs userDialogs, IHttpClientService httpClientService, IVariantService variantService, ISubUnitsetService subUnitsetService)
+	{
+		_productService = productService;
+		_userDialogs = userDialogs;
+		_httpClientService = httpClientService;
+		_variantService = variantService;
 
-        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
-        LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-        PerformSearchCommand = new Command(async () => await PerformSearchAsync());
-        PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
-        LoadVariantItemsCommand = new Command(async () => await LoadVariantItemsAsync());
-        LoadMoreVariantItemsCommand = new Command(async () => await LoadMoreVariantItemsAsync());
-        VariantTappedCommand = new Command<VariantModel>(async (parameter) => await VariantTappedAsync(parameter));
-        ConfirmVariantCommand = new Command(async () => await ConfirmVariantAsync());
-        ItemTappedCommand = new Command<ProductModel>(ItemTappedAsync);
-        NextViewCommand = new Command(async () => await NextViewAsync());
-    }
+		Title = "Malzemeler";
 
-    [ObservableProperty]
+		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+		PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+		PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
+		LoadVariantItemsCommand = new Command(async () => await LoadVariantItemsAsync());
+		LoadMoreVariantItemsCommand = new Command(async () => await LoadMoreVariantItemsAsync());
+		VariantTappedCommand = new Command<VariantModel>(async (parameter) => await VariantTappedAsync(parameter));
+		ConfirmVariantCommand = new Command(async () => await ConfirmVariantAsync());
+		ItemTappedCommand = new Command<ProductModel>(ItemTappedAsync);
+		NextViewCommand = new Command(async () => await NextViewAsync());
+	}
+
+	[ObservableProperty]
     public ProductModel selectedProduct;
 
     [ObservableProperty]
@@ -250,11 +251,12 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
 
                     SelectedProduct = item;
                     SelectedProduct.IsSelected = true;
-                 
+
+                    ProductCountingBasketModel = new();
                     ProductCountingBasketModel.ItemReferenceId = SelectedProduct.ReferenceId;
                     ProductCountingBasketModel.ItemCode = SelectedProduct.Code;
                     ProductCountingBasketModel.ItemName = SelectedProduct.Name;
-                    //ProductCountingBasketModel.Image = SelectedProduct.Image;
+                    ProductCountingBasketModel.Image = SelectedProduct.ImageData;
                     ProductCountingBasketModel.MainItemReferenceId = default;
                     ProductCountingBasketModel.MainItemCode = string.Empty;
                     ProductCountingBasketModel.MainItemName = string.Empty;

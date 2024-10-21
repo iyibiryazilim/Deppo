@@ -5,6 +5,7 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.CountingModels;
 using Deppo.Mobile.Core.Models.CountingModels.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
@@ -27,6 +28,7 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
     private readonly IUserDialogs _userDialogs;
     private readonly IWarehouseCountingService _warehouseCountingService;
     private readonly ILocationTransactionService _locationTransactionService;
+    private readonly ISubUnitsetService _subUnitsetService;
 
     [ObservableProperty]
     private ProductCountingWarehouseModel productCountingWarehouseModel = null!;
@@ -42,28 +44,33 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
 
 
 
-    public ProductCountingBasketViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IWarehouseCountingService warehouseCountingService, ILocationTransactionService locationTransactionService)
-    {
-        _httpClientService = httpClientService;
-        _userDialogs = userDialogs;
-        _warehouseCountingService = warehouseCountingService;
-        _locationTransactionService = locationTransactionService;
+	public ProductCountingBasketViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IWarehouseCountingService warehouseCountingService, ILocationTransactionService locationTransactionService, ISubUnitsetService subUnitsetService)
+	{
+		_httpClientService = httpClientService;
+		_userDialogs = userDialogs;
+		_warehouseCountingService = warehouseCountingService;
+		_locationTransactionService = locationTransactionService;
+		_subUnitsetService = subUnitsetService;
 
-        Title = "Sepet";
+		Title = "Sepet";
 
-        IncreaseCommand = new Command(async () => await IncreaseAsync());
-        DecreaseCommand = new Command(async () => await DecreaseAsync());
-        NextViewCommand = new Command(async () => await NextViewAsync());
+		IncreaseCommand = new Command(async () => await IncreaseAsync());
+		DecreaseCommand = new Command(async () => await DecreaseAsync());
+		NextViewCommand = new Command(async () => await NextViewAsync());
 
-    }
+        UnitActionTappedCommand = new Command(async () => await UnitActionTappedAsync());
+        SubUnitsetTappedCommand = new Command<SubUnitset>(async (item) => await SubUnitsetTappedAsync(item));
+	}
 
-    public Page CurrentPage { get; set; } = null!;
+	public Page CurrentPage { get; set; } = null!;
 
 
 
     public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
+	public Command UnitActionTappedCommand { get; }
+	public Command SubUnitsetTappedCommand { get; }
 
-    public Command NextViewCommand { get; }
+	public Command NextViewCommand { get; }
     public Command IncreaseCommand { get; }
     public Command DecreaseCommand { get; }
     public Command BackCommand { get; }
@@ -271,4 +278,98 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+	private async Task UnitActionTappedAsync()
+	{
+        if (ProductCountingBasketModel is null)
+            return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			await LoadSubUnitsetsAsync(ProductCountingBasketModel);
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.HalfExpanded;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task LoadSubUnitsetsAsync(ProductCountingBasketModel item)
+	{
+		if (item is null)
+			return;
+		try
+		{
+			item.SubUnitsets.Clear();
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _subUnitsetService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				productReferenceId: item.ItemReferenceId
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var subUnitset in result.Data)
+				{
+					item.SubUnitsets.Add(Mapping.Mapper.Map<SubUnitset>(subUnitset));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+	}
+
+	private async Task SubUnitsetTappedAsync(SubUnitset subUnitset)
+	{
+		if (subUnitset is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			if (ProductCountingBasketModel is not null)
+			{
+				ProductCountingBasketModel.SubUnitsetReferenceId = subUnitset.ReferenceId;
+				ProductCountingBasketModel.SubUnitsetName = subUnitset.Name;
+				ProductCountingBasketModel.SubUnitsetCode = subUnitset.Code;
+			}
+
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.Hidden;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 }
