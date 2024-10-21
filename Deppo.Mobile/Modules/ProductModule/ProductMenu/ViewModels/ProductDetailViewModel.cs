@@ -455,9 +455,18 @@ public partial class ProductDetailViewModel : BaseViewModel
                 if (result.Data is null)
                     return;
 
-                ProductDetailModel.ProductInputOutputModels.Clear();
-                foreach (var item in result.Data)
-                    ProductDetailModel.ProductInputOutputModels.Add(Mapping.Mapper.Map<ProductDetailInputOutputModel>(item));
+				List<ProductDetailInputOutputModel> cacheItems = new();
+
+				foreach (var item in result.Data)
+				{
+					var value = Mapping.Mapper.Map<ProductDetailInputOutputModel>(item);
+					cacheItems.Add(value);
+				}
+
+				ProductDetailModel.ProductInputOutputModels.Clear();
+				foreach (var item in cacheItems.OrderBy(x => x.ArgumentDay))
+					ProductDetailModel.ProductInputOutputModels.Add(item);
+				
             }
         }
         catch (Exception ex)

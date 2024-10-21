@@ -1,7 +1,18 @@
+using Deppo.Core.DataStores;
+using Deppo.Core.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddHttpClient("helix", c =>
+{
+	c.BaseAddress = new Uri("http://172.16.1.25:52789");
+});
+
+builder.Services.AddSingleton<IAuthenticationService, AuthenticateDataStore>();
+builder.Services.AddTransient<IProductService, ProductDataStoreV2>();
 
 var app = builder.Build();
 
