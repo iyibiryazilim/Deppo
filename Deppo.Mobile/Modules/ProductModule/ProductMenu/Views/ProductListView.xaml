@@ -69,7 +69,7 @@
                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProductListViewModel}}, Path=ItemTappedCommand}"
                                                   CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>
-                        <Grid ColumnDefinitions="Auto,*"
+                        <Grid ColumnDefinitions="Auto,*,Auto"
                               ColumnSpacing="10">
                             <Border StrokeShape="RoundRectangle 5"
                                     StrokeThickness="0.5">
@@ -102,11 +102,39 @@
                                                              Color="{StaticResource Primary}" />
                                         </Image.Source>
                                     </Image>
-                                    <Label Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
-                                           TextColor="{StaticResource Gray600}"
-                                           VerticalOptions="Center" />
+                                    <Label>
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span FontAttributes="Bold"
+                                                      Text="{Binding StockQuantity, StringFormat='{0:N2}'}" />
+                                                <Span Text="  " />
+                                                <Span Text="{Binding SubUnitsetCode}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
                                 </HorizontalStackLayout>
                             </VerticalStackLayout>
+                            <Grid Grid.Column="2"
+                                  ColumnDefinitions="Auto, Auto, Auto"
+                                  ColumnSpacing="3"
+                                  HorizontalOptions="End"
+                                  VerticalOptions="Start">
+                                <Label Grid.Column="0"
+                                       FontFamily="FAS"
+                                       FontSize="10"
+                                       Text="{Binding VariantIcon}"
+                                       TextColor="{Binding VariantIconColor}" />
+                                <Label Grid.Column="1"
+                                       FontFamily="FAS"
+                                       FontSize="10"
+                                       Text="{Binding LocTrackingIcon}"
+                                       TextColor="{Binding LocTrackingIconColor}" />
+                                <Label Grid.Column="2"
+                                       FontFamily="FAS"
+                                       FontSize="10"
+                                       Text="{Binding TrackingTypeIcon}"
+                                       TextColor="{Binding TrackingTypeIconColor}" />
+                            </Grid>
                         </Grid>
                     </Border>
                 </DataTemplate>

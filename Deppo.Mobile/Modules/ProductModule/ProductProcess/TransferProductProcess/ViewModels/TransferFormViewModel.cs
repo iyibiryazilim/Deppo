@@ -5,10 +5,14 @@ using Deppo.Core.DTOs.TransferTransaction;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.TransferModels;
+using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Helpers.TransactionAuditHelpers;
 using Deppo.Mobile.Modules.ResultModule;
 using Deppo.Mobile.Modules.ResultModule.Views;
+using Deppo.Sys.Service.Services;
+using DevExpress.Maui.Core.Internal;
 using System.Collections.ObjectModel;
 using System.Security.Cryptography.X509Certificates;
 
@@ -21,33 +25,37 @@ public partial class TransferFormViewModel : BaseViewModel
     private readonly ITransferTransactionService _transferTransactionService;
     private readonly IServiceProvider _serviceProvider;
     private readonly IUserDialogs _userDialogs;
+    private readonly ITransactionAuditService _transactionAuditService;
+    private readonly IHttpClientSysService _httpClientSysService;
+    private readonly ITransactionAuditHelperService _transactionAuditHelperService;
 
     [ObservableProperty]
-    TransferBasketModel transferBasketModel = null!;
+    private TransferBasketModel transferBasketModel = null!;
 
     [ObservableProperty]
-    DateTime ficheDate = DateTime.Now;
+    private DateTime ficheDate = DateTime.Now;
 
     [ObservableProperty]
-    string documentNumber = string.Empty;
+    private string documentNumber = string.Empty;
 
     [ObservableProperty]
-    string documentTrackingNumber = string.Empty;
+    private string documentTrackingNumber = string.Empty;
 
     [ObservableProperty]
-    string specialCode = string.Empty;
+    private string specialCode = string.Empty;
 
     [ObservableProperty]
-    string description = string.Empty;
+    private string description = string.Empty;
 
-
-
-    public TransferFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ITransferTransactionService transferTransactionService, IServiceProvider serviceProvider)
+    public TransferFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ITransferTransactionService transferTransactionService, IServiceProvider serviceProvider, ITransactionAuditService transactionAuditService, IHttpClientSysService httpClientSysService, ITransactionAuditHelperService transactionAuditHelperService)
     {
         _httpClientService = httpClientService;
         _transferTransactionService = transferTransactionService;
         _serviceProvider = serviceProvider;
         _userDialogs = userDialogs;
+        _transactionAuditService = transactionAuditService;
+        _httpClientSysService = httpClientSysService;
+        _transactionAuditHelperService = transactionAuditHelperService;
 
         Title = "Ambar Transfer Formu";
         //LoadPageCommand = new Command(async () => await LoadPageAsync());
@@ -76,7 +84,6 @@ public partial class TransferFormViewModel : BaseViewModel
     //	}
     //	catch (System.Exception)
     //	{
-
     //		throw;
     //	}
     //	finally
@@ -96,11 +103,9 @@ public partial class TransferFormViewModel : BaseViewModel
 
     //		CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
 
-
     //	}
     //	catch (System.Exception)
     //	{
-
     //		throw;
     //	}
     //	finally
@@ -109,15 +114,12 @@ public partial class TransferFormViewModel : BaseViewModel
     //	}
     //}
 
-
     private async Task SaveAsync()
     {
         if (IsBusy)
             return;
         try
         {
-
-
             IsBusy = true;
             _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
             await Task.Delay(1000);
@@ -151,12 +153,11 @@ public partial class TransferFormViewModel : BaseViewModel
                             Locations.Add(location);
                         }
                     }
-
                 }
 
                 var transferTransactionLineDto = new TransferTransactionLineDto
                 {
-                    ProductCode = item.IsVariant?  item.MainItemCode : item.ItemCode,
+                    ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
                     VariantCode = item.IsVariant ? item.ItemCode : string.Empty,
                     WarehouseNumber = TransferBasketModel.OutWarehouse.Number,
                     DestinationWarehouseNumber = TransferBasketModel.InWarehouse.Number,
@@ -168,7 +169,6 @@ public partial class TransferFormViewModel : BaseViewModel
 
                 foreach (var locationTransaction in item.LocationTransactions)
                 {
-
                     foreach (var location in Locations)
                     {
                         if (location.InputQuantity <= 0)
@@ -195,14 +195,10 @@ public partial class TransferFormViewModel : BaseViewModel
                         if (locationTransaction.Quantity <= 0)
                             break;
                     }
-
                 }
 
                 transferTransactionInsertDto.Lines.Add(transferTransactionLineDto);
-
             }
-
-
 
             var result = await _transferTransactionService.InsertTransferTransaction(httpClient, transferTransactionInsertDto, _httpClientService.FirmNumber);
             Console.WriteLine(result);
@@ -214,6 +210,26 @@ public partial class TransferFormViewModel : BaseViewModel
                 resultModel.Code = result.Data.Code;
                 resultModel.PageTitle = "Ambar Transferi";
                 resultModel.PageCountToBack = 7;
+
+                try
+                {
+                    await _transactionAuditHelperService.InsertProducTransactionAuditAsync(firmNumber: _httpClientService.FirmNumber,
+                        periodNumber: _httpClientService.PeriodNumber,
+                        ioType: 2,
+                        transactionType: 25,
+                        transactionDate: FicheDate,
+                        transactionReferenceId: result.Data.ReferenceId,
+                        transactionNumber: result.Data.Code,
+                        documentNumber: DocumentNumber,
+                        warehouseNumber: TransferBasketModel.OutWarehouse.Number,
+                        warehouseName: TransferBasketModel.OutWarehouse.Name,
+                        productReferenceCount: default
+                      );
+                }
+                catch (Exception ex)
+                {
+                    _userDialogs.Alert(ex.Message, "HAta", "Tamam");
+                }
 
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();
@@ -227,7 +243,6 @@ public partial class TransferFormViewModel : BaseViewModel
             }
             else
             {
-
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();
 
@@ -241,8 +256,6 @@ public partial class TransferFormViewModel : BaseViewModel
                     [nameof(ResultModel)] = resultModel
                 });
             }
-
-
         }
         catch (Exception ex)
         {
@@ -272,9 +285,6 @@ public partial class TransferFormViewModel : BaseViewModel
         SpecialCode = string.Empty;
         Description = string.Empty;
         FicheDate = DateTime.Now;
-
-
-
     }
 
     private async Task BackAsync()
@@ -296,7 +306,6 @@ public partial class TransferFormViewModel : BaseViewModel
             Description = string.Empty;
             FicheDate = DateTime.Now;
 
-
             await Shell.Current.GoToAsync("..");
         }
         catch (Exception ex)
@@ -309,4 +318,3 @@ public partial class TransferFormViewModel : BaseViewModel
         }
     }
 }
-

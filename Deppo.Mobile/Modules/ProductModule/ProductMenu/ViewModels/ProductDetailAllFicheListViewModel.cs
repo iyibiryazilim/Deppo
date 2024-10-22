@@ -40,7 +40,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels
             _productDetailAllFichesService = productDetailAllFichesService;
             _userDialogs = userDialogs;
 
-            Title = "Hareketler";
+            Title = "Malzeme Hareketleri";
 
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
             LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
@@ -193,16 +193,31 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels
                 Transactions.Clear();
 
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _productDetailAllFichesService.GetTransactionsByFiche(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, ficheReferenceId: SelectedItem.ReferenceId, productRefrenceId: ProductDetailModel.Product.ReferenceId, skip: Transactions.Count, take: 20);
-                if (result.IsSuccess)
+                var result = await _productDetailAllFichesService.GetTransactionsByFiche(
+                    httpClient: httpClient,
+                    firmNumber: _httpClientService.FirmNumber,
+                    periodNumber: _httpClientService.PeriodNumber,
+                    ficheReferenceId: SelectedItem.ReferenceId,
+                    productRefrenceId: ProductDetailModel.Product.ReferenceId,
+                    skip: Transactions.Count,
+                    take: 20
+                );
+
+                if (result.IsSuccess && result.Data is not null)
                 {
-                    if (result.Data is null)
-                        return;
-
                     foreach (var item in result.Data)
-                        Transactions.Add(Mapping.Mapper.Map<ProductTransaction>(item));
+                    {
+                        var transaction = Mapping.Mapper.Map<ProductTransaction>(item);
 
-                    if (!Transactions.Any(x => x.ReferenceId == productFiche.ReferenceId))
+                        // Aynı `ReferenceId`'ye sahip bir transaction varsa ekleme
+                        if (!Transactions.Any(x => x.ReferenceId == transaction.ReferenceId))
+                        {
+                            Transactions.Add(transaction);
+                        }
+                    }
+
+                    // Aynı `ReferenceId`'ye sahip bir `ProductFiche` yoksa ekle
+                    if (!Items.Any(x => x.ReferenceId == productFiche.ReferenceId))
                     {
                         Items.Add(productFiche);
                     }
@@ -223,22 +238,37 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels
         {
             if (IsBusy)
                 return;
+
             try
             {
                 IsBusy = true;
 
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _productDetailAllFichesService.GetTransactionsByFiche(httpClient: httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, ficheReferenceId: SelectedItem.ReferenceId, productRefrenceId: ProductDetailModel.Product.ReferenceId, skip: Transactions.Count, take: 20);
-                if (result.IsSuccess)
+                var result = await _productDetailAllFichesService.GetTransactionsByFiche(
+                    httpClient: httpClient,
+                    firmNumber: _httpClientService.FirmNumber,
+                    periodNumber: _httpClientService.PeriodNumber,
+                    ficheReferenceId: SelectedItem.ReferenceId,
+                    productRefrenceId: ProductDetailModel.Product.ReferenceId,
+                    skip: Transactions.Count,
+                    take: 20
+                );
+
+                if (result.IsSuccess && result.Data is not null)
                 {
-                    if (result.Data is null)
-                        return;
-
                     foreach (var item in result.Data)
-                        Transactions.Add(Mapping.Mapper.Map<ProductTransaction>(item));
-                }
-                _userDialogs.HideHud();
+                    {
+                        var transaction = Mapping.Mapper.Map<ProductTransaction>(item);
 
+                        // Aynı `ReferenceId`'ye sahip bir transaction varsa ekleme
+                        if (!Transactions.Any(x => x.ReferenceId == transaction.ReferenceId))
+                        {
+                            Transactions.Add(transaction);
+                        }
+                    }
+                }
+
+                _userDialogs.HideHud();
             }
             catch (Exception ex)
             {

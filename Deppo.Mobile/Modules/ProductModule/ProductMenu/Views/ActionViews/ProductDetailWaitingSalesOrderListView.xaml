@@ -30,7 +30,6 @@
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
-
     <Grid RowDefinitions="Auto, *"
           RowSpacing="10">
         <Grid Grid.Row="0"
@@ -54,7 +53,8 @@
                 </ImageButton.Source>
             </ImageButton>
         </Grid>
-        <CollectionView Grid.Row="1" ItemsSource="{Binding Items}"
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Items}"
                         RemainingItemsThreshold="2"
                         RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
             <CollectionView.ItemTemplate>
@@ -105,11 +105,11 @@
                                     <Label Text="{Binding WaitingQuantity, StringFormat='{0:N2}'}"
                                            TextColor="{StaticResource Gray600}"
                                            VerticalOptions="Center" />
+                                    <Label Text="{Binding SubUnitsetCode}"
+                                           TextColor="{StaticResource Gray600}" />
                                 </HorizontalStackLayout>
                             </VerticalStackLayout>
-
                         </Grid>
-
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

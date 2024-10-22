@@ -13,6 +13,9 @@ public partial class ProductDetailModel : ObservableObject
     private Product product = null!;
 
     [ObservableProperty]
+    private ProductModel productModel = null!;
+
+    [ObservableProperty]
     private double inputQuantity;
 
     [ObservableProperty]

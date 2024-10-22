@@ -124,7 +124,10 @@
                                             <Label Grid.Column="1">
                                                 <Label.FormattedText>
                                                     <FormattedString>
-                                                        <Span FontAttributes="Bold" Text="{Binding Quantity}" />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding Quantity, StringFormat='{0:N2}'}"
+                                                              TextColor="{StaticResource OffBlack}" />
+
                                                         <Span Text=" " />
                                                         <Span FontAttributes="Bold" Text="{Binding SubUnitsetCode}" />
                                                     </FormattedString>

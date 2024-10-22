@@ -13,8 +13,10 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Helpers.TransactionAuditHelpers;
 using Deppo.Mobile.Modules.ResultModule;
 using Deppo.Mobile.Modules.ResultModule.Views;
+using Deppo.Sys.Service.Services;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -28,43 +30,44 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess
 [QueryProperty(name: nameof(Items), queryId: nameof(Items))]
 public partial class OutputProductProcessFormViewModel : BaseViewModel
 {
-	private readonly IHttpClientService _httpClientService;
-	private readonly IConsumableTransactionService _consumableTransactionService;
+    private readonly IHttpClientService _httpClientService;
+    private readonly IConsumableTransactionService _consumableTransactionService;
     private readonly IWastageTransactionService _wastageTransactionService;
     private readonly IOutCountingTransactionService _outCountingTransactionService;
     private readonly IUserDialogs _userDialogs;
     private readonly IServiceProvider _serviceProvider;
     private readonly ILocationTransactionService _locationTransactionService;
-
+    private readonly ITransactionAuditService _transactionAuditService;
+    private readonly IHttpClientSysService _httpClientSysService;
+    private readonly ITransactionAuditHelperService _transactionAuditHelperService;
 
     [ObservableProperty]
-	OutputProductProcessType outputProductProcessType;
+    private OutputProductProcessType outputProductProcessType;
 
-	[ObservableProperty]
-	WarehouseModel warehouseModel = null!;
+    [ObservableProperty]
+    private WarehouseModel warehouseModel = null!;
 
-	[ObservableProperty]
-	ObservableCollection<OutputProductBasketModel> items = null!;
+    [ObservableProperty]
+    private ObservableCollection<OutputProductBasketModel> items = null!;
 
-    ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
+    private ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
 
-	[ObservableProperty]
-	string documentNumber = string.Empty;
+    [ObservableProperty]
+    private string documentNumber = string.Empty;
 
-	[ObservableProperty]
-	DateTime transactionDate = DateTime.Now;
+    [ObservableProperty]
+    private DateTime transactionDate = DateTime.Now;
 
-	[ObservableProperty]
-	string description = string.Empty;
+    [ObservableProperty]
+    private string description = string.Empty;
 
-	[ObservableProperty]
-	string documentTrackingNumber = string.Empty;
+    [ObservableProperty]
+    private string documentTrackingNumber = string.Empty;
 
-	[ObservableProperty]
-	string specialCode = string.Empty;
+    [ObservableProperty]
+    private string specialCode = string.Empty;
 
-
-    public OutputProductProcessFormViewModel(IHttpClientService httpClientService, IConsumableTransactionService consumableTransactionService, IUserDialogs userDialogs, IWastageTransactionService wastageTransactionService, IOutCountingTransactionService outCountingTransactionService, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService)
+    public OutputProductProcessFormViewModel(IHttpClientService httpClientService, IConsumableTransactionService consumableTransactionService, IUserDialogs userDialogs, IWastageTransactionService wastageTransactionService, IOutCountingTransactionService outCountingTransactionService, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService, ITransactionAuditService transactionAuditService, IHttpClientSysService httpClientSysService, ITransactionAuditHelperService transactionAuditHelperService)
     {
         _httpClientService = httpClientService;
         _consumableTransactionService = consumableTransactionService;
@@ -72,89 +75,92 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
         _outCountingTransactionService = outCountingTransactionService;
         _userDialogs = userDialogs;
         _serviceProvider = serviceProvider;
+        _locationTransactionService = locationTransactionService;
+        _transactionAuditService = transactionAuditService;
+        _httpClientSysService = httpClientSysService;
+        _transactionAuditHelperService = transactionAuditHelperService;
 
         Items = new();
         SaveCommand = new Command(async () => await SaveAsync());
         LoadPageCommand = new Command(async () => await LoadPageAsync());
         ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
         BackCommand = new Command(async () => await BackAsync());
-        _locationTransactionService = locationTransactionService;
     }
+
     public Page CurrentPage { get; set; }
 
     public Command SaveCommand { get; }
-	public Command LoadPageCommand { get; }
-	public Command ShowBasketItemCommand { get; }
+    public Command LoadPageCommand { get; }
+    public Command ShowBasketItemCommand { get; }
     public Command BackCommand { get; }
 
-	private async Task LoadPageAsync()
-	{
-		if (IsBusy)
-			return;
+    private async Task LoadPageAsync()
+    {
+        if (IsBusy)
+            return;
 
-		try
-		{
-			IsBusy = true;
+        try
+        {
+            IsBusy = true;
 
-			Title = GetEnumDescription(OutputProductProcessType);
-			CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
-		}
-		catch (Exception ex)
-		{
-            if(_userDialogs.IsHudShowing)
+            Title = GetEnumDescription(OutputProductProcessType);
+            CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
 
-           await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-	private async Task ShowBasketItemAsync()
-	{
-		if (IsBusy)
-			return;
+    private async Task ShowBasketItemAsync()
+    {
+        if (IsBusy)
+            return;
 
-		try
-		{
-			IsBusy = true;
+        try
+        {
+            IsBusy = true;
 
-			CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+            CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-	public static string GetEnumDescription(Enum value)
-	{
-		FieldInfo fi = value.GetType().GetField(value.ToString());
+    public static string GetEnumDescription(Enum value)
+    {
+        FieldInfo fi = value.GetType().GetField(value.ToString());
 
-		DescriptionAttribute[] attributes = fi.GetCustomAttributes(typeof(DescriptionAttribute), false) as DescriptionAttribute[];
+        DescriptionAttribute[] attributes = fi.GetCustomAttributes(typeof(DescriptionAttribute), false) as DescriptionAttribute[];
 
-		if (attributes != null && attributes.Any())
-		{
-			return attributes.First().Description;
-		}
+        if (attributes != null && attributes.Any())
+        {
+            return attributes.First().Description;
+        }
 
-		return value.ToString();
-	}
+        return value.ToString();
+    }
 
-    public async Task LoadLocationTransaction(OutputProductBasketModel outputProductBasketModel,OutputProductBasketDetailModel outputProductBasketDetailModel)
+    public async Task LoadLocationTransaction(OutputProductBasketModel outputProductBasketModel, OutputProductBasketDetailModel outputProductBasketDetailModel)
     {
         try
         {
-
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _locationTransactionService.GetInputObjectsAsync(
                 httpClient: httpClient,
@@ -177,7 +183,6 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
                 {
                     LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
                 }
-
             }
 
             _userDialogs.Loading().Hide();
@@ -191,11 +196,12 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-	private async Task SaveAsync()
-	{
-		if (IsBusy)
-			return;
-		try
+
+    private async Task SaveAsync()
+    {
+        if (IsBusy)
+            return;
+        try
         {
             IsBusy = true;
 
@@ -205,35 +211,36 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 
             _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
             await Task.Delay(1000);
-         
+
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            switch(OutputProductProcessType)
+            switch (OutputProductProcessType)
             {
                 case OutputProductProcessType.ConsumableProcess:
                     await ConsumableTransactionInsertAsync(httpClient);
                     break;
+
                 case OutputProductProcessType.WasteProcess:
                     await WastageTransactionInsertAsync(httpClient);
                     break;
+
                 case OutputProductProcessType.UnderCountProcess:
                     await OutCountingTransactionInsert(httpClient);
                     break;
             }
-
         }
         catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
     private async Task ConsumableTransactionInsertAsync(HttpClient httpClient)
     {
@@ -248,7 +255,6 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
             FirmNumber = _httpClientService.FirmNumber,
             SpeCode = SpecialCode,
             WarehouseNumber = WarehouseModel.Number,
-
         };
 
         foreach (var item in Items)
@@ -266,8 +272,8 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 
             foreach (var detail in item.Details)
             {
-                await LoadLocationTransaction(item,detail);
-                    LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
+                await LoadLocationTransaction(item, detail);
+                LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
 
                 foreach (var locationTransaction in LocationTransactions)
                 {
@@ -288,14 +294,8 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
                         locationTransaction.RemainingQuantity -= (double)serilotTransactionDto.Quantity;
                         consumableTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
                         item.Quantity -= (double)serilotTransactionDto.Quantity;
-
-
                     }
-
-
                 }
-
-
             }
 
             consumableTransactionDto.Lines.Add(consumableTransactionLineDto);
@@ -311,12 +311,30 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
             resultModel.PageTitle = Title;
             resultModel.PageCountToBack = 4;
 
+            try
+            {
+                await _transactionAuditHelperService.InsertProducTransactionAuditAsync(firmNumber: _httpClientService.FirmNumber,
+                    periodNumber: _httpClientService.PeriodNumber,
+                    ioType: 3,
+                    transactionType: 12,
+                    transactionDate: TransactionDate,
+                    transactionReferenceId: result.Data.ReferenceId,
+                    transactionNumber: result.Data.Code,
+                    documentNumber: DocumentNumber,
+                    warehouseNumber: WarehouseModel.Number,
+                    warehouseName: WarehouseModel.Name,
+                    productReferenceCount: Items.Count
+                    );
+            }
+            catch (Exception ex)
+            {
+                _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+            }
+
             await ClearFormAsync();
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
-
-
 
             await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
             {
@@ -351,7 +369,6 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
             FirmNumber = _httpClientService.FirmNumber,
             SpeCode = SpecialCode,
             WarehouseNumber = WarehouseModel.Number,
-
         };
 
         foreach (var item in Items)
@@ -369,7 +386,7 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 
             foreach (var detail in item.Details)
             {
-                await LoadLocationTransaction(item,detail);
+                await LoadLocationTransaction(item, detail);
                 LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
 
                 foreach (var locationTransaction in LocationTransactions)
@@ -391,11 +408,7 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
                         locationTransaction.RemainingQuantity -= (double)serilotTransactionDto.Quantity;
                         wastageTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
                         item.Quantity -= (double)serilotTransactionDto.Quantity;
-
-
                     }
-
-
                 }
 
                 wastageTransactionDto.Lines.Add(wastageTransactionLineDto);
@@ -410,6 +423,27 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
                 resultModel.Code = result.Data.Code;
                 resultModel.PageTitle = Title;
                 resultModel.PageCountToBack = 4;
+
+                try
+                {
+                    await _transactionAuditHelperService.InsertProducTransactionAuditAsync(firmNumber: _httpClientService.FirmNumber,
+                        periodNumber: _httpClientService.PeriodNumber,
+                        ioType: 3,
+                        transactionType: 11,
+                        transactionDate: TransactionDate,
+                        transactionReferenceId: result.Data.ReferenceId,
+                        transactionNumber: result.Data.Code,
+                        documentNumber: DocumentNumber,
+                        warehouseNumber: WarehouseModel.Number,
+                        warehouseName: WarehouseModel.Name,
+                        productReferenceCount: Items.Count
+
+                        );
+                }
+                catch (Exception ex)
+                {
+                    _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+                }
 
                 await ClearFormAsync();
                 if (_userDialogs.IsHudShowing)
@@ -449,7 +483,6 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
             FirmNumber = _httpClientService.FirmNumber,
             SpeCode = SpecialCode,
             WarehouseNumber = WarehouseModel.Number,
-
         };
 
         foreach (var item in Items)
@@ -489,7 +522,6 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
                         locationTransaction.RemainingQuantity -= (double)serilotTransactionDto.Quantity;
                         outCountingTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
                         item.Quantity -= (double)serilotTransactionDto.Quantity;
-
                     }
                 }
             }
@@ -505,6 +537,27 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
             resultModel.Code = result.Data.Code;
             resultModel.PageTitle = Title;
             resultModel.PageCountToBack = 4;
+
+            try
+            {
+                await _transactionAuditHelperService.InsertProducTransactionAuditAsync(firmNumber: _httpClientService.FirmNumber,
+                    periodNumber: _httpClientService.PeriodNumber,
+                    ioType: 3,
+                    transactionType: 51,
+                    transactionDate: TransactionDate,
+                    transactionReferenceId: result.Data.ReferenceId,
+                    transactionNumber: result.Data.Code,
+                    documentNumber: DocumentNumber,
+                    warehouseNumber: WarehouseModel.Number,
+                    warehouseName: WarehouseModel.Name,
+                    productReferenceCount: Items.Count
+
+                    );
+            }
+            catch (Exception ex)
+            {
+                _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+            }
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
@@ -538,17 +591,17 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
         {
             IsBusy = true;
 
-			var confirm = await _userDialogs.ConfirmAsync("Form verileriniz silinecektir. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
-			if (!confirm)
-				return;
+            var confirm = await _userDialogs.ConfirmAsync("Form verileriniz silinecektir. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+            if (!confirm)
+                return;
 
             await ClearFormAsync();
 
             await Shell.Current.GoToAsync("..");
-		}
+        }
         catch (Exception ex)
         {
-            if(_userDialogs.IsHudShowing)
+            if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
 
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -563,11 +616,11 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
     {
         try
         {
-			DocumentNumber = string.Empty;
-			TransactionDate = DateTime.Now;
-			Description = string.Empty;
-			DocumentTrackingNumber = string.Empty;
-			SpecialCode = string.Empty;
+            DocumentNumber = string.Empty;
+            TransactionDate = DateTime.Now;
+            Description = string.Empty;
+            DocumentTrackingNumber = string.Empty;
+            SpecialCode = string.Empty;
 
             var basketViewModel = _serviceProvider.GetRequiredService<OutputProductProcessBasketListViewModel>();
             var productListViewModel = _serviceProvider.GetRequiredService<OutputProductProcessProductListViewModel>();
@@ -575,26 +628,26 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 
             foreach (var item in productListViewModel.Items)
                 item.IsSelected = false;
-            
+
             productListViewModel.Items.Clear();
             productListViewModel.SelectedProducts.Clear();
 
             foreach (var item in basketViewModel.Items)
                 item.Details.Clear();
-           
+
             basketViewModel.Items.Clear();
 
             foreach (var item in warehouseListViewModel.Items)
                 item.IsSelected = false;
-            
+
             warehouseListViewModel.SelectedWarehouseModel = null;
         }
         catch (Exception ex)
         {
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-		}
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
     }
 }

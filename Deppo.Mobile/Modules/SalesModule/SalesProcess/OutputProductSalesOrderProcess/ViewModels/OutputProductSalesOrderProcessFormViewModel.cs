@@ -13,8 +13,10 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Helpers.TransactionAuditHelpers;
 using Deppo.Mobile.Modules.ResultModule;
 using Deppo.Mobile.Modules.ResultModule.Views;
+using Deppo.Sys.Service.Services;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
 
@@ -33,45 +35,49 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
     private readonly IServiceProvider _serviceProvider;
     private readonly IUserDialogs _userDialogs;
     private readonly ILocationTransactionService _locationTransactionService;
+    private readonly ITransactionAuditService _transactionAuditService;
+    private readonly IHttpClientSysService _httpClientSysService;
+    private readonly ITransactionAuditHelperService _transactionAuditHelperService;
 
     [ObservableProperty]
-    WarehouseModel warehouseModel = null!;
+    private WarehouseModel warehouseModel = null!;
 
     [ObservableProperty]
-    SalesCustomer salesCustomer = null!;
+    private SalesCustomer salesCustomer = null!;
 
     [ObservableProperty]
-    ObservableCollection<OutputSalesBasketModel> items = null!;
+    private ObservableCollection<OutputSalesBasketModel> items = null!;
 
-    ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
+    private ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
 
     public ObservableCollection<Carrier> Carriers { get; } = new();
     public ObservableCollection<Driver> Drivers { get; } = new();
 
     [ObservableProperty]
-    Carrier? selectedCarrier;
-    [ObservableProperty]
-    Driver? selectedDriver;
+    private Carrier? selectedCarrier;
 
     [ObservableProperty]
-    DateTime transactionDate = DateTime.Now;
+    private Driver? selectedDriver;
 
     [ObservableProperty]
-    string documentNumber = string.Empty;
+    private DateTime transactionDate = DateTime.Now;
 
     [ObservableProperty]
-    string documentTrackingNumber = string.Empty;
+    private string documentNumber = string.Empty;
 
     [ObservableProperty]
-    string specialCode = string.Empty;
+    private string documentTrackingNumber = string.Empty;
 
     [ObservableProperty]
-    string description = string.Empty;
+    private string specialCode = string.Empty;
 
     [ObservableProperty]
-    string cargoTrackingNumber = string.Empty;
+    private string description = string.Empty;
 
-    public OutputProductSalesOrderProcessFormViewModel(IHttpClientService httpClientService, ICarrierService carrierService, IDriverService driverService, IUserDialogs userDialogs, IRetailSalesDispatchTransactionService retailSalesDispatchTransactionService, IWholeSalesDispatchTransactionService wholeSalesDispatchTransactionService, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService)
+    [ObservableProperty]
+    private string cargoTrackingNumber = string.Empty;
+
+    public OutputProductSalesOrderProcessFormViewModel(IHttpClientService httpClientService, ICarrierService carrierService, IDriverService driverService, IUserDialogs userDialogs, IRetailSalesDispatchTransactionService retailSalesDispatchTransactionService, IWholeSalesDispatchTransactionService wholeSalesDispatchTransactionService, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService, ITransactionAuditService transactionAuditService, IHttpClientSysService httpClientSysService, ITransactionAuditHelperService transactionAuditHelperService)
     {
         _httpClientService = httpClientService;
 
@@ -81,7 +87,10 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
         _retailSalesDispatchTransactionService = retailSalesDispatchTransactionService;
         _wholeSalesDispatchTransactionService = wholeSalesDispatchTransactionService;
         _serviceProvider = serviceProvider;
-
+        _locationTransactionService = locationTransactionService;
+        _transactionAuditHelperService = transactionAuditHelperService;
+        _httpClientSysService = httpClientSysService;
+        _transactionAuditService = transactionAuditService;
 
         Title = "Sevk İşlemi";
 
@@ -94,7 +103,6 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 
         LoadCarriersCommand = new Command(async () => await LoadCarriersAsync());
         LoadDriversCommand = new Command(async () => await LoadDriversAsync());
-        _locationTransactionService = locationTransactionService;
     }
 
     public Page CurrentPage { get; set; } = null!;
@@ -109,7 +117,6 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 
     public Command SelectWholeCommand { get; }
     public Command SelectRetailCommand { get; }
-
 
     private async Task ShowBasketItemAsync()
     {
@@ -144,7 +151,6 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
             IsBusy = true;
 
             CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
-
         }
         catch (Exception ex)
         {
@@ -256,7 +262,6 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
             IsBusy = true;
 
             await OpenInsertOptionsAsync();
-
         }
         catch (Exception ex)
         {
@@ -287,7 +292,6 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
                 await CloseInsertOptionsAsync();
                 return;
             }
-
 
             _userDialogs.Loading("İşlem tamamlanıyor...");
             await Task.Delay(1000);
@@ -350,7 +354,6 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
     {
         try
         {
-
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _locationTransactionService.GetInputObjectsAsync(
                 httpClient: httpClient,
@@ -373,7 +376,6 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
                 {
                     LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
                 }
-
             }
 
             _userDialogs.Loading().Hide();
@@ -411,7 +413,6 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
             FirmNumber = _httpClientService.FirmNumber,
             SpeCode = SpecialCode,
             WarehouseNumber = WarehouseModel.Number,
-
         };
 
         foreach (var item in Items)
@@ -451,10 +452,8 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
                         wholeSalesDispatchTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
                         locationTransaction.RemainingQuantity -= (double)serilotTransactionDto.Quantity;
                         item.OutputQuantity -= (double)serilotTransactionDto.Quantity;
-
                     }
                 }
-
             }
 
             dto.Lines.Add(wholeSalesDispatchTransactionLineDto);
@@ -470,6 +469,33 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
             resultModel.Code = result.Data.Code;
             resultModel.PageTitle = Title;
             resultModel.PageCountToBack = 6;
+            try
+            {
+                await _transactionAuditHelperService.InsertSalesTransactionAuditAsync(
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                ioType: 3,
+                transactionType: 3,
+                transactionDate: TransactionDate,
+                transactionReferenceId: result.Data.ReferenceId,
+                transactionNumber: result.Data.Code,
+                documentNumber: DocumentNumber,
+                warehouseNumber: WarehouseModel.Number,
+                warehouseName: WarehouseModel.Name,
+                productReferenceCount: Items.Count,
+                currentReferenceId: SalesCustomer.ReferenceId,
+                currentCode: SalesCustomer.Code,
+                currentName: SalesCustomer.Name,
+                shipAddressReferenceId: SalesCustomer.ShipAddressReferenceId,
+                shipAddressCode: SalesCustomer.ShipAddressCode,
+                shipAddressName: SalesCustomer.ShipAddressName
+
+               );
+            }
+            catch (Exception ex)
+            {
+                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            }
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
@@ -525,7 +551,6 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
             FirmNumber = _httpClientService.FirmNumber,
             SpeCode = SpecialCode,
             WarehouseNumber = WarehouseModel.Number,
-
         };
 
         foreach (var item in Items)
@@ -565,10 +590,8 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
                         retailSalesDispatchTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
                         locationTransaction.RemainingQuantity -= (double)serilotTransactionDto.Quantity;
                         item.OutputQuantity -= (double)serilotTransactionDto.Quantity;
-
                     }
                 }
-
             }
             dto.Lines.Add(retailSalesDispatchTransactionLineDto);
         }
@@ -583,6 +606,35 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
             resultModel.Code = result.Data.Code;
             resultModel.PageTitle = Title;
             resultModel.PageCountToBack = 6;
+
+            try
+            {
+                await _transactionAuditHelperService.InsertSalesTransactionAuditAsync(
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                ioType: 2,
+                transactionType: 3,
+                transactionDate: TransactionDate,
+                transactionReferenceId: result.Data.ReferenceId,
+                transactionNumber: result.Data.Code,
+                documentNumber: DocumentNumber,
+                warehouseNumber: WarehouseModel.Number,
+                warehouseName: WarehouseModel.Name,
+                productReferenceCount: Items.Count,
+                currentReferenceId: SalesCustomer.ReferenceId,
+                currentCode: SalesCustomer.Code,
+                currentName: SalesCustomer.Name,
+                shipAddressReferenceId: SalesCustomer.ShipAddressReferenceId,
+                shipAddressCode: SalesCustomer.ShipAddressCode,
+                shipAddressName: SalesCustomer.ShipAddressName
+
+               );
+            }
+            catch (Exception ex)
+            {
+                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            }
+
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
@@ -655,7 +707,6 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
             CargoTrackingNumber = string.Empty;
             SelectedCarrier = null;
             SelectedDriver = null;
-
         }
         catch (Exception ex)
         {

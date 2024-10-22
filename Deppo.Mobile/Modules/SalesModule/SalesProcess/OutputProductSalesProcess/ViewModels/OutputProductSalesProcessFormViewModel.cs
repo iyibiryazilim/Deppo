@@ -84,7 +84,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
     [ObservableProperty]
     private string cargoTrackingNumber = string.Empty;
 
-    public OutputProductSalesProcessFormViewModel(IHttpClientService httpClientService, IShipAddressService shipAddressService, IUserDialogs userDialogs, ICustomerService customerService, ICarrierService carrierService, IDriverService driverService, IWholeSalesDispatchTransactionService wholeSalesDispatchTransactionService, IRetailSalesDispatchTransactionService retailSalesDispatchTransactionService, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService)
+    public OutputProductSalesProcessFormViewModel(IHttpClientService httpClientService, IShipAddressService shipAddressService, IUserDialogs userDialogs, ICustomerService customerService, ICarrierService carrierService, IDriverService driverService, IWholeSalesDispatchTransactionService wholeSalesDispatchTransactionService, IRetailSalesDispatchTransactionService retailSalesDispatchTransactionService, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService, ITransactionAuditService transactionAuditService, IHttpClientSysService httpClientSysService, ITransactionAuditHelperService transactionAuditHelperService)
     {
         _httpClientService = httpClientService;
         _shipAddressService = shipAddressService;
@@ -96,6 +96,9 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
         _retailSalesDispatchTransactionService = retailSalesDispatchTransactionService;
         _serviceProvider = serviceProvider;
         _locationTransactionService = locationTransactionService;
+        _transactionAuditService = transactionAuditService;
+        _httpClientSysService = httpClientSysService;
+        _transactionAuditHelperService = transactionAuditHelperService;
 
         Title = "Sevk İşlemi";
 
@@ -605,7 +608,9 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
             resultModel.PageTitle = Title;
             resultModel.PageCountToBack = 5;
 
-            await _transactionAuditHelperService.InsertSalesTransactionAuditAsync(
+            try
+            {
+                await _transactionAuditHelperService.InsertSalesTransactionAuditAsync(
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 ioType: 8,
@@ -620,11 +625,16 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
                 currentReferenceId: SelectedCustomer.ReferenceId,
                 currentCode: SelectedCustomer.Code,
                 currentName: SelectedCustomer.Name,
-                shipAddressReferenceId: SelectedShipAddress?.ReferenceId ?? 0,
-                shipAddressCode: SelectedShipAddress?.Code ?? string.Empty,
-                shipAddressName: SelectedShipAddress?.Name ?? string.Empty
+                shipAddressReferenceId: SelectedShipAddress.ReferenceId,
+                shipAddressCode: SelectedShipAddress.Code,
+                shipAddressName: SelectedShipAddress.Name
 
-                );
+               );
+            }
+            catch (Exception ex)
+            {
+                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            }
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
