@@ -148,64 +148,65 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            _userDialogs.Loading("Refreshing Items...");
+
+            _userDialogs.Loading("Loading More Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
             if (ProductCountingBasketModel.IsVariant)
             {
-                if (ProductCountingBasketModel.IsVariant)
+                var result = await _productCountingService.GetWarehousesByVariant(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, variantReferenceId: ProductCountingBasketModel.ItemReferenceId, string.Empty, Items.Count, 20);
+                if (result.IsSuccess)
                 {
-                    var result = await _productCountingService.GetWarehousesByVariant(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, variantReferenceId: ProductCountingBasketModel.ItemReferenceId, string.Empty, Items.Count, 20);
-                    if (result.IsSuccess)
+                    if (result.Data == null)
+                        return;
+
+                    foreach (var item in result.Data)
                     {
-                        if (result.Data == null)
-                            return;
 
-                        foreach (var item in result.Data)
-                        {
-
-                            Items.Add(Mapping.Mapper.Map<ProductCountingWarehouseModel>(item));
-
-                        }
-                        _userDialogs.Loading().Hide();
-                    }
-                    else
-                    {
-                        if (_userDialogs.IsHudShowing)
-                            _userDialogs.Loading().Hide();
-
-                        Debug.WriteLine(result.Message);
-                        _userDialogs.Alert(message: result.Message, title: "Load Items");
+                        Items.Add(Mapping.Mapper.Map<ProductCountingWarehouseModel>(item));
 
                     }
-                }
+					if (_userDialogs.IsHudShowing)
+						_userDialogs.HideHud();
+				}
                 else
                 {
-                    var result = await _productCountingService.GetWarehouses(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: ProductCountingBasketModel.ItemReferenceId, string.Empty, Items.Count, 20);
-                    if (result.IsSuccess)
-                    {
-                        if (result.Data == null)
-                            return;
+                    if (_userDialogs.IsHudShowing)
+                        _userDialogs.HideHud();
 
-                        foreach (var item in result.Data)
-                        {
+                    Debug.WriteLine(result.Message);
+                    _userDialogs.Alert(message: result.Message, title: "Load Items");
 
-                            Items.Add(Mapping.Mapper.Map<ProductCountingWarehouseModel>(item));
-
-                        }
-                        _userDialogs.Loading().Hide();
-                    }
-                    else
-                    {
-                        if (_userDialogs.IsHudShowing)
-                            _userDialogs.Loading().Hide();
-
-                        Debug.WriteLine(result.Message);
-                        _userDialogs.Alert(message: result.Message, title: "Load Items");
-
-                    }
                 }
             }
+            else
+            {
+                var result = await _productCountingService.GetWarehouses(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: ProductCountingBasketModel.ItemReferenceId, string.Empty, Items.Count, 20);
+                if (result.IsSuccess)
+                {
+                    if (result.Data == null)
+                        return;
+
+                    foreach (var item in result.Data)
+                    {
+
+                        Items.Add(Mapping.Mapper.Map<ProductCountingWarehouseModel>(item));
+
+                    }
+					if (_userDialogs.IsHudShowing)
+						_userDialogs.HideHud();
+				}
+                else
+                {
+                    if (_userDialogs.IsHudShowing)
+						_userDialogs.HideHud();
+
+					Debug.WriteLine(result.Message);
+                    _userDialogs.Alert(message: result.Message, title: "Load Items");
+
+                }
+            }
+            
 
            
         }

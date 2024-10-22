@@ -111,7 +111,7 @@
 			<!--begin:Menu item-->
 			<div class="menu-item">
 				<!--begin:Menu link-->
-				<a class="menu-link" href="https://preview.keenthemes.com/html/metronic/docs" target="_blank"
+				<a class="menu-link" asp-controller="Product" asp-action="Index" target="_blank"
 					title="Malzeme Listesi" data-bs-toggle="tooltip" data-bs-trigger="hover"
 					data-bs-dismiss="click" data-bs-placement="right">
 					<span class="menu-bullet">
@@ -156,13 +156,14 @@
 			<!--begin:Menu item-->
 			<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
 				<!--begin:Menu link-->
-				<span class="menu-link">
+				<a class="menu-link" asp-controller="Customer" asp-action="Index" target="_blank"
+				   title="Malzeme Listesi" data-bs-toggle="tooltip" data-bs-trigger="hover"
+				   data-bs-dismiss="click" data-bs-placement="right">
 					<span class="menu-bullet">
 						<span class="bullet bullet-dot"></span>
 					</span>
-					<span class="menu-title">Projects</span>
-					<span class="menu-arrow"></span>
-				</span>
+					<span class="menu-title">Müşteri Listesi</span>
+				</a>
 				<!--end:Menu link-->
 				<!--begin:Menu sub-->
 				<div class="menu-sub menu-sub-accordion">
@@ -1296,13 +1297,14 @@
 			<!--begin:Menu item-->
 			<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
 				<!--begin:Menu link-->
-				<span class="menu-link">
+				<a class="menu-link" asp-controller="Supplier" asp-action="Index" target="_blank"
+				   title="Malzeme Listesi" data-bs-toggle="tooltip" data-bs-trigger="hover"
+				   data-bs-dismiss="click" data-bs-placement="right">
 					<span class="menu-bullet">
 						<span class="bullet bullet-dot"></span>
 					</span>
-					<span class="menu-title">Modals</span>
-					<span class="menu-arrow"></span>
-				</span>
+					<span class="menu-title">Tedarikçi Listesi</span>
+				</a>
 				<!--end:Menu link-->
 				<!--begin:Menu sub-->
 				<div class="menu-sub menu-sub-accordion menu-active-bg">

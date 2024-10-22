@@ -593,13 +593,13 @@
                                    Text="Alt Birim" />
                             <Label Grid.Column="1"
                                    FontAttributes="Bold"
-                                   HorizontalOptions="Center"
                                    FontSize="Subtitle"
+                                   HorizontalOptions="Center"
                                    Text="Çevrim" />
                             <Label Grid.Column="2"
                                    FontAttributes="Bold"
-                                   HorizontalOptions="Center"
                                    FontSize="Subtitle"
+                                   HorizontalOptions="Center"
                                    Text="Katsayı" />
                         </Grid>
                         <BoxView Grid.Row="1"
@@ -612,17 +612,23 @@
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:SubUnitset">
-                                <Border StrokeShape="RoundRectangle 5" Padding="10" BackgroundColor="WhiteSmoke">
+                                <Border Padding="10"
+                                        BackgroundColor="WhiteSmoke"
+                                        StrokeShape="RoundRectangle 5">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferBasketListViewModel}}, Path=SubUnitsetTappedCommand}" CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
                                     <Grid ColumnDefinitions=".40*,.25*,.25*">
-                                        <Grid.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferBasketListViewModel}}, Path=SubUnitsetTapppedCommand}" CommandParameter="{Binding .}" />
-                                        </Grid.GestureRecognizers>
-                                        <Label Grid.Column="0" Text="{Binding Code}"  />
-                                        <Label Grid.Column="1" Text="{Binding ConversionValue}" HorizontalOptions="Center" />
-                                        <Label Grid.Column="2" Text="{Binding OtherConversionValue}" HorizontalOptions="Center" />
+                                        <Label Grid.Column="0" Text="{Binding Code}" />
+                                        <Label Grid.Column="1"
+                                               HorizontalOptions="Center"
+                                               Text="{Binding ConversionValue}" />
+                                        <Label Grid.Column="2"
+                                               HorizontalOptions="Center"
+                                               Text="{Binding OtherConversionValue}" />
                                     </Grid>
                                 </Border>
-                                
+
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>

@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Deppo.Core.Models;
 using Deppo.Mobile.Core.Models.LocationModels;
 using System.Collections.ObjectModel;
 
@@ -51,6 +52,19 @@ public partial class WarehouseCountingBasketModel : ObservableObject
 	[ObservableProperty]
 	string? image;
 
+	public byte[] ImageData
+	{
+		get
+		{
+			if (string.IsNullOrEmpty(Image))
+				return Array.Empty<byte>();
+			else
+			{
+				return Convert.FromBase64String(Image);
+			}
+		}
+	}
+
 	[ObservableProperty]
 	bool isVariant;
 
@@ -62,6 +76,9 @@ public partial class WarehouseCountingBasketModel : ObservableObject
 
 	[ObservableProperty]
 	ObservableCollection<LocationTransactionModel> locationTransactions = new();
+
+	[ObservableProperty]
+	ObservableCollection<SubUnitset> subUnitsets = new();
 
 	[ObservableProperty]
 	double differenceQuantity = 0;
