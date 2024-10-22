@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
@@ -33,6 +35,7 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
     private readonly ILocationService _locationService;
     private readonly ISeriLotService _seriLotService;
     private readonly IServiceProvider _serviceProvider;
+    private readonly ISubUnitsetService _subUnitsetService;
 
     [ObservableProperty]
     private WarehouseModel warehouseModel = null!;
@@ -52,44 +55,50 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
     [ObservableProperty]
     public ObservableCollection<SalesTransactionModel> selectedSalesTransactions;
 
-    public ReturnSalesDispatchBasketViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider)
-    {
-        _httpClientService = httpClientService;
-        _userDialogs = userDialogs;
-        _locationService = locationService;
-        _seriLotService = seriLotService;
-        _serviceProvider = serviceProvider;
+	public ReturnSalesDispatchBasketViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider, ISubUnitsetService subUnitsetService)
+	{
+		_httpClientService = httpClientService;
+		_userDialogs = userDialogs;
+		_locationService = locationService;
+		_seriLotService = seriLotService;
+		_serviceProvider = serviceProvider;
+		_subUnitsetService = subUnitsetService;
 
-        Title = "Satış İade Sepeti";
+		Title = "Satış İade Sepeti";
 
-        IncreaseCommand = new Command<ReturnSalesBasketModel>(async (x) => await IncreaseAsync(x));
+        UnitActionTappedCommand = new Command<ReturnSalesBasketModel>(async (x) => await UnitActionTappedAsync(x));
+        SubUnitsetTappedCommand = new Command<SubUnitset>(async (x) => await SubUnitsetTappedAsync(x));
+		QuantityTappedCommand = new Command<ReturnSalesBasketModel>(async (x) => await QuantityTappedAsync(x));
+		IncreaseCommand = new Command<ReturnSalesBasketModel>(async (x) => await IncreaseAsync(x));
+		DecreaseCommand = new Command<ReturnSalesBasketModel>(async (x) => await DecreaseAsync(x));
 
-        LoadMoreWarehouseLocationsCommand = new Command(async () => await LoadMoreWarehouseLocationsAsync());
-        //LocationIncreaseCommand = new Command<LocationModel>(LocationIncrease);
-        //LocationDecreaseCommand = new Command<LocationModel>(LocationDecrease);
-        //LocationConfirmCommand = new Command(LocationConfirm);
-        LocationCloseCommand = new Command(async () => await LocationCloseAsync());
+		LoadMoreWarehouseLocationsCommand = new Command(async () => await LoadMoreWarehouseLocationsAsync());
+		//LocationIncreaseCommand = new Command<LocationModel>(LocationIncrease);
+		//LocationDecreaseCommand = new Command<LocationModel>(LocationDecrease);
+		//LocationConfirmCommand = new Command(LocationConfirm);
+		LocationCloseCommand = new Command(async () => await LocationCloseAsync());
 
-        LoadMoreSeriLotsCommand = new Command(async () => await LoadMoreSeriLotAsync());
-        SeriLotIncreaseCommand = new Command<SeriLotModel>(SeriLotIncrease);
-        SeriLotDecreaseCommand = new Command<SeriLotModel>(SeriLotDecrease);
-        SeriLotConfirmCommand = new Command(SeriLotConfirm);
-        SeriLotCloseCommand = new Command(async () => await SeriLotCloseAsync());
-        DecreaseCommand = new Command<ReturnSalesBasketModel>(async (x) => await DecreaseAsync(x));
-        NextViewCommand = new Command(async () => await NextViewAsync());
+		LoadMoreSeriLotsCommand = new Command(async () => await LoadMoreSeriLotAsync());
+		SeriLotIncreaseCommand = new Command<SeriLotModel>(SeriLotIncrease);
+		SeriLotDecreaseCommand = new Command<SeriLotModel>(SeriLotDecrease);
+		SeriLotConfirmCommand = new Command(SeriLotConfirm);
+		SeriLotCloseCommand = new Command(async () => await SeriLotCloseAsync());
+		NextViewCommand = new Command(async () => await NextViewAsync());
 
-        BackCommand = new Command(async () => await BackAsync());
+		BackCommand = new Command(async () => await BackAsync());
 
-        //  ShowOtherProductCommand = new Command(async () => await ShowOtherProductAsync());
-    }
+		//  ShowOtherProductCommand = new Command(async () => await ShowOtherProductAsync());
+	}
 
-    public Page CurrentPage { get; set; }
+	public Page CurrentPage { get; set; }
 
     public ObservableCollection<LocationModel> Locations { get; } = new();
     public ObservableCollection<SeriLotModel> SeriLots { get; } = new();
 
     #region Commands
-
+    public Command UnitActionTappedCommand { get; }
+	public Command SubUnitsetTappedCommand { get; }
+	public Command<ReturnSalesBasketModel> QuantityTappedCommand { get; }
     public Command<ReturnSalesBasketModel> DeleteItemCommand { get; }
     public Command<ReturnSalesBasketModel> IncreaseCommand { get; }
     public Command<ReturnSalesBasketModel> DecreaseCommand { get; }
@@ -111,9 +120,146 @@ public partial class ReturnSalesDispatchBasketViewModel : BaseViewModel
 
     public Command ShowOtherProductCommand { get; }
 
-    #endregion Commands
+	#endregion Commands
 
-    private async Task IncreaseAsync(ReturnSalesBasketModel item)
+	private async Task UnitActionTappedAsync(ReturnSalesBasketModel item)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			SelectedItem = item;
+			await LoadSubUnitsetsAsync(item);
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.HalfExpanded;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task LoadSubUnitsetsAsync(ReturnSalesBasketModel item)
+	{
+		if (item is null)
+			return;
+		try
+		{
+			item.SubUnitsets.Clear();
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _subUnitsetService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				productReferenceId: item.ItemReferenceId
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var subUnitset in result.Data)
+				{
+					item.SubUnitsets.Add(Mapping.Mapper.Map<SubUnitset>(subUnitset));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+	}
+
+	private async Task SubUnitsetTappedAsync(SubUnitset subUnitset)
+	{
+		if (subUnitset is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			if (SelectedItem is not null)
+			{
+				SelectedItem.SubUnitsetReferenceId = subUnitset.ReferenceId;
+				SelectedItem.SubUnitsetName = subUnitset.Name;
+				SelectedItem.SubUnitsetCode = subUnitset.Code;
+			}
+
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.Hidden;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task QuantityTappedAsync(ReturnSalesBasketModel returnSalesBasketModel)
+	{
+		if (returnSalesBasketModel is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var result = await CurrentPage.DisplayPromptAsync(
+				title: returnSalesBasketModel.ItemCode,
+				message: "Miktarı giriniz",
+				cancel: "Vazgeç",
+				accept: "Tamam",
+				initialValue: returnSalesBasketModel.InputQuantity.ToString(),
+				keyboard: Keyboard.Numeric);
+
+			if (string.IsNullOrEmpty(result))
+				return;
+
+			var quantity = Convert.ToDouble(result);
+
+			if (quantity <= 0)
+			{
+				await _userDialogs.AlertAsync("Miktar sıfırdan küçük olmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			returnSalesBasketModel.InputQuantity = quantity;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task IncreaseAsync(ReturnSalesBasketModel item)
     {
         if (IsBusy)
             return;

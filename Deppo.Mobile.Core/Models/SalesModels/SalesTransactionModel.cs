@@ -19,7 +19,7 @@ namespace Deppo.Mobile.Core.Models.SalesModels
         private string _variantIconColor;
         private string _trackingTypeIcon;
         private string _trackingTypeIconColor;
-        private byte[]? _image;
+        private string? _image;
 
         public SalesTransactionModel()
         {
@@ -108,7 +108,7 @@ namespace Deppo.Mobile.Core.Models.SalesModels
 
         public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 
-        public byte[]? Image
+        public string? Image
         {
             get => _image;
             set
@@ -118,5 +118,18 @@ namespace Deppo.Mobile.Core.Models.SalesModels
                 NotifyPropertyChanged();
             }
         }
-    }
+
+		public byte[] ImageData
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(Image))
+					return Array.Empty<byte>();
+				else
+				{
+					return Convert.FromBase64String(Image);
+				}
+			}
+		}
+	}
 }

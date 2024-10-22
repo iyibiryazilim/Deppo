@@ -213,7 +213,7 @@ public partial class ReturnSalesDispatchProductListViewModel : BaseViewModel
                         VariantIcon = item.VariantIcon,
                         TrackingTypeIcon = item.TrackingTypeIcon,
                         DispatchReferenceId = item.ReferenceId,
-                        Image = item.Image
+                        Image = item.ImageData
                     };
 
                     SelectedProducts.Add(basketItem);

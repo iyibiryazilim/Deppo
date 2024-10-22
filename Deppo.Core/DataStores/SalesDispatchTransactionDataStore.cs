@@ -129,7 +129,8 @@ namespace Deppo.Core.DataStores
 	 [ProductReferenceId] =  ITEMS.LOGICALREF,
 	 [ProductCode] = ISNULL(ITEMS.CODE,''),
 	 [ProductName] = ISNULL(ITEMS.NAME,''),
-    [IsVariant] = ITEMS.CANCONFIGURE,
+     [Image] = ISNULL(FIRMDOC.LDATA,''),
+     [IsVariant] = ITEMS.CANCONFIGURE,
      [TrackingType] = ITEMS.TRACKTYPE,
      [LocTracking] = ITEMS.LOCTRACKING,
 	 [UnitsetReferenceId] = ISNULL( unitset.LOGICALREF,0),
@@ -150,6 +151,7 @@ namespace Deppo.Core.DataStores
 from  LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE as STLINE
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE on STLINE.STFICHEREF = STFICHE.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS on STLINE.STOCKREF = ITEMS.LOGICALREF
+LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_FIRMDOC AS FIRMDOC ON FIRMDOC.INFOREF = ITEMS.LOGICALREF AND FIRMDOC.INFOTYP = 20  AND FIRMDOC.DOCNR = 11
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD as CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS subunitset ON STLINE.UOMREF = subunitset.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS unitset ON STLINE.USREF = unitset.LOGICALREF

@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
 using Deppo.Mobile.Core.Models.SeriLotModels;
@@ -34,20 +35,20 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 	OutputOutsourceTransferBasketModel? selectedItem;
 
 	[ObservableProperty]
-	LocationTransactionModel? selectedLocationTransaction;
+	GroupLocationTransactionModel? selectedLocationTransaction;
 
 	[ObservableProperty]
 	SeriLotTransactionModel? selectedSeriLotTransaction;
 
 	[ObservableProperty]
-	public ObservableCollection<LocationTransactionModel> selectedLocationTransactions = new();
+	public ObservableCollection<GroupLocationTransactionModel> selectedLocationTransactions = new();
 	[ObservableProperty]
 	public ObservableCollection<SeriLotTransactionModel> selectedSeriLotTransactions = new();
 
 	[ObservableProperty]
 	public ObservableCollection<OutputOutsourceTransferBasketModel> items = new();
 
-	public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
+	public ObservableCollection<GroupLocationTransactionModel> LocationTransactions { get; } = new();
 	public ObservableCollection<SeriLotTransactionModel> SeriLotTransactions { get; } = new();
 
 	[ObservableProperty]
@@ -72,14 +73,16 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 		UnitActionTappedCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await UnitActionTappedAsync(item));
 		SubUnitsetTappedCommand = new Command<SubUnitset>(async (item) => await SubUnitsetTappedAsync(item));
 		CameraTappedCommand = new Command(async () => await CameraTappedAsync());
+		QuantityTappedCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await QuantityTappedAsync(item));
 		IncreaseCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await DecreaseAsync(item));
 		DeleteItemCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await DeleteItemAsync(item));
 		PerformSearchCommand = new Command<Entry>(async (x) => await PerformSearchAsync(x));
 
 		LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreWarehouseLocationTransactionsAsync());
-		LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
-		LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
+		LocationTransactionQuantityTappedCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionQuantityTappedAsync(item));
+		LocationTransactionIncreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
+		LocationTransactionDecreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
 		LocationTransactionConfirmCommand = new Command(async () => await LocationTransactionConfirmAsync());
 		LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
 
@@ -99,6 +102,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 	public Command UnitActionTappedCommand { get; }
 	public Command SubUnitsetTappedCommand { get; }
 	public Command CameraTappedCommand { get; }
+	public Command<OutputOutsourceTransferBasketModel> QuantityTappedCommand { get; }
 	public Command<OutputOutsourceTransferBasketModel> IncreaseCommand { get; }
 	public Command<OutputOutsourceTransferBasketModel> DecreaseCommand { get; }
 	public Command<OutputOutsourceTransferBasketModel> DeleteItemCommand { get; }
@@ -107,6 +111,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 	public Command BackCommand { get; }
 
 	public Command LoadMoreLocationTransactionsCommand { get; }
+	public Command LocationTransactionQuantityTappedCommand { get; }
 	public Command LocationTransactionIncreaseCommand { get; }
 	public Command LocationTransactionDecreaseCommand { get; }
 	public Command LocationTransactionConfirmCommand { get; }
@@ -277,6 +282,54 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 		}
 	}
 
+	private async Task QuantityTappedAsync(OutputOutsourceTransferBasketModel item)
+	{
+		if (item is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var result = await CurrentPage.DisplayPromptAsync(
+				title: item.ItemCode,
+				message: "Miktarı giriniz",
+				cancel: "Vazgeç",
+				accept: "Tamam",
+				initialValue: item.Quantity.ToString(),
+				keyboard: Keyboard.Numeric);
+
+			if (string.IsNullOrEmpty(result))
+				return;
+
+			var quantity = Convert.ToDouble(result);
+			if (quantity <= 0)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar 0'dan küçük olmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			if (quantity > item.StockQuantity)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar, stok miktarını aşmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			item.Quantity = quantity;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 	private async Task DeleteItemAsync(OutputOutsourceTransferBasketModel item)
 	{
 		if (IsBusy)
@@ -424,13 +477,13 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 	{
 		try
 		{
-			_userDialogs.ShowLoading("Yükleniyor...");
+			_userDialogs.ShowLoading("Load Location Transactions...");
 			await Task.Delay(1000);
 
 			LocationTransactions.Clear();
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _locationTransactionService.GetInputObjectsAsync(
+			var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
@@ -446,11 +499,11 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 					return;
 
 				foreach (var item in result.Data)
-					LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+					LocationTransactions.Add(Mapping.Mapper.Map<GroupLocationTransactionModel>(item));
 
 				foreach (var locationTransaction in LocationTransactions)
 				{
-					var matchingItem = SelectedItem.Details.FirstOrDefault(x => x.ReferenceId == locationTransaction.ReferenceId);
+					var matchingItem = SelectedItem.Details.FirstOrDefault(x => x.LocationReferenceId == locationTransaction.LocationReferenceId);
 					if (matchingItem is not null)
 					{
 						locationTransaction.OutputQuantity = matchingItem.Quantity;
@@ -458,14 +511,15 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 				}
 			}
 
-			_userDialogs.HideHud();
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 		}
 		catch (Exception ex)
 		{
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 	}
 
@@ -477,8 +531,10 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
+			_userDialogs.ShowLoading("Load More Location Transactions...");
+
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _locationTransactionService.GetInputObjectsAsync(httpClient: httpClient,
+			var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
 				productReferenceId: SelectedItem.IsVariant ? SelectedItem.MainItemReferenceId : SelectedItem.ItemReferenceId,
@@ -494,21 +550,27 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 
 				foreach (var item in result.Data)
 				{
-					LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+					LocationTransactions.Add(Mapping.Mapper.Map<GroupLocationTransactionModel>(item));
 				}
 
 				foreach (var locationTransaction in LocationTransactions)
 				{
-					var matchingItem = SelectedItem.Details.FirstOrDefault(x => x.ReferenceId == locationTransaction.ReferenceId);
+					var matchingItem = SelectedItem.Details.FirstOrDefault(x => x.LocationReferenceId == locationTransaction.LocationReferenceId);
 					if (matchingItem is not null)
 					{
 						locationTransaction.OutputQuantity = matchingItem.Quantity;
 					}
 				}
 			}
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 		}
 		catch (Exception ex)
 		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 		finally
@@ -517,7 +579,69 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 		}
 	}
 
-	private async Task LocationTransactionIncreaseAsync(LocationTransactionModel item)
+	private async Task LocationTransactionQuantityTappedAsync(GroupLocationTransactionModel item)
+	{
+		if (item is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var result = await CurrentPage.DisplayPromptAsync(
+				title: item.ItemCode,
+				message: "Miktarı giriniz",
+				cancel: "Vazgeç",
+				accept: "Tamam",
+				initialValue: item.OutputQuantity.ToString(),
+				keyboard: Keyboard.Numeric);
+
+			if (string.IsNullOrEmpty(result))
+				return;
+
+			var quantity = Convert.ToDouble(result);
+			if (quantity <= 0)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar 0'dan küçük olmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			if (quantity > item.RemainingQuantity)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar, kalan miktarı aşmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+			if (quantity > SelectedItem?.StockQuantity)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar, stok miktarını aşmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			var totalQuantity = LocationTransactions.Sum(x => x.OutputQuantity);
+			if (SelectedItem?.StockQuantity >= totalQuantity + quantity)
+			{
+				item.OutputQuantity = quantity;
+			}
+			else
+			{
+				await _userDialogs.AlertAsync($"Girilen miktar, Ürünün stok miktarını ({SelectedItem?.StockQuantity}) aşmamalıdır.", "Hata", "Tamam");
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task LocationTransactionIncreaseAsync(GroupLocationTransactionModel item)
 	{
 		if (IsBusy)
 			return;
@@ -559,7 +683,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 		}
 	}
 
-	private async Task LocationTransactionDecreaseAsync(LocationTransactionModel item)
+	private async Task LocationTransactionDecreaseAsync(GroupLocationTransactionModel item)
 	{
 		if (IsBusy)
 			return;
@@ -619,7 +743,7 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 
 				foreach (var item in SelectedLocationTransactions)
 				{
-					var selectedLocationTransactionItem = SelectedItem.Details.FirstOrDefault(x => x.TransactionReferenceId == item.TransactionReferenceId);
+					var selectedLocationTransactionItem = SelectedItem.Details.FirstOrDefault(x => x.LocationReferenceId == item.LocationReferenceId);
 					if (selectedLocationTransactionItem is not null)
 					{
 						selectedLocationTransactionItem.Quantity = item.OutputQuantity;
@@ -631,10 +755,10 @@ public partial class OutputOutsourceTransferBasketListViewModel : BaseViewModel
 						LocationReferenceId = item.LocationReferenceId,
 						LocationCode = item.LocationCode,
 						LocationName = item.LocationName,
-						TransactionReferenceId = item.TransactionReferenceId,
-						TransactionFicheReferenceId = item.TransactionFicheReferenceId,
-						InSerilotTransactionReferenceId = item.InSerilotTransactionReferenceId,
-						InTransactionReferenceId = item.InTransactionReferenceId,
+						//TransactionReferenceId = item.TransactionReferenceId,
+						//TransactionFicheReferenceId = item.TransactionFicheReferenceId,
+						//InSerilotTransactionReferenceId = item.InSerilotTransactionReferenceId,
+						//InTransactionReferenceId = item.InTransactionReferenceId,
 						Quantity = item.OutputQuantity,
 						RemainingQuantity = item.OutputQuantity,
 					});

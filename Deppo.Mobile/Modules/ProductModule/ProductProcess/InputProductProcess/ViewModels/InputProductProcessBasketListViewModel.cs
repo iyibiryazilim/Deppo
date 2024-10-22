@@ -286,7 +286,15 @@ public partial class InputProductProcessBasketListViewModel : BaseViewModel
 			if (string.IsNullOrEmpty(result))
 				return;
 
-			inputProductBasketModel.Quantity = Convert.ToDouble(result);
+			var quantity = Convert.ToDouble(result);
+
+			if (quantity <= 0)
+			{
+				await _userDialogs.AlertAsync("Miktar sıfırdan küçük olmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			inputProductBasketModel.Quantity = quantity;
 		}
 		catch (Exception ex)
 		{

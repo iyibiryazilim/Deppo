@@ -218,16 +218,11 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
                             VariantIcon = item.VariantIcon,
                             TrackingTypeIcon = item.TrackingTypeIcon,
                             DispatchReferenceId = item.ReferenceId,
+                            Image = item.ImageData,
                         };
                         SelectedProducts.Add(basketItem);
 
                     }
-
-
-
-
-
-
                     SelectedPurchaseTransactions.Add(selectedItem);
                     SelectedItems.Add(selectedItem);
                 }
@@ -256,6 +251,12 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
             IsBusy = true;
 
             SelectedItems.Clear();
+
+            if(SelectedPurchaseTransactions.Count == 0) 
+			{
+				await _userDialogs.AlertAsync("Devam etmek için lütfen en az bir ürün seçiniz.", "Uyarı", "Tamam");
+				return;
+			}
 
             await Shell.Current.GoToAsync($"{nameof(ReturnPurchaseDispatchBasketView)}", new Dictionary<string, object>
             {

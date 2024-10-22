@@ -213,6 +213,7 @@ FETCH NEXT {take} ROWS ONLY";
      [LocTracking] = ITEMS.LOCTRACKING,
 	 [ProductCode] = ISNULL(ITEMS.CODE,''),
 	 [ProductName] = ISNULL(ITEMS.NAME,''),
+     [Image] = ISNULL(FIRMDOC.LDATA,''),
 	 [UnitsetReferenceId] = ISNULL( unitset.LOGICALREF,0),
 	 [UnitsetCode] = ISNULL( unitset.CODE , ''),
 	 [UnitsetName] =  ISNULL (unitset.NAME , ''),
@@ -231,6 +232,7 @@ FETCH NEXT {take} ROWS ONLY";
 from  LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE as STLINE
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE on STLINE.STFICHEREF = STFICHE.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS on STLINE.STOCKREF = ITEMS.LOGICALREF
+LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_FIRMDOC AS FIRMDOC ON FIRMDOC.INFOREF = ITEMS.LOGICALREF AND FIRMDOC.INFOTYP = 20  AND FIRMDOC.DOCNR = 11
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD as CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS subunitset ON STLINE.UOMREF = subunitset.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS unitset ON STLINE.USREF = unitset.LOGICALREF
