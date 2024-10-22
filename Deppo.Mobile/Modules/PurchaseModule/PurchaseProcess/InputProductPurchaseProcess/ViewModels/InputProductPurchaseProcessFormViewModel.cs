@@ -13,8 +13,10 @@ using Deppo.Mobile.Core.Models.ShipAddressModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Helpers.TransactionAuditHelpers;
 using Deppo.Mobile.Modules.ResultModule;
 using Deppo.Mobile.Modules.ResultModule.Views;
+using Deppo.Sys.Service.Services;
 using DevExpress.Maui.Controls;
 using Microsoft.Maui.Controls.Compatibility.Platform.Android;
 using System;
@@ -38,6 +40,9 @@ public partial class InputProductPurchaseProcessFormViewModel : BaseViewModel
     private readonly IHttpClientService _httpClientService;
     private readonly IUserDialogs _userDialogs;
     private readonly IPurchaseDispatchTransactionService _purchaseDispatchTransactionService;
+    private readonly ITransactionAuditService _transactionAuditService;
+    private readonly IHttpClientSysService _httpClientSysService;
+    private readonly ITransactionAuditHelperService _transactionAuditHelperService;
 
     [ObservableProperty]
     private WarehouseModel warehouseModel = null!;
@@ -66,11 +71,14 @@ public partial class InputProductPurchaseProcessFormViewModel : BaseViewModel
     [ObservableProperty]
     private ObservableCollection<InputPurchaseBasketModel> items = null!;
 
-    public InputProductPurchaseProcessFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IPurchaseDispatchTransactionService purchaseDispatchTransactionService)
+    public InputProductPurchaseProcessFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IPurchaseDispatchTransactionService purchaseDispatchTransactionService, ITransactionAuditService transactionAuditService, IHttpClientSysService httpClientSysService, ITransactionAuditHelperService transactionAuditHelperService)
     {
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
         _purchaseDispatchTransactionService = purchaseDispatchTransactionService;
+        _transactionAuditService = transactionAuditService;
+        _httpClientSysService = httpClientSysService;
+        _transactionAuditHelperService = transactionAuditHelperService;
         Items = new();
         Title = "Mal Kabul İşlemi";
 
@@ -216,6 +224,24 @@ public partial class InputProductPurchaseProcessFormViewModel : BaseViewModel
                 resultModel.Code = result.Data.Code;
                 resultModel.PageTitle = Title;
                 resultModel.PageCountToBack = 5;
+
+                await _transactionAuditHelperService.InsertPurchaseTransactionAuditAsync(firmNumber: _httpClientService.FirmNumber,
+                    periodNumber: _httpClientService.PeriodNumber,
+                    ioType: 1,
+                    transactionType: 1,
+                    transactionDate: FicheDate,
+                    transactionReferenceId: result.Data.ReferenceId,
+                    transactionNumber: result.Data.Code,
+                    documentNumber: DocumentNumber,
+                    warehouseNumber: WarehouseModel.Number,
+                    warehouseName: WarehouseModel.Name,
+                    productReferenceCount: Items.Count,
+                    currentReferenceId: SupplierModel?.ReferenceId ?? 0,  // Default değer veya kontrol
+                    currentCode: SupplierModel?.Code ?? string.Empty,     // Default değer veya kontrol
+                    currentName: SupplierModel?.Name ?? string.Empty,
+                    shipAddressReferenceId: ShipAddressModel?.ReferenceId ?? 0,  // Default değer veya kontrol
+                    shipAddressCode: ShipAddressModel?.Code ?? string.Empty,     // Default değer veya kontrol
+                    shipAddressName: ShipAddressModel?.Name ?? string.Empty);
 
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();

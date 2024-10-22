@@ -12,8 +12,10 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Helpers.TransactionAuditHelpers;
 using Deppo.Mobile.Modules.ResultModule;
 using Deppo.Mobile.Modules.ResultModule.Views;
+using Deppo.Sys.Service.Services;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -26,7 +28,6 @@ namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurch
 [QueryProperty(name: nameof(PurchaseFicheModel), queryId: nameof(PurchaseFicheModel))]
 [QueryProperty(name: nameof(SelectedPurchaseTransactions), queryId: nameof(SelectedPurchaseTransactions))]
 [QueryProperty(name: nameof(Items), queryId: nameof(Items))]
-
 public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -36,48 +37,50 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
     private readonly IDriverService _driverService;
     private readonly IServiceProvider _serviceProvider;
     private readonly ILocationTransactionService _locationTransactionService;
-
-
-    [ObservableProperty]
-    WarehouseModel warehouseModel = null!;
-
-    [ObservableProperty]
-    PurchaseSupplier purchaseSupplier = null!;
+    private readonly ITransactionAuditService _transactionAuditService;
+    private readonly IHttpClientSysService _httpClientSysService;
+    private readonly ITransactionAuditHelperService _transactionAuditHelperService;
 
     [ObservableProperty]
-    PurchaseFicheModel purchaseFicheModel = null!;
+    private WarehouseModel warehouseModel = null!;
+
+    [ObservableProperty]
+    private PurchaseSupplier purchaseSupplier = null!;
+
+    [ObservableProperty]
+    private PurchaseFicheModel purchaseFicheModel = null!;
 
     [ObservableProperty]
     public ObservableCollection<PurchaseTransactionModel> selectedPurchaseTransactions;
+
     [ObservableProperty]
     public ObservableCollection<ReturnPurchaseBasketModel> items = null!;
 
     public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
 
+    [ObservableProperty]
+    private Carrier? selectedCarrier;
 
     [ObservableProperty]
-    Carrier? selectedCarrier;
-    [ObservableProperty]
-    Driver? selectedDriver;
+    private Driver? selectedDriver;
 
     public ObservableCollection<Carrier> Carriers { get; } = new();
     public ObservableCollection<Driver> Drivers { get; } = new();
 
+    [ObservableProperty]
+    private string documentNumber = string.Empty;
 
     [ObservableProperty]
-    string documentNumber = string.Empty;
+    private DateTime transactionDate = DateTime.Now;
 
     [ObservableProperty]
-    DateTime transactionDate = DateTime.Now;
+    private string description = string.Empty;
 
     [ObservableProperty]
-    string description = string.Empty;
+    private string documentTrackingNumber = string.Empty;
 
     [ObservableProperty]
-    string documentTrackingNumber = string.Empty;
-
-    [ObservableProperty]
-    string specialCode = string.Empty;
+    private string specialCode = string.Empty;
 
     public ReturnPurchaseDispatchFormViewModel(IHttpClientService httpClientService, IPurchaseReturnDispatchTransactionService purchaseReturnDispatchTransactionService, IUserDialogs userDialogs, ICarrierService carrierService, IDriverService driverService, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService)
     {
@@ -98,6 +101,7 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
         _driverService = driverService;
         _serviceProvider = serviceProvider;
     }
+
     public Page CurrentPage { get; set; }
 
     public Command SaveCommand { get; }
@@ -115,7 +119,6 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-
 
             CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
         }
@@ -236,7 +239,6 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
     {
         try
         {
-
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _locationTransactionService.GetInputObjectsAsync(
                 httpClient: httpClient,
@@ -259,7 +261,6 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
                 {
                     LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
                 }
-
             }
 
             _userDialogs.Loading().Hide();
@@ -273,6 +274,7 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
     private async Task SaveAsync()
     {
         if (IsBusy)
@@ -284,7 +286,6 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
             var confirm = await _userDialogs.ConfirmAsync("Satınalma İade İrsaliyesi oluşturulacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
             if (!confirm)
                 return;
-
 
             _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
             await Task.Delay(1000);
@@ -311,7 +312,6 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
                 FirmNumber = _httpClientService.FirmNumber,
                 SpeCode = SpecialCode,
                 WarehouseNumber = WarehouseModel.Number,
-
             };
 
             foreach (var item in Items)
@@ -353,7 +353,6 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
                             item.Quantity -= (double)serilotTransactionDto.Quantity;
                         }
                     }
-
                 }
 
                 dto.Lines.Add(purchaseReturnDispatchTransactionLineDto);
@@ -369,6 +368,33 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
                 resultModel.Code = result.Data.Code;
                 resultModel.PageTitle = Title;
                 resultModel.PageCountToBack = 7;
+
+                try
+                {
+                    await _transactionAuditHelperService.InsertPurchaseTransactionAuditAsync(firmNumber: _httpClientService.FirmNumber,
+                        periodNumber: _httpClientService.PeriodNumber,
+                        ioType: 3,
+                        transactionType: 6,
+                        transactionDate: TransactionDate,
+                        transactionReferenceId: result.Data.ReferenceId,
+                        transactionNumber: result.Data.Code,
+                        documentNumber: DocumentNumber,
+                        warehouseNumber: WarehouseModel.Number,
+                        warehouseName: WarehouseModel.Name,
+                        productReferenceCount: Items.Count,
+                        currentReferenceId: PurchaseSupplier.ReferenceId,
+                        currentCode: PurchaseSupplier.Code,
+                        currentName: PurchaseSupplier.Name,
+                        shipAddressReferenceId: 0,
+                        shipAddressCode: "",
+                        shipAddressName: ""
+
+                        );
+                }
+                catch (Exception ex)
+                {
+                    _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+                }
 
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();
@@ -400,7 +426,6 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
                     [nameof(ResultModel)] = resultModel
                 });
             }
-
         }
         catch (Exception ex)
         {
@@ -460,11 +485,9 @@ public partial class ReturnPurchaseDispatchFormViewModel : BaseViewModel
             Description = string.Empty;
             SelectedCarrier = null;
             SelectedDriver = null;
-
         }
         catch (Exception ex)
         {
-
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
     }

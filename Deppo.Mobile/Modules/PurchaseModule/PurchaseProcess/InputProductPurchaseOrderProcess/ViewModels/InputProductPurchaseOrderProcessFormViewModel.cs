@@ -11,9 +11,11 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Helpers.TransactionAuditHelpers;
 using Deppo.Mobile.Modules.ResultModule;
 using Deppo.Mobile.Modules.ResultModule.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProcess.ViewModels;
+using Deppo.Sys.Service.Services;
 using DevExpress.Data.Async.Helpers;
 using DevExpress.Maui.Controls;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,21 +43,23 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
     private readonly IDriverService _driverService;
     private readonly IUserDialogs _userDialogs;
     private readonly IServiceProvider _serviceProvider;
+    private readonly ITransactionAuditService _transactionAuditService;
+    private readonly IHttpClientSysService _httpClientSysService;
+    private readonly ITransactionAuditHelperService _transactionAuditHelperService;
 
     [ObservableProperty]
     private WarehouseModel warehouseModel = null!;
 
-	[ObservableProperty]
-	private PurchaseSupplier purchaseSupplier;
+    [ObservableProperty]
+    private PurchaseSupplier purchaseSupplier;
 
-	[ObservableProperty]
-	private ObservableCollection<InputPurchaseBasketModel> items = null!;
+    [ObservableProperty]
+    private ObservableCollection<InputPurchaseBasketModel> items = null!;
 
-	public ObservableCollection<Carrier> Carriers { get; } = new();
-	public ObservableCollection<Driver> Drivers { get; } = new();
+    public ObservableCollection<Carrier> Carriers { get; } = new();
+    public ObservableCollection<Driver> Drivers { get; } = new();
 
-
-	[ObservableProperty]
+    [ObservableProperty]
     private DateTime ficheDate = DateTime.Now;
 
     [ObservableProperty]
@@ -70,47 +74,50 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
     [ObservableProperty]
     private string description = string.Empty;
 
-	[ObservableProperty]
-	string cargoTrackingNumber = string.Empty;
+    [ObservableProperty]
+    private string cargoTrackingNumber = string.Empty;
 
-	
+    [ObservableProperty]
+    private Carrier? selectedCarrier;
 
-	[ObservableProperty]
-	Carrier? selectedCarrier;
-	[ObservableProperty]
-	Driver? selectedDriver;
+    [ObservableProperty]
+    private Driver? selectedDriver;
 
-	public InputProductPurchaseOrderProcessFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IPurchaseDispatchTransactionService purchaseDispatchTransactionService, ICarrierService carrierService, IDriverService driverService, IServiceProvider serviceProvider)
-	{
-		_httpClientService = httpClientService;
-		_userDialogs = userDialogs;
-		_purchaseDispatchTransactionService = purchaseDispatchTransactionService;
-		_carrierService = carrierService;
-		_driverService = driverService;
-		Items = new();
+    public InputProductPurchaseOrderProcessFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IPurchaseDispatchTransactionService purchaseDispatchTransactionService, ICarrierService carrierService, IDriverService driverService, IServiceProvider serviceProvider, ITransactionAuditService transactionAuditService, IHttpClientSysService httpClientSysService, ITransactionAuditHelperService transactionAuditHelperService)
+    {
+        _httpClientService = httpClientService;
+        _userDialogs = userDialogs;
+        _purchaseDispatchTransactionService = purchaseDispatchTransactionService;
+        _carrierService = carrierService;
+        _driverService = driverService;
+        _serviceProvider = serviceProvider;
+        _transactionAuditService = transactionAuditService;
+        _httpClientSysService = httpClientSysService;
+        _transactionAuditHelperService = transactionAuditHelperService;
 
-		Title = "Siparişe Bağlı Mal Kabul İşlemi";
+        Items = new();
 
-		LoadPageCommand = new Command(async () => await LoadPageAsync());
-		ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
-		SaveCommand = new Command(async () => await SaveAsync());
+        Title = "Siparişe Bağlı Mal Kabul İşlemi";
 
-		LoadCarriersCommand = new Command(async () => await LoadCarriersAsync());
-		LoadDriversCommand = new Command(async () => await LoadDriversAsync());
-		_serviceProvider = serviceProvider;
-	}
+        LoadPageCommand = new Command(async () => await LoadPageAsync());
+        ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
+        SaveCommand = new Command(async () => await SaveAsync());
 
-	public Page CurrentPage { get; set; }
+        LoadCarriersCommand = new Command(async () => await LoadCarriersAsync());
+        LoadDriversCommand = new Command(async () => await LoadDriversAsync());
+    }
+
+    public Page CurrentPage { get; set; }
 
     public Command LoadPageCommand { get; }
     public Command BackCommand { get; }
     public Command SaveCommand { get; }
     public Command ShowBasketItemCommand { get; }
 
-	public Command LoadCarriersCommand { get; }
-	public Command LoadDriversCommand { get; }
+    public Command LoadCarriersCommand { get; }
+    public Command LoadDriversCommand { get; }
 
-	private async Task ShowBasketItemAsync()
+    private async Task ShowBasketItemAsync()
     {
         if (IsBusy)
             return;
@@ -123,11 +130,11 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
         }
         catch (Exception ex)
         {
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-		}
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
         finally
         {
             IsBusy = false;
@@ -147,7 +154,7 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
         }
         catch (Exception ex)
         {
-            if(_userDialogs.IsHudShowing)
+            if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
 
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -169,27 +176,27 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
             Carriers.Clear();
             SelectedCarrier = null;
 
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			var result = await _carrierService.GetObjects(
-					httpClient: httpClient,
-					firmNumber: _httpClientService.FirmNumber
-			);
+            var result = await _carrierService.GetObjects(
+                    httpClient: httpClient,
+                    firmNumber: _httpClientService.FirmNumber
+            );
 
-			if (result.IsSuccess)
-			{
-				if (result.Data is null)
-					return;
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
 
-				foreach (var item in result.Data)
-				{
-					Carriers.Add(Mapping.Mapper.Map<Carrier>(item));
-				}
-			}
-		}
+                foreach (var item in result.Data)
+                {
+                    Carriers.Add(Mapping.Mapper.Map<Carrier>(item));
+                }
+            }
+        }
         catch (Exception ex)
         {
-            if(_userDialogs.IsHudShowing)
+            if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
 
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -197,55 +204,55 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
         finally
         {
             IsBusy = false;
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
-		}
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+        }
     }
 
-	private async Task LoadDriversAsync()
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
+    private async Task LoadDriversAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
 
-			Drivers.Clear();
-			SelectedDriver = null;
+            Drivers.Clear();
+            SelectedDriver = null;
 
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			var result = await _driverService.GetObjects(
-					httpClient: httpClient
-			);
+            var result = await _driverService.GetObjects(
+                    httpClient: httpClient
+            );
 
-			if (result.IsSuccess)
-			{
-				if (result.Data is null)
-					return;
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
 
-				foreach (var item in result.Data)
-				{
-					Drivers.Add(Mapping.Mapper.Map<Driver>(item));
-				}
-			}
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
+                foreach (var item in result.Data)
+                {
+                    Drivers.Add(Mapping.Mapper.Map<Driver>(item));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
-		}
-		finally
-		{
-			IsBusy = false;
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
-		}
-	}
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+        }
+    }
 
-	private async Task SaveAsync()
+    private async Task SaveAsync()
     {
         if (IsBusy)
             return;
@@ -395,18 +402,42 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
             if (result.IsSuccess)
             {
                 resultModel.Message = "Başarılı";
-				resultModel.Code = result.Data.Code;
-				resultModel.PageTitle = Title;
+                resultModel.Code = result.Data.Code;
+                resultModel.PageTitle = Title;
                 resultModel.PageCountToBack = 5;
 
-				var basketViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseOrderProcessBasketListViewModel>();
-                foreach (var item in basketViewModel?.Items)
-				{
-					item.Details.Clear();
-				}
-				basketViewModel.Items.Clear();
+                try
+                {
+                    await _transactionAuditHelperService.InsertPurchaseTransactionAuditAsync(firmNumber: _httpClientService.FirmNumber,
+                        periodNumber: _httpClientService.PeriodNumber,
+                        ioType: 1,
+                        transactionType: 1,
+                        transactionDate: FicheDate,
+                        transactionReferenceId: result.Data.ReferenceId,
+                        transactionNumber: result.Data.Code,
+                        documentNumber: DocumentNumber,
+                        warehouseNumber: WarehouseModel.Number,
+                        warehouseName: WarehouseModel.Name,
+                        productReferenceCount: Items.Count,
+                        currentReferenceId: PurchaseSupplier.ReferenceId,
+                        currentCode: PurchaseSupplier.Code,
+                        currentName: PurchaseSupplier.Name
 
-				if (_userDialogs.IsHudShowing)
+                        );
+                }
+                catch (Exception ex)
+                {
+                    _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+                }
+
+                var basketViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseOrderProcessBasketListViewModel>();
+                foreach (var item in basketViewModel?.Items)
+                {
+                    item.Details.Clear();
+                }
+                basketViewModel.Items.Clear();
+
+                if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();
 
                 await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
@@ -432,8 +463,9 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
         {
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
-        finally { 
-            IsBusy = false; 
+        finally
+        {
+            IsBusy = false;
         }
     }
 }

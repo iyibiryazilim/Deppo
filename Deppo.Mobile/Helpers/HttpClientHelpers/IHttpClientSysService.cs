@@ -10,7 +10,7 @@ public interface IHttpClientSysService
 {
     HttpClient GetOrCreateHttpClient();
 
-    public Guid Oid { get; set; }
+    public Guid UserOid { get; set; }
     string BaseUri { get; set; }
     string Token { get; set; }
     int FirmNumber { get; set; }

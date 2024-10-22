@@ -23,12 +23,13 @@ using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.BasketModels;
+using Deppo.Mobile.Helpers.TransactionAuditHelpers;
+using Deppo.Sys.Service.Services;
 
 namespace Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseProcess.ViewModels;
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(Items), queryId: nameof(Items))]
-
 public partial class ReturnPurchaseFormViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
@@ -41,21 +42,27 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
     private readonly IDriverService _driverService;
     private readonly IServiceProvider _serviceProvider;
     private readonly ILocationTransactionService _locationTransactionService;
+    private readonly ITransactionAuditService _transactionAuditService;
+    private readonly IHttpClientSysService _httpClientSysService;
+    private readonly ITransactionAuditHelperService _transactionAuditHelperService;
 
     [ObservableProperty]
-    OutputProductProcessType outputProductProcessType;
+    private OutputProductProcessType outputProductProcessType;
 
     [ObservableProperty]
-    WarehouseModel warehouseModel = null!;
+    private WarehouseModel warehouseModel = null!;
 
     [ObservableProperty]
-    SupplierModel? selectedSupplier;
+    private SupplierModel? selectedSupplier;
+
     [ObservableProperty]
-    ShipAddressModel? selectedShipAddress;
+    private ShipAddressModel? selectedShipAddress;
+
     [ObservableProperty]
-    Carrier? selectedCarrier;
+    private Carrier? selectedCarrier;
+
     [ObservableProperty]
-    Driver? selectedDriver;
+    private Driver? selectedDriver;
 
     public ObservableCollection<SupplierModel> Suppliers { get; } = new();
     public ObservableCollection<ShipAddressModel> ShipAddresses { get; } = new();
@@ -63,28 +70,26 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
     public ObservableCollection<Driver> Drivers { get; } = new();
 
     [ObservableProperty]
-    ObservableCollection<ReturnPurchaseBasketModel> items = null!;
+    private ObservableCollection<ReturnPurchaseBasketModel> items = null!;
 
-    ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
-
-
-    [ObservableProperty]
-    string documentNumber = string.Empty;
+    private ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
 
     [ObservableProperty]
-    DateTime transactionDate = DateTime.Now;
+    private string documentNumber = string.Empty;
 
     [ObservableProperty]
-    string description = string.Empty;
+    private DateTime transactionDate = DateTime.Now;
 
     [ObservableProperty]
-    string documentTrackingNumber = string.Empty;
+    private string description = string.Empty;
 
     [ObservableProperty]
-    string specialCode = string.Empty;
+    private string documentTrackingNumber = string.Empty;
 
+    [ObservableProperty]
+    private string specialCode = string.Empty;
 
-    public ReturnPurchaseFormViewModel(IHttpClientService httpClientService, IPurchaseReturnDispatchTransactionService purchaseReturnDispatchTransactionService, IUserDialogs userDialogs, IPurchaseSupplierService purchaseSupplierService, IShipAddressService shipAddressService, ICarrierService carrierService, IDriverService driverService, ISupplierService supplierService, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService)
+    public ReturnPurchaseFormViewModel(IHttpClientService httpClientService, IPurchaseReturnDispatchTransactionService purchaseReturnDispatchTransactionService, IUserDialogs userDialogs, IPurchaseSupplierService purchaseSupplierService, IShipAddressService shipAddressService, ICarrierService carrierService, IDriverService driverService, ISupplierService supplierService, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService, ITransactionAuditService transactionAuditService, IHttpClientSysService httpClientSysService, ITransactionAuditHelperService transactionAuditHelperService)
     {
         _httpClientService = httpClientService;
         _purchaseReturnDispatchTransactionService = purchaseReturnDispatchTransactionService;
@@ -96,6 +101,10 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
         _supplierService = supplierService;
         _serviceProvider = serviceProvider;
         _locationTransactionService = locationTransactionService;
+        _transactionAuditHelperService = transactionAuditHelperService;
+        _httpClientSysService = httpClientSysService;
+        _transactionAuditHelperService = transactionAuditHelperService;
+
         Items = new();
 
         Title = "Satınalma İade İrsaliyesi";
@@ -108,6 +117,7 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
         BackCommand = new Command(async () => await BackAsync());
         LoadShipAddressesCommand = new Command<PurchaseSupplier>(async (purchaseSupplier) => await LoadShipAddressesAsync(purchaseSupplier));
     }
+
     public Page CurrentPage { get; set; }
 
     public Command SaveCommand { get; }
@@ -119,7 +129,6 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
 
     public Command BackCommand { get; }
 
-
     private async Task LoadPageAsync()
     {
         if (IsBusy)
@@ -130,12 +139,9 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
             IsBusy = true;
 
             CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
-
-
         }
         catch (System.Exception)
         {
-
             throw;
         }
         finally
@@ -250,7 +256,6 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
                 _userDialogs.HideHud();
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-
         }
         finally
         {
@@ -275,7 +280,7 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
             var result = await _carrierService.GetObjects(
                     httpClient: httpClient,
                     firmNumber: _httpClientService.FirmNumber
-                    
+
             );
 
             if (result.IsSuccess)
@@ -350,7 +355,6 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
     {
         try
         {
-
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _locationTransactionService.GetInputObjectsAsync(
                 httpClient: httpClient,
@@ -373,7 +377,6 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
                 {
                     LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
                 }
-
             }
 
             _userDialogs.Loading().Hide();
@@ -400,7 +403,6 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
             if (!confirm)
                 return;
 
-
             _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
             await Task.Delay(1000);
 
@@ -423,14 +425,13 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
                 FirmNumber = _httpClientService.FirmNumber,
                 SpeCode = SpecialCode,
                 WarehouseNumber = WarehouseModel.Number,
-
             };
 
             foreach (var item in Items)
             {
                 var purchaseReturnDispatchTransactionLineDto = new PurchaseReturnDispatchTransactionLineDto
                 {
-                    ProductCode =item.IsVariant ? item.MainItemCode : item.ItemCode,
+                    ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
                     VariantCode = item.IsVariant ? item.ItemCode : string.Empty,
                     WarehouseNumber = (short?)WarehouseModel.Number,
                     Quantity = item.Quantity,
@@ -462,10 +463,8 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
                             purchaseReturnDispatchTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
                             locationTransaction.RemainingQuantity -= (double)serilotTransactionDto.Quantity;
                             item.Quantity -= (double)serilotTransactionDto.Quantity;
-
                         }
                     }
-
                 }
 
                 dto.Lines.Add(purchaseReturnDispatchTransactionLineDto);
@@ -487,6 +486,32 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
                 resultModel.PageTitle = Title;
                 resultModel.PageCountToBack = 5;
 
+                try
+                {
+                    await _transactionAuditHelperService.InsertPurchaseTransactionAuditAsync(firmNumber: _httpClientService.FirmNumber,
+                        periodNumber: _httpClientService.PeriodNumber,
+                        ioType: 3,
+                        transactionType: 6,
+                        transactionDate: TransactionDate,
+                        transactionReferenceId: result.Data.ReferenceId,
+                        transactionNumber: result.Data.Code,
+                        documentNumber: DocumentNumber,
+                        warehouseNumber: WarehouseModel.Number,
+                        warehouseName: WarehouseModel.Name,
+                        productReferenceCount: Items.Count,
+                        currentReferenceId: SelectedSupplier.ReferenceId,
+                        currentCode: SelectedSupplier.Code,
+                        currentName: SelectedSupplier.Name,
+                        shipAddressReferenceId: SelectedShipAddress.ReferenceId,
+                        shipAddressCode: SelectedShipAddress.Code,
+                        shipAddressName: SelectedShipAddress.Name
+
+                        );
+                }
+                catch (Exception ex)
+                {
+                    _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+                }
 
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();
@@ -511,7 +536,6 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
                     [nameof(ResultModel)] = resultModel
                 });
             }
-
         }
         catch (Exception ex)
         {
@@ -578,7 +602,6 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
     }

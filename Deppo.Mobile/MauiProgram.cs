@@ -7,6 +7,7 @@ using Deppo.Mobile.Core.DataStores;
 using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.BarcodeHelper;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.TransactionAuditHelpers;
 using Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.ViewModels;
 using Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.Views;
 using Deppo.Mobile.Modules.AnalysisModule.ProductAnalysis.ViewModels;
@@ -238,18 +239,17 @@ public static class MauiProgram
 #endif
         });
 
-		#endregion Remove Underline from SearchBar
+        #endregion Remove Underline from SearchBar
 
-		
 #if ANDROID
-		Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoUnderline", (h, v) => {
-			h.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToAndroid());
-            });
+        Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoUnderline", (h, v) =>
+        {
+            h.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToAndroid());
+        });
 #endif
 
-
 #if DEBUG
-			builder.Logging.AddDebug();
+        builder.Logging.AddDebug();
 #endif
 
         builder.Services.AddSingleton(UserDialogs.Instance);
@@ -371,6 +371,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IApplicationUserService, ApplicationUserDataStore>();
         builder.Services.AddSingleton<IProcurementAuditService, ProcurementAuditDataStore>();
         builder.Services.AddSingleton<IProcurementAuditCustomerService, ProcurementAuditCustomerDataStore>();
+        builder.Services.AddSingleton<ITransactionAuditHelperService, TransactionAuditHelperDataStore>();
 
         #region Analysis Modules
 

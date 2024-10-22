@@ -15,6 +15,7 @@ using System.Text;
 namespace Deppo.Sys.Module.BusinessObjects
 {
     [DefaultClassOptions]
+    [MapInheritance(MapInheritanceType.OwnTable)]
     public class ProcurementAuditCustomer : ProcurementAudit
     {
         private int _currentReferenceId;

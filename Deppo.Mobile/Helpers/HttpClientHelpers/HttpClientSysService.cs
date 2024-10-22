@@ -21,7 +21,7 @@ public class HttpClientSysService : IHttpClientSysService
 
    , LazyThreadSafetyMode.None);
 
-    public Guid Oid { get; set; }
+    public Guid UserOid { get; set; }
     public string Token { get; set; } = string.Empty;
     public string BaseUri { get; set; } = string.Empty;
     public int FirmNumber { get; set; }

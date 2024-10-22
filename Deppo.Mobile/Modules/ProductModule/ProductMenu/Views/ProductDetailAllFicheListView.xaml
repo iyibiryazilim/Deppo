@@ -36,11 +36,19 @@
         <Grid ColumnDefinitions="*, Auto"
               Grid.Row="0"
               Padding="10,10,0,0">
-            <Label Grid.Column="0"
-                   FontAttributes="Bold"
-                   FontSize="Large"
-                   Text="{Binding Title}"
-                   TextColor="WhiteSmoke" />
+
+            <VerticalStackLayout>
+                <Label FontSize="Large"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource White}"
+                       Text="{Binding Title}">
+                </Label>
+                <Label FontSize="16"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource White}"
+                       Text="{Binding ProductDetailModel.Product.Code}">
+                </Label>
+            </VerticalStackLayout>
 
             <ImageButton Grid.Column="1"
                          Command="{Binding BackCommand}"
@@ -132,11 +140,18 @@
                                          Spacing="5">
                         <Grid ColumnDefinitions=".80*, .20*"
                               ColumnSpacing="10">
-                            <Label Grid.Column="0"
-                                   FontAttributes="Bold"
-                                   FontSize="Medium"
-                                   HorizontalOptions="Start"
-                                   Text="Hareketler" />
+                            <VerticalStackLayout>
+                                <Label  FontAttributes="Bold"
+                                        FontSize="16"
+                                        Text="{Binding SelectedItem.FicheNumber}">
+                                    
+                                </Label>
+                                <Label Grid.Column="0"
+                                       FontAttributes="Bold"
+                                       FontSize="Medium"
+                                       HorizontalOptions="Start"
+                                       Text="Malzeme Hareket Detayı" />
+                            </VerticalStackLayout>
                             <ImageButton Grid.Column="1"
                                          Command="{Binding TransactionsCloseCommand}"
                                          HeightRequest="25"
