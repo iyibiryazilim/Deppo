@@ -1,7 +1,7 @@
 ﻿"use strict";
 
 // Class definition
-var customerList = function () {
+var negativeProductList = function () {
     // Shared variables
     var table;
     var datatable;
@@ -21,24 +21,24 @@ var customerList = function () {
             pageLength: 10,
             serverSide: true,
             ajax: {
-                url: "Customer/GetObjectsJsonResult",
+                url: "NegativeProduct/GetObjectsJsonResult",
                 type: "POST",
                 data: function (d) {
                     return {
                         draw: d.draw,
                         start: d.start,
                         length: d.length,
-                        searchText: $('#customerSearchInput').val()
+                        searchText: $('#negativeProductSearchInput').val()
                     };
                 }
             },
             columns: [
                 { data: 'code' },
-                { data: 'email' },
-                { data: 'telephone' },
-                { data: 'city' },
-                { data: 'country' },
-
+                { data: 'stockQuantity' },
+                { data: 'groupCode' },
+                { data: 'brandName' },
+                { data: 'isVariant' },
+                { data: 'trackingType' },
 
             ],
 
@@ -49,16 +49,19 @@ var customerList = function () {
                     className: 'text-start pe-0',
                     render: function (data, type, full, meta) {
                         var output;
-                        var initials = full.title ? full.title.substring(0, 2).toUpperCase() : '';
+                        var defaultImageUrl = "/assets/media/images/notfound.png"; // Correct path to your default image
+
+                        // Check if imageData is empty or null and use the default image if so
+                        var imageSrc = full.imageData ? `data:image/jpg;base64,${full.imageData}` : defaultImageUrl;
 
                         output = `
             <div class="d-flex align-items-center">
-                <div class="symbol symbol-40px mb-1" style="margin-right: 10px; display: flex; align-items: center; justify-content: center; background-color: #44B0C0; border-radius: 50%; width: 40px; height: 40px;">
-                    <span class="text-dark fw-bold">${initials}</span>
+                <div class="symbol symbol-40px mb-1" style="margin-right: 2%;"> <!-- Adjusted the margin-right -->
+                    <img src="${imageSrc}" alt="image" />
                 </div>
                 <div class="d-flex justify-content-start flex-column">
-                    <a href="#" class="text-dark fw-bold text-hover-primary mb-1 fs-6">${full.code}</a>
-                    <span class="text-muted fw-semibold text-muted d-block fs-7">${full.title}</span>
+                    <a href="../Vehicle/Detail/?VehicleOid=${full.referenceId}" class="text-dark fw-bold text-hover-primary mb-1 fs-6">${full.code}</a>
+                    <span class="text-muted fw-semibold text-muted d-block fs-7">${full.name}</span>
                 </div>
             </div>
         `;
@@ -68,27 +71,32 @@ var customerList = function () {
                 },
 
 
-
                 {
                     orderable: true,
                     targets: 1,
                     className: 'text-start pe-0',
                     render: function (data, type, full, meta) {
-
                         var output;
-                        output = `<span class="fw-bold">` + full.email + `</span>`
+
+                        output = `
+                        <div>
+                            <span class="fw-bold">${full.stockQuantity.toLocaleString('tr-TR')}</span>
+                            <span class="text-muted ms-2">(${full.subUnitsetCode})</span>
+                        </div>
+                            `;
 
                         return output;
                     },
                 },
+
                 {
                     orderable: true,
                     targets: 2,
-                    className: 'text-start pe-0',
+                    className: 'text-center pe-0',
                     render: function (data, type, full, meta) {
 
                         var output;
-                        output = `<span class="fw-bold">` + full.telephone + `</span>`
+                        output = `<span class="fw-bold">` + full.groupCode + `</span>`
 
                         return output;
                     },
@@ -97,11 +105,11 @@ var customerList = function () {
                 {
                     orderable: true,
                     targets: 3,
-                    className: 'text-start pe-0',
+                    className: 'text-center pe-0',
                     render: function (data, type, full, meta) {
 
                         var output;
-                        output = `<span class="fw-bold">` + full.city + `</span>`
+                        output = `<span class="fw-bold">` + full.brandName + `</span>`
 
                         return output;
                     },
@@ -109,17 +117,23 @@ var customerList = function () {
                 {
                     orderable: true,
                     targets: 4,
-                    className: 'text-start pe-0',
+                    className: 'text-center pe-0',
                     render: function (data, type, full, meta) {
-
-                        console.log(full)
                         var output;
-                        output = `<span class="fw-bold">` + full.country + `</span>`
-
+                        output = `<input type="checkbox" ${full.isVariant ? 'checked' : ''} onclick="return false;" tabindex="-1" />`;
                         return output;
                     },
                 },
-
+                {
+                    orderable: true,
+                    targets: 5,
+                    className: 'text-center pe-0',
+                    render: function (data, type, full, meta) {
+                        var output;
+                        output = `<input type="checkbox" ${full.locTracking ? 'checked' : ''} onclick="return false;" tabindex="-1" />`;
+                        return output;
+                    },
+                },
 
 
 
@@ -132,16 +146,15 @@ var customerList = function () {
     }
 
     var handleSearchDatatable = () => {
-        const filterSearch = document.querySelector('[customer_list_table="search"]');
+        const filterSearch = document.querySelector('[negative_product_list_table="search"]');
         filterSearch.addEventListener('keyup', function (e) {
             datatable.ajax.reload();
         });
     }
 
-    // Public methods
     return {
         init: async function () {
-            table = document.querySelector('#customer_list_table');
+            table = document.querySelector('#negative_product_list_table');
 
             if (!table) {
                 return;
@@ -155,5 +168,5 @@ var customerList = function () {
 
 // On document ready
 KTUtil.onDOMContentLoaded(function () {
-    customerList.init();
+    negativeProductList.init();
 });
