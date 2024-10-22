@@ -1187,7 +1187,7 @@ public partial class ProductDetailViewModel : BaseViewModel
                             title: "Malzeme Resmi",
                             cancel: "Vazgeç",
                             destructive: "Temizle",
-                            icon:null,
+                            icon: null,
                             useBottomSheet: true,
                             cancelToken: default,
                             "Kamerayı Kullan",
@@ -1196,13 +1196,13 @@ public partial class ProductDetailViewModel : BaseViewModel
 
             if (result == "Kamerayı Kullan")
             {
-                await TakePictureAsync();
+                await CaptureImageAsync();
             }
             else if (result == "Kütüphane")
             {
                 await PickImageAsync();
             }
-            else if(result == "Temizle")
+            else if (result == "Temizle")
             {
                 //await ClearImageAsync();
             }
@@ -1211,7 +1211,7 @@ public partial class ProductDetailViewModel : BaseViewModel
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();
             }
-            
+
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
@@ -1229,20 +1229,13 @@ public partial class ProductDetailViewModel : BaseViewModel
         }
     }
 
-    private async Task TakePictureAsync()
-    {
-        await Shell.Current.GoToAsync($"{nameof(ProductPictureView)}", new Dictionary<string, object>
-        {
-            ["Product"] = ProductDetailModel.Product
-        });
 
-    }
 
     private async Task CaptureImageAsync()
     {
-        await Shell.Current.GoToAsync($"{nameof(ProductPictureView)}", new Dictionary<string, object>
+        await Shell.Current.GoToAsync($"{nameof(ProductCaptureImageView)}", new Dictionary<string, object>
         {
-            ["Product"] = ProductDetailModel.Product
+            [nameof(Product)] = ProductDetailModel.Product
         });
     }
 
@@ -1253,11 +1246,18 @@ public partial class ProductDetailViewModel : BaseViewModel
             Title = "Select your photo"
         });
 
+
         if (photo is not null)
         {
             var stream = await photo.OpenReadAsync();
-            var image = ImageSource.FromStream(() => stream);
-            //image.Source = ImageSource.FromStream(() => stream);
+
+            Image productImage = CurrentPage.FindByName<Image>("productImage");
+            if (productImage is not null)
+                productImage.Source = ImageSource.FromStream(() => stream);
+
+
+            //update or insert image
         }
+
     }
 }
