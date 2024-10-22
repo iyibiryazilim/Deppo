@@ -31,7 +31,7 @@ namespace Deppo.Mobile.Core.Models.OutsourceModels.BasketModels
         private int _trackingType;
         private int _locTracking;
         private bool _isSelected;
-        private string? _image;
+        private byte[]? _image;
         private double _outputQuantity;
         private int _shipAddressReferenceId;
         private string _shipAddressCode = string.Empty;
@@ -281,7 +281,7 @@ namespace Deppo.Mobile.Core.Models.OutsourceModels.BasketModels
             }
         }
 
-        public string? Image
+        public byte[]? Image
         {
             get => _image;
             set
