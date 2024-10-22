@@ -2,6 +2,7 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.OutsourceModels;
 using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
@@ -62,6 +63,7 @@ public partial class InputOutsourceTransferOutsourceBasketListViewModel : BaseVi
         UnitActionTappedCommand = new Command<InputOutsourceTransferBasketModel>(async (item) => await UnitActionTappedAsync(item));
         SubUnitsetTappedCommand = new Command<SubUnitset>(async (subUnitset) => await SubUnitsetTappedAsync(subUnitset));
 
+        QuantityTappedCommand = new Command<InputOutsourceTransferBasketModel>(async (item) => await QuantityTappedAsync(item));
 		DeleteItemCommand = new Command<InputOutsourceTransferBasketModel>(async (item) => await DeleteItemAsync(item));
 		IncreaseCommand = new Command<InputOutsourceTransferBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<InputOutsourceTransferBasketModel>(async (item) => await DecreaseAsync(item));
@@ -83,6 +85,8 @@ public partial class InputOutsourceTransferOutsourceBasketListViewModel : BaseVi
     public Command ShowProductViewCommand { get; }
 	public Command UnitActionTappedCommand { get; }
 	public Command SubUnitsetTappedCommand { get; }
+
+    public Command<InputOutsourceTransferBasketModel> QuantityTappedCommand { get; }
     public Command<InputOutsourceTransferBasketModel> DeleteItemCommand { get; }
     public Command<InputOutsourceTransferBasketModel> IncreaseCommand { get; }
     public Command<InputOutsourceTransferBasketModel> DecreaseCommand { get; }
@@ -199,6 +203,50 @@ public partial class InputOutsourceTransferOutsourceBasketListViewModel : BaseVi
 			SelectedInputOutsourceTransferBasketModel = item;
 			await LoadSubUnitsetsAsync(item);
 			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.HalfExpanded;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task QuantityTappedAsync(InputOutsourceTransferBasketModel inputOutsourceTransferBasketModel)
+	{
+		if (inputOutsourceTransferBasketModel is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var result = await CurrentPage.DisplayPromptAsync(
+				title: inputOutsourceTransferBasketModel.ItemCode,
+				message: "Miktarı giriniz",
+				cancel: "Vazgeç",
+				accept: "Tamam",
+				initialValue: inputOutsourceTransferBasketModel.Quantity.ToString(),
+				keyboard: Keyboard.Numeric);
+
+			if (string.IsNullOrEmpty(result))
+				return;
+
+			var quantity = Convert.ToDouble(result);
+
+			if (quantity <= 0)
+			{
+				await _userDialogs.AlertAsync("Miktar sıfırdan küçük olmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			inputOutsourceTransferBasketModel.Quantity = quantity;
 		}
 		catch (Exception ex)
 		{
