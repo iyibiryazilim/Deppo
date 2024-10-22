@@ -211,7 +211,11 @@
                                                        FontSize="Large"
                                                        Text="{Binding Quantity}"
                                                        TextColor="{StaticResource OffBlack}"
-                                                       VerticalOptions="Center" />
+                                                       VerticalOptions="Center">
+                                                    <Label.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnPurchaseBasketViewModel}}, Path=QuantityTappedCommand}" CommandParameter="{Binding .}" />
+                                                    </Label.GestureRecognizers>
+                                                </Label>
                                                 <Border Grid.Column="2"
                                                         Padding="5"
                                                         BackgroundColor="{StaticResource Secondary}"
@@ -362,7 +366,11 @@
                                                        FontSize="Large"
                                                        Text="{Binding OutputQuantity}"
                                                        TextColor="{StaticResource OffBlack}"
-                                                       VerticalOptions="Center" />
+                                                       VerticalOptions="Center">
+                                                    <Label.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnPurchaseBasketViewModel}}, Path=LocationTransactionQuantityTappedCommand}" CommandParameter="{Binding .}" />
+                                                    </Label.GestureRecognizers>
+                                                </Label>
                                                 <Border Grid.Column="2"
                                                         Padding="5"
                                                         BackgroundColor="{StaticResource Secondary}"
