@@ -288,14 +288,12 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
                 return;
             }
 
-
-            _userDialogs.Loading("İşlem tamamlanıyor...");
-            await Task.Delay(1000);
+			await CloseInsertOptionsAsync();
+			
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             await WholeSalesDispatchTransactionInsertAsync(httpClient);
 
-            _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
@@ -325,13 +323,11 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
                 return;
             }
 
-            _userDialogs.Loading("İşlem tamamlanıyor...");
-            await Task.Delay(1000);
+			await CloseInsertOptionsAsync();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             await RetailSalesDispatchTransactionInsertAsync(httpClient);
 
-            _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
@@ -390,7 +386,9 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 
     private async Task WholeSalesDispatchTransactionInsertAsync(HttpClient httpClient)
     {
-        var dto = new WholeSalesDispatchTransactionInsert
+		_userDialogs.Loading("İşlem tamamlanıyor...");
+
+		var dto = new WholeSalesDispatchTransactionInsert
         {
             Code = "",
             CurrentCode = SalesCustomer != null ? SalesCustomer.Code : "",
@@ -434,7 +432,7 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 
                 foreach (var locationTransaction in LocationTransactions)
                 {
-                    while (locationTransaction.RemainingQuantity > 0 && item.Quantity > 0)
+                    while (locationTransaction.RemainingQuantity > 0 && item.OutputQuantity > 0)
                     {
                         var serilotTransactionDto = new SeriLotTransactionDto
                         {
@@ -504,7 +502,8 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 
     private async Task RetailSalesDispatchTransactionInsertAsync(HttpClient httpClient)
     {
-        var dto = new RetailSalesDispatchTransactionInsert
+		_userDialogs.Loading("İşlem tamamlanıyor...");
+		var dto = new RetailSalesDispatchTransactionInsert
         {
             Code = "",
             CurrentCode = SalesCustomer != null ? SalesCustomer.Code : "",
@@ -548,7 +547,7 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 
                 foreach (var locationTransaction in LocationTransactions)
                 {
-                    while (locationTransaction.RemainingQuantity > 0 && item.Quantity > 0)
+                    while (locationTransaction.RemainingQuantity > 0 && item.OutputQuantity > 0)
                     {
                         var serilotTransactionDto = new SeriLotTransactionDto
                         {
