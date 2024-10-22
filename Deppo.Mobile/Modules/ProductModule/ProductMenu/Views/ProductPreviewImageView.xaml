@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Deppo.Mobile.Modules.ProductModule.ProductMenu.Views.ProductPreviewImageView"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels"
+    Title="ProductPreviewImage"
+    x:DataType="viewModel:ProductPreviewImageViewModel"
+    Shell.PresentationMode="ModalAnimated"
+    Shell.TabBarIsVisible="False">
+
+   
+
+    <Grid
+        Padding="10"
+        RowDefinitions=".80*,.20*"
+        RowSpacing="10">
+        <Image
+            Grid.Row="0"
+            Aspect="AspectFit"
+            VerticalOptions="Center" />
+
+        <Border
+            Grid.Row="1"
+            Padding="10"
+            BackgroundColor="{StaticResource OffBlack}"
+            Stroke="{StaticResource OffBlack}">
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <Label
+                    Grid.Column="0"
+                    FontAttributes="Bold"
+                    FontSize="Subtitle"
+                    HorizontalOptions="Start"
+                    Text="Yeniden Çek"
+                    TextColor="{StaticResource White}"
+                    VerticalOptions="Center" />
+
+                <Label
+                    Grid.Column="1"
+                    FontAttributes="Bold"
+                    FontSize="Subtitle"
+                    HorizontalOptions="End"
+                    Text="Fotoğrafı Kullan"
+                    TextColor="{StaticResource White}"
+                    VerticalOptions="Center" />
+            </Grid>
+        </Border>
+
+
+    </Grid>
+</ContentPage>

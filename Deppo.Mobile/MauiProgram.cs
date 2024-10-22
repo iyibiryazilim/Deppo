@@ -398,7 +398,9 @@ public static class MauiProgram
         builder.Services.AddTransientWithShellRoute<WarehouseDetailAllFicheListView, WarehouseDetailAllFicheListViewModel>(nameof(WarehouseDetailAllFicheListView));
         builder.Services.AddScopedWithShellRoute<WarehouseDetailWarehouseTotalListView, WarehouseDetailWarehouseTotalListViewModel>(nameof(WarehouseDetailWarehouseTotalListView));
         builder.Services.AddScopedWithShellRoute<WarehouseDetailLocationListView, WarehouseDetailLocationListViewModel>(nameof(WarehouseDetailLocationListView));
-        builder.Services.AddScopedWithShellRoute<ProductPictureView, ProductPictureViewModel>(nameof(ProductPictureView));
+        builder.Services.AddScopedWithShellRoute<ProductCaptureImageView, ProductCaptureImageViewModel>(nameof(ProductCaptureImageView));
+        builder.Services.AddScopedWithShellRoute<ProductPreviewImageView, ProductPreviewImageViewModel>(nameof(ProductPreviewImageView));
+        
 
         #region ProductionInput Modules
 
