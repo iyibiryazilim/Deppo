@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.PurchaseModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
@@ -27,6 +29,7 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
     private readonly ISeriLotTransactionService _serilotTransactionService;
     private readonly ILocationTransactionService _locationTransactionService;
     private readonly IUserDialogs _userDialogs;
+    private readonly ISubUnitsetService _subUnitsetService;
 
     [ObservableProperty]
     WarehouseModel warehouseModel = null!;
@@ -61,44 +64,54 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
     #region Collections
     public ObservableCollection<SeriLotTransactionModel> SeriLotTransactions { get; } = new();
     public ObservableCollection<GroupLocationTransactionModel> LocationTransactions { get; } = new();
-    #endregion
+	#endregion
 
-    public ReturnPurchaseDispatchBasketViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs)
-    {
-        _httpClientService = httpClientService;
-        _serilotTransactionService = serilotTransactionService;
-        _locationTransactionService = locationTransactionService;
-        _userDialogs = userDialogs;
+	public ReturnPurchaseDispatchBasketViewModel(IHttpClientService httpClientService, ISeriLotTransactionService serilotTransactionService, ILocationTransactionService locationTransactionService, IUserDialogs userDialogs, ISubUnitsetService subUnitsetService)
+	{
+		_httpClientService = httpClientService;
+		_serilotTransactionService = serilotTransactionService;
+		_locationTransactionService = locationTransactionService;
+		_userDialogs = userDialogs;
+		_subUnitsetService = subUnitsetService;
 
-        Title = "Sepet Listesi";
+		Title = "Sepet Listesi";
 
-        IncreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await IncreaseAsync(item));
-        DecreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DecreaseAsync(item));
-        DeleteItemCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DeleteItemAsync(item));
-        NextViewCommand = new Command(async () => await NextViewAsync());
-        BackCommand = new Command(async () => await BackAsync());
+        UnitActionTappedCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await UnitActionTappedAsync(item));
+        SubUnitsetTappedCommand = new Command<SubUnitset>(async (item) => await SubUnitsetTappedAsync(item));
+
+        QuantityTappedCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await QuantityTappedAsync(item));
+		IncreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await IncreaseAsync(item));
+		DecreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DecreaseAsync(item));
+		DeleteItemCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DeleteItemAsync(item));
+		NextViewCommand = new Command(async () => await NextViewAsync());
+		BackCommand = new Command(async () => await BackAsync());
 
 
-        LoadMoreSeriLotTransactionsCommand = new Command(async () => await LoadMoreSeriLotTransactionsAsync());
-        SeriLotTransactionIncreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionIncreaseAsync(item));
-        SeriLotTransactionDecreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionDecreaseAsync(item));
-        ConfirmSeriLotTransactionCommand = new Command(ConfirmSeriLotTransactionAsync);
-        SeriLotTransactionCloseCommand = new Command(async () => await SeriLotTransactionCloseAsync());
+		LoadMoreSeriLotTransactionsCommand = new Command(async () => await LoadMoreSeriLotTransactionsAsync());
+		SeriLotTransactionIncreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionIncreaseAsync(item));
+		SeriLotTransactionDecreaseCommand = new Command<SeriLotTransactionModel>(item => SeriLotTransactionDecreaseAsync(item));
+		ConfirmSeriLotTransactionCommand = new Command(ConfirmSeriLotTransactionAsync);
+		SeriLotTransactionCloseCommand = new Command(async () => await SeriLotTransactionCloseAsync());
 
-        LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
-        LocationTransactionIncreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
-        LocationTransactionDecreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
-        ConfirmLocationTransactionCommand = new Command(ConfirmLocationTransactionAsync);
-        LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
-    }
+		LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
+        LocationTransactionQuantityTappedCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionQuantityTappedAsync(item));
+		LocationTransactionIncreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
+		LocationTransactionDecreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
+		ConfirmLocationTransactionCommand = new Command(ConfirmLocationTransactionAsync);
+		LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
+	}
 
-    #region Properties
-    public ContentPage CurrentPage { get; set; } = null!;
+	#region Properties
+	public ContentPage CurrentPage { get; set; } = null!;
 
     #endregion
 
     #region Commands
-    public Command IncreaseCommand { get; }
+    public Command UnitActionTappedCommand { get; }
+    public Command SubUnitsetTappedCommand { get; }
+
+    public Command QuantityTappedCommand { get; }
+	public Command IncreaseCommand { get; }
     public Command DecreaseCommand { get; }
     public Command DeleteItemCommand { get; }
     public Command NextViewCommand { get; }
@@ -107,6 +120,7 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
 
     #region Location Transaction Command
     public Command LoadMoreLocationTransactionsCommand { get; }
+    public Command LocationTransactionQuantityTappedCommand { get; }
     public Command LocationTransactionIncreaseCommand { get; }
     public Command LocationTransactionDecreaseCommand { get; }
     public Command ConfirmLocationTransactionCommand { get; }
@@ -119,13 +133,153 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
     public Command SeriLotTransactionDecreaseCommand { get; }
     public Command ConfirmSeriLotTransactionCommand { get; }
     public Command SeriLotTransactionCloseCommand { get; }
-    #endregion
+	#endregion
 
-    #endregion
+	#endregion
 
+	private async Task UnitActionTappedAsync(ReturnPurchaseBasketModel item)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
 
+			SelectedItem = item;
+			await LoadSubUnitsetsAsync(item);
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.HalfExpanded;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 
-    private async Task IncreaseAsync(ReturnPurchaseBasketModel item)
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task LoadSubUnitsetsAsync(ReturnPurchaseBasketModel item)
+	{
+		if (item is null)
+			return;
+		try
+		{
+			item.SubUnitsets.Clear();
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _subUnitsetService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				productReferenceId: item.ItemReferenceId
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var subUnitset in result.Data)
+				{
+					item.SubUnitsets.Add(Mapping.Mapper.Map<SubUnitset>(subUnitset));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+	}
+
+	private async Task SubUnitsetTappedAsync(SubUnitset subUnitset)
+	{
+		if (subUnitset is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			if (SelectedItem is not null)
+			{
+				SelectedItem.SubUnitsetReferenceId = subUnitset.ReferenceId;
+				SelectedItem.SubUnitsetName = subUnitset.Name;
+				SelectedItem.SubUnitsetCode = subUnitset.Code;
+			}
+
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.Hidden;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task QuantityTappedAsync(ReturnPurchaseBasketModel item)
+	{
+		if (item is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var result = await CurrentPage.DisplayPromptAsync(
+				title: item.ItemCode,
+				message: "Miktarı giriniz",
+				cancel: "Vazgeç",
+				accept: "Tamam",
+				initialValue: item.Quantity.ToString(),
+				keyboard: Keyboard.Numeric);
+
+			if (string.IsNullOrEmpty(result))
+				return;
+
+			var quantity = Convert.ToDouble(result);
+			if (quantity <= 0)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar 0'dan küçük olmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			if (quantity > item.StockQuantity)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar, stok miktarını aşmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			item.Quantity = quantity;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task IncreaseAsync(ReturnPurchaseBasketModel item)
     {
         if (IsBusy)
             return;
@@ -343,7 +497,68 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
         }
     }
 
-    private async Task LocationTransactionIncreaseAsync(GroupLocationTransactionModel item)
+	private async Task LocationTransactionQuantityTappedAsync(GroupLocationTransactionModel item)
+	{
+		if (item is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var result = await CurrentPage.DisplayPromptAsync(
+				title: item.ItemCode,
+				message: "Miktarı giriniz",
+				cancel: "Vazgeç",
+				accept: "Tamam",
+				initialValue: item.OutputQuantity.ToString(),
+				keyboard: Keyboard.Numeric);
+
+			if (string.IsNullOrEmpty(result))
+				return;
+
+			var quantity = Convert.ToDouble(result);
+			if (quantity <= 0)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar 0'dan küçük olmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			if (quantity > item.RemainingQuantity)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar, kalan miktarı aşmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+			if (quantity > SelectedItem?.StockQuantity)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar, stok miktarını aşmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			var totalQuantity = LocationTransactions.Sum(x => x.OutputQuantity);
+			if (SelectedItem?.StockQuantity >= totalQuantity + quantity)
+			{
+				item.OutputQuantity = quantity;
+			}
+			else
+			{
+				await _userDialogs.AlertAsync($"Girilen miktar, Ürünün stok miktarını ({SelectedItem?.StockQuantity}) aşmamalıdır.", "Hata", "Tamam");
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+	private async Task LocationTransactionIncreaseAsync(GroupLocationTransactionModel item)
     {
         if (IsBusy)
             return;
