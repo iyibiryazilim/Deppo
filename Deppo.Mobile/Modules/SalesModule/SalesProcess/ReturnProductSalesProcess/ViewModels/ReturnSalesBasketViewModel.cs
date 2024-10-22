@@ -67,6 +67,7 @@ public partial class ReturnSalesBasketViewModel : BaseViewModel
         UnitActionTappedCommand = new Command<ReturnSalesBasketModel>(async (item) => await UnitActionTappedAsync(item));
         SubUnitsetTappedCommand = new Command<SubUnitset>(async (subUnitset) => await SubUnitsetTappedAsync(subUnitset));
 
+        QuantityTappedCommand = new Command<ReturnSalesBasketModel>(async (item) => await QuantityTappedAsync(item));
 		DeleteItemCommand = new Command<ReturnSalesBasketModel>(async (item) => await DeleteItemAsync(item));
 		IncreaseCommand = new Command<ReturnSalesBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<ReturnSalesBasketModel>(async (item) => await DecreaseAsync(item));
@@ -91,6 +92,8 @@ public partial class ReturnSalesBasketViewModel : BaseViewModel
     public Command PerformSearchCommand { get; }
 	public Command UnitActionTappedCommand { get; }
 	public Command SubUnitsetTappedCommand { get; }
+
+    public Command<ReturnSalesBasketModel> QuantityTappedCommand { get; }
 	public Command<ReturnSalesBasketModel> DeleteItemCommand { get; }
     public Command<ReturnSalesBasketModel> IncreaseCommand { get; }
     public Command<ReturnSalesBasketModel> DecreaseCommand { get; }
@@ -262,6 +265,49 @@ public partial class ReturnSalesBasketViewModel : BaseViewModel
 		}
 	}
 
+	private async Task QuantityTappedAsync(ReturnSalesBasketModel returnSalesBasketModel)
+	{
+		if (returnSalesBasketModel is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var result = await CurrentPage.DisplayPromptAsync(
+				title: returnSalesBasketModel.ItemCode,
+				message: "Miktarı giriniz",
+				cancel: "Vazgeç",
+				accept: "Tamam",
+				initialValue: returnSalesBasketModel.Quantity.ToString(),
+				keyboard: Keyboard.Numeric);
+
+			if (string.IsNullOrEmpty(result))
+				return;
+
+			var quantity = Convert.ToDouble(result);
+
+			if (quantity <= 0)
+			{
+				await _userDialogs.AlertAsync("Miktar sıfırdan küçük olmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			returnSalesBasketModel.Quantity = quantity;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 	private async Task DeleteItemAsync(ReturnSalesBasketModel item)
     {
         if (IsBusy)
