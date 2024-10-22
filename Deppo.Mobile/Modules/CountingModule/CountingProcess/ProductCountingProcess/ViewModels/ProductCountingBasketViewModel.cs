@@ -2,6 +2,7 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.CountingModels;
 using Deppo.Mobile.Core.Models.CountingModels.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
@@ -54,6 +55,7 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
 
 		Title = "Sepet";
 
+        QuantityTappedCommand = new Command(async () => await QuantityTappedAsync());
 		IncreaseCommand = new Command(async () => await IncreaseAsync());
 		DecreaseCommand = new Command(async () => await DecreaseAsync());
 		NextViewCommand = new Command(async () => await NextViewAsync());
@@ -67,6 +69,7 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
 
 
     public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
+    public Command QuantityTappedCommand { get; }
 	public Command UnitActionTappedCommand { get; }
 	public Command SubUnitsetTappedCommand { get; }
 
@@ -75,8 +78,62 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
     public Command DecreaseCommand { get; }
     public Command BackCommand { get; }
 
+	private async Task QuantityTappedAsync()
+	{
+		if (ProductCountingBasketModel is null)
+			return;
 
-    private async Task IncreaseAsync()
+		if (IsBusy)
+			return;
+
+		try
+		{
+			IsBusy = true;
+
+			var result = await CurrentPage.DisplayPromptAsync(
+				title: ProductCountingBasketModel.ItemCode,
+				message: "Miktarı giriniz",
+				cancel: "Vazgeç",
+				accept: "Tamam",
+				initialValue: ProductCountingBasketModel.OutputQuantity.ToString(),
+				keyboard: Keyboard.Numeric);
+
+			if (string.IsNullOrEmpty(result))
+				return;
+
+			var quantity = Convert.ToDouble(result);
+
+			if (quantity <= 0)
+			{
+				await _userDialogs.AlertAsync("Miktar sıfırdan küçük olmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+			
+			ProductCountingBasketModel.OutputQuantity = quantity;
+
+			if (ProductCountingBasketModel.OutputQuantity - ProductCountingBasketModel.StockQuantity < 0)
+			{
+				ProductCountingBasketModel.DifferenceQuantity = ProductCountingBasketModel.OutputQuantity - ProductCountingBasketModel.StockQuantity;
+				await LoadLocationTransactionsAsync();
+			}
+			else
+			{
+				ProductCountingBasketModel.DifferenceQuantity = ProductCountingBasketModel.OutputQuantity - ProductCountingBasketModel.StockQuantity;
+			}
+			
+		}
+		catch (Exception ex)
+		{
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+
+	private async Task IncreaseAsync()
     {
         if (IsBusy)
             return;

@@ -140,7 +140,11 @@
                                    FontSize="Large"
                                    Text="{Binding ProductCountingBasketModel.OutputQuantity, StringFormat='{0:N2}'}"
                                    TextColor="{StaticResource OffBlack}"
-                                   VerticalOptions="Center" />
+                                   VerticalOptions="Center">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProductCountingBasketViewModel}}, Path=QuantityTappedCommand}" />
+                                </Label.GestureRecognizers>
+                            </Label>
                             <Border Grid.Column="2"
                                     Padding="5"
                                     BackgroundColor="{StaticResource Secondary}"
