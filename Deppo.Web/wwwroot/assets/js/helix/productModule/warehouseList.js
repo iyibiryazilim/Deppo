@@ -1,7 +1,7 @@
 ﻿"use strict";
 
 // Class definition
-var customerList = function () {
+var warehouseList = function () {
     // Shared variables
     var table;
     var datatable;
@@ -19,27 +19,24 @@ var customerList = function () {
             info: false,
             order: [],
             pageLength: 10,
-            serverSide: true,
+            serverSide: true, 
             ajax: {
-                url: "Customer/GetObjectsJsonResult",
+                url: "Warehouse/GetObjectsJsonResult",
                 type: "POST",
                 data: function (d) {
+                    console.log(d)
                     return {
                         draw: d.draw,
                         start: d.start,
                         length: d.length,
-                        searchText: $('#customerSearchInput').val()
+                        searchText: $('#warehouseSearchInput').val()
                     };
                 }
             },
             columns: [
-                { data: 'code' },
-                { data: 'email' },
-                { data: 'telephone' },
+                { data: 'number' },
                 { data: 'city' },
                 { data: 'country' },
-
-
             ],
 
             columnDefs: [
@@ -49,16 +46,18 @@ var customerList = function () {
                     className: 'text-start pe-0',
                     render: function (data, type, full, meta) {
                         var output;
-                        var initials = full.title ? full.title.substring(0, 2).toUpperCase() : '';
+
+                        var numberElement = `
+            <div class="symbol symbol-40px mb-1 d-flex align-items-center justify-content-center rounded-circle bg-light text-dark" style="margin-right: 2%; width: 40px; height: 40px;">
+                ${full.number}
+            </div>
+        `;
 
                         output = `
             <div class="d-flex align-items-center">
-                <div class="symbol symbol-40px mb-1" style="margin-right: 10px; display: flex; align-items: center; justify-content: center; background-color: #44B0C0; border-radius: 50%; width: 40px; height: 40px;">
-                    <span class="text-dark fw-bold">${initials}</span>
-                </div>
+                ${numberElement}
                 <div class="d-flex justify-content-start flex-column">
-                    <a href="#" class="text-dark fw-bold text-hover-primary mb-1 fs-6">${full.code}</a>
-                    <span class="text-muted fw-semibold text-muted d-block fs-7">${full.title}</span>
+                    <span class="text-dark fw-bold text-hover-primary mb-1 fs-6">${full.name}</span>
                 </div>
             </div>
         `;
@@ -66,38 +65,11 @@ var customerList = function () {
                         return output;
                     },
                 },
-
-
-
+               
                 {
                     orderable: true,
                     targets: 1,
-                    className: 'text-start pe-0',
-                    render: function (data, type, full, meta) {
-
-                        var output;
-                        output = `<span class="fw-bold">` + full.email + `</span>`
-
-                        return output;
-                    },
-                },
-                {
-                    orderable: true,
-                    targets: 2,
-                    className: 'text-start pe-0',
-                    render: function (data, type, full, meta) {
-
-                        var output;
-                        output = `<span class="fw-bold">` + full.telephone + `</span>`
-
-                        return output;
-                    },
-                },
-
-                {
-                    orderable: true,
-                    targets: 3,
-                    className: 'text-start pe-0',
+                    className: 'text-center pe-0',
                     render: function (data, type, full, meta) {
 
                         var output;
@@ -108,11 +80,10 @@ var customerList = function () {
                 },
                 {
                     orderable: true,
-                    targets: 4,
-                    className: 'text-start pe-0',
+                    targets: 2,
+                    className: 'text-center pe-0',
                     render: function (data, type, full, meta) {
 
-                        console.log(full)
                         var output;
                         output = `<span class="fw-bold">` + full.country + `</span>`
 
@@ -120,40 +91,39 @@ var customerList = function () {
                     },
                 },
 
-
-
-
             ]
         });
 
+        // Re-init functions on datatable re-draws
         datatable.on('draw', function () {
             KTMenu.createInstances();
         });
     }
 
+    // Search Datatable --- official docs reference: https://datatables.net/reference/api/search()
     var handleSearchDatatable = () => {
-        const filterSearch = document.querySelector('[customer_list_table="search"]');
+        const filterSearch = document.querySelector('[warehouse_list_table="search"]');
         filterSearch.addEventListener('keyup', function (e) {
             datatable.ajax.reload();
         });
     }
 
+
     // Public methods
     return {
         init: async function () {
-            table = document.querySelector('#customer_list_table');
+            table = document.querySelector('#warehouse_list_table');
 
             if (!table) {
                 return;
             }
             initDatatable();
             handleSearchDatatable();
-
         }
     };
 }();
 
 // On document ready
 KTUtil.onDOMContentLoaded(function () {
-    customerList.init();
+    warehouseList.init();
 });

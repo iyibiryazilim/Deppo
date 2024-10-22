@@ -1,7 +1,7 @@
 ﻿"use strict";
 
 // Class definition
-var customerList = function () {
+var outsourceList = function () {
     // Shared variables
     var table;
     var datatable;
@@ -21,14 +21,14 @@ var customerList = function () {
             pageLength: 10,
             serverSide: true,
             ajax: {
-                url: "Customer/GetObjectsJsonResult",
+                url: "Outsource/GetObjectsJsonResult",
                 type: "POST",
                 data: function (d) {
                     return {
                         draw: d.draw,
                         start: d.start,
                         length: d.length,
-                        searchText: $('#customerSearchInput').val()
+                        searchText: $('#outsourceSearchInput').val()
                     };
                 }
             },
@@ -93,7 +93,7 @@ var customerList = function () {
                         return output;
                     },
                 },
-
+                
                 {
                     orderable: true,
                     targets: 3,
@@ -132,7 +132,7 @@ var customerList = function () {
     }
 
     var handleSearchDatatable = () => {
-        const filterSearch = document.querySelector('[customer_list_table="search"]');
+        const filterSearch = document.querySelector('[outsource_list_table="search"]');
         filterSearch.addEventListener('keyup', function (e) {
             datatable.ajax.reload();
         });
@@ -141,7 +141,7 @@ var customerList = function () {
     // Public methods
     return {
         init: async function () {
-            table = document.querySelector('#customer_list_table');
+            table = document.querySelector('#outsource_list_table');
 
             if (!table) {
                 return;
@@ -155,5 +155,5 @@ var customerList = function () {
 
 // On document ready
 KTUtil.onDOMContentLoaded(function () {
-    customerList.init();
+    outsourceList.init();
 });

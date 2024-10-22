@@ -11,6 +11,15 @@ namespace Deppo.Web.Helpers.MappingHelper
 			CreateMap<Product, dynamic>();
 			CreateMap<Customer, dynamic>();
 			CreateMap<Supplier, dynamic>();
+			CreateMap<Warehouse, dynamic>();
+            CreateMap<WaitingSalesOrder, dynamic>();
+            CreateMap<WaitingPurchaseOrder, dynamic>();
+            CreateMap<Outsource, dynamic>();
+			CreateMap<NegativeProduct, dynamic>();
+
+
+
+
 
 		}
 	}

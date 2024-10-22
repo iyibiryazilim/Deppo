@@ -364,6 +364,7 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
 		string baseQuery = @$"SELECT
 			[ReferenceId] = ORFLINE.LOGICALREF,
             [OrderReferenceId] = ORFICHE.LOGICALREF,
+			[OrderNumber] = ORFICHE.FICHENO,
             [CustomerReferenceId] = CLCARD.LOGICALREF,
             [CustomerCode] = CLCARD.CODE,
             [CustomerName] = CLCARD.DEFINITION_,
@@ -401,7 +402,7 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
 
 		if (!string.IsNullOrEmpty(search))
 		{
-			baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";
+			baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%' OR CLCARD.CODE LIKE '{search}%' OR CLCARD.DEFINITION_ LIKE '%{search}%')";
 		}
 
 		baseQuery += $@" ORDER BY ITEMS.CODE ASC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";

@@ -15,6 +15,12 @@ builder.Services.AddSingleton<IAuthenticationService, AuthenticateDataStore>();
 builder.Services.AddTransient<IProductService, ProductDataStoreV2>();
 builder.Services.AddTransient<ICustomerService, CustomerDataStoreV2>();
 builder.Services.AddTransient<ISupplierService, SupplierDataStoreV2>();
+builder.Services.AddTransient<IWarehouseService, WarehouseDataStore>();
+builder.Services.AddTransient<IWaitingSalesOrderService, WaitingSalesOrderDataStore>();
+builder.Services.AddTransient<IWaitingPurchaseOrderService, WaitingPurchaseOrderDataStore>();
+builder.Services.AddTransient<IOutsourceService, OutsourceDataStore>();
+builder.Services.AddTransient<INegativeProductService, NegativeProductDataStore>();
+
 
 
 var app = builder.Build();
