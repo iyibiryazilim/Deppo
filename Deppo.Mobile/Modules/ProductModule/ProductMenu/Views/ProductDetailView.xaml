@@ -51,13 +51,15 @@
                                  Spacing="10"
                                  VerticalOptions="Start">
                 <!--#region Image-->
-                <Border HeightRequest="100"
-                        StrokeShape="RoundRectangle 10"
-                        StrokeThickness="1                     "
-                        VerticalOptions="Center"
-                        WidthRequest="150">
-                    <Image Aspect="AspectFill"
-                           Source="{Binding ProductDetailModel.Product.ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}" />
+
+                <Border
+                    HeightRequest="100"
+                    StrokeShape="RoundRectangle 10"
+                    StrokeThickness="1                     "
+                    VerticalOptions="Center"
+                    WidthRequest="150">
+                    <Image x:Name="productImage" Aspect="AspectFill" Source="{Binding ProductDetailModel.Product.ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}" />
+
 
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding ImageOptionCommand}" />

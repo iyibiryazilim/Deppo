@@ -89,6 +89,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Modules/ProductModule/ProductMenu/Views/ProductPreviewImageView.xaml.cs">
+	    <DependentUpon>ProductPreviewImageView.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Modules/QuicklyProductionModule/QuicklyProductionProcess/Manuel/Views/ManuelCalcInWarehouseListView.xaml.cs">
 	    <DependentUpon>ManuelCalcInWarehouseListView.xaml</DependentUpon>
 	  </Compile>

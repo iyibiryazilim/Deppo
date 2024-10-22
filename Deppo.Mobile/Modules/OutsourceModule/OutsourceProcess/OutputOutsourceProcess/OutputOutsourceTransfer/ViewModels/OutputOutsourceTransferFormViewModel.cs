@@ -6,6 +6,7 @@ using Deppo.Core.DTOs.SeriLotTransactionDto;
 using Deppo.Core.DTOs.TransferTransaction;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.OutsourceModels;
 using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
@@ -34,6 +35,7 @@ public partial class OutputOutsourceTransferFormViewModel : BaseViewModel
     private readonly IDriverService _driverService;
     private readonly ITransferTransactionService _transferTransactionService;
     private readonly IServiceProvider _serviceProvider;
+    private readonly ILocationTransactionService _locationTransactionService;
 
     [ObservableProperty]
     WarehouseModel warehouseModel = null!;
@@ -41,7 +43,9 @@ public partial class OutputOutsourceTransferFormViewModel : BaseViewModel
     [ObservableProperty]
     ObservableCollection<OutputOutsourceTransferBasketModel> items = null!;
 
-    public ObservableCollection<OutsourceModel> Outsources { get; } = new();
+	ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
+
+	public ObservableCollection<OutsourceModel> Outsources { get; } = new();
     public ObservableCollection<ShipAddressModel> ShipAddresses { get; } = new();
     public ObservableCollection<WarehouseModel> InWarehouses { get; } = new();
     public ObservableCollection<LocationModel> InLocations { get; } = new();
@@ -95,7 +99,8 @@ public partial class OutputOutsourceTransferFormViewModel : BaseViewModel
         ICarrierService carrierService,
         IDriverService driverService,
         ITransferTransactionService transferTransactionService,
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        ILocationTransactionService locationTransactionService)
     {
         _httpClientService = httpClientService;
         _shipAddressService = shipAddressService;
@@ -107,6 +112,7 @@ public partial class OutputOutsourceTransferFormViewModel : BaseViewModel
         _driverService = driverService;
         _transferTransactionService = transferTransactionService;
         _serviceProvider = serviceProvider;
+        _locationTransactionService = locationTransactionService;
 
         Title = "Fason Çıkış Transfer İşlemi";
 
@@ -397,8 +403,48 @@ public partial class OutputOutsourceTransferFormViewModel : BaseViewModel
                 _userDialogs.HideHud();
         }
     }
+	public async Task LoadLocationTransaction(OutputOutsourceTransferBasketModel outputOutsourceTransferBasketModel, OutputOutsourceTransferBasketDetailModel outputOutsourceTransferBasketDetailModel)
+	{
+		try
+		{
 
-    private async Task SaveAsync()
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _locationTransactionService.GetInputObjectsAsync(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				productReferenceId: outputOutsourceTransferBasketModel.IsVariant ? outputOutsourceTransferBasketModel.MainItemReferenceId : outputOutsourceTransferBasketModel.ItemReferenceId,
+				variantReferenceId: outputOutsourceTransferBasketModel.IsVariant ? outputOutsourceTransferBasketModel.ItemReferenceId : 0,
+				warehouseNumber: WarehouseModel.Number,
+				locationRef: outputOutsourceTransferBasketDetailModel.LocationReferenceId,
+				skip: 0,
+				take: 999999,
+				search: ""
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+				foreach (var item in result.Data)
+				{
+					LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+				}
+
+			}
+
+			_userDialogs.Loading().Hide();
+		}
+		catch (Exception ex)
+		{
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+	private async Task SaveAsync()
     {
         if (IsBusy)
             return;
@@ -447,19 +493,28 @@ public partial class OutputOutsourceTransferFormViewModel : BaseViewModel
 
                 foreach (var detail in item.Details)
                 {
-                    var serilotTransactionDto = new SeriLotTransactionDto
+					await LoadLocationTransaction(item, detail);
+					LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
+                    foreach (var locationTransaction in LocationTransactions)
                     {
-                        StockLocationCode = detail.LocationCode,
-                        InProductTransactionLineReferenceId = detail.TransactionReferenceId,
-                        OutProductTransactionLineReferenceId = detail.ReferenceId,
-                        Quantity = detail.RemainingQuantity,
-                        SubUnitsetCode = item.SubUnitsetCode,
-                        DestinationStockLocationCode = SelectedInlocationModel.Code,
-                        ConversionFactor = 1,
-                        OtherConversionFactor = 1,
-                    };
+                        while(locationTransaction.RemainingQuantity > 0 && item.Quantity > 0) {
+							var serilotTransactionDto = new SeriLotTransactionDto
+							{
+								StockLocationCode = detail.LocationCode,
+								InProductTransactionLineReferenceId = locationTransaction.TransactionReferenceId,
+								OutProductTransactionLineReferenceId = locationTransaction.ReferenceId,
+								Quantity = item.Quantity > locationTransaction.RemainingQuantity ? locationTransaction.RemainingQuantity : item.Quantity,
+								SubUnitsetCode = item.SubUnitsetCode,
+								DestinationStockLocationCode = SelectedInlocationModel.Code,
+								ConversionFactor = 1,
+								OtherConversionFactor = 1,
+							};
 
-                    transferTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+                            locationTransaction.RemainingQuantity -= (double)serilotTransactionDto.Quantity;
+							transferTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
+                            item.Quantity -= (double)serilotTransactionDto.Quantity;
+						}
+					}
                 }
 
                 transferTransactionInsertDto.Lines.Add(transferTransactionLineDto);

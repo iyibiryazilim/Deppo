@@ -477,6 +477,8 @@ public partial class InputProductPurchaseProcessProductListViewModel : BaseViewM
                 await Shell.Current.GoToAsync($"..");
             }
             SelectedItems.Clear();
+            SelectedProducts.ToList().ForEach(x => x.IsSelected = false);
+            SelectedProducts.Clear();
         }
         catch (Exception ex)
         {

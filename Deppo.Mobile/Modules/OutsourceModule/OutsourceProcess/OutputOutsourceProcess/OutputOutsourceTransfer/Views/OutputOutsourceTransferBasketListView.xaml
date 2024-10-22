@@ -221,7 +221,11 @@
                                                        HorizontalOptions="Center"
                                                        Text="{Binding Quantity}"
                                                        TextColor="{StaticResource OffBlack}"
-                                                       VerticalOptions="Center" />
+                                                       VerticalOptions="Center">
+                                                    <Label.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferBasketListViewModel}}, Path=QuantityTappedCommand}" CommandParameter="{Binding .}" />
+                                                    </Label.GestureRecognizers>
+                                                </Label>
                                                 <Border Grid.Column="2"
                                                         Padding="5"
                                                         BackgroundColor="{StaticResource Secondary}"
@@ -328,7 +332,7 @@
                                 <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="locationModels:LocationTransactionModel">
+                                <DataTemplate x:DataType="locationModels:GroupLocationTransactionModel">
                                     <Border Padding="10"
                                             BackgroundColor="{StaticResource WhiteSmoke}"
                                             StrokeShape="RoundRectangle 10"
@@ -383,7 +387,11 @@
                                                        FontSize="Large"
                                                        Text="{Binding OutputQuantity, StringFormat='{0:N2}'}"
                                                        TextColor="{StaticResource OffBlack}"
-                                                       VerticalOptions="Center" />
+                                                       VerticalOptions="Center">
+                                                    <Label.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferBasketListViewModel}}, Path=LocationTransactionQuantityTappedCommand}" CommandParameter="{Binding .}" />
+                                                    </Label.GestureRecognizers>
+                                                </Label>
                                                 <Border Grid.Column="2"
                                                         Padding="5"
                                                         BackgroundColor="{StaticResource Secondary}"

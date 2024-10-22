@@ -41,6 +41,7 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
     private readonly ISeriLotService _seriLotService;
     private readonly IServiceProvider _serviceProvider;
     private readonly IBarcodeSearchHelper _barcodeSearchHelper;
+    private readonly ISubUnitsetService _subUnitsetService;
 
     [ObservableProperty]
     private WarehouseModel warehouseModel = null!;
@@ -57,45 +58,58 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
     [ObservableProperty]
     public Entry barcodeEntry;
 
-    public InputProductPurchaseProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IHttpClientService httpClientService2, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider, IBarcodeSearchHelper barcodeSearchHelper)
-    {
-        _httpClientService = httpClientService;
-        _userDialogs = userDialogs;
-        _locationService = locationService;
-        _seriLotService = seriLotService;
-        _serviceProvider = serviceProvider;
-        _barcodeSearchHelper = barcodeSearchHelper;
+	public ObservableCollection<InputPurchaseBasketModel> Items { get; } = new();
+	public ObservableCollection<LocationModel> Locations { get; }
 
-        Title = "Sepet Listesi";
+	public InputProductPurchaseProcessBasketListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IHttpClientService httpClientService2, ILocationService locationService, ISeriLotService seriLotService, IServiceProvider serviceProvider, IBarcodeSearchHelper barcodeSearchHelper, ISubUnitsetService subUnitsetService)
+	{
+		_httpClientService = httpClientService;
+		_userDialogs = userDialogs;
+		_locationService = locationService;
+		_seriLotService = seriLotService;
+		_serviceProvider = serviceProvider;
+		_barcodeSearchHelper = barcodeSearchHelper;
+		_subUnitsetService = subUnitsetService;
 
-        ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
-        PerformSearchCommand = new Command<Entry>(async (barcodeEntry) => await PerformSearchAsync(barcodeEntry));
+		Title = "Sepet Listesi";
 
-        DeleteItemCommand = new Command<InputPurchaseBasketModel>(async (item) => await DeleteItemAsync(item));
-        IncreaseCommand = new Command<InputPurchaseBasketModel>(async (item) => await IncreaseAsync(item));
-        DecreaseCommand = new Command<InputPurchaseBasketModel>(async (item) => await DecreaseAsync(item));
+        UnitActionTappedCommand = new Command<InputPurchaseBasketModel>(async (item) => await UnitActionTappedAsync(item));
+        SubUnitsetTappedCommand = new Command<SubUnitset>(async (subUnitset) => await SubUnitsetTappedAsync(subUnitset));
 
-        LocationCloseCommand = new Command(async () => await LocationCloseAsync());
-        LocationConfirmCommand = new Command<LocationModel>(async (locationModel) => await LocationConfirmAsync(locationModel));
-        LocationIncreaseCommand = new Command<LocationModel>(async (locationModel) => await LocationIncreaseAsync(locationModel));
-        LocationDecreaseCommand = new Command<LocationModel>(async (LocationModel) => await LocationDecreaseAsync(LocationModel));
+		ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
+		PerformSearchCommand = new Command<Entry>(async (barcodeEntry) => await PerformSearchAsync(barcodeEntry));
 
-        NextViewCommand = new Command(async () => await NextViewAsync());
-        BackCommand = new Command(async () => await BackAsync());
-        CameraTappedCommand = new Command(async () => await CameraTappedAsync());
+		QuantityTappedCommand = new Command<InputPurchaseBasketModel>(async (item) => await QuantityTappedAsync(item));
+		DeleteItemCommand = new Command<InputPurchaseBasketModel>(async (item) => await DeleteItemAsync(item));
+		IncreaseCommand = new Command<InputPurchaseBasketModel>(async (item) => await IncreaseAsync(item));
+		DecreaseCommand = new Command<InputPurchaseBasketModel>(async (item) => await DecreaseAsync(item));
 
-        Items.Clear();
-    }
+		LocationCloseCommand = new Command(async () => await LocationCloseAsync());
+		LocationConfirmCommand = new Command<LocationModel>(async (locationModel) => await LocationConfirmAsync(locationModel));
+		LocationIncreaseCommand = new Command<LocationModel>(async (locationModel) => await LocationIncreaseAsync(locationModel));
+		LocationDecreaseCommand = new Command<LocationModel>(async (LocationModel) => await LocationDecreaseAsync(LocationModel));
 
-    public Page CurrentPage { get; set; } = null!;
+		NextViewCommand = new Command(async () => await NextViewAsync());
+		BackCommand = new Command(async () => await BackAsync());
+		CameraTappedCommand = new Command(async () => await CameraTappedAsync());
+
+		Items.Clear();
+	}
+
+	public Page CurrentPage { get; set; } = null!;
 
     public Command ShowProductViewCommand { get; }
     public Command PerformSearchCommand { get; }
+    public Command<InputPurchaseBasketModel> QuantityTappedCommand { get; }
     public Command<InputPurchaseBasketModel> DeleteItemCommand { get; }
     public Command<InputPurchaseBasketModel> IncreaseCommand { get; }
     public Command<InputPurchaseBasketModel> DecreaseCommand { get; }
 
-    public Command<LocationModel> LocationDecreaseCommand { get; }
+    public Command<InputPurchaseBasketModel> UnitActionTappedCommand { get; }
+    public Command<SubUnitset> SubUnitsetTappedCommand { get; }
+
+
+	public Command<LocationModel> LocationDecreaseCommand { get; }
     public Command<LocationModel> LocationIncreaseCommand { get; }
     public Command<LocationModel> LocationConfirmCommand { get; }
     public Command LocationCloseCommand { get; }
@@ -104,10 +118,100 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
     public Command BackCommand { get; }
     public Command CameraTappedCommand { get; }
 
-    public ObservableCollection<InputPurchaseBasketModel> Items { get; } = new();
-    public ObservableCollection<LocationModel> Locations { get; }
+	private async Task UnitActionTappedAsync(InputPurchaseBasketModel item)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
 
-    private async Task ShowProductViewAsync()
+			SelectedInputProductBasketModel = item;
+			await LoadSubUnitsetsAsync(item);
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.HalfExpanded;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task LoadSubUnitsetsAsync(InputPurchaseBasketModel item)
+	{
+		if (item is null)
+			return;
+		try
+		{
+			item.SubUnitsets.Clear();
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _subUnitsetService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				productReferenceId: item.ItemReferenceId
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var subUnitset in result.Data)
+				{
+					item.SubUnitsets.Add(Mapping.Mapper.Map<SubUnitset>(subUnitset));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+	}
+
+	private async Task SubUnitsetTappedAsync(SubUnitset subUnitset)
+	{
+		if (subUnitset is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			if (SelectedInputProductBasketModel is not null)
+			{
+				SelectedInputProductBasketModel.SubUnitsetReferenceId = subUnitset.ReferenceId;
+				SelectedInputProductBasketModel.SubUnitsetName = subUnitset.Name;
+				SelectedInputProductBasketModel.SubUnitsetCode = subUnitset.Code;
+			}
+
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.Hidden;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task ShowProductViewAsync()
     {
         if (IsBusy)
             return;
@@ -166,7 +270,51 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
         }
     }
 
-    private async Task DeleteItemAsync(InputPurchaseBasketModel item)
+	private async Task QuantityTappedAsync(InputPurchaseBasketModel inputPurchaseBasketModel)
+	{
+		if (inputPurchaseBasketModel is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var result = await CurrentPage.DisplayPromptAsync(
+				title: inputPurchaseBasketModel.ItemCode,
+				message: "Miktarı giriniz",
+				cancel: "Vazgeç",
+				accept: "Tamam",
+				initialValue: inputPurchaseBasketModel.Quantity.ToString(),
+				keyboard: Keyboard.Numeric);
+
+			if (string.IsNullOrEmpty(result))
+				return;
+
+			var quantity = Convert.ToDouble(result);
+
+			if (quantity <= 0)
+			{
+				await _userDialogs.AlertAsync("Miktar sıfırdan küçük olmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			inputPurchaseBasketModel.Quantity = quantity;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task DeleteItemAsync(InputPurchaseBasketModel item)
     {
         if (IsBusy)
             return;
@@ -383,13 +531,23 @@ public partial class InputProductPurchaseProcessBasketListViewModel : BaseViewMo
         {
             IsBusy = true;
 
-            if (Items.Count == 0)
+			var itemsToRemove = Items.Where(x => x.Quantity <= 0).ToList();
+            if(itemsToRemove.Count > 0)
             {
-                await _userDialogs.AlertAsync("Sepetinizde ürün bulunmamaktadır.", "Hata", "Tamam");
-                return;
-            }
+				foreach (var item in itemsToRemove)
+				{
+					item.Details.Clear();
+					Items.Remove(item);
+				}
+			}
 
-            await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseProcessFormView)}", new Dictionary<string, object>
+			if (Items.Count == 0)
+			{
+				await _userDialogs.AlertAsync("Sepetinizde ürün bulunmamaktadır.", "Hata", "Tamam");
+				return;
+			}
+
+			await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseProcessFormView)}", new Dictionary<string, object>
             {
                 [nameof(WarehouseModel)] = WarehouseModel,
                 [nameof(Items)] = Items,

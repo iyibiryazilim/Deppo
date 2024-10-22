@@ -1540,9 +1540,9 @@
 					</div>
 					<!--end::Sidebar-->
 					<!--begin::Main-->
-				<div class="content d-flex flex-column flex-column-fluid" id="kt_content">
-					<!--begin::Container-->
-					<div class="container-xxl" id="kt_content_container">
+					<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+						<!--begin::Content wrapper-->
+						<div class="d-flex flex-column flex-column-fluid">
 						@RenderBody()
 					</div>
 					<!--end::Container-->
@@ -1557,7 +1557,8 @@
 				<!--end::Wrapper-->
 			</div>
 			<!--end::Page-->
-		</div>
+	</div>
+
 		<!--end::App-->
 		<!--begin::Drawers-->
 		<!--begin::Activities drawer-->

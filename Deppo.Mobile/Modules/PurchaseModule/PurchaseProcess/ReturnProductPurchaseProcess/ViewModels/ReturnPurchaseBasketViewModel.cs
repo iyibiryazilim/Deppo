@@ -2,6 +2,7 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
 using Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;
@@ -71,6 +72,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
         UnitActionTappedCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await UnitActionTappedAsync(item));
         SubUnitsetTappedCommand = new Command<SubUnitset>(async (item) => await SubUnitsetTappedAsync(item));
 		PerformSearchCommand = new Command<Entry>(async (x) => await PerformSearchAsync(x));
+        QuantityTappedCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await QuantityTappedAsync(item));
 		IncreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DecreaseAsync(item));
 		DeleteItemCommand = new Command<ReturnPurchaseBasketModel>(async (item) => await DeleteItemAsync(item));
@@ -84,6 +86,7 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
 
 
 		LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
+        LocationTransactionQuantityTappedCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionQuantityTappedAsync(item));
 		LocationTransactionIncreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
 		LocationTransactionDecreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
 		ConfirmLocationTransactionCommand = new Command(ConfirmLocationTransactionAsync);
@@ -100,12 +103,14 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
     public Command SubUnitsetTappedCommand { get; }
     public Command UnitActionTappedCommand { get; }
     public Command PerformSearchCommand { get; }
+    public Command QuantityTappedCommand { get; }
     public Command IncreaseCommand { get; }
     public Command DecreaseCommand { get; }
     public Command DeleteItemCommand { get; }
 
     #region Location Transaction Command
     public Command LoadMoreLocationTransactionsCommand { get; }
+    public Command LocationTransactionQuantityTappedCommand { get; }
     public Command LocationTransactionIncreaseCommand { get; }
     public Command LocationTransactionDecreaseCommand { get; }
     public Command ConfirmLocationTransactionCommand { get; }
@@ -279,6 +284,54 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
 		}
 	}
 
+	private async Task QuantityTappedAsync(ReturnPurchaseBasketModel item)
+	{
+		if (item is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var result = await CurrentPage.DisplayPromptAsync(
+				title: item.ItemCode,
+				message: "Miktarı giriniz",
+				cancel: "Vazgeç",
+				accept: "Tamam",
+				initialValue: item.Quantity.ToString(),
+				keyboard: Keyboard.Numeric);
+
+			if (string.IsNullOrEmpty(result))
+				return;
+
+			var quantity = Convert.ToDouble(result);
+			if (quantity <= 0)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar 0'dan küçük olmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			if (quantity > item.StockQuantity)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar, stok miktarını aşmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			item.Quantity = quantity;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 	private async Task IncreaseAsync(ReturnPurchaseBasketModel item)
     {
         if (IsBusy)
@@ -490,8 +543,69 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+	private async Task LocationTransactionQuantityTappedAsync(GroupLocationTransactionModel item)
+	{
+		if (item is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
 
-    private async Task LocationTransactionIncreaseAsync(GroupLocationTransactionModel item)
+			var result = await CurrentPage.DisplayPromptAsync(
+				title: item.ItemCode,
+				message: "Miktarı giriniz",
+				cancel: "Vazgeç",
+				accept: "Tamam",
+				initialValue: item.OutputQuantity.ToString(),
+				keyboard: Keyboard.Numeric);
+
+			if (string.IsNullOrEmpty(result))
+				return;
+
+			var quantity = Convert.ToDouble(result);
+			if (quantity <= 0)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar 0'dan küçük olmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			if (quantity > item.RemainingQuantity)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar, kalan miktarı aşmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+			if (quantity > SelectedItem?.StockQuantity)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar, stok miktarını aşmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			var totalQuantity = LocationTransactions.Sum(x => x.OutputQuantity);
+			if (SelectedItem?.StockQuantity >= totalQuantity + quantity)
+			{
+				item.OutputQuantity = quantity;
+			}
+			else
+			{
+				await _userDialogs.AlertAsync($"Girilen miktar, Ürünün stok miktarını ({SelectedItem?.StockQuantity}) aşmamalıdır.", "Hata", "Tamam");
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task LocationTransactionIncreaseAsync(GroupLocationTransactionModel item)
     {
         if (IsBusy)
             return;

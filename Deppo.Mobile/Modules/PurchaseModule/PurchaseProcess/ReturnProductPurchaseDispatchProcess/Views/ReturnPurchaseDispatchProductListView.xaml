@@ -79,12 +79,11 @@
                         </Border.Triggers>
                         <Grid ColumnDefinitions="Auto, *, Auto"
                               ColumnSpacing="10">
-                            <Border BackgroundColor="{StaticResource Secondary}"
-                                    StrokeShape="RoundRectangle 5"
+                            <Border StrokeShape="RoundRectangle 5"
                                     StrokeThickness="0.5">
                                 <Image Grid.Column="0"
                                        HeightRequest="50"
-                                       Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                       Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                        WidthRequest="50" />
                             </Border>
 
@@ -118,7 +117,7 @@
                                 </Label>
                             </VerticalStackLayout>
 
-                            <!--<Grid Grid.Column="2"
+                            <Grid Grid.Column="2"
                                   ColumnDefinitions="Auto, Auto, Auto"
                                   ColumnSpacing="3"
                                   HorizontalOptions="Start"
@@ -138,7 +137,7 @@
                                        FontSize="10"
                                        Text="{Binding TrackingTypeIcon}"
                                        TextColor="{Binding TrackingTypeIconColor}" />
-                            </Grid>-->
+                            </Grid>
                         </Grid>
                     </Border>
                 </DataTemplate>

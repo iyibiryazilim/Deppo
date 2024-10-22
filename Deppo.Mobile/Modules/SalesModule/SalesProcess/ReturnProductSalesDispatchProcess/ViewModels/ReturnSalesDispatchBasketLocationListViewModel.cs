@@ -44,6 +44,7 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
         LoadSelectedItemsCommand = new Command(async () => await LoadSelectedItemsAsync());
         ShowLocationsCommand = new Command(async () => await ShowLocationsAsync());
         PerformSearchCommand = new Command<Entry>(async (searchBar) => await PerformSearchAsync(searchBar));
+        QuantityTappedCommand = new Command<LocationModel>(async (locationModel) => await QuantityTappedAsync(locationModel));
         IncreaseCommand = new Command<LocationModel>(async (locationModel) => await IncreaseAsync(locationModel));
         DecreaseCommand = new Command<LocationModel>(async (locationModel) => await DecreaseAsync(locationModel));
         ConfirmCommand = new Command(async () => await ConfirmAsync());
@@ -66,7 +67,7 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
     [ObservableProperty]
     private ReturnSalesBasketModel returnSalesBasketModel = null!;
 
-    public ObservableCollection<LocationModel> Items { get; } = new(); // serilotmodel
+    public ObservableCollection<LocationModel> Items { get; } = new(); 
     public ObservableCollection<LocationModel> SelectedItems { get; } = new();
 
     [ObservableProperty]
@@ -75,6 +76,7 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
     public Page CurrentPage { get; set; }
 
     public Command LoadSelectedItemsCommand { get; }
+    public Command<LocationModel> QuantityTappedCommand { get; }
     public Command<LocationModel> IncreaseCommand { get; }
     public Command<LocationModel> DecreaseCommand { get; }
     public Command<Entry> PerformSearchCommand { get; }
@@ -346,8 +348,57 @@ public partial class ReturnSalesDispatchBasketLocationListViewModel : BaseViewMo
             IsBusy = false;
         }
     }
+	private async Task QuantityTappedAsync(LocationModel locationModel)
+	{
+		if (locationModel is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
 
-    private async Task IncreaseAsync(LocationModel locationModel)
+			var result = await CurrentPage.DisplayPromptAsync(
+				title: locationModel.Code,
+				message: "Miktarı giriniz",
+				cancel: "Vazgeç",
+				accept: "Tamam",
+				initialValue: locationModel.InputQuantity.ToString(),
+				keyboard: Keyboard.Numeric);
+
+			if (string.IsNullOrEmpty(result))
+				return;
+
+			var quantity = Convert.ToDouble(result);
+
+			if (quantity < 0)
+			{
+				await _userDialogs.AlertAsync("Miktar sıfırdan küçük olmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+            if (quantity > ReturnSalesBasketModel.StockQuantity)
+			{
+				await _userDialogs.AlertAsync("Miktar stok miktarından fazla olamaz.", "Hata", "Tamam");
+				return;
+			}
+
+			locationModel.InputQuantity = quantity;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task IncreaseAsync(LocationModel locationModel)
     {
         if (IsBusy)
             return;

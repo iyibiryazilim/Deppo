@@ -6,7 +6,7 @@ namespace Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
 
 public class OutputOutsourceTransferBasketDetailModel : INotifyPropertyChanged, IDisposable
 {
-    private int _referenceId;
+    private Guid _referenceId;
     private int _transactionReferenceId;
     private int _transactionFicheReferenceId;
     private int _seriLotReferenceId;
@@ -27,7 +27,7 @@ public class OutputOutsourceTransferBasketDetailModel : INotifyPropertyChanged, 
     }
 
     [Browsable(false)]
-	public int ReferenceId
+	public Guid ReferenceId
 	{
 		get => _referenceId;
 		set

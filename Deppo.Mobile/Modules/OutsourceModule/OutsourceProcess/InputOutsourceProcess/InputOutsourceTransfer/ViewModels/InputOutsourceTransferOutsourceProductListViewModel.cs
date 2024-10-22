@@ -279,7 +279,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourcePr
                                 VariantIcon = item.VariantIcon,
                                 LocTrackingIcon = item.LocTrackingIcon,
                                 TrackingTypeIcon = item.TrackingTypeIcon,
-                                Image = item.Image,
+                                Image = item.ImageData,
                             };
 
                             SelectedProducts.Add(basketItem);

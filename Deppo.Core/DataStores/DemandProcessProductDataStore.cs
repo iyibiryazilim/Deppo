@@ -82,7 +82,12 @@ namespace Deppo.Core.DataStores
 [LocTracking] = ITEMS.LOCTRACKING,
 [BrandReferenceId] = ISNULL(BRAND.LOGICALREF,0),
 [BrandCode] = ISNULL(BRAND.CODE,''),
-[BrandName] = ISNULL(BRAND.DESCR,'')
+[BrandName] = ISNULL(BRAND.DESCR,''),
+[Image] = ISNULL((SELECT TOP 1 FIRMDOC.LDATA 
+                 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_FIRMDOC AS FIRMDOC
+                 WHERE FIRMDOC.INFOREF = ITEMS.LOGICALREF 
+                 AND FIRMDOC.INFOTYP = 20  
+                 AND FIRMDOC.DOCNR = 11), '')
 
 FROM LV_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STINVTOT AS STINVTOT WITH(NOLOCK)
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS WITH(NOLOCK) ON STINVTOT.STOCKREF = ITEMS.LOGICALREF

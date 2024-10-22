@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using Deppo.Core.Models;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Deppo.Mobile.Core.Models.BasketModels
@@ -33,6 +35,8 @@ namespace Deppo.Mobile.Core.Models.BasketModels
         private string _variantIconColor;
         private string _trackingTypeIcon;
         private string _trackingTypeIconColor;
+
+        private ObservableCollection<SubUnitset> _subUnitsets = new();
 
         public DemandProcessBasketModel()
         {
@@ -332,6 +336,17 @@ namespace Deppo.Mobile.Core.Models.BasketModels
         }
 
         public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
+
+        public ObservableCollection<SubUnitset> SubUnitsets
+		{
+			get => _subUnitsets;
+			set
+			{
+				if (_subUnitsets == value) return;
+				_subUnitsets = value;
+				NotifyPropertyChanged();
+			}
+		}
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

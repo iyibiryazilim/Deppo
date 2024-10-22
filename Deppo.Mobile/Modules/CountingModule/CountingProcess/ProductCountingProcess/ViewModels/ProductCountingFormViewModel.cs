@@ -68,7 +68,7 @@ public partial class ProductCountingFormViewModel : BaseViewModel
         _userDialogs = userDialogs;
 
 
-        Title = "Ambar Sayım Formu";
+        Title = "Ürüne Göre Ambar Sayım Formu";
 
         SaveCommand = new Command(async () => await SaveAsync());
         LoadPageCommand = new Command(async () => await LoadPageAsync());
