@@ -10,5 +10,6 @@ public partial class WarehouseCountingBasketView : ContentPage
 		InitializeComponent();
 		_viewModel = viewModel;
 		BindingContext = _viewModel;
+		_viewModel.CurrentPage = this;
 	}
 }

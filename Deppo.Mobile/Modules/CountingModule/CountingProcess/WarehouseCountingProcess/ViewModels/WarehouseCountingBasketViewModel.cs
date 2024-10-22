@@ -2,6 +2,7 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.CountingModels;
 using Deppo.Mobile.Core.Models.CountingModels.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
@@ -26,6 +27,7 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
     private readonly IUserDialogs _userDialogs;
     private readonly IWarehouseCountingService _warehouseCountingService;
     private readonly ILocationTransactionService _locationTransactionService;
+    private readonly ISubUnitsetService _subUnitsetService;
 
     [ObservableProperty]
     private WarehouseCountingWarehouseModel warehouseCountingWarehouseModel = null!;
@@ -39,26 +41,29 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
     [ObservableProperty]
     private ProductVariantType productVariantType;
 
-    public WarehouseCountingBasketViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IWarehouseCountingService warehouseCountingService, ILocationTransactionService locationTransactionService)
-    {
-        _httpClientService = httpClientService;
-        _userDialogs = userDialogs;
-        _warehouseCountingService = warehouseCountingService;
-        _locationTransactionService = locationTransactionService;
+	public WarehouseCountingBasketViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IWarehouseCountingService warehouseCountingService, ILocationTransactionService locationTransactionService, ISubUnitsetService subUnitsetService)
+	{
+		_httpClientService = httpClientService;
+		_userDialogs = userDialogs;
+		_warehouseCountingService = warehouseCountingService;
+		_locationTransactionService = locationTransactionService;
+		_subUnitsetService = subUnitsetService;
 
-        Title = "Ürün Sepeti";
+		Title = "Ürün Sepeti";
 
-        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
-        LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-        IncreaseCommand = new Command<WarehouseCountingBasketModel>(async (item) => await IncreaseAsync(item));
-        DecreaseCommand = new Command<WarehouseCountingBasketModel>(async (item) => await DecreaseAsync(item));
-        SwipeItemCommand = new Command<WarehouseCountingBasketModel>(async (item) => await SwipeItemAsync(item));
-        NextViewCommand = new Command(async () => await NextViewAsync());
+		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+        UnitActionTappedCommand = new Command<WarehouseCountingBasketModel>(async (item) => await UnitActionTappedAsync(item));
+        SubUnitsetTappedCommand = new Command<SubUnitset>(async (item) => await SubUnitsetTappedAsync(item));
+		QuantityTappedCommand = new Command<WarehouseCountingBasketModel>(async (item) => await QuantityTappedAsync(item));
+		IncreaseCommand = new Command<WarehouseCountingBasketModel>(async (item) => await IncreaseAsync(item));
+		DecreaseCommand = new Command<WarehouseCountingBasketModel>(async (item) => await DecreaseAsync(item));
+		SwipeItemCommand = new Command<WarehouseCountingBasketModel>(async (item) => await SwipeItemAsync(item));
+		NextViewCommand = new Command(async () => await NextViewAsync());
+	}
 
-    }
 
-
-    [ObservableProperty]
+	[ObservableProperty]
     bool isIncrease;
 
     public Page CurrentPage { get; set; } = null!;
@@ -72,10 +77,14 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
-    public Command NextViewCommand { get; }
+    public Command UnitActionTappedCommand { get; }
+    public Command SubUnitsetTappedCommand { get; }
+
+    public Command QuantityTappedCommand { get; }
     public Command IncreaseCommand { get; }
     public Command DecreaseCommand { get; }
     public Command SwipeItemCommand { get; }
+    public Command NextViewCommand { get; }
     public Command BackCommand { get; }
 
 
@@ -206,7 +215,167 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
         }
     }
 
-    private async Task IncreaseAsync(WarehouseCountingBasketModel item)
+	private async Task UnitActionTappedAsync(WarehouseCountingBasketModel item)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			SelectedItem = item;
+			await LoadSubUnitsetsAsync(item);
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.HalfExpanded;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task LoadSubUnitsetsAsync(WarehouseCountingBasketModel item)
+	{
+		if (item is null)
+			return;
+		try
+		{
+            if(item.SubUnitsets is null)
+            {
+                item.SubUnitsets = new();
+			}
+
+            if(item.SubUnitsets.Count > 0) 
+			    item.SubUnitsets.Clear();
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _subUnitsetService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				productReferenceId: item.ItemReferenceId
+			);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var subUnitset in result.Data)
+				{
+					item.SubUnitsets.Add(Mapping.Mapper.Map<SubUnitset>(subUnitset));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+	}
+
+	private async Task SubUnitsetTappedAsync(SubUnitset subUnitset)
+	{
+		if (subUnitset is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			if (SelectedItem is not null)
+			{
+				SelectedItem.SubUnitsetReferenceId = subUnitset.ReferenceId;
+				SelectedItem.SubUnitsetName = subUnitset.Name;
+				SelectedItem.SubUnitsetCode = subUnitset.Code;
+			}
+
+			CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.Hidden;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task QuantityTappedAsync(WarehouseCountingBasketModel item)
+	{
+		if (item is null)
+			return;
+
+		if (IsBusy)
+			return;
+
+		try
+		{
+			IsBusy = true;
+
+			var result = await CurrentPage.DisplayPromptAsync(
+				title: item.ItemCode,
+				message: "Miktarı giriniz",
+				cancel: "Vazgeç",
+				accept: "Tamam",
+				initialValue: item.OutputQuantity.ToString(),
+				keyboard: Keyboard.Numeric);
+
+			if (string.IsNullOrEmpty(result))
+				return;
+
+			var quantity = Convert.ToDouble(result);
+
+			if (quantity <= 0)
+			{
+				await _userDialogs.AlertAsync("Miktar sıfırdan küçük olmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			SelectedItem = item;
+
+			if (SelectedItem is not null)
+			{
+				
+				SelectedItem.OutputQuantity = quantity;
+
+				if (SelectedItem.OutputQuantity - SelectedItem.StockQuantity < 0)
+				{
+					// OutputQuantity Stok miktarından azsa
+					SelectedItem.DifferenceQuantity = SelectedItem.OutputQuantity - SelectedItem.StockQuantity;
+					await LoadLocationTransactionsAsync();
+				}
+				else
+				{
+					// OutputQuantity Stok miktarından fazla ve eşitse
+					SelectedItem.DifferenceQuantity = SelectedItem.OutputQuantity - SelectedItem.StockQuantity;
+				}
+			}
+
+		}
+		catch (Exception ex)
+		{
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+	private async Task IncreaseAsync(WarehouseCountingBasketModel item)
     {
         if (IsBusy)
             return;
