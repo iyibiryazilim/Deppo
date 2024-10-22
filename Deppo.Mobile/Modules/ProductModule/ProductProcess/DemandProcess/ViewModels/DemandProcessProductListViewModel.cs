@@ -112,14 +112,15 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
                     }
                 }
 
-                _userDialogs.Loading().Hide();
+                if(_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
             }
             catch (Exception ex)
             {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
 
-                _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+				_userDialogs.Alert(ex.Message, "Hata", "Tamam");
             }
             finally
             {
@@ -136,7 +137,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
             {
                 IsBusy = true;
 
-                _userDialogs.Loading("Loading Items...");
+                _userDialogs.Loading("Loading More Items...");
 
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
                 var result = await _demandProcessProductService.GetProducts(
@@ -166,14 +167,15 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
                     }
                 }
 
-                _userDialogs.HideHud();
-            }
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
+			}
             catch (Exception ex)
             {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
 
-                _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+				_userDialogs.Alert(ex.Message, "Hata", "Tamam");
             }
             finally
             {

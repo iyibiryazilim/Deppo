@@ -16,6 +16,7 @@ using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 using System.Collections.ObjectModel;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.Views;
 using Deppo.Mobile.Helpers.BarcodeHelper;
+using Deppo.Core.Models;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewModels
 {
@@ -54,6 +55,11 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
 
 			ShowProductViewCommand = new Command(async () => await ShowProductViewAsync());
 			PerformSearchCommand = new Command<Entry>(async (barcodeEntry) => await PerformSearchAsync(barcodeEntry));
+
+            UnitActionTappedCommand = new Command<DemandProcessBasketModel>(async (item) => await UnitActionTappedAsync(item));
+            SubUnitsetTappedCommand = new Command<SubUnitset>(async (subUnitset) => await SubUnitsetTappedAsync(subUnitset));
+
+            QuantityTappedCommand = new Command<DemandProcessBasketModel>(async (item) => await QuantityTappedAsync(item));
 			IncreaseCommand = new Command<DemandProcessBasketModel>(async (item) => await IncreaseAsync(item));
 			DecreaseCommand = new Command<DemandProcessBasketModel>(async (item) => await DecreaseAsync(item));
 			DeleteItemCommand = new Command<DemandProcessBasketModel>(async (item) => await DeleteItemAsync(item));
@@ -69,6 +75,10 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
         #region Commands
         public Command PerformSearchCommand { get; }
         public Command ShowProductViewCommand { get; }
+        public Command UnitActionTappedCommand { get; }
+        public Command SubUnitsetTappedCommand { get; }
+
+        public Command QuantityTappedCommand { get; }
         public Command IncreaseCommand { get; }
         public Command DecreaseCommand { get; }
         public Command DeleteItemCommand { get; }
@@ -78,6 +88,100 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
         public Command SelectProductsCommand { get; }
         public Command SelectVariantsCommand { get; }
 		#endregion
+
+		private async Task UnitActionTappedAsync(DemandProcessBasketModel item)
+		{
+			if (IsBusy)
+				return;
+			try
+			{
+				IsBusy = true;
+
+				SelectedItem = item;
+				await LoadSubUnitsetsAsync(item);
+				CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.HalfExpanded;
+			}
+			catch (Exception ex)
+			{
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
+
+				await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+			}
+			finally
+			{
+				IsBusy = false;
+			}
+		}
+
+		private async Task LoadSubUnitsetsAsync(DemandProcessBasketModel item)
+		{
+			if (item is null)
+				return;
+			try
+			{
+				item.SubUnitsets.Clear();
+
+				var httpClient = _httpClientService.GetOrCreateHttpClient();
+				var result = await _subUnitsetService.GetObjects(
+					httpClient: httpClient,
+					firmNumber: _httpClientService.FirmNumber,
+					periodNumber: _httpClientService.PeriodNumber,
+					productReferenceId: item.ItemReferenceId
+				);
+
+				if (result.IsSuccess)
+				{
+					if (result.Data is null)
+						return;
+
+					foreach (var subUnitset in result.Data)
+					{
+						item.SubUnitsets.Add(Mapping.Mapper.Map<SubUnitset>(subUnitset));
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
+
+				await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+			}
+		}
+
+		private async Task SubUnitsetTappedAsync(SubUnitset subUnitset)
+		{
+			if (subUnitset is null)
+				return;
+			if (IsBusy)
+				return;
+			try
+			{
+				IsBusy = true;
+
+				if (SelectedItem is not null)
+				{
+					SelectedItem.SubUnitsetReferenceId = subUnitset.ReferenceId;
+					SelectedItem.SubUnitsetName = subUnitset.Name;
+					SelectedItem.SubUnitsetCode = subUnitset.Code;
+				}
+
+				CurrentPage.FindByName<BottomSheet>("subUnitsetBottomSheet").State = BottomSheetState.Hidden;
+			}
+			catch (Exception ex)
+			{
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
+
+				await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+			}
+			finally
+			{
+				IsBusy = false;
+			}
+		}
+
 
 
 		private async Task PerformSearchAsync(Entry barcodeEntry)
@@ -194,8 +298,44 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
             }
         }
 
+		private async Task QuantityTappedAsync(DemandProcessBasketModel demandProcessBasketModel)
+		{
+			if (demandProcessBasketModel is null)
+				return;
+			if (IsBusy)
+				return;
+			try
+			{
+				IsBusy = true;
 
-        private async Task DeleteItemAsync(DemandProcessBasketModel item)
+				var result = await CurrentPage.DisplayPromptAsync(
+					title: demandProcessBasketModel.ItemCode,
+					message: "Miktarı giriniz",
+					cancel: "Vazgeç",
+					accept: "Tamam",
+					initialValue: demandProcessBasketModel.Quantity.ToString(),
+					keyboard: Keyboard.Numeric);
+
+				if (string.IsNullOrEmpty(result))
+					return;
+
+				var quantity = Convert.ToDouble(result);
+
+				demandProcessBasketModel.Quantity = quantity;
+			}
+			catch (Exception ex)
+			{
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
+
+				await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+			}
+			finally
+			{
+				IsBusy = false;
+			}
+		}
+		private async Task DeleteItemAsync(DemandProcessBasketModel item)
         {
             if (IsBusy)
                 return;
