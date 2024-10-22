@@ -373,7 +373,15 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
             if (string.IsNullOrEmpty(result))
 				return;
 
-            locationModel.InputQuantity = Convert.ToDouble(result);
+            var quantity = Convert.ToDouble(result);
+
+            if (quantity < 0)
+			{
+				await _userDialogs.AlertAsync("Miktar sıfırdan küçük olmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+            locationModel.InputQuantity = quantity;
 		}
         catch (Exception ex)
         {

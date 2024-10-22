@@ -82,6 +82,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		UnitActionTappedCommand = new Command<OutputProductBasketModel>(async (item) => await UnitActionTappedAsync(item));
 		SubUnitsetTappedCommand = new Command<SubUnitset>(async (item) => await SubUnitsetTappedAsync(item));
 
+		QuantityTappedCommand = new Command<OutputProductBasketModel>(async (item) => await QuantityTappedAsync(item));
 		IncreaseCommand = new Command<OutputProductBasketModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<OutputProductBasketModel>(async (item) => await DecreaseAsync(item));
 		DeleteItemCommand = new Command<OutputProductBasketModel>(async (item) => await DeleteItemAsync(item));
@@ -97,6 +98,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
 		LocationTransactionIncreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
 		LocationTransactionDecreaseCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
+		LocationTransactionQuantityTappedCommand = new Command<GroupLocationTransactionModel>(async (item) => await LocationTransactionQuantityTappedAsync(item));
 		ConfirmLocationTransactionCommand = new Command(ConfirmLocationTransactionAsync);
 		LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
 
@@ -117,6 +119,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	public Command PerformSearchCommand { get; }
 	public Command UnitActionTappedCommand { get; }
 	public Command SubUnitsetTappedCommand { get; }
+	public Command QuantityTappedCommand { get; }
 	public Command IncreaseCommand { get; }
 	public Command DecreaseCommand { get; }
 	public Command DeleteItemCommand { get; }
@@ -425,6 +428,54 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 			IsBusy = false;
 		}
 	}
+	private async Task QuantityTappedAsync(OutputProductBasketModel item)
+	{
+		if (item is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			var result = await CurrentPage.DisplayPromptAsync(
+				title: item.ItemCode,
+				message: "Miktarı giriniz",
+				cancel: "Vazgeç",
+				accept: "Tamam",
+				initialValue: item.Quantity.ToString(),
+				keyboard: Keyboard.Numeric);
+
+			if (string.IsNullOrEmpty(result))
+				return;
+
+			var quantity = Convert.ToDouble(result);
+			if (quantity <= 0)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar 0'dan küçük olmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			if (quantity > item.StockQuantity)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar, stok miktarını aşmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			item.Quantity = quantity;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 
 	private async Task LoadLocationTransactionsAsync()
 	{
@@ -619,15 +670,33 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 			if (string.IsNullOrEmpty(result))
 				return;
 
-			var totalQuantity = LocationTransactions.Sum(x => x.OutputQuantity);
+			var quantity = Convert.ToDouble(result);
+			if (quantity <= 0)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar 0'dan küçük olmamalıdır.", "Hata", "Tamam");
+				return;
+			}
 
-			if (item.OutputQuantity > item.RemainingQuantity)
+			if (quantity > item.RemainingQuantity)
 			{
 				await _userDialogs.AlertAsync("Girilen miktar, kalan miktarı aşmamalıdır.", "Hata", "Tamam");
 				return;
 			}
+			if(quantity > SelectedItem?.StockQuantity)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar, stok miktarını aşmamalıdır.", "Hata", "Tamam");
+				return;
+			}
 
-			item.OutputQuantity = Convert.ToDouble(result);
+			var totalQuantity = LocationTransactions.Sum(x => x.OutputQuantity);
+			if(SelectedItem?.StockQuantity >= totalQuantity + quantity)
+			{
+				item.OutputQuantity = quantity;
+			}
+			else
+			{
+				await _userDialogs.AlertAsync($"Girilen miktar, Ürünün stok miktarını ({SelectedItem?.StockQuantity}) aşmamalıdır.", "Hata", "Tamam");
+			}			
 		}
 		catch (Exception ex)
 		{
@@ -641,6 +710,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 			IsBusy = false;
 		}
 	}
+
 	private async Task LocationTransactionIncreaseAsync(GroupLocationTransactionModel item)
 	{
 		if (IsBusy)
