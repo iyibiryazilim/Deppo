@@ -138,8 +138,8 @@
                                        LineBreakMode="TailTruncation"
                                        Text="{Binding ProductCode}" />
                                 <Label LineBreakMode="TailTruncation"
-                                       Text="{Binding ProductName}"
                                        MaxLines="1"
+                                       Text="{Binding ProductName}"
                                        TextColor="{StaticResource Gray600}" />
 
                                 <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
@@ -154,9 +154,16 @@
                                                              Color="{StaticResource Primary}" />
                                         </Image.Source>
                                     </Image>
-                                    <Label Text="{Binding WaitingQuantity, StringFormat='{0:N2}'}"
-                                           TextColor="{StaticResource Gray600}"
-                                           VerticalOptions="Center" />
+                                    <Label VerticalOptions="Center">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{Binding WaitingQuantity, StringFormat='{0:N2}'}" TextColor="{StaticResource Gray600}" />
+                                                <Span Text=" " />
+                                                <Span Text="{Binding SubUnitsetCode}" TextColor="{StaticResource Gray600}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+
                                 </HorizontalStackLayout>
                             </VerticalStackLayout>
                         </Grid>

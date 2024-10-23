@@ -69,9 +69,34 @@ public partial class PurchaseSupplierProduct : ObservableObject
     [ObservableProperty]
     private string image = string.Empty;
 
-    [ObservableProperty]
+	public byte[] ImageData
+	{
+		get
+		{
+			if (string.IsNullOrEmpty(Image))
+				return Array.Empty<byte>();
+			else
+				return Convert.FromBase64String(Image);
+		}
+	}
+
+	[ObservableProperty]
     private double stockQuantity;
 
     [ObservableProperty]
     public List<WaitingPurchaseOrder> orders = new();
+
+	public string LocTrackingIcon => "location-dot";
+
+	public string LocTrackingIconColor => LocTracking == 1 ? "#F5004F" : "#C8C8C8";
+
+
+	public string VariantIcon => "bookmark";
+
+	public string VariantIconColor => IsVariant ? "#F5004F" : "#C8C8C8";
+
+
+	public string TrackingTypeIcon => "box-archive";
+
+	public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 }
