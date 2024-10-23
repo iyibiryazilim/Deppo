@@ -1,16 +1,11 @@
-﻿using Deppo.Sys.Module.BusinessObjects;
+﻿using Deppo.Sys.Service.Models;
 using Deppo.Sys.Service.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Threading.Tasks;
 
 namespace Deppo.Sys.Service.DataStores
 {
-    public class ProcurementAuditDataStore : IProcurementAuditService
+	public class ProcurementAuditDataStore : IProcurementAuditService
     {
         public string RequestUrl = "/api/odata/" + typeof(ProcurementAudit).Name;
 
