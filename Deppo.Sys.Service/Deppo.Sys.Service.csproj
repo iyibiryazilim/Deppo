@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Deppo.Sys.Module\Deppo.Sys.Module.csproj" />
-  </ItemGroup>
-
 </Project>
