@@ -292,18 +292,10 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
                 await CloseInsertOptionsAsync();
                 return;
             }
-
-
-            _userDialogs.Loading("İşlem tamamlanıyor...");
-            await Task.Delay(1000);
-
-			      await CloseInsertOptionsAsync();
-			
-
+			await CloseInsertOptionsAsync();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             await WholeSalesDispatchTransactionInsertAsync(httpClient);
-
         }
         catch (Exception ex)
         {
@@ -380,7 +372,8 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.Loading().Hide();
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
@@ -498,7 +491,9 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
             }
             catch (Exception ex)
             {
-                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
+				await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
             }
 
             if (_userDialogs.IsHudShowing)
@@ -637,7 +632,10 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
             }
             catch (Exception ex)
             {
-                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+				if(_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+				await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
             }
 
 
