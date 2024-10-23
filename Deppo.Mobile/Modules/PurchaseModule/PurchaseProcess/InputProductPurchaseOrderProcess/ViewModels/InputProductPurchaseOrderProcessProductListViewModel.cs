@@ -226,7 +226,7 @@ public partial class InputProductPurchaseOrderProcessProductListViewModel : Base
                         IsSelected = false,
                         TrackingType = selectedItem.TrackingType,
                         LocTracking = selectedItem.LocTracking,
-                        Image = null,
+                        Image = selectedItem.ImageData,
                         Quantity = selectedItem.WaitingQuantity,
                     };
 

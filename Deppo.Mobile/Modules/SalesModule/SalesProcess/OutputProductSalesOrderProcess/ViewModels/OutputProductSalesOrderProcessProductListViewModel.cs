@@ -260,9 +260,6 @@ public partial class OutputProductSalesOrderProcessProductListViewModel : BaseVi
                         LocTracking = selectedItem.LocTracking,
                         Image = selectedItem.ImageData,
                         Quantity = selectedItem.WaitingQuantity,
-                        LocTrackingIcon = selectedItem.LocTrackingIcon,
-                        TrackingTypeIcon = selectedItem.TrackingTypeIcon,
-                        VariantIcon = selectedItem.VariantIcon,
                     };
                     if (selectedItem.LocTracking == 1 || selectedItem.TrackingType == 1)
                         outputSalesBasketModelItem.OutputQuantity = 0;

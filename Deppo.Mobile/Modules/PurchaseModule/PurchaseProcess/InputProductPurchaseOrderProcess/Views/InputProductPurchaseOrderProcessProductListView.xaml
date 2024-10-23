@@ -9,8 +9,8 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.ViewModels"
              Title="{Binding Title}"
-             Shell.PresentationMode="ModalAnimated"
              x:DataType="viewModel:InputProductPurchaseOrderProcessProductListViewModel"
+             Shell.PresentationMode="ModalAnimated"
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
@@ -120,13 +120,11 @@
                             </DataTrigger>
 
                         </Border.Triggers>
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-                            <Border BackgroundColor="{StaticResource Secondary}"
-                                    StrokeShape="RoundRectangle 5"
-                                    StrokeThickness="0.5">
+                        <Grid ColumnDefinitions="Auto,*, Auto" ColumnSpacing="10">
+                            <Border StrokeShape="RoundRectangle 5" StrokeThickness="0.5">
                                 <Image Grid.Column="0"
                                        HeightRequest="50"
-                                       Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                       Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                        WidthRequest="50" />
                             </Border>
 
@@ -138,23 +136,47 @@
                                        Text="{Binding ItemName}"
                                        TextColor="{StaticResource Gray600}" />
 
-                                <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
-                                    <Image Aspect="AspectFit"
-                                           HeightRequest="16"
-                                           VerticalOptions="Center"
-                                           WidthRequest="16">
-                                        <Image.Source>
-                                            <FontImageSource FontFamily="FAS"
-                                                             Glyph="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                                                             Size="16"
-                                                             Color="{StaticResource Primary}" />
-                                        </Image.Source>
-                                    </Image>
-                                    <Label Text="{Binding WaitingQuantity, StringFormat='{0:N2}'}"
-                                           TextColor="{StaticResource Gray600}"
-                                           VerticalOptions="Center" />
-                                </HorizontalStackLayout>
+                                <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span FontAttributes="Bold"
+                                                  FontFamily="FAS"
+                                                  Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                  TextColor="{StaticResource Primary}" />
+                                            <Span Text=" " />
+                                            <Span FontAttributes="Bold"
+                                                  Text="{Binding WaitingQuantity, StringFormat='{0:N2}'}"
+                                                  TextColor="{StaticResource Primary}" />
+                                            <Span Text=" " />
+                                            <Span FontAttributes="Bold"
+                                                  Text="{Binding SubUnitsetCode}"
+                                                  TextColor="{StaticResource Primary}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
                             </VerticalStackLayout>
+
+                            <Grid Grid.Column="2"
+                                  ColumnDefinitions="Auto, Auto, Auto"
+                                  ColumnSpacing="3"
+                                  HorizontalOptions="End"
+                                  VerticalOptions="Start">
+                                <Label Grid.Column="0"
+                                       FontFamily="FAS"
+                                       FontSize="10"
+                                       Text="{Binding VariantIcon}"
+                                       TextColor="{Binding VariantIconColor}" />
+                                <Label Grid.Column="1"
+                                       FontFamily="FAS"
+                                       FontSize="10"
+                                       Text="{Binding LocTrackingIcon}"
+                                       TextColor="{Binding LocTrackingIconColor}" />
+                                <Label Grid.Column="2"
+                                       FontFamily="FAS"
+                                       FontSize="10"
+                                       Text="{Binding TrackingTypeIcon}"
+                                       TextColor="{Binding TrackingTypeIconColor}" />
+                            </Grid>
                         </Grid>
                     </Border>
                 </DataTemplate>

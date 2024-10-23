@@ -140,8 +140,6 @@
                                                                      Color="{StaticResource Gray600}" />
                                                 </Image.Source>
                                             </Image>
-
-
                                         </Grid>
 
                                         <Label LineBreakMode="TailTruncation"
