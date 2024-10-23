@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage
-    x:Class="Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.Views.ProcurementByCustomerBasketView"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:dx="http://schemas.devexpress.com/maui"
-    xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
-    xmlns:procurementCustomerBasketModel="clr-namespace:Deppo.Mobile.Core.Models.ProcurementModels.ByCustomerModels;assembly=Deppo.Mobile.Core"
-    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-    xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.ViewModels"
-    Title="{Binding Title}"
-    x:DataType="viewModel:ProcurementByCustomerBasketViewModel"
-    Shell.TabBarIsVisible="False">
+<ContentPage x:Class="Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.Views.ProcurementByCustomerBasketView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:procurementCustomerBasketModel="clr-namespace:Deppo.Mobile.Core.Models.ProcurementModels.ByCustomerModels;assembly=Deppo.Mobile.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:ProcurementByCustomerBasketViewModel"
+             Shell.TabBarIsVisible="False">
 
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
@@ -24,17 +23,21 @@
     </ContentPage.Resources>
 
     <ContentPage.ToolbarItems>
+        <ToolbarItem>
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.CircleCheck}"
+                                 Size="Medium" />
+
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
 
         <ToolbarItem Command="{Binding ProcurementInfoCommand}">
             <ToolbarItem.IconImageSource>
-                <FontImageSource
-                    FontFamily="FAS"
-                    Glyph="{x:Static fontAwesome:FontAwesomeIcons.CircleInfo}"
-                    Size="Medium" />
-
+                <FontImageSource FontFamily="FAS"
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.CircleInfo}"
+                                 Size="Medium" />
             </ToolbarItem.IconImageSource>
-
-
         </ToolbarItem>
     </ContentPage.ToolbarItems>
 
@@ -49,67 +52,60 @@
 
         <VerticalStackLayout Grid.Row="0">
 
-            <CarouselView
-                x:Name="carouselView"
-                IsSwipeEnabled="False"
-                ItemsSource="{Binding Items}"
-                Loop="False"
-                Position="{Binding CurrentPosition}">
+            <CarouselView x:Name="carouselView"
+                          IsSwipeEnabled="False"
+                          ItemsSource="{Binding Items}"
+                          Loop="False"
+                          Position="{Binding CurrentPosition}">
                 <CarouselView.ItemTemplate>
                     <DataTemplate x:DataType="procurementCustomerBasketModel:ProcurementCustomerBasketModel">
 
                         <Grid RowDefinitions="Auto,*" RowSpacing="10">
 
-                            <Grid
-                                Grid.Row="0"
-                                Padding="10"
-                                ColumnDefinitions="Auto,*,Auto"
-                                ColumnSpacing="5">
-                                <Border
-                                    Grid.Column="0"
-                                    Padding="10"
-                                    BackgroundColor="{StaticResource Primary}"
-                                    IsVisible="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=IsPreviousButtonVisible}"
-                                    Stroke="{StaticResource Primary}"
-                                    StrokeShape="RoundRectangle 10">
+                            <Grid Grid.Row="0"
+                                  Padding="10"
+                                  ColumnDefinitions="Auto,*,Auto"
+                                  ColumnSpacing="5">
+                                <Border Grid.Column="0"
+                                        Padding="10"
+                                        BackgroundColor="{StaticResource Primary}"
+                                        IsVisible="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=IsPreviousButtonVisible}"
+                                        Stroke="{StaticResource Primary}"
+                                        StrokeShape="RoundRectangle 10">
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=PreviousPositionCommand}" />
                                     </Border.GestureRecognizers>
-                                    <Label
-                                        FontFamily="FAS"
-                                        FontSize="Large"
-                                        HorizontalOptions="Center"
-                                        Text="{x:Static fontAwesome:FontAwesomeIcons.ArrowLeft}"
-                                        TextColor="{StaticResource White}"
-                                        VerticalOptions="Center" />
+                                    <Label FontFamily="FAS"
+                                           FontSize="Large"
+                                           HorizontalOptions="Center"
+                                           Text="{x:Static fontAwesome:FontAwesomeIcons.ArrowLeft}"
+                                           TextColor="{StaticResource White}"
+                                           VerticalOptions="Center" />
                                 </Border>
-                                <Label
-                                    Grid.Column="1"
-                                    FontAttributes="Bold"
-                                    FontSize="Large"
-                                    HorizontalOptions="Center"
-                                    Text="{Binding LocationCode}"
-                                    TextColor="{StaticResource White}"
-                                    VerticalOptions="Center" />
+                                <Label Grid.Column="1"
+                                       FontAttributes="Bold"
+                                       FontSize="Large"
+                                       HorizontalOptions="Center"
+                                       Text="{Binding LocationCode}"
+                                       TextColor="{StaticResource White}"
+                                       VerticalOptions="Center" />
 
-                                <Border
-                                    Grid.Column="2"
-                                    Padding="10"
-                                    BackgroundColor="{StaticResource Primary}"
-                                    IsVisible="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=IsNextButtonVisible}"
-                                    Stroke="{StaticResource Primary}"
-                                    StrokeShape="RoundRectangle 10">
+                                <Border Grid.Column="2"
+                                        Padding="10"
+                                        BackgroundColor="{StaticResource Primary}"
+                                        IsVisible="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=IsNextButtonVisible}"
+                                        Stroke="{StaticResource Primary}"
+                                        StrokeShape="RoundRectangle 10">
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=NextPositionCommand}" />
                                     </Border.GestureRecognizers>
-                                    <Label
-                                        Grid.Column="0"
-                                        FontFamily="FAS"
-                                        FontSize="Large"
-                                        HorizontalOptions="Center"
-                                        Text="{x:Static fontAwesome:FontAwesomeIcons.ArrowRight}"
-                                        TextColor="{StaticResource White}"
-                                        VerticalOptions="Center" />
+                                    <Label Grid.Column="0"
+                                           FontFamily="FAS"
+                                           FontSize="Large"
+                                           HorizontalOptions="Center"
+                                           Text="{x:Static fontAwesome:FontAwesomeIcons.ArrowRight}"
+                                           TextColor="{StaticResource White}"
+                                           VerticalOptions="Center" />
                                 </Border>
                             </Grid>
 
@@ -117,94 +113,162 @@
                             <StackLayout Grid.Row="1" BindableLayout.ItemsSource="{Binding Products}">
                                 <BindableLayout.ItemTemplate>
                                     <DataTemplate x:DataType="procurementCustomerBasketModel:ProcurementCustomerBasketProductModel">
-                                        <Border
-                                            Padding="10"
-                                            BackgroundColor="Transparent"
-                                            StrokeThickness="0.1">
-                                            <Grid ColumnDefinitions=".20*,.80*" ColumnSpacing="10">
-                                                <Border
-                                                    Grid.Column="0"
-                                                    BackgroundColor="{StaticResource Primary}"
-                                                    Stroke="{StaticResource Primary}"
-                                                    StrokeShape="RoundRectangle 5"
-                                                    StrokeThickness="0.5">
-                                                    <Image
-                                                        Grid.Column="0"
-                                                        HeightRequest="50"
-                                                        Source="dotnet_bot.png"
-                                                        WidthRequest="50" />
-                                                </Border>
+                                        <SwipeView Threshold="120">
+                                            <SwipeView.LeftItems>
+                                                <SwipeItems Mode="Execute">
+                                                    <SwipeItemView BackgroundColor="{StaticResource Primary}">
+                                                        <Label Padding="0,0,0,0"
+                                                               HorizontalOptions="Center"
+                                                               TextColor="White"
+                                                               VerticalOptions="Center">
 
-                                                <VerticalStackLayout Grid.Column="1">
-                                                    <Label
-                                                        FontAttributes="Bold"
-                                                        LineBreakMode="TailTruncation"
-                                                        Text="{Binding ItemCode}" />
-                                                    <Label
-                                                        LineBreakMode="TailTruncation"
-                                                        Text="{Binding ItemName}"
-                                                        TextColor="{StaticResource Gray600}" />
+                                                            <Label.FormattedText>
+                                                                <FormattedString>
+                                                                    <Span FontAttributes="Bold"
+                                                                          FontFamily="FAS"
+                                                                          FontSize="Medium"
+                                                                          Text="{x:Static fontAwesome:FontAwesomeIcons.RotateLeft}"
+                                                                          TextColor="White" />
+                                                                    <Span Text=" " />
+                                                                    <Span FontAttributes="Bold"
+                                                                          FontSize="Medium"
+                                                                          Text="Geri Al"
+                                                                          TextColor="White" />
+                                                                </FormattedString>
+                                                            </Label.FormattedText>
+                                                        </Label>
+                                                    </SwipeItemView>
+                                                </SwipeItems>
+                                            </SwipeView.LeftItems>
+                                            <SwipeView.RightItems>
+                                                <SwipeItems Mode="Execute">
+                                                    <SwipeItemView BackgroundColor="Red">
 
-                                                    <Label FontAttributes="Bold" FontSize="15">
-                                                        <Label.FormattedText>
-                                                            <FormattedString>
-                                                                <Span
-                                                                    FontFamily="FAS"
-                                                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                                                                    TextColor="{StaticResource Primary}" />
-                                                                <Span Text=" " />
-                                                                <Span Text="{Binding ProcurementQuantity, StringFormat='{0:N2}'}" TextColor="{StaticResource Primary}" />
-                                                            </FormattedString>
-                                                        </Label.FormattedText>
-                                                    </Label>
+                                                        <Label Padding="0,0,0,0"
+                                                               HorizontalOptions="Center"
+                                                               TextColor="White"
+                                                               VerticalOptions="Center">
 
-                                                    <Grid
-                                                        ColumnDefinitions="Auto,Auto,Auto"
-                                                        ColumnSpacing="10"
-                                                        HorizontalOptions="EndAndExpand">
-                                                        <Border
-                                                            Grid.Column="0"
-                                                            Padding="5"
-                                                            BackgroundColor="Transparent"
-                                                            Stroke="{StaticResource Secondary}"
-                                                            StrokeShape="RoundRectangle 2">
-                                                            <Label
-                                                                FontFamily="FAS"
-                                                                FontSize="Medium"
-                                                                Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
-                                                                TextColor="{StaticResource Secondary}" />
+                                                            <Label.FormattedText>
+                                                                <FormattedString>
+                                                                    <Span FontAttributes="Bold"
+                                                                          FontFamily="FAS"
+                                                                          FontSize="Medium"
+                                                                          Text="{x:Static fontAwesome:FontAwesomeIcons.TriangleExclamation}"
+                                                                          TextColor="White" />
+                                                                    <Span Text=" " />
+                                                                    <Span FontAttributes="Bold"
+                                                                          FontSize="Subtitle"
+                                                                          Text="Hata Kodu"
+                                                                          TextColor="White" />
+                                                                </FormattedString>
+                                                            </Label.FormattedText>
+                                                        </Label>
 
-                                                            <!-- <Border.GestureRecognizers>
-                                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessBasketListViewModel}}, Path=DecreaseCommand}" CommandParameter="{Binding .}" />
-                                                        </Border.GestureRecognizers>-->
-                                                        </Border>
-                                                        <Label
-                                                            Grid.Column="1"
-                                                            FontAttributes="Bold"
-                                                            FontSize="Large"
-                                                            Text="{Binding Quantity, StringFormat='{0:N2}'}"
-                                                            TextColor="{StaticResource OffBlack}"
-                                                            VerticalOptions="Center" />
-                                                        <Border
-                                                            Grid.Column="2"
-                                                            Padding="5"
-                                                            BackgroundColor="{StaticResource Secondary}"
-                                                            Stroke="{StaticResource Secondary}"
-                                                            StrokeShape="RoundRectangle 2">
-                                                            <Label
-                                                                FontFamily="FAS"
-                                                                FontSize="Medium"
-                                                                Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
-                                                                TextColor="{StaticResource White}" />
 
-                                                            <!-- <Border.GestureRecognizers>
-                                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputProductSalesOrderProcessBasketListViewModel}}, Path=IncreaseCommand}" CommandParameter="{Binding .}" />
-                                                        </Border.GestureRecognizers>-->
-                                                        </Border>
-                                                    </Grid>
-                                                </VerticalStackLayout>
-                                            </Grid>
-                                        </Border>
+                                                    </SwipeItemView>
+                                                </SwipeItems>
+                                            </SwipeView.RightItems>
+
+                                            <Border Padding="10"
+                                                    BackgroundColor="Transparent"
+                                                    StrokeThickness="0.1">
+                                                <Grid ColumnDefinitions=".20*,.80*" ColumnSpacing="10">
+                                                    <Border Grid.Column="0"
+                                                            Stroke="{StaticResource Primary}"
+                                                            StrokeShape="RoundRectangle 5"
+                                                            StrokeThickness="0.5">
+                                                        <Image Grid.Column="0"
+                                                               HeightRequest="50"
+                                                               Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                                               WidthRequest="50" />
+                                                    </Border>
+
+                                                    <VerticalStackLayout Grid.Column="1">
+                                                        <Label FontAttributes="Bold"
+                                                               LineBreakMode="TailTruncation"
+                                                               Text="{Binding ItemCode}" />
+                                                        <Label LineBreakMode="TailTruncation"
+                                                               Text="{Binding ItemName}"
+                                                               TextColor="{StaticResource Gray600}" />
+
+                                                        <HorizontalStackLayout Spacing="10">
+                                                            <Label FontAttributes="Bold" FontSize="15">
+                                                                <Label.FormattedText>
+                                                                    <FormattedString>
+                                                                        <Span FontFamily="FAS"
+                                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                                              TextColor="{StaticResource Primary}" />
+                                                                        <Span Text=" " />
+                                                                        <Span Text="{Binding ProcurementQuantity, StringFormat='{0:N2}'}" TextColor="{StaticResource Primary}" />
+                                                                        <Span Text=" " />
+                                                                        <Span Text="{Binding SubUnitsetCode}" TextColor="{StaticResource Primary}" />
+                                                                    </FormattedString>
+                                                                </Label.FormattedText>
+                                                            </Label>
+
+                                                            <Label FontAttributes="Bold" FontSize="15">
+                                                                <Label.FormattedText>
+                                                                    <FormattedString>
+                                                                        <Span FontFamily="FAS"
+                                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.SquareMinus}"
+                                                                              TextColor="{StaticResource Primary}" />
+                                                                        <Span Text=" " />
+                                                                        <Span Text="{Binding RemainingQuantity, StringFormat='{0:N2}'}" TextColor="{StaticResource Primary}" />
+                                                                    </FormattedString>
+                                                                </Label.FormattedText>
+                                                            </Label>
+                                                        </HorizontalStackLayout>
+
+
+                                                        <Grid ColumnDefinitions="Auto,Auto,Auto"
+                                                              ColumnSpacing="10"
+                                                              HorizontalOptions="EndAndExpand">
+                                                            <Border Grid.Column="0"
+                                                                    Padding="5"
+                                                                    BackgroundColor="Transparent"
+                                                                    Stroke="{StaticResource Secondary}"
+                                                                    StrokeShape="RoundRectangle 2">
+                                                                <Border.GestureRecognizers>
+                                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=DecreaseCommand}" CommandParameter="{Binding .}" />
+                                                                </Border.GestureRecognizers>
+                                                                <Label FontFamily="FAS"
+                                                                       FontSize="Medium"
+                                                                       Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                                                       TextColor="{StaticResource Secondary}" />
+
+
+                                                            </Border>
+                                                            <Label Grid.Column="1"
+                                                                   FontAttributes="Bold"
+                                                                   FontSize="Large"
+                                                                   Text="{Binding Quantity, StringFormat='{0:N2}'}"
+                                                                   TextColor="{StaticResource OffBlack}"
+                                                                   VerticalOptions="Center">
+                                                                <Label.GestureRecognizers>
+                                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=QuantityTappedCommand}" CommandParameter="{Binding .}" />
+                                                                </Label.GestureRecognizers>
+                                                            </Label>
+                                                            <Border Grid.Column="2"
+                                                                    Padding="5"
+                                                                    BackgroundColor="{StaticResource Secondary}"
+                                                                    Stroke="{StaticResource Secondary}"
+                                                                    StrokeShape="RoundRectangle 2">
+                                                                <Label FontFamily="FAS"
+                                                                       FontSize="Medium"
+                                                                       Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                                                       TextColor="{StaticResource White}" />
+
+                                                                <Border.GestureRecognizers>
+                                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=IncreaseCommand}" CommandParameter="{Binding .}" />
+                                                                </Border.GestureRecognizers>
+                                                            </Border>
+                                                        </Grid>
+                                                    </VerticalStackLayout>
+                                                </Grid>
+                                            </Border>
+                                        </SwipeView>
+
                                     </DataTemplate>
                                 </BindableLayout.ItemTemplate>
                             </StackLayout>
@@ -220,20 +284,18 @@
 
         </VerticalStackLayout>
 
-        <Button
-            Grid.Row="1"
-            Margin="5,10,5,20"
-            IsVisible="{Binding IsCompleteButtonVisible}"
-            Text="Bitir" />
+        <Button Grid.Row="1"
+                Margin="5,10,5,20"
+                IsVisible="{Binding IsCompleteButtonVisible}"
+                Text="Bitir" />
 
-        <Label
-            Grid.Row="1"
-            Margin="5,10,5,20"
-            FontAttributes="Bold"
-            FontSize="Large"
-            HorizontalOptions="Center"
-            IsVisible="{Binding IsPageIndicatorVisible}"
-            VerticalOptions="End">
+        <Label Grid.Row="1"
+               Margin="5,10,5,20"
+               FontAttributes="Bold"
+               FontSize="Large"
+               HorizontalOptions="Center"
+               IsVisible="{Binding IsPageIndicatorVisible}"
+               VerticalOptions="End">
             <Label.FormattedText>
                 <FormattedString>
                     <Span Text="{Binding CurrentPosition}" />
@@ -244,180 +306,158 @@
         </Label>
 
         <!--#region basketOptionsBottomSheet-->
-        <dx:BottomSheet
-            x:Name="procurementInfoBottomSheet"
-            AllowDismiss="True"
-            BackgroundColor="White"
-            CornerRadius="15"
-            HalfExpandedRatio="0.6"
-            IsModal="True"
-            ShowGrabber="True">
-            <Grid
-                Padding="10"
-                RowDefinitions="Auto,*"
-                RowSpacing="20">
+        <dx:BottomSheet x:Name="procurementInfoBottomSheet"
+                        AllowDismiss="True"
+                        BackgroundColor="White"
+                        CornerRadius="15"
+                        HalfExpandedRatio="0.6"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <Grid Padding="10"
+                  RowDefinitions="Auto,*"
+                  RowSpacing="20">
                 <VerticalStackLayout Grid.Row="0" Spacing="5">
-                    <Label
-                        Padding="10"
-                        FontAttributes="Bold"
-                        FontSize="Subtitle"
-                        Text="Ürün Toplama İşlemi" />
+                    <Label Padding="10"
+                           FontAttributes="Bold"
+                           FontSize="Subtitle"
+                           Text="Ürün Toplama İşlemi" />
                     <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
                 </VerticalStackLayout>
-                <Grid
-                    Grid.Row="1"
-                    RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
-                    RowSpacing="10">
+                <Grid Grid.Row="1"
+                      RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+                      RowSpacing="10">
 
-                    <Border
-                        Grid.Row="0"
-                        Padding="10"
-                        BackgroundColor="Transparent"
-                        StrokeShape="RoundRectangle 10"
-                        StrokeThickness="0">
+                    <Border Grid.Row="0"
+                            Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0">
 
                         <VerticalStackLayout>
-                            <Label
-                                FontAttributes="Bold"
-                                FontSize="Subtitle"
-                                Text="Müşteri"
-                                TextColor="{StaticResource Gray500}" />
-                            <Label
-                                FontAttributes="Bold"
-                                FontSize="Subtitle"
-                                LineBreakMode="TailTruncation"
-                                Text="{Binding ProcurementCustomerBasketModel.CustomerName}" />
+                            <Label FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   Text="Müşteri"
+                                   TextColor="{StaticResource Gray500}" />
+                            <Label FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   LineBreakMode="TailTruncation"
+                                   Text="{Binding ProcurementCustomerBasketModel.CustomerName}" />
                         </VerticalStackLayout>
 
                     </Border>
 
-                    <Border
-                        Grid.Row="1"
-                        Padding="10"
-                        BackgroundColor="Transparent"
-                        StrokeShape="RoundRectangle 10"
-                        StrokeThickness="0">
+                    <Border Grid.Row="1"
+                            Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0">
 
                         <VerticalStackLayout>
-                            <Label
-                                FontAttributes="Bold"
-                                FontSize="Subtitle"
-                                Text="Sevk Adresi"
-                                TextColor="{StaticResource Gray500}" />
-                            <Label
-                                FontAttributes="Bold"
-                                FontSize="Subtitle"
-                                Text="{Binding ProcurementCustomerBasketModel.ShipAddressName}" />
+                            <Label FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   Text="Sevk Adresi"
+                                   TextColor="{StaticResource Gray500}" />
+                            <Label FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   Text="{Binding ProcurementCustomerBasketModel.ShipAddressName}" />
                         </VerticalStackLayout>
 
                     </Border>
 
-                    <Border
-                        Grid.Row="2"
-                        Padding="10"
-                        BackgroundColor="Transparent"
-                        StrokeShape="RoundRectangle 10"
-                        StrokeThickness="0">
+                    <Border Grid.Row="2"
+                            Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0">
 
                         <Grid ColumnDefinitions="*,*">
-                            <Label
-                                Grid.Column="0"
-                                FontAttributes="Bold"
-                                FontSize="Subtitle"
-                                HorizontalOptions="Start"
-                                Text="Toplanacak Ürün Sayısı"
-                                VerticalOptions="Center" />
+                            <Label Grid.Column="0"
+                                   FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   HorizontalOptions="Start"
+                                   Text="Toplanacak Ürün Sayısı"
+                                   VerticalOptions="Center" />
 
-                            <Label
-                                Grid.Column="1"
-                                FontAttributes="Bold"
-                                FontSize="Subtitle"
-                                HorizontalOptions="End"
-                                Text="{Binding ProcurementCustomerBasketModel.Products.Count, StringFormat='{0}'}"
-                                VerticalOptions="Center" />
+                            <Label Grid.Column="1"
+                                   FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   HorizontalOptions="End"
+                                   Text="{Binding ProcurementCustomerBasketModel.Products.Count, StringFormat='{0}'}"
+                                   VerticalOptions="Center" />
                         </Grid>
 
 
 
                     </Border>
 
-                    <Border
-                        Grid.Row="3"
-                        Padding="10"
-                        BackgroundColor="Transparent"
-                        StrokeShape="RoundRectangle 10"
-                        StrokeThickness="0">
+                    <Border Grid.Row="3"
+                            Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0">
 
                         <Grid ColumnDefinitions="*,*">
-                            <Label
-                                Grid.Column="0"
-                                FontAttributes="Bold"
-                                FontSize="Subtitle"
-                                HorizontalOptions="Start"
-                                Text="Gezilecek Raf Sayısı"
-                                VerticalOptions="Center" />
+                            <Label Grid.Column="0"
+                                   FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   HorizontalOptions="Start"
+                                   Text="Gezilecek Raf Sayısı"
+                                   VerticalOptions="Center" />
 
-                            <Label
-                                Grid.Column="1"
-                                FontAttributes="Bold"
-                                FontSize="Subtitle"
-                                HorizontalOptions="End"
-                                Text="{Binding ProcurementCustomerBasketModel.Products.Count, StringFormat='{0}'}"
-                                VerticalOptions="Center" />
+                            <Label Grid.Column="1"
+                                   FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   HorizontalOptions="End"
+                                   Text="{Binding ProcurementCustomerBasketModel.Products.Count, StringFormat='{0}'}"
+                                   VerticalOptions="Center" />
                         </Grid>
 
                     </Border>
 
-                    <Border
-                        Grid.Row="4"
-                        Padding="10"
-                        BackgroundColor="Transparent"
-                        StrokeShape="RoundRectangle 10"
-                        StrokeThickness="0">
+                    <Border Grid.Row="4"
+                            Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0">
 
                         <Grid ColumnDefinitions="*,*">
-                            <Label
-                                Grid.Column="0"
-                                FontAttributes="Bold"
-                                FontSize="Subtitle"
-                                HorizontalOptions="Start"
-                                Text="Toplam Ürün Ağırlığı"
-                                VerticalOptions="Center" />
+                            <Label Grid.Column="0"
+                                   FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   HorizontalOptions="Start"
+                                   Text="Toplam Ürün Ağırlığı"
+                                   VerticalOptions="Center" />
 
-                            <Label
-                                Grid.Column="1"
-                                FontAttributes="Bold"
-                                FontSize="Subtitle"
-                                HorizontalOptions="End"
-                                Text="76KG"
-                                VerticalOptions="Center" />
+                            <Label Grid.Column="1"
+                                   FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   HorizontalOptions="End"
+                                   Text="76KG"
+                                   VerticalOptions="Center" />
                         </Grid>
 
                     </Border>
 
-                    <Border
-                        Grid.Row="5"
-                        Padding="10"
-                        BackgroundColor="Transparent"
-                        StrokeShape="RoundRectangle 10"
-                        StrokeThickness="0">
+                    <Border Grid.Row="5"
+                            Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0">
 
                         <Grid ColumnDefinitions="*,*">
-                            <Label
-                                Grid.Column="0"
-                                FontAttributes="Bold"
-                                FontSize="Subtitle"
-                                HorizontalOptions="Start"
-                                Text="Toplam Hacim"
-                                VerticalOptions="Center" />
+                            <Label Grid.Column="0"
+                                   FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   HorizontalOptions="Start"
+                                   Text="Toplam Hacim"
+                                   VerticalOptions="Center" />
 
-                            <Label
-                                Grid.Column="1"
-                                FontAttributes="Bold"
-                                FontSize="Subtitle"
-                                HorizontalOptions="End"
-                                Text="10M3"
-                                VerticalOptions="Center" />
+                            <Label Grid.Column="1"
+                                   FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   HorizontalOptions="End"
+                                   Text="10M3"
+                                   VerticalOptions="Center" />
                         </Grid>
 
                     </Border>

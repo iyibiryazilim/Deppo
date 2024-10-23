@@ -22,7 +22,8 @@ public class ProcurementCustomerBasketProductModel : INotifyPropertyChanged, IDi
     private double _orderQuantity;
     private double _procurementQuantity;
     private double _quantity;
-    private bool _isVariant;
+	private double _remainingQuantity; // ProcurementQuantity - Quantity
+	private bool _isVariant;
     private int _trackingType;
     private int _locTracking;
     private bool _isSelected;
@@ -33,6 +34,8 @@ public class ProcurementCustomerBasketProductModel : INotifyPropertyChanged, IDi
     private string _variantIconColor;
     private string _trackingTypeIcon;
     private string _trackingTypeIconColor;
+
+    
 
     public ProcurementCustomerBasketProductModel()
     {
@@ -239,7 +242,19 @@ public class ProcurementCustomerBasketProductModel : INotifyPropertyChanged, IDi
         }
     }
 
-    [DisplayName("Varyant")]
+	[DisplayName("Kalan Toplanacak Miktar")]
+	public double RemainingQuantity
+	{
+        get => _remainingQuantity;
+		set
+		{
+			if (_remainingQuantity == value) return;
+			_remainingQuantity = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	[DisplayName("Varyant")]
     public bool IsVariant
     {
         get => _isVariant;

@@ -28,7 +28,6 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
     [ObservableProperty]
     int totalPosition;
 
-
     public ProcurementByCustomerBasketViewModel(
         IHttpClientService httpClientService,
         IProcurementByCustomerBasketService procurementByCustomerBasketService,
@@ -45,8 +44,10 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
         PreviousPositionCommand = new Command(PreviousPositionAsync);
         ProcurementInfoCommand = new Command(async () => await ProcurementInfoAsync());
 
-
-    }
+        IncreaseCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await IncreaseAsync(item));
+		DecreaseCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await DecreaseAsync(item));
+		QuantityTappedCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await QuantityTappedAsync(item));
+	}
 
     public Page CurrentPage { get; set; }
     public bool IsPreviousButtonVisible => CurrentPosition == 0 ? false : true;
@@ -61,6 +62,10 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
     public Command NextPositionCommand { get; }
     public Command PreviousPositionCommand { get; }
     public Command ProcurementInfoCommand { get; }
+
+    public Command IncreaseCommand { get; }
+    public Command DecreaseCommand { get; }
+    public Command QuantityTappedCommand { get; }
 
 
     private async Task LoadItemsAsync()
@@ -166,6 +171,113 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
         }
     }
 
+    private async Task IncreaseAsync(ProcurementCustomerBasketProductModel item)
+    {
+		if (item is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+        {
+            IsBusy = true;
+
+			if (item.ProcurementQuantity > item.Quantity)
+            {
+                item.Quantity++;
+                item.RemainingQuantity = item.ProcurementQuantity - item.Quantity;
+			}
+				
+		}
+        catch (Exception ex)
+        {
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task DecreaseAsync(ProcurementCustomerBasketProductModel item)
+    {
+		if (item is null)
+			return;
+		if (IsBusy)
+			return;
+		try
+        {
+            if(item.Quantity > 0)
+            {
+				item.Quantity--;
+				item.RemainingQuantity = item.ProcurementQuantity - item.Quantity;
+			}
+        }
+        catch (Exception ex)
+        {
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task QuantityTappedAsync(ProcurementCustomerBasketProductModel item)
+    {
+        if(item is null)
+            return;
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+			var result = await CurrentPage.DisplayPromptAsync(
+				title: item.ItemCode,
+				message: "Miktarı giriniz",
+				cancel: "Vazgeç",
+				accept: "Tamam",
+				initialValue: item.Quantity.ToString(),
+				keyboard: Keyboard.Numeric);
+
+			if (string.IsNullOrEmpty(result))
+				return;
+
+			var quantity = Convert.ToDouble(result);
+			if (quantity <= 0)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar 0'dan küçük olmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			if (quantity > item.ProcurementQuantity)
+			{
+				await _userDialogs.AlertAsync("Girilen miktar, ürünün toplanabilir miktarını aşmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			item.Quantity = quantity;
+			item.RemainingQuantity = item.ProcurementQuantity - item.Quantity;
+
+		}
+        catch (Exception ex)
+        {
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
     private void NextPositionAsync()
     {
