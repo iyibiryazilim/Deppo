@@ -185,9 +185,27 @@
                                                     </Border>
 
                                                     <VerticalStackLayout Grid.Column="1">
-                                                        <Label FontAttributes="Bold"
-                                                               LineBreakMode="TailTruncation"
-                                                               Text="{Binding ItemCode}" />
+                                                        <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                                                            <Label Grid.Column="0"
+                                                                   FontAttributes="Bold"
+                                                                   LineBreakMode="TailTruncation"
+                                                                   Text="{Binding ItemCode}" />
+
+                                                            <Border Grid.Column="1"
+                                                                    Padding="10,0"
+                                                                    BackgroundColor="{Binding ProcurementStatusTextColor}"
+                                                                    HeightRequest="24"
+                                                                    MinimumHeightRequest="24"
+                                                                    StrokeShape="RoundRectangle 10"
+                                                                    StrokeThickness="0">
+                                                                <Label FontSize="12"
+                                                                       HorizontalOptions="Center"
+                                                                       Text="{Binding ProcurementStatusText}"
+                                                                       TextColor="{StaticResource White}"
+                                                                       VerticalOptions="Center" />
+                                                            </Border>
+                                                        </Grid>
+
                                                         <Label LineBreakMode="TailTruncation"
                                                                Text="{Binding ItemName}"
                                                                TextColor="{StaticResource Gray600}" />

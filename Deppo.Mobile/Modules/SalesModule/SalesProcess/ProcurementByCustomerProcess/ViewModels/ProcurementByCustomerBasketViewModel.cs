@@ -184,7 +184,6 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 			if (item.ProcurementQuantity > item.Quantity)
             {
                 item.Quantity++;
-                item.RemainingQuantity = item.ProcurementQuantity - item.Quantity;
 			}
 				
 		}
@@ -212,7 +211,6 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
             if(item.Quantity > 0)
             {
 				item.Quantity--;
-				item.RemainingQuantity = item.ProcurementQuantity - item.Quantity;
 			}
         }
         catch (Exception ex)
@@ -263,7 +261,6 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 			}
 
 			item.Quantity = quantity;
-			item.RemainingQuantity = item.ProcurementQuantity - item.Quantity;
 
 		}
         catch (Exception ex)

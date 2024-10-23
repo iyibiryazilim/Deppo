@@ -35,9 +35,7 @@ public class ProcurementCustomerBasketProductModel : INotifyPropertyChanged, IDi
     private string _trackingTypeIcon;
     private string _trackingTypeIconColor;
 
-    
-
-    public ProcurementCustomerBasketProductModel()
+	public ProcurementCustomerBasketProductModel()
     {
 
     }
@@ -227,7 +225,10 @@ public class ProcurementCustomerBasketProductModel : INotifyPropertyChanged, IDi
             if (_procurementQuantity == value) return;
             _procurementQuantity = value;
             NotifyPropertyChanged();
-        }
+			NotifyPropertyChanged(nameof(RemainingQuantity));
+			NotifyPropertyChanged(nameof(ProcurementStatusText)); 
+			NotifyPropertyChanged(nameof(ProcurementStatusTextColor));
+		}
     }
 
     [DisplayName("Toplanan Miktar")]
@@ -239,19 +240,16 @@ public class ProcurementCustomerBasketProductModel : INotifyPropertyChanged, IDi
             if (_quantity == value) return;
             _quantity = value;
             NotifyPropertyChanged();
-        }
+			NotifyPropertyChanged(nameof(RemainingQuantity));
+			NotifyPropertyChanged(nameof(ProcurementStatusText)); 
+			NotifyPropertyChanged(nameof(ProcurementStatusTextColor));
+		}
     }
 
 	[DisplayName("Kalan Toplanacak Miktar")]
 	public double RemainingQuantity
 	{
-        get => _remainingQuantity;
-		set
-		{
-			if (_remainingQuantity == value) return;
-			_remainingQuantity = value;
-			NotifyPropertyChanged();
-		}
+        get => ProcurementQuantity - Quantity;
 	}
 
 	[DisplayName("Varyant")]
@@ -352,7 +350,32 @@ public class ProcurementCustomerBasketProductModel : INotifyPropertyChanged, IDi
 
     public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 
-    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private string _procurementStatusText = "Bekliyor";
+    public string ProcurementStatusText
+    {
+        get => ProcurementQuantity == Quantity ? "Tamamlandı" : "Bekliyor";
+		set
+		{
+			if (_procurementStatusText == value) return;
+			_procurementStatusText = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+    private string _procurementStatusTextColor = "#E6BE0C";
+	public string ProcurementStatusTextColor
+    {
+        get => ProcurementQuantity == Quantity ? "Green" : "#E6BE0C";
+        set
+        {
+            if (_procurementStatusTextColor == value) return;
+            _procurementStatusTextColor = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+	public event PropertyChangedEventHandler? PropertyChanged;
 
     protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
     {
