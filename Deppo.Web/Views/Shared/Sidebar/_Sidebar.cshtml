@@ -126,7 +126,7 @@
 			<div class="menu-item">
 				<!--begin:Menu link-->
 				<a class="menu-link" asp-controller="Warehouse" asp-action="Index" target="_blank"
-				   title="Malzeme Listesi" data-bs-toggle="tooltip" data-bs-trigger="hover"
+				   title="Ambar Listesi" data-bs-toggle="tooltip" data-bs-trigger="hover"
 				   data-bs-dismiss="click" data-bs-placement="right">
 					<span class="menu-bullet">
 						<span class="bullet bullet-dot"></span>
@@ -157,7 +157,7 @@
 			<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
 				<!--begin:Menu link-->
 				<a class="menu-link" asp-controller="Customer" asp-action="Index" target="_blank"
-				   title="Malzeme Listesi" data-bs-toggle="tooltip" data-bs-trigger="hover"
+				   title="Müşteri Listesi" data-bs-toggle="tooltip" data-bs-trigger="hover"
 				   data-bs-dismiss="click" data-bs-placement="right">
 					<span class="menu-bullet">
 						<span class="bullet bullet-dot"></span>
@@ -171,7 +171,7 @@
 			<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
 				<!--begin:Menu link-->
 				<a class="menu-link" asp-controller="WaitingSalesOrder" asp-action="Index" target="_blank"
-				   title="Malzeme Listesi" data-bs-toggle="tooltip" data-bs-trigger="hover"
+				   title="Bekleyen Satış Siparişleri Listesi" data-bs-toggle="tooltip" data-bs-trigger="hover"
 				   data-bs-dismiss="click" data-bs-placement="right">
 					<span class="menu-bullet">
 						<span class="bullet bullet-dot"></span>
@@ -203,7 +203,7 @@
 			<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
 				<!--begin:Menu link-->
 				<a class="menu-link" asp-controller="Supplier" asp-action="Index" target="_blank"
-				   title="Malzeme Listesi" data-bs-toggle="tooltip" data-bs-trigger="hover"
+				   title="Tedarikçi Listesi" data-bs-toggle="tooltip" data-bs-trigger="hover"
 				   data-bs-dismiss="click" data-bs-placement="right">
 					<span class="menu-bullet">
 						<span class="bullet bullet-dot"></span>
@@ -217,7 +217,7 @@
 			<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
 				<!--begin:Menu link-->
 				<a class="menu-link" asp-controller="WaitingPurchaseOrder" asp-action="Index" target="_blank"
-				   title="Malzeme Listesi" data-bs-toggle="tooltip" data-bs-trigger="hover"
+				   title="Bekleyen Satınalma Siparişleri Listesi" data-bs-toggle="tooltip" data-bs-trigger="hover"
 				   data-bs-dismiss="click" data-bs-placement="right">
 					<span class="menu-bullet">
 						<span class="bullet bullet-dot"></span>
@@ -249,7 +249,7 @@
 			<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
 				<!--begin:Menu link-->
 				<a class="menu-link" asp-controller="Outsource" asp-action="Index" target="_blank"
-				   title="Malzeme Listesi" data-bs-toggle="tooltip" data-bs-trigger="hover"
+				   title="Fason Cari Listesi" data-bs-toggle="tooltip" data-bs-trigger="hover"
 				   data-bs-dismiss="click" data-bs-placement="right">
 					<span class="menu-bullet">
 						<span class="bullet bullet-dot"></span>
@@ -281,7 +281,7 @@
 			<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
 				<!--begin:Menu link-->
 				<a class="menu-link" asp-controller="NegativeProduct" asp-action="Index" target="_blank"
-				   title="Malzeme Listesi" data-bs-toggle="tooltip" data-bs-trigger="hover"
+				   title="Negatif Malzeme Listesi" data-bs-toggle="tooltip" data-bs-trigger="hover"
 				   data-bs-dismiss="click" data-bs-placement="right">
 					<span class="menu-bullet">
 						<span class="bullet bullet-dot"></span>
@@ -359,6 +359,51 @@
 						<span class="bullet bullet-dot"></span>
 					</span>
 					<span class="menu-title">Changelog v8.2.7</span>
+				</a>
+				<!--end:Menu link-->
+			</div>
+			<!--end:Menu item-->
+		</div>
+		<!--end:Menu sub-->
+	</div>
+	<!--end:Menu item-->
+	<!--begin:Menu item-->
+	<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+		<!--begin:Menu link-->
+		<span class="menu-link">
+			<span class="menu-icon">
+				<i class="ki-outline ki-briefcase fs-2"></i>
+			</span>
+			<span class="menu-title">Sistem Ayarları</span>
+			<span class="menu-arrow"></span>
+		</span>
+		<!--end:Menu link-->
+		<!--begin:Menu sub-->
+		<div class="menu-sub menu-sub-accordion">
+			<!--begin:Menu item-->
+			<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+				<!--begin:Menu link-->
+				<a class="menu-link" asp-controller="User" asp-action="Index" target="_blank"
+				   title="Kullanıcı Listesi" data-bs-toggle="tooltip" data-bs-trigger="hover"
+				   data-bs-dismiss="click" data-bs-placement="right">
+					<span class="menu-bullet">
+						<span class="bullet bullet-dot"></span>
+					</span>
+					<span class="menu-title">Kullanıcılar</span>
+				</a>
+				<!--end:Menu link-->
+			</div>
+			<!--end:Menu item-->
+			<!--begin:Menu item-->
+			<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+				<!--begin:Menu link-->
+				<a class="menu-link" asp-controller="TransactionAudit" asp-action="Index" target="_blank"
+				   title="Kullanıcı Listesi" data-bs-toggle="tooltip" data-bs-trigger="hover"
+				   data-bs-dismiss="click" data-bs-placement="right">
+					<span class="menu-bullet">
+						<span class="bullet bullet-dot"></span>
+					</span>
+					<span class="menu-title">İzleme Listesi</span>
 				</a>
 				<!--end:Menu link-->
 			</div>

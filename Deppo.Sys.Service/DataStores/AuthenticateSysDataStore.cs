@@ -20,7 +20,7 @@ namespace Deppo.Sys.Service.DataStores
                 var responseContent = await response.Content.ReadAsStringAsync();
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    token = JsonSerializer.Deserialize<string>(responseContent);
+                    token = responseContent;
                 }
                 else
                     token = string.Empty;
