@@ -60,6 +60,7 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
         PreviousPositionCommand = new Command(PreviousPositionAsync);
         ProcurementInfoCommand = new Command(async () => await ProcurementInfoAsync());
 		GoToReasonsForRejectionListViewCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await GoToReasonsForRejectionListViewAsync(item));
+		ReverseRejectStatusCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await ReverseRejectStatusAsync(item));
 
 		IncreaseCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await DecreaseAsync(item));
@@ -80,6 +81,7 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
     public Command PreviousPositionCommand { get; }
     public Command ProcurementInfoCommand { get; }
     public Command GoToReasonsForRejectionListViewCommand { get; }
+    public Command ReverseRejectStatusCommand { get; }
 
 
 	public Command IncreaseCommand { get; }
@@ -192,10 +194,12 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 
     private async Task IncreaseAsync(ProcurementCustomerBasketProductModel item)
     {
-		if (item is null)
-			return;
 		if (IsBusy)
 			return;
+		if (item is null)
+			return;
+        if (!string.IsNullOrEmpty(item.RejectionCode))
+            return;
 		try
         {
             IsBusy = true;
@@ -221,9 +225,11 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 
     private async Task DecreaseAsync(ProcurementCustomerBasketProductModel item)
     {
+		if (IsBusy)
+			return;
 		if (item is null)
 			return;
-		if (IsBusy)
+		if (!string.IsNullOrEmpty(item.RejectionCode))
 			return;
 		try
         {
@@ -247,11 +253,13 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 
     private async Task QuantityTappedAsync(ProcurementCustomerBasketProductModel item)
     {
-        if(item is null)
-            return;
-        if (IsBusy)
-            return;
-        try
+		if (IsBusy)
+			return;
+		if (item is null)
+			return;
+		if (!string.IsNullOrEmpty(item.RejectionCode))
+			return;
+		try
         {
             IsBusy = true;
 
@@ -311,6 +319,31 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
                 [nameof(ProcurementCustomerBasketProductModel)] = item
 			});
         }
+        catch (Exception ex)
+        {
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+    private async Task ReverseRejectStatusAsync(ProcurementCustomerBasketProductModel item)
+    {
+        if (IsBusy)
+            return;
+        if (item is null)
+            return;
+        if (string.IsNullOrEmpty(item.RejectionCode))
+            return;
+        try
+        {
+            item.RejectionCode = string.Empty;
+			item.RejectionName = string.Empty;
+		}
         catch (Exception ex)
         {
 			if (_userDialogs.IsHudShowing)

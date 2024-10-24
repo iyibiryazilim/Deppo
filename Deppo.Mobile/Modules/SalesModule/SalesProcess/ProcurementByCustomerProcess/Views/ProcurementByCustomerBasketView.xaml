@@ -19,6 +19,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+            <toolkit:IsNotEqualConverter x:Key="IsNotEqualConverter" />
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
@@ -116,7 +117,9 @@
                                         <SwipeView Threshold="120">
                                             <SwipeView.LeftItems>
                                                 <SwipeItems Mode="Execute">
-                                                    <SwipeItemView BackgroundColor="{StaticResource Primary}">
+                                                    <SwipeItemView BackgroundColor="{StaticResource Primary}"
+                                                                   Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=ReverseRejectStatusCommand}"
+                                                                   CommandParameter="{Binding .}">
                                                         <Label Padding="0,0,0,0"
                                                                HorizontalOptions="Center"
                                                                TextColor="White"
@@ -175,117 +178,146 @@
                                             <Border Padding="10"
                                                     BackgroundColor="Transparent"
                                                     StrokeThickness="0.1">
-                                                <Grid ColumnDefinitions=".20*,.80*" ColumnSpacing="10">
-                                                    <Border Grid.Column="0"
-                                                            Stroke="{StaticResource Primary}"
-                                                            StrokeShape="RoundRectangle 5"
-                                                            StrokeThickness="0.5">
-                                                        <Image Grid.Column="0"
-                                                               HeightRequest="50"
-                                                               Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
-                                                               WidthRequest="50" />
-                                                    </Border>
+                                                <Grid RowDefinitions="Auto, *">
+                                                    <HorizontalStackLayout Grid.Row="0"
+                                                                           Margin="0,0,0,10"
+                                                                           IsVisible="{Binding RejectionCode, Converter={StaticResource IsNotEqualConverter}, ConverterParameter=''}"
+                                                                           Spacing="5">
 
-                                                    <VerticalStackLayout Grid.Column="1">
-                                                        <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
-                                                            <Label Grid.Column="0"
-                                                                   FontAttributes="Bold"
-                                                                   LineBreakMode="TailTruncation"
-                                                                   Text="{Binding ItemCode}" />
-
-                                                            <Border Grid.Column="1"
-                                                                    Padding="10,0"
-                                                                    BackgroundColor="{Binding ProcurementStatusTextColor}"
-                                                                    HeightRequest="24"
-                                                                    MinimumHeightRequest="24"
-                                                                    StrokeShape="RoundRectangle 10"
-                                                                    StrokeThickness="0">
-                                                                <Label FontSize="12"
-                                                                       HorizontalOptions="Center"
-                                                                       Text="{Binding ProcurementStatusText}"
-                                                                       TextColor="{StaticResource White}"
-                                                                       VerticalOptions="Center" />
-                                                            </Border>
-                                                        </Grid>
+                                                        <Label FontFamily="FAS"
+                                                               FontSize="Medium"
+                                                               Text="{x:Static fontAwesome:FontAwesomeIcons.TriangleExclamation}"
+                                                               TextColor="Red" />
 
                                                         <Label LineBreakMode="TailTruncation"
-                                                               Text="{Binding ItemName}"
-                                                               TextColor="{StaticResource Gray600}" />
+                                                               MaxLines="1"
+                                                               VerticalOptions="Center"
+                                                               VerticalTextAlignment="Center">
+                                                            <Label.FormattedText>
+                                                                <FormattedString>
+                                                                    <Span Text="Hata Kodu: " TextColor="{StaticResource Gray600}" />
+                                                                    <Span FontAttributes="Bold" Text="{Binding RejectionCode}" />
+                                                                </FormattedString>
+                                                            </Label.FormattedText>
+                                                        </Label>
+                                                    </HorizontalStackLayout>
 
-                                                        <HorizontalStackLayout Spacing="10">
-                                                            <Label FontAttributes="Bold" FontSize="15">
-                                                                <Label.FormattedText>
-                                                                    <FormattedString>
-                                                                        <Span FontFamily="FAS"
-                                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                                                                              TextColor="{StaticResource Primary}" />
-                                                                        <Span Text=" " />
-                                                                        <Span Text="{Binding ProcurementQuantity, StringFormat='{0:N2}'}" TextColor="{StaticResource Primary}" />
-                                                                        <Span Text=" " />
-                                                                        <Span Text="{Binding SubUnitsetCode}" TextColor="{StaticResource Primary}" />
-                                                                    </FormattedString>
-                                                                </Label.FormattedText>
-                                                            </Label>
+                                                    <Grid Grid.Row="1"
+                                                          ColumnDefinitions=".20*,.80*"
+                                                          ColumnSpacing="10">
+                                                        <Border Grid.Column="0"
+                                                                Stroke="{StaticResource Primary}"
+                                                                StrokeShape="RoundRectangle 5"
+                                                                StrokeThickness="0.5">
+                                                            <Image Grid.Column="0"
+                                                                   HeightRequest="50"
+                                                                   Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                                                   WidthRequest="50" />
+                                                        </Border>
 
-                                                            <Label FontAttributes="Bold" FontSize="15">
-                                                                <Label.FormattedText>
-                                                                    <FormattedString>
-                                                                        <Span FontFamily="FAS"
-                                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.SquareMinus}"
-                                                                              TextColor="{StaticResource Primary}" />
-                                                                        <Span Text=" " />
-                                                                        <Span Text="{Binding RemainingQuantity, StringFormat='{0:N2}'}" TextColor="{StaticResource Primary}" />
-                                                                    </FormattedString>
-                                                                </Label.FormattedText>
-                                                            </Label>
-                                                        </HorizontalStackLayout>
+                                                        <VerticalStackLayout Grid.Column="1">
+                                                            <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                                                                <Label Grid.Column="0"
+                                                                       FontAttributes="Bold"
+                                                                       LineBreakMode="TailTruncation"
+                                                                       Text="{Binding ItemCode}" />
+
+                                                                <Border Grid.Column="1"
+                                                                        Padding="10,0"
+                                                                        BackgroundColor="{Binding ProcurementStatusTextColor}"
+                                                                        HeightRequest="24"
+                                                                        MinimumHeightRequest="24"
+                                                                        StrokeShape="RoundRectangle 10"
+                                                                        StrokeThickness="0">
+                                                                    <Label FontSize="12"
+                                                                           HorizontalOptions="Center"
+                                                                           Text="{Binding ProcurementStatusText}"
+                                                                           TextColor="{StaticResource White}"
+                                                                           VerticalOptions="Center" />
+                                                                </Border>
+                                                            </Grid>
+
+                                                            <Label LineBreakMode="TailTruncation"
+                                                                   Text="{Binding ItemName}"
+                                                                   TextColor="{StaticResource Gray600}" />
+
+                                                            <HorizontalStackLayout Spacing="10">
+                                                                <Label FontAttributes="Bold" FontSize="15">
+                                                                    <Label.FormattedText>
+                                                                        <FormattedString>
+                                                                            <Span FontFamily="FAS"
+                                                                                  Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                                                  TextColor="{StaticResource Primary}" />
+                                                                            <Span Text=" " />
+                                                                            <Span Text="{Binding ProcurementQuantity, StringFormat='{0:N2}'}" TextColor="{StaticResource Primary}" />
+                                                                            <Span Text=" " />
+                                                                            <Span Text="{Binding SubUnitsetCode}" TextColor="{StaticResource Primary}" />
+                                                                        </FormattedString>
+                                                                    </Label.FormattedText>
+                                                                </Label>
+
+                                                                <Label FontAttributes="Bold" FontSize="15">
+                                                                    <Label.FormattedText>
+                                                                        <FormattedString>
+                                                                            <Span FontFamily="FAS"
+                                                                                  Text="{x:Static fontAwesome:FontAwesomeIcons.SquareMinus}"
+                                                                                  TextColor="{StaticResource Primary}" />
+                                                                            <Span Text=" " />
+                                                                            <Span Text="{Binding RemainingQuantity, StringFormat='{0:N2}'}" TextColor="{StaticResource Primary}" />
+                                                                        </FormattedString>
+                                                                    </Label.FormattedText>
+                                                                </Label>
+                                                            </HorizontalStackLayout>
 
 
-                                                        <Grid ColumnDefinitions="Auto,Auto,Auto"
-                                                              ColumnSpacing="10"
-                                                              HorizontalOptions="EndAndExpand">
-                                                            <Border Grid.Column="0"
-                                                                    Padding="5"
-                                                                    BackgroundColor="Transparent"
-                                                                    Stroke="{StaticResource Secondary}"
-                                                                    StrokeShape="RoundRectangle 2">
-                                                                <Border.GestureRecognizers>
-                                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=DecreaseCommand}" CommandParameter="{Binding .}" />
-                                                                </Border.GestureRecognizers>
-                                                                <Label FontFamily="FAS"
-                                                                       FontSize="Medium"
-                                                                       Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
-                                                                       TextColor="{StaticResource Secondary}" />
+                                                            <Grid ColumnDefinitions="Auto,Auto,Auto"
+                                                                  ColumnSpacing="10"
+                                                                  HorizontalOptions="EndAndExpand">
+                                                                <Border Grid.Column="0"
+                                                                        Padding="5"
+                                                                        BackgroundColor="Transparent"
+                                                                        Stroke="{StaticResource Secondary}"
+                                                                        StrokeShape="RoundRectangle 2">
+                                                                    <Border.GestureRecognizers>
+                                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=DecreaseCommand}" CommandParameter="{Binding .}" />
+                                                                    </Border.GestureRecognizers>
+                                                                    <Label FontFamily="FAS"
+                                                                           FontSize="Medium"
+                                                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                                                           TextColor="{StaticResource Secondary}" />
 
 
-                                                            </Border>
-                                                            <Label Grid.Column="1"
-                                                                   FontAttributes="Bold"
-                                                                   FontSize="Large"
-                                                                   Text="{Binding Quantity, StringFormat='{0:N2}'}"
-                                                                   TextColor="{StaticResource OffBlack}"
-                                                                   VerticalOptions="Center">
-                                                                <Label.GestureRecognizers>
-                                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=QuantityTappedCommand}" CommandParameter="{Binding .}" />
-                                                                </Label.GestureRecognizers>
-                                                            </Label>
-                                                            <Border Grid.Column="2"
-                                                                    Padding="5"
-                                                                    BackgroundColor="{StaticResource Secondary}"
-                                                                    Stroke="{StaticResource Secondary}"
-                                                                    StrokeShape="RoundRectangle 2">
-                                                                <Label FontFamily="FAS"
-                                                                       FontSize="Medium"
-                                                                       Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
-                                                                       TextColor="{StaticResource White}" />
+                                                                </Border>
+                                                                <Label Grid.Column="1"
+                                                                       FontAttributes="Bold"
+                                                                       FontSize="Large"
+                                                                       Text="{Binding Quantity, StringFormat='{0:N2}'}"
+                                                                       TextColor="{StaticResource OffBlack}"
+                                                                       VerticalOptions="Center">
+                                                                    <Label.GestureRecognizers>
+                                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=QuantityTappedCommand}" CommandParameter="{Binding .}" />
+                                                                    </Label.GestureRecognizers>
+                                                                </Label>
+                                                                <Border Grid.Column="2"
+                                                                        Padding="5"
+                                                                        BackgroundColor="{StaticResource Secondary}"
+                                                                        Stroke="{StaticResource Secondary}"
+                                                                        StrokeShape="RoundRectangle 2">
+                                                                    <Label FontFamily="FAS"
+                                                                           FontSize="Medium"
+                                                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                                                           TextColor="{StaticResource White}" />
 
-                                                                <Border.GestureRecognizers>
-                                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=IncreaseCommand}" CommandParameter="{Binding .}" />
-                                                                </Border.GestureRecognizers>
-                                                            </Border>
-                                                        </Grid>
-                                                    </VerticalStackLayout>
+                                                                    <Border.GestureRecognizers>
+                                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=IncreaseCommand}" CommandParameter="{Binding .}" />
+                                                                    </Border.GestureRecognizers>
+                                                                </Border>
+                                                            </Grid>
+                                                        </VerticalStackLayout>
+                                                    </Grid>
                                                 </Grid>
+
+
                                             </Border>
                                         </SwipeView>
 

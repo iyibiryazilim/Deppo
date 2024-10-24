@@ -61,6 +61,7 @@ public partial class ProcurementByCustomerReasonsForRejectionListViewModel : Bas
 					Name = $"Hata Adı - {i}"
 				};
 
+
 				Items.Add(item);
 			}
 
@@ -132,8 +133,10 @@ public partial class ProcurementByCustomerReasonsForRejectionListViewModel : Bas
 			}
 
 			ProcurementCustomerBasketProductModel.RejectionCode = SelectedItem.Code;
-			ProcurementCustomerBasketProductModel.RejectionCode = SelectedItem.Name;
+			ProcurementCustomerBasketProductModel.RejectionName = SelectedItem.Name;
 
+			SelectedItem.IsSelected = false;
+			SelectedItem = null;
 
 			await Shell.Current.GoToAsync("..");
 		}
