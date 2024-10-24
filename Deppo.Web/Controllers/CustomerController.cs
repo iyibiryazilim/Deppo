@@ -1,5 +1,6 @@
 ﻿using Deppo.Core.Models;
 using Deppo.Core.Services;
+using Deppo.Sys.Service.Services;
 using Deppo.Web.Helpers.MappingHelper;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
@@ -10,13 +11,13 @@ namespace Deppo.Web.Controllers
 	{
 		private readonly IHttpClientFactory _httpClientFactory;
 		private readonly ICustomerService _customerService;
-		private readonly IAuthenticationService _authenticationService;
+		private readonly IAuthenticateSysService _authenticationSysService;
 
-		public CustomerController(IHttpClientFactory httpClientFactory, ICustomerService customerService, IAuthenticationService authenticationService)
+		public CustomerController(IHttpClientFactory httpClientFactory, ICustomerService customerService, IAuthenticateSysService authenticateSysService)
 		{
 			_httpClientFactory = httpClientFactory;
 			_customerService = customerService;
-			_authenticationService = authenticationService;
+			_authenticationSysService = authenticateSysService;
 		}
 
 		public IActionResult Index()
@@ -29,9 +30,12 @@ namespace Deppo.Web.Controllers
 		{
 			try
 			{
+				var httpClientSys = _httpClientFactory.CreateClient("sys");
 				var httpClient = _httpClientFactory.CreateClient("helix");
-				var token = await _authenticationService.Authenticate(httpClient, "Admin", "");
+				var token = await _authenticationSysService.AuthenticateAsync(httpClientSys, "Admin", "");
+
 				httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+				httpClientSys.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
 				var result = await _customerService.GetObjects(httpClient, 1, 2, searchText, start, length);
 

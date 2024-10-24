@@ -127,4 +127,6 @@ public class TransactionAudit : BaseObject
 
     [ModelDefault("AllowEdit", "False")]
     public int TransactionType { get => _transactionType; set => SetPropertyValue(nameof(TransactionType), ref _transactionType, value); }
+
+
 }

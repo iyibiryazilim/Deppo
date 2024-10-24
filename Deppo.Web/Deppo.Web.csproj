@@ -5,6 +5,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Deppo.Sys.Service\Deppo.Sys.Service.csproj" />
     <ProjectReference Include="..\Deppo.Web.Core\Deppo.Web.Core.csproj" />
   </ItemGroup>
 
