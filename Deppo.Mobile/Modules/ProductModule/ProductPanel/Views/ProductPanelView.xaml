@@ -329,6 +329,19 @@
                     <Label FontAttributes="Bold"
                            FontSize="Subtitle"
                            Text="Malzemeler" />
+
+                    <HorizontalStackLayout Spacing="5">
+                        <Label FontFamily="FAS"
+                               FontSize="Small"
+                               
+                               Text="{x:Static fontAwesome:FontAwesomeIcons.Ticket}"
+                               TextColor="{StaticResource Primary}"
+                               VerticalOptions="Center" />
+
+                        <Label FontAttributes="Bold"
+                               Text="{Binding SelectedProductFiche.FicheNumber}" />
+                    </HorizontalStackLayout>
+
                     <BoxView HeightRequest="2"
                              Color="{StaticResource OffBlack}" />
                 </VerticalStackLayout>
@@ -359,7 +372,7 @@
                                                          Spacing="1"
                                                          VerticalOptions="Center">
                                         <Label FontAttributes="Bold"
-                                               FontSize="Medium"
+                                               FontSize="15"
                                                Text="{Binding ProductCode}" />
                                         <Label FontSize="13"
                                                LineBreakMode="TailTruncation"

@@ -28,7 +28,7 @@ public partial class AllFicheListViewModel : BaseViewModel
 		_productPanelService = productPanelService;
 		_userDialogs = userDialogs;
 
-		Title = "Fiş Listesi";
+		Title = "Malzeme Fişleri";
 
 		BackCommand = new Command(async () => await BackAsync());
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());

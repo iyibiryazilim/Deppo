@@ -331,7 +331,7 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
                 _userDialogs.Alert(ex.Message, "Hata", "Tamam");
             }
 
-            await ClearFormAsync();
+            await ClearPageAsync();
 
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
@@ -445,7 +445,7 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
                     _userDialogs.Alert(ex.Message, "Hata", "Tamam");
                 }
 
-                await ClearFormAsync();
+                await ClearPageAsync();
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();
 
@@ -562,7 +562,7 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
 
-            await ClearFormAsync();
+            await ClearPageAsync();
             await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
             {
                 [nameof(ResultModel)] = resultModel
@@ -611,8 +611,28 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
     private async Task ClearFormAsync()
+    {
+        try
+        {
+            DocumentNumber = string.Empty;
+            TransactionDate = DateTime.Now;
+            Description = string.Empty;
+            DocumentTrackingNumber = string.Empty;
+            SpecialCode = string.Empty;
+
+            
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+    }
+
+    private async Task ClearPageAsync()
     {
         try
         {

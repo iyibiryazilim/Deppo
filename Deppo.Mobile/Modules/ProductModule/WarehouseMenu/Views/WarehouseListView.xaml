@@ -9,8 +9,10 @@
              Title="{Binding Title}"
              Shell.NavBarIsVisible="True">
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PrimaryLight}" StatusBarStyle="Default" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                        EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PrimaryLight}"
+                                   StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -21,13 +23,14 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android" Value="artboard.png" />
+            <On Platform="Android"
+                Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
-
     <!--#region Warehouse List-->
-    <Grid RowDefinitions="Auto, *" RowSpacing="10">
+    <Grid RowDefinitions="Auto, *"
+          RowSpacing="10">
         <!--#region Search area-->
         <Border Grid.Row="0"
                 Margin="0,0,0,0"
@@ -47,8 +50,10 @@
                                PlaceholderColor="{StaticResource OffBlack}"
                                TextColor="{StaticResource OffBlack}">
                         <SearchBar.Behaviors>
-                            <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}" EventName="SearchButtonPressed" />
-                            <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}" EventName="TextChanged" />
+                            <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                            EventName="SearchButtonPressed" />
+                            <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}"
+                                                            EventName="TextChanged" />
                         </SearchBar.Behaviors>
                     </SearchBar>
                 </Border>
@@ -61,16 +66,15 @@
                         ItemsSource="{Binding Items}"
                         RemainingItemsThreshold="2"
                         RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
-            <CollectionView.ItemsLayout>
-                <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
-            </CollectionView.ItemsLayout>
+
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="model:Warehouse">
                     <Border Padding="10"
                             BackgroundColor="Transparent"
                             StrokeThickness="0.1">
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WarehouseListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WarehouseListViewModel}}, Path=ItemTappedCommand}"
+                                                  CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="Auto, *">
                             <Border Grid.Column="0"
@@ -107,8 +111,4 @@
         </CollectionView>
         <!--#endregion-->
     </Grid>
-
-
-
-
 </ContentPage>

@@ -124,7 +124,17 @@
                     <Label FontAttributes="Bold"
                            FontSize="Medium"
                            HorizontalOptions="Start"
-                           Text="Fiş Hareketleri" />
+                           Text="Malzeme Fiş Detayı" />
+                    <HorizontalStackLayout Spacing="5">
+                        <Label FontFamily="FAS"
+                               FontSize="Small"
+                               Text="{x:Static fontAwesome:FontAwesomeIcons.Ticket}"
+                               TextColor="{StaticResource Primary}"
+                               VerticalOptions="Center" />
+
+                        <Label FontAttributes="Bold"
+                               Text="{Binding SelectedFiche.FicheNumber}" />
+                    </HorizontalStackLayout>
 
                     <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
                 </VerticalStackLayout>

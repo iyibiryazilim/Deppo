@@ -116,8 +116,10 @@
                                             StrokeThickness="0.5">
                                         <Image Grid.Column="0"
                                                HeightRequest="50"
+                                               WidthRequest="50"
+                                               Aspect="AspectFill"
                                                Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
-                                               WidthRequest="50" />
+                                                />
                                     </Border>
 
                                     <VerticalStackLayout Grid.Column="1">
