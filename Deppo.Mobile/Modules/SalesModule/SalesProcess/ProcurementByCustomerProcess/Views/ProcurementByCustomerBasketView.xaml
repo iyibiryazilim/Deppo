@@ -325,11 +325,7 @@
                                 </BindableLayout.ItemTemplate>
                             </StackLayout>
                         </ScrollView>
-
-
                     </Grid>
-
-
                 </DataTemplate>
             </CarouselView.ItemTemplate>
 
@@ -341,6 +337,7 @@
         <Button Grid.Row="1"
                 Margin="5,10,5,20"
                 IsVisible="{Binding IsCompleteButtonVisible}"
+                Command="{Binding NextViewCommand}"
                 Text="Bitir" />
 
         <Label Grid.Row="1"

@@ -65,6 +65,7 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 		IncreaseCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await DecreaseAsync(item));
 		QuantityTappedCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await QuantityTappedAsync(item));
+		NextViewCommand = new Command(async () => await NextViewAsync());
 	}
 
     public Page CurrentPage { get; set; }
@@ -82,11 +83,10 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
     public Command ProcurementInfoCommand { get; }
     public Command GoToReasonsForRejectionListViewCommand { get; }
     public Command ReverseRejectStatusCommand { get; }
-
-
-	public Command IncreaseCommand { get; }
+    public Command IncreaseCommand { get; }
     public Command DecreaseCommand { get; }
     public Command QuantityTappedCommand { get; }
+    public Command NextViewCommand { get; }
 
 
     private async Task LoadItemsAsync()
@@ -420,6 +420,39 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task NextViewAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+			if (Items.Count == 0)
+			{
+				await _userDialogs.AlertAsync("Herhangi bir toplanan ürününüz yok.", "Hata", "Tamam");
+				return;
+			}
+
+            await Shell.Current.GoToAsync($"{nameof(ProcurementByCustomerFormView)}", new Dictionary<string, object>
+            {
+                ["Items"] = Items,
+				[nameof(ProcurementCustomerBasketModel)] = ProcurementCustomerBasketModel
+			});
+		}
+        catch (Exception ex)
+        {
+            if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
         finally
         {
             IsBusy = false;
