@@ -35,6 +35,9 @@ public class ProcurementCustomerBasketProductModel : INotifyPropertyChanged, IDi
     private string _trackingTypeIcon;
     private string _trackingTypeIconColor;
 
+    private string rejectionCode = string.Empty;
+	private string rejectionName = string.Empty;
+
 	public ProcurementCustomerBasketProductModel()
     {
 
@@ -351,10 +354,17 @@ public class ProcurementCustomerBasketProductModel : INotifyPropertyChanged, IDi
     public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 
 
-    private string _procurementStatusText = "Bekliyor";
-    public string ProcurementStatusText
-    {
-        get => ProcurementQuantity == Quantity ? "Tamamlandı" : "Bekliyor";
+	private string _procurementStatusText = "Bekliyor";
+	public string ProcurementStatusText
+	{
+		get
+		{
+			if (!string.IsNullOrEmpty(RejectionCode))
+			{
+				return "Hata";
+			}
+			return ProcurementQuantity == Quantity ? "Tamamlandı" : "Bekliyor";
+		}
 		set
 		{
 			if (_procurementStatusText == value) return;
@@ -363,17 +373,48 @@ public class ProcurementCustomerBasketProductModel : INotifyPropertyChanged, IDi
 		}
 	}
 
-    private string _procurementStatusTextColor = "#E6BE0C";
+	private string _procurementStatusTextColor = "#E6BE0C";
 	public string ProcurementStatusTextColor
-    {
-        get => ProcurementQuantity == Quantity ? "Green" : "#E6BE0C";
-        set
-        {
-            if (_procurementStatusTextColor == value) return;
-            _procurementStatusTextColor = value;
-            NotifyPropertyChanged();
-        }
-    }
+	{
+		get
+		{
+			if (!string.IsNullOrEmpty(RejectionCode))
+			{
+				return "Red";
+			}
+			return ProcurementQuantity == Quantity ? "Green" : "#E6BE0C";
+		}
+		set
+		{
+			if (_procurementStatusTextColor == value) return;
+			_procurementStatusTextColor = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+	public string RejectionCode
+	{
+		get => rejectionCode;
+		set
+		{
+			if (rejectionCode == value) return;
+			rejectionCode = value;
+			NotifyPropertyChanged();
+			NotifyPropertyChanged(nameof(ProcurementStatusText));
+			NotifyPropertyChanged(nameof(ProcurementStatusTextColor));
+		}
+	}
+
+    public string RejectionName
+	{
+		get => rejectionName;
+		set
+		{
+			if (rejectionName == value) return;
+			rejectionName = value;
+			NotifyPropertyChanged();
+		}
+	}
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 

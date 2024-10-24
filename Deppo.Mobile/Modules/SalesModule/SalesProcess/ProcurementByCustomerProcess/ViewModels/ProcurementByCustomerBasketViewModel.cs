@@ -8,6 +8,7 @@ using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.Views;
 using DevExpress.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.ViewModels;
@@ -25,8 +26,23 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
     [ObservableProperty]
     int currentPosition;
 
+    partial void OnCurrentPositionChanged(int value)
+    {
+        OnPropertyChanged(nameof(IsPreviousButtonVisible));
+        OnPropertyChanged(nameof(IsNextButtonVisible));
+        OnPropertyChanged(nameof(IsCompleteButtonVisible));
+        //OnPropertyChanged(nameof(IsPageIndicatorVisible));
+    }
+
     [ObservableProperty]
     int totalPosition;
+
+    partial void OnTotalPositionChanged(int value)
+    {
+        OnPropertyChanged(nameof(IsNextButtonVisible));
+        OnPropertyChanged(nameof(IsCompleteButtonVisible));
+        //OnPropertyChanged(nameof(IsPageIndicatorVisible));
+    }
 
     public ProcurementByCustomerBasketViewModel(
         IHttpClientService httpClientService,
@@ -43,17 +59,20 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
         NextPositionCommand = new Command(NextPositionAsync);
         PreviousPositionCommand = new Command(PreviousPositionAsync);
         ProcurementInfoCommand = new Command(async () => await ProcurementInfoAsync());
+		GoToReasonsForRejectionListViewCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await GoToReasonsForRejectionListViewAsync(item));
+		ReverseRejectStatusCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await ReverseRejectStatusAsync(item));
 
-        IncreaseCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await IncreaseAsync(item));
+		IncreaseCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await DecreaseAsync(item));
 		QuantityTappedCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await QuantityTappedAsync(item));
+		NextViewCommand = new Command(async () => await NextViewAsync());
 	}
 
     public Page CurrentPage { get; set; }
     public bool IsPreviousButtonVisible => CurrentPosition == 0 ? false : true;
     public bool IsNextButtonVisible => CurrentPosition == TotalPosition ? false : true;
-    public bool IsCompleteButtonVisible => Items.Count > 0 && CurrentPosition == TotalPosition ? true : false;
-    public bool IsPageIndicatorVisible => !IsCompleteButtonVisible;
+    public bool IsCompleteButtonVisible => (/*Items.Count > 0 &&*/ CurrentPosition == TotalPosition) ? true : false;
+    //public bool IsPageIndicatorVisible => !IsCompleteButtonVisible;
 
 
     public ObservableCollection<ProcurementCustomerBasketModel> Items { get; } = new();
@@ -62,10 +81,12 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
     public Command NextPositionCommand { get; }
     public Command PreviousPositionCommand { get; }
     public Command ProcurementInfoCommand { get; }
-
+    public Command GoToReasonsForRejectionListViewCommand { get; }
+    public Command ReverseRejectStatusCommand { get; }
     public Command IncreaseCommand { get; }
     public Command DecreaseCommand { get; }
     public Command QuantityTappedCommand { get; }
+    public Command NextViewCommand { get; }
 
 
     private async Task LoadItemsAsync()
@@ -173,17 +194,24 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 
     private async Task IncreaseAsync(ProcurementCustomerBasketProductModel item)
     {
-		if (item is null)
-			return;
 		if (IsBusy)
 			return;
+		if (item is null)
+			return;
+        if (!string.IsNullOrEmpty(item.RejectionCode))
+            return;
 		try
         {
             IsBusy = true;
 
-			if (item.ProcurementQuantity > item.Quantity)
+			if (item.ProcurementQuantity > item.Quantity && item.StockQuantity > item.Quantity)
             {
                 item.Quantity++;
+			}
+            else if(item.Quantity >= item.StockQuantity)
+            {
+                await _userDialogs.AlertAsync($"Stok miktarı ({item.StockQuantity}) kadar arttırabilirsiniz.", "Uyarı", "Tamam");
+                return;
 			}
 				
 		}
@@ -202,9 +230,11 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 
     private async Task DecreaseAsync(ProcurementCustomerBasketProductModel item)
     {
+		if (IsBusy)
+			return;
 		if (item is null)
 			return;
-		if (IsBusy)
+		if (!string.IsNullOrEmpty(item.RejectionCode))
 			return;
 		try
         {
@@ -228,11 +258,13 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 
     private async Task QuantityTappedAsync(ProcurementCustomerBasketProductModel item)
     {
-        if(item is null)
-            return;
-        if (IsBusy)
-            return;
-        try
+		if (IsBusy)
+			return;
+		if (item is null)
+			return;
+		if (!string.IsNullOrEmpty(item.RejectionCode))
+			return;
+		try
         {
             IsBusy = true;
 
@@ -254,14 +286,74 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 				return;
 			}
 
+            if(quantity > item.StockQuantity)
+			{
+				await _userDialogs.AlertAsync($"Girilen miktar, stok miktarını ({item.StockQuantity}) aşmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
 			if (quantity > item.ProcurementQuantity)
 			{
-				await _userDialogs.AlertAsync("Girilen miktar, ürünün toplanabilir miktarını aşmamalıdır.", "Hata", "Tamam");
+				await _userDialogs.AlertAsync($"Girilen miktar, ürünün toplanabilir miktarını ({item.ProcurementQuantity}) aşmamalıdır.", "Hata", "Tamam");
 				return;
 			}
 
 			item.Quantity = quantity;
 
+		}
+        catch (Exception ex)
+        {
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task GoToReasonsForRejectionListViewAsync(ProcurementCustomerBasketProductModel item)
+    {
+        if (IsBusy)
+            return;
+
+		if (item is null)
+			return;
+		try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(ProcurementByCustomerReasonsForRejectionListView)}", new Dictionary<string, object>
+            {
+                [nameof(ProcurementCustomerBasketProductModel)] = item
+			});
+        }
+        catch (Exception ex)
+        {
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+    private async Task ReverseRejectStatusAsync(ProcurementCustomerBasketProductModel item)
+    {
+        if (IsBusy)
+            return;
+        if (item is null)
+            return;
+        if (string.IsNullOrEmpty(item.RejectionCode))
+            return;
+        try
+        {
+            item.RejectionCode = string.Empty;
+			item.RejectionName = string.Empty;
 		}
         catch (Exception ex)
         {
@@ -339,6 +431,52 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task NextViewAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+			if (Items.Count == 0)
+			{
+				await _userDialogs.AlertAsync("Herhangi bir toplanan ürününüz yok.", "Hata", "Tamam");
+				return;
+			}
+
+			bool hasProductsWithQuantity = Items.Any(basket => basket.Products.Any(p => p.Quantity > 0));
+
+			if (hasProductsWithQuantity == false)
+			{
+				await _userDialogs.AlertAsync("Herhangi bir toplanan ürününüz yok.", "Hata", "Tamam");
+				return;
+			}
+
+			foreach (var basket in Items)
+			{
+				basket.Products = basket.Products.Where(p => p.Quantity > 0).ToList();
+			}
+
+			await Shell.Current.GoToAsync($"{nameof(ProcurementByCustomerFormView)}", new Dictionary<string, object>
+            {
+                ["Items"] = Items,
+                [nameof(ProcurementCustomerBasketModel)] = ProcurementCustomerBasketModel
+			});
+		}
+        catch (Exception ex)
+        {
+            if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
         finally
         {
             IsBusy = false;
