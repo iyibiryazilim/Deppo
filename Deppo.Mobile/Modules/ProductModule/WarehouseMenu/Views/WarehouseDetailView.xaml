@@ -80,7 +80,7 @@
                                     <Span FontFamily="FAS"
                                           Text="{x:Static fontAwesome:FontAwesomeIcons.BoxArchive}" />
                                     <Span Text=" " />
-                                    <Span Text="{Binding WarehouseDetailModel.Warehouse.Quantity}" />
+                                    <Span Text="{Binding WarehouseDetailModel.Warehouse.Quantity, StringFormat='{0:N2}'}" />
                                 </FormattedString>
                             </Label.FormattedText>
                         </Label>
@@ -121,7 +121,7 @@
                             </Border.GestureRecognizers>
                             <VerticalStackLayout VerticalOptions="Center">
                                 <Label HorizontalOptions="Center"
-                                       Text="{Binding WarehouseDetailModel.OutputQuantity}"
+                                       Text="{Binding WarehouseDetailModel.OutputQuantity,StringFormat='{0:N2}'}"
                                        TextColor="{StaticResource White}"
                                        FontAttributes="Bold"
                                        FontSize="Medium" />
