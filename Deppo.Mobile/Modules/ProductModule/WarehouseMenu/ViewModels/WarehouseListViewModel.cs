@@ -17,202 +17,201 @@ public partial class WarehouseListViewModel : BaseViewModel
 {
     private IHttpClientService _httpClientService;
     private readonly IWarehouseService _warehouseService;
-	private readonly IUserDialogs _userDialogs;
+    private readonly IUserDialogs _userDialogs;
 
-	public ObservableCollection<Warehouse> Items { get; } = new();
+    public ObservableCollection<Warehouse> Items { get; } = new();
 
-	[ObservableProperty]
-	public SearchBar searchText;
+    [ObservableProperty]
+    public SearchBar searchText;
 
-	public WarehouseListViewModel(IWarehouseService warehouseService, IUserDialogs userDialogs, IHttpClientService httpClientService)
+    public WarehouseListViewModel(IWarehouseService warehouseService, IUserDialogs userDialogs, IHttpClientService httpClientService)
     {
         _warehouseService = warehouseService;
         _userDialogs = userDialogs;
         _httpClientService = httpClientService;
 
         Title = "Ambar Listesi";
-		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
-		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-		
-		PerformSearchCommand = new Command(async () => await PerformSearchAsync());
-		PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
-		ItemTappedCommand = new Command<Warehouse>(async (warehouse) => await ItemTappedAsync(warehouse));
+        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+        LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+
+        PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+        PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
+        ItemTappedCommand = new Command<Warehouse>(async (warehouse) => await ItemTappedAsync(warehouse));
     }
 
-	#region Commands
-	public Command LoadItemsCommand { get; }
-	public Command LoadMoreItemsCommand { get; }
-	public Command PerformSearchCommand { get; }
-	public Command PerformEmptySearchCommand { get; }
-	public Command RefreshPageCommand { get; }
-	public Command ItemTappedCommand { get; }
-	#endregion	
+    #region Commands
 
-	public async Task LoadItemsAsync()
-	{
-		if (IsBusy)
-			return;
+    public Command LoadItemsCommand { get; }
+    public Command LoadMoreItemsCommand { get; }
+    public Command PerformSearchCommand { get; }
+    public Command PerformEmptySearchCommand { get; }
+    public Command RefreshPageCommand { get; }
+    public Command ItemTappedCommand { get; }
 
-		try
-		{
-			IsBusy = true;
+    #endregion Commands
 
-			Items.Clear();
-			_userDialogs.Loading("Loading Items...");
-			await Task.Delay(1000);
+    public async Task LoadItemsAsync()
+    {
+        if (IsBusy)
+            return;
 
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
+        try
+        {
+            IsBusy = true;
 
-			var result = await _warehouseService.GetObjects(httpClient,search: SearchText.Text, orderBy: null, page: 0, pageSize: 20, firmNumber: _httpClientService.FirmNumber);
-			if (result.IsSuccess)
-			{
-				if (result.Data == null)
-					return;
+            Items.Clear();
+            _userDialogs.Loading("Loading Items...");
+            await Task.Delay(1000);
 
-				foreach (var item in result.Data)
-					Items.Add(item);
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-				_userDialogs.Loading().Hide();
-			}
-			else
-			{
-				if (_userDialogs.IsHudShowing)
-					_userDialogs.Loading().Hide();
+            var result = await _warehouseService.GetObjects(httpClient, search: SearchText.Text, orderBy: null, page: 0, pageSize: 20, firmNumber: _httpClientService.FirmNumber);
+            if (result.IsSuccess)
+            {
+                if (result.Data == null)
+                    return;
 
-				_userDialogs.Alert(message: result.Message, title: "Load Items");
-			}
-		}
-		catch (Exception ex)
-		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.Loading().Hide();
+                foreach (var item in result.Data)
+                    Items.Add(item);
 
-			_userDialogs.Alert(message: ex.Message, title: "Load Items Error");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+                _userDialogs.Loading().Hide();
+            }
+            else
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.Loading().Hide();
 
-	public async Task LoadMoreItemsAsync()
-	{
-		if (IsBusy)
-			return;
-		if (Items.Count < 18)  // 18 equals to PageSize (20) - RemainingItemsThreshold (2)
-			return;
+                _userDialogs.Alert(message: result.Message, title: "Load Items");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
 
-		try
-		{
-			IsBusy = true;
-			_userDialogs.Loading("Load more Items...");
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _warehouseService.GetObjects(httpClient, SearchText.Text, null, Items.Count, 20, _httpClientService.FirmNumber);
-			if (result.IsSuccess)
-			{
-				if (result.Data == null)
-					return;
+            _userDialogs.Alert(message: ex.Message, title: "Load Items Error");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-				foreach (var item in result.Data)
-					Items.Add(item);
+    public async Task LoadMoreItemsAsync()
+    {
+        if (IsBusy)
+            return;
+        if (Items.Count < 18)  // 18 equals to PageSize (20) - RemainingItemsThreshold (2)
+            return;
 
-				if (_userDialogs.IsHudShowing)
-					_userDialogs.Loading().Hide();
-			}
-			else
-			{
-				if (_userDialogs.IsHudShowing)
-					_userDialogs.Loading().Hide();
+        try
+        {
+            IsBusy = true;
 
-				_userDialogs.Alert(message: result.Message, title: "Load Items");
-			}
-		}
-		catch (Exception ex)
-		{
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _warehouseService.GetObjects(httpClient, SearchText.Text, null, Items.Count, 20, _httpClientService.FirmNumber);
+            if (result.IsSuccess)
+            {
+                if (result.Data == null)
+                    return;
+                _userDialogs.Loading("Load more Items...");
+                foreach (var item in result.Data)
+                    Items.Add(item);
 
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.Loading().Hide();
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.Loading().Hide();
+            }
+            else
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.Loading().Hide();
 
-			_userDialogs.Alert(message: ex.Message, title: "Load Items Error");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+                _userDialogs.Alert(message: result.Message, title: "Load Items");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.Loading().Hide();
 
+            _userDialogs.Alert(message: ex.Message, title: "Load Items Error");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-	async Task PerformSearchAsync()
-	{
-		if (IsBusy)
-			return;
-		try
-		{
-			if(string.IsNullOrWhiteSpace(SearchText.Text))
-			{
-				await LoadItemsAsync();
-				SearchText.Unfocus();
-				return;
-			}
-				
-			IsBusy = true;
-					
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _warehouseService.GetObjects(httpClient, SearchText.Text, null, 0, 20, _httpClientService.FirmNumber);
-			if (!result.IsSuccess)
-			{
-				_userDialogs.Alert(result.Message, "Hata");
-				return;
-			}
+    private async Task PerformSearchAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            if (string.IsNullOrWhiteSpace(SearchText.Text))
+            {
+                await LoadItemsAsync();
+                SearchText.Unfocus();
+                return;
+            }
 
-			Items.Clear();
-			foreach (var item in result.Data)
-				Items.Add(item);
-				
-		}
-		catch(Exception ex)
-		{
-			_userDialogs.Alert(message: ex.Message, title: "Hata");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+            IsBusy = true;
 
-	private async Task PerformEmptySearchAsync()
-	{
-		if (string.IsNullOrWhiteSpace(SearchText.Text))
-		{
-			await PerformSearchAsync();
-		}
-	}
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _warehouseService.GetObjects(httpClient, SearchText.Text, null, 0, 20, _httpClientService.FirmNumber);
+            if (!result.IsSuccess)
+            {
+                _userDialogs.Alert(result.Message, "Hata");
+                return;
+            }
 
-	async Task ItemTappedAsync(Warehouse warehouse)
-	{
-		if (warehouse is null)
-			return;
-		if (IsBusy)
-			return;
-		try
-		{
-			IsBusy = true;
+            Items.Clear();
+            foreach (var item in result.Data)
+                Items.Add(item);
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(message: ex.Message, title: "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-			WarehouseDetailModel warehouseDetailModel = new();
-			warehouseDetailModel.Warehouse = warehouse;
+    private async Task PerformEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText.Text))
+        {
+            await PerformSearchAsync();
+        }
+    }
 
-			await Shell.Current.GoToAsync($"{nameof(WarehouseDetailView)}", new Dictionary<string, object>
-			{
-				[nameof(WarehouseDetailModel)] = warehouseDetailModel
-			});
-		}
-		catch (Exception ex)
-		{
-			_userDialogs.Alert(ex.Message, "Hata");
-		}
-		finally
-		{
-			IsBusy = false;
-		}
-	}
+    private async Task ItemTappedAsync(Warehouse warehouse)
+    {
+        if (warehouse is null)
+            return;
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            WarehouseDetailModel warehouseDetailModel = new();
+            warehouseDetailModel.Warehouse = warehouse;
+
+            await Shell.Current.GoToAsync($"{nameof(WarehouseDetailView)}", new Dictionary<string, object>
+            {
+                [nameof(WarehouseDetailModel)] = warehouseDetailModel
+            });
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 }
