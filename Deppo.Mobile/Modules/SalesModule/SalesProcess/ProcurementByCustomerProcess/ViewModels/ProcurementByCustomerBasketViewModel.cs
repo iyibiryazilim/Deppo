@@ -204,9 +204,14 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
         {
             IsBusy = true;
 
-			if (item.ProcurementQuantity > item.Quantity)
+			if (item.ProcurementQuantity > item.Quantity && item.StockQuantity > item.Quantity)
             {
                 item.Quantity++;
+			}
+            else if(item.Quantity >= item.StockQuantity)
+            {
+                await _userDialogs.AlertAsync($"Stok miktarı ({item.StockQuantity}) kadar arttırabilirsiniz.", "Uyarı", "Tamam");
+                return;
 			}
 				
 		}
@@ -281,9 +286,15 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 				return;
 			}
 
+            if(quantity > item.StockQuantity)
+			{
+				await _userDialogs.AlertAsync($"Girilen miktar, stok miktarını ({item.StockQuantity}) aşmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
 			if (quantity > item.ProcurementQuantity)
 			{
-				await _userDialogs.AlertAsync("Girilen miktar, ürünün toplanabilir miktarını aşmamalıdır.", "Hata", "Tamam");
+				await _userDialogs.AlertAsync($"Girilen miktar, ürünün toplanabilir miktarını ({item.ProcurementQuantity}) aşmamalıdır.", "Hata", "Tamam");
 				return;
 			}
 
@@ -440,10 +451,23 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 				return;
 			}
 
-            await Shell.Current.GoToAsync($"{nameof(ProcurementByCustomerFormView)}", new Dictionary<string, object>
+			bool hasProductsWithQuantity = Items.Any(basket => basket.Products.Any(p => p.Quantity > 0));
+
+			if (hasProductsWithQuantity == false)
+			{
+				await _userDialogs.AlertAsync("Herhangi bir toplanan ürününüz yok.", "Hata", "Tamam");
+				return;
+			}
+
+			foreach (var basket in Items)
+			{
+				basket.Products = basket.Products.Where(p => p.Quantity > 0).ToList();
+			}
+
+			await Shell.Current.GoToAsync($"{nameof(ProcurementByCustomerFormView)}", new Dictionary<string, object>
             {
                 ["Items"] = Items,
-				[nameof(ProcurementCustomerBasketModel)] = ProcurementCustomerBasketModel
+                [nameof(ProcurementCustomerBasketModel)] = ProcurementCustomerBasketModel
 			});
 		}
         catch (Exception ex)
