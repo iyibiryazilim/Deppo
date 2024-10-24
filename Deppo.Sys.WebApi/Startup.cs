@@ -16,6 +16,7 @@ using DevExpress.ExpressApp.Security.Authentication.ClientServer;
 using Deppo.Sys.WebApi.Core;
 using DevExpress.ExpressApp.AspNetCore.WebApi;
 using Deppo.Sys.Module.BusinessObjects;
+using DevExpress.Persistent.BaseImpl;
 
 namespace Deppo.Sys.WebApi;
 
@@ -105,6 +106,7 @@ public class Startup
                 options.BusinessObject<DomainObject1>();
                 options.BusinessObject<ReasonsForRejection>();
                 options.BusinessObject<ReasonsForRejectionProcurement>();
+                options.BusinessObject<MediaDataObject>();
 			})
             .AddXpoServices();
         services

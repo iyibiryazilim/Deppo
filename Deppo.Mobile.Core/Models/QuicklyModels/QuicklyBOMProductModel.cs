@@ -22,9 +22,6 @@ namespace Deppo.Mobile.Core.Models.QuicklyModels
         private string _trackingTypeIcon;
         private string _trackingTypeIconColor;
 
-        private int _warehouseNumber = default;
-        private string _warehouseName = string.Empty;
-        private double _amount = default;
 
         public QuicklyBOMProductModel()
         {
@@ -63,37 +60,7 @@ namespace Deppo.Mobile.Core.Models.QuicklyModels
 			}
         }
 
-        public double Amount 
-        {
-            get => _amount;
-            set
-            {
-                if (_amount == value) return;
-                _amount = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        public int WarehouseNumber
-        {
-            get => _warehouseNumber;
-            set
-            {
-                if (_warehouseNumber == value) return;
-                _warehouseNumber = value;
-                NotifyPropertyChanged();
-            }
-        }
-        public string WarehouseName
-        {
-            get => _warehouseName;
-            set
-            {
-                if (_warehouseName == value) return;
-                _warehouseName = value;
-                NotifyPropertyChanged();
-            }
-        }
+        
 
 
         public int ReferenceId2

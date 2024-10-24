@@ -33,11 +33,13 @@ builder.Services.AddTransient<IWaitingSalesOrderService, WaitingSalesOrderDataSt
 builder.Services.AddTransient<IWaitingPurchaseOrderService, WaitingPurchaseOrderDataStore>();
 builder.Services.AddTransient<IOutsourceService, OutsourceDataStore>();
 builder.Services.AddTransient<INegativeProductService, NegativeProductDataStore>();
+builder.Services.AddTransient<IQuicklyBomService, QuicklyBomDataStore>();
 
 #region Sys Service
 builder.Services.AddTransient<IAuthenticateSysService, AuthenticateSysDataStore>();
 builder.Services.AddTransient<IApplicationUserService, ApplicationUserDataStore>(); 
 builder.Services.AddTransient<ITransactionAuditService, TransactionAuditDataStore>();
+builder.Services.AddTransient<IMediaDataObjectService, MediaDataObjectDataStore>();
 #endregion
 
 builder.Services.AddSession(options =>
