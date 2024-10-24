@@ -8,6 +8,7 @@ using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.Views;
 using DevExpress.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.ViewModels;
@@ -25,8 +26,23 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
     [ObservableProperty]
     int currentPosition;
 
+    partial void OnCurrentPositionChanged(int value)
+    {
+        OnPropertyChanged(nameof(IsPreviousButtonVisible));
+        OnPropertyChanged(nameof(IsNextButtonVisible));
+        OnPropertyChanged(nameof(IsCompleteButtonVisible));
+        //OnPropertyChanged(nameof(IsPageIndicatorVisible));
+    }
+
     [ObservableProperty]
     int totalPosition;
+
+    partial void OnTotalPositionChanged(int value)
+    {
+        OnPropertyChanged(nameof(IsNextButtonVisible));
+        OnPropertyChanged(nameof(IsCompleteButtonVisible));
+        //OnPropertyChanged(nameof(IsPageIndicatorVisible));
+    }
 
     public ProcurementByCustomerBasketViewModel(
         IHttpClientService httpClientService,
@@ -43,8 +59,9 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
         NextPositionCommand = new Command(NextPositionAsync);
         PreviousPositionCommand = new Command(PreviousPositionAsync);
         ProcurementInfoCommand = new Command(async () => await ProcurementInfoAsync());
+		GoToReasonsForRejectionListViewCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await GoToReasonsForRejectionListViewAsync(item));
 
-        IncreaseCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await IncreaseAsync(item));
+		IncreaseCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await IncreaseAsync(item));
 		DecreaseCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await DecreaseAsync(item));
 		QuantityTappedCommand = new Command<ProcurementCustomerBasketProductModel>(async (item) => await QuantityTappedAsync(item));
 	}
@@ -52,8 +69,8 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
     public Page CurrentPage { get; set; }
     public bool IsPreviousButtonVisible => CurrentPosition == 0 ? false : true;
     public bool IsNextButtonVisible => CurrentPosition == TotalPosition ? false : true;
-    public bool IsCompleteButtonVisible => Items.Count > 0 && CurrentPosition == TotalPosition ? true : false;
-    public bool IsPageIndicatorVisible => !IsCompleteButtonVisible;
+    public bool IsCompleteButtonVisible => (/*Items.Count > 0 &&*/ CurrentPosition == TotalPosition) ? true : false;
+    //public bool IsPageIndicatorVisible => !IsCompleteButtonVisible;
 
 
     public ObservableCollection<ProcurementCustomerBasketModel> Items { get; } = new();
@@ -62,8 +79,10 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
     public Command NextPositionCommand { get; }
     public Command PreviousPositionCommand { get; }
     public Command ProcurementInfoCommand { get; }
+    public Command GoToReasonsForRejectionListViewCommand { get; }
 
-    public Command IncreaseCommand { get; }
+
+	public Command IncreaseCommand { get; }
     public Command DecreaseCommand { get; }
     public Command QuantityTappedCommand { get; }
 
@@ -263,6 +282,35 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 			item.Quantity = quantity;
 
 		}
+        catch (Exception ex)
+        {
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task GoToReasonsForRejectionListViewAsync(ProcurementCustomerBasketProductModel item)
+    {
+        if (IsBusy)
+            return;
+
+		if (item is null)
+			return;
+		try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(ProcurementByCustomerReasonsForRejectionListView)}", new Dictionary<string, object>
+            {
+                [nameof(ProcurementCustomerBasketProductModel)] = item
+			});
+        }
         catch (Exception ex)
         {
 			if (_userDialogs.IsHudShowing)

@@ -19,6 +19,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -48,68 +49,67 @@
     </ContentPage.BackgroundImageSource>
 
 
-    <Grid RowDefinitions="*,Auto" RowSpacing="0">
+    <Grid RowDefinitions="*,Auto" RowSpacing="5">
 
-        <VerticalStackLayout Grid.Row="0">
+        <CarouselView x:Name="carouselView"
+                      Grid.Row="0"
+                      IsSwipeEnabled="False"
+                      ItemsSource="{Binding Items}"
+                      Loop="False"
+                      Position="{Binding CurrentPosition}">
+            <CarouselView.ItemTemplate>
+                <DataTemplate x:DataType="procurementCustomerBasketModel:ProcurementCustomerBasketModel">
 
-            <CarouselView x:Name="carouselView"
-                          IsSwipeEnabled="False"
-                          ItemsSource="{Binding Items}"
-                          Loop="False"
-                          Position="{Binding CurrentPosition}">
-                <CarouselView.ItemTemplate>
-                    <DataTemplate x:DataType="procurementCustomerBasketModel:ProcurementCustomerBasketModel">
+                    <Grid RowDefinitions="Auto,*" RowSpacing="10">
 
-                        <Grid RowDefinitions="Auto,*" RowSpacing="10">
-
-                            <Grid Grid.Row="0"
-                                  Padding="10"
-                                  ColumnDefinitions="Auto,*,Auto"
-                                  ColumnSpacing="5">
-                                <Border Grid.Column="0"
-                                        Padding="10"
-                                        BackgroundColor="{StaticResource Primary}"
-                                        IsVisible="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=IsPreviousButtonVisible}"
-                                        Stroke="{StaticResource Primary}"
-                                        StrokeShape="RoundRectangle 10">
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=PreviousPositionCommand}" />
-                                    </Border.GestureRecognizers>
-                                    <Label FontFamily="FAS"
-                                           FontSize="Large"
-                                           HorizontalOptions="Center"
-                                           Text="{x:Static fontAwesome:FontAwesomeIcons.ArrowLeft}"
-                                           TextColor="{StaticResource White}"
-                                           VerticalOptions="Center" />
-                                </Border>
-                                <Label Grid.Column="1"
-                                       FontAttributes="Bold"
+                        <Grid Grid.Row="0"
+                              Padding="10"
+                              ColumnDefinitions="Auto,*,Auto"
+                              ColumnSpacing="5">
+                            <Border Grid.Column="0"
+                                    Padding="10"
+                                    BackgroundColor="{StaticResource Primary}"
+                                    IsVisible="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=IsPreviousButtonVisible}"
+                                    Stroke="{StaticResource Primary}"
+                                    StrokeShape="RoundRectangle 10">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=PreviousPositionCommand}" />
+                                </Border.GestureRecognizers>
+                                <Label FontFamily="FAS"
                                        FontSize="Large"
                                        HorizontalOptions="Center"
-                                       Text="{Binding LocationCode}"
+                                       Text="{x:Static fontAwesome:FontAwesomeIcons.ArrowLeft}"
                                        TextColor="{StaticResource White}"
                                        VerticalOptions="Center" />
+                            </Border>
+                            <Label Grid.Column="1"
+                                   FontAttributes="Bold"
+                                   FontSize="Large"
+                                   HorizontalOptions="Center"
+                                   Text="{Binding LocationCode}"
+                                   TextColor="{StaticResource White}"
+                                   VerticalOptions="Center" />
 
-                                <Border Grid.Column="2"
-                                        Padding="10"
-                                        BackgroundColor="{StaticResource Primary}"
-                                        IsVisible="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=IsNextButtonVisible}"
-                                        Stroke="{StaticResource Primary}"
-                                        StrokeShape="RoundRectangle 10">
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=NextPositionCommand}" />
-                                    </Border.GestureRecognizers>
-                                    <Label Grid.Column="0"
-                                           FontFamily="FAS"
-                                           FontSize="Large"
-                                           HorizontalOptions="Center"
-                                           Text="{x:Static fontAwesome:FontAwesomeIcons.ArrowRight}"
-                                           TextColor="{StaticResource White}"
-                                           VerticalOptions="Center" />
-                                </Border>
-                            </Grid>
+                            <Border Grid.Column="2"
+                                    Padding="10"
+                                    BackgroundColor="{StaticResource Primary}"
+                                    IsVisible="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=IsNextButtonVisible}"
+                                    Stroke="{StaticResource Primary}"
+                                    StrokeShape="RoundRectangle 10">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=NextPositionCommand}" />
+                                </Border.GestureRecognizers>
+                                <Label Grid.Column="0"
+                                       FontFamily="FAS"
+                                       FontSize="Large"
+                                       HorizontalOptions="Center"
+                                       Text="{x:Static fontAwesome:FontAwesomeIcons.ArrowRight}"
+                                       TextColor="{StaticResource White}"
+                                       VerticalOptions="Center" />
+                            </Border>
+                        </Grid>
 
-
+                        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never">
                             <StackLayout Grid.Row="1" BindableLayout.ItemsSource="{Binding Products}">
                                 <BindableLayout.ItemTemplate>
                                     <DataTemplate x:DataType="procurementCustomerBasketModel:ProcurementCustomerBasketProductModel">
@@ -142,7 +142,9 @@
                                             </SwipeView.LeftItems>
                                             <SwipeView.RightItems>
                                                 <SwipeItems Mode="Execute">
-                                                    <SwipeItemView BackgroundColor="Red">
+                                                    <SwipeItemView BackgroundColor="Red"
+                                                                   Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerBasketViewModel}}, Path=GoToReasonsForRejectionListViewCommand}"
+                                                                   CommandParameter="{Binding .}">
 
                                                         <Label Padding="0,0,0,0"
                                                                HorizontalOptions="Center"
@@ -290,17 +292,19 @@
                                     </DataTemplate>
                                 </BindableLayout.ItemTemplate>
                             </StackLayout>
-
-                        </Grid>
-
-
-                    </DataTemplate>
-                </CarouselView.ItemTemplate>
-
-            </CarouselView>
+                        </ScrollView>
 
 
-        </VerticalStackLayout>
+                    </Grid>
+
+
+                </DataTemplate>
+            </CarouselView.ItemTemplate>
+
+        </CarouselView>
+
+
+
 
         <Button Grid.Row="1"
                 Margin="5,10,5,20"
@@ -312,7 +316,7 @@
                FontAttributes="Bold"
                FontSize="Large"
                HorizontalOptions="Center"
-               IsVisible="{Binding IsPageIndicatorVisible}"
+               IsVisible="{Binding IsCompleteButtonVisible, Converter={StaticResource InvertedBoolConverter}}"
                VerticalOptions="End">
             <Label.FormattedText>
                 <FormattedString>
