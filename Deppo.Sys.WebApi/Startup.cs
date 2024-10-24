@@ -103,7 +103,9 @@ public class Startup
                 options.BusinessObject<Warehouse>();
                 options.BusinessObject<WarehouseProcessParameter>();
                 options.BusinessObject<DomainObject1>();
-            })
+                options.BusinessObject<ReasonsForRejection>();
+                options.BusinessObject<ReasonsForRejectionProcurement>();
+			})
             .AddXpoServices();
         services
             .AddControllers()

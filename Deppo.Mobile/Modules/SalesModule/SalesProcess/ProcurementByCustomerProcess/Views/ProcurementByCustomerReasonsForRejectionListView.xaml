@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.Views.ProcurementByCustomerReasonsForRejectionListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:ProcurementByCustomerReasonsForRejectionListViewModel"
+             Shell.PresentationMode="ModalAnimated"
+             Shell.TabBarIsVisible="False">
+    <ContentPage.Behaviors>
+        <!--<toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />-->
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid RowDefinitions="Auto, Auto, *, Auto" RowSpacing="10">
+        <!--#region Page Title and Close Button-->
+        <Grid Grid.Row="0"
+              Padding="10,10,0,0"
+              ColumnDefinitions="*, Auto"
+              ColumnSpacing="10">
+            <Label Grid.Column="0"
+                   FontAttributes="Bold"
+                   FontSize="Large"
+                   Text="Hata Nedenleri Listesi"
+                   TextColor="{StaticResource WhiteSmoke}"
+                   VerticalOptions="Center" />
+
+            <ImageButton Grid.Column="1"
+                         Command="{Binding CloseCommand}"
+                         HeightRequest="25"
+                         HorizontalOptions="End">
+                <ImageButton.Source>
+                    <FontImageSource FontFamily="FAS"
+                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                                     Size="Medium"
+                                     Color="{StaticResource WhiteSmoke}" />
+                </ImageButton.Source>
+            </ImageButton>
+
+        </Grid>
+        <!--#endregion-->
+
+        <Border Grid.Row="1"
+                Padding="20,5,20,5"
+                BackgroundColor="Transparent"
+                StrokeShape="RoundRectangle 10"
+                StrokeThickness="0">
+            <Label FontSize="Medium" LineBreakMode="TailTruncation">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span FontFamily="FAS"
+                              Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                              TextColor="{StaticResource WhiteSmoke}" />
+                        <Span Text="  " />
+                        <!--<Span Text="{Binding }" TextColor="{StaticResource WhiteSmoke}" />-->
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+        </Border>
+
+
+        <Button Grid.Row="3"
+                Margin="10,10,10,20"
+                Command="{Binding ConfirmCommand}"
+                Text="Tamam" />
+    </Grid>
+</ContentPage>

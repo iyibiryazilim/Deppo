@@ -553,6 +553,7 @@ public static class MauiProgram
         builder.Services.AddScopedWithShellRoute<ProcurementByCustomerProcurementWarehouseListView, ProcurementByCustomerProcurementWarehouseListViewModel>(nameof(ProcurementByCustomerProcurementWarehouseListView));
         builder.Services.AddScopedWithShellRoute<ProcurementByCustomerProductListView, ProcurementByCustomerProductListViewModel>(nameof(ProcurementByCustomerProductListView));
         builder.Services.AddScopedWithShellRoute<ProcurementByCustomerBasketView, ProcurementByCustomerBasketViewModel>(nameof(ProcurementByCustomerBasketView));
+        builder.Services.AddScopedWithShellRoute<ProcurementByCustomerReasonsForRejectionListView, ProcurementByCustomerReasonsForRejectionListViewModel>(nameof(ProcurementByCustomerReasonsForRejectionListView));
 
         #endregion Müşteriye Göre Ürün Toplama
 

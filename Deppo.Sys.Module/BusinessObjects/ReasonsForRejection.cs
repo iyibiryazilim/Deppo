@@ -39,6 +39,6 @@ namespace Deppo.Sys.Module.BusinessObjects
         public string Name { get => _name; set => SetPropertyValue(nameof(Name), ref _name, value); }
 
         [ModelDefault("AllowEdit", "False")]
-        public bool IsAsctive { get => _isActive; set => SetPropertyValue(nameof(IsAsctive), ref _isActive, value); }
+        public bool IsActive { get => _isActive; set => SetPropertyValue(nameof(IsActive), ref _isActive, value); }
     }
 }
