@@ -54,7 +54,7 @@
 						<!--end::Sidebar toggle-->
 						<!--begin::Navbar-->
 						<div class="app-navbar flex-lg-grow-1" id="kt_app_header_navbar">
-							<div class="app-navbar-item d-flex align-items-stretch flex-lg-grow-1">
+							<div class="app-navbar-item d-flex align-items-stretch g-5 flex-lg-grow-1">
 								<!--begin::Search-->
 								<div id="kt_header_search" class="header-search d-flex align-items-center w-lg-200px" data-kt-search-keypress="true" data-kt-search-min-length="2" data-kt-search-enter="enter" data-kt-search-layout="menu" data-kt-search-responsive="true" data-kt-menu-trigger="auto" data-kt-menu-permanent="true" data-kt-menu-placement="bottom-start">
 									<!--begin::Tablet and mobile search toggle-->
@@ -1543,11 +1543,15 @@
 					<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
 						<!--begin::Content wrapper-->
 						<div class="d-flex flex-column flex-column-fluid">
+						<div id="kt_app_content_container" class="app-container container-fluid mt-5 mt-lg-10">
 						@RenderBody()
+						</div>
 					</div>
+					
 					<!--end::Container-->
-				</div>
+
 						<!--end::Content wrapper-->
+
 						<!--begin::Footer-->
 						<partial name="/Views/Shared/Footer/_Footer.cshtml" />
 						<!--end::Footer-->
@@ -1557,7 +1561,7 @@
 				<!--end::Wrapper-->
 			</div>
 			<!--end::Page-->
-	</div>
+		</div>
 
 		<!--end::App-->
 		<!--begin::Drawers-->
