@@ -586,6 +586,9 @@
 	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesProcess\Views\OutputProductSalesProcessWarehouseListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementByCustomerProcess\Views\ProcurementByCustomerFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementByCustomerProcess\Views\ProcurementByCustomerReasonsForRejectionListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
