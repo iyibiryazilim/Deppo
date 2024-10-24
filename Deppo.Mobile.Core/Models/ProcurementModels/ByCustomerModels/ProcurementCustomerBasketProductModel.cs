@@ -35,6 +35,9 @@ public class ProcurementCustomerBasketProductModel : INotifyPropertyChanged, IDi
     private string _trackingTypeIcon;
     private string _trackingTypeIconColor;
 
+    private string rejectionCode = string.Empty;
+	private string rejectionName = string.Empty;
+
 	public ProcurementCustomerBasketProductModel()
     {
 
@@ -374,6 +377,28 @@ public class ProcurementCustomerBasketProductModel : INotifyPropertyChanged, IDi
             NotifyPropertyChanged();
         }
     }
+
+	public string RejectionCode
+	{
+		get => rejectionCode;
+		set
+		{
+			if (rejectionCode == value) return;
+			rejectionCode = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+    public string RejectionName
+	{
+		get => rejectionName;
+		set
+		{
+			if (rejectionName == value) return;
+			rejectionName = value;
+			NotifyPropertyChanged();
+		}
+	}
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
