@@ -1,0 +1,64 @@
+﻿<div class="card mb-5 mb-xl-8">
+	<!--begin::Header-->
+	<div class="card-header border-0 pt-5">
+		<h3 class="card-title align-items-start flex-column">
+			<span class="card-label fw-bold fs-3">Reçete Listesi</span>
+		</h3>
+
+		<!--begin::Card toolbar-->
+		<div class="card-toolbar">
+			<!--begin::Toolbar-->
+			<div class="d-flex justify-content-end m-3" data-kt-customer-table-toolbar="base">
+
+			</div>
+
+			<div class="d-flex align-items-center position-relative my-1">
+				<i class="ki-outline ki-magnifier fs-3 position-absolute ms-5"></i>
+				<input type="text" id="quicklyProductionSearchInput" quickly_production_list_table="search" class="form-control form-control-solid w-250px ps-12" placeholder="Reçete Ara" />
+			</div>
+			<!--end::Toolbar-->
+
+		</div>
+		<!--end::Card toolbar-->
+	</div>
+	<!--end::Header-->
+	<!--begin::Body-->
+	<div class="card-body py-3">
+		<div id="loadingIndicator" class="loading-indicator" style="display: none;">
+			<div class="spinner-border text-primary" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
+		<!--begin::Table container-->
+		<div class="table-responsive">
+			<!--begin::Table-->
+			<table class="table align-middle gs-0 gy-4" id="quickly_production_list_table">
+				<!--begin::Table head-->
+				<thead>
+					<tr class="fw-bold text-muted bg-light">
+						<th class="ps-4 min-w-175px rounded-start">Ürün</th>
+						<th class="min-w-100px">Miktar</th>
+						<th class="min-w-100px">Grup</th>
+						<th class="min-w-100px">Marka</th>
+						<th class="min-w-100px">Ambar</th>
+						<th class="min-w-80px">Varyantlı</th>
+						<th class="min-w-80px rounded-end">Stok Yeri Takibi</th>
+
+					</tr>
+				</thead>
+				<!--end::Table head-->
+				<!--begin::Table body-->
+				<tbody>
+				</tbody>
+				<!--end::Table body-->
+			</table>
+			<!--end::Table-->
+		</div>
+		<!--end::Table container-->
+	</div>
+	<!--begin::Body-->
+</div>
+<!--end::Tables Widget 11-->
+@section Scripts {
+    <script src="~/assets/js/helix/quicklyproductionmodule/quicklyproductionbomlist.js"></script>
+}

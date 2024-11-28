@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views.InputProductPurchaseOrderProcessOrderListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:purchaseModels="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels;assembly=Deppo.Mobile.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.ViewModels"
+             x:DataType="viewModel:InputProductPurchaseOrderProcessOrderListViewModel"
+             Shell.PresentationMode="ModalAnimated">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid RowDefinitions="Auto, Auto, Auto, *, Auto" RowSpacing="10">
+        <!--#region Page Title and Close Button-->
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+            <Grid Grid.Row="0">
+                <Grid Grid.Row="0"
+                      Padding="10,10,0,0"
+                      ColumnDefinitions="*, Auto"
+                      ColumnSpacing="10">
+                    <Label Grid.Column="0"
+                           FontAttributes="Bold"
+                           FontSize="Large"
+                           Text="{Binding Title}"
+                           TextColor="{StaticResource WhiteSmoke}"
+                           VerticalOptions="Center" />
+
+                    <ImageButton Grid.Column="1"
+                                 Command="{Binding CloseCommand}"
+                                 HeightRequest="25"
+                                 HorizontalOptions="End">
+                        <ImageButton.Source>
+                            <FontImageSource FontFamily="FAS"
+                                             Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                                             Size="Medium"
+                                             Color="{StaticResource WhiteSmoke}" />
+                        </ImageButton.Source>
+                    </ImageButton>
+                </Grid>
+            </Grid>
+        </Grid>
+        <!--#endregion-->
+
+        <Border Grid.Row="1"
+                Padding="20,5,20,5"
+                BackgroundColor="Transparent"
+                StrokeShape="RoundRectangle 10"
+                StrokeThickness="0">
+            <Label FontSize="Medium" LineBreakMode="TailTruncation">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span FontFamily="FAS"
+                              Text="{x:Static fontAwesome:FontAwesomeIcons.User}"
+                              TextColor="{StaticResource WhiteSmoke}" />
+                        <Span Text="  " />
+                        <Span Text="{Binding PurchaseSupplier.Name}" TextColor="{StaticResource WhiteSmoke}" />
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+        </Border>
+
+        <Border Grid.Row="2"
+                Margin="5,0,5,0"
+                Padding="0"
+                BackgroundColor="{StaticResource PrimaryLight}"
+                HeightRequest="35"
+                Stroke="{StaticResource Primary}"
+                StrokeShape="RoundRectangle 5"
+                StrokeThickness="0.5">
+            <SearchBar x:Name="searchBar"
+                       Placeholder="Ara..."
+                       PlaceholderColor="{StaticResource OffBlack}"
+                       TextColor="{StaticResource OffBlack}">
+                <SearchBar.Behaviors>
+                    <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}" EventName="SearchButtonPressed" />
+                    <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}" EventName="TextChanged" />
+                </SearchBar.Behaviors>
+            </SearchBar>
+        </Border>
+
+        <CollectionView Grid.Row="3"
+                        ItemsSource="{Binding Items}"
+                        RemainingItemsThreshold="2"
+                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="purchaseModels:WaitingPurchaseOrderModel">
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeThickness="0.1">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputProductPurchaseOrderProcessOrderListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <Border.Triggers>
+                            <DataTrigger Binding="{Binding IsSelected}"
+                                         TargetType="Border"
+                                         Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
+                            </DataTrigger>
+
+                        </Border.Triggers>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                            <Border Padding="5"
+                                    BackgroundColor="{StaticResource Secondary}"
+                                    StrokeShape="RoundRectangle 5"
+                                    StrokeThickness="0.5">
+                                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Label FontAttributes="Bold"
+                                           FontSize="Subtitle"
+                                           HorizontalOptions="Center"
+                                           Text="{Binding OrderDate, StringFormat='{0:dd}'}" />
+                                    <Label FontSize="Caption"
+                                           HorizontalOptions="Center"
+                                           Text="{Binding OrderDate, StringFormat='{0:MM/yyyy}'}" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation"
+                                       Text="{Binding OrderNumber}" />
+                                <Label FontAttributes="Bold"
+                                       FontSize="14"
+                                       LineBreakMode="TailTruncation"
+                                       Text="{Binding ProductCode}" />
+                                <Label LineBreakMode="TailTruncation"
+                                       MaxLines="1"
+                                       Text="{Binding ProductName}"
+                                       TextColor="{StaticResource Gray600}" />
+
+                                <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                                    <Image Aspect="AspectFit"
+                                           HeightRequest="16"
+                                           VerticalOptions="Center"
+                                           WidthRequest="16">
+                                        <Image.Source>
+                                            <FontImageSource FontFamily="FAS"
+                                                             Glyph="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                             Size="16"
+                                                             Color="{StaticResource Primary}" />
+                                        </Image.Source>
+                                    </Image>
+                                    <Label Text="{Binding WaitingQuantity, StringFormat='{0:N2}'}"
+                                           TextColor="{StaticResource Gray600}"
+                                           VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Grid>
+
+                    </Border>
+
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Grid.Row="4"
+                Margin="10,10,10,20"
+                Command="{Binding ConfirmCommand}"
+                Text="Tamam" />
+    </Grid>
+</ContentPage>

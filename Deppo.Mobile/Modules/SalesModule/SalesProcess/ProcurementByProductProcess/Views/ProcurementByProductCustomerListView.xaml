@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByProductProcess.Views.ProcurementByProductCustomerListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:salesModels="clr-namespace:Deppo.Mobile.Core.Models.SalesModels;assembly=Deppo.Mobile.Core"
+             xmlns:shipAddressModel="clr-namespace:Deppo.Mobile.Core.Models.ShipAddressModels;assembly=Deppo.Mobile.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByProductProcess.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:ProcurementByProductCustomerListViewModel"
+             Shell.TabBarIsVisible="False">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding BackCommand}" />
+    </Shell.BackButtonBehavior>
+
+    <Grid RowDefinitions="Auto, *, Auto" RowSpacing="10">
+        <Border Grid.Row="0"
+                Margin="5,0,5,0"
+                Padding="0"
+                BackgroundColor="{StaticResource PrimaryLight}"
+                HeightRequest="35"
+                Stroke="{StaticResource Primary}"
+                StrokeShape="RoundRectangle 5"
+                StrokeThickness="0.5">
+            <SearchBar x:Name="searchBar"
+                       Placeholder="Ara..."
+                       PlaceholderColor="{StaticResource OffBlack}"
+                       TextColor="{StaticResource OffBlack}" />
+        </Border>
+
+        <CollectionView ItemsSource="{Binding Items}"
+                        Grid.Row="1"
+                        RemainingItemsThreshold="2"
+                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="salesModels:CustomerOrderModel">
+                    <Border StrokeShape="RoundRectangle 10" StrokeThickness="0.1" BackgroundColor="Transparent">
+                        <Grid Padding="10"
+                              ColumnDefinitions="Auto,*"
+                              ColumnSpacing="10">
+                            <toolkit:AvatarView Background="{StaticResource PrimaryLight}"
+                                                BorderColor="{StaticResource Primary}"
+                                                CornerRadius="200"
+                                                FontAttributes="Bold"
+                                                FontSize="16"
+                                                HeightRequest="50"
+                                                Text="{Binding TitleName}"
+                                                TextColor="{StaticResource OffBlack}"
+                                                VerticalOptions="Start"
+                                                WidthRequest="50" />
+
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="1"
+                                       Text="{Binding Name}" />
+
+                                <Label>
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding City}" />
+                                            <Span Text=" / " />
+                                            <Span Text="{Binding Country}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+
+                                <Grid ColumnDefinitions="Auto, Auto" ColumnSpacing="10">
+                                    <Label Grid.Column="0">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span FontFamily="FAS" Text="{x:Static fontAwesome:FontAwesomeIcons.Box}" />
+                                                <Span Text=" " />
+                                                <Span Text="{Binding OrderReferenceCount}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Grid>
+                        <Border.Triggers>
+                            <DataTrigger Binding="{Binding IsSelected}"
+                                         TargetType="Border"
+                                         Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
+                            </DataTrigger>
+
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByProductCustomerListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Grid.Row="2"
+                Margin="5,10,5,20"
+                Command="{Binding NextViewCommand}"
+                Text="İleri" />
+
+
+        <!--#region Ship Address Bottomsheet-->
+        <dx:BottomSheet x:Name="shipAddressBottomSheet"
+                        Grid.Row="1"
+                        Padding="10,30,10,10"
+                        AllowDismiss="False"
+                        BackgroundColor="{StaticResource Gray100}"
+                        CornerRadius="10"
+                        HalfExpandedRatio="0.5"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <Grid RowDefinitions="Auto, *" RowSpacing="20">
+                <VerticalStackLayout Grid.Row="0" Spacing="5">
+                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               FontAttributes="Bold"
+                               FontSize="Medium"
+                               HorizontalOptions="Start"
+                               Text="Sevk Adres Listesi" />
+                        <ImageButton Grid.Column="1"
+                                     Command="{Binding ShipAddressCloseCommand}"
+                                     HeightRequest="25"
+                                     HorizontalOptions="End"
+                                     VerticalOptions="Center">
+                            <ImageButton.Source>
+                                <FontImageSource FontFamily="FAS"
+                                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.ChevronDown}"
+                                                 Size="Medium"
+                                                 Color="{StaticResource OffBlack}" />
+                            </ImageButton.Source>
+                        </ImageButton>
+                    </Grid>
+                    <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+
+                <Grid Grid.Row="1"
+                      RowDefinitions="*, Auto"
+                      RowSpacing="10">
+                    <CollectionView Grid.Row="0" ItemsSource="{Binding ShipAddresses}">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="shipAddressModel:ShipAddressModel">
+                                <Border Padding="10"
+                                        BackgroundColor="{StaticResource WhiteSmoke}"
+                                        StrokeShape="RoundRectangle 10"
+                                        StrokeThickness="0.1">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByProductCustomerListViewModel}}, Path=ShipAddressTappedCommand}" CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <Border.Triggers>
+                                        <DataTrigger Binding="{Binding IsSelected}"
+                                                     TargetType="Border"
+                                                     Value="True">
+                                            <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+
+                                    <VerticalStackLayout Spacing="5">
+                                        <Label FontAttributes="Bold"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1"
+                                               Text="{Binding Code}" />
+                                        <Label LineBreakMode="TailTruncation"
+                                               MaxLines="1"
+                                               Text="{Binding Name}" />
+                                        <Label>
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding City}" />
+                                                    <Span Text=" / " />
+                                                    <Span Text="{Binding Country}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Button Grid.Row="1" Text="Tamam" Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByProductCustomerListViewModel}}, Path=ConfirmShipAddressCommand}" />
+                </Grid>
+            </Grid>
+        </dx:BottomSheet>
+        <!--#endregion-->
+    </Grid>
+</ContentPage>

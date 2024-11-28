@@ -1,0 +1,145 @@
+﻿<div class="card mb-5 mb-xl-8">
+	<!--begin::Header-->
+	<div class="card-header border-0 pt-5">
+		<h3 class="card-title align-items-start flex-column">
+			<span class="card-label fw-bold fs-3">Red Nedenleri Listesi</span>
+		</h3>
+
+		<!--begin::Card toolbar-->
+		<div class="card-toolbar">
+			<!--begin::Toolbar-->
+			<div class="d-flex justify-content-end m-3" data-kt-customer-table-toolbar="base">
+				<!--begin::Add user-->
+				<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_add_reason_for_rejection">
+					<i class="ki-outline ki-plus fs-2"></i>Red Nedeni Oluştur
+				</button>
+				<!--end::Add user-->
+			</div>
+
+			<div class="d-flex align-items-center position-relative my-1">
+				<i class="ki-outline ki-magnifier fs-3 position-absolute ms-5"></i>
+				<input type="text" reasons_for_rejection_list_table="search" class="form-control form-control-solid w-250px ps-12" placeholder="Red Nedeni Ara" />
+			</div>
+			<!--end::Toolbar-->
+
+		</div>
+		<!--end::Card toolbar-->
+	</div>
+	<!--end::Header-->
+	<!--begin::Body-->
+	<div class="card-body py-3">
+		<div id="loadingIndicator" class="loading-indicator" style="display: none;">
+			<div class="spinner-border text-primary" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
+		<!--begin::Table container-->
+		<div class="table-responsive">
+			<!--begin::Table-->
+			<table class="table align-middle gs-0 gy-4" id="reasons_for_rejection_list_table">
+				<!--begin::Table head-->
+				<thead>
+					<tr class="fw-bold text-muted bg-light">
+						<th class="ps-4 min-w-105px rounded-start">Kodu</th>
+						<th class="min-w-100px">Adı</th>
+						<th class="min-w-100px rounded-end">Aktif</th>
+					</tr>
+				</thead>
+				<!--end::Table head-->
+				<!--begin::Table body-->
+				<tbody>
+				</tbody>
+				<!--end::Table body-->
+			</table>
+			<!--end::Table-->
+		</div>
+		<!--end::Table container-->
+	</div>
+	<!--begin::Body-->
+</div>
+<!--end::Tables Widget 11-->
+<!--begin::Modal - Add task-->
+<div class="modal fade" id="kt_modal_add_reason_for_rejection" tabindex="-1" aria-hidden="true">
+	<!--begin::Modal dialog-->
+	<div class="modal-dialog modal-dialog-centered mw-650px">
+		<!--begin::Modal content-->
+		<div class="modal-content">
+			<!--begin::Modal header-->
+			<div class="modal-header" id="kt_modal_add_reason_for_rejection_header">
+				<!--begin::Modal title-->
+				<h2 class="fw-bold">Red Nedeni Oluştur</h2>
+				<!--end::Modal title-->
+				<!--begin::Close-->
+				<div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-reason-for-rejection-modal-action="close">
+					<i class="ki-outline ki-cross fs-1"></i>
+				</div>
+				<!--end::Close-->
+			</div>
+			<!--end::Modal header-->
+			<!--begin::Modal body-->
+			<div class="modal-body px-5 my-7">
+				<!--begin::Form-->
+				<form id="kt_modal_add_reason_for_rejection_form" class="form" action="#">
+					<!--begin::Scroll-->
+					<div class="d-flex flex-column scroll-y px-5 px-lg-10" id="kt_modal_add_user_scroll" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_user_header" data-kt-scroll-wrappers="#kt_modal_add_user_scroll" data-kt-scroll-offset="300px">
+						<!--begin::Input group-->
+						<div class="fv-row mb-7">
+							<!--begin::Label-->
+							<label class="required fw-semibold fs-6 mb-2">Kodu</label>
+							<!--end::Label-->
+							<!--begin::Input-->
+							<input type="text" name="code" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Red Nedeni Kodunu Giriniz" value="" />
+							<!--end::Input-->
+						</div>
+						<!--end::Input group-->
+						<!--begin::Input group-->
+						<div class="fv-row mb-7">
+							<!--begin::Label-->
+							<label class="required fw-semibold fs-6 mb-2">Adı</label>
+							<!--end::Label-->
+							<!--begin::Input-->
+							<input type="text" name="name" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Red Nedeni Adını Giriniz" value="" />
+							<!--end::Input-->
+						</div>
+						<!--end::Input group-->
+						<!--begin::Input group-->
+						<div class="fv-row mb-7">
+							<!--begin::Label-->
+							<label class="fw-semibold fs-6 mb-2">Aktif</label>
+							<!--end::Label-->
+							<!--begin::Input-->
+							<input type="checkbox" name="isActive" class="form-check-input" value="checked" checked />
+							<!--end::Input-->
+						</div>
+						<!--end::Input group-->
+					</div>
+					<!--end::Scroll-->
+					<!--begin::Actions-->
+					<div class="text-center pt-10">
+						<button type="reset" class="btn btn-light me-3" data-kt-reasons-for-rejection-modal-action="cancel">Vazgeç</button>
+						<button type="submit" class="btn btn-primary" data-kt-reasons-for-rejection-modal-action="submit">
+							<span class="indicator-label">Oluştur</span>
+							<span class="indicator-progress">
+								Lütfen Bekleyiniz...
+								<span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+							</span>
+						</button>
+					</div>
+					<!--end::Actions-->
+				</form>
+				<!--end::Form-->
+			</div>
+			<!--end::Modal body-->
+		</div>
+		<!--end::Modal content-->
+	</div>
+	<!--end::Modal dialog-->
+</div>
+<!--end::Modal - Add task-->
+
+
+@section Scripts {
+
+	<script src="~/assets/js/sys/reasonsforrejectionlist.js"></script>
+    <script src="~/assets/js/sys/createreasonforrejection.js"></script>
+}

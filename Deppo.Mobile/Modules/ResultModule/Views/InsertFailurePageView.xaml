@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.ResultModule.Views.InsertFailurePageView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:skia="clr-namespace:SkiaSharp.Extended.UI.Controls;assembly=SkiaSharp.Extended.UI"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ResultModule.ViewModels"
+             Title="InsertFailurePageView"
+             x:DataType="viewModel:InsertFailurePageViewModel"
+             Shell.NavBarIsVisible="False"
+             Shell.PresentationMode="ModalAnimated"
+             Shell.TabBarIsVisible="False">
+    <Grid Padding="10"
+          RowDefinitions="*, Auto"
+          RowSpacing="20">
+        <Grid Padding="0,80,0,0"
+              RowDefinitions=".40*, .60*"
+              RowSpacing="50">
+            <skia:SKLottieView Grid.Row="0"
+                               IsAnimationEnabled="True"
+                               RepeatCount="0"
+                               Source="unsuccess.json" />
+
+            <VerticalStackLayout Grid.Row="1"
+                                 HorizontalOptions="Center"
+                                 Spacing="10"
+                                 VerticalOptions="Start">
+
+
+                <Border Padding="20,0,20,0"
+                        HorizontalOptions="Center"
+                        StrokeThickness="0">
+                    <Label FontAttributes="Bold"
+                           FontSize="Title"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           LineBreakMode="CharacterWrap"
+                           Text="{Binding ResultModel.Message}"
+                           TextColor="Red" />
+                </Border>
+
+                <Border Padding="10"
+                        BackgroundColor="Red"
+                        StrokeThickness="0">
+                    <Label LineBreakMode="TailTruncation"
+                           MaxLines="1"
+                           Text="{Binding ResultModel.ErrorMessage}"
+                           TextColor="{StaticResource White}" />
+                </Border>
+
+                <Button BackgroundColor="Red"
+                        Command="{Binding ErrorTappedCommand}"
+                        Text="Hata Mesajlarını Görüntüle" />
+
+
+
+            </VerticalStackLayout>
+        </Grid>
+
+
+        <Grid Grid.Row="1" Padding="0,0,0,30">
+            <Button Grid.Row="1"
+                    Margin="10,10,10,20"
+                    BackgroundColor="Red"
+                    Command="{Binding BackCommand}"
+                    Text="Yeniden Dene" />
+        </Grid>
+
+
+        <dx:BottomSheet x:Name="errorBottomSheet"
+                        Padding="10,30,10,10"
+                        AllowDismiss="True"
+                        BackgroundColor="{StaticResource WhiteSmoke}"
+                        CornerRadius="10"
+                        HalfExpandedRatio="0.5"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <Grid>
+                <Label LineBreakMode="CharacterWrap"
+                       Text="{Binding ResultModel.ErrorMessage}"
+                       TextColor="{StaticResource OffBlack}" />
+            </Grid>
+        </dx:BottomSheet>
+    </Grid>
+
+
+</ContentPage>

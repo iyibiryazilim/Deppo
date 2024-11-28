@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.Views.OverviewAnalysisView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:model="clr-namespace:Deppo.Sys.Service.Models;assembly=Deppo.Sys.Service"
+             xmlns:modelCore="clr-namespace:Deppo.Mobile.Core.Models.AnalysisModels;assembly=Deppo.Mobile.Core"
+             xmlns:syncFusion="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:OverviewAnalysisViewModel">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid Padding="10"
+          RowDefinitions="Auto,Auto,*"
+          RowSpacing="20">
+        <Grid Grid.Row="0"
+              Padding="5"
+              ColumnDefinitions="Auto,*,*"
+              ColumnSpacing="10"
+              RowDefinitions="Auto,Auto">
+
+            <syncFusion:SfBadgeView Grid.Row="0"
+                                    Grid.RowSpan="2"
+                                    Grid.Column="0"
+                                    HorizontalOptions="End"
+                                    BadgeText="{Binding TaskCount}">
+                <syncFusion:SfBadgeView.Content>
+                    <toolkit:AvatarView Grid.Row="0"
+                                        Grid.RowSpan="2"
+                                        Grid.Column="0"
+                                        BorderColor="Transparent"
+                                        CornerRadius="30"
+                                        HeightRequest="60"
+                                        HorizontalOptions="Start"
+                                        ImageSource="{Binding CurrentUser.Image.MediaData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                        VerticalOptions="Center"
+                                        WidthRequest="60">
+                        <toolkit:AvatarView.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ProfileTappedCommand}" />
+                        </toolkit:AvatarView.GestureRecognizers>
+                    </toolkit:AvatarView>
+                </syncFusion:SfBadgeView.Content>
+                <syncFusion:SfBadgeView.BadgeSettings>
+                    <syncFusion:BadgeSettings FontFamily="Roboto" Type="Error" Position="TopRight" TextPadding="1" />
+                </syncFusion:SfBadgeView.BadgeSettings>
+            </syncFusion:SfBadgeView>
+
+
+            <Label Grid.Row="0"
+                   Grid.Column="1"
+                   FontAttributes="Bold"
+                   FontSize="Subtitle"
+                   HorizontalOptions="Start"
+                   Text="Hoşgeldiniz"
+                   TextColor="White"
+                   VerticalOptions="End" />
+
+            <Label Grid.Row="1"
+                   Grid.Column="1"
+                   HorizontalOptions="Start"
+                   Text="{Binding CurrentUser.FullName}"
+                   TextColor="White"
+                   VerticalOptions="Start" />
+
+            <HorizontalStackLayout Grid.RowSpan="2"
+                                   Grid.Column="2"
+                                   HorizontalOptions="End"
+                                   Spacing="10"
+                                   VerticalOptions="Center">
+                <Label Grid.Row="0"
+                       Grid.Column="2"
+                       FontAttributes="Bold"
+                       FontFamily="FAS"
+                       FontSize="25"
+                       HorizontalOptions="End"
+                       Text="{x:Static fontAwesome:FontAwesomeIcons.Bell}"
+                       TextColor="{StaticResource Secondary}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NotificationTappedCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+        </Grid>
+
+        <VerticalStackLayout Grid.Row="1" Spacing="10">
+            <Label Grid.Row="0"
+                   FontAttributes="Bold"
+                   FontSize="Subtitle"
+                   Text="İşlem Özeti"
+                   TextColor="{StaticResource OffBlack}" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <Border Grid.Column="1"
+                        Padding="10"
+                        BackgroundColor="{StaticResource Primary}"
+                        Stroke="{StaticResource Primary}"
+                        StrokeShape="RoundRectangle 10"
+                        StrokeThickness="0.2">
+                    <VerticalStackLayout Spacing="10" VerticalOptions="End">
+                        <Label FontAttributes="Bold"
+                               FontSize="45"
+                               HorizontalTextAlignment="Start"
+                               Text="{Binding OverviewAnalysisModel.OutputTransactionCount}"
+                               TextColor="White"
+                               VerticalTextAlignment="End" />
+                        <Label Text="Çıkış İşlem Sayısı" TextColor="{StaticResource White}" />
+                    </VerticalStackLayout>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OutputTransactionCountTappedCommand}" />
+                    </Border.GestureRecognizers>
+                </Border>
+
+                <Border Grid.Column="0"
+                        Padding="10"
+                        BackgroundColor="{StaticResource Primary}"
+                        Stroke="{StaticResource Primary}"
+                        StrokeShape="RoundRectangle 10"
+                        StrokeThickness="0.2">
+                    <VerticalStackLayout Spacing="10" VerticalOptions="End">
+                        <Label FontAttributes="Bold"
+                               FontSize="45"
+                               HorizontalTextAlignment="Start"
+                               Text="{Binding OverviewAnalysisModel.InputTransactionCount}"
+                               TextColor="White"
+                               VerticalTextAlignment="End" />
+                        <Label Text="Giriş İşlem Sayısı" TextColor="{StaticResource White}" />
+                    </VerticalStackLayout>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding InputTransactionCountTappedCommand}" />
+                    </Border.GestureRecognizers>
+                </Border>
+            </Grid>
+        </VerticalStackLayout>
+
+        <Grid Grid.Row="2"
+              RowDefinitions="Auto,*"
+              RowSpacing="10">
+            <Label Grid.Row="0"
+                   FontAttributes="Bold"
+                   FontSize="Subtitle"
+                   Text="Performans Analizi"
+                   TextColor="{StaticResource OffBlack}" />
+
+            <CollectionView Grid.Row="1" ItemsSource="{Binding Items}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="modelCore:PerformanceAnalysisModel">
+                        <Border Padding="10"
+                                Stroke="{StaticResource Primary}"
+                                StrokeShape="RoundRectangle 10"
+                                StrokeThickness="0.1">
+                            <Grid ColumnDefinitions=".10*,Auto,*,.30*"
+                                  ColumnSpacing="10"
+                                  RowSpacing="10"
+                                  VerticalOptions="Center">
+
+                                <Label Grid.Column="0"
+                                       FontFamily="FAS"
+                                       FontSize="18"
+                                       HorizontalOptions="Center"
+                                       IsVisible="{Binding IconVisibility}"
+                                       Text="{Binding Icon}"
+                                       TextColor="{Binding IconColor}"
+                                       VerticalOptions="Center" />
+
+                                <toolkit:AvatarView Grid.Column="1"
+                                                    Padding="0"
+                                                    BorderColor="Transparent"
+                                                    BorderWidth="0"
+                                                    CornerRadius="30"
+                                                    HeightRequest="60"
+                                                    HorizontalOptions="Start"
+                                                    ImageSource="{Binding ApplicationUser.Image.MediaData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                                    VerticalOptions="Center"
+                                                    WidthRequest="60" />
+
+                                <VerticalStackLayout Grid.Column="2"
+                                                     Spacing="2"
+                                                     VerticalOptions="Center">
+                                    <Label FontAttributes="Bold"
+                                           LineBreakMode="TailTruncation"
+                                           Text="{Binding ApplicationUser.FullName}" />
+                                    <Label LineBreakMode="TailTruncation"
+                                           Text="{Binding ApplicationUser.Position.Name}"
+                                           TextColor="{StaticResource Gray600}" />
+                                </VerticalStackLayout>
+                                <Border Grid.Column="3"
+                                        Padding="10,5,10,5"
+                                        BackgroundColor="{StaticResource Secondary}"
+                                        StrokeShape="RoundRectangle 10"
+                                        StrokeThickness="0"
+                                        VerticalOptions="Center">
+                                    <Label HorizontalOptions="Center">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span FontFamily="FAS"
+                                                      Text="{Binding TransactionCount}"
+                                                      TextColor="{StaticResource Gray600}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </Border>
+                            </Grid>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OverviewAnalysisViewModel}}, Path=PerformanceAnalysisTappedCommand}" CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+        <dx:BottomSheet x:Name="performanceAnalysisTransactionBottomSheet"
+                        Grid.Row="1"
+                        AllowDismiss="True"
+                        BackgroundColor="White"
+                        CornerRadius="15"
+                        HalfExpandedRatio="0.5"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <!--#region BottomSheetContent-->
+            <Grid Padding="10"
+                  RowDefinitions="Auto,*"
+                  RowSpacing="20">
+                <VerticalStackLayout Grid.Row="0" Spacing="5">
+
+                    <Label FontAttributes="Bold"
+                           FontSize="15"
+                           Text="Hareketler" />
+
+                    <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+
+                <CollectionView Grid.Row="1" ItemsSource="{Binding SelectedTransactionAudits}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:TransactionAudit">
+                            <Border Padding="10"
+                                    Stroke="{StaticResource Primary}"
+                                    StrokeShape="RoundRectangle 10"
+                                    StrokeThickness="0.1">
+                                <Grid ColumnDefinitions="Auto,*,.30*"
+                                      ColumnSpacing="10"
+                                      RowSpacing="10"
+                                      VerticalOptions="Center">
+
+                                    <toolkit:AvatarView Grid.Column="0"
+                                                        Padding="0"
+                                                        BorderColor="Transparent"
+                                                        BorderWidth="0"
+                                                        CornerRadius="30"
+                                                        HeightRequest="60"
+                                                        HorizontalOptions="Start"
+                                                        ImageSource="{Binding ApplicationUser.Image.MediaData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                                        VerticalOptions="Center"
+                                                        WidthRequest="60" />
+
+                                    <VerticalStackLayout Grid.Column="1"
+                                                         Spacing="2"
+                                                         VerticalOptions="Center">
+                                        <Label FontAttributes="Bold"
+                                               LineBreakMode="TailTruncation"
+                                               Text="{Binding ApplicationUser.FullName}" />
+                                        <Label LineBreakMode="TailTruncation"
+                                               Text="{Binding TransactionTypeName}"
+                                               TextColor="{StaticResource Gray600}" />
+
+                                        <Label>
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span FontAttributes="Bold"
+                                                          FontFamily="FAS"
+                                                          Text="{x:Static fontAwesome:FontAwesomeIcons.CalendarDays}"
+                                                          TextColor="{StaticResource Gray600}" />
+                                                    <Span Text=" " />
+                                                    <Span Text="{Binding TransactionDate}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+
+            <!--#endregion-->
+        </dx:BottomSheet>
+    </Grid>
+</ContentPage>

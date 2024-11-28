@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.CameraModule.Views.CameraReaderView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.CameraModule.ViewModels"
+             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
+             Title="CameraView"
+             x:DataType="viewModel:CameraReaderViewModel"
+             BackgroundColor="#000000"
+             Shell.PresentationMode="ModalAnimated">
+
+    <Grid RowDefinitions="1*, 5*, 1*">
+        <Grid Grid.Row="0"
+              Padding="20"
+              BackgroundColor="#aa000000"
+              ColumnDefinitions="*, Auto"
+              VerticalOptions="Start"
+              ZIndex="9999">
+            <Border Grid.Column="1"
+                    Padding="15"
+                    BackgroundColor="{StaticResource Gray600}"
+                    StrokeShape="RoundRectangle 50"
+                    StrokeThickness="0"
+                    VerticalOptions="Center">
+                <ImageButton Command="{Binding BackCommand}"
+                             HeightRequest="25"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             WidthRequest="25">
+                    <ImageButton.Source>
+                        <FontImageSource FontFamily="FAS"
+                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                                         Color="{StaticResource WhiteSmoke}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </Border>
+
+        </Grid>
+
+        <Image Grid.Row="1"
+               Aspect="AspectFit"
+               Source="barcode_scan.png"
+               HeightRequest="300"
+               ZIndex="9999"
+               VerticalOptions="Center"
+               HorizontalOptions="Center"/>
+
+        <zxing:CameraBarcodeReaderView x:Name="barcodeReader"
+                                       Grid.Row="0"
+                                       Grid.RowSpan="3"
+                                       BarcodesDetected="OnBarcodesDetected" />
+
+        <Grid Grid.Row="3"
+              Padding="20"
+              BackgroundColor="#aa000000"
+              ColumnDefinitions="Auto,*,Auto">
+
+            <Border Grid.Column="0"
+                    Padding="15"
+                    BackgroundColor="{StaticResource Gray600}"
+                    StrokeShape="RoundRectangle 50"
+                    StrokeThickness="0"
+                    VerticalOptions="Center">
+                <ImageButton Command="{Binding FlashlightTappedCommand}"
+                             HeightRequest="25"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             WidthRequest="25">
+                    <ImageButton.Source>
+                        <FontImageSource FontFamily="FAS"
+                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Lightbulb}"
+                                         Color="{StaticResource WhiteSmoke}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </Border>
+
+            <zxing:BarcodeGeneratorView x:Name="barcodeGenerator"
+                                        Grid.Column="1"
+                                        BarcodeMargin="1"
+                                        ForegroundColor="DarkBlue"
+                                        Format="QrCode"
+                                        HeightRequest="80"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center"
+                                        WidthRequest="80"
+                                        Value="https://deppo.iyibiryazilim.com.tr/" />
+
+            <Border Grid.Column="2"
+                    Padding="15"
+                    BackgroundColor="{StaticResource Gray600}"
+                    StrokeShape="RoundRectangle 50"
+                    StrokeThickness="0"
+                    VerticalOptions="Center">
+                <ImageButton Command="{Binding SwitchCameraTappedCommand}"
+                             HeightRequest="25"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             WidthRequest="25">
+                    <ImageButton.Source>
+                        <FontImageSource FontFamily="FAS"
+                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Rotate}"
+                                         Color="{StaticResource WhiteSmoke}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </Border>
+        </Grid>
+
+
+    </Grid>
+
+</ContentPage>

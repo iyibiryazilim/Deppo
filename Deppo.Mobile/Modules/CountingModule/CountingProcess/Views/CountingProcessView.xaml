@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.CountingModule.CountingProcess.Views.CountingProcessView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:viewModels="clr-namespace:Deppo.Mobile.Modules.CountingModule.CountingProcess.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModels:CountingProcessViewModel">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android"
+                Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid RowDefinitions=".30*,.70*">
+
+        <Grid Grid.Row="1"
+              RowDefinitions="Auto,Auto"
+              RowSpacing="20">
+            <VerticalStackLayout Grid.Row="0"
+                                 Padding="5"
+                                 Spacing="5">
+                <Label FontAttributes="Bold"
+                       FontSize="20"
+                       Text="Ambar Sayım İşlemleri"
+                       TextColor="{StaticResource OffBlack}" />
+
+                <Grid RowDefinitions="Auto,Auto,Auto"
+                      RowSpacing="5">
+                    <Border Grid.Row="0"
+                            Padding="5"
+                            HeightRequest="55"
+                            StrokeShape="RoundRectangle 5"
+                            StrokeThickness="0.2">
+                        <Grid ColumnDefinitions=".85*,.15*"
+                              ColumnSpacing="0">
+                            <Grid Grid.Column="0"
+                                  ColumnDefinitions="Auto,*"
+                                  ColumnSpacing="10">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding WarehouseCountingProcessCommand}" />
+                                </Grid.GestureRecognizers>
+                                <Border Padding="5"
+                                        WidthRequest="45"
+                                        Stroke="{StaticResource Primary}"
+                                        BackgroundColor="{StaticResource Primary}"
+                                        StrokeShape="RoundRectangle 5">
+                                    <Label FontFamily="FAS"
+                                           FontSize="25"
+                                           HorizontalOptions="Center"
+                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Calculator}"
+                                           TextColor="{StaticResource White}"
+                                           VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1"
+                                                     Spacing="4">
+                                    <Label FontAttributes="Bold"
+                                           FontSize="Subtitle"
+                                           Text="Ambara Göre Sayım İşlemi"
+                                           TextColor="{StaticResource Gray500}"
+                                           VerticalOptions="Center" />
+                                    <Label VerticalOptions="End"
+                                           LineBreakMode="TailTruncation"
+                                           Text="Ambara göre sayım işlemi yapabilirsiniz."
+                                           TextColor="{StaticResource Gray400}">
+                                    </Label>
+                                </VerticalStackLayout>
+                            </Grid>
+
+                            <Border Grid.Column="1"
+                                    StrokeThickness="0">
+                                <toolkit:AvatarView Padding="2"
+                                                    BorderColor="{StaticResource Primary}"
+                                                    CornerRadius="15"
+                                                    FontFamily="FAS"
+                                                    FontSize="14"
+                                                    HeightRequest="30"
+                                                    HorizontalOptions="End"
+                                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
+                                                    TextColor="{StaticResource Primary}"
+                                                    WidthRequest="30" />
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding WarehouseCountingInfoBottemSheetCommand}" />
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </VerticalStackLayout>
+            <VerticalStackLayout Grid.Row="1"
+                                 Padding="5"
+                                 Spacing="5">
+                <Label FontAttributes="Bold"
+                       FontSize="20"
+                       Text="Ürün Sayım İşlemleri"
+                       TextColor="{StaticResource OffBlack}" />
+
+                <Grid RowDefinitions="Auto,Auto,Auto"
+                      RowSpacing="0">
+                    <Border Grid.Row="0"
+                            Padding="5"
+                            HeightRequest="55"
+                            StrokeShape="RoundRectangle 5"
+                            StrokeThickness="0.2">
+                        <Grid ColumnDefinitions=".85*,.15*"
+                              ColumnSpacing="0">
+                            <Grid Grid.Column="0"
+                                  ColumnDefinitions="Auto,*"
+                                  ColumnSpacing="10">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ProductCountingProcessCommand}" />
+                                </Grid.GestureRecognizers>
+                                <Border Padding="5"
+                                        WidthRequest="45"
+                                        Stroke="{StaticResource Secondary}"
+                                        BackgroundColor="{StaticResource Secondary}"
+                                        StrokeShape="RoundRectangle 5">
+                                    <Label FontFamily="FAS"
+                                           FontSize="25"
+                                           HorizontalOptions="Center"
+                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Calculator}"
+                                           TextColor="{StaticResource White}"
+                                           VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1"
+                                                     Spacing="4">
+                                    <Label FontAttributes="Bold"
+                                           FontSize="Subtitle"
+                                           Text="Ürüne Göre Sayım İşlemi"
+                                           TextColor="{StaticResource Gray500}"
+                                           VerticalOptions="Center" />
+                                    <Label VerticalOptions="End"
+                                           LineBreakMode="TailTruncation"
+                                           Text="Ürüne göre sayım işlemi yapabilirsiniz."
+                                           TextColor="{StaticResource Gray400}">
+                                    </Label>
+                                </VerticalStackLayout>
+                            </Grid>
+
+                            <Border Grid.Column="1"
+                                    StrokeThickness="0">
+                                <toolkit:AvatarView Padding="2"
+                                                    BorderColor="{StaticResource Primary}"
+                                                    CornerRadius="15"
+                                                    FontFamily="FAS"
+                                                    FontSize="14"
+                                                    HeightRequest="30"
+                                                    HorizontalOptions="End"
+                                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
+                                                    TextColor="{StaticResource Primary}"
+                                                    WidthRequest="30" />
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ProductCountingInfoBottemSheetCommand}" />
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </VerticalStackLayout>
+        </Grid>
+        <VerticalStackLayout Grid.Row="1">
+            <dx:BottomSheet x:Name="infoBottomSheet"
+                            AllowDismiss="True"
+                            BackgroundColor="White"
+                            CornerRadius="15"
+                            HalfExpandedRatio="0.3"
+                            IsModal="True"
+                            ShowGrabber="True">
+                <Grid Padding="10"
+                      RowDefinitions="Auto,*"
+                      RowSpacing="10">
+                    <VerticalStackLayout Grid.Row="0"
+                                         Spacing="5">
+                        <Grid ColumnDefinitions="Auto,*"
+                              ColumnSpacing="10">
+                            <Border Padding="3"
+                                    Stroke="{Binding ProcessBottomSheetModel.IconColor}"
+                                    BackgroundColor="{Binding ProcessBottomSheetModel.IconColor}"
+                                    WidthRequest="30"
+                                    StrokeShape="RoundRectangle 4">
+                                <Label FontFamily="FAS"
+                                       FontSize="12"
+                                       HorizontalOptions="Center"
+                                       Text="{Binding ProcessBottomSheetModel.IconText}"
+                                       TextColor="{StaticResource White}"
+                                       VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1">
+                                <Label FontAttributes="Bold"
+                                       FontSize="16"
+                                       Text="{Binding ProcessBottomSheetModel.InfoTitle}"
+                                       TextColor="{StaticResource Gray500}"
+                                       VerticalOptions="End" />
+                            </VerticalStackLayout>
+                        </Grid>
+                        <BoxView HeightRequest="2"
+                                 Color="{Binding ProcessBottomSheetModel.IconColor }" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Row="1"
+                                         Spacing="10">
+                        <Border Padding="10"
+                                BackgroundColor="Transparent"
+                                StrokeShape="RoundRectangle 10"
+                                StrokeThickness="0">
+                            <VerticalStackLayout>
+                                <Label TextColor="{StaticResource Gray400}"
+                                       VerticalOptions="Center"
+                                       Margin="2">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span  Text="{Binding ProcessBottomSheetModel.Description}"
+                                                   FontSize="16"
+                                                   TextColor="{StaticResource Gray500}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </VerticalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+                </Grid>
+            </dx:BottomSheet>
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.LoginModule.Views.LoginView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.LoginModule.ViewModels"
+             Title="LoginView"
+             x:DataType="viewModel:LoginViewModel">
+
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <Grid RowDefinitions="Auto,Auto,Auto">
+
+                <ImageButton Grid.Row="0"
+                             Margin="0,10,10,0"
+                             BackgroundColor="Transparent"
+                             Command="{Binding ShowParameterCommand}"
+                             CommandParameter="{x:Reference bottomSheet}"
+                             HeightRequest="35"
+                             HorizontalOptions="End"
+                             VerticalOptions="Start">
+                    <ImageButton.Source>
+                        <FontImageSource FontFamily="FAS"
+                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Gear}"
+                                         Color="{StaticResource WhiteSmoke}" />
+                    </ImageButton.Source>
+                </ImageButton>
+
+                <Image Grid.Row="1"
+                       Aspect="AspectFit"
+                       HeightRequest="320"
+                       HorizontalOptions="Center"
+                       Source="deppo.png"
+                       VerticalOptions="Start" />
+
+                <VerticalStackLayout Grid.Row="2"
+                                     Padding="20"
+                                     Spacing="10"
+                                     VerticalOptions="Start">
+
+                    <dx:TextEdit BackgroundColor="{StaticResource White}"
+                                 Keyboard="Default"
+                                 LabelText="Kullanıcı Adı"
+                                 Text="{Binding UserName}" />
+
+                    <dx:PasswordEdit BackgroundColor="{StaticResource White}"
+                                     Keyboard="Default"
+                                     LabelText="Şifre"
+                                     Text="{Binding Password}" />
+
+
+                    <Button Margin="0,30,0,0"
+                            Padding="15"
+                            BackgroundColor="{StaticResource Primary}"
+                            Command="{Binding LoginCommand}"
+                            CornerRadius="10"
+                            FontSize="Subtitle"
+                            Text="Oturum Aç" />
+                </VerticalStackLayout>
+
+
+            </Grid>
+
+        </ScrollView>
+
+        <dx:BottomSheet x:Name="bottomSheet"
+                        Grid.Row="1"
+                        Padding="10,30,10,10"
+                        AllowDismiss="True"
+                        BackgroundColor="White"
+                        CornerRadius="10"
+                        HalfExpandedRatio="0.3"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <Grid RowDefinitions="Auto,*, Auto" RowSpacing="10">
+                <VerticalStackLayout Grid.Row="0" Spacing="10">
+                    <Grid Grid.Row="0"
+                          ColumnDefinitions="*, Auto"
+                          ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               FontAttributes="Bold"
+                               FontSize="Medium"
+                               HorizontalOptions="Start"
+                               Text="Ayarlar" />
+                        <!--<ImageButton Grid.Column="1"
+                                     HeightRequest="25"
+                                     HorizontalOptions="End"
+                                     VerticalOptions="Center">
+                            <ImageButton.Source>
+                                <FontImageSource FontFamily="FAS"
+                                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.ChevronDown}"
+                                                 Size="Medium"
+                                                 Color="{StaticResource OffBlack}" />
+                            </ImageButton.Source>
+                        </ImageButton>-->
+                    </Grid>
+                    <BoxView HeightRequest="2" />
+                </VerticalStackLayout>
+                <Grid Grid.Row="1" ColumnDefinitions="Auto, *, Auto" VerticalOptions="Center" ColumnSpacing="10">
+                    <Border Grid.Column="0" StrokeShape="RoundRectangle 10">
+                        <Picker x:Name="picker" Title="Protokol" SelectedItem="{Binding UrlProtocol}" >
+                            <Picker.ItemsSource>
+                                <x:Array Type="{x:Type x:String}">
+                                    <x:String>http</x:String>
+                                    <x:String>https</x:String>
+                                </x:Array>
+                            </Picker.ItemsSource>
+                        </Picker>
+                    </Border>
+                    <Border Grid.Column="1" StrokeShape="RoundRectangle 10">
+                        <Entry Text="{Binding Url}" Placeholder="e.g: 192.168.1.1" >
+                        </Entry>
+                    </Border>
+
+                    <Border Grid.Column="2" StrokeShape="RoundRectangle 10">
+                        <Entry Text="{Binding PortNumber}" Placeholder="Port">
+                        </Entry>
+                    </Border>
+
+                </Grid>
+
+                <Button Grid.Row="2" Text="Kaydet" VerticalOptions="End" Command="{Binding SaveCommand}" />
+
+            </Grid>
+
+            <!--#region BottomSheetContent-->
+            <!--<VerticalStackLayout Spacing="10" VerticalOptions="Center" Padding="10">
+                <VerticalStackLayout Spacing="5">
+                    <Label FontSize="Title" Text="Ayarlar" />
+                    <Entry Placeholder="http://172.16.1.25:52789" Text="{Binding BaseUri}" FontSize="Subtitle" />
+
+
+                </VerticalStackLayout>
+                <Button Command="{Binding SaveCommand}" Text="Kaydet" VerticalOptions="End" />
+            </VerticalStackLayout>-->
+
+            <!--#endregion-->
+        </dx:BottomSheet>
+    </Grid>
+
+
+
+</ContentPage>

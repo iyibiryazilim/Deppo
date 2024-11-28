@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application>
+  <BOModel>
+    <Class Name="Deppo.Sys.Module.BusinessObjects.TransactionAudit">
+      <OwnMembers>
+        <Member Name="IOType" Caption="Giriş/Çıkış" />
+      </OwnMembers>
+    </Class>
+  </BOModel>
+  <NavigationItems>
+    <Items>
+      <Item Id="Audit">
+        <Items>
+          <Item Id="ReasonsForRejection_ListView" Caption="Hata Kodları" />
+          <Item Id="ReasonsForRejectionProcurement_ListView" Caption="Ürün Toplama Red Nedenleri" />
+        </Items>
+      </Item>
+      <Item Id="SystemSettings">
+        <Items>
+          <Item Id="MyDetails" Caption="Detaylarım" />
+        </Items>
+      </Item>
+    </Items>
+  </NavigationItems>
+</Application>

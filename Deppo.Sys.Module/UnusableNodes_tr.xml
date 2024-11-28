@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application>
+  <NavigationItems Id="NavigationItems">
+    <Items Id="Items">
+      <Item Id="ProductProcurementManagement">
+        <Items Id="Items">
+          <Item Id="ReasonsForRejection_ListView" Caption="Red Nedenleri" />
+          <Item Id="ReasonsForRejectionProcurement_ListView" Caption="Ürün Toplama Red Nedenleri" />
+        </Items>
+      </Item>
+    </Items>
+  </NavigationItems>
+</Application>

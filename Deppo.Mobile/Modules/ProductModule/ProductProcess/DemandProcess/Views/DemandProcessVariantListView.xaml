@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.Views.DemandProcessVariantListView"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewModels"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:warehouseModels="clr-namespace:Deppo.Mobile.Core.Models.WarehouseModels;assembly=Deppo.Mobile.Core"
+             xmlns:productModels="clr-namespace:Deppo.Mobile.Core.Models.ProductModels;assembly=Deppo.Mobile.Core"
+             Title="{Binding Title}"
+             Padding="10"
+             x:DataType="viewModel:DemandProcessVariantListViewModel"
+             Shell.PresentationMode="ModalAnimated"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                        EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android"
+                Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid RowDefinitions="*, Auto">
+        <!--#region Main Content-->
+        <Grid Grid.Row="0"
+              Margin="0,0,0,0"
+              RowDefinitions="Auto, Auto, *, Auto"
+              RowSpacing="10">
+            <Grid Grid.Row="0"
+                  ColumnDefinitions="*, Auto"
+                  ColumnSpacing="10">
+                <Label Grid.Column="0"
+                       FontAttributes="Bold"
+                       FontSize="Medium"
+                       Text="{Binding WarehouseModel.Name, StringFormat='{0} Ambarı Ürünleri'}"
+                       TextColor="{StaticResource WhiteSmoke}"
+                       VerticalOptions="Center" />
+
+                <ImageButton Grid.Column="1"
+                             Command="{Binding BackCommand}"
+                             HeightRequest="25"
+                             HorizontalOptions="End">
+                    <ImageButton.Source>
+                        <FontImageSource FontFamily="FAS"
+                                         Size="Medium"
+                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                                         Color="{StaticResource WhiteSmoke}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </Grid>
+
+            <Border Grid.Row="1"
+                    Margin="5,0,5,0"
+                    Padding="0"
+                    BackgroundColor="{StaticResource PrimaryLight}"
+                    HeightRequest="35"
+                    Stroke="{StaticResource Primary}"
+                    StrokeShape="RoundRectangle 5"
+                    StrokeThickness="0.5">
+                <SearchBar x:Name="searchBar"
+                           Placeholder="Ara..."
+                           PlaceholderColor="{StaticResource OffBlack}"
+                           TextColor="{StaticResource OffBlack}">
+                    <SearchBar.Behaviors>
+                        <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                        EventName="SearchButtonPressed" />
+                        <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}"
+                                                        EventName="TextChanged" />
+                    </SearchBar.Behaviors>
+                </SearchBar>
+            </Border>
+
+            <CollectionView Grid.Row="2"
+                            ItemsSource="{Binding Items}"
+                            RemainingItemsThreshold="2"
+                            RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="productModels:VariantWarehouseTotalModel">
+                        <SwipeView Threshold="100">
+                            <SwipeView.LeftItems>
+                                <SwipeItems Mode="Execute">
+                                    <SwipeItemView BackgroundColor="{StaticResource Secondary}"
+                                                   Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:DemandProcessVariantListViewModel}}, Path=SwipeItemCommand}"
+                                                   CommandParameter="{Binding .}">
+                                        <Label HorizontalOptions="Center"
+                                               TextColor="White"
+                                               VerticalOptions="Center">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="Ambar Parametreleri"
+                                                          TextColor="White" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </SwipeItemView>
+                                </SwipeItems>
+
+                            </SwipeView.LeftItems>
+                            <Border Padding="10"
+                                    BackgroundColor="Transparent"
+                                    StrokeShape="RoundRectangle 10"
+                                    StrokeThickness="0.1">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:DemandProcessVariantListViewModel}}, Path=ItemTappedCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto,*, Auto"
+                                      ColumnSpacing="10">
+                                    <Border BackgroundColor="{StaticResource Primary}"
+                                            StrokeShape="RoundRectangle 5"
+                                            StrokeThickness="0.5">
+                                        <Image Grid.Column="0"
+                                               HeightRequest="50"
+                                               Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                               WidthRequest="50" />
+                                    </Border>
+
+                                    <VerticalStackLayout Grid.Column="1"
+                                                         Spacing="2">
+                                        <Label FontAttributes="Bold"
+                                               LineBreakMode="TailTruncation"
+                                               Text="{Binding VariantCode}"
+                                               TextColor="{StaticResource OffBlack}" />
+                                        <Label LineBreakMode="TailTruncation"
+                                               Text="{Binding VariantName}"
+                                               TextColor="{StaticResource Gray600}" />
+
+                                        <Label TextColor="{StaticResource Gray500}"
+                                               VerticalOptions="Center">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span FontAttributes="Bold"
+                                                          FontFamily="FAS"
+                                                          Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                          TextColor="{StaticResource Primary}" />
+                                                    <Span Text=" " />
+                                                    <Span FontAttributes="Bold"
+                                                          Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                                          TextColor="{StaticResource Primary}" />
+                                                    <Span Text=" " />
+                                                    <Span FontAttributes="Bold"
+                                                          Text="{Binding SubUnitsetCode}"
+                                                          TextColor="{StaticResource Primary}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </VerticalStackLayout>
+
+                                    <Grid Grid.Column="2"
+                                          ColumnDefinitions="Auto, Auto, Auto"
+                                          ColumnSpacing="3"
+                                          HorizontalOptions="End"
+                                          VerticalOptions="Start">
+                                        <Label Grid.Column="0"
+                                               FontFamily="FAS"
+                                               FontSize="10"
+                                               Text="{Binding VariantIcon}"
+                                               TextColor="{Binding VariantIconColor}" />
+                                        <Label Grid.Column="1"
+                                               FontFamily="FAS"
+                                               FontSize="10"
+                                               Text="{Binding LocTrackingIcon}"
+                                               TextColor="{Binding LocTrackingIconColor}" />
+                                        <Label Grid.Column="2"
+                                               FontFamily="FAS"
+                                               FontSize="10"
+                                               Text="{Binding TrackingTypeIcon}"
+                                               TextColor="{Binding TrackingTypeIconColor}" />
+                                    </Grid>
+                                </Grid>
+
+                                <Border.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected}"
+                                                 TargetType="Border"
+                                                 Value="True">
+                                        <Setter Property="BackgroundColor"
+                                                Value="{StaticResource SecondaryLight}" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                            </Border>
+                        </SwipeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Button Grid.Row="3"
+                    Command="{Binding ConfirmCommand}"
+                    Text="{Binding SelectedVariants.Count, StringFormat='Sepete Ekle : {0}'}" />
+
+        </Grid>
+        <dx:BottomSheet x:Name="warehouseParameterBottomSheet"
+                        AllowDismiss="True"
+                        Grid.Row="1"
+                        BackgroundColor="White"
+                        CornerRadius="15"
+                        HalfExpandedRatio="0.3"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <Grid RowDefinitions="Auto,*"
+                  RowSpacing="10"
+                  Padding="10">
+                <VerticalStackLayout Grid.Row="0"
+                                     Spacing="5">
+                    <Label FontAttributes="Bold"
+                           Padding="10"
+                           FontSize="18"
+                           Text="Ambar Parametreleri" />
+                    <BoxView HeightRequest="2"
+                             Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Row="1"
+                                     Spacing="5">
+
+                    <Border Padding="5"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0.1">
+
+                        <Grid ColumnDefinitions=".05*, .85*,.15*">
+                            <Label Grid.Column="0"
+                                   FontFamily="FAS"
+                                   FontSize="Small"
+                                   Text="{x:Static fontAwesome:FontAwesomeIcons.Circle}"
+                                   TextColor="Red"
+                                   VerticalOptions="Center" />
+
+                            <Label Grid.Column="1"
+                                   FontAttributes="Bold"
+                                   Padding="5"
+                                   LineBreakMode="TailTruncation"
+                                   MaxLines="1"
+                                   Text="Asgari Stok : "
+                                   VerticalOptions="End">
+
+                            </Label>
+
+                            <Label Grid.Column="2"
+                                   FontAttributes="Bold"
+                                   Padding="5"
+                                   LineBreakMode="TailTruncation"
+                                   MaxLines="1"
+                                   Text="{Binding WarehouseParameterModel.MinLevel}"
+                                   VerticalOptions="End"
+                                   HorizontalOptions="Center">
+
+                            </Label>
+                        </Grid>
+
+                    </Border>
+                    <Border Padding="5"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0.1">
+
+                        <Grid ColumnDefinitions=".05*, .85*,.15*">
+                            <Label Grid.Column="0"
+                                   FontFamily="FAS"
+                                   FontSize="Small"
+                                   Text="{x:Static fontAwesome:FontAwesomeIcons.Circle}"
+                                   TextColor="{StaticResource Secondary}"
+                                   VerticalOptions="Center" />
+
+                            <Label Grid.Column="1"
+                                   FontAttributes="Bold"
+                                   Padding="5"
+                                   LineBreakMode="TailTruncation"
+                                   MaxLines="1"
+                                   Text="Güvenli Stok : "
+                                   VerticalOptions="End">
+
+                            </Label>
+
+                            <Label Grid.Column="2"
+                                   FontAttributes="Bold"
+                                   Padding="5"
+                                   LineBreakMode="TailTruncation"
+                                   MaxLines="1"
+                                   Text="{Binding WarehouseParameterModel.SafeLevel}"
+                                   VerticalOptions="End"
+                                   HorizontalOptions="Center">
+
+                            </Label>
+                        </Grid>
+
+
+                    </Border>
+                    <Border Padding="5"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0.1">
+
+                        <Grid ColumnDefinitions=".05*, .85*,.15*">
+                            <Label Grid.Column="0"
+                                   FontFamily="FAS"
+                                   FontSize="Small"
+                                   Text="{x:Static fontAwesome:FontAwesomeIcons.Circle}"
+                                   TextColor="{StaticResource Primary}"
+                                   VerticalOptions="Center" />
+
+                            <Label Grid.Column="1"
+                                   FontAttributes="Bold"
+                                   Padding="5"
+                                   LineBreakMode="TailTruncation"
+                                   MaxLines="1"
+                                   Text="Azami Stok : "
+                                   VerticalOptions="End">
+
+                            </Label>
+
+                            <Label Grid.Column="2"
+                                   FontAttributes="Bold"
+                                   Padding="5"
+                                   LineBreakMode="TailTruncation"
+                                   MaxLines="1"
+                                   Text="{Binding WarehouseParameterModel.MaxLevel}"
+                                   VerticalOptions="End"
+                                   HorizontalOptions="Center">
+
+                            </Label>
+                        </Grid>
+
+                    </Border>
+                </VerticalStackLayout>
+            </Grid>
+        </dx:BottomSheet>
+    </Grid>
+</ContentPage>

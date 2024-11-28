@@ -1,0 +1,262 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application>
+  <ActionDesign>
+    <Actions>
+      <Action Id="MyDetails" Caption="Detaylarım" />
+    </Actions>
+  </ActionDesign>
+  <BOModel>
+    <Class Name="Deppo.Sys.Module.BusinessObjects.CustomerReleationship" Caption="Müşteri İlişkileri">
+      <OwnMembers>
+        <Member Name="Customer" Caption="Müşteri" />
+        <Member Name="CustomerProductBarcode" Caption="Müşteri Malzeme Barkodu" />
+        <Member Name="CustomerProductCode" Caption="Müşteri Malzeme Kodu" />
+        <Member Name="CustomerProductName" Caption="Müşteri Malzeme Adı" />
+        <Member Name="FirmNumber" Caption="Firma Numarası" />
+        <Member Name="Product" Caption="Malzeme" />
+        <Member Name="ReferenceId" Caption="Referans Id" />
+      </OwnMembers>
+    </Class>
+    <Class Name="Deppo.Sys.Module.BusinessObjects.Notification" Caption="Bildirim">
+      <OwnMembers>
+        <Member Name="Description" Caption="Açıklama" />
+        <Member Name="Title" Caption="Başlık" />
+      </OwnMembers>
+    </Class>
+    <Class Name="Deppo.Sys.Module.BusinessObjects.NotificationStatus" Caption="Bildirim Durumu">
+      <OwnMembers>
+        <Member Name="ApplicationUser" Caption="Kullanıcı" />
+        <Member Name="IsRead" Caption="Okundu" />
+        <Member Name="Notification" Caption="Bildirim" />
+      </OwnMembers>
+    </Class>
+    <Class Name="Deppo.Sys.Module.BusinessObjects.ProcurementAudit" Caption="Ürüne Göre Ürün Toplama">
+      <OwnMembers>
+        <Member Name="ApplicationUser" Caption="Kullanıcı" />
+        <Member Name="CreatedOn" Caption="Oluşturma Zamanı" />
+        <Member Name="IsVariant" Caption="Varyant Bilgisi" />
+        <Member Name="LocationCode" Caption="Raf Yeri Kodu" />
+        <Member Name="LocationName" Caption="Raf Yeri Adı" />
+        <Member Name="ProcurementQuantity" Caption="Toplama Miktarı" />
+        <Member Name="ProductCode" Caption="Ürün Kodu" />
+        <Member Name="ProductName" Caption="Ürün Adı" />
+        <Member Name="Quantity" Caption="Miktar" />
+        <Member Name="ReasonsForRejectionProcurement" Caption="Ürün Toplama Red Nedenleri" />
+        <Member Name="WarehouseName" Caption="Ambar Adı" />
+        <Member Name="WarehouseNumber" Caption="Ambar Numarası" />
+      </OwnMembers>
+    </Class>
+    <Class Name="Deppo.Sys.Module.BusinessObjects.ProcurementAuditCustomer" Caption="Müşteriye Göre Ürün Toplama">
+      <OwnMembers>
+        <Member Name="CurrentCode" Caption="Kullanıcı Kodu" />
+        <Member Name="CurrentName" Caption="Kullanıcı Adı" />
+      </OwnMembers>
+    </Class>
+    <Class Name="Deppo.Sys.Module.BusinessObjects.ProcurementFiche" Caption="Ürün toplama Fişi">
+      <OwnMembers>
+        <Member Name="CreatedOn" Caption="Oluşturulma Zamanı" />
+        <Member Name="Customer" Caption="Müşteri" />
+        <Member Name="FicheNumber" Caption="Fiş Numarası" />
+        <Member Name="Transactions" Caption="Hareketler" />
+      </OwnMembers>
+    </Class>
+    <Class Name="Deppo.Sys.Module.BusinessObjects.ProcurementFicheTransaction" Caption="Ürün Toplama Fiş Satırları">
+      <OwnMembers>
+        <Member Name="OrderNumber" Caption="Sipariş Numarası" />
+        <Member Name="OrderReferenceId" Caption="Sipariş Referans Id" />
+        <Member Name="ProcurementFiche" Caption="Ürün toplama Fişi" />
+        <Member Name="Product" Caption="Malzeme" />
+        <Member Name="Quantity" Caption="Miktar" />
+        <Member Name="Warehouse" Caption="Ambar" />
+      </OwnMembers>
+    </Class>
+    <Class Name="Deppo.Sys.Module.BusinessObjects.TaskList" Caption="Görevler">
+      <OwnMembers>
+        <Member Name="CreatedOn" Caption="Oluşturma Zamanı" />
+        <Member Name="Description" Caption="Açıklama" />
+        <Member Name="EndOn" Caption="Bitiş Zamanı" />
+        <Member Name="Priority" Caption="Öncelik" />
+        <Member Name="StartOn" Caption="Başlama Zamanı" />
+        <Member Name="Status" Caption="Durum" />
+        <Member Name="Subject" Caption="Konu" />
+        <Member Name="User" Caption="Kullanıcı" />
+      </OwnMembers>
+    </Class>
+    <Class Name="Deppo.Sys.Module.BusinessObjects.TransactionAudit" Caption="Hareket İzleme">
+      <OwnMembers>
+        <Member Name="ApplicationUser" Caption="Kullanıcı" />
+        <Member Name="CreatedOn" Caption="Oluşturma Zamanı" />
+        <Member Name="CurrentCode" Caption="Kullanıcı Kodu" />
+        <Member Name="CurrentName" Caption="Kullanıcı Adı" />
+        <Member Name="DocumentNumber" Caption="Doküman Numarası" />
+        <Member Name="FirmNumber" Caption="Firm Numarası" />
+        <Member Name="PeriodNumber" Caption="Period Numarası" />
+        <Member Name="ProductReferenceCount" Caption="Ürün Referans Sayısı" />
+        <Member Name="ShipAddressCode" Caption="Sevk Adresi Kodu" />
+        <Member Name="ShipAddressName" Caption="Sevk Adresi Adı" />
+        <Member Name="TransactionDate" Caption="Hareket Tarihi" />
+        <Member Name="TransactionNumber" Caption="Hareket Numarası" />
+        <Member Name="TransactionType" Caption="Hareket Türü" />
+        <Member Name="WarehouseName" Caption="Ambar Adı" />
+        <Member Name="WarehouseNumber" Caption="Ambar Numarası" />
+      </OwnMembers>
+    </Class>
+    <Class Name="Deppo.Sys.Module.LogoBusinessObjects.LOGO_Dispatch">
+      <OwnMembers>
+        <Member Name="CreatedOn" Caption="Oluşturulma Zamanı" />
+        <Member Name="CustomerName" Caption="Müşteri Adı" />
+        <Member Name="DocumentNumber" Caption="Doküman Numarası" />
+        <Member Name="FicheNumber" Caption="Fiş Numarası " />
+        <Member Name="FirmNumber" Caption="Firma Numarası" />
+        <Member Name="ReferenceId" Caption="Referans Id" />
+        <Member Name="ShippedAddressName" Caption="Sevk Adress Adı" />
+        <Member Name="Transactions" Caption="Hareketler" />
+        <Member Name="WarehouseName" Caption="Ambar Adı" />
+        <Member Name="WarehouseNumber" Caption="Ambar Numarası" />
+      </OwnMembers>
+    </Class>
+    <Class Name="Deppo.Sys.Module.LogoBusinessObjects.LOGO_DispatchTransaction">
+      <OwnMembers>
+        <Member Name="Product" Caption="Malzeme" />
+        <Member Name="Quantity" Caption="Miktar" />
+        <Member Name="ReferenceId" Caption="Referans Id" />
+        <Member Name="SubUnitset" Caption="Sub Unitset" />
+      </OwnMembers>
+    </Class>
+  </BOModel>
+  <CreatableItems>
+    <CreatableItem ClassName="Deppo.Sys.Module.BusinessObjects.ProcurementFiche" Caption="Ürün Toplama Fişi" />
+  </CreatableItems>
+  <Localization>
+    <LocalizationGroup Name="Namespaces">
+      <LocalizationItem Name="DevExpress.ExpressApp.SystemModule.Notifications" Value="Bildirimler" />
+    </LocalizationGroup>
+  </Localization>
+  <NavigationItems>
+    <Items>
+      <Item Id="Workspace" Caption="Çaışma Alanı" />
+      <Item Id="Audit" Caption="İzleme" />
+      <Item Id="CustomerManagement" Caption="Müşteri Yönetimi">
+        <Items>
+          <Item Id="Customer_ListView" Caption="Müşteri" />
+          <Item Id="Supplier_ListView" Caption="Tedarikçi" />
+        </Items>
+      </Item>
+      <Item Id="ProductManagement" Caption="Malzeme Yönetimi">
+        <Items>
+          <Item Id="CustomerReleationship_ListView" Caption="Müşteri Malzeme İlişkileri" />
+          <Item Id="Product_ListView" Caption="Malzeme" />
+          <Item Id="Unitset_ListView" Caption="Birim" />
+        </Items>
+      </Item>
+      <Item Id="ProductProcurementManagement" Caption="Ürün Toplama Yönetimi">
+        <Items>
+          <Item Id="LOGO_Dispatch_ListView" Caption="İrsaliyeler" />
+          <Item Id="ProcurementAudit_ListView" Caption="Ürüne Göre Toplama" />
+          <Item Id="ProcurementAuditCustomer_ListView" Caption="Müşteriye Göre Toplama" />
+        </Items>
+      </Item>
+      <Item Id="UserManagement" Caption="Kullanıcı Yönetimi ">
+        <Items>
+          <Item Id="Position_ListView" Caption="Pozisyon" />
+          <Item Id="ProcessRate_ListView" Caption="İşlem Hızı" />
+        </Items>
+      </Item>
+      <Item Id="Reports" Caption="Raporlar">
+        <Items>
+          <Item Id="Analysis_ListView" Caption="Analizler" />
+        </Items>
+      </Item>
+      <Item Id="SystemSettings" Caption="Sistem Ayarları">
+        <Items>
+          <Item Id="ApplicationUser_ListView" Caption="Kullanıcılar" />
+          <Item Id="ConnectionParameter_ListView" Caption="Bağlantı Parametresi" />
+          <Item Id="Country_ListView" Caption="Ülke" />
+          <Item Id="Warehouse_ListView" Caption="Ambar" />
+        </Items>
+      </Item>
+    </Items>
+  </NavigationItems>
+  <Views>
+    <DetailView Id="CustomerReleationship_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="SimpleEditors">
+            <LayoutGroup Id="CustomerReleationship" Caption="Müşteri İlişkileri" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <DetailView Id="ProcurementAudit_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="SimpleEditors">
+            <LayoutGroup Id="ProcurementAudit" Caption="Ürün Toplama" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <DetailView Id="ProcurementAuditCustomer_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="SimpleEditors">
+            <LayoutGroup Id="ProcurementAudit" Caption="Ürün Toplama" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <DetailView Id="ProcurementFiche_DetailView" Caption="Ürün Toplama Fişi">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="SimpleEditors">
+            <LayoutGroup Id="ProcurementFiche" Caption="Ürün Toplama Fişi" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="ProcurementFiche_ListView" Caption="Ürün Toplama Fişi" />
+    <ListView Id="ProcurementFiche_LookupListView" Caption="Ürün Toplama Fişi" />
+    <ListView Id="ProcurementFiche_Transactions_ListView">
+      <Columns>
+        <ColumnInfo Id="ProcurementFiche" Caption="Ürün Toplama Fişi" />
+      </Columns>
+    </ListView>
+    <DetailView Id="ProcurementFicheTransaction_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="SimpleEditors">
+            <LayoutGroup Id="ProcurementFicheTransaction" Caption="Ürün Toplama Fiş Satırları" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="ProcurementFicheTransaction_ListView">
+      <Columns>
+        <ColumnInfo Id="ProcurementFiche" Caption="Ürün Toplama Fişi" />
+      </Columns>
+    </ListView>
+    <ListView Id="ProcurementFicheTransaction_LookupListView">
+      <Columns>
+        <ColumnInfo Id="ProcurementFiche" Caption="Ürün Toplama Fişi" />
+      </Columns>
+    </ListView>
+    <DetailView Id="TaskList_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="SimpleEditors">
+            <LayoutGroup Id="TaskList" Caption="Görevler" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <DetailView Id="TransactionAudit_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="SimpleEditors">
+            <LayoutGroup Id="TransactionAudit" Caption="Hareket İzleme" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+  </Views>
+</Application>

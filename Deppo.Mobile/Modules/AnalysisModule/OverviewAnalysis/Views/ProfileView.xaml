@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.Views.ProfileView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:ProfileViewModel"
+             Shell.NavBarIsVisible="False"
+             Shell.PresentationMode="ModalAnimated"
+             Shell.TabBarIsVisible="False">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadPageCommand}" EventName="Loaded" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+            <toolkit:IsStringNotNullOrEmptyConverter x:Key="IsStringNotNullOrEmptyConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid Padding="20"
+          RowDefinitions="Auto, *"
+          RowSpacing="20">
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+            <Label Grid.Column="0"
+                   Margin="20,0,0,0"
+                   FontAttributes="Bold"
+                   FontSize="20"
+                   HorizontalOptions="Center"
+                   Text="Profilim"
+                   TextColor="{StaticResource WhiteSmoke}"
+                   VerticalOptions="End" />
+            <ImageButton Grid.Column="1"
+                         Aspect="AspectFill"
+                         Command="{Binding CloseCommand}"
+                         HeightRequest="25"
+                         HorizontalOptions="End"
+                         VerticalOptions="Center"
+                         WidthRequest="25">
+                <ImageButton.Source>
+                    <FontImageSource FontFamily="FAS"
+                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                                     Color="{StaticResource WhiteSmoke}" />
+                </ImageButton.Source>
+            </ImageButton>
+        </Grid>
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout>
+                <Grid RowDefinitions="Auto, Auto" RowSpacing="50">
+                    <toolkit:AvatarView Grid.Row="0"
+                                        BorderWidth="0.1"
+                                        CornerRadius="100"
+                                        HeightRequest="150"
+                                        ImageSource="{Binding CurrentUser.Image.MediaData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                        WidthRequest="150" />
+
+
+                    <VerticalStackLayout Grid.Row="1" Spacing="10">
+
+                        <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                     FocusedBorderColor="{StaticResource Primary}"
+                                     IsReadOnly="True"
+                                     LabelText="Kod"
+                                     Text="{Binding CurrentUser.Code}" />
+
+                        <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                     FocusedBorderColor="{StaticResource Primary}"
+                                     IsReadOnly="True"
+                                     LabelText="Ad Soyad"
+                                     Text="{Binding CurrentUser.FullName, TargetNullValue='-', FallbackValue='-'}" />
+
+                        <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                     FocusedBorderColor="{StaticResource Primary}"
+                                     IsReadOnly="True"
+                                     LabelText="Kullanıcı Adı"
+                                     Text="{Binding CurrentUser.UserName}" />
+                        <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                     FocusedBorderColor="{StaticResource Primary}"
+                                     IsReadOnly="True"
+                                     LabelText="Eposta"
+                                     Text="{Binding CurrentUser.EMail, TargetNullValue='-', FallbackValue='-'}" />
+                        <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                     FocusedBorderColor="{StaticResource Primary}"
+                                     IsReadOnly="True"
+                                     LabelText="Telefon"
+                                     Text="{Binding CurrentUser.Telephone, TargetNullValue='-', FallbackValue='-'}" />
+                        <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                     FocusedBorderColor="{StaticResource Primary}"
+                                     IsReadOnly="True"
+                                     LabelText="İnternet Adresi"
+                                     Text="{Binding CurrentUser.WebAddress, TargetNullValue='-', FallbackValue='-'}" />
+                        <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                     FocusedBorderColor="{StaticResource Primary}"
+                                     IsReadOnly="True"
+                                     LabelText="TC Kimlik Numarası"
+                                     Text="{Binding CurrentUser.Tckn, TargetNullValue='-', FallbackValue='-'}" />
+
+                    </VerticalStackLayout>
+                </Grid>
+
+
+            </VerticalStackLayout>
+
+
+        </ScrollView>
+    </Grid>
+</ContentPage>

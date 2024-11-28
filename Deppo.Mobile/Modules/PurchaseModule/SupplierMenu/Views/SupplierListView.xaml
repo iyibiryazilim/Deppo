@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.Views.SupplierListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:model="clr-namespace:Deppo.Core.BaseModels;assembly=Deppo.Core"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.SupplierMenu.ViewModels"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             Title="{Binding Title}"
+             x:DataType="viewModel:SupplierListViewModel"
+             Shell.NavBarIsVisible="True">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                        EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android"
+                Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+        <Grid 
+              RowDefinitions="Auto,*">
+            <Border Grid.Row="0"
+                    Margin="5,0,5,0"
+                    Padding="0"
+                    BackgroundColor="{StaticResource PrimaryLight}"
+                    HeightRequest="35"
+                    Stroke="{StaticResource Primary}"
+                    StrokeShape="RoundRectangle 5"
+                    StrokeThickness="0.5">
+                <SearchBar x:Name="searchBar"
+                           Placeholder="Ara..."
+                           PlaceholderColor="{StaticResource OffBlack}"
+                           TextColor="{StaticResource OffBlack}">
+                    <SearchBar.Behaviors>
+                    <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                    EventName="SearchButtonPressed" />
+                    <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}"
+                                                    EventName="TextChanged" />
+                </SearchBar.Behaviors>
+                </SearchBar>
+            </Border>
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Items}"
+                        RemainingItemsThreshold="2"
+                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:Current">
+                    <Border StrokeShape="RoundRectangle 5"
+                            StrokeThickness="0.1">
+                        <Grid Padding="10"
+                              ColumnDefinitions="Auto,*"
+                              ColumnSpacing="10">
+                            <toolkit:AvatarView CornerRadius="200"
+                                                Grid.Column="0"
+                                                Margin="5"
+                                                BorderColor="{StaticResource Primary}"
+                                                Background="{StaticResource PrimaryLight}"
+                                                Text="{Binding TitleName}"
+                                                TextColor="{StaticResource OffBlack}"
+                                                FontSize="16"
+                                                FontAttributes="Bold"
+                                                WidthRequest="50"
+                                                HeightRequest="50"
+                                                VerticalOptions="Start" />
+
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Spacing="2">
+                                <Label FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation"     
+                                       Text="{Binding Name}" />
+
+                                <Label>
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding City}" />
+                                            <Span Text=" / " />
+                                            <Span Text="{Binding Country}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+
+                                <Label>
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span FontFamily="FAS"
+                                                  Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                  TextColor="{StaticResource Primary}"
+                                                  />
+                                            <Span Text=" " />
+                                            <Span 
+                                                FontAttributes="Bold"
+                                                  Text="{Binding OrderReferenceCount}" />
+
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </VerticalStackLayout>
+                        </Grid>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:SupplierListViewModel}}, Path=ItemTappedCommand}"
+                                                  CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </Grid>
+
+</ContentPage>

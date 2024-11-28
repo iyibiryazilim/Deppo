@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.Views.ProcurementByCustomerWarehouseListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:locationModel="clr-namespace:Deppo.Mobile.Core.Models.LocationModels;assembly=Deppo.Mobile.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.ViewModels"
+             xmlns:warehouseModel="clr-namespace:Deppo.Mobile.Core.Models.WarehouseModels;assembly=Deppo.Mobile.Core"
+             Title="{Binding Title}"
+             x:DataType="viewModel:ProcurementByCustomerWarehouseListViewModel"
+             Shell.TabBarIsVisible="False">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding BackCommand}" />
+    </Shell.BackButtonBehavior>
+
+    <Grid RowDefinitions="*,Auto" RowSpacing="10">
+        <CollectionView Grid.Row="0"
+                        ItemsSource="{Binding Items}"
+                        RemainingItemsThreshold="2"
+                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="warehouseModel:WarehouseModel">
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0.1">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerWarehouseListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto, *">
+                            <Border Grid.Column="0"
+                                    Padding="0,0,10,0"
+                                    BackgroundColor="Transparent"
+                                    StrokeThickness="0">
+                                <toolkit:AvatarView BackgroundColor="{StaticResource Primary}"
+                                                    BorderWidth="0.1"
+                                                    CornerRadius="50"
+                                                    FontAttributes="Bold"
+                                                    HorizontalOptions="Start"
+                                                    Text="{Binding Number}"
+                                                    TextColor="{StaticResource White}" />
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Padding="5"
+                                                 Spacing="5"
+                                                 VerticalOptions="Start">
+                                <Label FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="1"
+                                       Text="{Binding Name}" />
+                                <Label FontAttributes="None"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="1"
+                                       Text="{Binding City, FallbackValue='-', TargetNullValue='-'}"
+                                       TextColor="{StaticResource Gray600}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                        <Border.Triggers>
+                            <DataTrigger Binding="{Binding IsSelected}"
+                                         TargetType="Border"
+                                         Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <Button Grid.Row="1"
+                Margin="5,10,5,20"
+                Command="{Binding NextViewCommand}"
+                IsEnabled="{Binding SelectedWarehouseModel, Converter={StaticResource IsNotNullConverter}}"
+                Text="İleri" />
+
+        <dx:BottomSheet x:Name="locationBottomSheet"
+                        Grid.Row="1"
+                        Padding="10,30,10,10"
+                        AllowDismiss="False"
+                        BackgroundColor="{StaticResource Gray100}"
+                        CornerRadius="10"
+                        HalfExpandedRatio="0.5"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <!--#region BottomSheetContent-->
+            <Grid RowDefinitions="Auto,*" RowSpacing="20">
+
+                <VerticalStackLayout Grid.Row="0" Spacing="5">
+                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               FontAttributes="Bold"
+                               FontSize="Medium"
+                               HorizontalOptions="Start"
+                               Text="{Binding SelectedWarehouseModel.Name, StringFormat='{0} Rafları'}" />
+                        <!--<ImageButton Grid.Column="1"
+                                     Command="{Binding CloseLocationsCommand}"
+                                     HeightRequest="25"
+                                     HorizontalOptions="End"
+                                     VerticalOptions="Center">
+                            <ImageButton.Source>
+                                <FontImageSource FontFamily="FAS"
+                                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.ChevronDown}"
+                                                 Size="Medium"
+                                                 Color="{StaticResource OffBlack}" />
+                            </ImageButton.Source>
+                        </ImageButton>-->
+                    </Grid>
+                    <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+
+                <Grid Grid.Row="1"
+                      RowDefinitions="Auto,*,Auto"
+                      RowSpacing="10">
+                    <Border Grid.Row="0"
+                            Padding="0"
+                            BackgroundColor="{StaticResource PrimaryLight}"
+                            HeightRequest="35"
+                            Stroke="{StaticResource Primary}"
+                            StrokeShape="RoundRectangle 5"
+                            StrokeThickness="0.5">
+                        <SearchBar x:Name="locationSearchBar"
+                                   Placeholder="Ara..."
+                                   PlaceholderColor="{StaticResource OffBlack}"
+                                   TextColor="{StaticResource OffBlack}">
+                            <SearchBar.Behaviors>
+                                <toolkit:EventToCommandBehavior Command="{Binding LocationsPerformSearchCommand}" EventName="SearchButtonPressed" />
+                                <toolkit:EventToCommandBehavior Command="{Binding LocationsPerformEmptySearchCommand}" EventName="TextChanged" />
+                            </SearchBar.Behaviors>
+                        </SearchBar>
+                    </Border>
+
+                    <CollectionView Grid.Row="1"
+                                    ItemsSource="{Binding Locations}"
+                                    RemainingItemsThreshold="2"
+                                    RemainingItemsThresholdReachedCommand="{Binding LoadMoreLocationsCommand}">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="locationModel:LocationModel">
+                                <Border Padding="10"
+                                        BackgroundColor="{StaticResource WhiteSmoke}"
+                                        StrokeShape="RoundRectangle 10"
+                                        StrokeThickness="0.1">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByCustomerWarehouseListViewModel}}, Path=LocationTappedCommand}" CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <Border.Triggers>
+                                        <DataTrigger Binding="{Binding IsSelected}"
+                                                     TargetType="Border"
+                                                     Value="True">
+                                            <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+
+                                        <VerticalStackLayout Grid.Column="0">
+                                            <Label FontAttributes="Bold"
+                                                   LineBreakMode="TailTruncation"
+                                                   Text="{Binding Code}" />
+                                            <Label LineBreakMode="TailTruncation"
+                                                   Text="{Binding Name}"
+                                                   TextColor="{StaticResource Gray600}" />
+
+                                            <Label>
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span FontAttributes="Bold"
+                                                              FontFamily="FAS"
+                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Button Grid.Row="2"
+                            Command="{Binding ConfirmLocationsCommand}"
+                            Text="Tamam" />
+                </Grid>
+            </Grid>
+
+            <!--#endregion-->
+        </dx:BottomSheet>
+    </Grid>
+
+</ContentPage>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Deppo.Mobile.Modules.ProductModule.ProductMenu.Views.ActionViews.ProductDetailVariantTotalListView"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductMenu.ViewModels.ActionViewModels"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:model="clr-namespace:Deppo.Mobile.Core.Models.WarehouseModels;assembly=Deppo.Mobile.Core"
+             Title="{Binding Title}"
+             x:DataType="viewModel:ProductDetailVariantTotalListViewModel"
+             Shell.TabBarIsVisible="False"
+             Shell.PresentationMode="ModalAnimated">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                        EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android"
+                Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+
+    <Grid RowDefinitions="Auto, *"
+          RowSpacing="10">
+        <Grid Grid.Row="0"
+              Padding="10,10,0,0"
+              ColumnDefinitions="*, Auto">
+            <Label Grid.Column="0"
+                   FontAttributes="Bold"
+                   FontSize="Large"
+                   Text="{Binding Title}"
+                   TextColor="WhiteSmoke" />
+
+            <ImageButton Grid.Column="1"
+                         Command="{Binding BackCommand}"
+                         HeightRequest="32"
+                         HorizontalOptions="End">
+                <ImageButton.Source>
+                    <FontImageSource FontFamily="FAS"
+                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                                     Size="Medium"
+                                     Color="{StaticResource WhiteSmoke}" />
+                </ImageButton.Source>
+            </ImageButton>
+        </Grid>
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Items}"
+                        RemainingItemsThreshold="2"
+                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:WarehouseModel">
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0.1">
+
+                        <Grid ColumnDefinitions="Auto, *">
+                            <Border Grid.Column="0"
+                                    Padding="0,0,10,0"
+                                    BackgroundColor="Transparent"
+                                    StrokeThickness="0">
+                                <toolkit:AvatarView BackgroundColor="{StaticResource Primary}"
+                                                    BorderWidth="0.1"
+                                                    CornerRadius="50"
+                                                    FontAttributes="Bold"
+                                                    HorizontalOptions="Start"
+                                                    Text="{Binding Number}"
+                                                    TextColor="{StaticResource White}" />
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Padding="5"
+                                                 Spacing="5"
+                                                 VerticalOptions="Start">
+                                <Label FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="1"
+                                       Text="{Binding Name}"
+                                       VerticalOptions="Center" />
+                                <HorizontalStackLayout Spacing="5"
+                                                       VerticalOptions="Center">
+                                    <Image Aspect="AspectFit"
+                                           HeightRequest="16"
+                                           VerticalOptions="Center"
+                                           WidthRequest="16">
+                                        <Image.Source>
+                                            <FontImageSource FontFamily="FAS"
+                                                             Glyph="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                             Size="16"
+                                                             Color="{StaticResource Primary}" />
+                                        </Image.Source>
+                                    </Image>
+                                    <Label Text="{Binding Quantity, StringFormat='{0:N2}'}"
+                                           TextColor="{StaticResource Gray600}"
+                                           VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Grid>
+                        <Border.Triggers>
+                            <DataTrigger Binding="{Binding IsSelected}"
+                                         TargetType="Border"
+                                         Value="True">
+                                <Setter Property="BackgroundColor"
+                                        Value="{StaticResource SecondaryLight}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

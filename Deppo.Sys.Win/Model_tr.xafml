@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application>
+  <BOModel>
+    <Class Name="Deppo.Sys.Module.BusinessObjects.CustomerReleationship" Caption="Müşteri Malzeme İlişkileri">
+      <OwnMembers>
+        <Member Name="Customer" Caption="Müşteri" />
+        <Member Name="CustomerProductBarcode" Caption="Müşteri Malzeme Barkodu" />
+        <Member Name="CustomerProductCode" Caption="Müşteri Malzeme Kodu" />
+        <Member Name="CustomerProductName" Caption="Müşteri Malzeme Adı" />
+        <Member Name="FirmNumber" Caption="Firma Numarası" />
+        <Member Name="Product" Caption="Malzeme " />
+        <Member Name="ReferenceId" Caption="Referans Id" />
+      </OwnMembers>
+    </Class>
+    <Class Name="Deppo.Sys.Module.LogoBusinessObjects.LOGO_Dispatch" Caption="İrsaliyeler" />
+    <Class Name="Deppo.Sys.Module.LogoBusinessObjects.LOGO_DispatchTransaction" Caption="İrsaliye Satırları">
+      <OwnMembers>
+        <Member Name="Dispatch" Caption="İrsaliye" />
+      </OwnMembers>
+    </Class>
+  </BOModel>
+  <NavigationItems>
+    <Items>
+      <Item Id="ProductProcurementManagement">
+        <Items>
+          <Item Id="ProcurementFiche_ListView" Caption="Ürün Toplama Fişi" />
+        </Items>
+      </Item>
+    </Items>
+  </NavigationItems>
+  <Views>
+    <DetailView Id="CustomerReleationship_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="SimpleEditors">
+            <LayoutGroup Id="CustomerReleationship" Caption="Müşteri Malzeme İlişkileri" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <DetailView Id="LOGO_Dispatch_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="SimpleEditors">
+            <LayoutGroup Id="LOGO_Dispatch" Caption="İrsaliyeler" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <DetailView Id="LOGO_DispatchTransaction_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="SimpleEditors">
+            <LayoutGroup Id="LOGO_DispatchTransaction" Caption="İrsaliye Satırları" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+  </Views>
+</Application>

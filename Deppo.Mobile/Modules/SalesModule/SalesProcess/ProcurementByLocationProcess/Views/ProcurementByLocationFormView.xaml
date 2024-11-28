@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByLocationProcess.Views.ProcurementByLocationFormView"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByLocationProcess.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:ProcurementByLocationFormViewModel"
+             Shell.TabBarIsVisible="False"
+             Shell.PresentationMode="Modal">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                        EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+            <toolkit:IsNotEqualConverter x:Key="IsNotEqualConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem>
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.BasketShopping}"
+                                 Size="Large" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android"
+                Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding BackCommand}" />
+    </Shell.BackButtonBehavior>
+
+    
+    <Grid RowDefinitions="Auto,*, Auto"
+          RowSpacing="10">
+       
+            <Grid Grid.Row="0"
+                  Padding="10,10,0,0"
+                  ColumnDefinitions="*, Auto"
+                  ColumnSpacing="10">
+                <Label Grid.Column="0"
+                       FontAttributes="Bold"
+                       FontSize="Medium"
+                       Text="Form Bilgileri"
+                       TextColor="{StaticResource WhiteSmoke}"
+                       VerticalOptions="Center" />
+
+                <ImageButton Grid.Column="1"
+                             Command="{Binding BackCommand}"
+                             HeightRequest="25"
+                             HorizontalOptions="End">
+                    <ImageButton.Source>
+                        <FontImageSource FontFamily="FAS"
+                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                                         Size="Medium"
+                                         Color="{StaticResource WhiteSmoke}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </Grid>
+            <ScrollView Grid.Row="1"
+                    Orientation="Vertical">
+            <VerticalStackLayout Spacing="5">
+                <dx:FormGroupItem Header="Fiş Bilgileri"
+                                  HeaderFontAttributes="Bold"
+                                  HeaderFontSize="18">
+                    <dx:FormItem>
+                        <dx:FormItem.ContentTemplate>
+                            <DataTemplate>
+                                <VerticalStackLayout Spacing="5">
+                                    <dx:DateEdit Grid.Column="0"
+                                                 BorderColor="{StaticResource PrimaryLight}"
+                                                 Date="{Binding TransactionDate}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 LabelText="Fiş Tarihi"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.CalendarDay}" />
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 IsReadOnly="True"
+                                                 LabelText="Müşteri"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.User}"
+                                                 Text="{Binding ProcurementLocationFormModel.ProcurementCustomerModel.CustomerName}" />
+
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 IsReadOnly="True"
+                                                 LabelText="Giriş Ambarı"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding WarehouseModel.Name}" />
+
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 IsReadOnly="True"
+                                                 LabelText="Çıkış Ambarı"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding SelectedOrderWarehouseModel.Name}" />
+
+
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 LabelText="Belge Numarası"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding DocumentNumber}" />
+
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 LabelText="Özel Kod"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding SpecialCode}" />
+
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 LabelText="Açıklama"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding Description}" />
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </dx:FormItem.ContentTemplate>
+                    </dx:FormItem>
+                </dx:FormGroupItem>
+
+               
+            </VerticalStackLayout>
+        </ScrollView>
+
+
+        <Button Grid.Row="2"
+                Margin="5,10,5,20"
+                Command="{Binding ConfirmCommand}"
+                Text="Tamam"
+                VerticalOptions="End" />
+
+    </Grid>
+</ContentPage>

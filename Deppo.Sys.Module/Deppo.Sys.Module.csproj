@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <Deterministic>false</Deterministic>
+    <AssemblyVersion>1.0.*</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Configurations>Debug;Release;EasyTest</Configurations>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Model.DesignedDiffs.Localization.tr.xafml" />
+    <None Remove="Model.DesignedDiffs.xafml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Model.DesignedDiffs.Localization.tr.xafml">
+      <DependentUpon>Model.DesignedDiffs.xafml</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Model.DesignedDiffs.xafml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DevExpress.ExpressApp" Version="22.2.4" />
+    <PackageReference Include="DevExpress.ExpressApp.CloneObject.Xpo" Version="22.2.4" />
+    <PackageReference Include="DevExpress.ExpressApp.CodeAnalysis" Version="22.2.4" />
+    <PackageReference Include="DevExpress.ExpressApp.ConditionalAppearance" Version="22.2.4" />
+    <PackageReference Include="DevExpress.ExpressApp.Dashboards" Version="22.2.4" />
+    <PackageReference Include="DevExpress.ExpressApp.Objects" Version="22.2.4" />
+    <PackageReference Include="DevExpress.ExpressApp.PivotChart" Version="22.2.4" />
+    <PackageReference Include="DevExpress.ExpressApp.PivotGrid" Version="22.2.4" />
+    <PackageReference Include="DevExpress.ExpressApp.ReportsV2" Version="22.2.4" />
+    <PackageReference Include="DevExpress.ExpressApp.Security.Xpo" Version="22.2.4" />
+    <PackageReference Include="DevExpress.ExpressApp.Validation" Version="22.2.4" />
+    <PackageReference Include="DevExpress.ExpressApp.ViewVariantsModule" Version="22.2.4" />
+    <PackageReference Include="DevExpress.ExpressApp.Xpo" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Persistent.Base" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Persistent.BaseImpl.Xpo" Version="22.2.4" />
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DataStores\" />
+    <Folder Include="NonPersistenControllers\" />
+    <Folder Include="NonPersistentObjects\" />
+    <Folder Include="Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="UnusableNodes1_tr.xml">
+      <DependentUpon>Model.DesignedDiffs.xafml</DependentUpon>
+    </None>
+    <None Update="UnusableNodes2_tr.xml">
+      <DependentUpon>Model.DesignedDiffs.xafml</DependentUpon>
+    </None>
+    <None Update="UnusableNodes_tr.xml">
+      <DependentUpon>Model.DesignedDiffs.xafml</DependentUpon>
+    </None>
+  </ItemGroup>
+</Project>

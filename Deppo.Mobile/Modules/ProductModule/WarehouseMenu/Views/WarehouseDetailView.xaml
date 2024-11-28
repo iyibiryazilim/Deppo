@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views.WarehouseDetailView"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:actionModel="clr-namespace:Deppo.Mobile.Core.ActionModels.WarehouseActionModels;assembly=Deppo.Mobile.Core"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             Title="{Binding Title}"
+             Shell.TabBarIsVisible="False"
+             xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
+             x:DataType="viewModel:WarehouseDetailViewModel">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Order="Primary"
+                     Command="{Binding ActionModelProcessTappedCommand}">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.EllipsisVertical}"
+                                 Size="20" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                        EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
+                                   StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android"
+                Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <ScrollView Padding="0"
+                Orientation="Vertical">
+        <VerticalStackLayout Padding="10">
+            <Grid RowDefinitions="Auto,Auto,*"
+                  RowSpacing="10">
+                <VerticalStackLayout   Grid.Row="0"
+                                       Padding="10"
+                                       HorizontalOptions="Fill"
+                                       Spacing="10"
+                                       VerticalOptions="Center">
+                    <Border BackgroundColor="{StaticResource Primary}"
+                            HeightRequest="100"
+                            StrokeShape="RoundRectangle 50"
+                            StrokeThickness="0"
+                            VerticalOptions="Center"
+                            WidthRequest="100">
+                        <toolkit:AvatarView Text="{Binding WarehouseDetailModel.Warehouse.Number}"
+                                            TextColor="White"
+                                            BorderColor="Transparent"
+                                            FontSize="Title"
+                                            FontAttributes="Bold" />
+                    </Border>
+                    <!--#region Code, Name -->
+                    <VerticalStackLayout HorizontalOptions="Center"
+                                         Spacing="4">
+                        <Label FontAttributes="Bold"
+                               HorizontalOptions="Center"
+                               FontSize="Large"
+                               Text="{Binding WarehouseDetailModel.Warehouse.Name}" />
+
+                        <HorizontalStackLayout Spacing="20">
+                            <Label FontAttributes="Bold"
+                                   HorizontalOptions="Center"
+                                   TextColor="{StaticResource White}"
+                                   VerticalOptions="Center">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span FontFamily="FAS"
+                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Calendar}" />
+                                        <Span Text=" " />
+                                        <Span Text="{Binding WarehouseDetailModel.LastTransactionDate, StringFormat='{0:dd/MM/yyyy}'}"  />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Label FontAttributes="Bold"
+                                   HorizontalOptions="Center"
+                                   TextColor="{StaticResource White}"
+                                   VerticalOptions="Center">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span FontFamily="FAS"
+                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Clock}" />
+                                        <Span Text=" " />
+                                        <Span Text="{Binding WarehouseDetailModel.LastTransactionTime, StringFormat='{0:HH:mm}'}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                    <!--#endregion-->
+
+                    <!--#region Input, Output -->
+                    <Grid Padding="10,0,10,0"
+                          ColumnDefinitions=".50*, .50*"
+                          ColumnSpacing="10">
+                        <Border Grid.Column="0"
+                                StrokeShape="RoundRectangle 10"
+                                Padding="20,10,20,10"
+                                BackgroundColor="{StaticResource PrimaryLight}"
+                                StrokeThickness="0">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding InputQuantityTappedCommand}" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout VerticalOptions="Center">
+                                <Label HorizontalOptions="Center"
+                                       Text="{Binding WarehouseDetailModel.InputQuantity,StringFormat='{0:N2}'}"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource White}"
+                                       FontSize="Medium" />
+                                <Label HorizontalOptions="Center"
+                                       Text="Giriş"
+                                       TextColor="{StaticResource WhiteSmoke}" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Border Grid.Column="1"
+                                Padding="20,10,20,10"
+                                StrokeShape="RoundRectangle 10"
+                                BackgroundColor="{StaticResource PrimaryLight}"
+                                StrokeThickness="0">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding OutputQuantityTappedCommand}" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout VerticalOptions="Center">
+                                <Label HorizontalOptions="Center"
+                                       Text="{Binding WarehouseDetailModel.OutputQuantity,StringFormat='{0:N2}'}"
+                                       TextColor="{StaticResource White}"
+                                       FontAttributes="Bold"
+                                       FontSize="Medium" />
+                                <Label HorizontalOptions="Center"
+                                       Text="Çıkış"
+                                       TextColor="{StaticResource WhiteSmoke}" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </Grid>
+                    <Border Margin="10,0,10,0"
+                            Padding="10"
+                            BackgroundColor="{StaticResource Secondary}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 10"
+                            VerticalOptions="Center">
+
+                        <Grid ColumnDefinitions=".10*,.70*,.20*"
+                              ColumnSpacing="5">
+                            <Border Grid.Column="0"
+                                    HorizontalOptions="Start"
+                                    StrokeThickness="0">
+                                <toolkit:AvatarView Padding="2"
+                                                    BorderColor="{StaticResource Black}"
+                                                    CornerRadius="15"
+                                                    FontFamily="FAS"
+                                                    FontSize="14"
+                                                    HeightRequest="30"
+                                                    HorizontalOptions="End"
+                                                    Text="{x:Static fontAwesome:FontAwesomeIcons.Cubes}"
+                                                    TextColor="{StaticResource Black}"
+                                                    WidthRequest="30" />
+                            </Border>
+
+                            <Label Grid.Column="1"
+                                   FontAttributes="Bold"
+                                   FontSize="14"
+                                   HorizontalOptions="Start"
+                                   Text="Ambar Referans Sayısı : "
+                                   VerticalOptions="Center" />
+                            <Label Grid.Column="2"
+                                   FontAttributes="Bold"
+                                   FontSize="14"
+                                   HorizontalOptions="Center"
+                                   Text="{Binding WarehouseDetailModel.WarehouseReferenceCount, StringFormat='{0:N2}'}"
+                                   VerticalOptions="Center" />
+                        </Grid>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToWarehouseTotalListCommand}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                </VerticalStackLayout>
+
+                <Border Grid.Row="1"
+                        Padding="10"
+                        BackgroundColor="{StaticResource White}"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 10">
+                    <Grid RowDefinitions=".20*,.80*"
+                          RowSpacing="10">
+                        <VerticalStackLayout>
+                            <Label FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   Text="Giriş / Çıkış Analizi"
+                                   TextColor="{StaticResource Primary}" />
+                            <Label FontSize="Caption"
+                                   Text="Giriş / Çıkış Miktarları"
+                                   TextColor="{StaticResource Gray500}" />
+                        </VerticalStackLayout>
+
+                        <dx:ChartView Grid.Row="1"
+                                      MaximumHeightRequest="330">
+                            <dx:ChartView.Series>
+                                <dx:AreaSeries DisplayName="Giren Malzeme Miktarı">
+                                    <!--  Bind the series to the data source.  -->
+                                    <dx:AreaSeries.Data>
+                                        <dx:SeriesDataAdapter ArgumentDataMember="Argument"
+                                                              DataSource="{Binding WarehouseDetailModel.ProductReferences}">
+                                            <dx:ValueDataMember Member="InputQuantity"
+                                                                Type="Value" />
+                                        </dx:SeriesDataAdapter>
+                                    </dx:AreaSeries.Data>
+                                    <dx:AreaSeries.Style>
+                                        <dx:AreaSeriesStyle Fill="{StaticResource Secondary}">
+                                            <dx:AreaSeriesStyle.FillEffect>
+                                                <dx:TransparencyGradient BaselineAlpha="0"
+                                                                         SeriesLineAlpha="0.6" />
+                                            </dx:AreaSeriesStyle.FillEffect>
+                                        </dx:AreaSeriesStyle>
+                                    </dx:AreaSeries.Style>
+                                </dx:AreaSeries>
+                                <dx:AreaSeries DisplayName="Çıkan Malzeme Miktarı">
+                                    <!--  Bind the series to the data source.  -->
+                                    <dx:AreaSeries.Data>
+                                        <dx:SeriesDataAdapter ArgumentDataMember="Argument"
+                                                              DataSource="{Binding WarehouseDetailModel.ProductReferences}">
+                                            <dx:ValueDataMember Member="OutputQuantity"
+                                                                Type="Value" />
+                                        </dx:SeriesDataAdapter>
+                                    </dx:AreaSeries.Data>
+                                    <dx:AreaSeries.Style>
+                                        <dx:AreaSeriesStyle Fill="{StaticResource Primary}">
+                                            <dx:AreaSeriesStyle.FillEffect>
+                                                <dx:TransparencyGradient BaselineAlpha="0"
+                                                                         SeriesLineAlpha="0.4" />
+                                            </dx:AreaSeriesStyle.FillEffect>
+                                        </dx:AreaSeriesStyle>
+                                    </dx:AreaSeries.Style>
+                                </dx:AreaSeries>
+                            </dx:ChartView.Series>
+
+                            <dx:ChartView.AxisY>
+                                <dx:NumericAxisY AlwaysShowZeroLevel="False"
+                                                 AutoRangeMode="VisibleValues">
+                                    <dx:NumericAxisY.Label>
+                                        <dx:AxisLabel>
+                                            <dx:AxisLabel.Style>
+                                                <dx:AxisLabelStyle>
+                                                    <dx:AxisLabelStyle.TextStyle>
+                                                        <dx:TextStyle Size="12" />
+                                                    </dx:AxisLabelStyle.TextStyle>
+                                                </dx:AxisLabelStyle>
+                                            </dx:AxisLabel.Style>
+                                        </dx:AxisLabel>
+                                    </dx:NumericAxisY.Label>
+                                </dx:NumericAxisY>
+                            </dx:ChartView.AxisY>
+                            <!-- <dx:ChartView.AxisY>
+    <dx:NumericAxisY>
+        <dx:NumericAxisY.Title>
+            <dx:AxisTitle Text="Intensivity, %" />
+        </dx:NumericAxisY.Title>
+        <dx:NumericAxisY.Style>
+            <dx:AxisStyle InterlacedColor="#22DDDDDD" InterlacedVisible="True" />
+        </dx:NumericAxisY.Style>
+    </dx:NumericAxisY>
+</dx:ChartView.AxisY>-->
+                            <dx:ChartView.Legend>
+                                <dx:Legend />
+                            </dx:ChartView.Legend>
+                        </dx:ChartView>
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Row="2">
+
+                    <Grid Grid.Row="1"
+                          RowDefinitions="Auto, *"
+                          RowSpacing="10">
+                        <Grid ColumnDefinitions="*, Auto"
+                              ColumnSpacing="10">
+                            <Label Grid.Column="0"
+                                   FontAttributes="Bold"
+                                   FontSize="18"
+                                   VerticalOptions="Center"
+                                   Text="Son Hareketler"
+                                   TextColor="{StaticResource OffBlack}" />
+
+                            <Border Grid.Column="1"
+                                    VerticalOptions="Center"
+                                    Padding="5"
+                                    BackgroundColor="{StaticResource Primary}"
+                                    HorizontalOptions="End"
+                                    Stroke="{StaticResource Primary}"
+                                    StrokeShape="RoundRectangle 10">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding AllFicheTappedCommand}" />
+                                </Border.GestureRecognizers>
+                                <Label FontFamily="FAS"
+                                       VerticalOptions="Center"
+                                       FontSize="15"
+                                       TextColor="{StaticResource White}">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+
+                                            <Span FontAttributes="Bold"
+                                                  Text="Tüm Hareketler"
+                                                  TextColor="{StaticResource White}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </Border>
+                        </Grid>
+
+                        <CollectionView Grid.Row="1"
+                                        ItemsSource="{Binding WarehouseDetailModel.LastFiches}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="model:WarehouseFiche">
+                                    <Border Padding="5"
+                                            BackgroundColor="Transparent"
+                                            StrokeThickness="0.1">
+                                        <Grid ColumnDefinitions="Auto, *"
+                                              ColumnSpacing="10">
+                                            <Border Grid.Column="0"
+                                                    Padding="5"
+                                                    BackgroundColor="{StaticResource Secondary}"
+                                                    StrokeThickness="0"
+                                                    StrokeShape="RoundRectangle 10">
+                                                <VerticalStackLayout Spacing="0"
+                                                                     VerticalOptions="Center">
+                                                    <Label FontAttributes="Bold"
+                                                           FontSize="13"
+                                                           HorizontalOptions="Center"
+                                                           Text="{Binding FicheDate, StringFormat='{0:dd}'}"
+                                                           TextColor="{StaticResource OffBlack}" />
+                                                    <Label HorizontalOptions="Center"
+                                                           FontSize="13"
+                                                           Text="{Binding FicheDate, StringFormat='{0:MM/yyyy}'}"
+                                                           TextColor="{StaticResource OffBlack}" />
+                                                    <Label HorizontalOptions="Center"
+                                                           FontSize="12"
+                                                           Text="{Binding FicheTime, StringFormat='{0:hh\\:mm}'}"
+                                                           TextColor="{StaticResource Black}" />
+                                                </VerticalStackLayout>
+                                            </Border>
+
+                                            <VerticalStackLayout Grid.Column="1"
+                                                                 Spacing="1"
+                                                                 VerticalOptions="Center">
+                                                <Label FontAttributes="Bold"
+                                                       FontSize="14"
+                                                       Text="{Binding FicheNumber}" />
+                                                <Label FontSize="13"
+                                                       LineBreakMode="TailTruncation"
+                                                       Text="{Binding CurrentName}" />
+
+                                                <Label FontSize="13"
+                                                       LineBreakMode="TailTruncation"
+                                                       Text="{Binding FicheTypeName}" />
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WarehouseDetailViewModel}}, Path=ItemTappedCommand}"
+                                                                  CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </Grid>
+                </Grid>
+
+                <dx:BottomSheet x:Name="processBottomSheet"
+                                AllowDismiss="True"
+                                BackgroundColor="White"
+                                CornerRadius="15"
+                                HalfExpandedRatio="0.5"
+                                IsModal="True"
+                                ShowGrabber="True">
+                    <Grid RowDefinitions="Auto,*"
+                          RowSpacing="20"
+                          Padding="10">
+                        <VerticalStackLayout Grid.Row="0"
+                                             Spacing="5">
+                            <Label FontAttributes="Bold"
+                                   Padding="10"
+                                   FontSize="18"
+                                   Text="İşlemler" />
+                            <BoxView HeightRequest="2"
+                                     Color="{StaticResource Primary}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Row="1"
+                                             Spacing="10">
+                            <CollectionView Grid.Row="0"
+                                            ItemsSource="{Binding WarehouseActionModels}">
+                                <CollectionView.ItemsLayout>
+                                    <LinearItemsLayout ItemSpacing="0"
+                                                       Orientation="Vertical" />
+                                </CollectionView.ItemsLayout>
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="actionModel:WarehouseDetailActionModel">
+
+                                        <Border Padding="10"
+                                                BackgroundColor="Transparent"
+                                                StrokeShape="RoundRectangle 10"
+                                                StrokeThickness="0.1">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WarehouseDetailViewModel}}, Path=ActionModelsTappedCommand}"
+                                                                      CommandParameter="{Binding .}" />
+                                            </Border.GestureRecognizers>
+                                            <Grid ColumnDefinitions="Auto, *">
+
+                                                <VerticalStackLayout Grid.Column="1"
+                                                                     Padding="5"
+                                                                     Spacing="5"
+                                                                     VerticalOptions="Start">
+                                                    <Label FontAttributes="Bold"
+                                                           LineBreakMode="TailTruncation"
+                                                           MaxLines="1"
+                                                           VerticalOptions="End"
+                                                           Text="{Binding ActionName}" />
+                                                </VerticalStackLayout>
+                                            </Grid>
+                                            <Border.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected}"
+                                                             TargetType="Border"
+                                                             Value="True">
+                                                    <Setter Property="BackgroundColor"
+                                                            Value="{StaticResource SecondaryLight}" />
+                                                </DataTrigger>
+                                            </Border.Triggers>
+                                        </Border>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Grid>
+                </dx:BottomSheet>
+                <dx:BottomSheet x:Name="ficheTransactionBottomSheet"
+                                Grid.Row="1"
+                                AllowDismiss="True"
+                                BackgroundColor="White"
+                                CornerRadius="15"
+                                HalfExpandedRatio="0.3"
+                                IsModal="True"
+                                ShowGrabber="True">
+                    <!--#region BottomSheetContent-->
+                    <Grid Padding="10"
+                          RowDefinitions="Auto,*"
+                          RowSpacing="20">
+                        <VerticalStackLayout Grid.Row="0"
+                                             Spacing="5">
+                            <Label FontAttributes="Bold"
+                                   FontSize="16"
+                                   Text="{Binding SelectedWarehouseFiche.FicheNumber}" />
+                            <Label FontAttributes="Bold"
+                                   FontSize="Subtitle"
+                                   Text="Malzemeler" />
+                            <BoxView HeightRequest="2"
+                                     Color="{StaticResource OffBlack}" />
+                        </VerticalStackLayout>
+
+                        <CollectionView Grid.Row="1"
+                                        ItemsSource="{Binding WarehouseDetailModel.LastTransactions}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="model:WarehouseTransaction">
+                                    <Border Padding="5"
+                                            BackgroundColor="Transparent"
+                                            StrokeThickness="0.1">
+                                        <Grid ColumnDefinitions="Auto, *"
+                                              ColumnSpacing="10">
+                                            <Border Grid.Column="0"
+                                                    Padding="5"
+                                                    StrokeShape="RoundRectangle 10">
+                                                <VerticalStackLayout Spacing="1"
+                                                                     VerticalOptions="Center">
+                                                    <Image Grid.Column="0"
+                                                           HeightRequest="50"
+                                                           Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                                           WidthRequest="50" />
+                                                </VerticalStackLayout>
+                                            </Border>
+
+                                            <VerticalStackLayout Grid.Column="1"
+                                                                 Spacing="1"
+                                                                 VerticalOptions="Center">
+                                                <Label FontAttributes="Bold"
+                                                       FontSize="15"
+                                                       Text="{Binding ProductCode}" />
+                                                <Label FontSize="13"
+                                                       LineBreakMode="TailTruncation"
+                                                       Text="{Binding ProductName}" />
+
+                                                <HorizontalStackLayout Spacing="5">
+                                                    <Label FontFamily="FAS"
+                                                           FontSize="Small"
+                                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
+                                                           TextColor="{StaticResource Primary}"
+                                                           VerticalOptions="Center" />
+                                                    <Label>
+                                                        <Label.FormattedText>
+                                                            <FormattedString>
+                                                                <Span FontAttributes="Bold"
+                                                                      Text="{Binding Quantity,StringFormat='{0:N2}'}" />
+                                                                <Span Text=" " />
+                                                                <Span FontAttributes="Bold"
+                                                                      Text="{Binding SubUnitsetCode}" />
+                                                            </FormattedString>
+                                                        </Label.FormattedText>
+                                                    </Label>
+                                                    <Image>
+                                                        <Image.Source>
+                                                            <FontImageSource FontFamily="FAS"
+                                                                             Glyph="{Binding IOTypeImageSource}"
+                                                                             Size="16"
+                                                                             Color="{StaticResource Primary}" />
+                                                        </Image.Source>
+                                                    </Image>
+                                                    <Label Text="{Binding IOTypeName}" />
+                                                </HorizontalStackLayout>
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </Grid>
+
+                    <!--#endregion-->
+                </dx:BottomSheet>
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

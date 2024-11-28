@@ -1,0 +1,90 @@
+﻿<div class="card mb-5 mb-xl-8">
+	<!--begin::Header-->
+	<div class="card-header border-0 pt-5">
+		<h3 class="card-title align-items-start flex-column">
+			<span class="card-label fw-bold fs-3">Negatif Malzeme Listesi</span>
+		</h3>
+
+		<!--begin::Card toolbar-->
+		<div class="card-toolbar">
+			<!--begin::Toolbar-->
+			<div class="d-flex justify-content-end m-3" data-kt-customer-table-toolbar="base">
+
+				@* <!--begin::Export dropdown-->
+				<button type="button" class="btn btn-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+				<i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span class="path2"></span></i>
+				Dışarı Aktar
+				</button> *@
+				@* 				<!--begin::Menu-->
+				<div id="kt_datatable_example_export_menu" class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4" data-kt-menu="true">
+
+				<!--begin::Menu item-->
+				<div class="menu-item px-3">
+				<a href="#" class="menu-link px-3" data-kt-export="excel">
+				Excel Dışarı Aktar
+				</a>
+				</div>
+				<!--end::Menu item-->
+				<!--begin::Menu item-->
+				<div class="menu-item px-3">
+				<a href="#" class="menu-link px-3" data-kt-export="pdf">
+				PDF Dışarı Aktar
+				</a>
+				</div>
+				<!--end::Menu item-->
+				</div>
+				<!--end::Menu--> *@
+				<!--end::Export dropdown-->
+				<div id="kt_datatable_example_buttons" class="d-none"></div>
+
+			</div>
+
+			<div class="d-flex align-items-center position-relative my-1">
+				<i class="ki-outline ki-magnifier fs-3 position-absolute ms-5"></i>
+				<input type="text" id="negativeProductSearchInput" negative_product_list_table="search" class="form-control form-control-solid w-250px ps-12" placeholder="Malzeme Ara" />
+			</div>
+			<!--end::Toolbar-->
+
+		</div>
+		<!--end::Card toolbar-->
+	</div>
+	<!--end::Header-->
+	<!--begin::Body-->
+	<div class="card-body py-3">
+		<div id="loadingIndicator" class="loading-indicator" style="display: none;">
+			<div class="spinner-border text-primary" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
+		<!--begin::Table container-->
+		<div class="table-responsive">
+			<!--begin::Table-->
+			<table class="table align-middle gs-0 gy-4" id="negative_product_list_table">
+				<!--begin::Table head-->
+				<thead>
+					<tr class="fw-bold text-muted bg-light">
+						<th class="ps-4 min-w-175px rounded-start">Ürün</th>
+						<th class="min-w-100px">Stok Miktarı</th>
+						<th class="min-w-100px">Grup</th>
+						<th class="min-w-100px">Marka</th>
+						<th class="min-w-80px">Varyantlı</th>
+						<th class="min-w-80px rounded-end">Stok Yeri Takibi</th>
+
+					</tr>
+				</thead>
+				<!--end::Table head-->
+				<!--begin::Table body-->
+				<tbody>
+				</tbody>
+				<!--end::Table body-->
+			</table>
+			<!--end::Table-->
+		</div>
+		<!--end::Table container-->
+	</div>
+	<!--begin::Body-->
+</div>
+<!--end::Tables Widget 11-->
+@section Scripts {
+    <script src="~/assets/js/helix/countingmodule/negativeproductlist.js"></script>
+}

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views.WarehouseListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.WarehouseMenu.ViewModels"
+             Title="{Binding Title}"
+             Shell.NavBarIsVisible="True">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                        EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PrimaryLight}"
+                                   StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android"
+                Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <!--#region Warehouse List-->
+    <Grid RowDefinitions="Auto, *"
+          RowSpacing="10">
+        <!--#region Search area-->
+        <Border Grid.Row="0"
+                Margin="0,0,0,0"
+                StrokeShape="RoundRectangle 5"
+                StrokeThickness="0">
+            <Grid ColumnDefinitions="*">
+                <Border Grid.Row="0"
+                        Margin="5,0,5,0"
+                        Padding="0"
+                        BackgroundColor="{StaticResource PrimaryLight}"
+                        HeightRequest="35"
+                        Stroke="{StaticResource Primary}"
+                        StrokeShape="RoundRectangle 5"
+                        StrokeThickness="0.5">
+                    <SearchBar x:Name="searchBar"
+                               Placeholder="Ara..."
+                               PlaceholderColor="{StaticResource OffBlack}"
+                               TextColor="{StaticResource OffBlack}">
+                        <SearchBar.Behaviors>
+                            <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                            EventName="SearchButtonPressed" />
+                            <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}"
+                                                            EventName="TextChanged" />
+                        </SearchBar.Behaviors>
+                    </SearchBar>
+                </Border>
+            </Grid>
+        </Border>
+        <!--#endregion-->
+
+        <!--#region Main List-->
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Items}"
+                        RemainingItemsThreshold="2"
+                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:Warehouse">
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeThickness="0.1">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WarehouseListViewModel}}, Path=ItemTappedCommand}"
+                                                  CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto, *">
+                            <Border Grid.Column="0"
+                                    Padding="0,0,10,0"
+                                    BackgroundColor="Transparent"
+                                    StrokeThickness="0">
+                                <toolkit:AvatarView BackgroundColor="{StaticResource Primary}"
+                                                    BorderWidth="0.1"
+                                                    CornerRadius="50"
+                                                    FontAttributes="Bold"
+                                                    HorizontalOptions="Start"
+                                                    Text="{Binding Number}"
+                                                    TextColor="{StaticResource White}" />
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Padding="5"
+                                                 Spacing="5"
+                                                 VerticalOptions="Start">
+                                <Label FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="1"
+                                       Text="{Binding Name}" />
+                                <Label FontAttributes="None"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="1"
+                                       Text="{Binding City, FallbackValue='-', TargetNullValue='-'}"
+                                       TextColor="{StaticResource Gray600}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <!--#endregion-->
+    </Grid>
+</ContentPage>

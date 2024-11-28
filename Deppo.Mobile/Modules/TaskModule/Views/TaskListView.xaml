@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.TaskModule.Views.TaskListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:taskModel="clr-namespace:Deppo.Mobile.Core.Models.TaskModels;assembly=Deppo.Mobile.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.TaskModule.ViewModels"
+             Title="{Binding Title}"
+             Shell.TabBarIsVisible="False"
+             x:DataType="viewModel:TaskListViewModel">
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid Padding="0,10,0,20"
+          RowDefinitions="Auto, *"
+          RowSpacing="10">
+        <Grid Margin="5,0,5,0"
+              ColumnDefinitions="*, Auto"
+              ColumnSpacing="10"
+              HeightRequest="40">
+            <Border Grid.Column="0"
+                    Padding="0"
+                    BackgroundColor="{StaticResource PrimaryLight}"
+                    Stroke="{StaticResource Primary}"
+                    StrokeShape="RoundRectangle 5"
+                    StrokeThickness="0.5">
+                <SearchBar x:Name="searchBar"
+                           Placeholder="Ara..."
+                           PlaceholderColor="{StaticResource OffBlack}"
+                           TextColor="{StaticResource OffBlack}" />
+            </Border>
+            <Border Grid.Column="1"
+                    Padding="10"
+                    BackgroundColor="{StaticResource PrimaryLight}"
+                    Stroke="{StaticResource Primary}"
+                    StrokeShape="RoundRectangle 200"
+                    StrokeThickness="0.5"
+                    WidthRequest="40">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding FilterIconTappedCommand}" />
+                </Border.GestureRecognizers>
+                <Image>
+                    <Image.Source>
+                        <FontImageSource FontFamily="FAS"
+                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Sort}"
+                                         Size="20"
+                                         Color="{StaticResource WhiteSmoke}" />
+                    </Image.Source>
+                </Image>
+            </Border>
+        </Grid>
+
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Items}">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="taskModel:TaskListModel">
+                    <SwipeView Threshold="100">
+                        <SwipeView.LeftItems>
+                            <SwipeItems Mode="Execute">
+                                <SwipeItemView BackgroundColor="{StaticResource PrimaryLight}"
+                                               Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:TaskListViewModel}}, Path=SwipeItemCommand}"
+                                               CommandParameter="{Binding .}">
+                                    <Label HorizontalOptions="Center"
+                                           TextColor="{StaticResource White}"
+                                           VerticalOptions="Center">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="Durum Değiştir" TextColor="White" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </SwipeItemView>
+                            </SwipeItems>
+                        </SwipeView.LeftItems>
+                        <Border Padding="5"
+                                BackgroundColor="Transparent"
+                                StrokeThickness="0.1">
+                            <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="10">
+                                <Border Grid.Column="0"
+                                        Padding="5"
+                                        BackgroundColor="{StaticResource Secondary}"
+                                        StrokeShape="RoundRectangle 10">
+                                    <VerticalStackLayout Spacing="0" VerticalOptions="Center">
+                                        <Label FontAttributes="Bold"
+                                               FontSize="13"
+                                               HorizontalOptions="Center"
+                                               Text="{Binding CreatedOn, StringFormat='{0:dd}'}"
+                                               TextColor="{StaticResource OffBlack}" />
+                                        <Label FontSize="13"
+                                               HorizontalOptions="Center"
+                                               Text="{Binding CreatedOn, StringFormat='{0:MM/yyyy}'}"
+                                               TextColor="{StaticResource OffBlack}" />
+                                        <Label FontSize="12"
+                                               HorizontalOptions="Center"
+                                               Text="{Binding CreatedOn, StringFormat='{0:hh\\:mm}'}"
+                                               TextColor="{StaticResource Black}" />
+                                    </VerticalStackLayout>
+                                </Border>
+
+                                <VerticalStackLayout Grid.Column="1"
+                                                     Spacing="1"
+                                                     VerticalOptions="Center">
+                                    <Label FontAttributes="Bold"
+                                           Text="{Binding Subject}"
+                                           ToolTipProperties.Text="{Binding Subject}" />
+                                    <Label LineBreakMode="TailTruncation"
+                                           Text="{Binding Description}"
+                                           TextColor="{StaticResource Gray600}"
+                                           ToolTipProperties.Text="{Binding Description}" />
+
+                                    <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
+
+                                        <Border BackgroundColor="{Binding PriorityColor}"
+                                                HeightRequest="5"
+                                                StrokeShape="RoundRectangle 100"
+                                                StrokeThickness="0"
+                                                VerticalOptions="Center"
+                                                WidthRequest="5" />
+
+                                        <Label FontAttributes="Bold"
+                                               FontSize="13"
+                                               LineBreakMode="TailTruncation"
+                                               Text="{Binding PriorityText}"
+                                               TextColor="{StaticResource Gray600}"
+                                               VerticalOptions="Start" />
+                                    </HorizontalStackLayout>
+
+                                </VerticalStackLayout>
+
+                                <Border Grid.Column="2"
+                                        Padding="8,5,8,5"
+                                        BackgroundColor="{Binding StatusColor}"
+                                        StrokeShape="RoundRectangle 10"
+                                        StrokeThickness="0"
+                                        VerticalOptions="Start">
+                                    <Label FontSize="12"
+                                           Text="{Binding StatusText}"
+                                           TextColor="{Binding StatusTextColor}" />
+                                </Border>
+                            </Grid>
+
+                        </Border>
+                    </SwipeView>
+
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <dx:BottomSheet x:Name="filterBottomSheet"
+                        Grid.Row="1"
+                        Padding="10,30,10,10"
+                        AllowDismiss="True"
+                        BackgroundColor="{StaticResource White}"
+                        CornerRadius="10"
+                        HalfExpandedRatio="0.4"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <Grid RowDefinitions="Auto, *" RowSpacing="10">
+                <Grid Grid.Row="0"
+                      ColumnDefinitions="Auto, *"
+                      ColumnSpacing="0">
+                    <Label FontSize="18"
+                           Text="İptal"
+                           TextColor="{StaticResource Gray400}">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CloseFilterBottomSheetCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label Grid.ColumnSpan="2"
+                           FontAttributes="Bold"
+                           FontSize="18"
+                           HorizontalOptions="Center"
+                           Text="Filtrele"
+                           VerticalOptions="Center" />
+                </Grid>
+                <VerticalStackLayout Grid.Row="1">
+                    <Border Padding="0,10,0,10" StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding AllItemsFilterTappedCommand}" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto, *" ColumnSpacing="5">
+                            <Border Grid.Column="0"
+                                    Background="{StaticResource Gray600}"
+                                    HeightRequest="5"
+                                    StrokeShape="RoundRectangle 100"
+                                    StrokeThickness="0"
+                                    VerticalOptions="Center"
+                                    WidthRequest="5" />
+                            <Label Grid.Column="1"
+                                   FontSize="16"
+                                   LineBreakMode="TailTruncation"
+                                   MaxLines="1"
+                                   Text="Tümü" />
+                        </Grid>
+                    </Border>
+
+                    <Border Padding="0,10,0,10" StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding NotStartedFilterTappedCommand}" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto, *" ColumnSpacing="5">
+                            <Border Grid.Column="0"
+                                    Background="{StaticResource Gray600}"
+                                    HeightRequest="5"
+                                    StrokeShape="RoundRectangle 100"
+                                    StrokeThickness="0"
+                                    VerticalOptions="Center"
+                                    WidthRequest="5" />
+                            <Label Grid.Column="1"
+                                   FontSize="16"
+                                   LineBreakMode="TailTruncation"
+                                   MaxLines="1"
+                                   Text="Başlamayan Görevler" />
+                        </Grid>
+                    </Border>
+
+                    <Border Padding="0,10,0,10" StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding InProgressFilterTappedCommand}" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto, *" ColumnSpacing="5">
+                            <Border Grid.Column="0"
+                                    Background="{StaticResource Gray600}"
+                                    HeightRequest="5"
+                                    StrokeShape="RoundRectangle 100"
+                                    StrokeThickness="0"
+                                    VerticalOptions="Center"
+                                    WidthRequest="5" />
+                            <Label Grid.Column="1"
+                                   FontSize="16"
+                                   LineBreakMode="TailTruncation"
+                                   MaxLines="1"
+                                   Text="Devam Eden Görevler" />
+                        </Grid>
+                    </Border>
+
+                    <Border Padding="0,10,0,10" StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding WaitingFilterTappedCommand}" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto, *" ColumnSpacing="5">
+                            <Border Grid.Column="0"
+                                    Background="{StaticResource Gray600}"
+                                    HeightRequest="5"
+                                    StrokeShape="RoundRectangle 100"
+                                    StrokeThickness="0"
+                                    VerticalOptions="Center"
+                                    WidthRequest="5" />
+                            <Label Grid.Column="1"
+                                   FontSize="16"
+                                   LineBreakMode="TailTruncation"
+                                   MaxLines="1"
+                                   Text="Bekleyen Görevler" />
+                        </Grid>
+                    </Border>
+
+                    <Border Padding="0,10,0,10" StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CompletedFilterTappedCommand}" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto, *" ColumnSpacing="5">
+                            <Border Grid.Column="0"
+                                    Background="{StaticResource Gray600}"
+                                    HeightRequest="5"
+                                    StrokeShape="RoundRectangle 100"
+                                    StrokeThickness="0"
+                                    VerticalOptions="Center"
+                                    WidthRequest="5" />
+                            <Label Grid.Column="1"
+                                   FontSize="16"
+                                   LineBreakMode="TailTruncation"
+                                   MaxLines="1"
+                                   Text="Tamamlanan Görevler" />
+                        </Grid>
+                    </Border>
+
+                    <Border Padding="0,10,0,10" StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CancelledFilterTappedCommand}" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto, *" ColumnSpacing="5">
+                            <Border Grid.Column="0"
+                                    Background="{StaticResource Gray600}"
+                                    HeightRequest="5"
+                                    StrokeShape="RoundRectangle 100"
+                                    StrokeThickness="0"
+                                    VerticalOptions="Center"
+                                    WidthRequest="5" />
+                            <Label Grid.Column="1"
+                                   FontSize="16"
+                                   LineBreakMode="TailTruncation"
+                                   MaxLines="1"
+                                   Text="İptal Edilen Görevler" />
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+            </Grid>
+
+        </dx:BottomSheet>
+
+        <dx:BottomSheet x:Name="changeStatusBottomSheet"
+                        Grid.Row="1"
+                        Padding="10,30,10,10"
+                        AllowDismiss="True"
+                        BackgroundColor="{StaticResource White}"
+                        CornerRadius="10"
+                        HalfExpandedRatio="0.4"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <Grid RowDefinitions="Auto, *" RowSpacing="10">
+                <Grid Grid.Row="0"
+                      ColumnDefinitions="Auto, *"
+                      ColumnSpacing="0">
+                    <Label FontSize="18"
+                           Text="İptal"
+                           TextColor="{StaticResource Gray400}">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CloseChangeStatusBottomSheetCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label Grid.ColumnSpan="2"
+                           FontAttributes="Bold"
+                           FontSize="18"
+                           HorizontalOptions="Center"
+                           Text="Durum Değiştir"
+                           VerticalOptions="Center" />
+                </Grid>
+
+                <CollectionView Grid.Row="1" ItemsSource="{Binding StatusItems}">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="viewModel:StatusModel">
+                            <Border Padding="0,10,0,10" StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:TaskListViewModel}}, Path=StatusItemTappedCommand}" CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto, *" ColumnSpacing="5">
+                                    <Border Grid.Column="0"
+                                            Background="{StaticResource Gray600}"
+                                            HeightRequest="5"
+                                            StrokeShape="RoundRectangle 100"
+                                            StrokeThickness="0"
+                                            VerticalOptions="Center"
+                                            WidthRequest="5" />
+                                    <Label Grid.Column="1"
+                                           FontSize="16"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="1"
+                                           Text="{Binding StatusName}" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+
+        </dx:BottomSheet>
+    </Grid>
+</ContentPage>

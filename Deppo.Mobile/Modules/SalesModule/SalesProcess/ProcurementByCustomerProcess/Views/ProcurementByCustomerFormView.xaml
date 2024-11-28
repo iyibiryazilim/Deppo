@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.Views.ProcurementByCustomerFormView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:coreModel="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:locationModel="clr-namespace:Deppo.Mobile.Core.Models.LocationModels;assembly=Deppo.Mobile.Core"
+             xmlns:procurementModels="clr-namespace:Deppo.Mobile.Core.Models.ProcurementModels.ByCustomerModels;assembly=Deppo.Mobile.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:ProcurementByCustomerFormViewModel"
+             Shell.TabBarIsVisible="False">
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+            <toolkit:IsNotEqualConverter x:Key="IsNotEqualConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <!--<ContentPage.ToolbarItems>
+        <ToolbarItem>
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.BasketShopping}"
+                                 Size="Large" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>-->
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding BackCommand}" />
+    </Shell.BackButtonBehavior>
+
+    <Grid RowDefinitions="*, Auto" RowSpacing="10">
+        <ScrollView Grid.Row="0" Orientation="Vertical">
+            <VerticalStackLayout Spacing="5">
+                <dx:FormGroupItem Header="Fiş Bilgileri"
+                                  HeaderFontAttributes="Bold"
+                                  HeaderFontSize="18">
+                    <dx:FormItem>
+                        <dx:FormItem.ContentTemplate>
+                            <DataTemplate>
+                                <VerticalStackLayout Spacing="5">
+                                    <dx:DateEdit Grid.Column="0"
+                                                 BorderColor="{StaticResource PrimaryLight}"
+                                                 Date="{Binding TransactionDate}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 LabelText="Fiş Tarihi"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.CalendarDay}" />
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 IsReadOnly="True"
+                                                 LabelText="Müşteri"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.User}"
+                                                 Text="{Binding ProcurementCustomerBasketModel.CustomerName}" />
+
+
+
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 IsReadOnly="True"
+                                                 LabelText="Çıkış Ambarı"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding ProcurementCustomerBasketModel.WarehouseName}" />
+
+
+
+                                    <!--#region Sevk Adresi-->
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 IsReadOnly="True"
+                                                 LabelText="Sevk Adresi"
+                                                 MaxCharacterCountOverflowMode="None"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.User}"
+                                                 Text="{Binding ProcurementCustomerBasketModel.ShipAddressName, TargetNullValue='-', FallbackValue='-'}"
+                                                 ToolTipProperties.Text="{Binding ProcurementCustomerBasketModel.ShipAddressName, TargetNullValue='-', FallbackValue='-'}" />
+                                    <!--#endregion-->
+
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 LabelText="Belge Numarası"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding DocumentNumber}" />
+
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 LabelText="Özel Kod"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding SpecialCode}" />
+
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 LabelText="Açıklama"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding Description}" />
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </dx:FormItem.ContentTemplate>
+                    </dx:FormItem>
+                </dx:FormGroupItem>
+
+                <dx:FormGroupItem Header="Giriş Bilgileri"
+                                  HeaderFontAttributes="Bold"
+                                  HeaderFontSize="18">
+                    <dx:FormItem>
+                        <dx:FormItem.ContentTemplate>
+                            <DataTemplate>
+                                <VerticalStackLayout Spacing="5">
+
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 IsReadOnly="True"
+                                                 LabelText="Giriş Ambarı"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding OrderWarehouseModel.Name}" />
+
+                                
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </dx:FormItem.ContentTemplate>
+                    </dx:FormItem>
+                </dx:FormGroupItem>
+            </VerticalStackLayout>
+        </ScrollView>
+
+
+        <Button Grid.Row="1"
+                Margin="5,10,5,20"
+                Command="{Binding SaveCommand}"
+                Text="Kaydet"
+                VerticalOptions="End" />
+
+
+        <!--#region Basket BottomSheet-->
+        <!--<dx:BottomSheet x:Name="basketItemBottomSheet"
+                        AllowDismiss="True"
+                        BackgroundColor="White"
+                        CornerRadius="15"
+                        HalfExpandedRatio="0.5"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <Grid Padding="10"
+                  RowDefinitions="Auto, *"
+                  RowSpacing="20">
+                <VerticalStackLayout Grid.Row="0" Spacing="5">
+                    <Label FontAttributes="Bold"
+                           FontSize="Subtitle"
+                           Text="Malzeme Listesi" />
+                    <BoxView HeightRequest="2" Color="{StaticResource OffBlack}" />
+                </VerticalStackLayout>
+
+                <CollectionView Grid.Row="1" ItemsSource="{Binding Items}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="procurementModels:ProcurementCustomerBasketProductModel">
+                            <Border Padding="10"
+                                    BackgroundColor="Transparent"
+                                    StrokeShape="RoundRectangle 10"
+                                    StrokeThickness="0.1">
+                                <Grid RowDefinitions="Auto, *">
+                                    <HorizontalStackLayout Grid.Row="0"
+                                                           Margin="0,0,0,10"
+                                                           IsVisible="{Binding RejectionCode, Converter={StaticResource IsNotEqualConverter}, ConverterParameter=''}"
+                                                           Spacing="5">
+
+                                        <Label FontFamily="FAS"
+                                               FontSize="Medium"
+                                               Text="{x:Static fontAwesome:FontAwesomeIcons.TriangleExclamation}"
+                                               TextColor="Red" />
+
+                                        <Label LineBreakMode="TailTruncation"
+                                               MaxLines="1"
+                                               VerticalOptions="Center"
+                                               VerticalTextAlignment="Center">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="Hata Kodu: " TextColor="{StaticResource Gray600}" />
+                                                    <Span FontAttributes="Bold" Text="{Binding RejectionCode}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </HorizontalStackLayout>
+                                    <Grid Grid.Row="1"
+                                          ColumnDefinitions="Auto, *"
+                                          ColumnSpacing="10">
+                                        <Border Grid.Column="0"
+                                                Stroke="{StaticResource Primary}"
+                                                StrokeShape="RoundRectangle 5"
+                                                StrokeThickness="0.5">
+                                            <Image Grid.Column="0"
+                                                   HeightRequest="50"
+                                                   Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                                   WidthRequest="50" />
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1">
+                                            <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                                                <Label Grid.Column="0"
+                                                       FontAttributes="Bold"
+                                                       LineBreakMode="TailTruncation"
+                                                       Text="{Binding ItemCode}" />
+
+                                                <Border Grid.Column="1"
+                                                        Padding="10,0"
+                                                        BackgroundColor="{Binding ProcurementStatusTextColor}"
+                                                        HeightRequest="24"
+                                                        MinimumHeightRequest="24"
+                                                        StrokeShape="RoundRectangle 10"
+                                                        StrokeThickness="0">
+                                                    <Label FontSize="12"
+                                                           HorizontalOptions="Center"
+                                                           Text="{Binding ProcurementStatusText}"
+                                                           TextColor="{StaticResource White}"
+                                                           VerticalOptions="Center" />
+                                                </Border>
+                                            </Grid>
+
+                                            <Label LineBreakMode="TailTruncation"
+                                                   Text="{Binding ItemName}"
+                                                   TextColor="{StaticResource Gray600}" />
+
+                                            <HorizontalStackLayout Spacing="10">
+                                                <Label FontAttributes="Bold" FontSize="15">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span FontFamily="FAS"
+                                                                  Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                                  TextColor="{StaticResource Primary}" />
+                                                            <Span Text=" " />
+                                                            <Span Text="{Binding ProcurementQuantity, StringFormat='{0:N2}'}" TextColor="{StaticResource Primary}" />
+                                                            <Span Text=" " />
+                                                            <Span Text="{Binding SubUnitsetCode}" TextColor="{StaticResource Primary}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+
+                                                <Label FontAttributes="Bold" FontSize="15">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span FontFamily="FAS"
+                                                                  Text="{x:Static fontAwesome:FontAwesomeIcons.SquareMinus}"
+                                                                  TextColor="{StaticResource Primary}" />
+                                                            <Span Text=" " />
+                                                            <Span Text="{Binding RemainingQuantity, StringFormat='{0:N2}'}" TextColor="{StaticResource Primary}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+                                            </HorizontalStackLayout>
+
+                                            <Grid ColumnDefinitions="Auto,Auto,Auto"
+                                                  ColumnSpacing="10"
+                                                  HorizontalOptions="EndAndExpand">
+                                                <Border Grid.Column="0"
+                                                        Padding="5"
+                                                        BackgroundColor="Transparent"
+                                                        Stroke="{StaticResource Secondary}"
+                                                        StrokeShape="RoundRectangle 2">
+                                                    <Label FontFamily="FAS"
+                                                           FontSize="Medium"
+                                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                                           TextColor="{StaticResource Secondary}" />
+                                                </Border>
+                                                <Label Grid.Column="1"
+                                                       FontAttributes="Bold"
+                                                       FontSize="Large"
+                                                       Text="{Binding Quantity, StringFormat='{0:N2}'}"
+                                                       TextColor="{StaticResource OffBlack}"
+                                                       VerticalOptions="Center" />
+                                                <Border Grid.Column="2"
+                                                        Padding="5"
+                                                        BackgroundColor="{StaticResource Secondary}"
+                                                        Stroke="{StaticResource Secondary}"
+                                                        StrokeShape="RoundRectangle 2">
+                                                    <Label FontFamily="FAS"
+                                                           FontSize="Medium"
+                                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                                           TextColor="{StaticResource White}" />
+
+                                                </Border>
+                                            </Grid>
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </Grid>
+        </dx:BottomSheet>-->
+        <!--#endregion-->
+    </Grid>
+</ContentPage>

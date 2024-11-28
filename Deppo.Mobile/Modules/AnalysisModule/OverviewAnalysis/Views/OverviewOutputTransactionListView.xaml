@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.Views.OverviewOutputTransactionListView"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:model="clr-namespace:Deppo.Sys.Service.Models;assembly=Deppo.Sys.Service"
+             xmlns:transactionModel="clr-namespace:Deppo.Mobile.Core.Models.AnalysisModels;assembly=Deppo.Mobile.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.AnalysisModule.OverviewAnalysis.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:OverviewOutputTransactionListViewModel"
+             Shell.NavBarIsVisible="False"
+             Shell.PresentationMode="ModalAnimated"
+             Shell.TabBarIsVisible="False"
+             Padding="0,0,0,10">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
+                                        EventName="Loaded" />
+    </ContentPage.Behaviors>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android"
+                Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+    <Grid RowDefinitions="Auto, *"
+          RowSpacing="20">
+        <Grid Grid.Row="0"
+              Padding="0,20,20,0"
+              ColumnDefinitions="*, Auto">
+            <Label Grid.Column="0"
+                   Margin="20,0,0,0"
+                   FontAttributes="Bold"
+                   FontSize="20"
+                   HorizontalOptions="Start"
+                   Text="Çıkış Hareketleri"
+                   TextColor="{StaticResource WhiteSmoke}"
+                   VerticalOptions="End" />
+            <ImageButton Grid.Column="1"
+                         Aspect="AspectFill"
+                         Command="{Binding CloseCommand}"
+                         HeightRequest="25"
+                         HorizontalOptions="End"
+                         VerticalOptions="Center"
+                         WidthRequest="25">
+                <ImageButton.Source>
+                    <FontImageSource FontFamily="FAS"
+                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                                     Color="{StaticResource WhiteSmoke}" />
+                </ImageButton.Source>
+            </ImageButton>
+        </Grid>
+
+        <CollectionView ItemsSource="{Binding Items}"
+                        Grid.Row="1">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:TransactionAudit">
+                    <Border Padding="10"
+                            Stroke="{StaticResource Primary}"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0.1">
+                        <Grid ColumnDefinitions="Auto,*,.30*"
+                              ColumnSpacing="10"
+                              VerticalOptions="Center"
+                              RowSpacing="10">
+
+                            <toolkit:AvatarView Grid.Column="0"
+                                                BorderColor="Transparent"
+                                                BorderWidth="0"
+                                                CornerRadius="30"
+                                                Padding="0"
+                                                HeightRequest="60"
+                                                HorizontalOptions="Start"
+                                                ImageSource="{Binding ApplicationUser.Image.MediaData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                                VerticalOptions="Center"
+                                                WidthRequest="60" />
+
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Spacing="2"
+                                                 VerticalOptions="Center">
+                                <Label FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation"
+                                       Text="{Binding ApplicationUser.FullName}" />
+                                <Label LineBreakMode="TailTruncation"
+                                       Text="{Binding TransactionTypeName}"
+                                       TextColor="{StaticResource Gray600}" />
+
+                                <Label>
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span FontAttributes="Bold"
+                                                  TextColor="{StaticResource Gray600}"
+                                                  FontFamily="FAS"
+                                                  Text="{x:Static fontAwesome:FontAwesomeIcons.CalendarDays}" />
+                                            <Span Text=" " />
+                                            <Span Text="{Binding TransactionDate}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </VerticalStackLayout>
+
+                        </Grid>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OverviewOutputTransactionListViewModel}}, Path=ItemTappedCommand}"
+                                                  CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <dx:BottomSheet x:Name="ficheTransactionBottomSheet"
+                        Grid.Row="1"
+                        AllowDismiss="True"
+                        BackgroundColor="White"
+                        CornerRadius="15"
+                        HalfExpandedRatio="0.5"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <!--#region BottomSheetContent-->
+            <Grid Padding="10"
+                  RowDefinitions="Auto,*"
+                  RowSpacing="20">
+                <VerticalStackLayout Grid.Row="0"
+                                     Spacing="5">
+                    <Label FontAttributes="Bold"
+                           FontSize="16"
+                           Text="{Binding SelectedTransactionAudit.TransactionNumber}" />
+                    <Label FontAttributes="Bold"
+                           FontSize="15"
+                           Text="Malzemeler" />
+
+                    <BoxView HeightRequest="2"
+                             Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+
+                <CollectionView Grid.Row="1"
+                                ItemsSource="{Binding OverviewFicheTransactions}"
+                                RemainingItemsThreshold="2"
+                                RemainingItemsThresholdReachedCommand="{Binding LoadMoreTransactionCommand}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="transactionModel:OverviewFicheTransactionModel">
+                            <Border Padding="5"
+                                    BackgroundColor="Transparent"
+                                    StrokeThickness="0.1">
+                                <Grid ColumnDefinitions="Auto, *"
+                                      ColumnSpacing="10">
+                                    <Border Grid.Column="0"
+                                            Padding="5"
+                                            StrokeShape="RoundRectangle 10">
+                                        <VerticalStackLayout Spacing="1"
+                                                             VerticalOptions="Center">
+                                            <Image Grid.Column="0"
+                                                   HeightRequest="50"
+                                                   Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                                   WidthRequest="50" />
+                                        </VerticalStackLayout>
+                                    </Border>
+
+                                    <VerticalStackLayout Grid.Column="1"
+                                                         Spacing="1"
+                                                         VerticalOptions="Center">
+                                        <Label FontAttributes="Bold"
+                                               FontSize="15"
+                                               Text="{Binding ProductCode}" />
+                                        <Label FontSize="13"
+                                               LineBreakMode="TailTruncation"
+                                               Text="{Binding ProductName}" />
+
+                                        <HorizontalStackLayout Spacing="5">
+                                            <Label FontFamily="FAS"
+                                                   FontSize="Small"
+                                                   Text="{x:Static fontAwesome:FontAwesomeIcons.Cube}"
+                                                   TextColor="{StaticResource Primary}"
+                                                   VerticalOptions="Center" />
+                                            <Label>
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding Quantity,StringFormat='{0:N2}'}" />
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding SubUnitsetCode}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                            <Image>
+                                                <Image.Source>
+                                                    <FontImageSource FontFamily="FAS"
+                                                                     Glyph="{Binding IOTypeImageSource}"
+                                                                     Size="16"
+                                                                     Color="{Binding IOTypeColor}" />
+                                                </Image.Source>
+                                            </Image>
+                                            <Label Text="{Binding IOTypeName}" />
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+
+            <!--#endregion-->
+        </dx:BottomSheet>
+
+    </Grid>
+</ContentPage>

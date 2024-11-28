@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application Title="Deppo.Sys" Logo="Actions_User">
+  <BOModel>
+    <Class Name="DevExpress.Persistent.BaseImpl.PermissionPolicy.PermissionPolicyUser" Caption="Base User" />
+  </BOModel>
+  <NavigationItems>
+    <Items>
+      <Item Id="Workspace" Index="0" ImageName="BO_Appointment" />
+      <Item Id="Audit" Index="2" ImageName="Sparkline" />
+      <Item Id="CustomerManagement" Index="2" ImageName="Card" />
+      <Item Id="ProductManagement" Index="2" ImageName="Products" />
+      <Item Id="ProductProcurementManagement" Index="3" ImageName="ProductOrderDetail-21" />
+      <Item Id="UserManagement" Index="4" ImageName="BO_Contact" />
+      <Item Id="Reports" Index="5" ImageName="BO_Contract">
+        <Items>
+          <Item Id="ReportsV2" Caption="Raporlar" />
+        </Items>
+      </Item>
+      <Item Id="SystemSettings" Index="6" ImageName="Actions_Settings" />
+      <Item Id="Default" Index="7" ImageName="New" Visible="False" />
+    </Items>
+  </NavigationItems>
+  <Options>
+    <LayoutManagerOptions RequiredFieldMark="*" />
+  </Options>
+  <SchemaModules>
+    <SchemaModule Name="CloneObjectModule" Version="22.2.4.0" IsNewNode="True" />
+    <SchemaModule Name="SystemModule" Version="22.2.4.0" IsNewNode="True" />
+  </SchemaModules>
+  <Views>
+    <ListView Id="ApplicationUser_ListView" Caption="Users" />
+  </Views>
+</Application>

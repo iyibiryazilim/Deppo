@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.ResultModule.Views.InsertSuccessPageView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:skia="clr-namespace:SkiaSharp.Extended.UI.Controls;assembly=SkiaSharp.Extended.UI"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ResultModule.ViewModels"
+             x:DataType="viewModel:InsertSuccessPageViewModel"
+             Shell.NavBarIsVisible="False"
+             Shell.PresentationMode="ModalAnimated"
+             Shell.TabBarIsVisible="False">
+    <Grid Padding="10"
+          RowDefinitions="*, Auto"
+          RowSpacing="20">
+        <skia:SKConfettiView Grid.Row="0" IsAnimationEnabled="True" />
+
+        <Grid Grid.Row="0"
+              Padding="0,80,0,0"
+              RowDefinitions=".40*, .60*"
+              RowSpacing="50">
+            <skia:SKLottieView Grid.Row="0"
+                               IsAnimationEnabled="True"
+                               RepeatCount="0"
+                               Source="success.json" />
+
+            <VerticalStackLayout Grid.Row="1"
+                                 HorizontalOptions="Center"
+                                 Spacing="30"
+                                 VerticalOptions="Start">
+
+                <Label FontAttributes="Bold"
+                       FontSize="Title"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"
+                       Text="{Binding ResultModel.Code}"
+                       TextColor="{StaticResource OffBlack}" />
+                <Label FontAttributes="Bold"
+                       FontSize="19"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"
+                       LineBreakMode="WordWrap"
+                       Text="{Binding ResultModel.PageTitle, StringFormat='{0} Başarıyla Gönderildi'}" />
+            </VerticalStackLayout>
+        </Grid>
+
+        <Grid Grid.Row="1" Padding="0,0,0,30">
+            <Button Grid.Row="1"
+                    Margin="10,10,10,20"
+                    BackgroundColor="#2ca57c"
+                    Command="{Binding BackCommand}"
+                    Text="Tamam" />
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

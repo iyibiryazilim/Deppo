@@ -1,0 +1,767 @@
+﻿
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net8.0-android</TargetFrameworks>
+		<!-- <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks> -->
+		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
+		<!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
+
+		<!-- Note for MacCatalyst:
+		The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
+		When specifying both architectures, use the plural <RuntimeIdentifiers> instead of the singular <RuntimeIdentifier>.
+		The Mac App Store will NOT accept apps with ONLY maccatalyst-arm64 indicated;
+		either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
+		<!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
+
+		<OutputType>Exe</OutputType>
+		<RootNamespace>Deppo.Mobile</RootNamespace>
+		<UseMaui>true</UseMaui>
+		<SingleProject>true</SingleProject>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<!-- Display name -->
+		<ApplicationTitle>Deppo.Mobile</ApplicationTitle>
+
+		<!-- App Identifier -->
+		<ApplicationId>com.companyname.deppo.mobile</ApplicationId>
+
+		<!-- Versions -->
+		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+		<ApplicationVersion>1</ApplicationVersion>
+
+		<!-- <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion> -->
+		<!-- <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion> -->
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">30.0</SupportedOSPlatformVersion>
+		<!-- <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion> -->
+		<!-- <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion> -->
+		<!-- <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion> -->
+
+		<PublishTrimmed>false</PublishTrimmed>
+		<RunAOTCompilation>false</RunAOTCompilation>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- App Icon -->
+
+		<MauiIcon Include="Resources\AppIcon\app_icon.png" ForegroundScale="0.80" Color="#2b6c78" />
+		<!--<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" BaseSize="200,200" />-->
+
+		<!-- Splash Screen -->
+		<MauiSplashScreen Include="Resources\Splash\app_splash.png" Color="#2b6c78" Scale="1.0" />
+
+		<!-- Images -->
+		<MauiImage Include="Resources\Images\*" />
+		<MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,300" />
+
+		<!-- Custom Fonts -->
+		<MauiFont Include="Resources\Fonts\*" />
+
+		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
+		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="Resources\Images\e_irsaliye_logo.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <AndroidResource Include="Platforms/Android/Resources/xml/network_security_config.xml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Maui.Camera" Version="1.0.5" />
+		<PackageReference Include="CommunityToolkit.Maui.Markup" Version="4.2.0" />
+		<PackageReference Include="CommunityToolkit.Maui.MediaElement" Version="4.1.2" />
+		<PackageReference Include="DotNetMeteor.HotReload.Plugin" Version="3.3.0" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="9.0.2" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+		<PackageReference Include="Controls.UserDialogs.Maui" Version="1.5.4" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.92" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.92" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+		<PackageReference Include="DevExpress.Maui.Editors" Version="24.1.*" />
+		<PackageReference Include="DevExpress.Maui.Controls" Version="24.1.*" />
+		<PackageReference Include="DevExpress.Maui.CollectionView" Version="24.1.*" />
+		<PackageReference Include="DevExpress.Maui.Charts" Version="24.1.*" />
+		<PackageReference Include="AutoMapper" Version="12.0.1" />
+		<PackageReference Include="SkiaSharp.Extended.UI.Maui" Version="2.0.0" />
+		<PackageReference Include="ZXing.Net.Maui.Controls" Version="0.4.0" />
+		<PackageReference Include="Syncfusion.Maui.Buttons" version="27.1.48" />
+	  	<PackageReference Include="Syncfusion.Maui.Core" version="27.1.48" />
+	  	<PackageReference Include="Syncfusion.Maui.Data" version="27.1.48" />
+	  	<PackageReference Include="Syncfusion.Maui.DataGrid" version="27.1.48" />
+	  	<PackageReference Include="Syncfusion.Maui.DataSource" version="27.1.48" />
+	  	<PackageReference Include="Syncfusion.Maui.GridCommon" version="27.1.48" />
+	  	<PackageReference Include="Syncfusion.Maui.Inputs" version="27.1.48" />
+	  	<PackageReference Include="Syncfusion.Maui.ListView" version="27.1.48" />
+	  	<PackageReference Include="Syncfusion.Maui.PullToRefresh" version="27.1.48" />
+	  	<PackageReference Include="Syncfusion.Maui.Popup" version="27.1.48" />	
+	  	<PackageReference Include="Syncfusion.Maui.TabView" version="27.1.48" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Deppo.Core\Deppo.Core.csproj" />
+		<ProjectReference Include="..\Deppo.Mobile.Core\Deppo.Mobile.Core.csproj" />
+		<ProjectReference Include="..\Deppo.Sys.Service\Deppo.Sys.Service.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Modules/ProductModule/ProductMenu/Views/ProductPreviewImageView.xaml.cs">
+	    <DependentUpon>ProductPreviewImageView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Modules/QuicklyProductionModule/QuicklyProductionProcess/Manuel/Views/ManuelCalcInWarehouseListView.xaml.cs">
+	    <DependentUpon>ManuelCalcInWarehouseListView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Modules/QuicklyProductionModule/QuicklyProductionProcess/Manuel/Views/ManuelCalcOutWarehouseListView.xaml.cs">
+	    <DependentUpon>ManuelCalcOutWarehouseListView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Modules\CameraModule\Views\CameraReaderView.xaml.cs">
+	    <DependentUpon>CameraReaderView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailApprovedSupplierView.xaml.cs">
+	    <DependentUpon>ProductDetailApprovedSupplierView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Modules\ProductModule\ProductPanel\Views\InputProductListView.xaml.cs">
+	    <DependentUpon>InputProductListView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Modules\ProductModule\ProductPanel\Views\OutputProductListView.xaml.cs">
+	    <DependentUpon>OutputProductListView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Modules\PurchaseModule\PurchasePanel\Views\PurchasePanelReceivedProductListView.xaml.cs">
+	    <DependentUpon>PurchasePanelReceivedProductListView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseProcess\Views\InputProductPurchaseProcessProductListView.xaml.cs">
+	    <DependentUpon>InputProductPurchaseProcessProductListView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseProcess\Views\InputProductPurchaseProcessSupplierListView.xaml.cs">
+	    <DependentUpon>InputProductPurchaseProcessSupplierListView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseProcess\Views\InputProductPurchaseProcessWarehouseListView.xaml.cs">
+	    <DependentUpon>InputProductPurchaseProcessWarehouseListView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseProcess\Views\InputProductPurchaseProcessBasketListView.xaml.cs">
+	    <DependentUpon>InputProductPurchaseProcessBasketListView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Modules\PurchaseModule\SupplierMenu\Views\SupplierDetailView.xaml.cs">
+	    <DependentUpon>SupplierDetailView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessWarehouseListView.xaml.cs">
+	    <DependentUpon>OutputProductSalesOrderProcessWarehouseListView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessCustomerListView.xaml.cs">
+	    <DependentUpon>OutputProductSalesOrderProcessCustomerListView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessProductListView.xaml.cs">
+	    <DependentUpon>OutputProductSalesOrderProcessProductListView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Modules\SalesModule\SalesProcess\ProcurementByLocationProcess\Views\ProcurementByLocationCustomerFormView.xaml.cs">
+	    <DependentUpon>ProcurementByLocationCustomerFormView.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Modules\AnalysisModule\OverviewAnalysis\Views\NotificationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\AnalysisModule\OverviewAnalysis\Views\OverviewInputTransactionListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\AnalysisModule\OverviewAnalysis\Views\OverviewOutputTransactionListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\AnalysisModule\OverviewAnalysis\Views\ProfileView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CameraModule\Views\CameraReaderView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\CountingPanel\Views\CountingInputReferenceProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\CountingPanel\Views\CountingOutputReferenceProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\CountingPanel\Views\CountingTransactionsListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\CountingProcess\ProductCountingProcess\Views\ProductCountingBasketView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\CountingProcess\ProductCountingProcess\Views\ProductCountingFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\CountingProcess\ProductCountingProcess\Views\ProductCountingLocationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\CountingProcess\ProductCountingProcess\Views\ProductCountingProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\CountingProcess\ProductCountingProcess\Views\ProductCountingWarehouseTotalListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\CountingProcess\WarehouseCountingProcess\Views\WarehouseCountingBasketView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\CountingProcess\WarehouseCountingProcess\Views\WarehouseCountingFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\CountingProcess\WarehouseCountingProcess\Views\WarehouseCountingLocationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\CountingProcess\WarehouseCountingProcess\Views\WarehouseCountingProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\CountingProcess\WarehouseCountingProcess\Views\WarehouseCountingShowProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\CountingProcess\WarehouseCountingProcess\Views\WarehouseCountingWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\CountingModule\NegativeProductMenu\Views\NegativeProductFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\LoginModule\Views\CompanyListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceMenu\Views\OutsourceDetailAllFichesView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceMenu\Views\OutsourceInputTransactionView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceMenu\Views\OutsourceOutputTransactionView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourcePanel\Views\OutsourcePanelAllFicheListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\InputOutsourceProcess\InputOutsourceTransfer\Views\InputOutsourceTransferBasketLocationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\InputOutsourceProcess\InputOutsourceTransfer\Views\InputOutsourceTransferOutsourceBasketListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\InputOutsourceProcess\InputOutsourceTransfer\Views\InputOutsourceTransferOutsourceFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\InputOutsourceProcess\InputOutsourceTransfer\Views\InputOutsourceTransferOutsourceProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\InputOutsourceProcess\InputOutsourceTransfer\Views\InputOutsourceTransferOutsourceSupplierListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\InputOutsourceProcess\InputOutsourceTransfer\Views\InputOutsourceTransferWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailAlternativeProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ProductDetailAllFicheListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ProductDetailWarehouseTotalListView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailApprovedSupplierView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailLocationTransactionListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailVariantDetailListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailVariantListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailVariantTotalListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailWaitingPurchaseOrderListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailWaitingSalesOrderListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ActionViews\ProductDetailWarehouseTotalListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ProductInputTransactionView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductMenu\Views\ProductOutputTransactionView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductPanel\Views\AllFicheListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductPanel\Views\InputProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductPanel\Views\OutputProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\DemandProcess\Views\DemandProcessBasketListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\DemandProcess\Views\DemandProcessFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\DemandProcess\Views\DemandProcessProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\DemandProcess\Views\DemandProcessVariantListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\DemandProcess\Views\DemandProcessWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\OutputProductProcess\Views\OutputProductProcessBasketListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\OutputProductProcess\Views\OutputProductProcessFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\OutputProductProcess\Views\OutputProductProcessProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\OutputProductProcess\Views\OutputProductProcessWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\VirmanProductProcess\Views\VirmanProductBasketListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\TransferProductProcess\Views\TransferFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\TransferProductProcess\Views\TransferInBasketView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\TransferProductProcess\Views\TransferInWarehouseView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\TransferProductProcess\Views\TransferOutBasketView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\TransferProductProcess\Views\TransferOutProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\TransferProductProcess\Views\TransferOutWarehouseListView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\VirmanProductProcess\Views\VirmanProductFormListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\VirmanProductProcess\Views\VirmanProductInListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\VirmanProductProcess\Views\VirmanProductInWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\VirmanProductProcess\Views\VirmanProductOutListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\ProductProcess\VirmanProductProcess\Views\VirmanProductOutWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\WarehouseMenu\Views\ActionViews\WarehouseDetailLocationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\WarehouseMenu\Views\ActionViews\WarehouseDetailWarehouseTotalListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\WarehouseMenu\Views\WarehouseDetailAllFicheListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\WarehouseMenu\Views\WarehouseDetailView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\WarehouseMenu\Views\WarehouseInputTransactionView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ProductModule\WarehouseMenu\Views\WarehouseOutputTransactionView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchasePanel\Views\PurchasePanelAllFicheListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchasePanel\Views\PurchasePanelReceivedProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchasePanel\Views\PurchasePanelWaitingProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseOrderProcess\Views\InputProductPurchaseOrderProcessBasketListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseOrderProcess\Views\InputProductPurchaseOrderProcessBasketLocationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseOrderProcess\Views\InputProductPurchaseOrderProcessBasketSeriLotListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseOrderProcess\Views\InputProductPurchaseOrderProcessFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseOrderProcess\Views\InputProductPurchaseOrderProcessOrderListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseOrderProcess\Views\InputProductPurchaseOrderProcessOtherProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseOrderProcess\Views\InputProductPurchaseOrderProcessProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseOrderProcess\Views\InputProductPurchaseOrderProcessSupplierListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseOrderProcess\Views\InputProductPurchaseOrderProcessWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseProcess\Views\InputProductPurchaseProcessBasketListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseProcess\Views\InputProductPurchaseProcessBasketLocationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseProcess\Views\InputProductPurchaseProcessBasketSeriLotListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseProcess\Views\InputProductPurchaseProcessFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseProcess\Views\InputProductPurchaseProcessProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\InputProductPurchaseProcess\Views\InputProductPurchaseProcessSupplierListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\ReturnProductPurchaseDispatchProcess\Views\ReturnPurchaseDispatchBasketView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\ReturnProductPurchaseDispatchProcess\Views\ReturnPurchaseDispatchFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\ReturnProductPurchaseDispatchProcess\Views\ReturnPurchaseDispatchListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\ReturnProductPurchaseDispatchProcess\Views\ReturnPurchaseDispatchProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\ReturnProductPurchaseDispatchProcess\Views\ReturnPurchaseDispatchSupplierListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\ReturnProductPurchaseDispatchProcess\Views\ReturnPurchaseDispatchWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\ReturnProductPurchaseProcess\Views\ReturnPurchaseBasketView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\ReturnProductPurchaseProcess\Views\ReturnPurchaseFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\ReturnProductPurchaseProcess\Views\ReturnPurchaseProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\PurchaseProcess\ReturnProductPurchaseProcess\Views\ReturnPurchaseWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\SupplierMenu\Views\ActionViews\SupplierDetailApprovedProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\SupplierMenu\Views\ActionViews\SupplierDetailShipAddressListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\SupplierMenu\Views\ActionViews\SupplierDetailWaitingPurchaseOrderListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\SupplierMenu\Views\SupplierDetailAllFicheListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\SupplierMenu\Views\SupplierDetailView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\SupplierMenu\Views\SupplierInputTransactionView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\SupplierMenu\Views\SupplierOutputTransactionView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\PurchaseModule\WaitingProductMenu\Views\WaitingPurchaseProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionBOMMenu\Views\QuicklyProductionBOMMenuDetailView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionPanel\Views\QuicklyProductionPanelAllFicheListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\ManuelRemorkProcess\Views\ManuelReworkProcessAllProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\ManuelRemorkProcess\Views\ManuelReworkProcessBasketLocationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\ManuelRemorkProcess\Views\ManuelReworkProcessBasketView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\ManuelRemorkProcess\Views\ManuelReworkProcessFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\ManuelRemorkProcess\Views\ManuelReworkProcessInWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\ManuelRemorkProcess\Views\ManuelReworkProcessOutWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\ManuelRemorkProcess\Views\ManuelReworkProcessWarehouseTotalListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\Manuel\Views\ManuelCalcSubProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\Manuel\Views\ManuelCalcView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules/QuicklyProductionModule/QuicklyProductionProcess/Manuel/Views/ManuelCalcInWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules/QuicklyProductionModule/QuicklyProductionProcess/Manuel/Views/ManuelCalcOutWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\Manuel\Views\ManuelFormListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\Manuel\Views\ManuelProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\WorkOrderReworkProcess\Views\WorkOrderReworkProcessBasketView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\WorkOrderReworkProcess\Views\WorkOrderReworkProcessFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\WorkOrderReworkProcess\Views\WorkOrderReworkProcessProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\WorkOrderReworkProcess\Views\WorkOrderReworkProcessSubProductLocationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\WorkOrder\Views\WorkOrderCalcView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\WorkOrder\Views\WorkOrderFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\WorkOrder\Views\WorkOrderProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\QuicklyProductionModule\QuicklyProductionProcess\WorkOrder\Views\WorkOrderProductLocationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ResultModule\Views\InsertFailurePageView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\ResultModule\Views\InsertSuccessPageView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\CustomerMenu\Views\ActionViews\CustomerDetailApprovedProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\CustomerMenu\Views\ActionViews\CustomerDetailShipAddressListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\CustomerMenu\Views\ActionViews\CustomerDetailWaitingSalesOrderListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\CustomerMenu\Views\CustomerDetailAllFichesView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\CustomerMenu\Views\CustomerDetailView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\CustomerMenu\Views\CustomerInputTransactionView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\CustomerMenu\Views\CustomerOutputTransactionView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesPanel\Views\SalesPanelAllFicheListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesPanel\Views\SalesPanelShippedProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesPanel\Views\SalesPanelWaitingProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessBasketListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessCustomerListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessOrderListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesOrderProcess\Views\OutputProductSalesOrderProcessProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesProcess\Views\OutputProductSalesProcessBasketListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesProcess\Views\OutputProductSalesProcessCustomerListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesProcess\Views\OutputProductSalesProcessFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesProcess\Views\OutputProductSalesProcessProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\OutputProductSalesProcess\Views\OutputProductSalesProcessWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementByCustomerProcess\Views\ProcurementByCustomerFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementByCustomerProcess\Views\ProcurementByCustomerReasonsForRejectionListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementByLocationProcess\Views\ProcurementByLocationBasketView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementByLocationProcess\Views\ProcurementByLocationCustomerListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementByLocationProcess\Views\ProcurementByLocationCustomerFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementByLocationProcess\Views\ProcurementByLocationFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementByLocationProcess\Views\ProcurementByLocationOrderWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementByLocationProcess\Views\ProcurementByLocationProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementByLocationProcess\Views\ProcurementByLocationReasonsForRejectionListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementByLocationProcess\Views\ProcurementByLocationWarehouseLocationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementByProductProcess\Views\ProcurementByProductBasketView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementByProductProcess\Views\ProcurementByProductFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementByProductProcess\Views\ProcurementByProductProcurableProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementByProductProcess\Views\ProcurementByProductProcurementWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementByProductProcess\Views\ProcurementByProductQuantityDistributionListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementByProductProcess\Views\ProcurementByProductReasonsForRejectionListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesPackageBasketView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesPackageProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesProcessBasketProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesProcessCustomerListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesProcessFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesProcessProductBasketView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesProcessProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ProcurementSalesProcess\Views\ProcurementSalesProcessWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ReturnProductSalesDispatchProcess\Views\ReturnSalesDispatchBasketLocationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ReturnProductSalesDispatchProcess\Views\ReturnSalesDispatchBasketSeriLotListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ReturnProductSalesDispatchProcess\Views\ReturnSalesDispatchBasketView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ReturnProductSalesDispatchProcess\Views\ReturnSalesDispatchCustomerListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ReturnProductSalesDispatchProcess\Views\ReturnSalesDispatchFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ReturnProductSalesDispatchProcess\Views\ReturnSalesDispatchListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ReturnProductSalesDispatchProcess\Views\ReturnSalesDispatchProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ReturnProductSalesDispatchProcess\Views\ReturnSalesDispatchWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ReturnProductSalesProcess\Views\ReturnSalesBasketLocationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ReturnProductSalesProcess\Views\ReturnSalesBasketSeriLotListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ReturnProductSalesProcess\Views\ReturnSalesBasketView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ReturnProductSalesProcess\Views\ReturnSalesFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ReturnProductSalesProcess\Views\ReturnSalesProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\SalesProcess\ReturnProductSalesProcess\Views\ReturnSalesWarehouseListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\SalesModule\WaitingProductMenu\Views\WaitingSalesProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\TaskModule\Views\TaskListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\TransactionSchedulerModule\Views\TransactionSchedulerView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/OutputOutsourceProcess/OutputOutsourceWorkOrder/" />
+	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/OutputOutsourceProcess/OutputOutsourceWorkOrder/ViewModels/" />
+	  <Folder Include="Modules/OutsourceModule/OutsourceProcess/OutputOutsourceProcess/OutputOutsourceWorkOrder/Views/" />
+	</ItemGroup>
+
+</Project>

@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.Views.InputProductPurchaseOrderProcessBasketListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:basketModel="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;assembly=Deppo.Mobile.Core"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:locationModel="clr-namespace:Deppo.Mobile.Core.Models.LocationModels;assembly=Deppo.Mobile.Core"
+             xmlns:models="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
+             xmlns:seriLotModel="clr-namespace:Deppo.Mobile.Core.Models.SeriLotModels;assembly=Deppo.Mobile.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModels="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseOrderProcess.ViewModels"
+             Title="{Binding Title}"
+             Padding="10"
+             x:DataType="viewModels:InputProductPurchaseOrderProcessBasketListViewModel"
+             Shell.TabBarIsVisible="False">
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding BackCommand}" />
+    </Shell.BackButtonBehavior>
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Command="{Binding CameraTappedCommand}">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Camera}"
+                                 Size="Large" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+
+        <ToolbarItem Command="{Binding PlusTappedCommand}">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                 Size="Large" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="*,Auto">
+        <Grid RowDefinitions="*,Auto">
+            <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
+                <Border Grid.Row="0"
+                        Margin="5,0,5,0"
+                        Padding="0"
+                        BackgroundColor="{StaticResource PrimaryLight}"
+                        HeightRequest="40"
+                        Stroke="{StaticResource Primary}"
+                        StrokeShape="RoundRectangle 5"
+                        StrokeThickness="0.5">
+                    <Entry x:Name="barcodeEntry"
+                           Placeholder="Barkod tara..."
+                           PlaceholderColor="{StaticResource OffBlack}"
+                           TextColor="{StaticResource OffBlack}">
+                        <Entry.Behaviors>
+                            <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                            CommandParameter="{Binding ., Source={x:Reference barcodeEntry}}"
+                                                            EventName="Completed" />
+                        </Entry.Behaviors>
+                    </Entry>
+                </Border>
+
+                <CollectionView Grid.Row="1" ItemsSource="{Binding Items}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="basketModel:InputPurchaseBasketModel">
+                            <SwipeView Threshold="100">
+                                <SwipeView.RightItems>
+                                    <SwipeItems Mode="Execute">
+                                        <SwipeItemView BackgroundColor="Red"
+                                                       Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductPurchaseOrderProcessBasketListViewModel}}, Path=DeleteItemCommand}"
+                                                       CommandParameter="{Binding .}">
+                                            <Label HorizontalOptions="Center"
+                                                   TextColor="White"
+                                                   VerticalOptions="Center">
+
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span FontAttributes="Bold"
+                                                              FontFamily="FAS"
+                                                              FontSize="Medium"
+                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Trash}"
+                                                              TextColor="White" />
+                                                        <Span Text=" " />
+                                                        <Span FontSize="Medium"
+                                                              Text="Sil"
+                                                              TextColor="White" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                        </SwipeItemView>
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
+                                <Border Padding="10"
+                                        BackgroundColor="Transparent"
+                                        StrokeThickness="0.1">
+                                    <Grid ColumnDefinitions=".20*,.80*" ColumnSpacing="10">
+                                        <Border Grid.Column="0"
+                                                Stroke="{StaticResource Primary}"
+                                                StrokeShape="RoundRectangle 5"
+                                                StrokeThickness="0.5"
+                                                WidthRequest="{OnIdiom 100, Phone=70, Tablet=100}"
+                                                HeightRequest="{OnIdiom 100, Phone=70, Tablet=100}"
+                                                >
+                                            <Image Grid.Column="0"
+                                                   Aspect="AspectFill" 
+                                                   Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                                    />
+                                        </Border>
+
+                                        <VerticalStackLayout Grid.Column="1">
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <Label Grid.Column="0"
+                                                       FontAttributes="Bold"
+                                                       HorizontalOptions="Start"
+                                                       LineBreakMode="TailTruncation"
+                                                       Text="{Binding ItemCode}" />
+
+                                                <Image Grid.Column="1">
+                                                    <Image.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductPurchaseOrderProcessBasketListViewModel}}, Path=UnitActionTappedCommand}" CommandParameter="{Binding .}" />
+                                                    </Image.GestureRecognizers>
+                                                    <Image.Source>
+                                                        <FontImageSource FontFamily="FAS"
+                                                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.Ellipsis}"
+                                                                         Size="Medium"
+                                                                         Color="{StaticResource Gray600}" />
+                                                    </Image.Source>
+                                                </Image>
+                                            </Grid>
+
+                                            <Label LineBreakMode="TailTruncation"
+                                                   Text="{Binding ItemName}"
+                                                   TextColor="{StaticResource Gray600}" />
+
+                                            <Label>
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span FontAttributes="Bold"
+                                                              FontFamily="FAS"
+                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding Quantity, StringFormat='{0:N2}'}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding SubUnitsetCode, StringFormat='{0:N2}'}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+
+                                            <Grid ColumnDefinitions="Auto, *">
+                                                <Grid Grid.Column="0"
+                                                      ColumnDefinitions="Auto, Auto,Auto"
+                                                      ColumnSpacing="3"
+                                                      HorizontalOptions="Start"
+                                                      VerticalOptions="End">
+                                                    <Label Grid.Column="0"
+                                                           FontFamily="FAS"
+                                                           FontSize="10"
+                                                           Text="{Binding VariantIcon}"
+                                                           TextColor="{Binding VariantIconColor}" />
+                                                    <Label Grid.Column="1"
+                                                           FontFamily="FAS"
+                                                           FontSize="10"
+                                                           Text="{Binding LocTrackingIcon}"
+                                                           TextColor="{Binding LocTrackingIconColor}" />
+                                                    <Label Grid.Column="2"
+                                                           FontFamily="FAS"
+                                                           FontSize="10"
+                                                           Text="{Binding TrackingTypeIcon}"
+                                                           TextColor="{Binding TrackingTypeIconColor}" />
+                                                </Grid>
+
+                                                <Grid Grid.Column="1"
+                                                      ColumnDefinitions="Auto,Auto,Auto"
+                                                      ColumnSpacing="10"
+                                                      HorizontalOptions="EndAndExpand">
+                                                    <Border Grid.Column="0"
+                                                            Padding="5"
+                                                            BackgroundColor="Transparent"
+                                                            Stroke="{StaticResource Secondary}"
+                                                            StrokeShape="RoundRectangle 2">
+                                                        <Label FontFamily="FAS"
+                                                               FontSize="Medium"
+                                                               Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                                               TextColor="{StaticResource Secondary}" />
+
+                                                         <Border.GestureRecognizers>
+                                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductPurchaseOrderProcessBasketListViewModel}}, Path=DecreaseCommand}" CommandParameter="{Binding .}" />
+        </Border.GestureRecognizers>
+                                                    </Border>
+                                                    <Label Grid.Column="1"
+                                                           FontAttributes="Bold"
+                                                           FontSize="Large"
+                                                           Text="{Binding InputQuantity, StringFormat='{0:N2}'}"
+                                                           TextColor="{StaticResource OffBlack}"
+                                                           VerticalOptions="Center">
+                                                        <Label.GestureRecognizers>
+                                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductPurchaseOrderProcessBasketListViewModel}}, Path=QuantityTappedCommand}" CommandParameter="{Binding .}" />
+                                                        </Label.GestureRecognizers>
+                                                    </Label>
+                                                    <Border Grid.Column="2"
+                                                            Padding="5"
+                                                            BackgroundColor="{StaticResource Secondary}"
+                                                            Stroke="{StaticResource Secondary}"
+                                                            StrokeShape="RoundRectangle 2">
+                                                        <Label FontFamily="FAS"
+                                                               FontSize="Medium"
+                                                               Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                                               TextColor="{StaticResource White}" />
+
+                                                        <Border.GestureRecognizers>
+                                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductPurchaseOrderProcessBasketListViewModel}}, Path=IncreaseCommand}" CommandParameter="{Binding .}" />
+                                                        </Border.GestureRecognizers>
+                                                    </Border>
+                                                </Grid>
+                                            </Grid>
+
+
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Border>
+                            </SwipeView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Button Grid.Row="2"
+                        Command="{Binding NextViewCommand}"
+                        Text="İleri" />
+            </Grid>
+        </Grid>
+
+        <!--#region basketOptionsBottomSheet-->
+        <dx:BottomSheet x:Name="basketOptionsBottomSheet"
+                        Grid.Row="1"
+                        AllowDismiss="True"
+                        BackgroundColor="White"
+                        CornerRadius="15"
+                        HalfExpandedRatio="0.3"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <Grid Padding="10"
+                  RowDefinitions="Auto,*"
+                  RowSpacing="20">
+                <VerticalStackLayout Grid.Row="0" Spacing="5">
+                    <Label Padding="10"
+                           FontAttributes="Bold"
+                           FontSize="Subtitle"
+                           Text="Seçim Listesi" />
+                    <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Row="1" Spacing="10">
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ProductOptionTappedCommand}" />
+                        </Border.GestureRecognizers>
+                        <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontAttributes="Bold"
+                                          FontFamily="FAS"
+                                          Text="{x:Static fontAwesome:FontAwesomeIcons.List}"
+                                          TextColor="{StaticResource OffBlack}" />
+                                    <Span Text=" " />
+
+                                    <Span Text=" " />
+                                    <Span FontAttributes="Bold"
+                                          Text="Ürün Listesi"
+                                          TextColor="{StaticResource OffBlack}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </Border>
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OrderOptionTappedCommand}" />
+                        </Border.GestureRecognizers>
+
+                        <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontAttributes="Bold"
+                                          FontFamily="FAS"
+                                          Text="{x:Static fontAwesome:FontAwesomeIcons.List}"
+                                          TextColor="{StaticResource OffBlack}" />
+                                    <Span Text=" " />
+
+                                    <Span FontAttributes="Bold"
+                                          Text="Sipariş Listesi"
+                                          TextColor="{StaticResource OffBlack}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+
+                    </Border>
+                </VerticalStackLayout>
+            </Grid>
+        </dx:BottomSheet>
+        <!--#endregion-->
+
+        <!--#region SubUnitset BottomSheet-->
+        <dx:BottomSheet x:Name="subUnitsetBottomSheet"
+                        Grid.Row="1"
+                        Padding="10,30,10,10"
+                        AllowDismiss="True"
+                        BackgroundColor="{StaticResource WhiteSmoke}"
+                        CornerRadius="10"
+                        HalfExpandedRatio="0.5"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <Grid RowDefinitions="Auto, Auto, *" RowSpacing="10">
+                <VerticalStackLayout Grid.Row="0" Spacing="5">
+
+                    <Label Grid.Column="0"
+                           FontAttributes="Bold"
+                           FontSize="Medium"
+                           HorizontalOptions="Start"
+                           Text="{Binding SelectedInputPurchaseBasketModel.ItemCode, StringFormat='{0} Ürünü'}" />
+
+                    <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+                <Grid Grid.Row="1"
+                      Padding="0,5,0,10"
+                      RowDefinitions="Auto, Auto"
+                      RowSpacing="10">
+                    <Grid Grid.Row="0" ColumnDefinitions=".40*, .25*, .25*">
+                        <Label Grid.Column="0"
+                               FontAttributes="Bold"
+                               FontSize="Subtitle"
+                               Text="Alt Birim" />
+                        <Label Grid.Column="1"
+                               FontAttributes="Bold"
+                               FontSize="Subtitle"
+                               HorizontalOptions="Center"
+                               Text="Çevrim" />
+                        <Label Grid.Column="2"
+                               FontAttributes="Bold"
+                               FontSize="Subtitle"
+                               HorizontalOptions="Center"
+                               Text="Katsayı" />
+                    </Grid>
+                    <BoxView Grid.Row="1"
+                             HeightRequest="2"
+                             Color="{StaticResource Primary}" />
+                </Grid>
+                <CollectionView Grid.Row="2" ItemsSource="{Binding SelectedInputPurchaseBasketModel.SubUnitsets}">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:SubUnitset">
+                            <Border Padding="10"
+                                    BackgroundColor="WhiteSmoke"
+                                    StrokeShape="RoundRectangle 5">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductPurchaseOrderProcessBasketListViewModel}}, Path=SubUnitsetTappedCommand}" CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions=".40*,.25*,.25*">
+
+                                    <Label Grid.Column="0" Text="{Binding Code}" />
+                                    <Label Grid.Column="1"
+                                           HorizontalOptions="Center"
+                                           Text="{Binding ConversionValue}" />
+                                    <Label Grid.Column="2"
+                                           HorizontalOptions="Center"
+                                           Text="{Binding OtherConversionValue}" />
+                                </Grid>
+                            </Border>
+
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+        </dx:BottomSheet>
+        <!--#endregion-->
+    </Grid>
+</ContentPage>

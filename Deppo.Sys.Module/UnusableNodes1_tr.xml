@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application>
+  <BOModel Id="BOModel">
+    <Class Name="Deppo.Sys.Module.BusinessObjects.ProcurementAudit">
+      <OwnMembers Id="OwnMembers">
+        <Member Name="LocationreferenceId" Caption="Raf Yeri Referans Id" />
+        <Member Name="ProductReferenceId" Caption="Ürün Referans Id" />
+      </OwnMembers>
+    </Class>
+    <Class Name="Deppo.Sys.Module.BusinessObjects.ProcurementAuditCustomer">
+      <OwnMembers Id="OwnMembers">
+        <Member Name="CurrentReferenceId" Caption="Kullanıcı Referans Id" />
+      </OwnMembers>
+    </Class>
+    <Class Name="Deppo.Sys.Module.BusinessObjects.TransactionAudit">
+      <OwnMembers Id="OwnMembers">
+        <Member Name="ApplicationUserOid" Caption="Kullanıcı Oid" />
+        <Member Name="CurrentReferenceId" Caption="Kullanıcı Referans Id" />
+        <Member Name="ShipAddressReferenceId" Caption="Sevk Adresi Referans Id" />
+        <Member Name="TransactionReferenceId" Caption="Hareket Referans Id" />
+      </OwnMembers>
+    </Class>
+  </BOModel>
+</Application>

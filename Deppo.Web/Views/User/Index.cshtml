@@ -1,0 +1,270 @@
+﻿<div class="card mb-5 mb-xl-8">
+	<!--begin::Header-->
+	<div class="card-header border-0 pt-5">
+		<h3 class="card-title align-items-start flex-column">
+			<span class="card-label fw-bold fs-3">Kullanıcı Listesi</span>
+		</h3>
+
+		<!--begin::Card toolbar-->
+		<div class="card-toolbar">
+			<!--begin::Toolbar-->
+			<div class="d-flex justify-content-end m-3" data-kt-customer-table-toolbar="base">
+				<!--begin::Add user-->
+				<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_add_user">
+					<i class="ki-outline ki-plus fs-2"></i>Kullanıcı Oluştur
+				</button>
+				<!--end::Add user-->
+			</div>
+
+			<div class="d-flex align-items-center position-relative my-1">
+				<i class="ki-outline ki-magnifier fs-3 position-absolute ms-5"></i>
+				<input type="text" user_list_table="search" class="form-control form-control-solid w-250px ps-12" placeholder="Kullanıcı Ara" />
+			</div>
+			<!--end::Toolbar-->
+
+		</div>
+		<!--end::Card toolbar-->
+	</div>
+	<!--end::Header-->
+	<!--begin::Body-->
+	<div class="card-body py-3">
+		<div id="loadingIndicator" class="loading-indicator" style="display: none;">
+			<div class="spinner-border text-primary" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
+		<!--begin::Table container-->
+		<div class="table-responsive">
+			<!--begin::Table-->
+			<table class="table align-middle gs-0 gy-4" id="user_list_table">
+				<!--begin::Table head-->
+				<thead>
+					<tr class="fw-bold text-muted bg-light">
+						<th class="ps-4 min-w-105px rounded-start">Kullanıcı</th>
+						<th class="min-w-100px">Email</th>
+						<th class="min-w-100px">Adres</th>
+						<th class="min-w-100px">Telefon</th>
+						<th class="min-w-80px rounded-end">Logo Kullanıcı Adı</th>
+					</tr>
+				</thead>
+				<!--end::Table head-->
+				<!--begin::Table body-->
+				<tbody>
+				</tbody>
+				<!--end::Table body-->
+			</table>
+			<!--end::Table-->
+		</div>
+		<!--end::Table container-->
+	</div>
+	<!--begin::Body-->
+</div>
+<!--end::Tables Widget 11-->
+<!--begin::Modal - Add task-->
+<div class="modal fade" id="kt_modal_add_user" tabindex="-1" aria-hidden="true">
+	<!--begin::Modal dialog-->
+	<div class="modal-dialog modal-dialog-centered mw-650px">
+		<!--begin::Modal content-->
+		<div class="modal-content">
+			<!--begin::Modal header-->
+			<div class="modal-header" id="kt_modal_add_user_header">
+				<!--begin::Modal title-->
+				<h2 class="fw-bold">Kullanıcı Oluştur</h2>
+				<!--end::Modal title-->
+				<!--begin::Close-->
+				<div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-users-modal-action="close">
+					<i class="ki-outline ki-cross fs-1"></i>
+				</div>
+				<!--end::Close-->
+			</div>
+			<!--end::Modal header-->
+			<!--begin::Modal body-->
+			<div class="modal-body px-5 my-7">
+				<!--begin::Form-->
+				<form id="kt_modal_add_user_form" class="form" action="#">
+					<!--begin::Scroll-->
+					<div class="d-flex flex-column scroll-y px-5 px-lg-10" id="kt_modal_add_user_scroll" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_user_header" data-kt-scroll-wrappers="#kt_modal_add_user_scroll" data-kt-scroll-offset="300px">
+						<div class="fv-row mb-7">
+							<label class="d-block fw-semibold fs-6 mb-5">Fotoğraf</label>
+							<div class="image-input image-input-outline image-input-placeholder" data-kt-image-input="true">
+								<div class="image-input-wrapper w-125px h-125px" style="background-image: none;"></div>
+								<label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="Change avatar">
+									<i class="ki-outline ki-pencil fs-7"></i>
+									<input type="file" name="avatar" accept=".png, .jpg, .jpeg" />
+									<input type="hidden" name="avatar_remove" />
+								</label>
+								<span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="Cancel avatar">
+									<i class="ki-outline ki-cross fs-2"></i>
+								</span>
+								<span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="remove" data-bs-toggle="tooltip" title="Remove avatar">
+									<i class="ki-outline ki-cross fs-2"></i>
+								</span>
+							</div>
+							<div class="form-text">Geçerli Türler: png, jpg, jpeg.</div>
+						</div>
+						<!--end::Input group-->
+						<!--begin::Input group-->
+						<!--begin::Row-->
+						<div class="row row-cols-1 row-cols-sm-2 rol-cols-md-1 row-cols-lg-2">
+							<!--begin::Col-->
+							<div class="col">
+								<!--begin::Input group-->
+								<div class="fv-row mb-7">
+									<!--begin::Label-->
+									<label class="fs-6 fw-semibold form-label mt-3">
+										<span class="required">Adı</span>
+										<span class="ms-1" data-bs-toggle="tooltip" title="Adınızı Giriniz">
+											<i class="ki-outline ki-information fs-7"></i>
+										</span>
+									</label>
+									<!--end::Label-->
+									<!--begin::Input-->
+									<input type="text" class="form-control form-control-solid" placeholder="Adınızı Giriniz" name="firstName" value="" />
+									<!--end::Input-->
+								</div>
+								<!--end::Input group-->
+							</div>
+							<!--end::Col-->
+							<!--begin::Col-->
+							<div class="col">
+								<!--begin::Input group-->
+								<div class="fv-row mb-7">
+									<!--begin::Label-->
+									<label class="fs-6 fw-semibold form-label mt-3">
+										<span>Soyadı</span>
+										<span class="ms-1" data-bs-toggle="tooltip" title="Soyadınızı Giriniz">
+											<i class="ki-outline ki-information fs-7"></i>
+										</span>
+									</label>
+									<!--end::Label-->
+									<!--begin::Input-->
+									<input type="text" class="form-control form-control-solid" placeholder="Soyadınızı Giriniz"  name="lastName" value="" />
+									<!--end::Input-->
+								</div>
+								<!--end::Input group-->
+							</div>
+							<!--end::Col-->
+						</div>
+						<!--end::Row-->
+						<!--end::Input group-->
+						<!--begin::Input group-->
+						<div class="fv-row mb-7">
+							<!--begin::Label-->
+							<label class="required fw-semibold fs-6 mb-2">Kullanıcı Adı</label>
+							<!--end::Label-->
+							<!--begin::Input-->
+							<input type="text" name="userName" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Kullanıcı Adını Giriniz" value="" />
+							<!--end::Input-->
+						</div>
+						<!--end::Input group-->
+						<!--begin::Row-->
+						<div class="row row-cols-1 row-cols-sm-2 rol-cols-md-1 row-cols-lg-2">
+							<!--begin::Col-->
+							<div class="col">
+								<!--begin::Input group-->
+								<div class="fv-row mb-7">
+									<!--begin::Label-->
+									<label class="fs-6 fw-semibold form-label mt-3">
+										<span>TC No</span>
+										<span class="ms-1" data-bs-toggle="tooltip" title="TC Kimlik Numaranızı Giriniz.">
+											<i class="ki-outline ki-information fs-7"></i>
+										</span>
+									</label>
+									<!--end::Label-->
+									<!--begin::Input-->
+									<input type="text" class="form-control form-control-solid" name="tckn" value="" />
+									<!--end::Input-->
+								</div>
+								<!--end::Input group-->
+							</div>
+							<!--end::Col-->
+							<!--begin::Col-->
+							<div class="col">
+								<!--begin::Input group-->
+								<div class="fv-row mb-7">
+									<!--begin::Label-->
+									<label class="fs-6 fw-semibold form-label mt-3">
+										<span>Telefon Numarası</span>
+										<span class="ms-1" data-bs-toggle="tooltip" title="Enter the contact's phone number (optional).">
+											<i class="ki-outline ki-information fs-7"></i>
+										</span>
+									</label>
+									<!--end::Label-->
+									<!--begin::Input-->
+									<input type="text" class="form-control form-control-solid" name="phone" placeholder="555 555 55 55" value="" />
+									<!--end::Input-->
+								</div>
+								<!--end::Input group-->
+							</div>
+							<!--end::Col-->
+						</div>
+						<!--end::Row-->
+						<!--begin::Input group-->
+						<div class="fv-row mb-7">
+							<!--begin::Label-->
+							<label class="required fw-semibold fs-6 mb-2">Email</label>
+							<!--end::Label-->
+							<!--begin::Input-->
+							<input type="email" name="email" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="iyibir@iyibir.com" value="" />
+							<!--end::Input-->
+						</div>
+						<!--end::Input group-->
+						<!--begin::Input group-->
+						<div class="fv-row mb-7">
+							<!--begin::Label-->
+							<label class="fw-semibold fs-6 mb-2">Web Adresi</label>
+							<!--end::Label-->
+							<!--begin::Input-->
+							<input type="text" name="webAddress" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="iyibir@iyibir.com" value="" />
+							<!--end::Input-->
+						</div>
+						<!--end::Input group-->
+						<!--begin::Input group-->
+						<div class="fv-row mb-7">
+							<!--begin::Label-->
+							<label class="fw-semibold fs-6 mb-2">Adres</label>
+							<!--end::Label-->
+							<!--begin::Textarea-->
+							<textarea name="address" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Adresinizi girin" rows="3"></textarea>
+							<!--end::Textarea-->
+						</div>
+						<!--end::Input group-->
+						<!--begin::Input group-->
+						<div class="fv-row mb-7">
+							<!--begin::Label-->
+							<label class="required fw-semibold fs-6 mb-2">Logo Kullanıcı Adı</label>
+							<!--end::Label-->
+							<!--begin::Input-->
+							<input type="text" name="logoUserName" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="LOGO" value="" />
+							<!--end::Input-->
+						</div>
+						<!--end::Input group-->
+					</div>
+					<!--end::Scroll-->
+					<!--begin::Actions-->
+					<div class="text-center pt-10">
+						<button type="reset" class="btn btn-light me-3" data-kt-users-modal-action="cancel">Vazgeç</button>
+						<button type="submit" class="btn btn-primary" data-kt-users-modal-action="submit">
+							<span class="indicator-label">Oluştur</span>
+							<span class="indicator-progress">
+								Lütfen Bekleyiniz...
+								<span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+							</span>
+						</button>
+					</div>
+					<!--end::Actions-->
+				</form>
+				<!--end::Form-->
+			</div>
+			<!--end::Modal body-->
+		</div>
+		<!--end::Modal content-->
+	</div>
+	<!--end::Modal dialog-->
+</div>
+<!--end::Modal - Add task-->
+
+@section Scripts {
+	<script src="~/assets/js/sys/userList.js"></script>
+    <script src="~/assets/js/sys/createuser.js"></script>
+}

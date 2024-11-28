@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProcess.Views.WarehouseCountingLocationListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:locationModel="clr-namespace:Deppo.Mobile.Core.Models.LocationModels;assembly=Deppo.Mobile.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.CountingModule.CountingProcess.WarehouseCountingProcess.ViewModels"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             Title="{Binding Title}"
+             x:DataType="viewModel:WarehouseCountingLocationListViewModel"
+             Shell.TabBarIsVisible="False">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid RowDefinitions="Auto, *, Auto" RowSpacing="10">
+
+        <Border Grid.Row="0"
+                Margin="5,0,5,0"
+                Padding="0"
+                BackgroundColor="{StaticResource PrimaryLight}"
+                HeightRequest="35"
+                Stroke="{StaticResource Primary}"
+                StrokeShape="RoundRectangle 5"
+                StrokeThickness="0.5">
+            <SearchBar x:Name="searchBar"
+                       Placeholder="Ara..."
+                       PlaceholderColor="{StaticResource OffBlack}"
+                       TextColor="{StaticResource OffBlack}">
+                <SearchBar.Behaviors>
+                    <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                    EventName="SearchButtonPressed" />
+                    <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}"
+                                                    EventName="TextChanged" />
+                </SearchBar.Behaviors>
+            </SearchBar>
+        </Border>
+
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Items}"
+                        RemainingItemsThreshold="2"
+                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="locationModel:LocationModel">
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0.1">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:WarehouseCountingLocationListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <Border.Triggers>
+                            <DataTrigger Binding="{Binding IsSelected}"
+                                         TargetType="Border"
+                                         Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+
+                        <Grid ColumnDefinitions="Auto, *">
+                            <Border Grid.Column="0"
+                                    Padding="0,0,10,0"
+                                    BackgroundColor="Transparent"
+                                    StrokeThickness="0">
+                                <toolkit:AvatarView BackgroundColor="{StaticResource Primary}"
+                                                    BorderWidth="0.1"
+                                                    CornerRadius="50"
+                                                    FontAttributes="Bold"
+                                                    HorizontalOptions="Start"
+                                                    Text="{Binding WarehouseNumber}"
+                                                    TextColor="{StaticResource White}" />
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation"
+                                       Text="{Binding Code}" />
+                                <Label LineBreakMode="TailTruncation"
+                                       Text="{Binding Name}"
+                                       TextColor="{StaticResource Gray600}" />
+
+                                <Label>
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span FontAttributes="Bold"
+                                                  FontFamily="FAS"
+                                                  Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                  TextColor="{StaticResource Primary}" />
+                                            <Span Text=" " />
+                                            <Span FontAttributes="Bold"
+                                                  Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                                  TextColor="{StaticResource Primary}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </VerticalStackLayout>
+                        </Grid>
+
+
+
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Grid.Row="2"
+                Margin="5,10,5,20"
+                Command="{Binding NextViewCommand}"
+                IsEnabled="{Binding SelectedLocation, Converter={StaticResource IsNotNullConverter}}"
+                Text="İleri" />
+
+        <dx:BottomSheet x:Name="productOrVariantBottomSheet"
+                        AllowDismiss="True"
+                        BackgroundColor="White"
+                        CornerRadius="15"
+                        HalfExpandedRatio="0.3"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <Grid Padding="10"
+                  RowDefinitions="Auto,*"
+                  RowSpacing="20">
+                <VerticalStackLayout Grid.Row="0"
+                                     Spacing="5">
+                    <Label Padding="10"
+                           FontAttributes="Bold"
+                           FontSize="Subtitle"
+                           Text="İşlem Türünü Seçiniz" />
+                    <BoxView HeightRequest="2"
+                             Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Row="1"
+                                     Spacing="10">
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectProductsCommand}" />
+                        </Border.GestureRecognizers>
+
+                        <Label TextColor="{StaticResource Gray600}"
+                               VerticalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontAttributes="Bold"
+                                          FontFamily="FAS"
+                                          Text="{x:Static fontAwesome:FontAwesomeIcons.List}"
+                                          TextColor="{StaticResource OffBlack}" />
+                                    <Span Text=" " />
+
+                                    <Span Text=" " />
+                                    <Span FontAttributes="Bold"
+                                          Text="Ürün Bazında"
+                                          TextColor="{StaticResource OffBlack}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </Border>
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectVariantsCommand}" />
+                        </Border.GestureRecognizers>
+                        <Label TextColor="{StaticResource Gray600}"
+                               VerticalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontAttributes="Bold"
+                                          FontFamily="FAS"
+                                          Text="{x:Static fontAwesome:FontAwesomeIcons.List}"
+                                          TextColor="{StaticResource OffBlack}" />
+                                    <Span Text=" " />
+
+                                    <Span FontAttributes="Bold"
+                                          Text=" Varyant Bazında"
+                                          TextColor="{StaticResource OffBlack}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </Border>
+                </VerticalStackLayout>
+            </Grid>
+        </dx:BottomSheet>
+    </Grid>
+
+</ContentPage>

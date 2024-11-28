@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.SalesModule.WaitingOrderMenu.Views.WaitingSalesOrderListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:customerModel="clr-namespace:Deppo.Mobile.Core.Models.SalesModels;assembly=Deppo.Mobile.Core"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:model="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
+             xmlns:shipAddressModel="clr-namespace:Deppo.Mobile.Core.Models.ShipAddressModels;assembly=Deppo.Mobile.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.WaitingOrderMenu.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:WaitingSalesOrderListViewModel">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Command="{Binding FilterTappedCommand}">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FAS"
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Filter}"
+                                 Size="Large" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
+    <ContentPage.Behaviors>
+
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid RowDefinitions="*, Auto" RowSpacing="10">
+
+        <CollectionView Grid.Row="0"
+                        ItemsSource="{Binding Items}"
+                        RemainingItemsThreshold="2"
+                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="customerModel:WaitingSalesOrderModel">
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeThickness="0.1">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                            <Border Padding="5"
+                                    BackgroundColor="{StaticResource Secondary}"
+                                    StrokeShape="RoundRectangle 5"
+                                    StrokeThickness="0.5">
+                                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Label FontAttributes="Bold"
+                                           FontSize="Subtitle"
+                                           HorizontalOptions="Center"
+                                           Text="{Binding OrderDate, StringFormat='{0:dd}'}" />
+                                    <Label FontSize="Caption"
+                                           HorizontalOptions="Center"
+                                           Text="{Binding OrderDate, StringFormat='{0:MM/yyyy}'}" />
+                                    <Label FontSize="Caption"
+                                           HorizontalOptions="Center"
+                                           Text="{Binding OrderDate, StringFormat='{0:HH:mm}'}" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation"
+                                       Text="{Binding OrderNumber}" />
+                                <Label FontAttributes="Bold"
+                                       FontSize="14"
+                                       LineBreakMode="TailTruncation"
+                                       Text="{Binding ProductCode}" />
+                                <Label LineBreakMode="TailTruncation"
+                                       Text="{Binding ProductName}"
+                                       TextColor="{StaticResource Gray600}" />
+
+                                <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+
+                                    <Label>
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span FontFamily="FAS"
+                                                      Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                      TextColor="{StaticResource Primary}" />
+                                                <Span Text=" " />
+                                                <Span Text="{Binding WaitingQuantity, StringFormat='{0:N2}'}" TextColor="{StaticResource Gray600}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+
+                                    <Label>
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span FontFamily="FAS"
+                                                      Text="{x:Static fontAwesome:FontAwesomeIcons.LocationDot}"
+                                                      TextColor="{StaticResource Primary}" />
+                                                <Span Text=" " />
+                                                <Span Text="{Binding ShipInfoCode}" TextColor="{StaticResource Gray600}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <VerticalStackLayout Grid.Row="1">
+            <dx:BottomSheet x:Name="filterBottomSheet"
+                            AllowDismiss="True"
+                            BackgroundColor="White"
+                            CornerRadius="15"
+                            HalfExpandedRatio="0.5"
+                            IsModal="True"
+                            ShowGrabber="True">
+                <!--#region BottomSheetContent-->
+                <Grid Padding="10"
+                      RowDefinitions="Auto,*,Auto"
+                      RowSpacing="20">
+
+                    <VerticalStackLayout Grid.Row="0" Spacing="5">
+                        <Label FontAttributes="Bold"
+                               FontSize="Subtitle"
+                               Text="Filtrele" />
+                        <BoxView HeightRequest="2" Color="{StaticResource OffBlack}" />
+                    </VerticalStackLayout>
+
+
+                    <VerticalStackLayout Grid.Row="1"
+                                         Spacing="10"
+                                         VerticalOptions="Start">
+                        <dx:FormListPickerItem InlineContent="Müşteri"
+                                               ItemsSource="{Binding Customers}"
+                                               PickerShowMode="BottomSheet"
+                                               PickerTitle="Müşteri Seçiniz"
+                                               SelectedItem="{Binding SelectedCustomerModel}"
+                                               TapCommand="{Binding LoadCustomersCommand}"
+                                               Text="{Binding SelectedCustomerModel.Name}">
+                            <dx:FormListPickerItem.ImageSource>
+                                <FontImageSource FontFamily="FAS"
+                                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.User}"
+                                                 Size="15"
+                                                 Color="{StaticResource White}" />
+                            </dx:FormListPickerItem.ImageSource>
+                            <dx:FormListPickerItem.ItemTemplate>
+                                <DataTemplate x:DataType="customerModel:CustomerModel">
+                                    <Border Padding="15" StrokeShape="RoundRectangle 5">
+                                        <Label FontAttributes="Bold"
+                                               LineBreakMode="TailTruncation"
+                                               Text="{Binding Name}"
+                                               TextColor="{StaticResource OffBlack}"
+                                               VerticalOptions="Center" />
+                                    </Border>
+                                </DataTemplate>
+                            </dx:FormListPickerItem.ItemTemplate>
+                        </dx:FormListPickerItem>
+
+                        <dx:FormListPickerItem InlineContent="Sevk Adresi"
+                                               ItemsSource="{Binding ShipAddresses}"
+                                               PickerShowMode="BottomSheet"
+                                               PickerTitle="Sevk Adresi Seçiniz"
+                                               SelectedItem="{Binding SelectedShipAddressModel}"
+                                               TapCommand="{Binding LoadShipAddressesCommand}"
+                                               Text="{Binding SelectedShipAddressModel.Name}">
+                            <dx:FormListPickerItem.ImageSource>
+                                <FontImageSource FontFamily="FAS"
+                                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.Truck}"
+                                                 Size="15"
+                                                 Color="{StaticResource White}" />
+                            </dx:FormListPickerItem.ImageSource>
+                            <dx:FormListPickerItem.ItemTemplate>
+                                <DataTemplate x:DataType="shipAddressModel:ShipAddressModel">
+                                    <Border Padding="15" StrokeShape="RoundRectangle 5">
+                                        <Label FontAttributes="Bold"
+                                               LineBreakMode="TailTruncation"
+                                               Text="{Binding Name}"
+                                               TextColor="{StaticResource OffBlack}"
+                                               VerticalOptions="Center" />
+                                    </Border>
+                                </DataTemplate>
+                            </dx:FormListPickerItem.ItemTemplate>
+                        </dx:FormListPickerItem>
+                    </VerticalStackLayout>
+
+
+                    <Button Grid.Row="2"
+                            Command="{Binding ConfirmCommand}"
+                            Text="Tamam" />
+
+                </Grid>
+                <!--#endregion-->
+            </dx:BottomSheet>
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application>
+  <BOModel Id="BOModel">
+    <Class Name="Deppo.Sys.Module.LogoBusinessObjects.LOGO_ProcurementFiche" Caption="Ürün Toplama Fiş Listesi">
+      <OwnMembers Id="OwnMembers">
+        <Member Name="CreatedOn" Caption="Oluşturulma Zamanı" />
+        <Member Name="CustomerCode" Caption="Müşteri Kodu" />
+        <Member Name="CustomerName" Caption="Müşteri Adı" />
+        <Member Name="CustomerReferenceId" Caption="Müşteri Referans Id" />
+        <Member Name="DocumentNumber" Caption="Doküman Numarası" />
+        <Member Name="FicheNumber" Caption="Fiş Numarası" />
+        <Member Name="FirmNumber" Caption="Firma Numarası" />
+        <Member Name="ReferenceId" Caption="Referans Id" />
+        <Member Name="ShippedAddressCode" Caption="Sevk Adres Kodu" />
+        <Member Name="ShippedAddressName" Caption="Sevk Adresi" />
+        <Member Name="ShippedAddressReferenceId" Caption="Sevk Adresi Referans Id" />
+        <Member Name="WarehouseName" Caption="Ambar Adı" />
+        <Member Name="WarehouseNumber" Caption="Ambar Numarası" />
+      </OwnMembers>
+    </Class>
+  </BOModel>
+  <Views Id="Views">
+    <DetailView Id="LOGO_ProcurementFiche_DetailView">
+      <Items Id="Items">
+        <PropertyEditor Id="ShippedAddressCode" Caption="Sevk Adres Kodu" />
+        <PropertyEditor Id="ShippedAddressName" Caption="Sevk Adresi" />
+      </Items>
+      <Layout Id="Layout">
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="SimpleEditors">
+            <LayoutGroup Id="LOGO_ProcurementFiche" Caption="Ürün Toplama Fiş Listesi" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+  </Views>
+</Application>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByProductProcess.Views.ProcurementByProductFormView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByProductProcess.ViewModels"
+             Title=""
+             x:DataType="viewModel:ProcurementByProductFormViewModel"
+             Shell.PresentationMode="Modal">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Loaded" Command="{Binding LoadPageCommand}" />
+    </ContentPage.Behaviors>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+            <toolkit:IsNotEqualConverter x:Key="IsNotEqualConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <!--<Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding BackCommand}" />
+    </Shell.BackButtonBehavior>-->
+
+    <Grid RowDefinitions="Auto, *, Auto" RowSpacing="10">
+        <Grid Grid.Row="0"
+              ColumnDefinitions="*, Auto"
+              ColumnSpacing="10"
+              Margin="10,10,10,0">
+            <Label Grid.Column="0"
+                   
+                   FontAttributes="Bold"
+                   FontSize="20"
+                   HorizontalOptions="Start"
+                   Text="Form Sayfası"
+                   TextColor="{StaticResource WhiteSmoke}"
+                   VerticalOptions="End" />
+            <ImageButton Grid.Column="1"
+                         Aspect="AspectFill"
+                         Command="{Binding BackCommand}"
+                         HeightRequest="25"
+                         HorizontalOptions="End"
+                         VerticalOptions="Center"
+                         WidthRequest="25">
+                <ImageButton.Source>
+                    <FontImageSource FontFamily="FAS"
+                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                                     Color="{StaticResource WhiteSmoke}" />
+                </ImageButton.Source>
+            </ImageButton>
+        </Grid>
+
+        <ScrollView Grid.Row="1" Orientation="Vertical">
+            <VerticalStackLayout Spacing="5">
+                <dx:FormGroupItem Header="Fiş Bilgileri"
+                                  HeaderFontAttributes="Bold"
+                                  HeaderFontSize="18">
+                    <dx:FormItem>
+                        <dx:FormItem.ContentTemplate>
+                            <DataTemplate>
+                                <VerticalStackLayout Spacing="5">
+                                    <dx:DateEdit Grid.Column="0"
+                                                 BorderColor="{StaticResource PrimaryLight}"
+                                                 Date="{Binding TransactionDate}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 LabelText="Fiş Tarihi"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.CalendarDay}" />
+
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                          FocusedBorderColor="{StaticResource Primary}"
+                                          IsReadOnly="True"
+                                          LabelText="Müşteri"
+                                          StartIcon="{x:Static fontAwesome:FontAwesomeIcons.User}"
+                                          Text="{Binding SelectedCustomer.Name}" />
+
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                          FocusedBorderColor="{StaticResource Primary}"
+                                          IsReadOnly="True"
+                                          LabelText="Giriş Ambarı"
+                                          StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                          Text="{Binding ProcurementProductBasketModel.OrderWarehouse.Name}" />
+
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                          FocusedBorderColor="{StaticResource Primary}"
+                                          IsReadOnly="True"
+                                          LabelText="Çıkış Ambarı"
+                                          StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                          Text="{Binding ProcurementProductBasketModel.ProcurementWarehouse.Name}" />
+
+                                    <!--#region Sevk Adresi-->
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                          FocusedBorderColor="{StaticResource Primary}"
+                                          IsReadOnly="True"
+                                          LabelText="Sevk Adresi"
+                                          MaxCharacterCountOverflowMode="None"
+                                          StartIcon="{x:Static fontAwesome:FontAwesomeIcons.User}"
+                                          Text="{Binding SelectedCustomer.ShipAddress.Name, TargetNullValue='-', FallbackValue='-'}"
+                                          ToolTipProperties.Text="{Binding SelectedCustomer.ShipAddress.Name, TargetNullValue='-', FallbackValue='-'}" />
+                                    <!--#endregion-->
+
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 LabelText="Belge Numarası"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding DocumentNumber}" />
+
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 LabelText="Özel Kod"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding SpecialCode}" />
+
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 LabelText="Açıklama"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding Description}" />
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </dx:FormItem.ContentTemplate>
+                    </dx:FormItem>
+                </dx:FormGroupItem>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Button Grid.Row="2"
+                Margin="5,10,5,20"
+                Text="Onayla"
+                Command="{Binding ConfirmCommand}"
+                VerticalOptions="End" />
+    </Grid>
+
+</ContentPage>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.Views.ReturnPurchaseDispatchSupplierListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:purchaseModel="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels;assembly=Deppo.Mobile.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:ReturnPurchaseDispatchSupplierListViewModel"
+             Shell.TabBarIsVisible="False">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid RowDefinitions="*,Auto">
+
+        <Grid Grid.Row="0"
+              RowDefinitions="Auto,*"
+              RowSpacing="10">
+            <Border Grid.Row="0"
+                    Margin="5,0,5,0"
+                    Padding="0"
+                    BackgroundColor="{StaticResource PrimaryLight}"
+                    HeightRequest="35"
+                    Stroke="{StaticResource Primary}"
+                    StrokeShape="RoundRectangle 5"
+                    StrokeThickness="0.5">
+                <SearchBar x:Name="searchBar"
+                           Placeholder="Ara..."
+                           PlaceholderColor="{StaticResource OffBlack}"
+                           TextColor="{StaticResource OffBlack}">
+                    <SearchBar.Behaviors>
+                        <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
+                                                        EventName="SearchButtonPressed" />
+                        <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}"
+                                                        EventName="TextChanged" />
+                    </SearchBar.Behaviors>
+                </SearchBar>
+            </Border>
+
+            <CollectionView Grid.Row="1"
+                            ItemsSource="{Binding Items}"
+                            RemainingItemsThreshold="2"
+                            RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="purchaseModel:PurchaseSupplier">
+
+
+                        <Border StrokeShape="RoundRectangle 10" StrokeThickness="0.1">
+                            <Grid Padding="10"
+                                  ColumnDefinitions="Auto,*"
+                                  ColumnSpacing="10">
+                                <toolkit:AvatarView Background="{StaticResource PrimaryLight}"
+                                                    BorderColor="{StaticResource Primary}"
+                                                    CornerRadius="200"
+                                                    FontAttributes="Bold"
+                                                    FontSize="16"
+                                                    HeightRequest="50"
+                                                    Text="{Binding TitleName}"
+                                                    TextColor="{StaticResource OffBlack}"
+                                                    VerticalOptions="Start"
+                                                    WidthRequest="50" />
+
+                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                    <Label FontAttributes="Bold"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="1"
+                                           Text="{Binding Name}" />
+
+                                    <Label>
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{Binding City}" />
+                                                <Span Text=" / " />
+                                                <Span Text="{Binding Country}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+
+                                    <Grid ColumnDefinitions="Auto, Auto" ColumnSpacing="10">
+                                        <Label Grid.Column="0">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span FontFamily="FAS" Text="{x:Static fontAwesome:FontAwesomeIcons.Box}" />
+                                                    <Span Text=" " />
+                                                    <Span Text="{Binding ProductReferenceCount}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Grid>
+                            <Border.Triggers>
+                                <DataTrigger Binding="{Binding IsSelected}"
+                                             TargetType="Border"
+                                             Value="True">
+                                    <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding IsSelected}"
+                                             TargetType="Border"
+                                             Value="False">
+                                    <Setter Property="BackgroundColor" Value="Transparent" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnPurchaseDispatchSupplierListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+        <Button Grid.Row="1"
+                Margin="5,10,5,20"
+                Command="{Binding NextViewCommand}"
+                IsEnabled="{Binding PurchaseSupplier, Converter={StaticResource IsNotNullConverter}}"
+                Text="İleri" />
+    </Grid>
+</ContentPage>

@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.CountingModule.NegativeProductMenu.Views.NegativeProductFormView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:countingModel="clr-namespace:Deppo.Mobile.Core.Models.CountingModels;assembly=Deppo.Mobile.Core"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.CountingModule.NegativeProductMenu.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:NegativeProductFormViewModel"
+             Shell.TabBarIsVisible="False">
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding BackCommand}" />
+    </Shell.BackButtonBehavior>
+
+
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
+        <VerticalStackLayout Grid.Row="0" Spacing="5">
+            <dx:FormGroupItem Header="Fiş Bilgileri"
+                              HeaderFontAttributes="Bold"
+                              HeaderFontSize="18">
+                <dx:FormItem>
+                    <dx:FormItem.ContentTemplate>
+                        <DataTemplate>
+                            <VerticalStackLayout Spacing="5">
+                                <dx:DateEdit Grid.Column="0"
+                                             BorderColor="{StaticResource PrimaryLight}"
+                                             Date="{Binding TransactionDate}"
+                                             FocusedBorderColor="{StaticResource Primary}"
+                                             LabelText="Fiş Tarihi"
+                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.CalendarDay}" />
+
+                                <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                             FocusedBorderColor="{StaticResource Primary}"
+                                             LabelText="Belge Numarası"
+                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                             Text="{Binding DocumentNumber}" />
+
+                                <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                             FocusedBorderColor="{StaticResource Primary}"
+                                             LabelText="Doküman İzleme Numarası"
+                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                             Text="{Binding DocumentTrackingNumber}" />
+
+                                <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                             FocusedBorderColor="{StaticResource Primary}"
+                                             LabelText="Özel Kod"
+                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                             Text="{Binding SpecialCode}" />
+
+                                <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                             FocusedBorderColor="{StaticResource Primary}"
+                                             LabelText="Açıklama"
+                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                             Text="{Binding Description}" />
+                            </VerticalStackLayout>
+                        </DataTemplate>
+                    </dx:FormItem.ContentTemplate>
+                </dx:FormItem>
+            </dx:FormGroupItem>
+        </VerticalStackLayout>
+        <CollectionView Grid.Row="1" ItemsSource="{Binding NegativeProductBasketModel}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="countingModel:NegativeProductBasketModel">
+                    <Border Padding="10"
+                            BackgroundColor="Transparent"
+                            StrokeThickness="0.1">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:NegativeProductFormViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="10">
+                            <Border Grid.Column="0"
+                                    Padding="0,0,10,0"
+                                    BackgroundColor="Transparent"
+                                    StrokeThickness="0">
+
+                                <toolkit:AvatarView BackgroundColor="{StaticResource Primary}"
+                                                    BorderWidth="0.1"
+                                                    CornerRadius="50"
+                                                    FontAttributes="Bold"
+                                                    HorizontalOptions="Start"
+                                                    Text="{Binding NegativeWarehouseModel.WarehouseNumber}"
+                                                    TextColor="{StaticResource White}" />
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Padding="5"
+                                                 Spacing="5"
+                                                 VerticalOptions="Center">
+                                <Label FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="1"
+                                       Text="{Binding NegativeWarehouseModel.WarehouseName}" />
+                            </VerticalStackLayout>
+
+                            <Label Grid.Column="2"
+                                   HorizontalOptions="End"
+                                   VerticalOptions="Center">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding NegativeWarehouseModel.StockQuantity}" TextColor="{StaticResource Gray600}" />
+                                        <Span Text=" " />
+                                        <Span Text="{Binding NegativeWarehouseModel.SubUnitsetCode}" TextColor="{StaticResource Gray600}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <Button Grid.Row="2"
+                Margin="5,10,5,20"
+                Command="{Binding SaveCommand}"
+                Text="Kaydet"
+                VerticalOptions="End" />
+
+        <dx:BottomSheet x:Name="productList"
+                        Padding="10,30,10,10"
+                        AllowDismiss="True"
+                        BackgroundColor="{StaticResource Gray100}"
+                        CornerRadius="10"
+                        HalfExpandedRatio="0.5"
+                        IsModal="True"
+                        ShowGrabber="True">
+            <Grid RowDefinitions="Auto,*" RowSpacing="20">
+                <VerticalStackLayout Grid.Row="0" Spacing="10">
+                    <Label FontAttributes="Bold"
+                           FontSize="Medium"
+                           Text="{Binding SelectedNegativeProductBasketModel.NegativeWarehouseModel.WarehouseName, StringFormat='{0} Ambarı Negatif Ürün Listesi'}" />
+                    <BoxView HeightRequest="2" Color="{StaticResource OffBlack}" />
+                </VerticalStackLayout>
+                <Grid Grid.Row="1"
+                      RowDefinitions="*, Auto"
+                      RowSpacing="10">
+                    <CollectionView Grid.Row="0" ItemsSource="{Binding NegativeProductItems}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="countingModel:NegativeProductModel">
+                                <Border Padding="10"
+                                        BackgroundColor="{StaticResource WhiteSmoke}"
+                                        StrokeShape="RoundRectangle 10"
+                                        StrokeThickness="0.1">
+                                    <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="10">
+                                        <Border Grid.Column="0"
+                                                BackgroundColor="{StaticResource Secondary}"
+                                                StrokeShape="RoundRectangle 5"
+                                                StrokeThickness="0.5">
+                                            <Image HeightRequest="50" WidthRequest="50" />
+                                        </Border>
+
+                                        <VerticalStackLayout Grid.Column="1"
+                                                             Spacing="2"
+                                                             VerticalOptions="Center">
+                                            <Label FontAttributes="Bold"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="1"
+                                                   Text="{Binding ProductCode}" />
+                                            <Label LineBreakMode="TailTruncation"
+                                                   MaxLines="1"
+                                                   Text="{Binding ProductName}"
+                                                   TextColor="{StaticResource Gray600}" />
+
+                                            <Grid ColumnDefinitions="Auto, Auto, Auto"
+                                                  ColumnSpacing="3"
+                                                  HorizontalOptions="Start"
+                                                  VerticalOptions="Start">
+                                                <Label Grid.Column="0"
+                                                       FontFamily="FAS"
+                                                       FontSize="10"
+                                                       Text="{Binding VariantIcon}"
+                                                       TextColor="{Binding VariantIconColor}" />
+                                                <Label Grid.Column="1"
+                                                       FontFamily="FAS"
+                                                       FontSize="10"
+                                                       Text="{Binding LocTrackingIcon}"
+                                                       TextColor="{Binding LocTrackingIconColor}" />
+                                                <Label Grid.Column="2"
+                                                       FontFamily="FAS"
+                                                       FontSize="10"
+                                                       Text="{Binding TrackingTypeIcon}"
+                                                       TextColor="{Binding TrackingTypeIconColor}" />
+                                            </Grid>
+                                        </VerticalStackLayout>
+
+                                        <Label Grid.Column="2"
+                                               HorizontalOptions="End"
+                                               VerticalOptions="Center">
+
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding StockQuantity}" TextColor="{StaticResource Gray600}" />
+                                                    <Span Text=" " />
+                                                    <Span Text="{Binding SubUnitsetCode}" TextColor="{StaticResource Gray600}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Button Grid.Row="1" Text="Tamam" Command="{Binding BottomSheetCloseCommand}" />
+                </Grid>
+
+
+
+            </Grid>
+        </dx:BottomSheet>
+    </Grid>
+
+</ContentPage>

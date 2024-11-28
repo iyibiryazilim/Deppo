@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByProductProcess.Views.ProcurementByProductQuantityDistributionListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
+             xmlns:salesModels="clr-namespace:Deppo.Mobile.Core.Models.SalesModels;assembly=Deppo.Mobile.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByProductProcess.ViewModels"
+             Title="{Binding Title}"
+             x:DataType="viewModel:ProcurementByProductQuantityDistributionListViewModel"
+             Shell.TabBarIsVisible="False">
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+            <toolkit:IsNotEqualConverter x:Key="IsNotEqualConverter" />
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <!--<Shell.BackButtonBehavior>
+     <BackButtonBehavior Command="{Binding BackCommand}" />
+ </Shell.BackButtonBehavior>-->
+
+    <ContentPage.BackgroundImageSource>
+        <OnPlatform x:TypeArguments="ImageSource">
+            <On Platform="Android" Value="artboard.png" />
+        </OnPlatform>
+    </ContentPage.BackgroundImageSource>
+
+    <Grid RowDefinitions="Auto, *, Auto" RowSpacing="10">
+        <Border Grid.Row="0"
+                Padding="10"
+                BackgroundColor="{StaticResource Primary}"
+                StrokeThickness="0">
+
+            <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="10">
+                <Border Grid.Column="0"
+                        Stroke="{StaticResource Gray200}"
+                        StrokeShape="RoundRectangle 5"
+                        StrokeThickness="0.5">
+                    <Image Grid.Column="0"
+                           HeightRequest="50"
+                           Source="{Binding ProcurementItem.ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                           WidthRequest="50" />
+                </Border>
+
+                <VerticalStackLayout Grid.Column="1" Spacing="3">
+                    <Label Grid.Column="0"
+                           FontAttributes="Bold"
+                           LineBreakMode="TailTruncation"
+                           Text="{Binding ProcurementItem.ItemCode}" />
+
+                    <Label LineBreakMode="TailTruncation"
+                           Text="{Binding ProcurementItem.ItemName}"
+                           TextColor="{StaticResource Gray600}" />
+                </VerticalStackLayout>
+
+                <Border Grid.Column="2" HorizontalOptions="End" VerticalOptions="Center" BackgroundColor="{StaticResource Secondary}" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="5" WidthRequest="50">
+                    <Label FontAttributes="Bold" FontSize="15" VerticalOptions="Center" HorizontalOptions="Center">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="{Binding ProcurementItem.Quantity}" TextColor="{StaticResource White}" FontAttributes="Bold" />
+                               
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+
+                </Border>
+            </Grid>
+
+        </Border>
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding ProcurementProductBasketModel.SelectedCustomers}">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout ItemSpacing="10" Orientation="Vertical" />
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="salesModels:CustomerOrderModel">
+                    <Border BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0.1">
+                        <Grid Padding="10"
+                              ColumnDefinitions="Auto,*, Auto"
+                              ColumnSpacing="10">
+                            <toolkit:AvatarView Background="{StaticResource PrimaryLight}"
+                                                BorderColor="{StaticResource Primary}"
+                                                CornerRadius="200"
+                                                FontAttributes="Bold"
+                                                FontSize="16"
+                                                HeightRequest="50"
+                                                Text="{Binding TitleName}"
+                                                TextColor="{StaticResource OffBlack}"
+                                                VerticalOptions="Start"
+                                                WidthRequest="50" />
+
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="1"
+                                       Text="{Binding Name}" />
+
+                                <Label>
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding City}" />
+                                            <Span Text=" / " />
+                                            <Span Text="{Binding Country}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+
+                                <Grid ColumnDefinitions="Auto, Auto" ColumnSpacing="10">
+                                    <Label Grid.Column="0">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span FontFamily="FAS" Text="{x:Static fontAwesome:FontAwesomeIcons.Box}" />
+                                                <Span Text=" " />
+                                                <Span Text="{Binding OrderReferenceCount}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </Grid>
+                            </VerticalStackLayout>
+
+                            <Grid Grid.Column="2"
+                                  ColumnDefinitions="Auto,Auto,Auto"
+                                  ColumnSpacing="10"
+                                  HorizontalOptions="End"
+                                  VerticalOptions="Center">
+                                <Border Grid.Column="0"
+                                        Padding="5"
+                                        BackgroundColor="Transparent"
+                                        Stroke="{StaticResource Secondary}"
+                                        StrokeShape="RoundRectangle 2">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByProductQuantityDistributionListViewModel}}, Path=DecreaseCommand}" CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <Label FontFamily="FAS"
+                                           FontSize="Medium"
+                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                           TextColor="{StaticResource Secondary}" />
+                                </Border>
+                                <Label Grid.Column="1"
+                                       FontAttributes="Bold"
+                                       FontSize="Large"
+                                       Text="{Binding DistributedQuantity}"
+                                       TextColor="{StaticResource OffBlack}"
+                                       VerticalOptions="Center">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByProductQuantityDistributionListViewModel}}, Path=QuantityTappedCommand}" CommandParameter="{Binding .}" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Border Grid.Column="2"
+                                        Padding="5"
+                                        BackgroundColor="{StaticResource Secondary}"
+                                        Stroke="{StaticResource Secondary}"
+                                        StrokeShape="RoundRectangle 2">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByProductQuantityDistributionListViewModel}}, Path=IncreaseCommand}" CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <Label FontFamily="FAS"
+                                           FontSize="Medium"
+                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                           TextColor="{StaticResource White}" />
+
+
+                                </Border>
+                            </Grid>
+                        </Grid>
+
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ProcurementByProductQuantityDistributionListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Grid.Row="2"
+                Margin="5,10,5,20"
+                Command="{Binding SaveCommand}"
+                Text="Kaydet" />
+    </Grid>
+
+</ContentPage>
