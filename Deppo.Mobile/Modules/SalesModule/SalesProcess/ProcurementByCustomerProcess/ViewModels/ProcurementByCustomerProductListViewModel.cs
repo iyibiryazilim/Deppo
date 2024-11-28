@@ -90,6 +90,7 @@ public partial class ProcurementByCustomerProductListViewModel : BaseViewModel
 				warehouseNumber: WarehouseModel?.Number ?? 0,
 				orderWarehouseNumber: OrderWarehouseModel?.Number ?? 0,
 				customerReferenceId: ProcurementCustomerModel.ReferenceId,
+				shipAddressReferenceId: ProcurementCustomerModel.ShipAddressReferenceId,
 				search: string.Empty,
 				skip: 0,
 				take: 99999
