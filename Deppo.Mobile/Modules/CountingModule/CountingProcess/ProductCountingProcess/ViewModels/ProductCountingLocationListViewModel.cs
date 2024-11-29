@@ -26,7 +26,7 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 	private readonly ILocationService _locationService;
 
 	[ObservableProperty]
-	LocationModel selectedLocation = null!;
+	LocationModel? selectedLocation;
 
 	[ObservableProperty]
     ProductCountingBasketModel productCountingBasketModel = null!;
@@ -239,6 +239,11 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
+			if(SelectedLocation is not null)
+			{
+				SelectedLocation.IsSelected = false;
+				SelectedLocation = null;
+			}
 
 			SearchText.Text = string.Empty;
 			await Shell.Current.GoToAsync("..");

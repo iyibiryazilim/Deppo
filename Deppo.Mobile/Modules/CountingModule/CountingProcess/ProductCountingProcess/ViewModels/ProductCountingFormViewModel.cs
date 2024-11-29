@@ -31,6 +31,7 @@ public partial class ProductCountingFormViewModel : BaseViewModel
     private readonly IInCountingTransactionService _inCountingTransactionService;
     private readonly IOutCountingTransactionService _outCountingTransactionService;
     private readonly IUserDialogs _userDialogs;
+    private readonly IServiceProvider _serviceProvider;
 
 
     [ObservableProperty]
@@ -60,22 +61,22 @@ public partial class ProductCountingFormViewModel : BaseViewModel
     string specialCode = string.Empty;
 
 
-    public ProductCountingFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IOutCountingTransactionService outCountingTransactionService, IInCountingTransactionService inCountingTransactionService)
-    {
-        _httpClientService = httpClientService;
-        _inCountingTransactionService = inCountingTransactionService;
-        _outCountingTransactionService = outCountingTransactionService;
-        _userDialogs = userDialogs;
+	public ProductCountingFormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IOutCountingTransactionService outCountingTransactionService, IInCountingTransactionService inCountingTransactionService, IServiceProvider serviceProvider)
+	{
+		_httpClientService = httpClientService;
+		_inCountingTransactionService = inCountingTransactionService;
+		_outCountingTransactionService = outCountingTransactionService;
+		_userDialogs = userDialogs;
+		_serviceProvider = serviceProvider;
 
+		Title = "Ürüne Göre Ambar Sayım Formu";
 
-        Title = "Ürüne Göre Ambar Sayım Formu";
-
-        SaveCommand = new Command(async () => await SaveAsync());
-        LoadPageCommand = new Command(async () => await LoadPageAsync());
-        ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
-        BackCommand = new Command(async () => await BackAsync());
-    }
-    public Page CurrentPage { get; set; }
+		SaveCommand = new Command(async () => await SaveAsync());
+		LoadPageCommand = new Command(async () => await LoadPageAsync());
+		ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
+		BackCommand = new Command(async () => await BackAsync());
+	}
+	public Page CurrentPage { get; set; }
 
     public Command SaveCommand { get; }
     public Command LoadPageCommand { get; }
@@ -252,7 +253,10 @@ public partial class ProductCountingFormViewModel : BaseViewModel
             resultModel.PageTitle = Title;
             resultModel.PageCountToBack = LocationModel == null ? 5 : 6;
 
-            if (_userDialogs.IsHudShowing)
+			await ClearFormAsync();
+            await ClearDataAsync();
+
+			if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
 
             await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
@@ -260,7 +264,7 @@ public partial class ProductCountingFormViewModel : BaseViewModel
                 [nameof(ResultModel)] = resultModel
             });
 
-            await ClearFormAsync();
+            
         }
         else
         {
@@ -336,15 +340,16 @@ public partial class ProductCountingFormViewModel : BaseViewModel
             resultModel.PageTitle = Title;
             resultModel.PageCountToBack = LocationModel == null ? 5 : 6;
 
-            if (_userDialogs.IsHudShowing)
+			await ClearFormAsync();
+			await ClearDataAsync();
+
+			if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
 
             await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
             {
                 [nameof(ResultModel)] = resultModel
             });
-
-            await ClearFormAsync();
         }
         else
         {
@@ -402,5 +407,55 @@ public partial class ProductCountingFormViewModel : BaseViewModel
         Description = string.Empty;
         SpecialCode = string.Empty;
         TransactionDate = DateTime.Now;
+    }
+
+    private async Task ClearDataAsync()
+    {
+        try
+        {
+            var locationListViewModel = _serviceProvider.GetRequiredService<ProductCountingLocationListViewModel>();
+            var productListViewModel = _serviceProvider.GetRequiredService<ProductCountingProductListViewModel>();
+            var warehouseTotalListViewModel = _serviceProvider.GetRequiredService<ProductCountingWarehouseTotalListViewModel>();
+            var basketViewModel = _serviceProvider.GetRequiredService<ProductCountingBasketViewModel>();
+
+            if(productListViewModel is not null)
+            {
+                if(productListViewModel.SelectedProduct is not null)
+                {
+                    productListViewModel.SelectedProduct.IsSelected = false;
+					productListViewModel.SelectedProduct = null;
+				}   
+            }
+
+            if(warehouseTotalListViewModel is not null)
+            {
+                if(warehouseTotalListViewModel.SelectedWarehouse is not null)
+                {
+                    warehouseTotalListViewModel.SelectedWarehouse.IsSelected = false;
+                    warehouseTotalListViewModel.SelectedWarehouse = null;
+                }
+            }
+
+            if(locationListViewModel is not null)
+            {
+                if(locationListViewModel.SelectedLocation is not null)
+                {
+                    locationListViewModel.SelectedLocation.IsSelected = false;
+                    locationListViewModel.SelectedLocation = null;
+                }
+            }
+
+            if(basketViewModel is not null)
+            {
+                basketViewModel.ProductCountingBasketModel.LocationTransactions.Clear();
+
+			}
+            
+
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
     }
 }

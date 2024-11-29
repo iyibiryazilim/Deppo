@@ -43,6 +43,7 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
 		ConfirmVariantCommand = new Command(async () => await ConfirmVariantAsync());
 		ItemTappedCommand = new Command<ProductModel>(ItemTappedAsync);
 		NextViewCommand = new Command(async () => await NextViewAsync());
+		BackCommand = new Command(async () => await BackAsync());
 	}
 
 	[ObservableProperty]
@@ -67,6 +68,7 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
     public Command ConfirmVariantCommand { get; }
 
     public Command NextViewCommand { get; }
+    public Command BackCommand { get; }
 
     public Page CurrentPage { get; set; } = null!;
 
@@ -462,9 +464,6 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
 
             if (SelectedProduct is not null)
             {
-
-               
-
                 await Shell.Current.GoToAsync($"{nameof(ProductCountingWarehouseTotalListView)}", new Dictionary<string, object>
                 {
                     [nameof(ProductCountingBasketModel)] = ProductCountingBasketModel,
@@ -478,6 +477,35 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
         catch (Exception ex)
         {
             _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            if(SelectedProduct is not null)
+            {
+                SelectedProduct.IsSelected = false;
+                SelectedProduct = null;
+            }
+
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
