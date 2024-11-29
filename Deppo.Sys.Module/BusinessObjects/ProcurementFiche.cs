@@ -22,8 +22,8 @@ namespace Deppo.Sys.Module.BusinessObjects
     [NavigationItem("ProductProcurementManagement")]
     [ImageName("BO_Contract")]
     [Appearance("ProcurementFiche Delete", AppearanceItemType = "Action", TargetItems = "Delete", Visibility = ViewItemVisibility.Hide)]
-    [Appearance("ProcurementFiche", AppearanceItemType = "Action", TargetItems = "Edit", Visibility = ViewItemVisibility.Hide)]
-    [Appearance("ProcurementFiche", AppearanceItemType = "Action", TargetItems = "New", Visibility = ViewItemVisibility.Hide)]
+    [Appearance("ProcurementFiche Edit", AppearanceItemType = "Action", TargetItems = "Edit", Visibility = ViewItemVisibility.Hide)]
+    [Appearance("ProcurementFiche New", AppearanceItemType = "Action", TargetItems = "New", Visibility = ViewItemVisibility.Hide)]
     public class ProcurementFiche : BaseObject
     {
         private int _referenceId;

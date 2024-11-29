@@ -18,8 +18,8 @@ namespace Deppo.Sys.Module.BusinessObjects
 {
     [DefaultClassOptions]
     [Appearance("ProcurementFicheTransaction Delete", AppearanceItemType = "Action", TargetItems = "Delete", Visibility = ViewItemVisibility.Hide)]
-    [Appearance("ProcurementFicheTransaction", AppearanceItemType = "Action", TargetItems = "Edit", Visibility = ViewItemVisibility.Hide)]
-    [Appearance("ProcurementFicheTransaction", AppearanceItemType = "Action", TargetItems = "New", Visibility = ViewItemVisibility.Hide)]
+    [Appearance("ProcurementFicheTransaction Edit", AppearanceItemType = "Action", TargetItems = "Edit", Visibility = ViewItemVisibility.Hide)]
+    [Appearance("ProcurementFicheTransaction New", AppearanceItemType = "Action", TargetItems = "New", Visibility = ViewItemVisibility.Hide)]
     [NavigationItem(false)]
     public class ProcurementFicheTransaction : BaseObject
     {
