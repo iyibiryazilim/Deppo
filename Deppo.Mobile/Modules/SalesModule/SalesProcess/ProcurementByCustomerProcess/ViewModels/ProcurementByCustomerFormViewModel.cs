@@ -34,6 +34,7 @@ using System.Net.Http;
 using Android.Net.Wifi.Rtt;
 using Microsoft.Maui.Controls.Shapes;
 using Deppo.Core.DataResultModel;
+using DevExpress.Maui.Controls;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.ViewModels;
 
@@ -111,6 +112,7 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 		SaveCommand = new Command(async () => await SaveAsync());
 		BackCommand = new Command(async () => await BackAsync());
 		LoadLocationsCommand = new Command(async () => await LoadLocationsAsync());
+		BasketTappedCommand = new Command(async () => await BasketTappedAsync());
 	}
 
 	public Page CurrentPage { get; set; } = null!;
@@ -123,6 +125,30 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 	public Command SaveCommand { get; }
 	public Command BackCommand { get; }
 	public Command LoadLocationsCommand { get; }
+	public Command BasketTappedCommand { get; }
+
+	private async Task BasketTappedAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
+		}
+		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 
 	public async Task LoadLocationsAsync()
 	{
