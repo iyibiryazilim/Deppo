@@ -292,8 +292,8 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
                 VariantCode = item.IsVariant ? item.ItemCode : string.Empty,
                 WarehouseNumber = WarehouseCountingWarehouseModel.Number,
                 Quantity = item.StockQuantity - item.OutputQuantity,
-                ConversionFactor = 1,
-                OtherConversionFactor = 1,
+                ConversionFactor = item.StockQuantity - item.OutputQuantity,
+                OtherConversionFactor = item.StockQuantity - item.OutputQuantity,
                 SubUnitsetCode = item.SubUnitsetCode,
             };
 
@@ -309,8 +309,8 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
                         Quantity = detail.OutputQuantity,
                         SubUnitsetCode = item.SubUnitsetCode,
                         DestinationStockLocationCode = string.Empty,
-                        ConversionFactor = 1,
-                        OtherConversionFactor = 1,
+                        ConversionFactor = detail.OutputQuantity,
+                        OtherConversionFactor = detail.OutputQuantity,
                     };
 
                     outCountingTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
@@ -370,8 +370,8 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
                 VariantCode = item.IsVariant ? item.ItemCode : string.Empty,
                 WarehouseNumber = WarehouseCountingWarehouseModel.Number,
                 Quantity = item.OutputQuantity - item.StockQuantity,
-                ConversionFactor = 1,
-                OtherConversionFactor = 1,
+                ConversionFactor = item.OutputQuantity - item.StockQuantity,
+                OtherConversionFactor = item.OutputQuantity - item.StockQuantity,
                 SubUnitsetCode = item.SubUnitsetCode,
             };
 
@@ -386,8 +386,8 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
                     Quantity = item.OutputQuantity - item.StockQuantity,
                     SubUnitsetCode = item.SubUnitsetCode,
                     DestinationStockLocationCode = string.Empty,
-                    ConversionFactor = 1,
-                    OtherConversionFactor = 1,
+                    ConversionFactor = item.OutputQuantity - item.StockQuantity,
+                    OtherConversionFactor = item.OutputQuantity - item.StockQuantity,
                 };
                 inCountingTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
             }
@@ -462,6 +462,7 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
         try
         {
             var warehouseListViewModel = _serviceProvider.GetRequiredService<WarehouseCountingWarehouseListViewModel>();
+            var locationViewModel = _serviceProvider.GetRequiredService<WarehouseCountingLocationListViewModel>();
             var basketListViewModel = _serviceProvider.GetRequiredService<WarehouseCountingBasketViewModel>();
 
             if (warehouseListViewModel is not null && warehouseListViewModel.SelectedWarehouse is not null)
@@ -470,7 +471,14 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
                 warehouseListViewModel.SelectedWarehouse = null;
             }
 
-            foreach (var item in basketListViewModel.Items.ToList())
+			if (locationViewModel is not null && locationViewModel.SelectedLocation is not null)
+			{
+				locationViewModel.SelectedLocation.IsSelected = false;
+				locationViewModel.SelectedLocation = null;
+			}
+
+
+			foreach (var item in basketListViewModel.Items.ToList())
             {
                 item.LocationTransactions?.Clear();
             }
