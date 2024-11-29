@@ -39,6 +39,7 @@ namespace Deppo.Sys.Module.BusinessObjects
         string _speCode5;
         int _firmNumber;
         IntegrationResult _result;
+        string _producerCode;
 
         public Product(Session session)
             : base(session)
@@ -92,6 +93,9 @@ namespace Deppo.Sys.Module.BusinessObjects
 
         [ModelDefault("AllowEdit", "False"), Browsable(false)]
         public int UnitsetReferenceId { get => _unitsetReferenceId; set => SetPropertyValue(nameof(UnitsetReferenceId), ref _unitsetReferenceId, value); }
+
+        [ModelDefault("AllowEdit", "False"), Browsable(false)]
+        public string ProducerCode { get => _producerCode; set => SetPropertyValue(nameof(ProducerCode), ref _producerCode, value); }
 
     }
 }
