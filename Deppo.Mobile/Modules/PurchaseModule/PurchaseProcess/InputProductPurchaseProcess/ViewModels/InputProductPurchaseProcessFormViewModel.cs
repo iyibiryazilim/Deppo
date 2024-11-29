@@ -71,6 +71,9 @@ public partial class InputProductPurchaseProcessFormViewModel : BaseViewModel
     [ObservableProperty]
     private string description = string.Empty;
 
+	[ObservableProperty]
+	private string ficheNumber = string.Empty;
+
     [ObservableProperty]
     private ObservableCollection<InputPurchaseBasketModel> items = null!;
 
@@ -174,9 +177,9 @@ public partial class InputProductPurchaseProcessFormViewModel : BaseViewModel
 
             var purchaseDispatchDto = new PurchaseDispatchTransactionInsert
             {
+                Code = FicheNumber,
                 SpeCode = SpecialCode,
                 CurrentCode = SupplierModel.Code,
-                Code = string.Empty,
                 DocTrackingNumber = DocumentTrackingNumber,
                 DoCode = DocumentNumber,
                 TransactionDate = FicheDate,
@@ -196,7 +199,6 @@ public partial class InputProductPurchaseProcessFormViewModel : BaseViewModel
                 {
                     ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
                     VariantCode = item.IsVariant ? item.ItemCode : "",
-
                     WarehouseNumber = (short)WarehouseModel.Number,
                     Quantity = item.Quantity,
                     ConversionFactor = item.Quantity * item.ConversionFactor,
@@ -326,9 +328,7 @@ public partial class InputProductPurchaseProcessFormViewModel : BaseViewModel
 			Description = string.Empty;
 			DocumentTrackingNumber = string.Empty;
 			SpecialCode = string.Empty;
-            
-
-
+			FicheNumber = string.Empty;
 		}
 		catch (Exception ex)
 		{

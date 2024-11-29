@@ -58,6 +58,10 @@ public partial class ProcurementCustomerProductModel : ObservableObject
 	double waitingQuantity;
 
 	[ObservableProperty]
+	double dispatchAmount;
+
+
+	[ObservableProperty]
 	bool isSelected;
 
 	[ObservableProperty]

@@ -227,8 +227,14 @@ public partial class ProcurementSalesProcessBasketProductListViewModel : BaseVie
             if (previouseViewModel is not null)
             {
                 foreach (var item in SelectedProducts)
-                    if (!previouseViewModel.Items.Any(x => x.ReferenceId== item.ReferenceId))
-                        previouseViewModel.Items.Add(item);
+                {
+					if (!previouseViewModel.Items.Any(x => x.ReferenceId == item.ReferenceId))
+					{
+                        item.OutputQuantity = 1;
+					    previouseViewModel.Items.Add(item);
+					}
+				}
+                    
             }
             SelectedItems.Clear();
             SelectedProducts.Clear();

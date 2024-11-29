@@ -143,7 +143,7 @@
         <Button Grid.Row="1"
                 Margin="5,10,5,20"
                 Command="{Binding NextViewCommand}"
-                Text="Rota Oluştur" />
+                Text="{Binding Items.Count, StringFormat='Rota Oluştur ({0})'}" />
     </Grid>
 
 </ContentPage>

@@ -103,8 +103,12 @@ public partial class ProcurementByCustomerProductListViewModel : BaseViewModel
 					{
 						var customer = Mapping.Mapper.Map<ProcurementCustomerProductModel>(item);
 						customer.DestinationLocationCode = OrderWarehouseModel.LocationCode;
-						Items.Add(customer);
-						SearchItems.Add(customer);
+						customer.WaitingQuantity = customer.Quantity - customer.DispatchAmount - customer.ShippedQuantity;
+						if(customer.WaitingQuantity > 0)
+						{
+							Items.Add(customer);
+							SearchItems.Add(customer);
+						}
 					}
 			}
 

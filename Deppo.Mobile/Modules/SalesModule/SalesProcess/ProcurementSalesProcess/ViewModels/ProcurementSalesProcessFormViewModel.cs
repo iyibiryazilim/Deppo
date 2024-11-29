@@ -687,7 +687,7 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
 			{
 				resultModel.IsSuccess = true;
 				resultModel.Message = "Başarılı";
-				resultModel.PageTitle = "Güncelleme işlemi başarılı";
+				resultModel.PageTitle = "Sevk İşlemi";
 				resultModel.PageCountToBack = 6;
 
                 await ClearFormAsync();

@@ -170,7 +170,7 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 							var locationData = Mapping.Mapper.Map<ProcurementCustomerLocationDataModel>(prlocationData);
 							if (locationData.ItemReferenceId == item.ItemReferenceId)
 							{
-								if (waitingQuantity == 0)
+								if (waitingQuantity <= 0)
 									break;
 
 								var procurementCustomerLocationDataModel = new ProcurementCustomerLocationDataModel
@@ -209,7 +209,7 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 
 
 					var groupByLocation = CacheItems
-						.OrderBy(x => x.LocationName)
+						.OrderBy(x => x.LocationCode)
 						.GroupBy(x => new
 						{
 							LocationReferenceId = x.LocationReferenceId,
