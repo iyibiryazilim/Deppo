@@ -51,7 +51,8 @@ public partial class WarehouseCountingLocationListViewModel : BaseViewModel
         PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
         SelectProductsCommand = new Command(async () => await SelectProductsAsync());
         SelectVariantsCommand = new Command(async () => await SelectVariantsAsync());
-    }
+		GoToBackCommand = new Command(async () => await GoToBackAsync());
+	}
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
@@ -61,11 +62,14 @@ public partial class WarehouseCountingLocationListViewModel : BaseViewModel
     public Command PerformEmptySearchCommand { get; }
     public Command SelectProductsCommand { get; }
     public Command SelectVariantsCommand { get; }
+    public Command GoToBackCommand { get; }
 
-    [ObservableProperty]
+	[ObservableProperty]
     public SearchBar searchText;
 
     public Page CurrentPage { get; set; } = null!;
+
+
     private async Task LoadItemsAsync()
     {
         if (IsBusy)
@@ -327,6 +331,35 @@ public partial class WarehouseCountingLocationListViewModel : BaseViewModel
         if (string.IsNullOrWhiteSpace(SearchText.Text))
         {
             await PerformSearchAsync();
+        }
+    }
+
+    private async Task GoToBackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            if(SelectedLocation is not null)
+            {
+                SelectedLocation.IsSelected = false;
+                SelectedLocation = null;
+            }
+
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 }

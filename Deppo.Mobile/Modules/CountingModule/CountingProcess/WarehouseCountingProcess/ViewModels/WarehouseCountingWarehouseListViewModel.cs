@@ -41,12 +41,14 @@ public partial class WarehouseCountingWarehouseListViewModel : BaseViewModel
         NextViewCommand = new Command(async () => await NextViewAsync());
         SelectProductsCommand = new Command(async () => await SelectProductsAsync());
         SelectVariantsCommand = new Command(async () => await SelectVariantsAsync());
-    }
+		GoToBackCommand = new Command(async () => await GoToBackAsync());
+	}
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
+    public Command GoToBackCommand { get; }
 
     public Command SelectProductsCommand { get; }
     public Command SelectVariantsCommand { get; }
@@ -262,4 +264,34 @@ public partial class WarehouseCountingWarehouseListViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+	private async Task GoToBackAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			if (SelectedWarehouse is not null)
+			{
+				SelectedWarehouse.IsSelected = false;
+				SelectedWarehouse = null;
+			}
+
+			await Shell.Current.GoToAsync("..");
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
 }

@@ -34,7 +34,8 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<ProductCountingWarehouseModel>(ItemTappedAsync);
         NextViewCommand = new Command(async () => await NextViewAsync());
-    }
+		BackCommand = new Command(async () => await BackAsync());
+	}
 
     [ObservableProperty]
     public ProductCountingWarehouseModel selectedWarehouse;
@@ -50,6 +51,7 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
     public Command<ProductCountingWarehouseModel> ItemTappedCommand { get; }
 
     public Command NextViewCommand { get; }
+    public Command BackCommand { get; }
 
     public async Task LoadItemsAsync()
     {
@@ -298,6 +300,31 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
         catch (Exception ex)
         {
             _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task BackAsync()
+    {
+        try
+        {
+            if(SelectedWarehouse is not null)
+            {
+                SelectedWarehouse.IsSelected = false;
+				SelectedWarehouse = null;
+			}
+
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
