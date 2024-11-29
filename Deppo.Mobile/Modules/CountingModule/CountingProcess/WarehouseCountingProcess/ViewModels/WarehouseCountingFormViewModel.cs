@@ -462,6 +462,7 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
         try
         {
             var warehouseListViewModel = _serviceProvider.GetRequiredService<WarehouseCountingWarehouseListViewModel>();
+            var locationViewModel = _serviceProvider.GetRequiredService<WarehouseCountingLocationListViewModel>();
             var basketListViewModel = _serviceProvider.GetRequiredService<WarehouseCountingBasketViewModel>();
 
             if (warehouseListViewModel is not null && warehouseListViewModel.SelectedWarehouse is not null)
@@ -470,7 +471,14 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
                 warehouseListViewModel.SelectedWarehouse = null;
             }
 
-            foreach (var item in basketListViewModel.Items.ToList())
+			if (locationViewModel is not null && locationViewModel.SelectedLocation is not null)
+			{
+				locationViewModel.SelectedLocation.IsSelected = false;
+				locationViewModel.SelectedLocation = null;
+			}
+
+
+			foreach (var item in basketListViewModel.Items.ToList())
             {
                 item.LocationTransactions?.Clear();
             }
