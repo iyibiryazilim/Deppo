@@ -292,8 +292,8 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
                 VariantCode = item.IsVariant ? item.ItemCode : string.Empty,
                 WarehouseNumber = WarehouseCountingWarehouseModel.Number,
                 Quantity = item.StockQuantity - item.OutputQuantity,
-                ConversionFactor = 1,
-                OtherConversionFactor = 1,
+                ConversionFactor = item.StockQuantity - item.OutputQuantity,
+                OtherConversionFactor = item.StockQuantity - item.OutputQuantity,
                 SubUnitsetCode = item.SubUnitsetCode,
             };
 
@@ -309,8 +309,8 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
                         Quantity = detail.OutputQuantity,
                         SubUnitsetCode = item.SubUnitsetCode,
                         DestinationStockLocationCode = string.Empty,
-                        ConversionFactor = 1,
-                        OtherConversionFactor = 1,
+                        ConversionFactor = detail.OutputQuantity,
+                        OtherConversionFactor = detail.OutputQuantity,
                     };
 
                     outCountingTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
@@ -370,8 +370,8 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
                 VariantCode = item.IsVariant ? item.ItemCode : string.Empty,
                 WarehouseNumber = WarehouseCountingWarehouseModel.Number,
                 Quantity = item.OutputQuantity - item.StockQuantity,
-                ConversionFactor = 1,
-                OtherConversionFactor = 1,
+                ConversionFactor = item.OutputQuantity - item.StockQuantity,
+                OtherConversionFactor = item.OutputQuantity - item.StockQuantity,
                 SubUnitsetCode = item.SubUnitsetCode,
             };
 
@@ -386,8 +386,8 @@ public partial class WarehouseCountingFormViewModel : BaseViewModel
                     Quantity = item.OutputQuantity - item.StockQuantity,
                     SubUnitsetCode = item.SubUnitsetCode,
                     DestinationStockLocationCode = string.Empty,
-                    ConversionFactor = 1,
-                    OtherConversionFactor = 1,
+                    ConversionFactor = item.OutputQuantity - item.StockQuantity,
+                    OtherConversionFactor = item.OutputQuantity - item.StockQuantity,
                 };
                 inCountingTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
             }
