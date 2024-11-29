@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentPage x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views.InputProductPurchaseProcessFormView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views.InputProductPurchaseProcessFormView"
              xmlns:basketModel="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;assembly=Deppo.Mobile.Core"
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
@@ -26,10 +26,8 @@
     </ContentPage.ToolbarItems>
 
     <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
-                                   StatusBarStyle="Default" />
-        <toolkit:EventToCommandBehavior Command="{Binding LoadPageCommand}"
-                                        EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadPageCommand}" EventName="Loaded" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -41,15 +39,12 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android"
-                Value="artboard.png" />
+            <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
-    <Grid RowDefinitions="*,Auto"
-          RowSpacing="10">
-        <VerticalStackLayout Grid.Row="0"
-                             Spacing="5">
+    <Grid RowDefinitions="*,Auto" RowSpacing="10">
+        <VerticalStackLayout Grid.Row="0" Spacing="5">
             <dx:FormGroupItem Header="Fiş Bilgileri"
                               HeaderFontAttributes="Bold"
                               HeaderFontSize="18">
@@ -63,6 +58,12 @@
                                              FocusedBorderColor="{StaticResource Primary}"
                                              LabelText="Fiş Tarihi"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.CalendarDay}" />
+
+                                <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                             FocusedBorderColor="{StaticResource Primary}"
+                                             LabelText="Fiş Numarası"
+                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                             Text="{Binding FicheNumber}" />
 
                                 <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
@@ -116,8 +117,8 @@
         </VerticalStackLayout>
 
         <Button Grid.Row="1"
-                Command="{Binding SaveCommand}"
                 Margin="10,10,10,10"
+                Command="{Binding SaveCommand}"
                 Text="Kaydet"
                 VerticalOptions="End" />
 
@@ -129,29 +130,25 @@
                         IsModal="True"
                         ShowGrabber="True">
             <!--#region BottomSheetContent-->
-            <Grid RowDefinitions="Auto,*"
-                  RowSpacing="20"
-                  Padding="10">
+            <Grid Padding="10"
+                  RowDefinitions="Auto,*"
+                  RowSpacing="20">
 
-                <VerticalStackLayout Grid.Row="0"
-                                     Spacing="5">
+                <VerticalStackLayout Grid.Row="0" Spacing="5">
                     <Label FontAttributes="Bold"
                            FontSize="Subtitle"
                            Text="Malzeme Listesi" />
-                    <BoxView HeightRequest="2"
-                             Color="{StaticResource OffBlack}" />
+                    <BoxView HeightRequest="2" Color="{StaticResource OffBlack}" />
                 </VerticalStackLayout>
 
-                <CollectionView Grid.Row="1"
-                                ItemsSource="{Binding Items}">
+                <CollectionView Grid.Row="1" ItemsSource="{Binding Items}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="basketModel:InputPurchaseBasketModel">
                             <Border Padding="10"
                                     BackgroundColor="Transparent"
                                     StrokeShape="RoundRectangle 10"
                                     StrokeThickness="0.1">
-                                <Grid ColumnDefinitions="Auto,*, Auto"
-                                      ColumnSpacing="10">
+                                <Grid ColumnDefinitions="Auto,*, Auto" ColumnSpacing="10">
                                     <Border BackgroundColor="Transparent"
                                             StrokeShape="RoundRectangle 5"
                                             StrokeThickness="0.5">
@@ -161,8 +158,7 @@
                                                WidthRequest="50" />
                                     </Border>
 
-                                    <VerticalStackLayout Grid.Column="1"
-                                                         Spacing="2">
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2">
 
                                         <Label FontAttributes="Bold"
                                                LineBreakMode="TailTruncation"
@@ -171,8 +167,7 @@
                                                Text="{Binding ItemName}"
                                                TextColor="{StaticResource Gray600}" />
 
-                                        <Label TextColor="{StaticResource Gray600}"
-                                               VerticalOptions="Center">
+                                        <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
                                             <Label.FormattedText>
                                                 <FormattedString>
                                                     <Span FontAttributes="Bold"

@@ -61,6 +61,11 @@
                                                  FocusedBorderColor="{StaticResource Primary}"
                                                  LabelText="Fiş Tarihi"
                                                  StartIcon="{x:Static fontAwesome:FontAwesomeIcons.CalendarDay}" />
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 LabelText="Fiş Numarası"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding FicheNumber}" />
 
                                     <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                                  FocusedBorderColor="{StaticResource Primary}"
@@ -226,8 +231,7 @@
                                     StrokeShape="RoundRectangle 10"
                                     StrokeThickness="0.1">
                                 <Grid ColumnDefinitions="Auto,*, Auto" ColumnSpacing="10">
-                                    <Border StrokeShape="RoundRectangle 5"
-                                            StrokeThickness="0.5">
+                                    <Border StrokeShape="RoundRectangle 5" StrokeThickness="0.5">
                                         <Image Grid.Column="0"
                                                HeightRequest="50"
                                                Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"

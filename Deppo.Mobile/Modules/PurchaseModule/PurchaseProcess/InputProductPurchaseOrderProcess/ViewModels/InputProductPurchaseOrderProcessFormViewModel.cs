@@ -75,6 +75,9 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
     private string description = string.Empty;
 
     [ObservableProperty]
+    private string ficheNumber = string.Empty;
+
+    [ObservableProperty]
     private string cargoTrackingNumber = string.Empty;
 
     [ObservableProperty]
@@ -295,7 +298,7 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
 
             var purchaseDispatchDto = new PurchaseDispatchTransactionInsert
             {
-                Code = string.Empty,
+                Code = FicheNumber,
                 CurrentCode = PurchaseSupplier?.Code,
                 FirmNumber = _httpClientService.FirmNumber,
                 WarehouseNumber = WarehouseModel.Number,
@@ -568,6 +571,8 @@ public partial class InputProductPurchaseOrderProcessFormViewModel : BaseViewMod
 			CargoTrackingNumber = string.Empty;
 			SelectedCarrier = null;
 			SelectedDriver = null;
+			FicheNumber = string.Empty;
+            FicheDate = DateTime.Now;
 		}
 		catch (Exception ex)
 		{
