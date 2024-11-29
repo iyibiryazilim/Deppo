@@ -411,8 +411,8 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
 				if(foundResult != null) {
 					if (!Items.Any(item => item.ItemReferenceId == foundResult.ItemReferenceId))
 					{
-                        foundResult.OutputQuantity = 0;
-						Items.Add(foundResult);
+                        foundResult.OutputQuantity = 1;
+						Items.Insert(0, foundResult);
 					}
                     else
                     {

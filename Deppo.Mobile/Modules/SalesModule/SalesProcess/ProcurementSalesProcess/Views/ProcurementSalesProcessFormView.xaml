@@ -118,6 +118,15 @@
                                                  Text="{Binding ProcurementSalesCustomerModel.CustomerName}"
                                                  ToolTipProperties.Text="{Binding ProcurementSalesCustomerModel.CustomerName}" />
 
+
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
+                                                 IsReadOnly="True"
+                                                 LabelText="Sevk Adresi"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                                 Text="{Binding ProcurementSalesCustomerModel.ShipAddressName}"
+                                                 ToolTipProperties.Text="{Binding ProcurementSalesCustomerModel.ShipAddressName}" />
+
                                     <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                                  FocusedBorderColor="{StaticResource Primary}"
                                                  LabelText="Belge Numarası"
