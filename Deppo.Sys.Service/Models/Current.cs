@@ -9,6 +9,7 @@ namespace Deppo.Sys.Service.Models
 {
     public class Current
     {
+        public Guid Oid { get; set; }
         public string Code { get; set; }=string.Empty;  
         public string Title { get; set; }=string.Empty;
 
