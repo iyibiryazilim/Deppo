@@ -113,6 +113,7 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 		BackCommand = new Command(async () => await BackAsync());
 		LoadLocationsCommand = new Command(async () => await LoadLocationsAsync());
 		BasketTappedCommand = new Command(async () => await BasketTappedAsync());
+		LoadPageCommand = new Command(async () => await LoadPageAsync());
 	}
 
 	public Page CurrentPage { get; set; } = null!;
@@ -138,6 +139,29 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 			CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
 		}
 		catch (Exception ex)
+		{
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task LoadPageAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
+		}
+		catch (Exception ex) 
 		{
 			if(_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
