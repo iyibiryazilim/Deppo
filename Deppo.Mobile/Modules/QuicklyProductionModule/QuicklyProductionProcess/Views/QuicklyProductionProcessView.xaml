@@ -30,7 +30,7 @@
         <Grid Grid.Row="1"
               RowDefinitions="Auto,Auto"
               RowSpacing="20">
-            <VerticalStackLayout Grid.Row="0"
+            <!--<VerticalStackLayout Grid.Row="0"
                                  Padding="5"
                                  Spacing="5">
                 <Label Padding="5"
@@ -149,7 +149,7 @@
                         </Grid>
                     </Border>
                 </Grid>
-            </VerticalStackLayout>
+            </VerticalStackLayout>-->
             <VerticalStackLayout Grid.Row="1"
                                  Padding="5"
                                  Spacing="5">
@@ -185,7 +185,7 @@
                                     <Label Margin="0,3,0,0"
                                            FontAttributes="Bold"
                                            FontSize="Subtitle"
-                                           Text="İş Emrine Bağlı Hızlı Üretim"
+                                           Text="Hızlı Üretim"
                                            TextColor="{StaticResource Gray500}"
                                            VerticalOptions="Center" />
                                     <Label Text="Alt malzeme tanımı ile hızlı üretim işlemi yapabilirsiniz."
@@ -239,7 +239,7 @@
                                     <Label Margin="0,3,0,0"
                                            FontAttributes="Bold"
                                            FontSize="Subtitle"
-                                           Text="İş Emrine Bağlı Rework"
+                                           Text="Rework"
                                            TextColor="{StaticResource Gray500}"
                                            VerticalOptions="Center" />
                                     <Label Text="Alt malzeme tanımı ile hızlı üretim boz işlemi yapabilirsiniz."
