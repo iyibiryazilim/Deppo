@@ -144,6 +144,8 @@ using Deppo.Mobile.Modules.PurchaseModule.WaitingProductMenu.Views;
 using Deppo.Mobile.Modules.PurchaseModule.WaitingProductMenu.ViewModels;
 using IProductService = Deppo.Core.Services.IProductService;
 using ICustomerService = Deppo.Core.Services.ICustomerService;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcessV2.OutputOutsourceTransferV2.Views;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcessV2.OutputOutsourceTransferV2.ViewModels;
 
 namespace Deppo.Mobile;
 
@@ -841,6 +843,12 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddScopedWithShellRoute<InputOutsourceTransferBasketLocationListView, InputOutsourceTransferBasketLocationListViewModel>(nameof(InputOutsourceTransferBasketLocationListView));
 
         builder.Services.AddScopedWithShellRoute<InputOutsourceTransferOutsourceFormView, InputOutsourceTransferOutsourceFormViewModel>(nameof(InputOutsourceTransferOutsourceFormView));
+
+        #region v2
+        builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferV2WarehouseListView,OutputOutsourceTransferV2WarehouseListViewModel>(nameof(OutputOutsourceTransferV2WarehouseListView)); 
+        #endregion
+
+
 
         #region OutSource Panel
 
