@@ -142,6 +142,8 @@ using Deppo.Mobile.Modules.SalesModule.WaitingProductMenu.Views;
 using Deppo.Mobile.Modules.SalesModule.WaitingProductMenu.ViewModels;
 using Deppo.Mobile.Modules.PurchaseModule.WaitingProductMenu.Views;
 using Deppo.Mobile.Modules.PurchaseModule.WaitingProductMenu.ViewModels;
+using IProductService = Deppo.Core.Services.IProductService;
+using ICustomerService = Deppo.Core.Services.ICustomerService;
 
 namespace Deppo.Mobile;
 
@@ -388,7 +390,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IAuthenticateSysService, AuthenticateSysDataStore>();
         builder.Services.AddSingleton<ITransactionAuditService, TransactionAuditDataStore>();
         builder.Services.AddSingleton<IWarehouseProcessParameterService, WarehouseProcessParameterDataStore>();
-        builder.Services.AddSingleton<Deppo.Sys.Service.Services.IWarehouseService, Deppo.Sys.Service.DataStores.WarehouseDataStore>();
+        
         builder.Services.AddSingleton<IApplicationUserService, ApplicationUserDataStore>();
         builder.Services.AddSingleton<IProcurementAuditService, ProcurementAuditDataStore>();
         builder.Services.AddSingleton<IProcurementAuditCustomerService, ProcurementAuditCustomerDataStore>();
@@ -413,6 +415,10 @@ public static class MauiProgram
         builder.Services.AddSingleton<IConnectionParameterService, ConnectionParameterDataStore>();
 		builder.Services.AddSingleton<IProcurementLocationTransactionService, ProcurementLocationTransactionDataStore>();
         builder.Services.AddSingleton<IProcurementFicheService, ProcurementFicheDataStore>();
+		builder.Services.AddSingleton<Deppo.Sys.Service.Services.IWarehouseService, Deppo.Sys.Service.DataStores.WarehouseDataStore>();
+		builder.Services.AddSingleton<Deppo.Sys.Service.Services.IProductService, Deppo.Sys.Service.DataStores.ProductDataStore>();
+        builder.Services.AddSingleton<Deppo.Sys.Service.Services.ISubunitsetService, Deppo.Sys.Service.DataStores.SubunitsetDataStore>();
+        builder.Services.AddSingleton<Deppo.Sys.Service.Services.ICustomerService, Deppo.Sys.Service.DataStores.CustomerDataStore>();
 
 
 		#region Analysis Modules
