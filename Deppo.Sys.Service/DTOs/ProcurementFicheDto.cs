@@ -17,5 +17,12 @@ namespace Deppo.Sys.Service.DTOs
 
         public  Guid Customer { get; set; }
 
-    }
+        public ProcurementFicheDto()
+        {
+            Lines = new();
+		}
+
+        public List<ProcurementFicheTransactionDto> Lines { get; set; }
+
+	}
 }

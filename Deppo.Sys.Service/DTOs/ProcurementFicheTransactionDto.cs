@@ -20,7 +20,5 @@ namespace Deppo.Sys.Service.DTOs
         public string OrderNumber { get; set; } = string.Empty;
 
         public int  OrderReferenceId { get; set; }
-
-        public Guid ProcurementFiche { get; set; }
     }
 }
