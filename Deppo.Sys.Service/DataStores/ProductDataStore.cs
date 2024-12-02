@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Deppo.Sys.Service.DataStores;
 
-internal class ProductDataStore : IProductService
+public class ProductDataStore : IProductService
 {
     public string RequestUrl = "/api/odata/" + typeof(Product).Name;
 

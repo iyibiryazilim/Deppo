@@ -20,6 +20,7 @@ using Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesOrderProce
 using Deppo.Sys.Service.Services;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
+using ICustomerService = Deppo.Core.Services.ICustomerService;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.ViewModels;
 
