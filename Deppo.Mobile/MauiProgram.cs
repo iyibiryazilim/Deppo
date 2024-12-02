@@ -412,6 +412,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<ITransactionSchedulerService, TransactionSchedulerDataStore>();
         builder.Services.AddSingleton<IConnectionParameterService, ConnectionParameterDataStore>();
 		builder.Services.AddSingleton<IProcurementLocationTransactionService, ProcurementLocationTransactionDataStore>();
+        builder.Services.AddSingleton<IProcurementFicheService, ProcurementFicheDataStore>();
+
 
 		#region Analysis Modules
 
