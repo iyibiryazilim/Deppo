@@ -62,6 +62,12 @@ namespace Deppo.Mobile.Core.Models.ProcurementModels.ProcurementSalesModels
         private string subUnitsetName = string.Empty;
 
         [ObservableProperty]
+        private double weight = default;
+
+        [ObservableProperty]
+        private double volume = default;
+
+        [ObservableProperty]
         private double quantity;
 
         [ObservableProperty]
@@ -112,5 +118,5 @@ namespace Deppo.Mobile.Core.Models.ProcurementModels.ProcurementSalesModels
 
         [ObservableProperty]
         private double outputQuantity = 1;
-    }
+	}
 }
