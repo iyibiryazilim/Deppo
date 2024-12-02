@@ -57,6 +57,8 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 	private readonly IWholeSalesDispatchTransactionService _wholeSalesDispatchTransactionService;
 	private readonly IProcurementLocationTransactionService _procurementLocationTransactionService;
 	private readonly ILocationService _locationService;
+	private readonly IProcurementFicheService _procurementFicheService;
+	private readonly Deppo.Sys.Service.Services.IWarehouseService _warehouseSysService;
 
 	[ObservableProperty]
 	WarehouseModel orderWarehouseModel;
@@ -92,7 +94,7 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 	[ObservableProperty]
 	private string description = string.Empty;
 
-	public ProcurementByCustomerFormViewModel(IHttpClientService httpClientService, IHttpClientSysService httpClientSysService, ITransferTransactionService transferTransactionService, IUserDialogs userDialogs, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService, ICarrierService carrierService, IDriverService driverService, IProcurementAuditCustomerService procurementAuditCustomerService, IWholeSalesDispatchTransactionService wholeSalesDispatchTransactionService, IProcurementLocationTransactionService procurementLocationTransactionService, ILocationService locationService)
+	public ProcurementByCustomerFormViewModel(IHttpClientService httpClientService, IHttpClientSysService httpClientSysService, ITransferTransactionService transferTransactionService, IUserDialogs userDialogs, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService, ICarrierService carrierService, IDriverService driverService, IProcurementAuditCustomerService procurementAuditCustomerService, IWholeSalesDispatchTransactionService wholeSalesDispatchTransactionService, IProcurementLocationTransactionService procurementLocationTransactionService, ILocationService locationService, IProcurementFicheService procurementFicheService, Sys.Service.Services.IWarehouseService warehouseSysService)
 	{
 		_httpClientService = httpClientService;
 		_httpClientSysService = httpClientSysService;
@@ -106,6 +108,8 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 		_wholeSalesDispatchTransactionService = wholeSalesDispatchTransactionService;
 		_procurementLocationTransactionService = procurementLocationTransactionService;
 		_locationService = locationService;
+		_procurementFicheService = procurementFicheService;
+		_warehouseSysService = warehouseSysService;
 
 		Title = "Ürün Toplama Formu";
 
@@ -293,190 +297,6 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 		}
 	}
 
-	//private async Task SaveTESTAsync()
-	//{
-	//	if (IsBusy)
-	//		return;
-	//	try
-	//	{
-	//		IsBusy = true;
-
-	//		_userDialogs.ShowLoading("İşlem Tamamlanıyor...");
-	//		await Task.Delay(500);
-	//		var httpClient = _httpClientService.GetOrCreateHttpClient();
-
-	//		var transferTransactionInsertDto = new TransferTransactionInsert();
-	//		transferTransactionInsertDto.Code = string.Empty;
-	//		transferTransactionInsertDto.IsEDispatch = 0;
-	//		transferTransactionInsertDto.SpeCode = SpecialCode;
-	//		transferTransactionInsertDto.CurrentCode = ProcurementCustomerBasketModel.CustomerCode ?? string.Empty;
-	//		transferTransactionInsertDto.DoCode = DocumentNumber;
-	//		transferTransactionInsertDto.TransactionDate = TransactionDate;
-	//		transferTransactionInsertDto.Description = Description;
-	//		transferTransactionInsertDto.DestinationWarehouseNumber = OrderWarehouseModel.Number;
-	//		transferTransactionInsertDto.FirmNumber = _httpClientService.FirmNumber;
-	//		transferTransactionInsertDto.ShipInfoCode = ProcurementCustomerBasketModel.ShipAddressCode ?? string.Empty;
-	//		transferTransactionInsertDto.WarehouseNumber = Items.FirstOrDefault().WarehouseNumber;
-
-	//		foreach (var item in Items)
-	//           {
-
-	//			foreach (var product in item.Products.Where(x => x.Quantity > 0))
-	//               {
-	//				var tempProductQuantity = product.Quantity;
-	//				var transferTransactionLineDto = new TransferTransactionLineDto
-	//				{
-	//					ProductCode = product.IsVariant ? product.MainItemCode : product.ItemCode,
-	//					VariantCode = product.IsVariant ? product.ItemCode : string.Empty,
-	//					WarehouseNumber = ProcurementCustomerBasketModel.WarehouseNumber,
-	//					DestinationWarehouseNumber = OrderWarehouseModel.Number,
-	//					SubUnitsetCode = product.SubUnitsetCode,
-	//					ConversionFactor = 1,
-	//					OtherConversionFactor = 1,
-	//					Quantity = tempProductQuantity,
-	//				};
-
-	//				await LoadLocationTransactionAsync(
-	//					procurementCustomerBasketModel: item,
-	//					procurementCustomerBasketProductModel: product
-	//				);
-
-	//				var locationTransactionList = LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
-
-	//                   foreach (var locationTransaction in locationTransactionList)
-	//                   {
-	//					var tempLocationTransactionQuantity = locationTransaction.RemainingQuantity;
-	//					while (tempLocationTransactionQuantity > 0 && tempProductQuantity > 0)
-	//					{
-	//						var serilotTransactionDto = new SeriLotTransactionDto
-	//						{
-	//							StockLocationCode = item.LocationCode,
-	//							InProductTransactionLineReferenceId = locationTransaction.TransactionReferenceId,
-	//							OutProductTransactionLineReferenceId = locationTransaction.ReferenceId,
-	//							SubUnitsetCode = product.SubUnitsetCode,
-	//							DestinationStockLocationCode = locationTransaction.LocationCode,
-	//							ConversionFactor = 1,
-	//							OtherConversionFactor = 1,
-	//							Quantity = tempProductQuantity > tempLocationTransactionQuantity ? tempLocationTransactionQuantity : tempProductQuantity,
-	//						};
-
-	//						transferTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
-	//						tempLocationTransactionQuantity -= (double)serilotTransactionDto.Quantity;
-	//						tempProductQuantity -= (double)serilotTransactionDto.Quantity;
-	//					}
-	//                   }
-
-
-	//                   transferTransactionInsertDto.Lines.Add(transferTransactionLineDto);
-	//			}
-	//           }
-
-
-	//		var result = await _transferTransactionService.InsertTransferTransaction(httpClient, transferTransactionInsertDto, _httpClientService.FirmNumber);
-
-	//		ResultModel resultModel = new();
-
-	//		if (result.IsSuccess)
-	//		{
-	//			resultModel.Message = "Başarılı";
-	//			resultModel.Code = result.Data.Code;
-	//			resultModel.PageTitle = "Ambar Transferi";
-	//			resultModel.PageCountToBack = 7;
-
-	//			try
-	//			{
-	//				foreach(var item in Items)
-	//				{
-	//                       foreach (var item1 in item.Products.Where(x => x.RejectionCode != string.Empty))
-	//                       {
-	//						var httpSysClient = _httpClientSysService.GetOrCreateHttpClient();
-
-	//						ProcurementAuditCustomerDto procurementAuditCustomerDto = new ProcurementAuditCustomerDto
-	//						{
-	//							ApplicationUser = _httpClientSysService.UserOid,
-	//							ReasonsForRejectionProcurement = item1.RejectionOid,
-	//							CurrentCode = ProcurementCustomerBasketModel.CustomerCode ?? string.Empty,
-	//							CurrentName = ProcurementCustomerBasketModel.CustomerName ?? string.Empty,
-	//							CurrentReferenceId = ProcurementCustomerBasketModel.CustomerReferenceId,
-	//							IsVariant = item1.IsVariant,
-	//							Quantity = item1.Quantity,
-	//							ProcurementQuantity = item1.ProcurementQuantity,
-	//							ProductName = item1.IsVariant ? item1.MainItemName : item1.ItemName,
-	//							ProductReferenceId = item1.IsVariant ? item1.MainItemReferenceId : item1.ItemReferenceId,
-	//							CreatedOn = DateTime.Now,
-	//							LocationCode = item.LocationCode,
-	//							LocationReferenceId = item.LocationReferenceId,
-	//							LocationName = item.LocationName,
-	//							WarehouseName = ProcurementCustomerBasketModel.WarehouseName,
-	//							WarehouseNumber = ProcurementCustomerBasketModel.WarehouseNumber,
-	//						};
-
-	//						await _procurementAuditCustomerService.CreateAsync(
-	//							httpClient: httpSysClient,
-	//							dto: procurementAuditCustomerDto
-	//						);
-	//					}
-	//                   }
-	//			}
-	//			catch (Exception ex)
-	//			{
-	//				if(_userDialogs.IsHudShowing)
-	//					_userDialogs.HideHud();
-	//				_userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-	//			}
-
-
-	//			await ClearDataAsync();
-	//			var warehouseListViewModel = _serviceProvider.GetRequiredService<ProcurementByCustomerWarehouseListViewModel>();
-	//			var customerListViewModel = _serviceProvider.GetRequiredService<ProcurementByCustomerListViewModel>();
-	//			var productListViewModel = _serviceProvider.GetRequiredService<ProcurementByProductListViewModel>();
-	//			var procurementWarehouseListViewModel = _serviceProvider.GetRequiredService<ProcurementByCustomerProcurementWarehouseListViewModel>();
-
-	//			warehouseListViewModel.SelectedWarehouseModel = null;
-	//			customerListViewModel.SelectedCustomerModel = null;
-	//			productListViewModel.SelectedProductOrderModel = null;
-	//			procurementWarehouseListViewModel.SelectedWarehouseModel = null;
-
-
-	//			if (_userDialogs.IsHudShowing)
-	//				_userDialogs.HideHud();
-
-	//			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
-	//			{
-	//				[nameof(ResultModel)] = resultModel
-	//			});
-	//		}
-	//		else
-	//		{
-
-	//			resultModel.Message = "Başarısız";
-	//			resultModel.PageTitle = "Ambar Transferi";
-	//			resultModel.PageCountToBack = 1;
-	//			resultModel.ErrorMessage = result.Message;
-
-	//			if (_userDialogs.IsHudShowing)
-	//				_userDialogs.HideHud();
-
-	//			await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
-	//			{
-	//				[nameof(ResultModel)] = resultModel
-	//			});
-	//		}
-
-
-	//	}
-	//	catch (Exception ex)
-	//	{
-	//		if (_userDialogs.IsHudShowing)
-	//			_userDialogs.HideHud();
-
-	//		await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-	//	}
-	//	finally
-	//	{
-	//		IsBusy = false;
-	//	}
-	//}
 
 	private async Task SaveAsync()
 	{
