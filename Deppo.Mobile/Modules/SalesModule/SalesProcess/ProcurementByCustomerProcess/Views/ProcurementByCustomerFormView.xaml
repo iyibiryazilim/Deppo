@@ -14,6 +14,7 @@
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadPageCommand}" EventName="Loaded" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -23,7 +24,7 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <!--<ContentPage.ToolbarItems>
+    <ContentPage.ToolbarItems>
         <ToolbarItem Command="{Binding BasketTappedCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="FAS"
@@ -31,7 +32,7 @@
                                  Size="Large" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
-    </ContentPage.ToolbarItems>-->
+    </ContentPage.ToolbarItems>
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
@@ -144,197 +145,217 @@
 
 
         <!--#region Basket BottomSheet-->
-        <!--<dx:BottomSheet x:Name="basketItemBottomSheet"
+        <dx:BottomSheet x:Name="basketItemBottomSheet"
                         AllowDismiss="True"
                         BackgroundColor="White"
                         CornerRadius="15"
                         HalfExpandedRatio="0.5"
                         IsModal="True"
                         ShowGrabber="True">
-            <Grid Padding="10"
-                  RowDefinitions="Auto, *"
-                  RowSpacing="20">
-                <CollectionView ItemsSource="{Binding Items}">
-                    <CollectionView.ItemsLayout>
-                        <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
-                    </CollectionView.ItemsLayout>
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="procurementModels:ProcurementCustomerBasketModel">
-                            <toolkit:Expander x:Name="basketExpander">
-                                <toolkit:Expander.Header>
-                                    <Border Padding="10"
-                                            BackgroundColor="Transparent"
-                                            StrokeShape="RoundRectangle 10"
-                                            StrokeThickness="0.5">
-                                        <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="10">
-                                            <Border Grid.Column="0"
-                                                    Padding="15"
-                                                    BackgroundColor="{StaticResource PrimaryLight}"
-                                                    StrokeShape="RoundRectangle 50"
-                                                    StrokeThickness="0"
-                                                    VerticalOptions="CenterAndExpand">
-                                                <Image HeightRequest="20" WidthRequest="20">
+            <ScrollView>
+                <Grid Padding="10"
+                      RowDefinitions="Auto, *"
+                      RowSpacing="20">
+
+                    <VerticalStackLayout Grid.Row="0" Spacing="5">
+                        <Label FontAttributes="Bold"
+                               FontSize="Subtitle"
+                               Text="Toplanan Ürün Listesi" />
+                        <BoxView HeightRequest="2" Color="{StaticResource OffBlack}" />
+                    </VerticalStackLayout>
+
+
+                    <CollectionView Grid.Row="1" ItemsSource="{Binding Items}">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="procurementModels:ProcurementCustomerBasketModel">
+                                <toolkit:Expander x:Name="basketExpander">
+                                    <toolkit:Expander.Header>
+                                        <Border Padding="10"
+                                                BackgroundColor="Transparent"
+                                                StrokeShape="RoundRectangle 10"
+                                                StrokeThickness="0.5">
+                                            <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="10">
+                                                <Border Grid.Column="0"
+                                                        Padding="15"
+                                                        BackgroundColor="{StaticResource PrimaryLight}"
+                                                        StrokeShape="RoundRectangle 50"
+                                                        StrokeThickness="0"
+                                                        VerticalOptions="CenterAndExpand">
+                                                    <Image HeightRequest="20" WidthRequest="20">
+                                                        <Image.Source>
+                                                            <FontImageSource FontFamily="FAS"
+                                                                             Glyph="{x:Static fontAwesome:FontAwesomeIcons.LocationDot}"
+                                                                             Color="{StaticResource White}" />
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Border>
+
+                                                <VerticalStackLayout Grid.Column="1"
+                                                                     Spacing="2"
+                                                                     VerticalOptions="Start">
+                                                    <Label FontAttributes="Bold"
+                                                           LineBreakMode="TailTruncation"
+                                                           MaxLines="1"
+                                                           Text="{Binding LocationCode}"
+                                                           TextColor="{StaticResource OffBlack}" />
+                                                    <Label LineBreakMode="TailTruncation"
+                                                           MaxLines="1"
+                                                           Text="{Binding LocationName}"
+                                                           TextColor="{StaticResource Gray600}" />
+
+                                                </VerticalStackLayout>
+
+                                                <Image Grid.Column="2"
+                                                       Margin="0,0,10,0"
+                                                       HeightRequest="15"
+                                                       HorizontalOptions="End">
                                                     <Image.Source>
                                                         <FontImageSource FontFamily="FAS"
-                                                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.LocationDot}"
-                                                                         Color="{StaticResource White}" />
+                                                                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.ChevronRight}"
+                                                                         Color="{StaticResource Gray500}" />
                                                     </Image.Source>
+                                                    <Image.Triggers>
+                                                        <DataTrigger Binding="{Binding Source={x:Reference basketExpander}, Path=IsExpanded}"
+                                                                     TargetType="Image"
+                                                                     Value="True">
+                                                            <Setter Property="Rotation" Value="90" />
+                                                        </DataTrigger>
+                                                    </Image.Triggers>
                                                 </Image>
-                                            </Border>
+                                            </Grid>
+                                        </Border>
+                                    </toolkit:Expander.Header>
 
-                                            <VerticalStackLayout Grid.Column="1"
-                                                                 Spacing="2"
-                                                                 VerticalOptions="Start">
-                                                <Label FontAttributes="Bold"
-                                                       LineBreakMode="TailTruncation"
-                                                       MaxLines="1"
-                                                       Text="{Binding LocationCode}"
-                                                       TextColor="{StaticResource OffBlack}" />
-                                                <Label LineBreakMode="TailTruncation"
-                                                       MaxLines="1"
-                                                       Text="{Binding LocationName}"
-                                                       TextColor="{StaticResource Gray600}" />
+                                    <toolkit:Expander.Content>
+                                        <CollectionView ItemsSource="{Binding Products}">
+                                            <CollectionView.ItemsLayout>
+                                                <LinearItemsLayout ItemSpacing="3" Orientation="Vertical" />
+                                            </CollectionView.ItemsLayout>
+                                            <CollectionView.ItemTemplate>
+                                                <DataTemplate x:DataType="procurementModels:ProcurementCustomerBasketProductModel">
 
-                                            </VerticalStackLayout>
+                                                    <Border Padding="10"
+                                                            HorizontalOptions="StartAndExpand"
+                                                            StrokeShape="RoundRectangle 10"
+                                                            StrokeThickness="0">
+                                                        <Grid HorizontalOptions="Fill" RowDefinitions="Auto, *">
+                                                            <HorizontalStackLayout Grid.Row="0"
+                                                                                   Margin="0,0,0,10"
+                                                                                   HorizontalOptions="Fill"
+                                                                                   IsVisible="{Binding RejectionCode, Converter={StaticResource IsNotEqualConverter}, ConverterParameter=''}"
+                                                                                   Spacing="5">
 
-                                            <Image Grid.Column="2"
-                                                   Margin="0,0,10,0"
-                                                   HeightRequest="15"
-                                                   HorizontalOptions="End">
-                                                <Image.Source>
-                                                    <FontImageSource FontFamily="FAS"
-                                                                     Glyph="{x:Static fontAwesome:FontAwesomeIcons.ChevronRight}"
-                                                                     Color="{StaticResource Gray500}" />
-                                                </Image.Source>
-                                                <Image.Triggers>
-                                                    <DataTrigger Binding="{Binding Source={x:Reference basketExpander}, Path=IsExpanded}"
-                                                                 TargetType="Image"
-                                                                 Value="True">
-                                                        <Setter Property="Rotation" Value="90" />
-                                                    </DataTrigger>
-                                                </Image.Triggers>
-                                            </Image>
-                                        </Grid>
-                                    </Border>
-                                </toolkit:Expander.Header>
-
-                                <toolkit:Expander.Content>
-                                    <CollectionView ItemsSource="{Binding Products}">
-                                        <CollectionView.ItemsLayout>
-                                            <LinearItemsLayout ItemSpacing="3" Orientation="Vertical" />
-                                        </CollectionView.ItemsLayout>
-                                        <CollectionView.ItemTemplate>
-                                            <DataTemplate x:DataType="procurementModels:ProcurementCustomerBasketProductModel">
-                                                <Border Padding="10"
-                                                        BackgroundColor="Transparent"
-                                                        StrokeShape="RoundRectangle 10"
-                                                        StrokeThickness="0.1">
-                                                    <Grid RowDefinitions="Auto, *">
-                                                        <HorizontalStackLayout Grid.Row="0"
-                                                                               Margin="0,0,0,10"
-                                                                               IsVisible="{Binding RejectionCode, Converter={StaticResource IsNotEqualConverter}, ConverterParameter=''}"
-                                                                               Spacing="5">
-
-                                                            <Label FontFamily="FAS"
-                                                                   FontSize="Medium"
-                                                                   Text="{x:Static fontAwesome:FontAwesomeIcons.TriangleExclamation}"
-                                                                   TextColor="Red" />
-
-                                                            <Label LineBreakMode="TailTruncation"
-                                                                   MaxLines="1"
-                                                                   VerticalOptions="Center"
-                                                                   VerticalTextAlignment="Center">
-                                                                <Label.FormattedText>
-                                                                    <FormattedString>
-                                                                        <Span Text="Hata Kodu: " TextColor="{StaticResource Gray600}" />
-                                                                        <Span FontAttributes="Bold" Text="{Binding RejectionCode}" />
-                                                                    </FormattedString>
-                                                                </Label.FormattedText>
-                                                            </Label>
-                                                        </HorizontalStackLayout>
-
-                                                        <Grid Grid.Row="1"
-                                                              ColumnDefinitions="Auto, *"
-                                                              ColumnSpacing="10">
-                                                            <Border StrokeShape="RoundRectangle 5" StrokeThickness="0.5">
-                                                                <Image Grid.Column="0"
-                                                                       HeightRequest="50"
-                                                                       Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
-                                                                       WidthRequest="50" />
-                                                            </Border>
-
-
-                                                            <VerticalStackLayout Grid.Column="1">
-
-                                                                <Label Grid.Column="0"
-                                                                       FontAttributes="Bold"
-                                                                       LineBreakMode="TailTruncation"
-                                                                       Text="{Binding ItemCode}" />
+                                                                <Label FontFamily="FAS"
+                                                                       FontSize="Medium"
+                                                                       Text="{x:Static fontAwesome:FontAwesomeIcons.TriangleExclamation}"
+                                                                       TextColor="Red" />
 
                                                                 <Label LineBreakMode="TailTruncation"
-                                                                       Text="{Binding ItemName}"
-                                                                       TextColor="{StaticResource Gray600}" />
+                                                                       MaxLines="1"
+                                                                       VerticalOptions="Center"
+                                                                       VerticalTextAlignment="Center">
+                                                                    <Label.FormattedText>
+                                                                        <FormattedString>
+                                                                            <Span Text="Hata Kodu: " TextColor="{StaticResource Gray600}" />
+                                                                            <Span FontAttributes="Bold" Text="{Binding RejectionCode}" />
+                                                                        </FormattedString>
+                                                                    </Label.FormattedText>
+                                                                </Label>
+                                                            </HorizontalStackLayout>
 
-                                                                <HorizontalStackLayout Spacing="10">
-                                                                    <Label FontAttributes="Bold" FontSize="15">
-                                                                        <Label.FormattedText>
-                                                                            <FormattedString>
-                                                                                <Span FontFamily="FAS"
-                                                                                      Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                                                                                      TextColor="{StaticResource Primary}" />
-                                                                                <Span Text=" " />
-                                                                                <Span Text="{Binding ProcurementQuantity, StringFormat='{0:N2}'}" TextColor="{StaticResource Primary}" />
-                                                                                <Span Text=" " />
-                                                                                <Span Text="{Binding SubUnitsetCode}" TextColor="{StaticResource Primary}" />
-                                                                            </FormattedString>
-                                                                        </Label.FormattedText>
-                                                                    </Label>
+                                                            <Grid Grid.Row="1"
+                                                                  ColumnDefinitions="Auto, *"
+                                                                  ColumnSpacing="10"
+                                                                  HorizontalOptions="Fill">
+                                                                <Border Grid.Column="0"
+                                                                        StrokeShape="RoundRectangle 5"
+                                                                        StrokeThickness="0.5">
+                                                                    <Image HeightRequest="50"
+                                                                           Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                                                           WidthRequest="50" />
+                                                                </Border>
 
-                                                                    <Label FontAttributes="Bold" FontSize="15">
-                                                                        <Label.FormattedText>
-                                                                            <FormattedString>
-                                                                                <Span FontFamily="FAS"
-                                                                                      Text="{x:Static fontAwesome:FontAwesomeIcons.SquarePlus}"
-                                                                                      TextColor="{StaticResource Primary}" />
-                                                                                <Span Text=" " />
-                                                                                <Span Text="{Binding Quantity, StringFormat='{0:N2}'}" TextColor="{StaticResource Primary}" />
-                                                                            </FormattedString>
-                                                                        </Label.FormattedText>
-                                                                    </Label>
 
-                                                                    <Label Grid.Column="0"
-                                                                           FontAttributes="Bold"
-                                                                           HorizontalOptions="End"
+                                                                <VerticalStackLayout Grid.Column="1">
+
+                                                                    <Label FontAttributes="Bold"
                                                                            LineBreakMode="TailTruncation"
                                                                            MaxLines="1"
-                                                                           TextColor="{StaticResource Primary}"
-                                                                           VerticalOptions="Center">
-                                                                        <Label.FormattedText>
-                                                                            <FormattedString>
-                                                                                <Span FontFamily="FAS"
-                                                                                      Text="{x:Static fontAwesome:FontAwesomeIcons.LocationDot}"
-                                                                                      TextColor="{StaticResource Primary}" />
-                                                                                <Span Text=" " />
-                                                                                <Span Text="{Binding DestinationLocationCode}" TextColor="{StaticResource Primary}" />
-                                                                            </FormattedString>
-                                                                        </Label.FormattedText>
-                                                                    </Label>
-                                                                </HorizontalStackLayout>
-                                                            </VerticalStackLayout>
-                                                        </Grid>
-                                                    </Grid>
-                                                </Border>
-                                            </DataTemplate>
-                                        </CollectionView.ItemTemplate>
-                                    </CollectionView>
-                                </toolkit:Expander.Content>
-                            </toolkit:Expander>
+                                                                           Text="{Binding ItemCode}" />
 
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </Grid>
-        </dx:BottomSheet>-->
+                                                                    <Label LineBreakMode="TailTruncation"
+                                                                           MaxLines="1"
+                                                                           Text="{Binding ItemName}"
+                                                                           TextColor="{StaticResource Gray600}" />
+
+                                                                    <HorizontalStackLayout Spacing="10">
+                                                                        <Label FontAttributes="Bold" FontSize="15">
+                                                                            <Label.FormattedText>
+                                                                                <FormattedString>
+                                                                                    <Span FontFamily="FAS"
+                                                                                          Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                                                          TextColor="{StaticResource Primary}" />
+                                                                                    <Span Text=" " />
+                                                                                    <Span Text="{Binding ProcurementQuantity, StringFormat='{0:N2}'}" TextColor="{StaticResource Primary}" />
+                                                                                    <Span Text=" " />
+                                                                                    <Span Text="{Binding SubUnitsetCode}" TextColor="{StaticResource Primary}" />
+                                                                                </FormattedString>
+                                                                            </Label.FormattedText>
+                                                                        </Label>
+
+                                                                        <Label FontAttributes="Bold" FontSize="15">
+                                                                            <Label.FormattedText>
+                                                                                <FormattedString>
+                                                                                    <Span FontFamily="FAS"
+                                                                                          Text="{x:Static fontAwesome:FontAwesomeIcons.SquarePlus}"
+                                                                                          TextColor="{StaticResource Primary}" />
+                                                                                    <Span Text=" " />
+                                                                                    <Span Text="{Binding Quantity, StringFormat='{0:N2}'}" TextColor="{StaticResource Primary}" />
+                                                                                </FormattedString>
+                                                                            </Label.FormattedText>
+                                                                        </Label>
+
+                                                                        <Label Grid.Column="0"
+                                                                               FontAttributes="Bold"
+                                                                               HorizontalOptions="End"
+                                                                               LineBreakMode="TailTruncation"
+                                                                               MaxLines="1"
+                                                                               TextColor="{StaticResource Primary}"
+                                                                               VerticalOptions="Center">
+                                                                            <Label.FormattedText>
+                                                                                <FormattedString>
+                                                                                    <Span FontFamily="FAS"
+                                                                                          Text="{x:Static fontAwesome:FontAwesomeIcons.LocationDot}"
+                                                                                          TextColor="{StaticResource Primary}" />
+                                                                                    <Span Text=" " />
+                                                                                    <Span Text="{Binding DestinationLocationCode}" TextColor="{StaticResource Primary}" />
+                                                                                </FormattedString>
+                                                                            </Label.FormattedText>
+                                                                        </Label>
+                                                                    </HorizontalStackLayout>
+                                                                </VerticalStackLayout>
+                                                            </Grid>
+                                                        </Grid>
+                                                    </Border>
+
+
+
+                                                </DataTemplate>
+                                            </CollectionView.ItemTemplate>
+                                        </CollectionView>
+                                    </toolkit:Expander.Content>
+                                </toolkit:Expander>
+
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Grid>
+            </ScrollView>
+
+        </dx:BottomSheet>
         <!--#endregion-->
     </Grid>
 </ContentPage>

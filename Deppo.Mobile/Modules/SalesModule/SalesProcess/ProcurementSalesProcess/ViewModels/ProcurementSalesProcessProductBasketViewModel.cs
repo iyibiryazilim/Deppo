@@ -346,7 +346,9 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementSalesProcess.
                     {
                         if(!previousViewModel.SelectedPackageBasketModel.PackageProducts.Any(x => x.ReferenceId == item.ReferenceId))
                         {
-						    previousViewModel.SelectedPackageBasketModel?.PackageProducts.Add(item);
+                            previousViewModel.SelectedPackageBasketModel.PackageProductModel.Weight += item.Weight * item.OutputQuantity;
+                            previousViewModel.SelectedPackageBasketModel.PackageProductModel.Volume += item.Volume * item.OutputQuantity;
+							previousViewModel.SelectedPackageBasketModel?.PackageProducts.Add(item);
                         }
 					}   
                 }

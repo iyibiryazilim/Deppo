@@ -55,7 +55,7 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
 		_subUnitsetService = subUnitsetService;
 		_barcodeSearchHelper = barcodeSearchHelper;
 
-		Title = "Ürün Sepeti";
+		Title = "";
 
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
@@ -112,6 +112,17 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
             IsBusy = true;
 
             _userDialogs.ShowLoading("Loading...");
+
+            if(LocationModel is not null)
+            {
+				Title = $"{WarehouseCountingWarehouseModel.Name} - {LocationModel.Name} : Sepeti";
+			}
+            else
+            {
+				Title = $"{WarehouseCountingWarehouseModel.Name} : Sepeti";
+			}
+
+            
             Items.Clear();
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();

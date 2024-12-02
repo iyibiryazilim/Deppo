@@ -77,6 +77,7 @@ public partial class ProcurementByCustomerProductListViewModel : BaseViewModel
 		try
 		{
 			IsBusy = true;
+
 			_userDialogs.ShowLoading("Yükleniyor...");
 			Items.Clear();
 			SearchItems.Clear();

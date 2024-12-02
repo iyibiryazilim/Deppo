@@ -210,12 +210,15 @@
                                                           ColumnDefinitions=".20*,.80*"
                                                           ColumnSpacing="10">
                                                         <Border Grid.Column="0"
-                                                               
+                                                                HeightRequest="{OnIdiom 100,
+                                                                                        Phone=70,
+                                                                                        Tablet=100}"
                                                                 Stroke="{StaticResource Primary}"
                                                                 StrokeShape="RoundRectangle 5"
                                                                 StrokeThickness="0.5"
-                                                                WidthRequest="{OnIdiom 100, Phone=70, Tablet=100}"
-                                                                HeightRequest="{OnIdiom 100, Phone=70, Tablet=100}">
+                                                                WidthRequest="{OnIdiom 100,
+                                                                                       Phone=70,
+                                                                                       Tablet=100}">
                                                             <Image Grid.Column="0"
                                                                    Aspect="AspectFill"
                                                                    Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}" />
@@ -248,6 +251,22 @@
                                                                    TextColor="{StaticResource Gray600}" />
 
                                                             <HorizontalStackLayout Spacing="10">
+                                                                <!--<Label FontAttributes="Bold" FontSize="15">
+                                                                    <Label.FormattedText>
+                                                                        <FormattedString>
+                                                                            <Span FontFamily="FAS"
+                                                                                  Text="{x:Static fontAwesome:FontAwesomeIcons.Database}"
+                                                                                  TextColor="{StaticResource Primary}" />
+                                                                            <Span Text=" " />
+                                                                            <Span Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                                                                  TextColor="{StaticResource Primary}"
+                                                                                  ToolTipProperties.Text="Stok Miktarı" />
+                                                                            <Span Text=" " />
+                                                                            <Span Text="{Binding SubUnitsetCode}" TextColor="{StaticResource Primary}" />
+                                                                        </FormattedString>
+                                                                    </Label.FormattedText>
+                                                                </Label>-->
+
                                                                 <Label FontAttributes="Bold" FontSize="15">
                                                                     <Label.FormattedText>
                                                                         <FormattedString>
@@ -255,7 +274,9 @@
                                                                                   Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
                                                                                   TextColor="{StaticResource Primary}" />
                                                                             <Span Text=" " />
-                                                                            <Span Text="{Binding ProcurementQuantity, StringFormat='{0:N2}'}" TextColor="{StaticResource Primary}" />
+                                                                            <Span Text="{Binding ProcurementQuantity, StringFormat='{0:N2}'}"
+                                                                                  TextColor="{StaticResource Primary}"
+                                                                                  ToolTipProperties.Text="Toplanabilir Miktar" />
                                                                             <Span Text=" " />
                                                                             <Span Text="{Binding SubUnitsetCode}" TextColor="{StaticResource Primary}" />
                                                                         </FormattedString>

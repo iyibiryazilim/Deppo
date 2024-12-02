@@ -160,7 +160,7 @@ namespace Deppo.Core.DataStores
 
         private string GetLinesQuery(int firmNumber, int periodNumber, int ficheReferenceId, string search = "", int skip = 0, int take = 20)
         {
-            string baseQuery = $@"Select
+            string baseQuery = $@"SELECT
      [ReferenceId] = STLINE.LOGICALREF,
      [TransactionDate] = STLINE.DATE_,
      [TransactionTime] = dbo.LG_INTTOTIME(STLINE.FTIME),
@@ -185,9 +185,11 @@ namespace Deppo.Core.DataStores
 	 [SubUnitsetName] = ISNULL (subunitset.NAME , ''),
      [Image] = ISNULL(FIRMDOC.LDATA,''),
 	 [Barcode] = ISNULL(BARCODE.BARCODE,''),
-	 [Quantity] = ISNULL (STLINE.AMOUNT,0)
+	 [Quantity] = ISNULL (STLINE.AMOUNT,0),
+     [Volume] =  ISNULL((SELECT VOLUME_ FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_ITMUNITA AS ITMUNITA WITH(NOLOCK) WHERE ITMUNITA.ITEMREF = ITEMS.LOGICALREF AND ITMUNITA.UNITLINEREF = subunitset.LOGICALREF),0),
+     [Weight] =  ISNULL((SELECT WEIGHT FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_ITMUNITA AS ITMUNITA WITH(NOLOCK) WHERE ITMUNITA.ITEMREF = ITEMS.LOGICALREF AND ITMUNITA.UNITLINEREF = subunitset.LOGICALREF),0)
 
-from  LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE as STLINE
+FROM  LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE as STLINE
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE on STLINE.STFICHEREF = STFICHE.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFICHE AS ORFICHE ON STLINE.ORDFICHEREF = ORFICHE.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS on STLINE.STOCKREF = ITEMS.LOGICALREF
@@ -233,7 +235,9 @@ where STFICHE.LOGICALREF = {ficheReferenceId}";
 	 [SubUnitsetName] = ISNULL (subunitset.NAME , ''),
      [Image] = ISNULL(FIRMDOC.LDATA,''),
 	 [Barcode] = ISNULL(BARCODE.BARCODE,''),
-	 [Quantity] = ISNULL (STLINE.AMOUNT,0)
+	 [Quantity] = ISNULL (STLINE.AMOUNT,0),
+     [Volume] =  ISNULL((SELECT VOLUME_ FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_ITMUNITA AS ITMUNITA WITH(NOLOCK) WHERE ITMUNITA.ITEMREF = ITEMS.LOGICALREF AND ITMUNITA.UNITLINEREF = subunitset.LOGICALREF),0),
+     [Weight] =  ISNULL((SELECT WEIGHT FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_ITMUNITA AS ITMUNITA WITH(NOLOCK) WHERE ITMUNITA.ITEMREF = ITEMS.LOGICALREF AND ITMUNITA.UNITLINEREF = subunitset.LOGICALREF),0)
 
 from  LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE as STLINE
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE on STLINE.STFICHEREF = STFICHE.LOGICALREF
@@ -277,7 +281,9 @@ where STFICHE.LOGICALREF = {ficheReferenceId} AND (ITEMS.CODE = '{code}' OR VARI
 	 [SubUnitsetName] = ISNULL (subunitset.NAME , ''),
      [Image] = ISNULL(FIRMDOC.LDATA,''),
 	 [Barcode] = ISNULL(BARCODE.BARCODE,''),
-	 [Quantity] = ISNULL (STLINE.AMOUNT,0)
+	 [Quantity] = ISNULL (STLINE.AMOUNT,0),
+     [Volume] =  ISNULL((SELECT VOLUME_ FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_ITMUNITA AS ITMUNITA WITH(NOLOCK) WHERE ITMUNITA.ITEMREF = ITEMS.LOGICALREF AND ITMUNITA.UNITLINEREF = subunitset.LOGICALREF),0),
+     [Weight] =  ISNULL((SELECT WEIGHT FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_ITMUNITA AS ITMUNITA WITH(NOLOCK) WHERE ITMUNITA.ITEMREF = ITEMS.LOGICALREF AND ITMUNITA.UNITLINEREF = subunitset.LOGICALREF),0)
 
 from  LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE as STLINE
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE on STLINE.STFICHEREF = STFICHE.LOGICALREF
