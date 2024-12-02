@@ -14,18 +14,18 @@ public partial class InputOutsourceTransferV2WarehouseListViewModel : BaseViewMo
 {
 	private readonly IHttpClientService _httpClientService;
 	private readonly IUserDialogs _userDialogs;
-	private readonly IOutsourceService _outsourceService;
+	private readonly IWarehouseService _warehouseService;
 
 	public ObservableCollection<WarehouseModel> Items { get; } = new();
 
 	[ObservableProperty]
 	WarehouseModel? selectedWarehouseModel;
 
-	public InputOutsourceTransferV2WarehouseListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IOutsourceService outsourceService)
+	public InputOutsourceTransferV2WarehouseListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IWarehouseService warehouseService)
 	{
 		_httpClientService = httpClientService;
 		_userDialogs = userDialogs;
-		_outsourceService = outsourceService;
+		_warehouseService = warehouseService;
 
 		Title = "Fason Ambarı Seçimi";
 
@@ -55,7 +55,7 @@ public partial class InputOutsourceTransferV2WarehouseListViewModel : BaseViewMo
 			await Task.Delay(1000);
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _outsourceService.GetOutsourceWarehousesAsync(
+			var result = await _warehouseService.GetObjectsAsync(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
@@ -105,7 +105,7 @@ public partial class InputOutsourceTransferV2WarehouseListViewModel : BaseViewMo
 			IsBusy = true;
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _outsourceService.GetOutsourceWarehousesAsync(
+			var result = await _warehouseService.GetObjectsAsync(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
