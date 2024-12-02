@@ -8,6 +8,7 @@ namespace Deppo.Sys.Service.Models
 {
     public class SubUnitset
     {
+        public Guid Oid { get; set; }
         public int ReferenceId { get; set; }
 
         public int UnitsetReferenceId { get; set; }
