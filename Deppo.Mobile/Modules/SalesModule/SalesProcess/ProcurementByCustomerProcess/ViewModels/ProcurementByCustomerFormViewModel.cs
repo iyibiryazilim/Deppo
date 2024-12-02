@@ -35,6 +35,7 @@ using Android.Net.Wifi.Rtt;
 using Microsoft.Maui.Controls.Shapes;
 using Deppo.Core.DataResultModel;
 using DevExpress.Maui.Controls;
+using Xamarin.Google.ErrorProne.Annotations;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.ViewModels;
 
@@ -59,6 +60,9 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 	private readonly ILocationService _locationService;
 	private readonly IProcurementFicheService _procurementFicheService;
 	private readonly Deppo.Sys.Service.Services.IWarehouseService _warehouseSysService;
+	private readonly Deppo.Sys.Service.Services.ICustomerService _customerSysService;
+	private readonly Deppo.Sys.Service.Services.IProductService _productSysService;
+	private readonly Deppo.Sys.Service.Services.ISubunitsetService _subunitsetSysService;
 
 	[ObservableProperty]
 	WarehouseModel orderWarehouseModel;
@@ -94,7 +98,7 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 	[ObservableProperty]
 	private string description = string.Empty;
 
-	public ProcurementByCustomerFormViewModel(IHttpClientService httpClientService, IHttpClientSysService httpClientSysService, ITransferTransactionService transferTransactionService, IUserDialogs userDialogs, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService, ICarrierService carrierService, IDriverService driverService, IProcurementAuditCustomerService procurementAuditCustomerService, IWholeSalesDispatchTransactionService wholeSalesDispatchTransactionService, IProcurementLocationTransactionService procurementLocationTransactionService, ILocationService locationService, IProcurementFicheService procurementFicheService, Sys.Service.Services.IWarehouseService warehouseSysService)
+	public ProcurementByCustomerFormViewModel(IHttpClientService httpClientService, IHttpClientSysService httpClientSysService, ITransferTransactionService transferTransactionService, IUserDialogs userDialogs, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService, ICarrierService carrierService, IDriverService driverService, IProcurementAuditCustomerService procurementAuditCustomerService, IWholeSalesDispatchTransactionService wholeSalesDispatchTransactionService, IProcurementLocationTransactionService procurementLocationTransactionService, ILocationService locationService, IProcurementFicheService procurementFicheService, Sys.Service.Services.IWarehouseService warehouseSysService, Sys.Service.Services.ICustomerService customerSysService, Sys.Service.Services.IProductService productSysService, ISubunitsetService subunitsetSysService)
 	{
 		_httpClientService = httpClientService;
 		_httpClientSysService = httpClientSysService;
@@ -110,6 +114,9 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 		_locationService = locationService;
 		_procurementFicheService = procurementFicheService;
 		_warehouseSysService = warehouseSysService;
+		_customerSysService = customerSysService;
+		_productSysService = productSysService;
+		_subunitsetSysService = subunitsetSysService;
 
 		Title = "Ürün Toplama Formu";
 
@@ -452,6 +459,45 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 				{
 					await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 				}
+
+				//#region ProcurementFiche Insert
+				//try
+				//{
+				//	var httpSysClient = _httpClientSysService.GetOrCreateHttpClient();
+				//	var customerResult = await _customerSysService.GetAllAsync(httpSysClient, $"$filter= Code eq '{ProcurementCustomerBasketModel.CustomerCode}'");
+				//	var warehouseResult = await _warehouseSysService.GetAllAsync(httpSysClient, $"$filter= WarehouseNumber eq {OrderWarehouseModel.Number}");
+				//	foreach (var item in Items)
+    //                {
+    //                    foreach (var product in item.Products)
+    //                    {
+				//			var productResult = await _productSysService.GetAllAsync(httpSysClient, $"$filter= Code eq '{product.ItemCode}'");
+				//			var subUnitsetResult = await _subunitsetSysService.GetAllAsync(httpSysClient, $"filter= Code eq '{product.SubUnitsetCode}'");
+
+				//			ProcurementFicheDto procurementFicheDto = new ProcurementFicheDto
+				//			{
+				//				CreatedOn = DateTime.Now,
+				//				//Customer = customerResult.FirstOrDefault().Oid,
+				//				//ReferenceId = result.Data.ReferenceId,
+				//				//FicheNumber = result.Data.Code,
+				//			};
+
+				//			ProcurementFicheTransactionDto procurementFicheTransactionDto = new();
+				//			//procurementFicheTransactionDto.Product = productResult.FirstOrDefault().Oid;
+				//			//procurementFicheTransactionDto.SubUnitset = subUnitsetResult.FirstOrDefault().Oid;
+				//			procurementFicheTransactionDto.Quantity = product.Quantity;
+							
+				//			procurementFicheDto.Lines.Add(procurementFicheTransactionDto);
+				//			//await _procurementFicheService.CreateAsync(httpSysClient, procurementFicheDto);
+    //                    }
+    //                }
+    //            }
+				//catch (Exception ex)
+				//{
+
+				//	throw;
+				//}
+				//#endregion
+
 
 				await ClearFormAsync();
 				await ClearDataAsync();
