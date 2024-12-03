@@ -5,6 +5,7 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcess.OutputOutsourceTransfer.Views;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcessV2.OutputOutsourceTransferV2.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -182,13 +183,13 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
             {
                 IsBusy = true;
 
-                //if (SelectedWarehouseModel is not null)
-                //{
-                //    await Shell.Current.GoToAsync($"{nameof(OutputOutsourceTransferBasketListView)}", new Dictionary<string, object>
-                //    {
-                //        [nameof(WarehouseModel)] = SelectedWarehouseModel
-                //    });
-                //}
+                if (SelectedWarehouseModel is not null)
+                {
+                    await Shell.Current.GoToAsync($"{nameof(OutputOutsourceTransferV2OutsourceSupplierListView)}", new Dictionary<string, object>
+                    {
+                        [nameof(WarehouseModel)] = SelectedWarehouseModel
+                    });
+                }
             }
             catch (Exception ex)
             {
