@@ -9,5 +9,6 @@ public partial class InputOutsourceTransferV2FormView : ContentPage
 	{
 		InitializeComponent();
 		BindingContext = _viewModel = viewModel;
+		_viewModel.CurrentPage = this;
 	}
 }
