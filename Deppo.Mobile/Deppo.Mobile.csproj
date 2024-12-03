@@ -273,7 +273,16 @@
 	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\InputOutsourceProcess\InputOutsourceTransfer\Views\InputOutsourceTransferWarehouseListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\OutputOutsourceProcessV2\OutputOutsourceTransferV2\Views\OutputOutsourceTransferV2OutsourceBasketView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\OutputOutsourceProcessV2\OutputOutsourceTransferV2\Views\OutputOutsourceTransferV2OutsourceFormView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\OutputOutsourceProcessV2\OutputOutsourceTransferV2\Views\OutputOutsourceTransferV2OutsourceSupplierListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\OutputOutsourceProcessV2\OutputOutsourceTransferV2\Views\OutputOutsourceTransferV2ProductListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\OutputOutsourceProcessV2\OutputOutsourceTransferV2\Views\OutputOutsourceTransferV2WarehouseListView.xaml">

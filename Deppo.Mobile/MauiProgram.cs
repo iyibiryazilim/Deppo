@@ -846,16 +846,19 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
 
         builder.Services.AddScopedWithShellRoute<InputOutsourceTransferOutsourceFormView, InputOutsourceTransferOutsourceFormViewModel>(nameof(InputOutsourceTransferOutsourceFormView));
 
-        #region v2
+        #region OutputTransferv2
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferV2WarehouseListView,OutputOutsourceTransferV2WarehouseListViewModel>(nameof(OutputOutsourceTransferV2WarehouseListView));
+        builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferV2OutsourceSupplierListView, OutputOutsourceTransferV2OutsourceSupplierListViewModel>(nameof(OutputOutsourceTransferV2OutsourceSupplierListView));
+        builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferV2ProductListView, OutputOutsourceTransferV2ProductListViewModel>(nameof(OutputOutsourceTransferV2ProductListView));
+
         #endregion
 
         #region InputOutsourceTransferV2
         builder.Services.AddScopedWithShellRoute<InputOutsourceTransferV2WarehouseListView, InputOutsourceTransferV2WarehouseListViewModel>(nameof(InputOutsourceTransferV2WarehouseListView));
-		builder.Services.AddScopedWithShellRoute<InputOutsourceTransferV2SupplierListView, InputOutsourceTransferV2SupplierListViewModel>(nameof(InputOutsourceTransferV2SupplierListView));
+		    builder.Services.AddScopedWithShellRoute<InputOutsourceTransferV2SupplierListView, InputOutsourceTransferV2SupplierListViewModel>(nameof(InputOutsourceTransferV2SupplierListView));
         builder.Services.AddScopedWithShellRoute<InputOutsourceTransferV2ProductListView, InputOutsourceTransferV2ProductListViewModel>(nameof(InputOutsourceTransferV2ProductListView));
-		builder.Services.AddScopedWithShellRoute<InputOutsourceTransferV2BasketView, InputOutsourceTransferV2BasketViewModel>(nameof(InputOutsourceTransferV2BasketView));
-		builder.Services.AddScopedWithShellRoute<InputOutsourceTransferV2FormView, InputOutsourceTransferV2FormViewModel>(nameof(InputOutsourceTransferV2FormView));
+		    builder.Services.AddScopedWithShellRoute<InputOutsourceTransferV2BasketView, InputOutsourceTransferV2BasketViewModel>(nameof(InputOutsourceTransferV2BasketView));
+		    builder.Services.AddScopedWithShellRoute<InputOutsourceTransferV2FormView, InputOutsourceTransferV2FormViewModel>(nameof(InputOutsourceTransferV2FormView));
 		#endregion
 
 		#region OutSource Panel
