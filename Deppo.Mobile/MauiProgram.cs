@@ -424,6 +424,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<Deppo.Sys.Service.Services.ISubunitsetService, Deppo.Sys.Service.DataStores.SubunitsetDataStore>();
         builder.Services.AddSingleton<Deppo.Sys.Service.Services.ICustomerService, Deppo.Sys.Service.DataStores.CustomerDataStore>();
 
+        builder.Services.AddSingleton<IOutputOutsourceTransferV2Service, OutputOutsourceTransferV2DataStore>();
+
 
 		#region Analysis Modules
 
@@ -850,6 +852,7 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferV2WarehouseListView,OutputOutsourceTransferV2WarehouseListViewModel>(nameof(OutputOutsourceTransferV2WarehouseListView));
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferV2OutsourceSupplierListView, OutputOutsourceTransferV2OutsourceSupplierListViewModel>(nameof(OutputOutsourceTransferV2OutsourceSupplierListView));
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferV2ProductListView, OutputOutsourceTransferV2ProductListViewModel>(nameof(OutputOutsourceTransferV2ProductListView));
+        builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferV2OutsourceBasketView, OutputOutsourceTransferV2OutsourceBasketViewModel>(nameof(OutputOutsourceTransferV2OutsourceBasketView));
 
         #endregion
 
