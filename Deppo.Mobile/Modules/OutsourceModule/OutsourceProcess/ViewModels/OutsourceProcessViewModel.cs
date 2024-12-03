@@ -5,6 +5,7 @@ using Deppo.Mobile.Core.Models.ProcessBottomSheetModels;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransfer.ViewModels;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransfer.Views;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransferV2.Views;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcess.OutputOutsourceTransfer.Views;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcessV2.OutputOutsourceTransferV2.Views;
 using DevExpress.Maui.Controls;
@@ -59,7 +60,7 @@ public partial class OutsourceProcessViewModel : BaseViewModel
 
     private async Task InputOutsourceTransferAsync()
     {
-        await Shell.Current.GoToAsync($"{nameof(InputOutsourceTransferWarehouseListView)}");
+        await Shell.Current.GoToAsync($"{nameof(InputOutsourceTransferV2WarehouseListView)}");
     }
 
     private async Task InputOutsourceInfoBottemSheetAsync()
