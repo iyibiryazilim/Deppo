@@ -297,9 +297,10 @@ public partial class LoginViewModel : BaseViewModel
             //if (string.IsNullOrEmpty(baseUri))
             //    _httpClientService.BaseUri = "http://172.25.140.11:52789";
             //else
-            _httpClientService.BaseUri = baseUri;
+            //_httpClientService.BaseUri = baseUri;
+            _httpClientService.BaseUri = "http://172.16.1.25:52789";
 
-            _userDialogs.Loading("Loading...");
+			_userDialogs.Loading("Loading...");
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 

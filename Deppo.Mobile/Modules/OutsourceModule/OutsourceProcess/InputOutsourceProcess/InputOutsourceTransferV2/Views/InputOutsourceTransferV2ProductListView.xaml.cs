@@ -2,13 +2,13 @@ using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProces
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransferV2.Views;
 
-public partial class InputOutsourceTransferV2FormView : ContentPage
+public partial class InputOutsourceTransferV2ProductListView : ContentPage
 {
-	private readonly InputOutsourceTransferV2FormViewModel _viewModel;
-	public InputOutsourceTransferV2FormView(InputOutsourceTransferV2FormViewModel viewModel)
+	private readonly InputOutsourceTransferV2ProductListViewModel _viewModel;
+	public InputOutsourceTransferV2ProductListView(InputOutsourceTransferV2ProductListViewModel viewModel)
 	{
 		InitializeComponent();
 		BindingContext = _viewModel = viewModel;
-		_viewModel.CurrentPage = this;
+		_viewModel.SearchText = searchBar;
 	}
 }

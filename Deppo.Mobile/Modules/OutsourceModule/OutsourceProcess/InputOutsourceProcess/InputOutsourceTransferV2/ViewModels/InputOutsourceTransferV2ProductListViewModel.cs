@@ -2,53 +2,53 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.OutsourceModels;
+using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransferV2.Views;
-using DevExpress.Maui.Core.Internal;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransferV2.ViewModels;
 
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
-public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewModel
+[QueryProperty(name: nameof(OutsourceModel), queryId: nameof(OutsourceModel))]
+public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
 	private readonly IOutsourceService _outsourceService;
 	private readonly IUserDialogs _userDialogs;
+	private readonly IProductService _productService;
 
 	[ObservableProperty]
 	WarehouseModel? warehouseModel;
 
 	[ObservableProperty]
-	OutsourceModel? selectedOutsourceModel;
+	OutsourceModel? outsourceModel;
 
-	public ObservableCollection<OutsourceModel> Items { get; } = new();
+	[ObservableProperty]
+	ProductModel? selectedOutsourceProductModel;
+
+	public ObservableCollection<ProductModel> Items { get; } = new();
 
 	[ObservableProperty]
 	SearchBar searchText;
 
-	public InputOutsourceTransferV2SupplierListViewModel(IHttpClientService httpClientService, IOutsourceService outsourceService, IUserDialogs userDialogs)
+	public InputOutsourceTransferV2ProductListViewModel(IHttpClientService httpClientService, IOutsourceService outsourceService, IUserDialogs userDialogs, IProductService productService)
 	{
 		_httpClientService = httpClientService;
 		_outsourceService = outsourceService;
 		_userDialogs = userDialogs;
+		_productService = productService;
 
-		Title = "Fason Cari Seçimi";
+		Title = "Fason Ürünler";
 
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
 		PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
 		PerformSearchCommand = new Command(async () => await PerformSearchAsync());
-		ItemTappedCommand = new Command<OutsourceModel>(async (outsourceModel) => await ItemTappedAsync(outsourceModel));
+		ItemTappedCommand = new Command<ProductModel>(async (productModel) => await ItemTappedAsync(productModel));
 		NextViewCommand = new Command(async () => await NextViewAsync());
 		BackCommand = new Command(async () => await BackAsync());
 	}
@@ -60,7 +60,6 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 	public Command ItemTappedCommand { get; }
 	public Command NextViewCommand { get; }
 	public Command BackCommand { get; }
-
 
 	private async Task LoadItemsAsync()
 	{
@@ -75,12 +74,21 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 			await Task.Delay(1000);
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _outsourceService.GetObjects(
+			//var result = await _outsourceService.GetObjects(
+			//	httpClient: httpClient,
+			//	firmNumber: _httpClientService.FirmNumber,
+			//	periodNumber: _httpClientService.PeriodNumber,
+			//	search: SearchText.Text,
+			//	skip: 0,
+			//	take: 20
+			//);
+
+			var result = await _productService.GetObjects(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
 				search: SearchText.Text,
-				skip: 0,
+				skip: Items.Count,
 				take: 20
 			);
 
@@ -91,14 +99,14 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 
 				foreach (var item in result.Data)
 				{
-					var obj = Mapping.Mapper.Map<OutsourceModel>(item);
-					obj.IsSelected = SelectedOutsourceModel != null && SelectedOutsourceModel.Code == obj.Code ? SelectedOutsourceModel.IsSelected : false;
+					var obj = Mapping.Mapper.Map<ProductModel>(item);
+					obj.IsSelected = SelectedOutsourceProductModel != null && SelectedOutsourceProductModel.Code == obj.Code ? SelectedOutsourceProductModel.IsSelected : false;
 					Items.Add(obj);
 				}
 
 			}
 
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 		}
@@ -127,10 +135,18 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 		{
 			IsBusy = true;
 
-
 			_userDialogs.ShowLoading("Loading More Items...");
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _outsourceService.GetObjects(
+			//var result = await _outsourceService.GetObjects(
+			//	httpClient: httpClient,
+			//	firmNumber: _httpClientService.FirmNumber,
+			//	periodNumber: _httpClientService.PeriodNumber,
+			//	search: SearchText.Text,
+			//	skip: Items.Count,
+			//	take: 20
+			//);
+
+			var result = await _productService.GetObjects(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
@@ -144,12 +160,10 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 				if (result.Data is null)
 					return;
 
-				
-
 				foreach (var item in result.Data)
 				{
-					var obj = Mapping.Mapper.Map<OutsourceModel>(item);
-					obj.IsSelected = SelectedOutsourceModel != null && SelectedOutsourceModel.Code == obj.Code ? SelectedOutsourceModel.IsSelected : false;
+					var obj = Mapping.Mapper.Map<ProductModel>(item);
+					obj.IsSelected = SelectedOutsourceProductModel != null && SelectedOutsourceProductModel.Code == obj.Code ? SelectedOutsourceProductModel.IsSelected : false;
 					Items.Add(obj);
 				}
 
@@ -195,15 +209,26 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 			IsBusy = true;
 			Items.Clear();
 			_userDialogs.Loading("Searching...");
+
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _outsourceService.GetObjects(
+			//var result = await _outsourceService.GetObjects(
+			//	httpClient: httpClient,
+			//	firmNumber: _httpClientService.FirmNumber,
+			//	periodNumber: _httpClientService.PeriodNumber,
+			//	search: SearchText.Text,
+			//	skip: 0,
+			//	take: 20
+			//);
+
+			var result = await _productService.GetObjects(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
 				search: SearchText.Text,
-				skip: 0,
+				skip: Items.Count,
 				take: 20
 			);
+
 
 			if (result.IsSuccess)
 			{
@@ -212,8 +237,8 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 
 				foreach (var item in result.Data)
 				{
-					var obj = Mapping.Mapper.Map<OutsourceModel>(item);
-					obj.IsSelected = SelectedOutsourceModel != null && SelectedOutsourceModel.Code == obj.Code ? SelectedOutsourceModel.IsSelected : false;
+					var obj = Mapping.Mapper.Map<ProductModel>(item);
+					obj.IsSelected = SelectedOutsourceProductModel != null && SelectedOutsourceProductModel.Code == obj.Code ? SelectedOutsourceProductModel.IsSelected : false;
 					Items.Add(obj);
 				}
 			}
@@ -224,7 +249,7 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -234,7 +259,7 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 			IsBusy = false;
 		}
 	}
-	private async Task ItemTappedAsync(OutsourceModel outsourceModel)
+	private async Task ItemTappedAsync(ProductModel item)
 	{
 		if (IsBusy)
 			return;
@@ -242,21 +267,21 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 		{
 			IsBusy = true;
 
-			if (SelectedOutsourceModel == outsourceModel)
+			if (SelectedOutsourceProductModel == item)
 			{
-				SelectedOutsourceModel.IsSelected = false;
-				SelectedOutsourceModel = null;
+				SelectedOutsourceProductModel.IsSelected = false;
+				SelectedOutsourceProductModel = null;
 			}
 			else
 			{
-				if (SelectedOutsourceModel != null)
+				if (SelectedOutsourceProductModel != null)
 				{
-					SelectedOutsourceModel.IsSelected = false;
+					SelectedOutsourceProductModel.IsSelected = false;
 				}
-				SelectedOutsourceModel = outsourceModel;
-				SelectedOutsourceModel.IsSelected = true;
+				SelectedOutsourceProductModel = item;
+				SelectedOutsourceProductModel.IsSelected = true;
 
-				Items.Where(x => x.Code != outsourceModel.Code).ForEach(x => x.IsSelected = false);
+				Items.Where(x => x.Code != item.Code).ToList().ForEach(x => x.IsSelected = false);
 			}
 		}
 		catch (Exception ex)
@@ -276,16 +301,17 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 	{
 		if (IsBusy)
 			return;
-		if (SelectedOutsourceModel is null && WarehouseModel is null)
+		if (SelectedOutsourceProductModel is null && WarehouseModel is null && SelectedOutsourceProductModel is null)
 			return;
 		try
 		{
 			IsBusy = true;
 
-			await Shell.Current.GoToAsync($"{nameof(InputOutsourceTransferV2ProductListView)}", new Dictionary<string, object>
+			await Shell.Current.GoToAsync($"{nameof(InputOutsourceTransferV2BasketView)}", new Dictionary<string, object>
 			{
 				[nameof(WarehouseModel)] = WarehouseModel,
-				[nameof(OutsourceModel)] = SelectedOutsourceModel
+				[nameof(OutsourceModel)] = OutsourceModel,
+				[nameof(ProductModel)] = SelectedOutsourceProductModel
 			});
 
 			SearchText.Text = string.Empty;
@@ -312,17 +338,17 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 			IsBusy = true;
 
 
-			if(SelectedOutsourceModel is not null)
+			if (SelectedOutsourceProductModel is not null)
 			{
-				SelectedOutsourceModel.IsSelected = false;
-				SelectedOutsourceModel = null;
+				SelectedOutsourceProductModel.IsSelected = false;
+				SelectedOutsourceProductModel = null;
 			}
 
 			SearchText.Text = string.Empty;
 
 			await Shell.Current.GoToAsync("..");
 		}
-		catch(Exception ex)
+		catch (Exception ex)
 		{
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
@@ -334,7 +360,5 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 			IsBusy = false;
 		}
 	}
-
-	
 
 }

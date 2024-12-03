@@ -855,10 +855,10 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
 
         #region InputOutsourceTransferV2
         builder.Services.AddScopedWithShellRoute<InputOutsourceTransferV2WarehouseListView, InputOutsourceTransferV2WarehouseListViewModel>(nameof(InputOutsourceTransferV2WarehouseListView));
-		builder.Services.AddScopedWithShellRoute<InputOutsourceTransferV2SupplierListView, InputOutsourceTransferV2SupplierListViewModel>(nameof(InputOutsourceTransferV2SupplierListView));
-        builder.Services.AddScopedWithShellRoute<InputOutsourceTransferOutsourceProductListView, InputOutsourceTransferOutsourceProductListViewModel>(nameof(InputOutsourceTransferOutsourceProductListView));
-		builder.Services.AddScopedWithShellRoute<InputOutsourceTransferV2BasketView, InputOutsourceTransferV2BasketViewModel>(nameof(InputOutsourceTransferV2BasketView));
-		builder.Services.AddScopedWithShellRoute<InputOutsourceTransferV2FormView, InputOutsourceTransferV2FormViewModel>(nameof(InputOutsourceTransferV2FormView));
+		    builder.Services.AddScopedWithShellRoute<InputOutsourceTransferV2SupplierListView, InputOutsourceTransferV2SupplierListViewModel>(nameof(InputOutsourceTransferV2SupplierListView));
+        builder.Services.AddScopedWithShellRoute<InputOutsourceTransferV2ProductListView, InputOutsourceTransferV2ProductListViewModel>(nameof(InputOutsourceTransferV2ProductListView));
+		    builder.Services.AddScopedWithShellRoute<InputOutsourceTransferV2BasketView, InputOutsourceTransferV2BasketViewModel>(nameof(InputOutsourceTransferV2BasketView));
+		    builder.Services.AddScopedWithShellRoute<InputOutsourceTransferV2FormView, InputOutsourceTransferV2FormViewModel>(nameof(InputOutsourceTransferV2FormView));
 		#endregion
 
 		#region OutSource Panel
