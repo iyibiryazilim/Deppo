@@ -5,6 +5,7 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransferV2.Views;
 using DevExpress.Data.Async.Helpers;
 using System.Collections.ObjectModel;
 
@@ -189,7 +190,7 @@ public partial class InputOutsourceTransferV2WarehouseListViewModel : BaseViewMo
 		{
 			IsBusy = true;
 
-			await Shell.Current.GoToAsync($"{nameof(InputOutsourceTransferV2SupplierListViewModel)}", new Dictionary<string, object>
+			await Shell.Current.GoToAsync($"{nameof(InputOutsourceTransferV2SupplierListView)}", new Dictionary<string, object>
 			{
 				[nameof(WarehouseModel)] = SelectedWarehouseModel
 			});
