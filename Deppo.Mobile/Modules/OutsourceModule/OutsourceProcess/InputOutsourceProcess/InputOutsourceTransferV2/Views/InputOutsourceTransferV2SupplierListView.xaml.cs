@@ -9,5 +9,6 @@ public partial class InputOutsourceTransferV2SupplierListView : ContentPage
 	{
 		InitializeComponent();
 		BindingContext = _viewModel = viewModel;
+		_viewModel.SearchText = searchBar;
 	}
 }
