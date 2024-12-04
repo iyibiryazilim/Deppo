@@ -26,6 +26,11 @@
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding BackCommand}" />
+    </Shell.BackButtonBehavior>
+    
+
     <Grid Padding="0"
           RowDefinitions="*,Auto"
           RowSpacing="10">
