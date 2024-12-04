@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Mobile.Core.Models.OutsourceModels;
 using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -14,6 +15,10 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 	private readonly IHttpClientService _httpClientService;
 	private readonly IUserDialogs _userDialogs;
 	private readonly IServiceProvider _serviceProvider;
+
+	[ObservableProperty]
+	InputOutsourceTransferV2BasketModel? inputOutsourceTransferV2BasketModel;
+
 	public InputOutsourceTransferV2BasketViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IServiceProvider serviceProvider)
 	{
 		_httpClientService = httpClientService;
@@ -22,11 +27,15 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 
 		Title = "Fason Kabul Sepeti";
 
-
 		LoadPageCommand = new Command(async () => await LoadPageAsync());
 		IncreaseCommand = new Command(async () => await IncreaseAsync());
 		DecreaseCommand = new Command(async () => await DecreaseAsync());
 		QuantityTappedCommand = new Command(async () => await QuantityTappedAsync());
+
+		SubProductIncreaseCommand = new Command<InputOutsourceTransferSubProductModel>(async (item) => await SubProductIncreaseAsync(item));
+		SubProductDecreaseCommand = new Command<InputOutsourceTransferSubProductModel>(async (item) => await SubProductDecreaseAsync(item));
+		SubProductQuantityTappedCommand = new Command<InputOutsourceTransferSubProductModel>(async (item) => await SubProductQuantityTappedAsync(item));
+
 		NextViewCommand = new Command(async () => await NextViewAsync());
 		BackCommand = new Command(async () => await BackAsync());
 	}
@@ -35,11 +44,14 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 	public Command IncreaseCommand { get; }
 	public Command DecreaseCommand { get; }
 	public Command QuantityTappedCommand { get; }
+
+	public Command SubProductIncreaseCommand { get; }
+	public Command SubProductDecreaseCommand { get; }
+	public Command SubProductQuantityTappedCommand { get; }
+
 	public Command NextViewCommand { get; }
 	public Command BackCommand { get; }
 
-	[ObservableProperty]
-	InputOutsourceTransferV2BasketModel inputOutsourceTransferV2BasketModel;
 
 	private async Task LoadPageAsync()
 	{
@@ -207,6 +219,69 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 			InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity = quantity;
 			// TODO: Sarf Malzemelerin quantityleri buradaki sayı kadar çarpılacak 
 
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task SubProductIncreaseAsync(InputOutsourceTransferSubProductModel item)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task SubProductDecreaseAsync(InputOutsourceTransferSubProductModel item)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+	private async Task SubProductQuantityTappedAsync(InputOutsourceTransferSubProductModel item)
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			IsBusy = true;
 		}
 		catch (Exception ex)
 		{
