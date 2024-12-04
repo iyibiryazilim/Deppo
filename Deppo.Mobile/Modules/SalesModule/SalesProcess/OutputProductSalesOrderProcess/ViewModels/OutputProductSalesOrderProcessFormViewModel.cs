@@ -471,13 +471,14 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 		}
 		else
 		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
-
 			resultModel.Message = "Başarısız";
 			resultModel.PageTitle = Title;
 			resultModel.ErrorMessage = result.Message;
 			resultModel.PageCountToBack = 1;
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
 			await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
 			{
 				[nameof(ResultModel)] = resultModel
@@ -485,9 +486,8 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 
 			LocationTransactions.Clear();
 		}
-
-
 	}
+
 	private async Task<RetailSalesDispatchTransactionInsert> CreateRetailDto()
 	{
 		var dto = new RetailSalesDispatchTransactionInsert
@@ -653,16 +653,11 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 			}
 			catch (Exception ex)
 			{
-				if (_userDialogs.IsHudShowing)
-					_userDialogs.HideHud();
-
 				await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 			}
 
-
-			await ClearDataAsync();
 			await ClearFormAsync();
-
+			await ClearDataAsync();
 
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
@@ -674,13 +669,14 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 		}
 		else
 		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
-
 			resultModel.Message = "Başarısız";
 			resultModel.PageTitle = Title;
 			resultModel.ErrorMessage = result.Message;
 			resultModel.PageCountToBack = 1;
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
 			await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
 			{
 				[nameof(ResultModel)] = resultModel
@@ -688,8 +684,6 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 
 			LocationTransactions.Clear();
 		}
-
-
 	}
 
 	private async Task<WholeSalesDispatchTransactionInsert> CreateDto()
@@ -813,9 +807,6 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 		return wholeSalesDispatchTransactionSerilots;
 	}
 
-
-
-
 	private async Task GetLocationTransaction(OutputSalesBasketModel item)
 	{
 
@@ -846,6 +837,7 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 		{
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
+
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 		finally
@@ -856,43 +848,75 @@ public partial class OutputProductSalesOrderProcessFormViewModel : BaseViewModel
 
 	private async Task ClearDataAsync()
 	{
-		var warehouseListViewModel = _serviceProvider.GetRequiredService<OutputProductSalesOrderProcessWarehouseListViewModel>();
-		var customerListViewModel = _serviceProvider.GetRequiredService<OutputProductSalesOrderProcessCustomerListViewModel>();
-		var basketViewModel = _serviceProvider.GetRequiredService<OutputProductSalesOrderProcessBasketListViewModel>();
-		var orderViewModel = _serviceProvider.GetRequiredService<OutputProductSalesOrderProcessOrderListViewModel>();
-		var productViewModel = _serviceProvider.GetRequiredService<OutputProductSalesOrderProcessProductListViewModel>();
-
-
-		if (warehouseListViewModel.SelectedWarehouseModel != null)
+		try
 		{
-			warehouseListViewModel.SelectedWarehouseModel.IsSelected = false;
-			warehouseListViewModel.SelectedWarehouseModel = null;
+			var warehouseListViewModel = _serviceProvider.GetRequiredService<OutputProductSalesOrderProcessWarehouseListViewModel>();
+			var customerListViewModel = _serviceProvider.GetRequiredService<OutputProductSalesOrderProcessCustomerListViewModel>();
+			var basketViewModel = _serviceProvider.GetRequiredService<OutputProductSalesOrderProcessBasketListViewModel>();
+			var orderViewModel = _serviceProvider.GetRequiredService<OutputProductSalesOrderProcessOrderListViewModel>();
+			var productViewModel = _serviceProvider.GetRequiredService<OutputProductSalesOrderProcessProductListViewModel>();
 
+
+			if (warehouseListViewModel != null && warehouseListViewModel.SelectedWarehouseModel != null)
+			{
+				warehouseListViewModel.SelectedWarehouseModel.IsSelected = false;
+				warehouseListViewModel.SelectedWarehouseModel = null;
+
+			}
+
+			if (customerListViewModel != null)
+			{
+				if (customerListViewModel.SelectedShipAddressModel != null)
+				{
+					customerListViewModel.SelectedShipAddressModel.IsSelected = false;
+					customerListViewModel.SelectedShipAddressModel = null;
+				}
+
+				if (customerListViewModel.SalesCustomer != null)
+				{
+					customerListViewModel.SalesCustomer.IsSelected = false;
+					customerListViewModel.SalesCustomer = null;
+				}
+			}
+
+			if (basketViewModel != null)
+			{
+				foreach (var item in basketViewModel.Items)
+				{
+					item.Details.Clear();
+					item.Orders.Clear();
+				}
+				basketViewModel.Items.Clear();
+
+				basketViewModel.SelectedLocationTransactionItems.Clear();
+				basketViewModel.SelectedLocationTransactions.Clear();
+				basketViewModel.SelectedSeriLotTransactions.Clear();
+			}
+
+			if (orderViewModel != null)
+			{
+				orderViewModel.BasketItems.Clear();
+				orderViewModel.SelectedItems.Clear();
+			}
+
+			if (productViewModel != null)
+			{
+				productViewModel.BasketItems.Clear();
+				productViewModel.SelectedItems.Clear();
+			}
 		}
-		if(customerListViewModel.SelectedShipAddressModel != null)
+		catch (Exception ex)
 		{
-			customerListViewModel.SelectedShipAddressModel.IsSelected = false;
-			customerListViewModel.SelectedShipAddressModel = null;
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
-
-		foreach (var item in basketViewModel.Items)
-		{
-			item.Details.Clear();
-			item.Orders.Clear();
-		}
-		basketViewModel.Items.Clear();
-
-		basketViewModel.SelectedLocationTransactionItems.Clear();
-		basketViewModel.SelectedLocationTransactions.Clear();
-		basketViewModel.SelectedSeriLotTransactions.Clear();
-		orderViewModel.BasketItems.Clear();
-		productViewModel.BasketItems.Clear();
+		
 	}
 
 	private async Task ClearFormAsync()
 	{
 		try
 		{
+			TransactionDate = DateTime.Now;
 			CargoTrackingNumber = string.Empty;
 			DocumentNumber = string.Empty;
 			SpecialCode = string.Empty;

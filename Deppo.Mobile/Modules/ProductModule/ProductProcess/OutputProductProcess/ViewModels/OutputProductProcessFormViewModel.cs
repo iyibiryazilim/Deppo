@@ -18,6 +18,7 @@ using Deppo.Mobile.Modules.ResultModule;
 using Deppo.Mobile.Modules.ResultModule.Views;
 using Deppo.Sys.Service.Services;
 using DevExpress.Maui.Controls;
+using DevExpress.Maui.Core.Internal;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
@@ -336,17 +337,17 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
                 _userDialogs.Alert(ex.Message, "Hata", "Tamam");
             }
 
-
-            await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
-            {
-                [nameof(ResultModel)] = resultModel
-            });
-
-			await ClearPageAsync();
-
+            await ClearFormAsync();
+            await ClearPageAsync();
 
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
+
+
+			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
+            {
+                [nameof(ResultModel)] = resultModel
+            });
 		}
         else
         {
@@ -458,15 +459,16 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 				_userDialogs.Alert(ex.Message, "Hata", "Tamam");
 			}
 
-
-			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
-			{
-				[nameof(ResultModel)] = resultModel
-			});
+			await ClearFormAsync();
 			await ClearPageAsync();
 
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
+
+			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
+			{
+				[nameof(ResultModel)] = resultModel
+			});	
 		}
 		else
 		{
@@ -578,25 +580,27 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
                 _userDialogs.Alert(ex.Message, "Hata", "Tamam");
             }
 
-          
-            await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
-            {
-                [nameof(ResultModel)] = resultModel
-            });
+
+			await ClearFormAsync();
 			await ClearPageAsync();
 
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
+
+			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
+            {
+                [nameof(ResultModel)] = resultModel
+            });
 		}
         else
         {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
             resultModel.Message = "Başarısız";
             resultModel.PageTitle = Title;
             resultModel.PageCountToBack = 1;
 			resultModel.ErrorMessage = result.Message;
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 
 			await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
             {
@@ -647,9 +651,6 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
     }
@@ -658,38 +659,38 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
     {
         try
         {
-            DocumentNumber = string.Empty;
-            TransactionDate = DateTime.Now;
-            Description = string.Empty;
-            DocumentTrackingNumber = string.Empty;
-            SpecialCode = string.Empty;
-
+            var warehouseListViewModel = _serviceProvider.GetRequiredService<OutputProductProcessWarehouseListViewModel>();
             var basketViewModel = _serviceProvider.GetRequiredService<OutputProductProcessBasketListViewModel>();
             var productListViewModel = _serviceProvider.GetRequiredService<OutputProductProcessProductListViewModel>();
-            var warehouseListViewModel = _serviceProvider.GetRequiredService<OutputProductProcessWarehouseListViewModel>();
 
-            foreach (var item in productListViewModel.Items)
-                item.IsSelected = false;
+            if(warehouseListViewModel is not null && warehouseListViewModel.SelectedWarehouseModel is not null)
+            {
+                warehouseListViewModel.SelectedWarehouseModel.IsSelected = false;
+                warehouseListViewModel.SelectedWarehouseModel = null;
 
-            productListViewModel.Items.Clear();
-            productListViewModel.SelectedProducts.Clear();
+				foreach (var item in warehouseListViewModel.Items)
+					item.IsSelected = false;
+			}
 
-            foreach (var item in basketViewModel.Items)
-                item.Details.Clear();
+            if(basketViewModel is not null)
+            {
+                basketViewModel.Items.ForEach(x => x.Details.Clear());
+				basketViewModel.Items.Clear();
+                basketViewModel.SelectedItems.Clear();
+            }
 
-            basketViewModel.Items.Clear();
-            basketViewModel.SelectedItems.Clear();
+            if(productListViewModel is not null)
+            {
+				foreach (var item in productListViewModel.Items)
+					item.IsSelected = false;
 
-            foreach (var item in warehouseListViewModel.Items)
-                item.IsSelected = false;
-
-            warehouseListViewModel.SelectedWarehouseModel = null;
+				productListViewModel.Items.Clear();
+				productListViewModel.SelectedProducts.Clear();
+                productListViewModel.SelectedItems.Clear(); 
+			}
         }
         catch (Exception ex)
         {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
     }

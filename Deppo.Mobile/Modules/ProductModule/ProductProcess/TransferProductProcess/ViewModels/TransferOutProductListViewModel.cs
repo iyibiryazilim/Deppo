@@ -43,28 +43,6 @@ public partial class TransferOutProductListViewModel : BaseViewModel
 
     public ContentPage CurrentPage { get; set; } = null!;
 
-    private bool IsSearchMode
-    {
-        get
-        {
-            if (CurrentPage is OutputProductProcessProductListView)
-            {
-                SearchBar searchBar = (SearchBar)CurrentPage.FindByName("searchBar");
-                if (searchBar is not null)
-                {
-                    if (string.IsNullOrEmpty(searchBar.Text))
-                        return false;
-                    else
-                        return true;
-                }
-                else
-                    return false;
-            }
-            else
-                return false;
-        }
-    }
-
     public TransferOutProductListViewModel(IHttpClientService httpClientService, IWarehouseTotalService warehouseTotalService, IServiceProvider serviceProvider, IVariantWarehouseTotalService variantWarehouseTotalService, IUserDialogs userDialogs)
     {
         _httpClientService = httpClientService;
@@ -142,14 +120,15 @@ public partial class TransferOutProductListViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.Loading().Hide();
-        }
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+		}
         catch (Exception ex)
         {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
@@ -161,6 +140,10 @@ public partial class TransferOutProductListViewModel : BaseViewModel
     {
         if (IsBusy)
             return;
+
+        if (Items.Count < 18)
+            return;
+
         try
         {
             IsBusy = true;
@@ -187,14 +170,15 @@ public partial class TransferOutProductListViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.Loading().Hide();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+				_userDialogs.HideHud();
 
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {

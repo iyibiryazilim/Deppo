@@ -31,11 +31,113 @@
     </Shell.BackButtonBehavior>
 
 
-    <Grid RowDefinitions="*, Auto">
+    <Grid RowDefinitions="*, Auto, Auto">
+        <Grid Grid.Row="0" RowDefinitions=".40*, .60*">
+            <!--#region MainProduct Info-->
+            <VerticalStackLayout Grid.Row="0"
+                                 HorizontalOptions="Center"
+                                 Spacing="10"
+                                 VerticalOptions="Start">
+                <!--#region Image-->
+                <Border HeightRequest="100"
+                        StrokeShape="RoundRectangle 50"
+                        StrokeThickness="1"
+                        VerticalOptions="Center"
+                        WidthRequest="100">
+                    <Image Source="{Binding InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}" />
+                </Border>
+                <!--#endregion-->
+
+                <!--#region ProductCode, ProductName-->
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+                    <Label FontAttributes="Bold"
+                           FontSize="Large"
+                           HorizontalOptions="Center"
+                           LineBreakMode="TailTruncation"
+                           MaxLines="1"
+                           Text="{Binding InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.ProductCode}" />
+                    <Label FontSize="Medium"
+                           HorizontalOptions="Center"
+                           LineBreakMode="TailTruncation"
+                           MaxLines="1"
+                           Text="{Binding InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.ProductName}"
+                           TextColor="{StaticResource Gray600}" />
+                </VerticalStackLayout>
+                <!--#endregion-->
+
+                <!--#region Quantity Area-->
+                <Grid ColumnDefinitions="Auto,Auto,Auto"
+                      ColumnSpacing="10"
+                      HorizontalOptions="Center">
+                    <Border Grid.Column="0"
+                            Padding="5"
+                            BackgroundColor="Transparent"
+                            Stroke="{StaticResource Secondary}"
+                            StrokeShape="RoundRectangle 2">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputOutsourceTransferV2BasketViewModel}}, Path=DecreaseCommand}" />
+                        </Border.GestureRecognizers>
+                        <Label FontFamily="FAS"
+                               FontSize="Medium"
+                               Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                               TextColor="{StaticResource Secondary}" />
+
+
+                    </Border>
+                    <Label Grid.Column="1"
+                           FontAttributes="Bold"
+                           FontSize="Large"
+                           Text="{Binding InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity}"
+                           TextColor="{StaticResource OffBlack}"
+                           VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding QuantityTappedCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Border Grid.Column="2"
+                            Padding="5"
+                            BackgroundColor="{StaticResource Secondary}"
+                            Stroke="{StaticResource Secondary}"
+                            StrokeShape="RoundRectangle 2">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputOutsourceTransferV2BasketViewModel}}, Path=IncreaseCommand}" />
+                        </Border.GestureRecognizers>
+                        <Label FontFamily="FAS"
+                               FontSize="Medium"
+                               Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                               TextColor="{StaticResource White}" />
+
+
+                    </Border>
+                </Grid>
+                <!--#endregion-->
+
+            </VerticalStackLayout>
+            <!--#endregion-->
+
+            <Grid RowDefinitions="Auto, *" Grid.Row="1" Padding="10,0,10,10">
+                <Label Grid.Row="0"
+                       FontAttributes="Bold"
+                       FontSize="18"
+                       HorizontalOptions="Start"
+                       LineBreakMode="TailTruncation"
+                       MaxLines="1"
+                       Text="Sarf Malzemeler"
+                       TextColor="{StaticResource OffBlack}"
+                       VerticalOptions="Center" />
+            </Grid>
+
+        </Grid>
         <Button Grid.Row="1"
                 Margin="5,10,5,20"
                 Command="{Binding NextViewCommand}"
-                Text="İleri" />
+                Text="İleri"
+                VerticalOptions="End" />
+
+
+        <!--#region BottomSheets-->
+
+        <!--#endregion-->
     </Grid>
 
 </ContentPage>

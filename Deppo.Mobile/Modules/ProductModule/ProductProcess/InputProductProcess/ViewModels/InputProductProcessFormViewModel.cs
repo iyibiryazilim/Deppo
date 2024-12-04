@@ -20,6 +20,7 @@ using Deppo.Mobile.Modules.ResultModule.Views;
 using Deppo.Sys.Service.DTOs;
 using Deppo.Sys.Service.Services;
 using DevExpress.Maui.Controls;
+using DevExpress.Maui.Core.Internal;
 using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.ViewModels;
@@ -270,26 +271,17 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
 
             );
 
+            await ClearFormAsync();
+            await ClearDataAsync();
+
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
 
-            var basketViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketListViewModel>();
-			foreach (var item in basketViewModel.Items)
-			{
-				item.Details.Clear();
-			}
-			basketViewModel.Items.Clear();
-
-			var viewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketLocationListViewModel>();
-			viewModel.SelectedItems.Clear();
-			viewModel.Items.Clear();
 
 			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
             {
                 [nameof(ResultModel)] = resultModel
             });
-
-            await ClearFormAsync();
         }
         else
         {
@@ -380,21 +372,8 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
             );
 
 			await ClearFormAsync();
-
-			var basketViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketListViewModel>();
-			foreach (var item in basketViewModel.Items)
-			{
-				item.Details.Clear();
-			}
-			basketViewModel.Items.Clear();
-
-			var viewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketLocationListViewModel>();
-            viewModel.SelectedItems.Clear();
-            viewModel.Items.Clear();
-
-
-
-
+            await ClearDataAsync();
+			
             if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
 
@@ -452,6 +431,39 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
+        }
+    }
+
+
+    private async Task ClearDataAsync()
+    {
+        try
+        {
+            var warehouseListViewModel = _serviceProvider.GetRequiredService<InputProductProcessWarehouseListViewModel>();
+            var basketViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketListViewModel>();
+            var locationListViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketLocationListViewModel>();
+
+            if(warehouseListViewModel is not null && warehouseListViewModel.SelectedWarehouseModel is not null)
+            {
+                warehouseListViewModel.SelectedWarehouseModel.IsSelected = false;
+                warehouseListViewModel.SelectedWarehouseModel = null;
+            }
+
+            if(locationListViewModel is not null)
+            {
+                locationListViewModel.SelectedItems.Clear();
+                locationListViewModel.Items.Clear();
+            }
+
+            if(basketViewModel is not null)
+            {
+                basketViewModel.Items.ForEach(x => x.Details.Clear());
+                basketViewModel.Items.Clear();
+			}
+        }
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
     }
 

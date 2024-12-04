@@ -7,16 +7,13 @@ using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Core.Models.OutsourceModels;
 
-public partial class InputOutsourceTransferProductModel : ObservableObject
+public partial class InputOutsourceTransferSubProductModel : ObservableObject
 {
 	[ObservableProperty]
-	int referenceId = default;
+	int referenceId;
 
 	[ObservableProperty]
-	int productionReferenceId = default;
-
-	[ObservableProperty]
-	int productReferenceId = default;
+	int productReferenceId;
 
 	[ObservableProperty]
 	string productCode = string.Empty;
@@ -25,7 +22,16 @@ public partial class InputOutsourceTransferProductModel : ObservableObject
 	string productName = string.Empty;
 
 	[ObservableProperty]
-	int unitsetReferenceId = default;
+	int warehouseReferenceId;
+
+	[ObservableProperty]
+	int warehouseNumber;
+
+	[ObservableProperty]
+	string warehouseName = string.Empty;
+
+	[ObservableProperty]
+	int unitsetReferenceId;
 
 	[ObservableProperty]
 	string unitsetCode = string.Empty;
@@ -34,7 +40,7 @@ public partial class InputOutsourceTransferProductModel : ObservableObject
 	string unitsetName = string.Empty;
 
 	[ObservableProperty]
-	int subUnitsetReferenceId = default;
+	int subUnitsetReferenceId;
 
 	[ObservableProperty]
 	string subUnitsetCode = string.Empty;
@@ -43,31 +49,10 @@ public partial class InputOutsourceTransferProductModel : ObservableObject
 	string subUnitsetName = string.Empty;
 
 	[ObservableProperty]
-	int outsourceReferenceId = default;
+	double stockQuantity;
 
 	[ObservableProperty]
-	string outsourceCode = string.Empty;
-
-	[ObservableProperty]
-	string outsourceName = string.Empty;
-
-	[ObservableProperty]
-	int operationReferenceId = default;
-
-	[ObservableProperty]
-	string operationCode = string.Empty;
-
-	[ObservableProperty]
-	string operationName = string.Empty;
-
-	[ObservableProperty]	
-	double planningQuantity = default;
-
-	[ObservableProperty]
-	double actualQuantity = default;
-
-	[ObservableProperty]
-	double stockQuantity = default;
+	double quotientQuantity;  // Katsayi miktari
 
 	[ObservableProperty]
 	string image = string.Empty;
@@ -94,7 +79,6 @@ public partial class InputOutsourceTransferProductModel : ObservableObject
 	[ObservableProperty]
 	int locTracking;
 
-
 	[ObservableProperty]
 	bool isSelected = false;
 
@@ -108,8 +92,7 @@ public partial class InputOutsourceTransferProductModel : ObservableObject
 	public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 
 	[ObservableProperty]
-	double inputQuantity = default;
+	double inputQuantity;
 
-	public List<InputOutsourceTransferProductDetailModel> Details { get; set; } = new();
-
+	public List<InputOutsourceTransferSubProductDetailModel> Details { get; set; } = new();
 }

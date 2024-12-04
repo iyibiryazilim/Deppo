@@ -40,12 +40,14 @@ public partial class InputProductProcessWarehouseListViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<WarehouseModel>(ItemTappedAsync);
         NextViewCommand = new Command(async () => await NextViewAsync());
-    }
+		BackCommand = new Command(async () => await BackAsync());
+	}
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
+    public Command BackCommand { get; }
 
     public ObservableCollection<WarehouseModel> Items { get; } = new();
 
@@ -222,6 +224,11 @@ public partial class InputProductProcessWarehouseListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+
+            if(SelectedWarehouseModel is not null) {
+                SelectedWarehouseModel.IsSelected = false;
+                SelectedWarehouseModel = null;
+            }
 
             await Shell.Current.GoToAsync("..");
         }

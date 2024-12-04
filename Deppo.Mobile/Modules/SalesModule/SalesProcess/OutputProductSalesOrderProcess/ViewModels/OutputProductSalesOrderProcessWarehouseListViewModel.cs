@@ -27,7 +27,8 @@ public partial class OutputProductSalesOrderProcessWarehouseListViewModel : Base
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<WarehouseModel>(ItemTappedAsync);
         NextViewCommand = new Command(async () => await NextViewAsync());
-    }
+		BackCommand = new Command(async () => await BackAsync());
+	}
 
     #region Commands
 
@@ -35,6 +36,7 @@ public partial class OutputProductSalesOrderProcessWarehouseListViewModel : Base
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
+    public Command BackCommand { get; }
 
     #endregion Commands
 
@@ -81,7 +83,8 @@ public partial class OutputProductSalesOrderProcessWarehouseListViewModel : Base
                 }
             }
 
-            _userDialogs.HideHud();
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
         }
         catch (Exception ex)
         {
@@ -99,6 +102,9 @@ public partial class OutputProductSalesOrderProcessWarehouseListViewModel : Base
     private async Task LoadMoreItemsAsync()
     {
         if (IsBusy)
+            return;
+
+        if (Items.Count < 18)
             return;
 
         try
@@ -126,8 +132,9 @@ public partial class OutputProductSalesOrderProcessWarehouseListViewModel : Base
                 }
             }
 
-            _userDialogs.Loading().Hide();
-        }
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
@@ -167,7 +174,10 @@ public partial class OutputProductSalesOrderProcessWarehouseListViewModel : Base
         }
         catch (Exception ex)
         {
-            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
         finally
         {
@@ -179,17 +189,17 @@ public partial class OutputProductSalesOrderProcessWarehouseListViewModel : Base
     {
         if (IsBusy)
             return;
+        if (SelectedWarehouseModel is null)
+            return;
         try
         {
             IsBusy = true;
 
-            if (SelectedWarehouseModel is not null)
+            
+            await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessCustomerListView)}", new Dictionary<string, object>
             {
-                await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessCustomerListView)}", new Dictionary<string, object>
-                {
-                    [nameof(WarehouseModel)] = SelectedWarehouseModel
-                });
-            }
+                [nameof(WarehouseModel)] = SelectedWarehouseModel
+            });
         }
         catch (Exception ex)
         {
@@ -203,4 +213,36 @@ public partial class OutputProductSalesOrderProcessWarehouseListViewModel : Base
             IsBusy = false;
         }
     }
+
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            if(SelectedWarehouseModel is not null)
+            {
+                SelectedWarehouseModel.IsSelected = false;
+                SelectedWarehouseModel = null;
+            }
+
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (Exception ex)
+        {
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+
+		}
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+
 }
