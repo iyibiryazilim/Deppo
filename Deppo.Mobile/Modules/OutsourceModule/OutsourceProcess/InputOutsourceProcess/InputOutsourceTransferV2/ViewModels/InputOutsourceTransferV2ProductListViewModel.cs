@@ -2,6 +2,7 @@
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.OutsourceModels;
+using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Core.Services;
@@ -289,11 +290,18 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 		{
 			IsBusy = true;
 
+			InputOutsourceTransferV2BasketModel inputOutsourceTransferV2BasketModel = new();
+
+			inputOutsourceTransferV2BasketModel.OutsourceWarehouseModel = WarehouseModel;
+			inputOutsourceTransferV2BasketModel.OutsourceModel = OutsourceModel;
+
+			SelectedOutsourceProductModel.InputQuantity = (SelectedOutsourceProductModel.LocTracking == 0) ? 1 : 0;
+			inputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel = SelectedOutsourceProductModel;
+
+
 			await Shell.Current.GoToAsync($"{nameof(InputOutsourceTransferV2BasketView)}", new Dictionary<string, object>
 			{
-				[nameof(WarehouseModel)] = WarehouseModel,
-				[nameof(OutsourceModel)] = OutsourceModel,
-				[nameof(InputOutsourceTransferProductModel)] = SelectedOutsourceProductModel
+				[nameof(InputOutsourceTransferV2BasketModel)] = inputOutsourceTransferV2BasketModel
 			});
 
 			SearchText.Text = string.Empty;
