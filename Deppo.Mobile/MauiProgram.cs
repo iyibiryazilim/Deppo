@@ -344,7 +344,7 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<ISalesDispatchTransactionService, SalesDispatchTransactionDataStore>();
         builder.Services.AddSingleton<IOutsourceService, OutsourceDataStore>();
-        builder.Services.AddSingleton<IWorkOrderProductService, WorkOrderProductDataStore>();
+        builder.Services.AddSingleton<IInputOutsourceTransferV2ProductService, InputOutsourceTransferV2ProductDataStore>();
         builder.Services.AddSingleton<IWarehouseCountingService, WarehouseCountingDataStore>();
         builder.Services.AddSingleton<IProductCountingService, ProductCountingDataStore>();
 

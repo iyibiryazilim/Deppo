@@ -4,6 +4,7 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.OutsourceModels;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
+using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -19,7 +20,7 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 	private readonly IHttpClientService _httpClientService;
 	private readonly IUserDialogs _userDialogs;
 	private readonly IProductService _productService;
-	private readonly IWorkOrderProductService _workOrderProductService;
+	private readonly IInputOutsourceTransferV2ProductService _inputOutsourceTransferV2ProductService;
 
 	[ObservableProperty]
 	WarehouseModel? warehouseModel;
@@ -35,13 +36,12 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 	[ObservableProperty]
 	SearchBar searchText;
 
-	public InputOutsourceTransferV2ProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IProductService productService, IWorkOrderProductService workOrderProductService)
+	public InputOutsourceTransferV2ProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IInputOutsourceTransferV2ProductService inputOutsourceTransferV2ProductService)
 	{
 		_httpClientService = httpClientService;
 		_userDialogs = userDialogs;
-		_productService = productService;
-		_workOrderProductService = workOrderProductService;
-
+		_inputOutsourceTransferV2ProductService = inputOutsourceTransferV2ProductService;
+		
 		Title = "Fason Ürünler";
 
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
@@ -75,7 +75,7 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			var result = await _workOrderProductService.GetObjects(
+			var result = await _inputOutsourceTransferV2ProductService.GetObjects(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
@@ -132,7 +132,7 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 			_userDialogs.ShowLoading("Loading More Items...");
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			var result = await _workOrderProductService.GetObjects(
+			var result = await _inputOutsourceTransferV2ProductService.GetObjects(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
@@ -200,7 +200,7 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			var result = await _workOrderProductService.GetObjects(
+			var result = await _inputOutsourceTransferV2ProductService.GetObjects(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
