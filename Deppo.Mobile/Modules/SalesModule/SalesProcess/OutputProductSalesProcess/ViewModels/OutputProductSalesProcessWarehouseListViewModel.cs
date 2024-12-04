@@ -13,19 +13,17 @@ namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProces
 public partial class OutputProductSalesProcessWarehouseListViewModel : BaseViewModel
 {
     private readonly IHttpClientService _httpClientService;
-    private readonly IServiceProvider _serviceProvider;
     private readonly IWarehouseService _warehouseService;
     private readonly IUserDialogs _userDialogs;
 
     [ObservableProperty]
-    private WarehouseModel selectedWarehouseModel = null!;
+    WarehouseModel? selectedWarehouseModel;
 
     public ObservableCollection<WarehouseModel> Items { get; } = new();
 
-    public OutputProductSalesProcessWarehouseListViewModel(IHttpClientService httpClientService, IWarehouseService warehouseService, IUserDialogs userDialogs, IServiceProvider serviceProvider)
+    public OutputProductSalesProcessWarehouseListViewModel(IHttpClientService httpClientService, IWarehouseService warehouseService, IUserDialogs userDialogs)
     {
         _httpClientService = httpClientService;
-        _serviceProvider = serviceProvider;
         _warehouseService = warehouseService;
         _userDialogs = userDialogs;
 
@@ -75,8 +73,9 @@ public partial class OutputProductSalesProcessWarehouseListViewModel : BaseViewM
                 }
             }
 
-            _userDialogs.HideHud();
-        }
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
@@ -122,8 +121,9 @@ public partial class OutputProductSalesProcessWarehouseListViewModel : BaseViewM
                 }
             }
 
-            _userDialogs.HideHud();
-        }
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
@@ -176,21 +176,23 @@ public partial class OutputProductSalesProcessWarehouseListViewModel : BaseViewM
     {
         if (IsBusy)
             return;
+        if (SelectedWarehouseModel is null)
+            return;
 
         try
         {
             IsBusy = true;
 
-            if (SelectedWarehouseModel is not null)
+            await Shell.Current.GoToAsync($"{nameof(OutputProductSalesProcessBasketListView)}", new Dictionary<string, object>
             {
-                await Shell.Current.GoToAsync($"{nameof(OutputProductSalesProcessBasketListView)}", new Dictionary<string, object>
-                {
-                    [nameof(WarehouseModel)] = SelectedWarehouseModel
-                });
-            }
+                [nameof(WarehouseModel)] = SelectedWarehouseModel
+            });
         }
         catch (Exception ex)
         {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
             _userDialogs.Alert(ex.Message);
         }
         finally
@@ -206,6 +208,12 @@ public partial class OutputProductSalesProcessWarehouseListViewModel : BaseViewM
         try
         {
             IsBusy = true;
+
+            if(SelectedWarehouseModel is not null)
+            {
+                SelectedWarehouseModel.IsSelected = false;
+                SelectedWarehouseModel = null;
+            }
 
             await Shell.Current.GoToAsync("..");
         }

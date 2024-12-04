@@ -622,7 +622,6 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
             }
             dto.Lines.Add(wholeSalesDispatchTransactionLineDto);
         }
-        Console.WriteLine(dto);
 
         var result = await _wholeSalesDispatchTransactionService.InsertWholeSalesDispatchTransaction(httpClient, _httpClientService.FirmNumber, dto);
 
@@ -631,7 +630,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
         {
             resultModel.Message = "Başarılı";
             resultModel.Code = result.Data.Code;
-            resultModel.PageTitle = Title;
+            resultModel.PageTitle = "Sevk İşlemi";
             resultModel.PageCountToBack = 5;
 
             try
@@ -662,35 +661,27 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
                 await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
             }
 
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
             await ClearFormAsync();
+            await ClearDataAsync();
 
-            var basketViewModel = _serviceProvider.GetRequiredService<OutputProductSalesOrderProcessBasketListViewModel>();
-			foreach (var item in basketViewModel.Items)
-			{
-				item.Details.Clear();
-			}
-			basketViewModel.Items.Clear();
-            basketViewModel.SelectedLocationTransactions.Clear();
-            basketViewModel.SelectedSeriLotTransactions.Clear();
-           
-            await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
             {
                 [nameof(ResultModel)] = resultModel
             });
         }
         else
         {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
             resultModel.Message = "Başarısız";
             resultModel.PageTitle = Title;
             resultModel.ErrorMessage = result.Message;
             resultModel.PageCountToBack = 1;
-            await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+			await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
             {
                 [nameof(ResultModel)] = resultModel
             });
@@ -769,8 +760,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 
             dto.Lines.Add(retailSalesDispatchTransactionLineDto);
         }
-        Console.WriteLine(dto);
-
+        
         var result = await _retailSalesDispatchTransactionService.InsertRetailSalesDispatchTransaction(httpClient, _httpClientService.FirmNumber, dto);
 
         ResultModel resultModel = new();
@@ -778,7 +768,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
         {
             resultModel.Message = "Başarılı";
             resultModel.Code = result.Data.Code;
-            resultModel.PageTitle = Title;
+            resultModel.PageTitle = "Sevk İşlemi";
             resultModel.PageCountToBack = 5;
 
 			try
@@ -810,15 +800,7 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 			}
 
             await ClearFormAsync();
-
-            var basketViewModel = _serviceProvider.GetRequiredService<OutputProductSalesProcessBasketListViewModel>();
-			foreach (var item in basketViewModel.Items)
-			{
-				item.Details.Clear();
-			}
-			basketViewModel.Items.Clear();
-            basketViewModel.SelectedLocationTransactions.Clear();
-            basketViewModel.SelectedSeriLotTransactions.Clear();
+            await ClearDataAsync();
 
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
@@ -830,14 +812,15 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
         }
         else
         {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
             resultModel.Message = "Başarısız";
             resultModel.PageTitle = Title;
             resultModel.ErrorMessage = result.Message;
             resultModel.PageCountToBack = 1;
-            await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
             {
                 [nameof(ResultModel)] = resultModel
             });
@@ -860,10 +843,41 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
         });
     }
 
+    private async Task ClearDataAsync()
+    {
+        try
+        {
+            var warehouseListViewModel = _serviceProvider.GetRequiredService<OutputProductSalesProcessWarehouseListViewModel>();
+            var basketViewModel = _serviceProvider.GetRequiredService<OutputProductSalesProcessBasketListViewModel>();
+
+            if(warehouseListViewModel is not null && warehouseListViewModel.SelectedWarehouseModel is not null)
+            {
+                warehouseListViewModel.SelectedWarehouseModel.IsSelected = false;
+                warehouseListViewModel.SelectedWarehouseModel = null;
+            }
+
+            if(basketViewModel is not null)
+            {
+				foreach (var item in basketViewModel.Items)
+				{
+					item.Details.Clear();
+				}
+				basketViewModel.Items.Clear();
+				basketViewModel.SelectedLocationTransactions.Clear();
+				basketViewModel.SelectedSeriLotTransactions.Clear();
+			}
+        }
+        catch (Exception ex)
+        {
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+    }
+
     private async Task ClearFormAsync()
     {
         try
         {
+            TransactionDate = DateTime.Now;
             CargoTrackingNumber = string.Empty;
             DocumentNumber = string.Empty;
             SpecialCode = string.Empty;
