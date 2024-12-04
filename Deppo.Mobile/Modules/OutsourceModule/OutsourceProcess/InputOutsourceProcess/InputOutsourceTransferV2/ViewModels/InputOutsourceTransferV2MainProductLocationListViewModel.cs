@@ -54,6 +54,7 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 		IncreaseCommand = new Command<LocationModel>(async (x) => await IncreaseAsync(x));
 		DecreaseCommand = new Command<LocationModel>(async (x) => await DecreaseAsync(x));
 		QuantityTappedCommand = new Command<LocationModel>(async (x) => await QuantityTappedAsync(x));
+		PerformSearchCommand = new Command<Entry>(async (x) => await PerformSearchAsync(x));
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
 		ShowLocationsCommand = new Command(async () => await ShowLocationsAsync());
@@ -185,6 +186,73 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 		}
 	}
 
+	private async Task PerformSearchAsync(Entry barcodeEntry)
+	{
+		if (IsBusy)
+			return;
+
+		try
+		{
+			if (string.IsNullOrEmpty(barcodeEntry.Text))
+				return;
+
+			IsBusy = true;
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var result = await _locationService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				warehouseNumber: InputOutsourceTransferV2BasketModel.OutsourceWarehouseModel.Number,
+				productReferenceId: InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.IsVariant == true ? InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.ProductReferenceId : InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.ProductReferenceId,
+				variantReferenceId: InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.IsVariant == true ? InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.ProductReferenceId : 0,
+				search: barcodeEntry.Text,
+				skip: 0,
+				take: 1);
+
+			if (result.IsSuccess)
+			{
+				if (!(result.Data.Count() > 0))
+				{
+					if (_userDialogs.IsHudShowing)
+						_userDialogs.HideHud();
+
+					_userDialogs.ShowToast(message: $"{barcodeEntry.Text} kodlu raf bulunamadı.");
+					return;
+				}
+
+				foreach (var item in result.Data)
+				{
+					var obj = Mapping.Mapper.Map<LocationModel>(item);
+					if (SelectedItems.Where(x => x.Code == obj.Code).Any())
+					{
+						SelectedItems.Where(x => x.Code == obj.Code).FirstOrDefault().InputQuantity += 1;
+					}
+					else
+					{
+						SelectedItems.Add(obj);
+					}
+				}
+			}
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message);
+		}
+		finally
+		{
+			barcodeEntry.Text = string.Empty;
+			barcodeEntry.Focus();
+			IsBusy = false;
+		}
+	}
+
 
 	private async Task CancelAsync()
 	{
@@ -252,8 +320,8 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 					foreach (var item in result.Data)
 					{
 						var obj = Mapping.Mapper.Map<LocationModel>(item);
-						//var matchedItem = SelectedSearchItems.FirstOrDefault(x => x.Code == obj.Code);
-						//obj.IsSelected = matchedItem != null ? matchedItem.IsSelected : false;
+						var matchedItem = SelectedSearchItems.FirstOrDefault(x => x.Code == obj.Code);
+						obj.IsSelected = matchedItem != null ? matchedItem.IsSelected : false;
 						Items.Add(obj);
 					}
 				}
@@ -267,7 +335,7 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
-			await _userDialogs.AlertAsync(ex.Message, "Error", "OK");
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{
@@ -308,8 +376,8 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 					foreach (var item in result.Data)
 					{
 						var obj = Mapping.Mapper.Map<LocationModel>(item);
-						//var matchedItem = SelectedSearchItems.FirstOrDefault(x => x.Code == obj.Code);
-						//obj.IsSelected = matchedItem != null ? matchedItem.IsSelected : false;
+						var matchedItem = SelectedSearchItems.FirstOrDefault(x => x.Code == obj.Code);
+						obj.IsSelected = matchedItem != null ? matchedItem.IsSelected : false;
 						Items.Add(obj);
 					}
 				}
@@ -323,7 +391,7 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
-			await _userDialogs.AlertAsync(ex.Message, "Error", "OK");
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{
@@ -458,8 +526,8 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 					foreach (var item in result.Data)
 					{
 						var obj = Mapping.Mapper.Map<LocationModel>(item);
-						//var matchedItem = SelectedSearchItems.FirstOrDefault(x => x.Code == obj.Code);
-						//obj.IsSelected = matchedItem != null ? matchedItem.IsSelected : false;
+						var matchedItem = SelectedSearchItems.FirstOrDefault(x => x.Code == obj.Code);
+						obj.IsSelected = matchedItem != null ? matchedItem.IsSelected : false;
 						Items.Add(obj);
 					}
 				}
@@ -511,6 +579,4 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 			IsBusy = false;
 		}
 	}
-
-
 }
