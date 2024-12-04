@@ -109,4 +109,7 @@ public partial class InputOutsourceTransferProductModel : ObservableObject
 
 	[ObservableProperty]
 	double inputQuantity = default;
+
+	public List<InputOutsourceTransferProductDetailModel> Details { get; set; } = new();
+
 }
