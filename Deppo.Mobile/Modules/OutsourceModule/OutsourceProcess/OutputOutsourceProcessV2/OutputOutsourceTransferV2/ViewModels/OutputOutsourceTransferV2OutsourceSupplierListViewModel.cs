@@ -462,7 +462,8 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
                 await Shell.Current.GoToAsync($"{nameof(OutputOutsourceTransferV2ProductListView)}", new Dictionary<string, object>
                 {
                     [nameof(WarehouseModel)] = WarehouseModel,
-                    [nameof(OutsourceModel)] = SelectedOutsource
+                    [nameof(OutsourceModel)] = SelectedOutsource,
+                    [nameof(ShipAddressModel)] = selectedShipAddressModel
                 });
             }
             catch (Exception ex)
