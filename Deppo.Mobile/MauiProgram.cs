@@ -854,6 +854,7 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferV2OutsourceSupplierListView, OutputOutsourceTransferV2OutsourceSupplierListViewModel>(nameof(OutputOutsourceTransferV2OutsourceSupplierListView));
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferV2ProductListView, OutputOutsourceTransferV2ProductListViewModel>(nameof(OutputOutsourceTransferV2ProductListView));
         builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferV2OutsourceBasketView, OutputOutsourceTransferV2OutsourceBasketViewModel>(nameof(OutputOutsourceTransferV2OutsourceBasketView));
+        builder.Services.AddScopedWithShellRoute<OutputOutsourceTransferV2OutsourceFormView, OutputOutsourceTransferV2OutsourceFormViewModel>(nameof(OutputOutsourceTransferV2OutsourceFormView));
 
         #endregion
 
