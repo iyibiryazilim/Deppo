@@ -389,6 +389,8 @@ public partial class OutputOutsourceTransferV2ProductListViewModel : BaseViewMod
         try
         {
             IsBusy = true;
+            Console.Write(SelectedProduct);
+            
 
             await Shell.Current.GoToAsync($"{nameof(OutputOutsourceTransferV2OutsourceBasketView)}", new Dictionary<string, object>
             {

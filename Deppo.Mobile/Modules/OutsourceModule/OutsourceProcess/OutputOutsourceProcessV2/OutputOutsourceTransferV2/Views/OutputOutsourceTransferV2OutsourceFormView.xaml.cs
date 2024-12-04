@@ -10,5 +10,6 @@ public partial class OutputOutsourceTransferV2OutsourceFormView : ContentPage
 		InitializeComponent();
 		_viewModel = viewModel;
 		BindingContext = _viewModel;
+		_viewModel.CurrentPage = this;
 	}
 }
