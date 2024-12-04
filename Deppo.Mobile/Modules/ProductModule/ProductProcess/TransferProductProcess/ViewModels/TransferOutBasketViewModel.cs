@@ -549,10 +549,9 @@ public partial class TransferOutBasketViewModel : BaseViewModel
                 else
                 {
                     if (item.OutputQuantity > 0)
-                        item.OutputQuantity--;
-
-                    if (item.OutputQuantity == 0)
-                        item.IsSelected = false;
+                    {
+						item.OutputQuantity--;
+					}
                 }
             }
         }
@@ -580,7 +579,13 @@ public partial class TransferOutBasketViewModel : BaseViewModel
             if (LocationTransactions.Count > 0)
             {
                 SelectedLocationTransactions.Clear();
-                foreach (var x in LocationTransactions.Where(x => x.OutputQuantity > 0))
+
+				foreach (var x in LocationTransactions.Where(x => x.OutputQuantity <= 0))
+				{
+					SelectedItem.LocationTransactions.Remove(SelectedItem.LocationTransactions.FirstOrDefault(y => y.ReferenceId == x.ReferenceId));
+				}
+
+				foreach (var x in LocationTransactions.Where(x => x.OutputQuantity > 0))
                 {
                     SelectedLocationTransactions.Add(x);
                 }
@@ -592,23 +597,25 @@ public partial class TransferOutBasketViewModel : BaseViewModel
                     {
                         selectedLocationTransactionItem.Quantity = item.OutputQuantity;
                     }
-
-                    SelectedItem.LocationTransactions.Add(new LocationTransactionModel
+                    else
                     {
-                        ReferenceId = item.ReferenceId,
-                        LocationReferenceId = item.LocationReferenceId,
-                        LocationCode = item.LocationCode,
-                        LocationName = item.LocationName,
-                        TransactionReferenceId = item.TransactionReferenceId,
-                        InSerilotTransactionReferenceId = item.InSerilotTransactionReferenceId,
-                        TransactionFicheReferenceId = item.TransactionFicheReferenceId,
-                        InTransactionReferenceId = item.InTransactionReferenceId,
-                        Quantity = item.OutputQuantity,
-                        RemainingQuantity = item.OutputQuantity,
-                    });
+						SelectedItem.LocationTransactions.Add(new LocationTransactionModel
+						{
+							ReferenceId = item.ReferenceId,
+							LocationReferenceId = item.LocationReferenceId,
+							LocationCode = item.LocationCode,
+							LocationName = item.LocationName,
+							TransactionReferenceId = item.TransactionReferenceId,
+							InSerilotTransactionReferenceId = item.InSerilotTransactionReferenceId,
+							TransactionFicheReferenceId = item.TransactionFicheReferenceId,
+							InTransactionReferenceId = item.InTransactionReferenceId,
+							Quantity = item.OutputQuantity,
+							RemainingQuantity = item.OutputQuantity,
+						});
+					}
                 }
 
-                var totalOutputQuantity = LocationTransactions.Where(x => x.OutputQuantity > 0).Sum(x => (double)x.OutputQuantity);
+                var totalOutputQuantity = LocationTransactions.Sum(x => (double)x.OutputQuantity);
                 SelectedItem.OutputQuantity = totalOutputQuantity;
 
                 CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.Hidden;

@@ -9,7 +9,7 @@
              Title="{Binding Title}"
              x:DataType="viewModel:TransferFormViewModel"
              Shell.TabBarIsVisible="False">
-    <ContentPage.ToolbarItems>
+    <!--<ContentPage.ToolbarItems>
         <ToolbarItem>
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="FAS"
@@ -17,7 +17,7 @@
                                  Size="Large" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
-    </ContentPage.ToolbarItems>
+    </ContentPage.ToolbarItems>-->
 
     <ContentPage.Behaviors>
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />

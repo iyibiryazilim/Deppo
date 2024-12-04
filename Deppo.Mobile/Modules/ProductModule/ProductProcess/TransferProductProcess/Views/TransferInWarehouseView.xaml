@@ -31,7 +31,9 @@
     </Shell.BackButtonBehavior>
 
     <Grid RowDefinitions="*,Auto" RowSpacing="10">
-        <CollectionView ItemsSource="{Binding Items}" RemainingItemsThreshold="2" RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
+        <CollectionView ItemsSource="{Binding Items}"
+                        RemainingItemsThreshold="2"
+                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="warehouseModel:WarehouseModel">
                     <Border Padding="10"

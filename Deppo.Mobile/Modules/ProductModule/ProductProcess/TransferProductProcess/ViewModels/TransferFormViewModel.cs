@@ -231,9 +231,8 @@ public partial class TransferFormViewModel : BaseViewModel
                     _userDialogs.Alert(ex.Message, "Hata", "Tamam");
                 }
 
-               
-
-                await ClearData();
+                await ClearFormAsync();
+                await ClearDataAsync();
 
 				if (_userDialogs.IsHudShowing)
 					_userDialogs.HideHud();
@@ -245,15 +244,15 @@ public partial class TransferFormViewModel : BaseViewModel
             }
             else
             {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.HideHud();
-
                 resultModel.Message = "Başarısız";
                 resultModel.PageTitle = "Ambar Transferi";
                 resultModel.PageCountToBack = 1;
                 resultModel.ErrorMessage = result.Message;
 
-                await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
+
+				await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
                 {
                     [nameof(ResultModel)] = resultModel
                 });
@@ -272,32 +271,70 @@ public partial class TransferFormViewModel : BaseViewModel
         }
     }
 
-    private async Task ClearData()
+    private async Task ClearDataAsync()
     {
-        var inBasketViewModel = _serviceProvider.GetRequiredService<TransferInBasketViewModel>();
-        var outBasketViewModel = _serviceProvider.GetRequiredService<TransferOutBasketViewModel>();
-
-        foreach (var item in inBasketViewModel.TransferBasketModel.InProducts)
+        try
         {
-            item.Locations.Clear();
-        }
+			var outWarehouseViewModel = _serviceProvider.GetRequiredService<TransferOutWarehouseListViewModel>();
+			var inWarehouseViewModel = _serviceProvider.GetRequiredService<TransferInWarehouseViewModel>();
+			var inBasketViewModel = _serviceProvider.GetRequiredService<TransferInBasketViewModel>();
+			var outBasketViewModel = _serviceProvider.GetRequiredService<TransferOutBasketViewModel>();
 
-        inBasketViewModel.TransferBasketModel.InProducts.Clear();
-        inBasketViewModel.TransferBasketModel.InWarehouse = null;
 
-        foreach (var item in outBasketViewModel.TransferBasketModel.OutProducts)
+			if (outWarehouseViewModel is not null && outWarehouseViewModel.SelectedWarehouseModel is not null)
+			{
+				outWarehouseViewModel.SelectedWarehouseModel.IsSelected = false;
+				outWarehouseViewModel.SelectedWarehouseModel = null;
+			}
+
+			if (inWarehouseViewModel is not null && inWarehouseViewModel.SelectedWarehouseModel is not null)
+			{
+				inWarehouseViewModel.SelectedWarehouseModel.IsSelected = false;
+				inWarehouseViewModel.SelectedWarehouseModel = null;
+			}
+
+			if (outBasketViewModel is not null && outBasketViewModel.TransferBasketModel is not null)
+			{
+				foreach (var item in outBasketViewModel.TransferBasketModel.OutProducts)
+				{
+					item.LocationTransactions.Clear();
+				}
+
+				outBasketViewModel.TransferBasketModel.OutProducts.Clear();
+				outBasketViewModel.TransferBasketModel.OutWarehouse = null;
+			}
+
+			if (inBasketViewModel is not null && inBasketViewModel.TransferBasketModel is not null)
+			{
+				foreach (var item in inBasketViewModel.TransferBasketModel.InProducts)
+				{
+					item.Locations.Clear();
+				}
+
+				inBasketViewModel.TransferBasketModel.InProducts.Clear();
+				inBasketViewModel.TransferBasketModel.InWarehouse = null;
+			}
+		}
+        catch (Exception ex)
         {
-            item.LocationTransactions.Clear();
-        }
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+    }
 
-        outBasketViewModel.TransferBasketModel.OutProducts.Clear();
-        outBasketViewModel.TransferBasketModel.OutWarehouse = null;
-
-        DocumentNumber = string.Empty;
-        DocumentTrackingNumber = string.Empty;
-        SpecialCode = string.Empty;
-        Description = string.Empty;
-        FicheDate = DateTime.Now;
+    private async Task ClearFormAsync()
+    {
+        try
+        {
+			DocumentNumber = string.Empty;
+			DocumentTrackingNumber = string.Empty;
+			SpecialCode = string.Empty;
+			Description = string.Empty;
+			FicheDate = DateTime.Now;
+		}
+        catch (Exception ex)
+        {
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
     }
 
     private async Task BackAsync()
@@ -313,16 +350,15 @@ public partial class TransferFormViewModel : BaseViewModel
             if (!confirm)
                 return;
 
-            DocumentNumber = string.Empty;
-            DocumentTrackingNumber = string.Empty;
-            SpecialCode = string.Empty;
-            Description = string.Empty;
-            FicheDate = DateTime.Now;
+            await ClearFormAsync();
 
-            await Shell.Current.GoToAsync("..");
+		    await Shell.Current.GoToAsync("..");
         }
         catch (Exception ex)
         {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally

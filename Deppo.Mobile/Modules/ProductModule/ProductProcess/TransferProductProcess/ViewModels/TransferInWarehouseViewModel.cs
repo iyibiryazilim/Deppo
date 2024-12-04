@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using AndroidX.ConstraintLayout.Core.Motion;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.TransferModels;
@@ -16,7 +17,21 @@ public partial class TransferInWarehouseViewModel : BaseViewModel
     private readonly IHttpClientService _httpClientService;
     private readonly IWarehouseService _warehouseService;
     private readonly IUserDialogs _userDialogs;
-    public TransferInWarehouseViewModel(IHttpClientService httpClientService, IWarehouseService warehouseService, IUserDialogs userDialogs)
+
+	[ObservableProperty]
+	TransferBasketModel transferBasketModel = null!;
+
+	#region Collections
+	public ObservableCollection<WarehouseModel> Items { get; } = new();
+	#endregion
+
+	#region Properties
+
+	[ObservableProperty]
+	WarehouseModel? selectedWarehouseModel;
+	#endregion
+
+	public TransferInWarehouseViewModel(IHttpClientService httpClientService, IWarehouseService warehouseService, IUserDialogs userDialogs)
     {
         _httpClientService = httpClientService;
         _warehouseService = warehouseService;
@@ -36,22 +51,10 @@ public partial class TransferInWarehouseViewModel : BaseViewModel
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
-
     public Command BackCommand { get; }
     #endregion
 
-    #region Collections
-    public ObservableCollection<WarehouseModel> Items { get; } = new();
-    #endregion
-
-    #region Properties
-
-    [ObservableProperty]
-    WarehouseModel selectedWarehouseModel = null!;
-    #endregion
-
-    [ObservableProperty]
-    TransferBasketModel transferBasketModel = null!;
+   
 
     private async Task LoadItemsAsync()
     {
@@ -65,6 +68,7 @@ public partial class TransferInWarehouseViewModel : BaseViewModel
             _userDialogs.ShowLoading("Loading...");
             Items.Clear();
             await Task.Delay(1000);
+
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, 0, 20, _httpClientService.FirmNumber);
             if (result.IsSuccess)
@@ -86,8 +90,9 @@ public partial class TransferInWarehouseViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.HideHud();
-        }
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
@@ -113,6 +118,7 @@ public partial class TransferInWarehouseViewModel : BaseViewModel
             IsBusy = true;
 
             _userDialogs.ShowLoading("Loading...");
+
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, Items.Count, 20, _httpClientService.FirmNumber);
             if (result.IsSuccess)
@@ -132,9 +138,10 @@ public partial class TransferInWarehouseViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.HideHud();
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 
-        }
+		}
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
@@ -156,6 +163,7 @@ public partial class TransferInWarehouseViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+
 			if (item == SelectedWarehouseModel)
 			{
 				SelectedWarehouseModel.IsSelected = false;
@@ -170,10 +178,7 @@ public partial class TransferInWarehouseViewModel : BaseViewModel
 
 				SelectedWarehouseModel = item;
 				SelectedWarehouseModel.IsSelected = true;
-
-                TransferBasketModel.InWarehouse = SelectedWarehouseModel;
 			}
-
 		}
         catch (Exception ex)
         {
@@ -189,9 +194,14 @@ public partial class TransferInWarehouseViewModel : BaseViewModel
     {
         if (IsBusy)
             return;
+
+        if (SelectedWarehouseModel is null)
+            return;
         try
         {
             IsBusy = true;
+
+            TransferBasketModel.InWarehouse = SelectedWarehouseModel;
 
             foreach (var item in TransferBasketModel.OutProducts)
             {
@@ -220,10 +230,7 @@ public partial class TransferInWarehouseViewModel : BaseViewModel
                     TrackingTypeIcon = item.TrackingTypeIcon,
                     VariantIcon = item.VariantIcon,
                 });
-
 			}
-
-            
 
             await Shell.Current.GoToAsync($"{nameof(TransferInBasketView)}", new Dictionary<string, object>
             {
@@ -251,16 +258,20 @@ public partial class TransferInWarehouseViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            
-            if(TransferBasketModel.InWarehouse != null)
-            {
-                TransferBasketModel.InWarehouse.IsSelected = false;
 
-                TransferBasketModel.InWarehouse = null;
-            }
+            if(SelectedWarehouseModel is not null)
+            {
+                if(TransferBasketModel.InWarehouse is not null)
+                {
+				    TransferBasketModel.InWarehouse.IsSelected = false;
+				    TransferBasketModel.InWarehouse = null;
+                }
+
+                SelectedWarehouseModel.IsSelected = false;
+                SelectedWarehouseModel = null;
+			}
 
             await Shell.Current.GoToAsync("..");
-
         }
         catch (Exception ex)
         {

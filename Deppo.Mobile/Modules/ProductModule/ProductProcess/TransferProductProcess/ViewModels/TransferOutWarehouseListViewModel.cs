@@ -18,11 +18,11 @@ public partial class TransferOutWarehouseListViewModel : BaseViewModel
 
 	#region Collections
 	public ObservableCollection<WarehouseModel> Items { get; } = new();
-	#endregion
+    #endregion
 
 
-	[ObservableProperty]
-	WarehouseModel selectedWarehouseModel = null!;
+    [ObservableProperty]
+    WarehouseModel? selectedWarehouseModel;
 	
 	public TransferOutWarehouseListViewModel(IHttpClientService httpClientService, IWarehouseService warehouseService, IUserDialogs userDialogs)
     {
@@ -36,13 +36,15 @@ public partial class TransferOutWarehouseListViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<WarehouseModel>(ItemTappedAsync);
         NextViewCommand = new Command(async () => await NextViewAsync());
-    }
+		BackCommand = new Command(async () => await BackAsync());
+	}
 
     #region Commands
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
+    public Command BackCommand { get; }
     #endregion
 
    
@@ -59,6 +61,7 @@ public partial class TransferOutWarehouseListViewModel : BaseViewModel
             _userDialogs.ShowLoading("Loading...");
             Items.Clear();
             await Task.Delay(1000);
+
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, 0, 20, _httpClientService.FirmNumber);
             if (result.IsSuccess)
@@ -80,7 +83,8 @@ public partial class TransferOutWarehouseListViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.HideHud();
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
@@ -182,6 +186,10 @@ public partial class TransferOutWarehouseListViewModel : BaseViewModel
     {
         if (IsBusy)
             return;
+
+        if (SelectedWarehouseModel is null)
+            return;
+
         try
         {
             IsBusy = true;
@@ -204,5 +212,32 @@ public partial class TransferOutWarehouseListViewModel : BaseViewModel
         }
     }
 
-   
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            if(SelectedWarehouseModel is not null)
+            {
+                SelectedWarehouseModel.IsSelected = false;
+                SelectedWarehouseModel = null;
+            }
+
+            await Shell.Current.GoToAsync("..");    
+		}
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }   
 }
