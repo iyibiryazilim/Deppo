@@ -1,11 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.OutsourceModels;
+using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Core.Models.VariantModels;
+using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcessV2.OutputOutsourceTransferV2.Views;
 using DevExpress.Maui.Controls;
 using System;
 using System.Collections.Generic;
@@ -16,40 +20,69 @@ using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcessV2.OutputOutsourceTransferV2.ViewModels;
 
-public partial class OutputOutsourceTransferV2ProductListViewModel :BaseViewModel
+
+[QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
+[QueryProperty(name: nameof(OutsourceModel), queryId: nameof(OutsourceModel))]
+
+
+public partial class OutputOutsourceTransferV2ProductListViewModel : BaseViewModel
 {
-  
+
     private readonly IUserDialogs _userDialogs;
     private readonly IHttpClientService _httpClientService;
     private readonly IServiceProvider _serviceProvider;
     private readonly IVariantService _variantService;
+    private readonly IOutputOutsourceTransferV2Service _outputOutsourceTransferV2Service;
+    private readonly IProductService _productService;
 
-    
+    [ObservableProperty]
+    WarehouseModel warehouseModel = null!;
+
+    [ObservableProperty]
+    OutsourceModel outsourceModel = null!;
+
+    [ObservableProperty]
+    public SearchBar searchText;
+
+    [ObservableProperty]
+    OutputOutsourceTransferV2ProductModel? selectedProduct;
+
+    public ObservableCollection<VariantWarehouseTotalModel> ItemVariants { get; } = new();
+    public ObservableCollection<OutputOutsourceTransferV2ProductModel> Items { get; } = new();
+
+    //Arama İşleminde seçilenlerin tutulması için liste
+    public ObservableCollection<OutputOutsourceTransferV2ProductModel> SelectedItems { get; } = new();
+
+    [ObservableProperty]
+    public ObservableCollection<OutputOutsourceTransferV2ProductModel> selectedProducts = new();
 
     public OutputOutsourceTransferV2ProductListViewModel(IHttpClientService httpClientService,
         IVariantService variantService,
         IUserDialogs userDialogs,
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider, IOutputOutsourceTransferV2Service outputOutsourceTransferV2Service,
+        IProductService productService
+        )
     {
 
-         Title = "Ürün Listesi";
+        Title = "Ürün Listesi";
         _httpClientService = httpClientService;
         _variantService = variantService;
         _userDialogs = userDialogs;
         _serviceProvider = serviceProvider;
+        _outputOutsourceTransferV2Service = outputOutsourceTransferV2Service;
+        _productService = productService;
 
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-        ItemTappedCommand = new Command<ProductModel>(async (parameter) => await ItemTappedAsync(parameter));
-        LoadVariantItemsCommand = new Command<ProductModel>(async (parameter) => await LoadVariantItemsAsync(parameter));
-        LoadMoreVariantItemsCommand = new Command(async () => await LoadMoreVariantItemsAsync());
-        VariantTappedCommand = new Command<VariantModel>(async (parameter) => await VariantTappedAsync(parameter));
-        ConfirmVariantCommand = new Command(async () => await ConfirmVariantAsync());
+        ItemTappedCommand = new Command<OutputOutsourceTransferV2ProductModel>(async (item) => await ItemTappedAsync(item));
         ConfirmCommand = new Command(async () => await ConfirmAsync());
         BackCommand = new Command(async () => await BackAsync());
         PerformSearchCommand = new Command(async () => await PerformSearchAsync());
         PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
+
+        NextViewCommand = new Command(async () => await NextViewAsync());
+
 
 
     }
@@ -59,24 +92,15 @@ public partial class OutputOutsourceTransferV2ProductListViewModel :BaseViewMode
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
-    public Command<ProductModel> LoadVariantItemsCommand { get; }
-    public Command LoadMoreVariantItemsCommand { get; }
-    public Command<VariantModel> VariantTappedCommand { get; }
-    public Command ConfirmVariantCommand { get; }
+
     public Command ConfirmCommand { get; }
     public Command BackCommand { get; }
     public Command PerformSearchCommand { get; }
     public Command PerformEmptySearchCommand { get; }
 
-    public ObservableCollection<ProductModel> Items { get; } = new();
+    public Command NextViewCommand { get; }
 
-    //Arama işleminde seçilen ürünlerin listesi
-    public ObservableCollection<ProductModel> SelectedItems { get; } = new();
 
-    public ObservableCollection<VariantModel> ItemVariants { get; } = new();
-
-    [ObservableProperty]
-    public SearchBar searchText;
 
 
     private async Task LoadItemsAsync()
@@ -89,10 +113,41 @@ public partial class OutputOutsourceTransferV2ProductListViewModel :BaseViewMode
             IsBusy = true;
             Items.Clear();
 
+            IsBusy = true;
+
             _userDialogs.Loading("Loading Items...");
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            Items.Clear();
             await Task.Delay(1000);
-           
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _outputOutsourceTransferV2Service.GetObjects(
+                httpClient,
+                _httpClientService.FirmNumber,
+                _httpClientService.PeriodNumber,
+                warehouseNumber: WarehouseModel.Number,
+                currentReferenceId:OutsourceModel.ReferenceId,
+                search: SearchText.Text,
+                skip: 0,
+                take: 20);
+
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var product in result.Data)
+                {
+                    var item = Mapping.Mapper.Map<OutputOutsourceTransferV2ProductModel>(product);
+                    var matchedItem = SelectedItems.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
+                    if (matchedItem is not null)
+                        item.IsSelected = matchedItem.IsSelected;
+                    else
+                        item.IsSelected = false;
+
+                    Items.Add(item);
+                }
+            }
+
 
             _userDialogs.Loading().Hide();
         }
@@ -122,53 +177,37 @@ public partial class OutputOutsourceTransferV2ProductListViewModel :BaseViewMode
 
             _userDialogs.Loading("Loading More Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-          
-
-            _userDialogs.Loading().Hide();
-        }
-        catch (Exception ex)
-        {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
-
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-            _userDialogs.Loading().Dispose();
-        }
-    }
-
-    private async Task ItemTappedAsync(ProductModel productModel)
-    {
-        if (IsBusy)
-            return;
-       
-    }
-
-    private async Task LoadVariantItemsAsync(ProductModel item)
-    {
-        try
-        {
-            _userDialogs.Loading("Loading Variant Items...");
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
-            await Task.Delay(1000);
-            var result = await _variantService.GetVariants(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, item.ReferenceId, string.Empty, 0, 20);
+            var result = await _outputOutsourceTransferV2Service.GetObjects(
+                httpClient,
+                _httpClientService.FirmNumber,
+                _httpClientService.PeriodNumber,
+                warehouseNumber: WarehouseModel.Number,
+                currentReferenceId: OutsourceModel.ReferenceId,
+                search: SearchText.Text,
+                skip: 0,
+                take: 20);
 
             if (result.IsSuccess)
             {
-                if (result.Data == null)
+                if (result.Data is null)
                     return;
-                ItemVariants.Clear();
-                foreach (var variant in result.Data)
+
+                foreach (var product in result.Data)
                 {
-                    var obj = Mapping.Mapper.Map<VariantModel>(variant);
-                    ItemVariants.Add(obj);
+                    var item = Mapping.Mapper.Map<OutputOutsourceTransferV2ProductModel>(product);
+                    var matchedItem = SelectedItems.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
+                    if (matchedItem is not null)
+                        item.IsSelected = matchedItem.IsSelected;
+                    else
+                        item.IsSelected = false;
+
+                    Items.Add(item);
                 }
             }
 
+
             _userDialogs.Loading().Hide();
+
         }
         catch (Exception ex)
         {
@@ -184,113 +223,50 @@ public partial class OutputOutsourceTransferV2ProductListViewModel :BaseViewMode
         }
     }
 
-    private async Task LoadMoreVariantItemsAsync()
+    private async Task ItemTappedAsync(OutputOutsourceTransferV2ProductModel item)
     {
-        if (ItemVariants.Count < 18)
+        if (item is null)
             return;
-        if (IsBusy)
-            return;
+        if (IsBusy) return;
 
         try
         {
             IsBusy = true;
 
-            _userDialogs.Loading("Loading More Variant Items...");
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
            
+            if (SelectedProduct == item)
+            {
+                item.IsSelected = false;
+                SelectedProduct = null; // Seçimi sıfırla
+            }
+            else
+            {
+                // Daha önce seçilen ürünü sıfırla (varsa)
+                if (SelectedProduct != null)
+                {
+                    SelectedProduct.IsSelected = false;
+                }
 
-            _userDialogs.Loading().Hide();
+                // Yeni ürünü seç
+                item.IsSelected = true;
+                SelectedProduct = item;
+            }
         }
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
                 _userDialogs.Loading().Hide();
 
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-            _userDialogs.Loading().Dispose();
-        }
-    }
-
-    private async Task VariantTappedAsync(VariantModel item)
-    {
-        if (IsBusy)
-            return;
-
-        try
-        {
-            IsBusy = true;
-
-            ItemVariants.ToList().ForEach(x => x.IsSelected = false);
-            var selectedItem = ItemVariants.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-            if (selectedItem != null)
-                selectedItem.IsSelected = true;
-        }
-        catch (Exception ex)
-        {
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
         finally
         {
             IsBusy = false;
         }
+
     }
 
-    private async Task ConfirmVariantAsync()
-    {
-        if (IsBusy)
-            return;
 
-        try
-        {
-            IsBusy = true;
-
-            var item = ItemVariants.FirstOrDefault(x => x.IsSelected);
-
-            //var basketItem = new InputOutsourceTransferBasketModel
-            //{
-            //    ItemReferenceId = item.ReferenceId,
-            //    ItemCode = item.Code,
-            //    ItemName = item.Name,
-            //    UnitsetReferenceId = item.UnitsetReferenceId,
-            //    UnitsetCode = item.UnitsetCode,
-            //    UnitsetName = item.UnitsetName,
-            //    SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-            //    SubUnitsetCode = item.SubUnitsetCode,
-            //    SubUnitsetName = item.SubUnitsetName,
-            //    IsSelected = false,
-            //    MainItemCode = item.ProductCode,
-            //    MainItemName = item.ProductName,
-            //    MainItemReferenceId = item.ProductReferenceId,
-            //    StockQuantity = item.StockQuantity,
-            //    Quantity = item.LocTracking == 0 ? 1 : 0,
-            //    TrackingType = item.TrackingType,
-            //    IsVariant = true,
-            //    LocTracking = item.LocTracking,
-            //};
-
-            //SelectedProducts.Add(basketItem);
-
-            //if (SelectedProduct is not null)
-            //{
-            //    SelectedProduct.IsSelected = true;
-            //    SelectedItems.Add(SelectedProduct);
-            //}
-
-            CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.Hidden;
-        }
-        catch (Exception ex)
-        {
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
 
     private async Task ConfirmAsync()
     {
@@ -359,46 +335,32 @@ public partial class OutputOutsourceTransferV2ProductListViewModel :BaseViewMode
                 return;
             }
             IsBusy = true;
-
             Items.Clear();
-
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            //var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, 0, 20);
-            //if (result.IsSuccess)
-            //{
-            //    if (result.Data == null)
-            //        return;
+            var result = await _outputOutsourceTransferV2Service.GetObjects(
+              httpClient,
+              _httpClientService.FirmNumber,
+              _httpClientService.PeriodNumber,
+              warehouseNumber: WarehouseModel.Number,
+              currentReferenceId: OutsourceModel.ReferenceId,
+              search: SearchText.Text,
+              skip: 0,
+              take: 20);
+            if (result.IsSuccess)
+            {
+                if (result.Data == null)
+                    return;
 
-            //    foreach (var product in result.Data)
-            //    {
-            //        var item = Mapping.Mapper.Map<Product>(product);
-            //        var matchedItem = SelectedItems.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-            //        Items.Add(new ProductModel
-            //        {
-            //            ReferenceId = item.ReferenceId,
-            //            Code = item.Code,
-            //            Name = item.Name,
-            //            UnitsetReferenceId = item.UnitsetReferenceId,
-            //            UnitsetCode = item.UnitsetCode,
-            //            UnitsetName = item.UnitsetName,
-            //            SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-            //            SubUnitsetCode = item.SubUnitsetCode,
-            //            SubUnitsetName = item.SubUnitsetName,
-            //            StockQuantity = item.StockQuantity,
-            //            TrackingType = item.TrackingType,
-            //            LocTracking = item.LocTracking,
-            //            IsVariant = item.IsVariant,
-            //            Image = item.Image,
-            //            IsSelected = matchedItem != null ? matchedItem.IsSelected : false
-            //        });
-            //    }
-            //}
+                foreach (var item in result.Data)
+                    Items.Add(Mapping.Mapper.Map<OutputOutsourceTransferV2ProductModel>(item));
 
-            //if (!result.IsSuccess)
-            //{
-            //    _userDialogs.Alert(result.Message, "Hata");
-            //    return;
-            //}
+                _userDialogs.Loading().Hide();
+            }
+            else
+            {
+                _userDialogs.Alert(result.Message, "Hata");
+                return;
+            }
         }
         catch (System.Exception ex)
         {
@@ -415,6 +377,33 @@ public partial class OutputOutsourceTransferV2ProductListViewModel :BaseViewMode
         if (string.IsNullOrWhiteSpace(SearchText.Text))
         {
             await PerformSearchAsync();
+        }
+    }
+
+
+    private async Task NextViewAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync($"{nameof(OutputOutsourceTransferV2OutsourceBasketView)}", new Dictionary<string, object>
+            {
+                [nameof(WarehouseModel)] = WarehouseModel,
+                [nameof(OutsourceModel)] = OutsourceModel,
+                [nameof(OutputOutsourceTransferV2ProductModel)] = SelectedProduct
+            });
+        }
+        catch (Exception ex)
+        {
+            _userDialogs.Alert(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 

@@ -27,6 +27,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
         private readonly IOutsourceService _outsourceService;
         private readonly IUserDialogs _userDialogs;
         private readonly IShipAddressService _shipAddressService;
+        private readonly IProductService _productService;
 
         [ObservableProperty]
         private WarehouseModel warehouseModel = null!;
@@ -37,12 +38,13 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
         [ObservableProperty]
         private OutsourceModel selectedOutsource = null!;
 
-        public OutputOutsourceTransferV2OutsourceSupplierListViewModel(IHttpClientService httpClientService, IOutsourceService outsourceService, IUserDialogs userDialogs, IShipAddressService shipAddressService)
+        public OutputOutsourceTransferV2OutsourceSupplierListViewModel(IHttpClientService httpClientService, IOutsourceService outsourceService, IUserDialogs userDialogs, IShipAddressService shipAddressService,IProductService productService)
         {
             _httpClientService = httpClientService;
             _outsourceService = outsourceService;
             _userDialogs = userDialogs;
             _shipAddressService = shipAddressService;
+            _productService = productService;
 
             Title = "Fason Cariler";
 

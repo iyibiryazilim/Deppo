@@ -32,7 +32,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
             _warehouseService = warehouseService;
             _userDialogs = userDialogs;
 
-            Title = "Çıkış Ambar Seçiniz..";
+            Title = "Çıkış Ambar Seçiniz";
 
             LoadItemsCommand = new Command(async () => await LoadItemsAsync());
             LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
