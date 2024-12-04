@@ -106,4 +106,7 @@ public partial class InputOutsourceTransferProductModel : ObservableObject
 
 	public string TrackingTypeIcon => "box-archive";
 	public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
+
+	[ObservableProperty]
+	double inputQuantity = default;
 }
