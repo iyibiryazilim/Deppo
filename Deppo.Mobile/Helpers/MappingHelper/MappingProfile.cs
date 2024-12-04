@@ -117,10 +117,9 @@ public class MappingProfile : Profile
 		CreateMap<BarcodeInProductModel, dynamic>();
 		CreateMap<BarcodeOutProductModel, dynamic>();
 		CreateMap<BarcodeDemandProductModel, dynamic>();
-        CreateMap<BarcodeSalesProductModel, dynamic>();
+    CreateMap<BarcodeSalesProductModel, dynamic>();
 		CreateMap<BarcodePurchaseProductModel, dynamic>();
-        CreateMap<OutputOutsourceTransferV2ProductModel, dynamic>();
-
-
-    }
+    CreateMap<InputOutsourceTransferProductModel, dynamic>();
+    CreateMap<OutputOutsourceTransferV2ProductModel, dynamic>();        
+	}
 }

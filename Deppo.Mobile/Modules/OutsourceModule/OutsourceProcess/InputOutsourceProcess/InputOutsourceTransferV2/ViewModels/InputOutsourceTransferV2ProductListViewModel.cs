@@ -17,9 +17,9 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourcePr
 public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
-	private readonly IOutsourceService _outsourceService;
 	private readonly IUserDialogs _userDialogs;
 	private readonly IProductService _productService;
+	private readonly IWorkOrderProductService _workOrderProductService;
 
 	[ObservableProperty]
 	WarehouseModel? warehouseModel;
@@ -28,19 +28,19 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 	OutsourceModel? outsourceModel;
 
 	[ObservableProperty]
-	ProductModel? selectedOutsourceProductModel;
+	InputOutsourceTransferProductModel? selectedOutsourceProductModel;
 
-	public ObservableCollection<ProductModel> Items { get; } = new();
+	public ObservableCollection<InputOutsourceTransferProductModel> Items { get; } = new();
 
 	[ObservableProperty]
 	SearchBar searchText;
 
-	public InputOutsourceTransferV2ProductListViewModel(IHttpClientService httpClientService, IOutsourceService outsourceService, IUserDialogs userDialogs, IProductService productService)
+	public InputOutsourceTransferV2ProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IProductService productService, IWorkOrderProductService workOrderProductService)
 	{
 		_httpClientService = httpClientService;
-		_outsourceService = outsourceService;
 		_userDialogs = userDialogs;
 		_productService = productService;
+		_workOrderProductService = workOrderProductService;
 
 		Title = "Fason Ürünler";
 
@@ -48,7 +48,7 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 		LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
 		PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
 		PerformSearchCommand = new Command(async () => await PerformSearchAsync());
-		ItemTappedCommand = new Command<ProductModel>(async (productModel) => await ItemTappedAsync(productModel));
+		ItemTappedCommand = new Command<InputOutsourceTransferProductModel>(async (productModel) => await ItemTappedAsync(productModel));
 		NextViewCommand = new Command(async () => await NextViewAsync());
 		BackCommand = new Command(async () => await BackAsync());
 	}
@@ -74,21 +74,15 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 			await Task.Delay(1000);
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			//var result = await _outsourceService.GetObjects(
-			//	httpClient: httpClient,
-			//	firmNumber: _httpClientService.FirmNumber,
-			//	periodNumber: _httpClientService.PeriodNumber,
-			//	search: SearchText.Text,
-			//	skip: 0,
-			//	take: 20
-			//);
 
-			var result = await _productService.GetObjects(
+			var result = await _workOrderProductService.GetObjects(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
+				warehouseNumber: WarehouseModel.Number,
+				currentReferenceId: OutsourceModel.ReferenceId,
 				search: SearchText.Text,
-				skip: Items.Count,
+				skip: 0,
 				take: 20
 			);
 
@@ -99,8 +93,8 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 
 				foreach (var item in result.Data)
 				{
-					var obj = Mapping.Mapper.Map<ProductModel>(item);
-					obj.IsSelected = SelectedOutsourceProductModel != null && SelectedOutsourceProductModel.Code == obj.Code ? SelectedOutsourceProductModel.IsSelected : false;
+					var obj = Mapping.Mapper.Map<InputOutsourceTransferProductModel>(item);
+					obj.IsSelected = SelectedOutsourceProductModel != null && SelectedOutsourceProductModel.ReferenceId == obj.ReferenceId ? SelectedOutsourceProductModel.IsSelected : false;
 					Items.Add(obj);
 				}
 
@@ -137,19 +131,13 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 
 			_userDialogs.ShowLoading("Loading More Items...");
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			//var result = await _outsourceService.GetObjects(
-			//	httpClient: httpClient,
-			//	firmNumber: _httpClientService.FirmNumber,
-			//	periodNumber: _httpClientService.PeriodNumber,
-			//	search: SearchText.Text,
-			//	skip: Items.Count,
-			//	take: 20
-			//);
 
-			var result = await _productService.GetObjects(
+			var result = await _workOrderProductService.GetObjects(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
+				warehouseNumber: WarehouseModel.Number,
+				currentReferenceId: OutsourceModel.ReferenceId,
 				search: SearchText.Text,
 				skip: Items.Count,
 				take: 20
@@ -162,8 +150,8 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 
 				foreach (var item in result.Data)
 				{
-					var obj = Mapping.Mapper.Map<ProductModel>(item);
-					obj.IsSelected = SelectedOutsourceProductModel != null && SelectedOutsourceProductModel.Code == obj.Code ? SelectedOutsourceProductModel.IsSelected : false;
+					var obj = Mapping.Mapper.Map<InputOutsourceTransferProductModel>(item);
+					obj.IsSelected = SelectedOutsourceProductModel != null && SelectedOutsourceProductModel.ReferenceId == obj.ReferenceId ? SelectedOutsourceProductModel.IsSelected : false;
 					Items.Add(obj);
 				}
 
@@ -211,21 +199,15 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 			_userDialogs.Loading("Searching...");
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			//var result = await _outsourceService.GetObjects(
-			//	httpClient: httpClient,
-			//	firmNumber: _httpClientService.FirmNumber,
-			//	periodNumber: _httpClientService.PeriodNumber,
-			//	search: SearchText.Text,
-			//	skip: 0,
-			//	take: 20
-			//);
 
-			var result = await _productService.GetObjects(
+			var result = await _workOrderProductService.GetObjects(
 				httpClient: httpClient,
 				firmNumber: _httpClientService.FirmNumber,
 				periodNumber: _httpClientService.PeriodNumber,
+				warehouseNumber: WarehouseModel.Number,
+				currentReferenceId: OutsourceModel.ReferenceId,
 				search: SearchText.Text,
-				skip: Items.Count,
+				skip: 0,
 				take: 20
 			);
 
@@ -237,8 +219,8 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 
 				foreach (var item in result.Data)
 				{
-					var obj = Mapping.Mapper.Map<ProductModel>(item);
-					obj.IsSelected = SelectedOutsourceProductModel != null && SelectedOutsourceProductModel.Code == obj.Code ? SelectedOutsourceProductModel.IsSelected : false;
+					var obj = Mapping.Mapper.Map<InputOutsourceTransferProductModel>(item);
+					obj.IsSelected = SelectedOutsourceProductModel != null && SelectedOutsourceProductModel.ReferenceId == obj.ReferenceId ? SelectedOutsourceProductModel.IsSelected : false;
 					Items.Add(obj);
 				}
 			}
@@ -259,7 +241,7 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 			IsBusy = false;
 		}
 	}
-	private async Task ItemTappedAsync(ProductModel item)
+	private async Task ItemTappedAsync(InputOutsourceTransferProductModel item)
 	{
 		if (IsBusy)
 			return;
@@ -281,7 +263,7 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 				SelectedOutsourceProductModel = item;
 				SelectedOutsourceProductModel.IsSelected = true;
 
-				Items.Where(x => x.Code != item.Code).ToList().ForEach(x => x.IsSelected = false);
+				Items.Where(x => x.ReferenceId != item.ReferenceId).ToList().ForEach(x => x.IsSelected = false);
 			}
 		}
 		catch (Exception ex)
@@ -311,7 +293,7 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 			{
 				[nameof(WarehouseModel)] = WarehouseModel,
 				[nameof(OutsourceModel)] = OutsourceModel,
-				[nameof(ProductModel)] = SelectedOutsourceProductModel
+				[nameof(InputOutsourceTransferProductModel)] = SelectedOutsourceProductModel
 			});
 
 			SearchText.Text = string.Empty;
