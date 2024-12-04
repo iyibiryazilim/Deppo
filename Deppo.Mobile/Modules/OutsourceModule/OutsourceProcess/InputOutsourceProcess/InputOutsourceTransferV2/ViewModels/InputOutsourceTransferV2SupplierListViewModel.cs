@@ -34,7 +34,7 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 	public ObservableCollection<OutsourceModel> Items { get; } = new();
 
 	[ObservableProperty]
-	SearchBar searchText;
+	SearchBar? searchText;
 
 	public InputOutsourceTransferV2SupplierListViewModel(IHttpClientService httpClientService, IOutsourceService outsourceService, IUserDialogs userDialogs)
 	{
@@ -127,7 +127,6 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 		{
 			IsBusy = true;
 
-
 			_userDialogs.ShowLoading("Loading More Items...");
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			var result = await _outsourceService.GetObjects(
@@ -144,15 +143,12 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 				if (result.Data is null)
 					return;
 
-				
-
 				foreach (var item in result.Data)
 				{
 					var obj = Mapping.Mapper.Map<OutsourceModel>(item);
 					obj.IsSelected = SelectedOutsourceModel != null && SelectedOutsourceModel.Code == obj.Code ? SelectedOutsourceModel.IsSelected : false;
 					Items.Add(obj);
 				}
-
 			}
 
 			if (_userDialogs.IsHudShowing)
