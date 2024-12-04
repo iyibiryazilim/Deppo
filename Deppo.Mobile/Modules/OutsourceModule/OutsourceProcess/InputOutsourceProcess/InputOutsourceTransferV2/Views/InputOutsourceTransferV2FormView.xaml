@@ -67,6 +67,12 @@
 
                                     <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                                  FocusedBorderColor="{StaticResource Primary}"
+                                                 IsReadOnly="True"
+                                                 LabelText="Fason Cari"
+                                                 StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}" />
+
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                                 FocusedBorderColor="{StaticResource Primary}"
                                                  LabelText="Belge Numarası"
                                                  StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
                                                  Text="{Binding DocumentNumber}" />

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentPage x:Class="Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransferV2.Views.InputOutsourceTransferV2BasketView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransferV2.Views.InputOutsourceTransferV2BasketView"
+             xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransferV2.ViewModels"
-             x:DataType="viewModel:InputOutsourceTransferV2BasketViewModel"
              Title="{Binding Title}"
+             x:DataType="viewModel:InputOutsourceTransferV2BasketViewModel"
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
         <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
@@ -32,7 +32,10 @@
 
 
     <Grid RowDefinitions="*, Auto">
-        
+        <Button Grid.Row="1"
+                Margin="5,10,5,20"
+                Command="{Binding NextViewCommand}"
+                Text="İleri" />
     </Grid>
-    
+
 </ContentPage>
