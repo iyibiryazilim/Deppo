@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using DevExpress.Maui.Controls;
@@ -11,11 +12,16 @@ using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransferV2.ViewModels;
 
+
+[QueryProperty(name: nameof(InputOutsourceTransferV2BasketModel), queryId: nameof(InputOutsourceTransferV2BasketModel))]
 public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
 	private readonly IUserDialogs _userDialogs;
 	private readonly IServiceProvider _serviceProvider;
+
+	[ObservableProperty]
+	InputOutsourceTransferV2BasketModel? inputOutsourceTransferV2BasketModel;
 
 
 	[ObservableProperty]
