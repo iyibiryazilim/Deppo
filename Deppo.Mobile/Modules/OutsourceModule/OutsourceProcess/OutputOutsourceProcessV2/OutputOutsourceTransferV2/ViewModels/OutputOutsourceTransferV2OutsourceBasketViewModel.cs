@@ -33,7 +33,9 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
         private readonly IHttpClientService _httpClientService;
         private readonly IUserDialogs _userDialogs;
         private readonly ILocationTransactionService _locationTransactionService;
-        private readonly ISeriLotService _seriLotService;
+       
+        private readonly IProductService _productService;
+        
 
         [ObservableProperty]
         WarehouseModel? warehouseModel;
@@ -48,6 +50,9 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
         OutputOutsourceTransferV2ProductModel? outputOutsourceTransferV2ProductModel;
 
         [ObservableProperty]
+        private OutputOutsourceTransferV2ProductModel selectedProduct;
+
+        [ObservableProperty]
         GroupLocationTransactionModel? selectedLocationTransaction;
 
         [ObservableProperty]
@@ -56,316 +61,105 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
         [ObservableProperty]
         public ObservableCollection<GroupLocationTransactionModel> selectedLocationTransactions = new();
         public ObservableCollection<GroupLocationTransactionModel> LocationTransactions { get; } = new();
-        [ObservableProperty]
-        public ObservableCollection<SeriLotTransactionModel> selectedSeriLotTransactions = new();
-        public ObservableCollection<SeriLotTransactionModel> SeriLotTransactions { get; } = new();
-
+        public ObservableCollection<LocationModel> Items { get; } = new();
+        public ObservableCollection<LocationModel> SelectedSearchItems { get; } = new();
+        public ObservableCollection<LocationModel> SelectedItems { get; } = new();
         public ObservableCollection<OutputOutsourceTransferV2SubProductModel> SubProducts { get; } = new();
 
-        
+        [ObservableProperty]
+        private LocationModel selectedItem;
+
+        public Page CurrentPage { get; set; }
+
+        [ObservableProperty]
+        public SearchBar searchText;
 
 
 
-        public OutputOutsourceTransferV2OutsourceBasketViewModel(IHttpClientService httpClientService,IUserDialogs userDialogs, ILocationTransactionService locationTransactionService, ISeriLotService _seriLotService)
+
+        public OutputOutsourceTransferV2OutsourceBasketViewModel(IHttpClientService httpClientService,IUserDialogs userDialogs, ILocationTransactionService locationTransactionService)
         {
             _httpClientService = httpClientService;
             _userDialogs = userDialogs;
             _locationTransactionService = locationTransactionService;
-
+           
             Title = "Ürün - Reçete";
 
 
-                 //IncreaseCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await IncreaseAsync(item));
-		        //DecreaseCommand = new Command<OutputOutsourceTransferBasketModel>(async (item) => await DecreaseAsync(item));
-                NextViewCommand = new Command(async () => await NextViewAsync());
+            IncreaseCommand = new Command(async () => await IncreaseAsync());
+            DecreaseCommand = new Command(async () => await DecreaseAsync());
+            NextViewCommand = new Command(async () => await NextViewAsync());
                 BackCommand = new Command(async () => await BackAsync());
 
+            SelectedProduct = new OutputOutsourceTransferV2ProductModel();
+            SelectedProduct.SubProducts.Add(new OutputOutsourceTransferV2SubProductModel
+            {
+                ProductCode = "Code1",
+                ProductName = "Name1",
+                Quantity = 3
 
-            SubProducts = new ObservableCollection<OutputOutsourceTransferV2SubProductModel>
-    {
-        new OutputOutsourceTransferV2SubProductModel { ProductCode = "Code1", ProductName = "Name1" },
-        new OutputOutsourceTransferV2SubProductModel { ProductCode = "Code2", ProductName = "Name2"},
-        
-    };
+            });
+            SelectedProduct.SubProducts.Add(new OutputOutsourceTransferV2SubProductModel
+            {
+                ProductCode = "Code2",
+                ProductName = "Name2",
+                Quantity = 2
+
+            });
+            SelectedProduct.SubProducts.Add(new OutputOutsourceTransferV2SubProductModel
+            {
+                ProductCode = "Code3",
+                ProductName = "Name3",
+                Quantity = 4
+
+            });
+
+            Console.WriteLine($"SubProducts Count: {SelectedProduct.SubProducts.Count}");
+
+
 
         }
 
-        public Page CurrentPage { get; set; } = null!;
-        public Command<OutputOutsourceTransferV2ProductModel> IncreaseCommand { get; }
-        public Command<OutputOutsourceTransferV2ProductModel> DecreaseCommand { get; }
+        public Command IncreaseCommand { get; }
+        public Command DecreaseCommand { get; }
 
         public Command NextViewCommand { get; }
         public Command BackCommand { get; }
 
 
-        private async Task LoadWarehouseLocationTransactionsAsync(OutputOutsourceTransferBasketModel outputOutsourceTransferBasketModel)
+        
+      
+
+
+        private async Task IncreaseAsync()
         {
-            //try
-            //{
-            //    _userDialogs.ShowLoading("Load Location Transactions...");
-            //    await Task.Delay(1000);
-
-            //    LocationTransactions.Clear();
-
-            //    var httpClient = _httpClientService.GetOrCreateHttpClient();
-            //    var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(
-            //        httpClient: httpClient,
-            //        firmNumber: _httpClientService.FirmNumber,
-            //        periodNumber: _httpClientService.PeriodNumber,
-            //        productReferenceId: SelectedItem.IsVariant ? SelectedItem.MainItemReferenceId : SelectedItem.ItemReferenceId,
-            //        variantReferenceId: SelectedItem.IsVariant ? SelectedItem.ItemReferenceId : 0,
-            //        warehouseNumber: WarehouseModel.Number,
-            //        skip: 0,
-            //        take: 20,
-            //        search: "");
-            //    if (result.IsSuccess)
-            //    {
-            //        if (result.Data is null)
-            //            return;
-
-            //        foreach (var item in result.Data)
-            //            LocationTransactions.Add(Mapping.Mapper.Map<GroupLocationTransactionModel>(item));
-
-            //        foreach (var locationTransaction in LocationTransactions)
-            //        {
-            //            var matchingItem = SelectedItem.Details.FirstOrDefault(x => x.LocationReferenceId == locationTransaction.LocationReferenceId);
-            //            if (matchingItem is not null)
-            //            {
-            //                locationTransaction.OutputQuantity = matchingItem.Quantity;
-            //            }
-            //        }
-            //    }
-
-            //    if (_userDialogs.IsHudShowing)
-            //        _userDialogs.HideHud();
-            //}
-            //catch (Exception ex)
-            //{
-            //    if (_userDialogs.IsHudShowing)
-            //        _userDialogs.HideHud();
-
-            //    await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-            //}
-        }
-        private async Task LoadMoreWarehouseLocationTransactionsAsync()
-        {
-            //if (IsBusy)
-            //    return;
-            //try
-            //{
-            //    IsBusy = true;
-
-            //    _userDialogs.ShowLoading("Load More Location Transactions...");
-
-            //    var httpClient = _httpClientService.GetOrCreateHttpClient();
-            //    var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(httpClient: httpClient,
-            //        firmNumber: _httpClientService.FirmNumber,
-            //        periodNumber: _httpClientService.PeriodNumber,
-            //        productReferenceId: SelectedItem.IsVariant ? SelectedItem.MainItemReferenceId : SelectedItem.ItemReferenceId,
-            //        variantReferenceId: SelectedItem.IsVariant ? SelectedItem.ItemReferenceId : 0,
-            //        warehouseNumber: WarehouseModel.Number,
-            //        skip: LocationTransactions.Count,
-            //        take: 20);
-
-            //    if (result.IsSuccess)
-            //    {
-            //        if (result.Data is null)
-            //            return;
-
-            //        foreach (var item in result.Data)
-            //        {
-            //            LocationTransactions.Add(Mapping.Mapper.Map<GroupLocationTransactionModel>(item));
-            //        }
-
-            //        foreach (var locationTransaction in LocationTransactions)
-            //        {
-            //            var matchingItem = SelectedItem.Details.FirstOrDefault(x => x.LocationReferenceId == locationTransaction.LocationReferenceId);
-            //            if (matchingItem is not null)
-            //            {
-            //                locationTransaction.OutputQuantity = matchingItem.Quantity;
-            //            }
-            //        }
-            //    }
-
-            //    if (_userDialogs.IsHudShowing)
-            //        _userDialogs.HideHud();
-            //}
-            //catch (Exception ex)
-            //{
-            //    if (_userDialogs.IsHudShowing)
-            //        _userDialogs.HideHud();
-
-            //    await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-            //}
-            //finally
-            //{
-            //    IsBusy = false;
-            //}
-        }
-        private async Task LoadSeriLotTransactionsAsync()
-        {
-            //try
-            //{
-            //    _userDialogs.ShowLoading("Load Serilot Items...");
-            //    await Task.Delay(1000);
-            //    SeriLotTransactions.Clear();
-            //    var httpClient = _httpClientService.GetOrCreateHttpClient();
-            //    var result = await _seriLotTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: SelectedItem.ItemReferenceId, warehouseNumber: WarehouseModel.Number, search: string.Empty);
-
-            //    if (result.IsSuccess)
-            //    {
-            //        if (result.Data is null)
-            //            return;
-
-            //        foreach (var item in result.Data)
-            //        {
-            //            SeriLotTransactions.Add(Mapping.Mapper.Map<SeriLotTransactionModel>(item));
-            //        }
-            //    }
-
-            //    _userDialogs.Loading().Hide();
-            //}
-            //catch (Exception ex)
-            //{
-            //    if (_userDialogs.IsHudShowing)
-            //        _userDialogs.HideHud();
-
-            //    _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-            //}
-            //finally
-            //{
-            //    IsBusy = false;
-            //}
-        }
-        private async Task LoadMoreSeriLotTransactionsAsync()
-        {
-            //if (IsBusy)
-            //    return;
-            //if (SeriLotTransactions.Count < 18)
-            //    return;
-
-            //try
-            //{
-            //    IsBusy = true;
-
-            //    var httpClient = _httpClientService.GetOrCreateHttpClient();
-            //    var result = await _seriLotTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: SelectedItem.ItemReferenceId, warehouseNumber: WarehouseModel.Number, skip: SeriLotTransactions.Count, take: 20);
-
-            //    if (result.IsSuccess)
-            //    {
-            //        if (result.Data is null)
-            //            return;
-
-            //        foreach (var item in result.Data)
-            //        {
-            //            SeriLotTransactions.Add(Mapping.Mapper.Map<SeriLotTransactionModel>(item));
-            //        }
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    if (_userDialogs.IsHudShowing)
-            //        _userDialogs.HideHud();
-
-            //    _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-            //}
-            //finally
-            //{
-            //    IsBusy = false;
-            //}
-        }
-
-
-        private async Task IncreaseAsync(OutputOutsourceTransferBasketModel outputOutsourceTransferBasketModel)
-        {
-            if (outputOutsourceTransferBasketModel is null)
+            if (OutputOutsourceTransferV2ProductModel is null)
                 return;
             if (IsBusy)
                 return;
 
             try
             {
-                IsBusy = true;
-
-               // SelectedItem = outputOutsourceTransferBasketModel;
-
-                if (outputOutsourceTransferBasketModel.LocTracking == 1 && outputOutsourceTransferBasketModel.TrackingType == 0)
+                if(OutputOutsourceTransferV2ProductModel is not null)
                 {
-                    // Sadece Stok Yeri Takipli olma durumu
-                    await LoadWarehouseLocationTransactionsAsync(outputOutsourceTransferBasketModel);
-                    CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.FullExpanded;
-
-                }
-                else if (outputOutsourceTransferBasketModel.LocTracking == 1 && outputOutsourceTransferBasketModel.TrackingType == 1)
-                {
-                    // Stok Yeri ve Lot takipli olma durumu
-                    await LoadSeriLotTransactionsAsync();
-                    CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.FullExpanded;
-                }
-                else if (outputOutsourceTransferBasketModel.LocTracking == 1 && outputOutsourceTransferBasketModel.TrackingType == 2)
-                {
-                    //todo: Stok Yeri ve Seri takipli olma durumu
-                }
-                else if (outputOutsourceTransferBasketModel.LocTracking == 0 && outputOutsourceTransferBasketModel.TrackingType == 1)
-                {
-                    //todo: Sadece Lot takipli olma durumu
-                }
-                else if (outputOutsourceTransferBasketModel.LocTracking == 0 && outputOutsourceTransferBasketModel.TrackingType == 2)
-                {
-                    //todo:Sadece Seri takipli olma durumu
-                }
-                else
-                {
-                    if (outputOutsourceTransferBasketModel.Quantity < outputOutsourceTransferBasketModel.StockQuantity)
-                        outputOutsourceTransferBasketModel.Quantity += 1;
-                }
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.HideHud();
-
-                _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
-
-        private async Task DecreaseAsync(OutputOutsourceTransferBasketModel outputOutsourceTransferBasketModel)
-        {
-            if (IsBusy)
-                return;
-
-            try
-            {
-                IsBusy = true;
-
-                if (outputOutsourceTransferBasketModel is not null)
-                {
-                    //SelectedItem = outputOutsourceTransferBasketModel;
-                    if (outputOutsourceTransferBasketModel.Quantity > 1)
+                    if (OutputOutsourceTransferV2ProductModel.Quantity >=0)
                     {
-                        // Stok Yeri Takipli olma durumu
-                        if (outputOutsourceTransferBasketModel.LocTracking == 1)
+                        OutputOutsourceTransferV2ProductModel.Quantity++;
+                        foreach (var subProduct in SelectedProduct.SubProducts)
                         {
-                            await LoadWarehouseLocationTransactionsAsync(outputOutsourceTransferBasketModel);
-                            CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.FullExpanded;
-                        }
-                        // SeriLot takipli olma durumu
-                        else if (outputOutsourceTransferBasketModel.LocTracking == 0 && (outputOutsourceTransferBasketModel.TrackingType == 1 || outputOutsourceTransferBasketModel.TrackingType == 2))
-                        {
-                            await LoadSeriLotTransactionsAsync();
-                            CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.FullExpanded;
-                        }
-                        else
-                        {
-                            outputOutsourceTransferBasketModel.Quantity -= 1;
+                            subProduct.Quantity = subProduct.BomQuantity * SelectedProduct.Quantity;
                         }
                     }
-
+                    else
+                    {
+                        
+                    }
                 }
+
+
+
+
+
             }
             catch (Exception ex)
             {
@@ -380,8 +174,38 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
             }
         }
 
+        private async Task DecreaseAsync()
+        {
+            if (IsBusy)
+                return;
 
+            try
+            {
+                if (OutputOutsourceTransferV2ProductModel is not null)
+                {
+                    if (OutputOutsourceTransferV2ProductModel.Quantity == 0)
+                    {
+                        await _userDialogs.AlertAsync("Girilen miktar 0'dan küçük olmamalıdır.", "Hata", "Tamam");
+                    }
+                    else
+                    {
+                        OutputOutsourceTransferV2ProductModel.Quantity--;
+                    }
+                }
 
+            }
+            catch (Exception ex)
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
 
         private async Task NextViewAsync()
         {
@@ -434,7 +258,8 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
                     OutputOutsourceTransferV2ProductModel = null;
                 }
 
-                
+
+               
 
                 await Shell.Current.GoToAsync("..");
             }

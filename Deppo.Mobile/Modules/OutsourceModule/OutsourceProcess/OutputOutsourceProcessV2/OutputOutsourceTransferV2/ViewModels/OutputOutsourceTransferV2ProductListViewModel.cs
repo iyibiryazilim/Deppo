@@ -390,6 +390,10 @@ public partial class OutputOutsourceTransferV2ProductListViewModel : BaseViewMod
         {
             IsBusy = true;
             Console.Write(SelectedProduct);
+
+            OutputOutsourceTransferV2ProductModel item = new OutputOutsourceTransferV2ProductModel();
+            item.ProductReferenceId = SelectedProduct.ReferenceId;
+            item.ProductCode = SelectedProduct.ProductCode;
             
 
             await Shell.Current.GoToAsync($"{nameof(OutputOutsourceTransferV2OutsourceBasketView)}", new Dictionary<string, object>
