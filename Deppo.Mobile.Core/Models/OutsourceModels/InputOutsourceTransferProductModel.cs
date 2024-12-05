@@ -9,7 +9,13 @@ namespace Deppo.Mobile.Core.Models.OutsourceModels;
 
 public partial class InputOutsourceTransferProductModel : ObservableObject
 {
-	[ObservableProperty]
+
+    public InputOutsourceTransferProductModel()
+    {
+        Details = new();
+	}
+
+    [ObservableProperty]
 	int referenceId = default;
 
 	[ObservableProperty]

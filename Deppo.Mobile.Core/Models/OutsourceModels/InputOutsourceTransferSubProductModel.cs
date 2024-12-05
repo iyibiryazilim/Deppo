@@ -9,7 +9,13 @@ namespace Deppo.Mobile.Core.Models.OutsourceModels;
 
 public partial class InputOutsourceTransferSubProductModel : ObservableObject
 {
-	[ObservableProperty]
+
+    public InputOutsourceTransferSubProductModel()
+    {
+		Details = new();    
+    }
+
+    [ObservableProperty]
 	int referenceId;
 
 	[ObservableProperty]
@@ -55,6 +61,9 @@ public partial class InputOutsourceTransferSubProductModel : ObservableObject
 	double quotientQuantity;  // Katsayi miktari
 
 	[ObservableProperty]
+	double totalQuantityWithQuotient; // quotientQuantity * InputQuantity (MainProduct)
+
+	[ObservableProperty]
 	string image = string.Empty;
 
 	public byte[] ImageData
@@ -92,7 +101,7 @@ public partial class InputOutsourceTransferSubProductModel : ObservableObject
 	public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 
 	[ObservableProperty]
-	double inputQuantity;
+	double outputQuantity;
 
 	public List<InputOutsourceTransferSubProductDetailModel> Details { get; set; } = new();
 }
