@@ -62,7 +62,7 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 	public Command NextViewCommand { get; }
 	public Command BackCommand { get; }
 
-	private async Task LoadItemsAsync()
+	public async Task LoadItemsAsync()
 	{
 		if (IsBusy)
 			return;

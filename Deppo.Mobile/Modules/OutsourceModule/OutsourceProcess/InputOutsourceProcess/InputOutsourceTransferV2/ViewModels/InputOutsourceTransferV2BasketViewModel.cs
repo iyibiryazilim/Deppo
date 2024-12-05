@@ -826,9 +826,14 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 			SelectedSubProductModel = null;
 			LocationTransactions.Clear();
 
-			InputOutsourceTransferV2BasketModel = null;
-
 			await Shell.Current.GoToAsync("..");
+
+			var previousViewModel = _serviceProvider.GetRequiredService<InputOutsourceTransferV2ProductListViewModel>();
+			previousViewModel.WarehouseModel = InputOutsourceTransferV2BasketModel.OutsourceWarehouseModel;
+			previousViewModel.OutsourceModel = InputOutsourceTransferV2BasketModel.OutsourceModel;
+			await previousViewModel.LoadItemsAsync();
+
+			InputOutsourceTransferV2BasketModel = null;
 		}
 		catch (Exception ex)
 		{
