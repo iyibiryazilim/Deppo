@@ -3,6 +3,7 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.BasketModels;
 using Deppo.Mobile.Core.Models.LocationModels;
+using Deppo.Mobile.Core.Models.OutsourceModels;
 using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
@@ -16,6 +17,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xamarin.Google.Crypto.Tink.Proto;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransferV2.ViewModels;
 
@@ -29,7 +31,7 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 	private readonly IServiceProvider _serviceProvider;
 
 	[ObservableProperty]
-	InputOutsourceTransferV2BasketModel? inputOutsourceTransferV2BasketModel;
+	public InputOutsourceTransferV2BasketModel? inputOutsourceTransferV2BasketModel;
 
 	public ObservableCollection<LocationModel> Items { get; } = new();
 	public ObservableCollection<LocationModel> SelectedSearchItems { get; } = new();
@@ -64,6 +66,7 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 		ItemTappedCommand = new Command<LocationModel>(async (locationModel) => await ItemTappedAsync(locationModel));
 		ConfirmLocationsCommand = new Command(async () => await ConfirmLocationsAsync());
 		CancelCommand = new Command(async () => await CancelAsync());
+		ConfirmCommand = new Command(async () => await ConfirmAsync());
 	}
 
 	public Page CurrentPage { get; set; } = null!;
@@ -84,6 +87,44 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 	public Command LocationsPerformEmptySearchCommand { get; }
 	public Command ConfirmLocationsCommand { get; }
 	#endregion
+
+	public async Task LoadSelectedItemsAsync()
+	{
+		if (InputOutsourceTransferV2BasketModel is null || InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel is null)
+			return;
+
+		try
+		{
+			_userDialogs.Loading("Loading...");
+			SelectedItems.Clear();
+			await Task.Delay(1000);
+
+			if(InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.Details.Count > 0)
+			{
+                foreach (var item in InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.Details)
+                {
+					SelectedItems.Add(new LocationModel
+					{
+						Code = item.LocationCode,
+						Name = item.LocationName,
+						InputQuantity = item.Quantity,
+						ReferenceId = item.LocationReferenceId,
+						StockQuantity = default
+					});
+                }
+            }
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+	}
 
 	private async Task IncreaseAsync(LocationModel locationModel)
 	{
@@ -253,6 +294,76 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 		}
 	}
 
+	private async Task ConfirmAsync()
+	{
+		if (IsBusy)
+			return;
+
+		if (InputOutsourceTransferV2BasketModel is null)
+			return;
+		try
+		{
+			IsBusy = true;
+
+			if(!SelectedItems.Any())
+			{
+				await Shell.Current.GoToAsync("..");
+				return;
+			}
+
+			_userDialogs.ShowLoading("Loading...");
+
+            foreach (var item in SelectedItems.Where(x => x.InputQuantity <= 0))
+            {
+				InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel?.Details.Remove(InputOutsourceTransferV2BasketModel?.InputOutsourceTransferMainProductModel?.Details?.FirstOrDefault(x => x.LocationCode == item.Code));
+
+			}
+
+			foreach (var item in SelectedItems.Where(x => x.InputQuantity > 0))
+			{
+				if (InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.Details.Where(x => x.LocationCode == item.Code).Any())
+				{
+					InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.Details.FirstOrDefault(x => x.LocationCode == item.Code).Quantity = item.InputQuantity;
+				}
+				else
+				{
+					InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.Details.Add(new InputOutsourceTransferProductDetailModel
+					{
+						LocationCode = item.Code,
+						LocationName = item.Name,
+						Quantity = item.InputQuantity,
+						LocationReferenceId = item.ReferenceId,
+					});
+				}
+			}
+
+			InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity = SelectedItems.Sum(x => x.InputQuantity);
+
+			foreach (var subProduct in InputOutsourceTransferV2BasketModel.InputOutsourceTransferSubProducts)
+			{
+				subProduct.TotalQuantityWithQuotient = InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity == 0 ?
+					1 * subProduct.QuotientQuantity :    
+					subProduct.QuotientQuantity * InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity;
+			}
+
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();	
+
+			await Shell.Current.GoToAsync("..");
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
 
 	private async Task CancelAsync()
 	{
