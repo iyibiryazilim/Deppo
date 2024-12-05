@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentPage x:Class="Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.Views.DemandProcessWarehouseListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.Views.DemandProcessWarehouseListView"
-             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewModels"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewModels"
              xmlns:warehouseModel="clr-namespace:Deppo.Mobile.Core.Models.WarehouseModels;assembly=Deppo.Mobile.Core"
              Title="{Binding Title}"
              x:DataType="viewModel:DemandProcessWarehouseListViewModel"
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
-                                        EventName="Loaded" />
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
-                                   StatusBarStyle="Default" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -24,11 +22,14 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android"
-                Value="artboard.png" />
+            <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding BackCommand}" />
+    </Shell.BackButtonBehavior>
+    
     <Grid Padding="0"
           RowDefinitions="*,Auto"
           RowSpacing="10">
@@ -42,8 +43,7 @@
                             StrokeShape="RoundRectangle 0"
                             StrokeThickness="0.1">
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:DemandProcessWarehouseListViewModel}}, Path=ItemTappedCommand}"
-                                                  CommandParameter="{Binding .}" />
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:DemandProcessWarehouseListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="Auto, *">
                             <Border Grid.Column="0"
@@ -66,22 +66,19 @@
                                 <Label FontAttributes="Bold"
                                        LineBreakMode="TailTruncation"
                                        MaxLines="1"
-                                       Text="{Binding Name}">
-                                </Label>
+                                       Text="{Binding Name}" />
                                 <Label FontAttributes="None"
                                        LineBreakMode="TailTruncation"
                                        MaxLines="1"
                                        Text="{Binding City, FallbackValue='-', TargetNullValue='-'}"
-                                       TextColor="{StaticResource Gray600}">
-                                </Label>
+                                       TextColor="{StaticResource Gray600}" />
                             </VerticalStackLayout>
                         </Grid>
                         <Border.Triggers>
                             <DataTrigger Binding="{Binding IsSelected}"
                                          TargetType="Border"
                                          Value="True">
-                                <Setter Property="BackgroundColor"
-                                        Value="{StaticResource SecondaryLight}" />
+                                <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
                             </DataTrigger>
                         </Border.Triggers>
                     </Border>

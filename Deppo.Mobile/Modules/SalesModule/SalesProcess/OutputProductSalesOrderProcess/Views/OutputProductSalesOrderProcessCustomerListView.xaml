@@ -25,6 +25,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -213,7 +214,7 @@
                                         <Image
                                             Grid.Column="0"
                                             HeightRequest="50"
-                                            Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                            Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                             WidthRequest="50" />
                                     </Border>
 

@@ -354,6 +354,7 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
 
                     SelectedItems.Clear();
 
+                    SearchText.Text = string.Empty;
                     await Shell.Current.GoToAsync("..");
                 }
             }
@@ -395,6 +396,8 @@ namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewMo
 
                     SelectedProducts.Clear();
                 }
+
+                SearchText.Text = string.Empty;
                 await Shell.Current.GoToAsync("..");
             }
             catch (Exception ex)

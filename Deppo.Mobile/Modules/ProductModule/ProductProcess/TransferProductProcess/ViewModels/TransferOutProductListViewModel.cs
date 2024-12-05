@@ -500,6 +500,8 @@ public partial class TransferOutProductListViewModel : BaseViewModel
 					}
                 }
             }
+
+			SearchText.Text = string.Empty;
 			await Shell.Current.GoToAsync($"..");
 			SelectedProducts.Clear();
 			SelectedItems.Clear();
@@ -588,6 +590,7 @@ public partial class TransferOutProductListViewModel : BaseViewModel
 				SelectedProducts.Clear();
 			}
 
+            SearchText.Text = string.Empty;
             await Shell.Current.GoToAsync($"..");
         }
         catch (Exception ex)

@@ -210,6 +210,11 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
 
             SalesCustomer = selectedItem;
 
+            if(selectedItem.Products is null)
+            {
+                selectedItem.Products = new();
+			}
+
             if (selectedItem?.Products?.Count > 0)
             {
                 selectedItem.Products.Clear();
@@ -438,7 +443,9 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
                 return;
             }
 
-            await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessBasketListView)}", new Dictionary<string, object>
+			SearchText.Text = string.Empty;
+
+			await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessBasketListView)}", new Dictionary<string, object>
             {
                 [nameof(SalesCustomer)] = SalesCustomer,
                 [nameof(WarehouseModel)] = WarehouseModel,
@@ -538,6 +545,8 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
             }
             SalesCustomer = null;
             Items.ForEach(x => x.IsSelected = false);
+
+            SearchText.Text = string.Empty;
 
             await Shell.Current.GoToAsync("..");
         }

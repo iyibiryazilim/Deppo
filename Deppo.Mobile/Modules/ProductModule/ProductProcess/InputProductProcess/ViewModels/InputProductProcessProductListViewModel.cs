@@ -518,6 +518,8 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                 if (!previouseViewModel.Items.Any(x => x.ItemCode == item.ItemCode))
                     previouseViewModel.Items.Add(item);
 
+            SearchText.Text = string.Empty;
+
             await Shell.Current.GoToAsync($"..");
             
             SelectedItems.Clear();
