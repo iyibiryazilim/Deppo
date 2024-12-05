@@ -314,9 +314,13 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 
 
 			InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity = quantity;
-			// TODO: Sarf Malzemelerin quantityleri buradaki sayı kadar çarpılacak 
 
-		}
+            foreach (var subProduct in InputOutsourceTransferV2BasketModel.InputOutsourceTransferSubProducts)
+            {
+				subProduct.TotalQuantityWithQuotient = subProduct.QuotientQuantity * InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity;
+			}
+
+        }
 		catch (Exception ex)
 		{
 			if (_userDialogs.IsHudShowing)
@@ -541,6 +545,8 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 	{
 		if (IsBusy)
 			return;
+		if (item is null)
+			return;
 		try
 		{
 			IsBusy = true;
@@ -566,6 +572,8 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 	private async Task LocationTransactionDecreaseAsync(GroupLocationTransactionModel item)
 	{
 		if (IsBusy)
+			return;
+		if (item is null)
 			return;
 		try
 		{
@@ -593,9 +601,53 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 	{
 		if (IsBusy)
 			return;
+		if (item is null)
+			return;
 		try
 		{
 			IsBusy = true;
+
+			var result = await CurrentPage.DisplayPromptAsync(
+				title: item.ItemCode,
+				message: "Miktarı giriniz",
+				cancel: "Vazgeç",
+				accept: "Tamam",
+				placeholder: item.OutputQuantity.ToString(),
+				keyboard: Keyboard.Numeric
+			);
+
+			if (string.IsNullOrEmpty(result))
+				return;
+
+			var quantity = Convert.ToDouble(result);
+
+			if (quantity < 0)
+			{
+				_userDialogs.ShowToast("Girilen miktar 0'dan küçük olmamalıdır.");
+				return;
+			}
+
+			if (quantity > item.RemainingQuantity)
+			{
+				_userDialogs.ShowToast("Girilen miktar, kalan miktarı geçemez.");
+				return;
+			}
+
+			if (quantity > SelectedSubProductModel?.StockQuantity)
+			{
+				_userDialogs.ShowToast($"Girilen miktar, ilgili ürünün ({SelectedSubProductModel.ProductCode}) stok miktarını {SelectedSubProductModel.StockQuantity} aşmamalıdır.");
+				return;
+			}
+
+			var totalQuantity = LocationTransactions.Where(x => x.LocationReferenceId != item.LocationReferenceId).Sum(x => x.OutputQuantity);
+			if (totalQuantity + quantity > SelectedSubProductModel?.StockQuantity)
+			{
+				_userDialogs.ShowToast($"Toplam girilen miktar, ilgili ürünün ({SelectedSubProductModel.ProductCode}) stok miktarını ({SelectedSubProductModel.StockQuantity}) aşmamalıdır.");
+				return;
+			}
+
+			item.OutputQuantity = quantity;
+
 		}
 		catch (Exception ex)
 		{
@@ -751,9 +803,34 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 	{
 		if (IsBusy)
 			return;
+		if (InputOutsourceTransferV2BasketModel is null)
+			return;
 		try
 		{
 			IsBusy = true;
+
+			var confirm = await _userDialogs.ConfirmAsync("İşlemi iptal etmek istediğinize emin misiniz?", "Onay", "Evet", "Hayır");
+			if (!confirm)
+				return;
+
+			if(InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.Details is not null)
+			{
+				InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.Details.Clear();
+			}
+			
+			InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel = null;
+
+			foreach (var item in InputOutsourceTransferV2BasketModel.InputOutsourceTransferSubProducts)
+			{
+				item.Details.Clear();
+			}
+
+			InputOutsourceTransferV2BasketModel.InputOutsourceTransferSubProducts.Clear();
+
+			SelectedSubProductModel = null;
+			LocationTransactions.Clear();
+
+			InputOutsourceTransferV2BasketModel = null;
 
 			await Shell.Current.GoToAsync("..");
 		}

@@ -160,6 +160,8 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 			var warehouseListViewModel = _serviceProvider.GetRequiredService<InputOutsourceTransferV2WarehouseListViewModel>();
 			var supplierListViewModel = _serviceProvider.GetRequiredService<InputOutsourceTransferV2SupplierListViewModel>();
 			var productListViewModel = _serviceProvider.GetRequiredService<InputOutsourceTransferV2ProductListViewModel>();
+			var locationListViewModel = _serviceProvider.GetRequiredService<InputOutsourceTransferV2MainProductLocationListViewModel>();
+			var basketViewModel = _serviceProvider.GetRequiredService<InputOutsourceTransferV2BasketViewModel>();
 
 			if(warehouseListViewModel is not null && warehouseListViewModel.SelectedWarehouseModel is not null)
 			{
@@ -178,6 +180,30 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 				productListViewModel.SelectedOutsourceProductModel.IsSelected = false;
 				productListViewModel.SelectedOutsourceProductModel = null;
 			}
+
+			if(locationListViewModel is not null)
+			{
+				locationListViewModel.SelectedItems.Clear();
+			}
+
+			if(basketViewModel is not null && basketViewModel.InputOutsourceTransferV2BasketModel is not null)
+			{
+				basketViewModel.InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.Details.Clear();
+				basketViewModel.InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel = null;
+
+				foreach (var item in basketViewModel.InputOutsourceTransferV2BasketModel.InputOutsourceTransferSubProducts)
+				{
+					item.Details.Clear();
+				}
+
+				basketViewModel.InputOutsourceTransferV2BasketModel.InputOutsourceTransferSubProducts.Clear();
+
+				basketViewModel.SelectedSubProductModel = null;
+				basketViewModel.LocationTransactions.Clear();
+				
+				basketViewModel.InputOutsourceTransferV2BasketModel = null;
+			}
+
 
 		}
 		catch (Exception ex)
