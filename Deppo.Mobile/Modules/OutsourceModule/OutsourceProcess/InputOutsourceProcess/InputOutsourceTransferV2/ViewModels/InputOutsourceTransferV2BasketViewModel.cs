@@ -120,7 +120,7 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 				ProductCode = "Y.1246",
 				ProductName = "Amortisör",
 				IsVariant = false,
-				LocTracking = 1,
+				LocTracking = 0,
 				StockQuantity = 67,
 				WarehouseNumber = 2,
 				WarehouseName = "Sevkiyat",
@@ -150,9 +150,7 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 			foreach (var item in subProducts)
             {
 				InputOutsourceTransferV2BasketModel.InputOutsourceTransferSubProducts.Add(item);
-
 			}
-
 
             if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
@@ -742,8 +740,6 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 		try
 		{
 			IsBusy = true;
-
-			Console.WriteLine(InputOutsourceTransferV2BasketModel);
 
 			if(InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.LocTracking == 1 && InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity == 0)
 			{

@@ -66,7 +66,7 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
-			//CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
+			CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
 		}
 		catch (Exception ex)
 		{
@@ -89,7 +89,7 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
-			//CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
+			CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
 		}
 		catch (Exception ex)
 		{
@@ -113,8 +113,15 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var confirm = await _userDialogs.ConfirmAsync("Kaydetmek istediğinize emin misiniz?", "Onay", "Evet", "Hayır");
+			if (!confirm)
+				return;
 
+			_userDialogs.Loading("Kaydediliyor...");
+			await Task.Delay(500);
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			// TODO: Insert işlemi
 		}
 		catch (Exception ex)
 		{
@@ -137,7 +144,11 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
+			var confirm = await _userDialogs.ConfirmAsync("Form verileriniz silinecektir. Devam etmek istediğinize emin misiniz?", "Onay", "Evet", "Hayır");
+			if (!confirm)
+				return;
 
+			await ClearFormAsync();
 			await Shell.Current.GoToAsync("..");
 		}
 		catch (Exception ex)
