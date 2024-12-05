@@ -100,7 +100,14 @@ public partial class TransferOutProductListViewModel : BaseViewModel
             Items.Clear();
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, search: SearchText.Text);
+            var result = await _warehouseTotalService.GetObjects(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                warehouseNumber: WarehouseModel.Number, 
+                search: SearchText.Text,
+                skip: 0,
+                take: 20);
 
             if (result.IsSuccess)
             {
@@ -150,7 +157,14 @@ public partial class TransferOutProductListViewModel : BaseViewModel
 
             _userDialogs.Loading("Loading More Items...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: Items.Count, take: 20, search: SearchText.Text);
+            var result = await _warehouseTotalService.GetObjects(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                warehouseNumber: WarehouseModel.Number, 
+                skip: Items.Count, 
+                take: 20, 
+                search: SearchText.Text);
 
             if (result.IsSuccess)
             {
@@ -519,7 +533,7 @@ public partial class TransferOutProductListViewModel : BaseViewModel
             IsBusy = true;
             Items.Clear();
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, search: SearchText.Text);
+            var result = await _warehouseTotalService.GetObjects(httpClient, firmNumber: _httpClientService.FirmNumber, periodNumber: _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, search: SearchText.Text, skip: 0, take: 20);
 
             if (result.IsSuccess)
             {
@@ -534,11 +548,9 @@ public partial class TransferOutProductListViewModel : BaseViewModel
                     Items.Add(item);
                 }
             }
-            if (!result.IsSuccess)
-            {
-                _userDialogs.Alert(result.Message, "Hata");
-                return;
-            }
+
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (System.Exception ex)
         {
