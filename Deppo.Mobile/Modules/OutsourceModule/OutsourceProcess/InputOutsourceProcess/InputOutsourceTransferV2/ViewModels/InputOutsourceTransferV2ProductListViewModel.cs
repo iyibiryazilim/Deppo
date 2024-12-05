@@ -298,6 +298,10 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 			SelectedOutsourceProductModel.InputQuantity = (SelectedOutsourceProductModel.LocTracking == 0) ? 1 : 0;
 			inputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel = SelectedOutsourceProductModel;
 
+			if(inputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.Details is null)
+			{
+				inputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.Details = new();
+			}
 
 			await Shell.Current.GoToAsync($"{nameof(InputOutsourceTransferV2BasketView)}", new Dictionary<string, object>
 			{
