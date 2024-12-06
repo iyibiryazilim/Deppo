@@ -167,8 +167,8 @@
 
                                         <Grid ColumnDefinitions="Auto, Auto, Auto" ColumnSpacing="5">
                                             <Label Grid.Column="0"
-                                                   ToolTipProperties.Text="Stok Miktarı"
                                                    TextColor="{StaticResource Gray600}"
+                                                   ToolTipProperties.Text="Stok Miktarı"
                                                    VerticalOptions="Center">
                                                 <Label.FormattedText>
                                                     <FormattedString>
@@ -190,7 +190,7 @@
 
                                             <Label Grid.Column="1"
                                                    TextColor="{StaticResource Gray600}"
-                                                    ToolTipProperties.Text="Toplam Çarpan Miktarı"
+                                                   ToolTipProperties.Text="Toplam Çarpan Miktarı"
                                                    VerticalOptions="Center">
                                                 <Label.FormattedText>
                                                     <FormattedString>
@@ -200,15 +200,15 @@
                                                               TextColor="{StaticResource Primary}" />
                                                         <Span Text=" " />
                                                         <Span FontAttributes="Bold"
-                                                              Text="{Binding TotalQuantityWithQuotient, StringFormat='{0:N2}'}"
+                                                              Text="{Binding TotalBOMQuantity, StringFormat='{0:N2}'}"
                                                               TextColor="{StaticResource Primary}" />
                                                     </FormattedString>
                                                 </Label.FormattedText>
                                             </Label>
 
                                             <Label Grid.Column="2"
-                                                   ToolTipProperties.Text="Çarpan"
                                                    TextColor="{StaticResource Gray600}"
+                                                   ToolTipProperties.Text="Çarpan"
                                                    VerticalOptions="Center">
                                                 <Label.FormattedText>
                                                     <FormattedString>
@@ -218,7 +218,7 @@
                                                               TextColor="{StaticResource Primary}" />
                                                         <Span Text="" />
                                                         <Span FontAttributes="Bold"
-                                                              Text="{Binding QuotientQuantity, StringFormat='{0:N1}'}"
+                                                              Text="{Binding BOMQuantity, StringFormat='{0:N1}'}"
                                                               TextColor="{StaticResource Primary}" />
                                                     </FormattedString>
                                                 </Label.FormattedText>

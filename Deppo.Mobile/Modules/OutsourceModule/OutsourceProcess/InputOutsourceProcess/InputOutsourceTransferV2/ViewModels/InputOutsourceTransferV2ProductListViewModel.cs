@@ -20,7 +20,6 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 {
 	private readonly IHttpClientService _httpClientService;
 	private readonly IUserDialogs _userDialogs;
-	private readonly IProductService _productService;
 	private readonly IInputOutsourceTransferV2ProductService _inputOutsourceTransferV2ProductService;
 
 	[ObservableProperty]
