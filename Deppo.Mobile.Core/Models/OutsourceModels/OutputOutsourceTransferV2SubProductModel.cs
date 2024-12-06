@@ -14,8 +14,8 @@ namespace Deppo.Mobile.Core.Models.OutsourceModels
         //[ObservableProperty]
         //private int referenceId;
 
-        //[ObservableProperty]
-        //private int productReferenceId;
+        [ObservableProperty]
+        private int productReferenceId;
 
         [ObservableProperty]
         private string productCode = string.Empty;
@@ -78,22 +78,13 @@ namespace Deppo.Mobile.Core.Models.OutsourceModels
         private double stockQuantity = default;
 
         [ObservableProperty]
-        private string locTrackingIcon;
+        bool isVariant;
 
         [ObservableProperty]
-        private string locTrackingIconColor;
+        int trackingType;
 
         [ObservableProperty]
-        private string variantIcon;
-
-        [ObservableProperty]
-        private string variantIconColor;
-
-        [ObservableProperty]
-        private string trackingTypeIcon;
-
-        [ObservableProperty]
-        private string trackingTypeIconColor;
+        int locTracking;
 
         [ObservableProperty]
         public bool _isSelected;
@@ -119,6 +110,17 @@ namespace Deppo.Mobile.Core.Models.OutsourceModels
 
         [ObservableProperty]
         private ObservableCollection<LocationModel> locations = new();
+
+        public string LocTrackingIcon => "location-dot";
+        public string LocTrackingIconColor => LocTracking == 1 ? "#F5004F" : "#C8C8C8";
+
+        public string VariantIcon => "bookmark";
+        public string VariantIconColor => IsVariant ? "#F5004F" : "#C8C8C8";
+
+        public string TrackingTypeIcon => "box-archive";
+        public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
+
+        public List<OutputOutsourceTransferSubProductDetailModel> Details { get; set; } = new();
 
     }
 }

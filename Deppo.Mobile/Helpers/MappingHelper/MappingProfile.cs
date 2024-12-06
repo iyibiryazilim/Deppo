@@ -122,5 +122,9 @@ public class MappingProfile : Profile
         CreateMap<InputOutsourceTransferProductModel, dynamic>();
         CreateMap<OutputOutsourceTransferV2ProductModel, dynamic>();
         CreateMap<InputOutsourceTransferSubProductModel, dynamic>();
-	}
+        CreateMap<OutputOutsourceTransferV2SubProductModel, dynamic>();
+
+        
+
+    }
 }
