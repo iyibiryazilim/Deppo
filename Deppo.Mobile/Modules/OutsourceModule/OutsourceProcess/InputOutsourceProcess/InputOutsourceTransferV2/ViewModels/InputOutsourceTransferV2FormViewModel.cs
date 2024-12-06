@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using DevExpress.Maui.Controls;
@@ -11,11 +12,16 @@ using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransferV2.ViewModels;
 
+
+[QueryProperty(name: nameof(InputOutsourceTransferV2BasketModel), queryId: nameof(InputOutsourceTransferV2BasketModel))]
 public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 {
 	private readonly IHttpClientService _httpClientService;
 	private readonly IUserDialogs _userDialogs;
 	private readonly IServiceProvider _serviceProvider;
+
+	[ObservableProperty]
+	InputOutsourceTransferV2BasketModel? inputOutsourceTransferV2BasketModel;
 
 
 	[ObservableProperty]
@@ -60,7 +66,7 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
-			//CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
+			CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
 		}
 		catch (Exception ex)
 		{
@@ -83,7 +89,7 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
-			//CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
+			CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
 		}
 		catch (Exception ex)
 		{
@@ -107,8 +113,15 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
-			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			var confirm = await _userDialogs.ConfirmAsync("Kaydetmek istediğinize emin misiniz?", "Onay", "Evet", "Hayır");
+			if (!confirm)
+				return;
 
+			_userDialogs.Loading("Kaydediliyor...");
+			await Task.Delay(500);
+
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+			// TODO: Insert işlemi
 		}
 		catch (Exception ex)
 		{
@@ -131,7 +144,11 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
+			var confirm = await _userDialogs.ConfirmAsync("Form verileriniz silinecektir. Devam etmek istediğinize emin misiniz?", "Onay", "Evet", "Hayır");
+			if (!confirm)
+				return;
 
+			await ClearFormAsync();
 			await Shell.Current.GoToAsync("..");
 		}
 		catch (Exception ex)
@@ -154,6 +171,8 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 			var warehouseListViewModel = _serviceProvider.GetRequiredService<InputOutsourceTransferV2WarehouseListViewModel>();
 			var supplierListViewModel = _serviceProvider.GetRequiredService<InputOutsourceTransferV2SupplierListViewModel>();
 			var productListViewModel = _serviceProvider.GetRequiredService<InputOutsourceTransferV2ProductListViewModel>();
+			var locationListViewModel = _serviceProvider.GetRequiredService<InputOutsourceTransferV2MainProductLocationListViewModel>();
+			var basketViewModel = _serviceProvider.GetRequiredService<InputOutsourceTransferV2BasketViewModel>();
 
 			if(warehouseListViewModel is not null && warehouseListViewModel.SelectedWarehouseModel is not null)
 			{
@@ -172,6 +191,30 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 				productListViewModel.SelectedOutsourceProductModel.IsSelected = false;
 				productListViewModel.SelectedOutsourceProductModel = null;
 			}
+
+			if(locationListViewModel is not null)
+			{
+				locationListViewModel.SelectedItems.Clear();
+			}
+
+			if(basketViewModel is not null && basketViewModel.InputOutsourceTransferV2BasketModel is not null)
+			{
+				basketViewModel.InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.Details.Clear();
+				basketViewModel.InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel = null;
+
+				foreach (var item in basketViewModel.InputOutsourceTransferV2BasketModel.InputOutsourceTransferSubProducts)
+				{
+					item.Details.Clear();
+				}
+
+				basketViewModel.InputOutsourceTransferV2BasketModel.InputOutsourceTransferSubProducts.Clear();
+
+				basketViewModel.SelectedSubProductModel = null;
+				basketViewModel.LocationTransactions.Clear();
+				
+				basketViewModel.InputOutsourceTransferV2BasketModel = null;
+			}
+
 
 		}
 		catch (Exception ex)

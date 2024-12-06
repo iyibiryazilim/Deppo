@@ -509,8 +509,9 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
                 }
 
                 SelectedItems.Clear();
+				SearchText.Text = string.Empty;
 
-                await Shell.Current.GoToAsync("..");
+				await Shell.Current.GoToAsync("..");
             }
         }
         catch (Exception ex)
@@ -545,6 +546,8 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
                 }
                 SelectedProducts.Clear();
             }
+
+            SearchText.Text = string.Empty;
             await Shell.Current.GoToAsync("..");
         }
         catch (Exception ex)

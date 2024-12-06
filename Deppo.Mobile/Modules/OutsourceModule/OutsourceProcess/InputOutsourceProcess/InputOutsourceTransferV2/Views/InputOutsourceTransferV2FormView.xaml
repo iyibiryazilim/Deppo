@@ -107,5 +107,15 @@
                 Command="{Binding SaveCommand}"
                 Text="Kaydet"
                 VerticalOptions="End" />
+
+        <dx:BottomSheet x:Name="basketItemBottomSheet"
+                        AllowDismiss="True"
+                        BackgroundColor="{StaticResource White}"
+                        CornerRadius="15"
+                        HalfExpandedRatio="0.5"
+                        IsModal="True"
+                        ShowGrabber="True">
+            
+        </dx:BottomSheet>
     </Grid>
 </ContentPage>

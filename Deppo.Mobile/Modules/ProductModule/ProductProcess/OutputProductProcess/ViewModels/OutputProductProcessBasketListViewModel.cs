@@ -575,8 +575,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 		try
 		{
 			_userDialogs.ShowLoading("Load Location Items...");
-			await Task.Delay(1000);
 			LocationTransactions.Clear();
+			await Task.Delay(1000);
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(
