@@ -88,25 +88,64 @@
                                 <Label LineBreakMode="TailTruncation"
                                        Text="{Binding ProductName}"
                                        TextColor="{StaticResource Gray600}" />
+                                <HorizontalStackLayout Spacing="8">
+                                    <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center" ToolTipProperties.Text="Stok Miktarı">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span FontAttributes="Bold"
+                                                      FontFamily="FAS"
+                                                      Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                      TextColor="{StaticResource Primary}" />
+                                                <Span Text=" " />
+                                                <Span FontAttributes="Bold"
+                                                      Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                                      TextColor="{StaticResource Primary}" />
+                                                <Span Text=" " />
+                                                <Span FontAttributes="Bold"
+                                                      Text="{Binding SubUnitsetCode}"
+                                                      TextColor="{StaticResource Primary}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
 
-                                <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
-                                    <Label.FormattedText>
-                                        <FormattedString>
-                                            <Span FontAttributes="Bold"
-                                                  FontFamily="FAS"
-                                                  Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                                                  TextColor="{StaticResource Primary}" />
-                                            <Span Text=" " />
-                                            <Span FontAttributes="Bold"
-                                                  Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
-                                                  TextColor="{StaticResource Primary}" />
-                                            <Span Text=" " />
-                                            <Span FontAttributes="Bold"
-                                                  Text="{Binding SubUnitsetCode}"
-                                                  TextColor="{StaticResource Primary}" />
-                                        </FormattedString>
-                                    </Label.FormattedText>
-                                </Label>
+                                    <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center" ToolTipProperties.Text="Planlanan Miktar">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span FontAttributes="Bold"
+                                                      FontFamily="FAS"
+                                                      Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                      TextColor="{StaticResource Primary}" />
+                                                <Span Text=" " />
+                                                <Span FontAttributes="Bold"
+                                                      Text="{Binding PlanningQuantity, StringFormat='{0:N2}'}"
+                                                      TextColor="{StaticResource Primary}" />
+                                                <Span Text=" " />
+                                                <Span FontAttributes="Bold"
+                                                      Text="{Binding SubUnitsetCode}"
+                                                      TextColor="{StaticResource Primary}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+
+                                    <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center" ToolTipProperties.Text="Gerçekleşen Miktar">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span FontAttributes="Bold"
+                                                      FontFamily="FAS"
+                                                      Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                      TextColor="{StaticResource Primary}" />
+                                                <Span Text=" " />
+                                                <Span FontAttributes="Bold"
+                                                      Text="{Binding ActualQuantity, StringFormat='{0:N2}'}"
+                                                      TextColor="{StaticResource Primary}" />
+                                                <Span Text=" " />
+                                                <Span FontAttributes="Bold"
+                                                      Text="{Binding SubUnitsetCode}"
+                                                      TextColor="{StaticResource Primary}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </HorizontalStackLayout>
                             </VerticalStackLayout>
 
                             <Grid Grid.Column="2"

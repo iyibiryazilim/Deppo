@@ -22,6 +22,15 @@ public partial class InputOutsourceTransferProductModel : ObservableObject
 	int productionReferenceId = default;
 
 	[ObservableProperty]
+	DateTime? planningStartDate;
+
+	[ObservableProperty]
+	DateTime? planningEndDate;
+
+	[ObservableProperty]
+	DateTime? actualStartDate;
+
+	[ObservableProperty]
 	int productReferenceId = default;
 
 	[ObservableProperty]
@@ -74,6 +83,13 @@ public partial class InputOutsourceTransferProductModel : ObservableObject
 
 	[ObservableProperty]
 	double stockQuantity = default;
+
+	[ObservableProperty]
+	int warehouseNumber;
+
+	[ObservableProperty]
+	string warehouseName = string.Empty;
+
 
 	[ObservableProperty]
 	string image = string.Empty;
