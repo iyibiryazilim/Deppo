@@ -150,7 +150,7 @@
                                         <Image Grid.Column="0"
                                                HeightRequest="50"
                                                Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
-                                               WidthRequest="50" />
+                                               WidthRequest="60" />
                                     </Border>
                                     <!--#endregion-->
 
@@ -164,6 +164,11 @@
                                                MaxLines="1"
                                                Text="{Binding ProductName}"
                                                TextColor="{StaticResource Gray600}" />
+
+                                        <Label LineBreakMode="TailTruncation"
+                                               MaxLines="1"
+                                               Text="{Binding WarehouseName}"
+                                               TextColor="{StaticResource Gray500}" />
 
                                         <Grid ColumnDefinitions="Auto, Auto, Auto" ColumnSpacing="5">
                                             <Label Grid.Column="0"
@@ -253,9 +258,18 @@
                                                    TextColor="{Binding TrackingTypeIconColor}" />
                                         </Grid>
 
-                                        <Grid ColumnDefinitions="Auto,Auto,Auto"
+                                        <Label FontAttributes="Bold"
+                                               FontSize="Large"
+                                               Text="{Binding OutputQuantity}"
+                                               TextColor="{StaticResource OffBlack}"
+                                               HorizontalOptions="EndAndExpand"
+                                               VerticalOptions="CenterAndExpand"/>
+
+
+                                        <!--<Grid ColumnDefinitions="Auto,Auto,Auto"
                                               ColumnSpacing="10"
-                                              HorizontalOptions="Center">
+                                              VerticalOptions="End"
+                                              HorizontalOptions="End">
                                             <Border Grid.Column="0"
                                                     Padding="5"
                                                     BackgroundColor="Transparent"
@@ -274,7 +288,7 @@
                                                    FontSize="Large"
                                                    Text="{Binding OutputQuantity}"
                                                    TextColor="{StaticResource OffBlack}"
-                                                   VerticalOptions="Center">
+                                                   VerticalOptions="End">
                                                 <Label.GestureRecognizers>
                                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputOutsourceTransferV2BasketViewModel}}, Path=SubProductQuantityTappedCommand}" CommandParameter="{Binding .}" />
                                                 </Label.GestureRecognizers>
@@ -292,7 +306,7 @@
                                                        Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
                                                        TextColor="{StaticResource White}" />
                                             </Border>
-                                        </Grid>
+                                        </Grid>-->
                                     </VerticalStackLayout>
 
 
