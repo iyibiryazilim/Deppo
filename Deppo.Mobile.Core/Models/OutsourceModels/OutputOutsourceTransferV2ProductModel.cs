@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
 using Deppo.Mobile.Core.Models.ProductModels;
 using System;
 using System.Collections.Generic;
@@ -120,21 +121,7 @@ namespace Deppo.Mobile.Core.Models.OutsourceModels
         public string TrackingTypeIcon => "box-archive";
         public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        public List<OutputOutsourceTransferProductDetailModel> Details { get; set; } = new();
 
 
 

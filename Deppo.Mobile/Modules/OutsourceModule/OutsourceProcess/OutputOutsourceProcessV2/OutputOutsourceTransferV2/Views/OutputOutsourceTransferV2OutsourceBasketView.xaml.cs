@@ -10,7 +10,8 @@ public partial class OutputOutsourceTransferV2OutsourceBasketView : ContentPage
 		InitializeComponent();
 		_viewModel = viewModel;
 		BindingContext = _viewModel;
-		_viewModel.CurrentPage = this;
+        
+        _viewModel.CurrentPage = this;
 		
 		
 	}

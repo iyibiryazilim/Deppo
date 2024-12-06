@@ -11,7 +11,7 @@
              Shell.TabBarIsVisible="False"
              >
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding .}"
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
                                     EventName="Loaded" />
     </ContentPage.Behaviors>
     <ContentPage.Resources>
@@ -41,7 +41,7 @@
                         <Border StrokeShape="RoundRectangle 5" StrokeThickness="0.5" Grid.Column="1" BackgroundColor="{StaticResource Primary}">
                             <Image Grid.Column="0" HeightRequest="100" WidthRequest="50"
 
-Source="{Binding OutputOutsourceTransferV2ProductModel.ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+Source="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
  />
                         </Border>
                         <Grid Grid.Column="2"
@@ -52,18 +52,18 @@ VerticalOptions="Start">
              <Label Grid.Column="0"
      FontFamily="FAS"
      FontSize="12"
-     Text="{Binding OutputOutsourceTransferV2ProductModel.VariantIcon}"
-     TextColor="{Binding OutputOutsourceTransferV2ProductModel.VariantIconColor}" />
+     Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.VariantIcon}"
+     TextColor="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.VariantIconColor}" />
              <Label Grid.Column="1"
      FontFamily="FAS"
      FontSize="12"
-     Text="{Binding OutputOutsourceTransferV2ProductModel.LocTrackingIcon}"
-     TextColor="{Binding OutputOutsourceTransferV2ProductModel.LocTrackingIconColor}" />
+     Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.LocTrackingIcon}"
+     TextColor="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.LocTrackingIconColor}" />
              <Label Grid.Column="2"
      FontFamily="FAS"
      FontSize="12"
-     Text="{Binding OutputOutsourceTransferV2ProductModel.TrackingTypeIcon}"
-     TextColor="{Binding OutputOutsourceTransferV2ProductModel.TrackingTypeIconColor}" />
+     Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.TrackingTypeIcon}"
+     TextColor="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.TrackingTypeIconColor}" />
          </Grid>
 
                     </Grid>
@@ -71,9 +71,9 @@ VerticalOptions="Start">
                         <Label FontAttributes="Bold" HorizontalOptions="Center"
                                LineBreakMode="TailTruncation"
                                FontSize="17"
-                               Text="{Binding OutputOutsourceTransferV2ProductModel.ProductCode}" />
+                               Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.ProductCode}" />
                         <Label LineBreakMode="TailTruncation" HorizontalOptions="Center"
-                               Text="{Binding OutputOutsourceTransferV2ProductModel.ProductName}"
+                               Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.ProductName}"
                                FontSize="15"
                                TextColor="{StaticResource Gray600}" />
 
@@ -86,8 +86,8 @@ VerticalOptions="Start">
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferV2OutsourceBasketViewModel}}, Path=DecreaseCommand}" />
                                 </Border.GestureRecognizers>
                             </Border>
-                            
-                            <Label Grid.Column="1" FontAttributes="Bold" FontSize="Large" HorizontalOptions="Center" Text="{Binding OutputOutsourceTransferV2ProductModel.Quantity}" TextColor="{StaticResource OffBlack}" VerticalOptions="Center" />
+
+                            <Label Grid.Column="1" FontAttributes="Bold" FontSize="Large" HorizontalOptions="Center" Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity}" TextColor="{StaticResource OffBlack}" VerticalOptions="Center" />
                             
                             <Border Grid.Column="2" Padding="5" BackgroundColor="{StaticResource Secondary}" Stroke="{StaticResource Secondary}" StrokeShape="RoundRectangle 2">
                                 <Label FontFamily="FAS" FontSize="Medium" HorizontalOptions="Center" Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}" TextColor="{StaticResource White}" VerticalOptions="Center" />
@@ -146,7 +146,7 @@ Text="Sarf Edilecek Ürünler" />
 
         </Border>
 
-        <CarouselView ItemsSource="{Binding SelectedProduct.SubProducts}" Grid.Row="2" Margin="5" IndicatorView="indicatorView" VerticalOptions="End" >
+        <CarouselView ItemsSource="{Binding SubProducts}" Grid.Row="2" Margin="5" IndicatorView="indicatorView" VerticalOptions="End" >
                 <CarouselView.ItemTemplate>
                 <DataTemplate x:DataType="subProduct:OutputOutsourceTransferV2SubProductModel">
                         <StackLayout Spacing="10" VerticalOptions="Center">

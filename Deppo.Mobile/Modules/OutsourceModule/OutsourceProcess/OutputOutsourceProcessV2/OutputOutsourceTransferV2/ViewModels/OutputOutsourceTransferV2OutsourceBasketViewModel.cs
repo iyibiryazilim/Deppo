@@ -22,32 +22,22 @@ using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcessV2.OutputOutsourceTransferV2.ViewModels
 {
-    [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
-    [QueryProperty(name: nameof(OutsourceModel), queryId: nameof(OutsourceModel))]
-    [QueryProperty(name: nameof(ShipAddressModel), queryId: nameof(ShipAddressModel))]
-    [QueryProperty(name: nameof(OutputOutsourceTransferV2ProductModel), queryId: nameof(OutputOutsourceTransferV2ProductModel))]
 
-    public partial class OutputOutsourceTransferV2OutsourceBasketViewModel :BaseViewModel    
+
+    [QueryProperty(name: nameof(OutputOutsourceTransferV2BasketModel), queryId: nameof(OutputOutsourceTransferV2BasketModel))]
+
+    public partial class OutputOutsourceTransferV2OutsourceBasketViewModel : BaseViewModel
     {
 
         private readonly IHttpClientService _httpClientService;
         private readonly IUserDialogs _userDialogs;
         private readonly ILocationTransactionService _locationTransactionService;
-       
+        private readonly IOutputOutsourceTransferV2Service _outputOutsourceTransferV2Service;
         private readonly IProductService _productService;
-        
+
 
         [ObservableProperty]
-        WarehouseModel? warehouseModel;
-
-        [ObservableProperty]
-        OutsourceModel? outsourceModel;
-
-        [ObservableProperty]
-        ShipAddressModel? shipAddressModel;
-
-        [ObservableProperty]
-        OutputOutsourceTransferV2ProductModel? outputOutsourceTransferV2ProductModel;
+        OutputOutsourceTransferV2BasketModel? outputOutsourceTransferV2BasketModel;
 
         [ObservableProperty]
         private OutputOutsourceTransferV2ProductModel selectedProduct;
@@ -77,44 +67,47 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
 
 
 
-        public OutputOutsourceTransferV2OutsourceBasketViewModel(IHttpClientService httpClientService,IUserDialogs userDialogs, ILocationTransactionService locationTransactionService)
+        public OutputOutsourceTransferV2OutsourceBasketViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ILocationTransactionService locationTransactionService, IOutputOutsourceTransferV2Service outputOutsourceTransferV2Service)
         {
             _httpClientService = httpClientService;
             _userDialogs = userDialogs;
             _locationTransactionService = locationTransactionService;
-           
+            _outputOutsourceTransferV2Service = outputOutsourceTransferV2Service;
+
             Title = "Ürün - Reçete";
 
 
             IncreaseCommand = new Command(async () => await IncreaseAsync());
             DecreaseCommand = new Command(async () => await DecreaseAsync());
             NextViewCommand = new Command(async () => await NextViewAsync());
-                BackCommand = new Command(async () => await BackAsync());
+            BackCommand = new Command(async () => await BackAsync());
 
-            SelectedProduct = new OutputOutsourceTransferV2ProductModel();
-            SelectedProduct.SubProducts.Add(new OutputOutsourceTransferV2SubProductModel
-            {
-                ProductCode = "Code1",
-                ProductName = "Name1",
-                Quantity = 3
+            LoadItemsCommand = new Command(async () => await LoadItemsAsync());
 
-            });
-            SelectedProduct.SubProducts.Add(new OutputOutsourceTransferV2SubProductModel
-            {
-                ProductCode = "Code2",
-                ProductName = "Name2",
-                Quantity = 2
+            //SelectedProduct = new OutputOutsourceTransferV2ProductModel();
+            //SelectedProduct.SubProducts.Add(new OutputOutsourceTransferV2SubProductModel
+            //{
+            //    ProductCode = "Code1",
+            //    ProductName = "Name1",
+            //    Quantity = 3
 
-            });
-            SelectedProduct.SubProducts.Add(new OutputOutsourceTransferV2SubProductModel
-            {
-                ProductCode = "Code3",
-                ProductName = "Name3",
-                Quantity = 4
+            //});
+            //SelectedProduct.SubProducts.Add(new OutputOutsourceTransferV2SubProductModel
+            //{
+            //    ProductCode = "Code2",
+            //    ProductName = "Name2",
+            //    Quantity = 2
 
-            });
+            //});
+            //SelectedProduct.SubProducts.Add(new OutputOutsourceTransferV2SubProductModel
+            //{
+            //    ProductCode = "Code3",
+            //    ProductName = "Name3",
+            //    Quantity = 4
 
-            Console.WriteLine($"SubProducts Count: {SelectedProduct.SubProducts.Count}");
+            //});
+
+            //Console.WriteLine($"SubProducts Count: {SelectedProduct.SubProducts.Count}");
 
 
 
@@ -126,33 +119,94 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
         public Command NextViewCommand { get; }
         public Command BackCommand { get; }
 
+        public Command LoadItemsCommand { get; }
 
-        
-      
+
+        private async Task LoadItemsAsync()
+        {
+            if (OutputOutsourceTransferV2BasketModel is null)
+                return;
+
+            if (IsBusy)
+                return;
+
+            try
+            {
+                IsBusy = true;
+                _userDialogs.Loading("Yükleniyor...");
+                OutputOutsourceTransferV2BasketModel?.OutputOutsourceTransferSubProducts?.Clear();
+                await Task.Delay(1000);
+                var httpClient = _httpClientService.GetOrCreateHttpClient();
+                var result = await _outputOutsourceTransferV2Service.GetObjectSubProducts(httpClient,
+                    firmNumber: _httpClientService.FirmNumber,
+                    periodNumber: _httpClientService.PeriodNumber,
+                    productReferenceId: OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.ProductReferenceId,
+                    search: "",
+                    skip: 0,
+                    take: 20
+
+                    );
+
+                if (result.IsSuccess)
+                {
+                    if (result.Data is null)
+                        return;
+
+                    foreach (var product in result.Data)
+                    {
+                        var item = Mapping.Mapper.Map<OutputOutsourceTransferV2SubProductModel>(product);
+                        var matchedItem = SubProducts.FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId);
+                        if (matchedItem is not null)
+                            item.IsSelected = matchedItem.IsSelected;
+                        else
+                            item.IsSelected = false;
+
+                        SubProducts.Add(item);
+                    }
+                }
+
+
+                _userDialogs.Loading().Hide();
+
+
+
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
 
 
         private async Task IncreaseAsync()
         {
-            if (OutputOutsourceTransferV2ProductModel is null)
+            if (OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel is null)
                 return;
             if (IsBusy)
                 return;
 
             try
             {
-                if(OutputOutsourceTransferV2ProductModel is not null)
+                if (OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel is not null)
                 {
-                    if (OutputOutsourceTransferV2ProductModel.Quantity >=0)
+                    if (OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity >= 0)
                     {
-                        OutputOutsourceTransferV2ProductModel.Quantity++;
-                        foreach (var subProduct in SelectedProduct.SubProducts)
+                        OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity++;
+                        foreach (var subProduct in SubProducts)
                         {
-                            subProduct.Quantity = subProduct.BomQuantity * SelectedProduct.Quantity;
+                            subProduct.Quantity = subProduct.BomQuantity * OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity;
                         }
                     }
                     else
                     {
-                        
+
                     }
                 }
 
@@ -181,15 +235,15 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
 
             try
             {
-                if (OutputOutsourceTransferV2ProductModel is not null)
+                if (OutputOutsourceTransferV2BasketModel is not null)
                 {
-                    if (OutputOutsourceTransferV2ProductModel.Quantity == 0)
+                    if (OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity == 0)
                     {
                         await _userDialogs.AlertAsync("Girilen miktar 0'dan küçük olmamalıdır.", "Hata", "Tamam");
                     }
                     else
                     {
-                        OutputOutsourceTransferV2ProductModel.Quantity--;
+                        OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity--;
                     }
                 }
 
@@ -211,10 +265,10 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
         {
             if (IsBusy)
                 return;
-            
-           
 
-            if (OutputOutsourceTransferV2ProductModel is null && WarehouseModel is null && OutsourceModel is null)
+
+
+            if (OutputOutsourceTransferV2BasketModel is null && OutputOutsourceTransferV2BasketModel.OutsourceWarehouseModel is null && OutputOutsourceTransferV2BasketModel.OutsourceModel is null)
                 return;
             try
             {
@@ -222,10 +276,8 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
 
                 await Shell.Current.GoToAsync($"{nameof(OutputOutsourceTransferV2OutsourceFormView)}", new Dictionary<string, object>
                 {
-                    [nameof(WarehouseModel)] = WarehouseModel,
-                    [nameof(OutsourceModel)] = OutsourceModel,
-                    [nameof(ShipAddressModel)]= ShipAddressModel,
-                    [nameof(InputOutsourceTransferProductModel)] = OutputOutsourceTransferV2ProductModel
+                    [nameof(OutputOutsourceTransferV2BasketModel)] = OutputOutsourceTransferV2BasketModel,
+
                 });
 
             }
@@ -252,14 +304,14 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
                 IsBusy = true;
 
 
-                if (OutputOutsourceTransferV2ProductModel is not null)
+                if (OutputOutsourceTransferV2BasketModel is not null)
                 {
-                    OutputOutsourceTransferV2ProductModel.IsSelected = false;
-                    OutputOutsourceTransferV2ProductModel = null;
+                    OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.IsSelected = false;
+                    OutputOutsourceTransferV2BasketModel = null;
                 }
 
 
-               
+
 
                 await Shell.Current.GoToAsync("..");
             }

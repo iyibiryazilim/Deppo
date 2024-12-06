@@ -9,6 +9,7 @@ using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransferV2.Views;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcessV2.OutputOutsourceTransferV2.Views;
 using DevExpress.Maui.Controls;
 using System;
@@ -385,23 +386,32 @@ public partial class OutputOutsourceTransferV2ProductListViewModel : BaseViewMod
     {
         if (IsBusy)
             return;
+        if (SelectedProduct is null && WarehouseModel is null && SelectedProduct is null)
+            return;
 
         try
         {
             IsBusy = true;
-            Console.Write(SelectedProduct);
 
-            OutputOutsourceTransferV2ProductModel item = new OutputOutsourceTransferV2ProductModel();
-            item.ProductReferenceId = SelectedProduct.ReferenceId;
-            item.ProductCode = SelectedProduct.ProductCode;
+            OutputOutsourceTransferV2BasketModel outputOutsourceTransferV2BasketModel = new();
+
+            outputOutsourceTransferV2BasketModel.OutsourceWarehouseModel = WarehouseModel;
+            outputOutsourceTransferV2BasketModel.OutsourceModel = OutsourceModel;
+
             
+            outputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel = SelectedProduct;
+
+            if (outputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Details is null)
+            {
+                outputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Details = new();
+            }
 
             await Shell.Current.GoToAsync($"{nameof(OutputOutsourceTransferV2OutsourceBasketView)}", new Dictionary<string, object>
             {
-                [nameof(WarehouseModel)] = WarehouseModel,
-                [nameof(OutsourceModel)] = OutsourceModel,
-                [nameof(OutputOutsourceTransferV2ProductModel)] = SelectedProduct
+                [nameof(OutputOutsourceTransferV2BasketModel)] = outputOutsourceTransferV2BasketModel
             });
+
+            SearchText.Text = string.Empty;
         }
         catch (Exception ex)
         {

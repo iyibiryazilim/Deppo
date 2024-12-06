@@ -63,6 +63,56 @@ namespace Deppo.Core.DataStores
             }
         }
 
+        public async Task<DataResult<IEnumerable<dynamic>>> GetObjectSubProducts(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
+        {
+            var content = new StringContent(JsonConvert.SerializeObject(OutsourceSubProductQuery(firmNumber, periodNumber,productReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
+            DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
+            if (responseMessage.IsSuccessStatusCode)
+            {
+                var data = await responseMessage.Content.ReadAsStringAsync();
+                if (data != null)
+                {
+                    if (!string.IsNullOrEmpty(data))
+                    {
+                        var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<dynamic>>>(data);
+
+                        dataResult.Data = result?.Data;
+                        dataResult.IsSuccess = true;
+                        dataResult.Message = "success";
+                        return dataResult;
+                    }
+                    else
+                    {
+                        var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                        dataResult.Data = result?.Data;
+                        dataResult.IsSuccess = true;
+                        dataResult.Message = "empty";
+                        return dataResult;
+                    }
+                }
+                else
+                {
+                    var result = JsonConvert.DeserializeObject<DataResult<IEnumerable<Dictionary<string, object>>>>(data);
+
+                    dataResult.Data = Enumerable.Empty<dynamic>();
+                    dataResult.IsSuccess = false;
+                    dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+
+                    return dataResult;
+                }
+            }
+            else
+            {
+                dataResult.Data = Enumerable.Empty<dynamic>();
+                dataResult.IsSuccess = false;
+                dataResult.Message = await responseMessage.Content.ReadAsStringAsync();
+                return dataResult;
+            }
+        }
+
         private string OutsourceProductQuery(int firmNumber, int periodNumber, int warehouseNumber,int currentReferenceId, string search = "", int skip = 0, int take = 20)
         {
             string baseQuery = $@"SELECT 
@@ -106,6 +156,52 @@ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD WITH(NOLOC
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_OPERTION AS OPR WITH(NOLOCK) ON DISPLINE.OPERATIONREF = OPR.LOGICALREF
 LEFT JOIN L_CAPIWHOUSE AS WAREHOUSE WITH(NOLOCK) ON POLINE.INVENNO = WAREHOUSE.NR AND WAREHOUSE.FIRMNR = {firmNumber}
 WHERE DISPLINE.PRODORDTYP = 2 AND DISPLINE.LINESTATUS = 0 AND POLINE.INVENNO={warehouseNumber} AND CLCARD.LOGICALREF={currentReferenceId}"  ;
+
+            if (!string.IsNullOrEmpty(search))
+                baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%'
+                        OR ITEMS.NAME LIKE '%{search}%')";
+
+            baseQuery += $@" ORDER BY ITEMS.CODE DESC
+                    OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+
+            return baseQuery;
+        }
+
+        private string OutsourceSubProductQuery(int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
+        {
+            string baseQuery = $@"SELECT 
+[ReferenceId] = ITEMS.LOGICALREF,
+[ProductCode] = ITEMS.CODE,
+[ProductName] = ITEMS.NAME,
+[OutWarehouseName] = CLCARD.ININVENNR,
+[InWarehouseName] = CLCARD.OUTINVENNR,
+[OutsourceReferenceId] = CLCARD.LOGICALREF,
+[OutsourceCode] = CLCARD.CODE,
+[OutsourceName] = CLCARD.DEFINITION_,
+[BOMQuantity] = BOMLINE.AMOUNT,
+[UnitsetReferenceId]=UNITSETF.LOGICALREF,
+[UnitsetName]=UNITSETF.NAME,
+[UnitsetCode]=UNITSETF.CODE,
+[SubUnitsetReferenceId]=UNITSETL.LOGICALREF,
+[SubUnitseName]=UNITSETL.NAME,
+[SubUnitsetCode]=UNITSETL.CODE,
+[StokQuantity] = ISNULL((SELECT SUM(ONHAND) FROM LV_001_02_STINVTOT AS STINVTOT WITH(NOLOCK) WHERE STINVTOT.STOCKREF = ITEMS.LOGICALREF AND STINVTOT.INVENNO = CLCARD.ININVENNR),0),
+[IsVariant] = ITEMS.CANCONFIGURE,
+[TrackingType] = ITEMS.TRACKTYPE,
+[LocTracking] = ITEMS.LOCTRACKING,
+[Image] = ISNULL((SELECT TOP 1 FIRMDOC.LDATA
+                 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_FIRMDOC AS FIRMDOC
+                 WHERE FIRMDOC.INFOREF = ITEMS.LOGICALREF
+                 AND FIRMDOC.INFOTYP = 20
+                 AND FIRMDOC.DOCNR = 11), '')
+FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_BOMLINE AS BOMLINE WITH(NOLOCK)
+LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_BOMASTER AS BOMASTER WITH(NOLOCK) ON BOMLINE.BOMMASTERREF = BOMASTER.LOGICALREF
+LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS WITH(NOLOCK) ON BOMLINE.ITEMREF = ITEMS.LOGICALREF
+LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(NOLOCK) ON BOMLINE.UOMREF = UNITSETL.LOGICALREF
+LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON BOMLINE.USREF = UNITSETF.LOGICALREF
+LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD WITH(NOLOCK) ON BOMASTER.CLIENTREF = CLCARD.LOGICALREF
+LEFT JOIN L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON BOMLINE.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+WHERE BOMLINE.BOMTYPE = 2 AND BOMLINE.LINETYPE <> 4 AND BOMASTER.MAINPRODREF = {productReferenceId}";
 
             if (!string.IsNullOrEmpty(search))
                 baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%'
