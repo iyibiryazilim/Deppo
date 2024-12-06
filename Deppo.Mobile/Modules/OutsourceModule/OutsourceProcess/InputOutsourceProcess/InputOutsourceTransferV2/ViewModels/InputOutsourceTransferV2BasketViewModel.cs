@@ -833,6 +833,7 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 			var previousViewModel = _serviceProvider.GetRequiredService<InputOutsourceTransferV2ProductListViewModel>();
 			previousViewModel.WarehouseModel = InputOutsourceTransferV2BasketModel.OutsourceWarehouseModel;
 			previousViewModel.OutsourceModel = InputOutsourceTransferV2BasketModel.OutsourceModel;
+			IsBusy = false;
 			await previousViewModel.LoadItemsAsync();
 
 			InputOutsourceTransferV2BasketModel = null;

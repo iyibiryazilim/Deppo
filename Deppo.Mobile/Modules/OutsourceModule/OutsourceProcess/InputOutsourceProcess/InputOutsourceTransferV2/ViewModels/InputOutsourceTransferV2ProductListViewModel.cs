@@ -21,6 +21,7 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 	private readonly IHttpClientService _httpClientService;
 	private readonly IUserDialogs _userDialogs;
 	private readonly IInputOutsourceTransferV2ProductService _inputOutsourceTransferV2ProductService;
+	private readonly IServiceProvider _serviceProvider;
 
 	[ObservableProperty]
 	WarehouseModel? warehouseModel;
@@ -36,12 +37,13 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 	[ObservableProperty]
 	SearchBar searchText;
 
-	public InputOutsourceTransferV2ProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IInputOutsourceTransferV2ProductService inputOutsourceTransferV2ProductService)
+	public InputOutsourceTransferV2ProductListViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IInputOutsourceTransferV2ProductService inputOutsourceTransferV2ProductService, IServiceProvider serviceProvider)
 	{
 		_httpClientService = httpClientService;
 		_userDialogs = userDialogs;
 		_inputOutsourceTransferV2ProductService = inputOutsourceTransferV2ProductService;
-		
+		_serviceProvider = serviceProvider;
+
 		Title = "Fason Ürünler";
 
 		LoadItemsCommand = new Command(async () => await LoadItemsAsync());
@@ -340,6 +342,11 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 			SearchText.Text = string.Empty;
 
 			await Shell.Current.GoToAsync("..");
+
+			var previousViewModel = _serviceProvider.GetRequiredService<InputOutsourceTransferV2SupplierListViewModel>();
+			previousViewModel.WarehouseModel = WarehouseModel;
+			IsBusy = false;
+			await previousViewModel.LoadItemsAsync();
 		}
 		catch (Exception ex)
 		{
