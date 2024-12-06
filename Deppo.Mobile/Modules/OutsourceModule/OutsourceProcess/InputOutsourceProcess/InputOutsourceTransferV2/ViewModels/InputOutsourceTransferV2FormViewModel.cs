@@ -210,7 +210,7 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 				basketViewModel.InputOutsourceTransferV2BasketModel.InputOutsourceTransferSubProducts.Clear();
 
 				basketViewModel.SelectedSubProductModel = null;
-				basketViewModel.LocationTransactions.Clear();
+				basketViewModel.Locations.Clear();
 				
 				basketViewModel.InputOutsourceTransferV2BasketModel = null;
 			}
