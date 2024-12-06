@@ -8,13 +8,7 @@ using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransferV2.Views;
 using DevExpress.Maui.Core.Internal;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransferV2.ViewModels;
 
@@ -62,7 +56,7 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 	public Command BackCommand { get; }
 
 
-	private async Task LoadItemsAsync()
+	public async Task LoadItemsAsync()
 	{
 		if (IsBusy)
 			return;
@@ -98,7 +92,7 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 
 			}
 
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 		}
@@ -220,7 +214,7 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -308,7 +302,7 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 			IsBusy = true;
 
 
-			if(SelectedOutsourceModel is not null)
+			if (SelectedOutsourceModel is not null)
 			{
 				SelectedOutsourceModel.IsSelected = false;
 				SelectedOutsourceModel = null;
@@ -318,7 +312,7 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 
 			await Shell.Current.GoToAsync("..");
 		}
-		catch(Exception ex)
+		catch (Exception ex)
 		{
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
@@ -331,6 +325,6 @@ public partial class InputOutsourceTransferV2SupplierListViewModel : BaseViewMod
 		}
 	}
 
-	
+
 
 }

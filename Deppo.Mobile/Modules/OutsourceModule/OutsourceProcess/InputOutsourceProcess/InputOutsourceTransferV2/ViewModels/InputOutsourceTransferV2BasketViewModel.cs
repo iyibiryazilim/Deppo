@@ -4,10 +4,12 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.OutsourceModels;
 using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
+using Deppo.Mobile.Core.Services;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransferV2.Views;
+using DevExpress.Data.Async.Helpers;
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
@@ -22,6 +24,7 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 	private readonly IUserDialogs _userDialogs;
 	private readonly IServiceProvider _serviceProvider;
 	private readonly ILocationTransactionService _locationTransactionService;
+	private readonly IInputOutsourceTransferV2SubProductService _inputOutsourceTransferV2SubProductService;
 
 	[ObservableProperty]
 	InputOutsourceTransferV2BasketModel? inputOutsourceTransferV2BasketModel;
@@ -31,12 +34,13 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 	[ObservableProperty]
 	InputOutsourceTransferSubProductModel? selectedSubProductModel;
 
-	public InputOutsourceTransferV2BasketViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService)
+	public InputOutsourceTransferV2BasketViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IServiceProvider serviceProvider, ILocationTransactionService locationTransactionService, IInputOutsourceTransferV2SubProductService inputOutsourceTransferV2SubProductService)
 	{
 		_httpClientService = httpClientService;
 		_userDialogs = userDialogs;
 		_serviceProvider = serviceProvider;
 		_locationTransactionService = locationTransactionService;
+		_inputOutsourceTransferV2SubProductService = inputOutsourceTransferV2SubProductService;
 
 		Title = "Fason Kabul Sepeti";
 
@@ -82,7 +86,7 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 
 	private async Task LoadPageAsync()
 	{
-		if (InputOutsourceTransferV2BasketModel is null)
+		if (InputOutsourceTransferV2BasketModel is null || InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel is null)
 			return;
 		if (IsBusy)
 			return;
@@ -95,61 +99,28 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 			await Task.Delay(1000);
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			// TODO: Alt ürünlerin yüklenmesi 
+			var result = await _inputOutsourceTransferV2SubProductService.GetObjects(
+				httpClient: httpClient, 
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				mainProductReferenceId: InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.ProductReferenceId
+			);
 
-			ObservableCollection<InputOutsourceTransferSubProductModel> subProducts = new();
-			subProducts.Add(new InputOutsourceTransferSubProductModel
+
+			if(result.IsSuccess)
 			{
-				Image = "",
-				ProductCode = "Y.1245",
-				ProductName = "Takoz",
-				IsVariant = false,
-				LocTracking = 0,
-				StockQuantity = 50,
-				WarehouseNumber = 2,
-				WarehouseName = "Sevkiyat",
-				OutputQuantity = 1,
-				QuotientQuantity = 2,
-				TotalQuantityWithQuotient = 2,
-				Details = new()
-			});
+				if (result.Data is null)
+					return;
 
-			subProducts.Add(new InputOutsourceTransferSubProductModel
-			{
-				Image = "",
-				ProductCode = "Y.1246",
-				ProductName = "Amortisör",
-				IsVariant = false,
-				LocTracking = 0,
-				StockQuantity = 67,
-				WarehouseNumber = 2,
-				WarehouseName = "Sevkiyat",
-				OutputQuantity = 0,
-				QuotientQuantity = 3,
-				TotalQuantityWithQuotient = 3,
-				Details = new()
-			});
+				foreach (var item in result.Data)
+				{
+					var obj = Mapping.Mapper.Map<InputOutsourceTransferSubProductModel>(item);
+					obj.TotalBOMQuantity = obj.BOMQuantity;
+					obj.OutputQuantity = obj.LocTracking == 1 ? 0 : 0;
+					obj.Details = new List<InputOutsourceTransferSubProductDetailModel>();
 
-			subProducts.Add(new InputOutsourceTransferSubProductModel
-			{
-				Image = "",
-				ProductCode = "Y.1248",
-				ProductName = "Direksiyon",
-				IsVariant = false,
-				LocTracking = 0,
-				StockQuantity = 50,
-				WarehouseNumber = 2,
-				WarehouseName = "Sevkiyat",
-				OutputQuantity = 0,
-				QuotientQuantity = 1,
-				TotalQuantityWithQuotient = 1,
-				Details = new()
-			});
-
-
-			foreach (var item in subProducts)
-            {
-				InputOutsourceTransferV2BasketModel.InputOutsourceTransferSubProducts.Add(item);
+					InputOutsourceTransferV2BasketModel.InputOutsourceTransferSubProducts.Add(obj);
+				}
 			}
 
             if (_userDialogs.IsHudShowing)
@@ -195,10 +166,9 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 			{
 				InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity += 1;
 
-                // TODO: Sarf Malzemeler çarpan kadar miktarı arttırılacak
                 foreach (var subProduct in InputOutsourceTransferV2BasketModel.InputOutsourceTransferSubProducts)
                 {
-					subProduct.TotalQuantityWithQuotient = subProduct.QuotientQuantity * InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity;
+					subProduct.TotalBOMQuantity = subProduct.BOMQuantity * InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity;
 				}
             }
 
@@ -230,7 +200,7 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 			if (InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.LocTracking == 1 && InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity == 0)
 				return;
 
-			if (InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.LocTracking == 0 && InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity == 1)
+			if (InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.LocTracking == 0 && InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity == 0)
 				return;
 
 			if (InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.LocTracking == 1)
@@ -252,7 +222,7 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 
 				foreach (var subProduct in InputOutsourceTransferV2BasketModel.InputOutsourceTransferSubProducts)
 				{
-					subProduct.TotalQuantityWithQuotient = subProduct.QuotientQuantity * InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity;
+					subProduct.TotalBOMQuantity = subProduct.BOMQuantity * InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity;
 				}
 			}
 
@@ -298,24 +268,24 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 
 			var quantity = Convert.ToDouble(result);
 
-			if (quantity < 0)
+			if (quantity <= 0)
 			{
-				await _userDialogs.AlertAsync("Girilen miktar 0'dan küçük olmamalıdır.", "Hata", "Tamam");
+				await _userDialogs.AlertAsync("Girilen miktar 0'dan büyük olmalıdır.", "Hata", "Tamam");
 				return;
 			}
 
-			if (InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.LocTracking == 0 && quantity < 1)
-			{
-				await _userDialogs.AlertAsync("Girilen miktar 1'den küçük olmamalıdır.", "Hata", "Tamam");
-				return;
-			}
+			//if (InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.LocTracking == 0 && quantity < 1)
+			//{
+			//	await _userDialogs.AlertAsync("Girilen miktar 1'den küçük olmamalıdır.", "Hata", "Tamam");
+			//	return;
+			//}
 
 
 			InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity = quantity;
 
             foreach (var subProduct in InputOutsourceTransferV2BasketModel.InputOutsourceTransferSubProducts)
             {
-				subProduct.TotalQuantityWithQuotient = subProduct.QuotientQuantity * InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity;
+				subProduct.TotalBOMQuantity = subProduct.BOMQuantity * InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity;
 			}
 
         }
@@ -390,7 +360,7 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 
 			if(item.LocTracking == 0)
 			{
-				if (item.OutputQuantity == 1)
+				if (item.OutputQuantity == 0)
 					return;
 
 				item.OutputQuantity -= 1;
@@ -413,9 +383,41 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 	{
 		if (IsBusy)
 			return;
+		if (item.LocTracking == 1)
+			return;
 		try
 		{
 			IsBusy = true;
+
+			SelectedSubProductModel = item;
+
+			var result = await CurrentPage.DisplayPromptAsync(
+				title: item.ProductCode,
+				message: "Miktarı giriniz",
+				cancel: "Vazgeç",
+				accept: "Tamam",
+				placeholder: item.OutputQuantity.ToString(),
+				keyboard: Keyboard.Numeric
+			);
+
+			if (string.IsNullOrEmpty(result))
+				return;
+
+			var quantity = Convert.ToDouble(result);
+
+			if (quantity < 0)
+			{
+				_userDialogs.ShowToast("Girilen miktar 0'dan küçük olmamalıdır.");
+				return;
+			}
+
+			if (quantity > item.StockQuantity)
+			{
+				_userDialogs.ShowToast($"Girilen miktar, ürünün stok miktarını ({item.StockQuantity}) geçemez.");
+				return;
+			}
+
+			item.OutputQuantity = quantity;
 		}
 		catch (Exception ex)
 		{
@@ -464,6 +466,7 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
                     var obj = Mapping.Mapper.Map<GroupLocationTransactionModel>(item);
 					var matchingItem = SelectedSubProductModel.Details.FirstOrDefault(x => x.LocationReferenceId == obj.LocationReferenceId);
 					obj.OutputQuantity = matchingItem?.Quantity ?? 0;
+					LocationTransactions.Add(obj);
 
 				}
             }
@@ -519,6 +522,7 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 					var obj = Mapping.Mapper.Map<GroupLocationTransactionModel>(item);
 					var matchingItem = SelectedSubProductModel.Details.FirstOrDefault(x => x.LocationReferenceId == obj.LocationReferenceId);
 					obj.OutputQuantity = matchingItem?.Quantity ?? 0;
+					LocationTransactions.Add(obj);
 
 				}
 			}
@@ -741,7 +745,7 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
-			if(InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.LocTracking == 1 && InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity == 0)
+			if(InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity == 0)
 			{
 				_userDialogs.ShowToast($"Ana ürünün miktarı 0 olamaz");
 				return;
@@ -755,7 +759,7 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 
             foreach (var item in InputOutsourceTransferV2BasketModel.InputOutsourceTransferSubProducts)
             {
-				if(item.TotalQuantityWithQuotient > item.StockQuantity)
+				if(item.TotalBOMQuantity > item.StockQuantity)
 				{
 					_userDialogs.ShowToast($"Toplam katsayı miktarı, ilgili sarf malzemenin stok miktarını geçemez!");
 					return;
@@ -765,12 +769,12 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 					_userDialogs.ShowToast($"Girilen miktar, ilgili sarf malzemenin stok miktarını geçemez!");
 					return;
 				}
-				else if(item.OutputQuantity > item.TotalQuantityWithQuotient)
+				else if(item.OutputQuantity > item.TotalBOMQuantity)
 				{
 					_userDialogs.ShowToast($"Girilen miktar, ilgili sarf malzemenin toplam katsayı miktarını geçemez!");
 					return;
 				}
-				else if(item.OutputQuantity != item.TotalQuantityWithQuotient)
+				else if(item.OutputQuantity != item.TotalBOMQuantity)
 				{
 					_userDialogs.ShowToast($"Girilen miktar, ilgili sarf malzemenin toplam katsayı miktarına eşit olmak zorunda!");
 					return;
@@ -831,6 +835,7 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 			var previousViewModel = _serviceProvider.GetRequiredService<InputOutsourceTransferV2ProductListViewModel>();
 			previousViewModel.WarehouseModel = InputOutsourceTransferV2BasketModel.OutsourceWarehouseModel;
 			previousViewModel.OutsourceModel = InputOutsourceTransferV2BasketModel.OutsourceModel;
+			IsBusy = false;
 			await previousViewModel.LoadItemsAsync();
 
 			InputOutsourceTransferV2BasketModel = null;

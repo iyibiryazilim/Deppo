@@ -341,9 +341,9 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 
 			foreach (var subProduct in InputOutsourceTransferV2BasketModel.InputOutsourceTransferSubProducts)
 			{
-				subProduct.TotalQuantityWithQuotient = InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity == 0 ?
-					1 * subProduct.QuotientQuantity :    
-					subProduct.QuotientQuantity * InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity;
+				subProduct.TotalBOMQuantity = InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity == 0 ?
+					1 * subProduct.BOMQuantity :    
+					subProduct.BOMQuantity * InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity;
 			}
 
 

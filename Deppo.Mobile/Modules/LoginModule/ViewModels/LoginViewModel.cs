@@ -215,13 +215,9 @@ public partial class LoginViewModel : BaseViewModel
 
         try
         {
-            string baseUri = await SecureStorage.GetAsync("baseUri"); //"http://172.25.140.11:1923"; //"http://172.16.1.3:1923";
+            string baseUri = await SecureStorage.GetAsync("baseUri");
 
-			//if (string.IsNullOrEmpty(baseUri))
-   //             _httpClientSysService.BaseUri = "http://172.25.140.11:1923";
-   //         else
              _httpClientSysService.BaseUri = baseUri;
-
             var httpClient = _httpClientSysService.GetOrCreateHttpClient();
             var token = await _authenticateSysService.AuthenticateAsync(httpClient, UserName, Password);
             if (!string.IsNullOrEmpty(token))
@@ -290,15 +286,10 @@ public partial class LoginViewModel : BaseViewModel
                     gatewayUri = item.GatewayUri;
                     gatewayPort = item.GatewayPort;
                 }
-
             }
 
-            string baseUri = $"{gatewayUri}:{gatewayPort}";
-            //if (string.IsNullOrEmpty(baseUri))
-            //    _httpClientService.BaseUri = "http://172.25.140.11:52789";
-            //else
-            //_httpClientService.BaseUri = baseUri;
-            _httpClientService.BaseUri = "http://172.16.1.25:52789";
+            string baseUri = $"{gatewayUri}:{gatewayPort}";          
+            _httpClientService.BaseUri = baseUri;
 
 			_userDialogs.Loading("Loading...");
             await Task.Delay(1000);
