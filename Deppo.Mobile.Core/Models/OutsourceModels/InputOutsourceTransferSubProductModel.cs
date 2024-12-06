@@ -58,10 +58,11 @@ public partial class InputOutsourceTransferSubProductModel : ObservableObject
 	double stockQuantity;
 
 	[ObservableProperty]
-	double quotientQuantity;  // Katsayi miktari
+	double bOMQuantity;   // Katsayi miktari
 
 	[ObservableProperty]
-	double totalQuantityWithQuotient; // quotientQuantity * InputQuantity (MainProduct)
+	double totalBOMQuantity; // bOMQuantity * InputQuantity (MainProduct)
+
 
 	[ObservableProperty]
 	string image = string.Empty;
