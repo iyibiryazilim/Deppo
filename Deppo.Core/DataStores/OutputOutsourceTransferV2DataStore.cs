@@ -87,7 +87,10 @@ namespace Deppo.Core.DataStores
 [ActualQuantity] = PRODORD.ACTAMOUNT,
 [WarehouseNumber] = POLINE.INVENNO,
 [WarehouseName] = '',
-[StockQuantity] = 0,
+[StockQuantity] = ISNULL((SELECT SUM(ONHAND) FROM LV_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STINVTOT AS STINVTOT WITH(NOLOCK) WHERE STINVTOT.STOCKREF = ITEMS.LOGICALREF AND STINVTOT.INVENNO = {warehouseNumber}),0),
+[IsVariant] = ITEMS.CANCONFIGURE,
+[TrackingType] = ITEMS.TRACKTYPE,
+[LocTracking] = ITEMS.LOCTRACKING,
 [Image] = ISNULL((SELECT TOP 1 FIRMDOC.LDATA
                  FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_FIRMDOC AS FIRMDOC
                  WHERE FIRMDOC.INFOREF = ITEMS.LOGICALREF

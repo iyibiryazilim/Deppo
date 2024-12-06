@@ -90,19 +90,32 @@
                                         <FormattedString>
                                             <Span FontAttributes="Bold"
                                               FontFamily="FAS"
-                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Clock}"
                                               TextColor="{StaticResource Primary}" />
+                                            
                                             <Span Text=" " />
                                             <Span FontAttributes="Bold"
-                                              Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                              Text="{Binding PlanningQuantity, StringFormat='{0:N2}'}"
                                               TextColor="{StaticResource Primary}" />
+                                            <Span Text="        " />
+                                            <Span FontAttributes="Bold"
+                                                  FontFamily="FAS"
+                                                  Text="{x:Static fontAwesome:FontAwesomeIcons.CircleCheck}"
+                                                 TextColor="{StaticResource Primary}" />
                                             <Span Text=" " />
                                             <Span FontAttributes="Bold"
-                                              Text="{Binding SubUnitsetCode}"
-                                              TextColor="{StaticResource Primary}" />
+                                                   
+                                                  Text="{Binding PlanningQuantity, StringFormat='{0:N2}'}"
+                                                  TextColor="{StaticResource Primary}" />
+                                            <Span Text=" " />
+
+
                                         </FormattedString>
                                     </Label.FormattedText>
                                 </Label>
+                                
+                                
+                                
                             </VerticalStackLayout>
 
                             <Grid Grid.Column="2"

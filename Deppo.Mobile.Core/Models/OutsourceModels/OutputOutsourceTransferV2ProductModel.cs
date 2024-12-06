@@ -2,6 +2,7 @@
 using Deppo.Mobile.Core.Models.ProductModels;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -73,28 +74,30 @@ namespace Deppo.Mobile.Core.Models.OutsourceModels
         private double stockQuantity = default;
 
         [ObservableProperty]
-        private string locTrackingIcon;
+        bool isVariant;
 
         [ObservableProperty]
-        private string locTrackingIconColor;
+        int trackingType;
 
         [ObservableProperty]
-        private string variantIcon;
-
-        [ObservableProperty]
-        private string variantIconColor;
-
-        [ObservableProperty]
-        private string trackingTypeIcon;
-
-        [ObservableProperty]
-        private string trackingTypeIconColor;
+        int locTracking;
 
         [ObservableProperty]
         public bool _isSelected;
 
         [ObservableProperty]
         string image = string.Empty;
+
+        [ObservableProperty]
+        public ObservableCollection<OutputOutsourceTransferV2SubProductModel> subProducts = new();
+
+        [ObservableProperty]
+        private double bomQuantity =1;
+
+        [ObservableProperty]
+        private double quantity ;
+
+
 
         public byte[] ImageData
         {
@@ -108,6 +111,14 @@ namespace Deppo.Mobile.Core.Models.OutsourceModels
                 }
             }
         }
+        public string LocTrackingIcon => "location-dot";
+        public string LocTrackingIconColor => LocTracking == 1 ? "#F5004F" : "#C8C8C8";
+
+        public string VariantIcon => "bookmark";
+        public string VariantIconColor => IsVariant ? "#F5004F" : "#C8C8C8";
+
+        public string TrackingTypeIcon => "box-archive";
+        public string TrackingTypeIconColor => TrackingType == 1 ? "#F5004F" : "#C8C8C8";
 
 
 
