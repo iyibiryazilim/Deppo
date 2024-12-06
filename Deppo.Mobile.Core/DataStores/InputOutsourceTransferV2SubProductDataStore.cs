@@ -78,6 +78,10 @@ public class InputOutsourceTransferV2SubProductDataStore : IInputOutsourceTransf
 		[IsVariant] = ITEMS.CANCONFIGURE,
 		[LocTracking] = ITEMS.LOCTRACKING,
 		[TrackingType] = ITEMS.TRACKTYPE,
+        [OutWarehouseNumber] = CLCARD.ININVENNR,
+		[InWarehouseNumber] = CLCARD.OUTINVENNR,
+		[WarehouseNumber] = WHOUSE.NR,
+        [WarehouseName] = WHOUSE.NAME,
 		[BOMQuantity] = BOMLINE.AMOUNT,
 		[StockQuantity] = ISNULL((SELECT SUM(ONHAND) FROM LV_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STINVTOT AS STINVTOT WITH(NOLOCK) WHERE STINVTOT.STOCKREF = ITEMS.LOGICALREF AND STINVTOT.INVENNO = CLCARD.ININVENNR), 0),
 		[Image] = ISNULL((SELECT TOP 1 FIRMDOC.LDATA
