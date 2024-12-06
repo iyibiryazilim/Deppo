@@ -466,6 +466,7 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
                     var obj = Mapping.Mapper.Map<GroupLocationTransactionModel>(item);
 					var matchingItem = SelectedSubProductModel.Details.FirstOrDefault(x => x.LocationReferenceId == obj.LocationReferenceId);
 					obj.OutputQuantity = matchingItem?.Quantity ?? 0;
+					LocationTransactions.Add(obj);
 
 				}
             }
@@ -521,6 +522,7 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 					var obj = Mapping.Mapper.Map<GroupLocationTransactionModel>(item);
 					var matchingItem = SelectedSubProductModel.Details.FirstOrDefault(x => x.LocationReferenceId == obj.LocationReferenceId);
 					obj.OutputQuantity = matchingItem?.Quantity ?? 0;
+					LocationTransactions.Add(obj);
 
 				}
 			}

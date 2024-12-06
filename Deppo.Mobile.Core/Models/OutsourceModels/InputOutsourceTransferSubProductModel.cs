@@ -28,9 +28,6 @@ public partial class InputOutsourceTransferSubProductModel : ObservableObject
 	string productName = string.Empty;
 
 	[ObservableProperty]
-	int outWarehouseNumber;
-
-	[ObservableProperty]
 	int inWarehouseNumber;
 
 	[ObservableProperty]
