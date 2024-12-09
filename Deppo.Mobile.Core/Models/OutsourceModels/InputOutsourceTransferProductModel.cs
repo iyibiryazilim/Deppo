@@ -22,6 +22,9 @@ public partial class InputOutsourceTransferProductModel : ObservableObject
 	int productionReferenceId = default;
 
 	[ObservableProperty]
+	string productionNumber = string.Empty;
+
+	[ObservableProperty]
 	DateTime? planningStartDate;
 
 	[ObservableProperty]

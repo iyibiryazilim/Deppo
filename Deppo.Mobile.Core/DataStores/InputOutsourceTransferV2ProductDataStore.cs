@@ -65,8 +65,9 @@ public class InputOutsourceTransferV2ProductDataStore : IInputOutsourceTransferV
 	private string GetWorkOrderByWarehouseAndCurrentQuery(int firmNumber, int periodNumber, int warehouseNumber, int currentReferenceId, string search = "", int skip = 0, int take = 20)
 	{
 		string baseQuery = $@"SELECT 
-[ReferenceId]  =DISPLINE.LOGICALREF,
+[ReferenceId] = DISPLINE.LOGICALREF,
 [ProductionReferenceId] = PRODORD.LOGICALREF,
+[ProductionNumber] = PRODORD.FICHENO, 
 [PlanningStartDate] = PRODORD.PLNBEGDATE,
 [PlanningEndDate] = PRODORD.PLNENDDATE,
 [ActualStartDate] = PRODORD.ACTBEGDATE,
