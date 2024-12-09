@@ -2,10 +2,12 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcessV2.OutputOutsourceTransferV2.Views.OutputOutsourceTransferV2OutsourceBasketView"
+             xmlns:dx="http://schemas.devexpress.com/maui" 
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcessV2.OutputOutsourceTransferV2.ViewModels"
              xmlns:subProduct="clr-namespace:Deppo.Mobile.Core.Models.OutsourceModels;assembly=Deppo.Mobile.Core"
+             xmlns:locationModel="clr-namespace:Deppo.Mobile.Core.Models.LocationModels;assembly=Deppo.Mobile.Core"
              x:DataType="viewModel:OutputOutsourceTransferV2OutsourceBasketViewModel"
              Title="{Binding Title}"
              Shell.TabBarIsVisible="False"
@@ -30,254 +32,399 @@
     <Shell.BackButtonBehavior>
         <BackButtonBehavior Command="{Binding BackCommand}" />
     </Shell.BackButtonBehavior>
-    <Grid RowDefinitions="Auto,.20*,*,.15*,Auto">
-        <Border StrokeThickness="0" StrokeShape="RoundRectangle 10" Grid.Row="0" Padding="5" >
-            <Border Padding="10"
-     BackgroundColor="Transparent"
-     StrokeShape="RoundRectangle 10"
-     StrokeThickness="0.1">
-                <Grid RowDefinitions="Auto,*">
-                    <Grid ColumnDefinitions=".30*,.40*,.30*">
-                        <Border StrokeShape="RoundRectangle 5" StrokeThickness="0.5" Grid.Column="1" BackgroundColor="{StaticResource Primary}">
-                            <Image Grid.Column="0" HeightRequest="100" WidthRequest="50"
-
-Source="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
- />
-                        </Border>
-                        <Grid Grid.Column="2"
-ColumnDefinitions="Auto, Auto, Auto"
-ColumnSpacing="3"
-HorizontalOptions="End"
-VerticalOptions="Start">
-             <Label Grid.Column="0"
-     FontFamily="FAS"
-     FontSize="12"
-     Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.VariantIcon}"
-     TextColor="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.VariantIconColor}" />
-             <Label Grid.Column="1"
-     FontFamily="FAS"
-     FontSize="12"
-     Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.LocTrackingIcon}"
-     TextColor="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.LocTrackingIconColor}" />
-             <Label Grid.Column="2"
-     FontFamily="FAS"
-     FontSize="12"
-     Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.TrackingTypeIcon}"
-     TextColor="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.TrackingTypeIconColor}" />
-         </Grid>
-
-                    </Grid>
-                    <VerticalStackLayout Grid.Row="1" Spacing="2" >
-                        <Label FontAttributes="Bold" HorizontalOptions="Center"
-                               LineBreakMode="TailTruncation"
-                               FontSize="17"
-                               Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.ProductCode}" />
-                        <Label LineBreakMode="TailTruncation" HorizontalOptions="Center"
-                               Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.ProductName}"
-                               FontSize="15"
-                               TextColor="{StaticResource Gray600}" />
-
-                        
-
-                        <Grid Grid.Column="1" ColumnDefinitions="Auto,Auto,Auto" ColumnSpacing="10" HorizontalOptions="Center">
-                            <Border Grid.Column="0" Padding="5" BackgroundColor="Transparent" Stroke="{StaticResource Secondary}" StrokeShape="RoundRectangle 2">
-                                <Label FontFamily="FAS" FontSize="Medium" HorizontalOptions="Center" Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}" TextColor="{StaticResource Secondary}" VerticalOptions="Center" />
-                                <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferV2OutsourceBasketViewModel}}, Path=DecreaseCommand}" />
-                                </Border.GestureRecognizers>
-                            </Border>
-
-                            <Label Grid.Column="1" FontAttributes="Bold" FontSize="Large" HorizontalOptions="Center" Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity}" TextColor="{StaticResource OffBlack}" VerticalOptions="Center" />
-                            
-                            <Border Grid.Column="2" Padding="5" BackgroundColor="{StaticResource Secondary}" Stroke="{StaticResource Secondary}" StrokeShape="RoundRectangle 2">
-                                <Label FontFamily="FAS" FontSize="Medium" HorizontalOptions="Center" Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}" TextColor="{StaticResource White}" VerticalOptions="Center" />
-                                <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferV2OutsourceBasketViewModel}}, Path=IncreaseCommand}" />
-                                </Border.GestureRecognizers>
-                            </Border>
-                        </Grid>
-
-                    </VerticalStackLayout>
-
-
-
-
-                </Grid>
-              
-            </Border>
-
-        </Border>
-
-        <Border Grid.Row="1" Background="Transparent" StrokeShape="RoundRectangle 10" Margin="10" StrokeThickness="1" VerticalOptions="End" Stroke="{StaticResource Primary}">
-         
-            <Grid ColumnDefinitions="Auto,*">
-                <Label Grid.Column="1" 
-TextColor="{StaticResource Primary}"            
-Padding="10" 
-FontSize="Medium"
-FontAttributes="Bold"
-HorizontalOptions="Center"
-Text="Sarf Edilecek Ürünler" />
-                <Border Grid.Column="0" Padding="5"
-        HorizontalOptions="Center"
-        StrokeThickness="0">
-                    <toolkit:AvatarView Padding="2"
-                        BorderColor="{StaticResource Primary}"
-                                        BackgroundColor="{StaticResource Primary}"
-                        CornerRadius="15"
-                        FontFamily="FAS"
-                        FontSize="14"
-                        HeightRequest="27"
-                        HorizontalOptions="End"
-                        Text="{x:Static fontAwesome:FontAwesomeIcons.Info}"
-                        TextColor="{StaticResource White}"
-                        WidthRequest="27" />
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding .}" />
-                    </Border.GestureRecognizers>
+    <Grid RowDefinitions="*, Auto, Auto">
+        <Grid Grid.Row="0" RowDefinitions=".40*, .60*">
+            <!--#region MainProduct Info-->
+            <VerticalStackLayout Grid.Row="0"
+                                 HorizontalOptions="Center"
+                                 Spacing="10"
+                                 VerticalOptions="Start">
+                <!--#region Image-->
+                <Border HeightRequest="100"
+                        StrokeShape="RoundRectangle 50"
+                        StrokeThickness="1"
+                        VerticalOptions="Center"
+                        WidthRequest="100">
+                    <Image Source="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}" />
                 </Border>
+                <!--#endregion-->
+
+                <!--#region ProductCode, ProductName-->
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+                    <Label FontAttributes="Bold"
+                           FontSize="Large"
+                           HorizontalOptions="Center"
+                           LineBreakMode="TailTruncation"
+                           MaxLines="1"
+                           Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.ProductCode}" />
+                    <Label FontSize="Medium"
+                           HorizontalOptions="Center"
+                           LineBreakMode="TailTruncation"
+                           MaxLines="1"
+                           Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.ProductName}"
+                           TextColor="{StaticResource Gray600}" />
+                    <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center" HorizontalOptions="Center">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span FontAttributes="Bold"
+                           FontFamily="FAS"
+                           Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                           TextColor="{StaticResource Primary}" />
+                                <Span Text=" " />
+                                <Span FontAttributes="Bold"
+                           Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.PlanningQantity, StringFormat='{0:N2}'}"
+                           TextColor="{StaticResource Primary}" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </VerticalStackLayout>
+                <!--#endregion-->
+
+                <!--#region Quantity Area-->
+                <Grid ColumnDefinitions="Auto,Auto,Auto"
+                      ColumnSpacing="10"
+                      HorizontalOptions="Center">
+                    <Border Grid.Column="0"
+                            Padding="5"
+                            BackgroundColor="Transparent"
+                            Stroke="{StaticResource Secondary}"
+                            StrokeShape="RoundRectangle 2">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferV2OutsourceBasketViewModel}}, Path=DecreaseCommand}" />
+                        </Border.GestureRecognizers>
+                        <Label FontFamily="FAS"
+                               FontSize="Medium"
+                               Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                               TextColor="{StaticResource Secondary}" />
+
+
+                    </Border>
+                    <Label Grid.Column="1"
+                           FontAttributes="Bold"
+                           FontSize="Large"
+                           Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity}"
+                           TextColor="{StaticResource OffBlack}"
+                           VerticalOptions="Center">
+                        <!--<Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding QuantityTappedCommand}" />
+                        </Label.GestureRecognizers>-->
+                    </Label>
+                    <Border Grid.Column="2"
+                            Padding="5"
+                            BackgroundColor="{StaticResource Secondary}"
+                            Stroke="{StaticResource Secondary}"
+                            StrokeShape="RoundRectangle 2">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferV2OutsourceBasketViewModel}}, Path=IncreaseCommand}" />
+                        </Border.GestureRecognizers>
+                        <Label FontFamily="FAS"
+                               FontSize="Medium"
+                               Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                               TextColor="{StaticResource White}" />
+
+
+                    </Border>
+                </Grid>
+                <!--#endregion-->
+
+            </VerticalStackLayout>
+            <!--#endregion-->
+
+            <Grid Grid.Row="1"
+                  Padding="10,0,10,10"
+                  RowDefinitions="Auto, *"
+                  RowSpacing="10">
+                <Label Grid.Row="0"
+                       FontAttributes="Bold"
+                       FontSize="18"
+                       HorizontalOptions="Start"
+                       LineBreakMode="TailTruncation"
+                       MaxLines="1"
+                       Text="Sarf Malzemeler"
+                       TextColor="{StaticResource OffBlack}"
+                       VerticalOptions="Center" />
+
+                <CollectionView Grid.Row="1" ItemsSource="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferSubProducts}">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="subProduct:OutputOutsourceTransferV2SubProductModel">
+                            <SwipeView Threshold="120">
+                                <!-- Sol kaydırma -->
+                                <SwipeView.LeftItems>
+                                    <SwipeItems Mode="Execute">
+                                        <SwipeItemView BackgroundColor="{StaticResource Primary}"
+                                       Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferV2OutsourceBasketViewModel}}, Path=LeftSwipeShowLocationTransactionCommand}"
+                                       CommandParameter="{Binding .}">
+                                            <Label HorizontalOptions="Center"
+                                   TextColor="White"
+                                   VerticalOptions="Center">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                              FontFamily="FAS"
+                                              FontSize="Medium"
+                                              Text="{x:Static fontAwesome:FontAwesomeIcons.CircleUp}"
+                                              TextColor="White" />
+                                                        <Span Text=" " />
+                                                        <Span FontSize="Medium"
+                                              Text="Çıkış Hareketi Seçiniz"
+                                              TextColor="White" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                        </SwipeItemView>
+                                    </SwipeItems>
+                                </SwipeView.LeftItems>
+
+                                <!-- Sağ kaydırma -->
+                                <SwipeView.RightItems>
+                                    <SwipeItems Mode="Execute">
+                                        <SwipeItemView BackgroundColor="{StaticResource Secondary}"
+                                       Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferV2OutsourceBasketViewModel}}, Path= RightSwipeShowLocationCommand}"
+                                       CommandParameter="{Binding .}">
+                                            <Label HorizontalOptions="Center"
+                                   TextColor="White"
+                                   VerticalOptions="Center">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                              FontFamily="FAS"
+                                              FontSize="Medium"
+                                              Text="{x:Static fontAwesome:FontAwesomeIcons.CircleDown}"
+                                              TextColor="White" />
+                                                        <Span Text=" " />
+                                                        <Span FontSize="Medium"
+                                              Text="Giriş Rafı Seçiniz"
+                                              TextColor="White" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                        </SwipeItemView>
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
+
+                                <!-- İçerik -->
+                                <Border Padding="10" StrokeShape="RoundRectangle 10" StrokeThickness="0.1">
+                                    <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="10">
+                                        <!-- Image -->
+                                        <Border Grid.Column="0" StrokeShape="RoundRectangle 5" StrokeThickness="0.5">
+                                            <Image Grid.Column="0"
+                                   HeightRequest="50"
+                                   Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                   WidthRequest="60" />
+                                        </Border>
+
+                                        <!-- Code, Name -->
+                                        <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                            <Label FontAttributes="Bold"
+                                   LineBreakMode="TailTruncation"
+                                               
+                                   MaxLines="1"
+                                   Text="{Binding ProductCode}" />
+                                            <Label LineBreakMode="TailTruncation"
+                                   MaxLines="1"
+                                                  
+                                   Text="{Binding ProductName}"
+                                   TextColor="{StaticResource Gray600}" />
+                                            <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span Text="{Binding OutWarehouseName}" TextColor="{StaticResource OffBlack}" />
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                              FontFamily="FAS"
+                                              FontSize="15"
+                                              Text="{x:Static fontAwesome:FontAwesomeIcons.ArrowRight}"
+                                              TextColor="{StaticResource Primary}" />
+                                                        <Span Text="  " />
+                                                        <Span Text="{Binding InWarehouseName}" TextColor="{StaticResource OffBlack}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                        </VerticalStackLayout>
+
+                                        <!-- Quantity Information -->
+                                        <VerticalStackLayout Grid.Column="2" Spacing="10">
+                                            <Label FontAttributes="Bold"
+                                   FontSize="Large"
+                                   Text="{Binding Quantity}"
+                                   TextColor="{StaticResource OffBlack}"
+                                   HorizontalOptions="EndAndExpand"
+                                   VerticalOptions="CenterAndExpand" />
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Border>
+
+                            </SwipeView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
 
 
 
 
             </Grid>
 
-
-
-        </Border>
-
-        <CarouselView ItemsSource="{Binding SubProducts}" Grid.Row="2" Margin="5" IndicatorView="indicatorView" VerticalOptions="End" >
-                <CarouselView.ItemTemplate>
-                <DataTemplate x:DataType="subProduct:OutputOutsourceTransferV2SubProductModel">
-                        <StackLayout Spacing="10" VerticalOptions="Center">
-                            <!-- Çıkış Rafı Bölümü -->
-                        <Border Background="{StaticResource RedMonza}" StrokeShape="RoundRectangle 10" Margin="5" StrokeThickness="0" 
-                        HorizontalOptions="Start" VerticalOptions="Start">
-                            <Label Padding="8" Text="Çıkış Rafı Seçiniz" TextColor="{StaticResource White}" FontAttributes="Bold"/>
-                        </Border>
-
-                        <Border Padding="10" BackgroundColor="Transparent" StrokeThickness="0.2" StrokeShape="RoundRectangle 10" >
-                                <Grid ColumnDefinitions=".20*,.80*" ColumnSpacing="10">
-                                    <Border Grid.Column="0" StrokeShape="RoundRectangle 5" StrokeThickness="0.5">
-                                        <Image Grid.Column="0" HeightRequest="50" Source="{Binding ., Converter={StaticResource ByteArrayToImageSourceConverter}}" WidthRequest="50" />
-                                    </Border>
-                                    <VerticalStackLayout Grid.Column="1">
-                                        <Grid ColumnDefinitions="*,Auto">
-                                            <Label Grid.Column="0" FontAttributes="Bold" HorizontalOptions="Start" LineBreakMode="TailTruncation" Text="{Binding ProductCode}" />
-                                            <Image Grid.Column="1">
-                                                <Image.Source>
-                                                    <FontImageSource FontFamily="FAS" Glyph="{x:Static fontAwesome:FontAwesomeIcons.Ellipsis}" Size="Medium" Color="{StaticResource Gray600}" />
-                                                </Image.Source>
-                                            </Image>
-                                        </Grid>
-                                        <Label LineBreakMode="TailTruncation" Text="{Binding ProductName}" TextColor="{StaticResource Gray600}" />
-                                        <Label>
-                                            <Label.FormattedText>
-                                                <FormattedString>
-                                                    <Span FontAttributes="Bold" FontFamily="FAS" Text="{x:Static fontAwesome:FontAwesomeIcons.Box}" TextColor="{StaticResource Primary}" />
-                                                    <Span Text=" " />
-                                                    <Span FontAttributes="Bold" Text="x" TextColor="{StaticResource Primary}" />
-                                                    <Span Text=" " />
-                                                    <Span FontAttributes="Bold" Text="a" TextColor="{StaticResource Primary}" />
-                                                </FormattedString>
-                                            </Label.FormattedText>
-                                        </Label>
-                                        <Grid ColumnDefinitions="Auto, *">
-                                            <!--<Grid Grid.Column="0" ColumnDefinitions="Auto, Auto,Auto" ColumnSpacing="3" HorizontalOptions="Start" VerticalOptions="End">
-                                                <Label Grid.Column="0" FontFamily="FAS" FontSize="10" Text="{Binding VariantIcon}" TextColor="{Binding VariantIconColor}" />
-                                                <Label Grid.Column="1" FontFamily="FAS" FontSize="10" Text="{Binding LocTrackingIcon}" TextColor="{Binding LocTrackingIconColor}" />
-                                                <Label Grid.Column="2" FontFamily="FAS" FontSize="10" Text="{Binding TrackingTypeIcon}" TextColor="{Binding TrackingTypeIconColor}" />
-                                            </Grid>-->
-                                            <Grid Grid.Column="1" ColumnDefinitions="Auto,Auto,Auto" ColumnSpacing="10" HorizontalOptions="EndAndExpand">
-                                                
-                                                <Label Grid.Column="1" FontAttributes="Bold" FontSize="Large" HorizontalOptions="Center" Text="{Binding Quantity}" TextColor="{StaticResource OffBlack}" VerticalOptions="Center" />
-                                              
-                                            </Grid>
-                                        </Grid>
-                                    </VerticalStackLayout>
-                                </Grid>
-                            </Border>
-
-                        <Image>
-
-                            <Image.Source>
-                                <FontImageSource FontFamily="FAS"
-             Glyph="{x:Static fontAwesome:FontAwesomeIcons.ArrowDownLong}"
-             Size="25"
-             Color="{StaticResource Gray400}" />
-                            </Image.Source>
-                            
-                        </Image>
-                       
-
-
-                        <!-- Giriş Rafı Bölümü -->
-                        <Border Background="{StaticResource GreenEmerald}" StrokeShape="RoundRectangle 10" Margin="5" StrokeThickness="0" 
- HorizontalOptions="Start" VerticalOptions="Start">
-                            <Label Padding="8" Text="Giriş Rafı Seçiniz" TextColor="{StaticResource White}" FontAttributes="Bold"/>
-                        </Border>
-                        <Border Padding="10" BackgroundColor="Transparent" StrokeThickness="0.2" StrokeShape="RoundRectangle 10">
-                                <Grid ColumnDefinitions=".20*,.80*" ColumnSpacing="10">
-                                    <Border Grid.Column="0" StrokeShape="RoundRectangle 5" StrokeThickness="0.5">
-                                        <!--<Image Grid.Column="0" HeightRequest="50" Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}" WidthRequest="50" />-->
-                                    </Border>
-                                    <VerticalStackLayout Grid.Column="1">
-                                        <Grid ColumnDefinitions="*,Auto">
-                                            <Label Grid.Column="0" FontAttributes="Bold" HorizontalOptions="Start" LineBreakMode="TailTruncation" Text="{Binding ProductCode}" />
-                                            <Image Grid.Column="1">
-                                                <Image.Source>
-                                                    <FontImageSource FontFamily="FAS" Glyph="{x:Static fontAwesome:FontAwesomeIcons.Ellipsis}" Size="Medium" Color="{StaticResource Gray600}" />
-                                                </Image.Source>
-                                            </Image>
-                                        </Grid>
-                                        <Label LineBreakMode="TailTruncation" Text="{Binding ProductName}" TextColor="{StaticResource Gray600}" />
-                                        <Label>
-                                            <Label.FormattedText>
-                                                <FormattedString>
-                                                    <Span FontAttributes="Bold" FontFamily="FAS" Text="{x:Static fontAwesome:FontAwesomeIcons.Box}" TextColor="{StaticResource Primary}" />
-                                                    <Span Text=" " />
-                                                    <Span FontAttributes="Bold" Text="0" TextColor="{StaticResource Primary}" />
-                                                    <Span Text=" " />
-                                                    <Span FontAttributes="Bold" Text="x" TextColor="{StaticResource Primary}" />
-                                                </FormattedString>
-                                            </Label.FormattedText>
-                                        </Label>
-                                        <Grid ColumnDefinitions="Auto, *">
-                                            <!--<Grid Grid.Column="0" ColumnDefinitions="Auto, Auto,Auto" ColumnSpacing="3" HorizontalOptions="Start" VerticalOptions="End">
-                                                <Label Grid.Column="0" FontFamily="FAS" FontSize="10" Text="{Binding VariantIcon}" TextColor="{Binding VariantIconColor}" />
-                                                <Label Grid.Column="1" FontFamily="FAS" FontSize="10" Text="{Binding LocTrackingIcon}" TextColor="{Binding LocTrackingIconColor}" />
-                                                <Label Grid.Column="2" FontFamily="FAS" FontSize="10" Text="{Binding TrackingTypeIcon}" TextColor="{Binding TrackingTypeIconColor}" />
-                                            </Grid>-->
-                                            <Grid Grid.Column="1" ColumnDefinitions="Auto,Auto,Auto" ColumnSpacing="10" HorizontalOptions="EndAndExpand">
-                                                
-                                                <Label Grid.Column="1" FontAttributes="Bold" FontSize="Large" HorizontalOptions="Center" Text="{Binding Quantity}" TextColor="{StaticResource OffBlack}" VerticalOptions="Center" />
-                                               
-                                            </Grid>
-                                        </Grid>
-                                    </VerticalStackLayout>
-                                </Grid>
-                            </Border>
-                        </StackLayout>
-                    </DataTemplate>
-                </CarouselView.ItemTemplate>
-
-              
-            </CarouselView>
-        <IndicatorView x:Name="indicatorView"
-                   Grid.Row="3"
-                   IndicatorColor="LightGray"
-                   SelectedIndicatorColor="DarkGray"
-                   HorizontalOptions="Center" />
-
-
-        <Button Grid.Row="4"
-                Text="İleri"
-                Margin="5,15"
+        </Grid>
+        <Button Grid.Row="1"
+                Margin="5,10,5,20"
                 Command="{Binding NextViewCommand}"
-                VerticalOptions="End">
-            
-        </Button>
+                Text="İleri"
+                VerticalOptions="End" />
 
+
+
+        <dx:BottomSheet x:Name="locationTransactionBottomSheet"
+                        Grid.Row="1"
+                        Padding="10,30,10,10"
+                        AllowDismiss="False"
+                        BackgroundColor="{StaticResource Gray100}"
+                        CornerRadius="10"
+                        HalfExpandedRatio="0.5"
+                        IsModal="True"
+                        ShowGrabber="True">
+
+            <Grid RowDefinitions="Auto, *" RowSpacing="20">
+                <VerticalStackLayout Grid.Row="0" Spacing="5">
+                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               FontAttributes="Bold"
+                               FontSize="Medium"
+                               HorizontalOptions="Start"
+                               Text="{Binding SelectedSubProductModel.OutWarehouseName, StringFormat='{0} Stok Yerleri Hareketleri'}" />
+                        <ImageButton Grid.Column="1"
+                                     Command="{Binding LocationTransactionCloseCommand}"
+                                     HeightRequest="25"
+                                     HorizontalOptions="End"
+                                     VerticalOptions="Center">
+                            <ImageButton.Source>
+                                <FontImageSource FontFamily="FAS"
+                                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.ChevronDown}"
+                                                 Size="Medium"
+                                                 Color="{StaticResource OffBlack}" />
+                            </ImageButton.Source>
+                        </ImageButton>
+                    </Grid>
+                </VerticalStackLayout>
+
+                <Grid Grid.Row="1"
+                      RowDefinitions="Auto, *, Auto"
+                      RowSpacing="10">
+                    <Border Grid.Row="0"
+                            Padding="0"
+                            BackgroundColor="{StaticResource PrimaryLight}"
+                            HeightRequest="35"
+                            Stroke="{StaticResource Primary}"
+                            StrokeShape="RoundRectangle 5"
+                            StrokeThickness="0.5">
+                        <SearchBar x:Name="locationTransactionSearchBar"
+                                   Placeholder="Ara..."
+                                   PlaceholderColor="{StaticResource OffBlack}"
+                                   TextColor="{StaticResource OffBlack}">
+                            <!--<SearchBar.Behaviors>
+                                <toolkit:EventToCommandBehavior Command="{Binding LocationTransactionPerformSearchCommand}" EventName="SearchButtonPressed" />
+                                <toolkit:EventToCommandBehavior Command="{Binding LocationTransactionPerformEmptySearchCommand}" EventName="TextChanged" />
+                            </SearchBar.Behaviors>-->
+                        </SearchBar>
+                    </Border>
+                    <CollectionView Grid.Row="1"
+                                    ItemsSource="{Binding LocationTransactions}"
+                                    RemainingItemsThreshold="2"
+                                    RemainingItemsThresholdReachedCommand="{Binding LoadMoreLocationTransactionsCommand}">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="locationModel:GroupLocationTransactionModel">
+                                <Border Padding="10"
+                                        BackgroundColor="{StaticResource WhiteSmoke}"
+                                        StrokeShape="RoundRectangle 10"
+                                        StrokeThickness="0.1">
+                                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                                        <VerticalStackLayout Grid.Column="0">
+                                            <Label FontAttributes="Bold"
+                                                   LineBreakMode="TailTruncation"
+                                                   Text="{Binding LocationCode}" />
+                                            <Label LineBreakMode="TailTruncation"
+                                                   Text="{Binding LocationName}"
+                                                   TextColor="{StaticResource Gray600}" />
+
+                                            <Label>
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span FontAttributes="Bold"
+                                                              FontFamily="FAS"
+                                                              Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                        <Span Text=" " />
+                                                        <Span FontAttributes="Bold"
+                                                              Text="{Binding RemainingQuantity, StringFormat='{0:N2}'}"
+                                                              TextColor="{StaticResource Primary}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                        </VerticalStackLayout>
+                                        <Grid Grid.Column="1"
+                                              ColumnDefinitions="Auto,Auto,Auto"
+                                              ColumnSpacing="10"
+                                              HorizontalOptions="EndAndExpand"
+                                              VerticalOptions="Center">
+                                            <Border Grid.Column="0"
+                                                    Padding="5"
+                                                    BackgroundColor="Transparent"
+                                                    Stroke="{StaticResource Secondary}"
+                                                    StrokeShape="RoundRectangle 2">
+                                                <Label FontFamily="FAS"
+                                                       FontSize="Medium"
+                                                       Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                                       TextColor="{StaticResource Secondary}" />
+
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferV2OutsourceBasketViewModel}}, Path=LocationTransactionDecreaseCommand}" CommandParameter="{Binding .}" />
+                                                </Border.GestureRecognizers>
+                                            </Border>
+                                            <Label Grid.Column="1"
+                                                   FontAttributes="Bold"
+                                                   FontSize="Large"
+                                                   Text="{Binding OutputQuantity}"
+                                                   TextColor="{StaticResource OffBlack}"
+                                                   VerticalOptions="Center">
+                                                <Label.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferV2OutsourceBasketViewModel}}, Path=LocationTransactionQuantityTappedCommand}" CommandParameter="{Binding .}" />
+                                                </Label.GestureRecognizers>
+                                            </Label>
+                                            <Border Grid.Column="2"
+                                                    Padding="5"
+                                                    BackgroundColor="{StaticResource Secondary}"
+                                                    Stroke="{StaticResource Secondary}"
+                                                    StrokeShape="RoundRectangle 2">
+                                                <Label FontFamily="FAS"
+                                                       FontSize="Medium"
+                                                       Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                                       TextColor="{StaticResource White}" />
+
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferV2OutsourceBasketViewModel}}, Path=LocationTransactionIncreaseCommand}" CommandParameter="{Binding .}" />
+                                                </Border.GestureRecognizers>
+                                            </Border>
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <Button Grid.Row="2"
+                            Command="{Binding LocationTransactionConfirmCommand}"
+                            Text="Tamam" />
+                </Grid>
+            </Grid>
+
+
+        </dx:BottomSheet>
 
     </Grid>
 

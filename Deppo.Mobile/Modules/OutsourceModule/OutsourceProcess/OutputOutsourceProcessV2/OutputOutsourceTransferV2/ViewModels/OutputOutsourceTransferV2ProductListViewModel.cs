@@ -267,8 +267,6 @@ public partial class OutputOutsourceTransferV2ProductListViewModel : BaseViewMod
 
     }
 
-
-
     private async Task ConfirmAsync()
     {
         if (IsBusy)

@@ -66,13 +66,13 @@ namespace Deppo.Mobile.Core.Models.OutsourceModels
         private string operationName = string.Empty;
 
         [ObservableProperty]
-        private double planningQuantity = default;
+        private double planningQantity;
 
         [ObservableProperty]
-        private double actualQuantity = default;
+        private double actualQuantity;
 
         [ObservableProperty]
-        private double stockQuantity = default;
+        private double stockQuantity;
 
         [ObservableProperty]
         bool isVariant;
@@ -93,7 +93,7 @@ namespace Deppo.Mobile.Core.Models.OutsourceModels
         public ObservableCollection<OutputOutsourceTransferV2SubProductModel> subProducts = new();
 
         [ObservableProperty]
-        private double bomQuantity =1;
+        private double bomQuantity;
 
         [ObservableProperty]
         private double quantity ;
@@ -123,7 +123,8 @@ namespace Deppo.Mobile.Core.Models.OutsourceModels
 
         public List<OutputOutsourceTransferProductDetailModel> Details { get; set; } = new();
 
-
+        [ObservableProperty]
+        double inputQuantity = default;
 
 
     }

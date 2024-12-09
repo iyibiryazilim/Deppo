@@ -24,13 +24,19 @@ namespace Deppo.Mobile.Core.Models.OutsourceModels
         private string productName = string.Empty;
 
         [ObservableProperty]
-        private int warehouseNumber;
+        private int inWarehouseNumber;
 
         [ObservableProperty]
-        private string warehouseName = string.Empty;
+        private string inWarehouseName = string.Empty;
 
         [ObservableProperty]
-        private double bomQuantity = 2;
+        private int outWarehouseNumber;
+
+        [ObservableProperty]
+        private string outWarehouseName = string.Empty;
+
+        [ObservableProperty]
+        private double bOMQuantity;
 
         [ObservableProperty]
         private double quantity;

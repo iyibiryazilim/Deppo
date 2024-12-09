@@ -276,6 +276,9 @@
 	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\InputOutsourceProcess\InputOutsourceTransfer\Views\InputOutsourceTransferWarehouseListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\OutputOutsourceProcessV2\OutputOutsourceTransferV2\Views\OutputOutsourceTransferV2MainProductLocationListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\OutputOutsourceProcessV2\OutputOutsourceTransferV2\Views\OutputOutsourceTransferV2OutsourceBasketView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -286,6 +289,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\OutputOutsourceProcessV2\OutputOutsourceTransferV2\Views\OutputOutsourceTransferV2ProductListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\OutputOutsourceProcessV2\OutputOutsourceTransferV2\Views\OutputOutsourceTransferV2SubProductLocationListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Modules\OutsourceModule\OutsourceProcess\OutputOutsourceProcessV2\OutputOutsourceTransferV2\Views\OutputOutsourceTransferV2WarehouseListView.xaml">
