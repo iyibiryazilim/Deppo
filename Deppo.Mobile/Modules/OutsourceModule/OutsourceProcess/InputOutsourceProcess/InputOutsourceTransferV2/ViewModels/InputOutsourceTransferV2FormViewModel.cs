@@ -1,12 +1,19 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.DataResultModel;
+using Deppo.Core.DTOs.ConsumableTransaction;
+using Deppo.Core.DTOs.ProductionTransaction;
+using Deppo.Core.DTOs.SeriLotTransactionDto;
+using Deppo.Core.ResponseResultModels;
 using Deppo.Core.Services;
+using Deppo.Mobile.Core.Models.OutsourceModels;
 using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using DevExpress.Maui.Controls;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -110,7 +117,6 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 		}
 	}
 
-
 	private async Task SaveAsync()
 	{
 		if (IsBusy)
@@ -141,6 +147,104 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 			IsBusy = false;
 		}
 	}
+
+	private async Task<DataResult<ResponseModel>> ProductionTransactionInsertAsync(HttpClient httpClient)
+	{
+		var productionTransactionDto = new ProductionTransactionInsert
+		{
+			SpeCode = SpecialCode,
+			CurrentCode = "",
+			Code = string.Empty,
+			DocTrackingNumber = DocumentTrackingNumber,
+			DoCode = DocumentNumber,
+			TransactionDate = FicheDate,
+			FirmNumber = _httpClientService.FirmNumber,
+			WarehouseNumber = InputOutsourceTransferV2BasketModel.OutsourceWarehouseModel.Number,
+			Description = Description,
+		};
+
+		var productionTransactionLineDto = new ProductionTransactionLineDto
+		{
+			ProductCode = InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.IsVariant ?  InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.ProductCode : InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.ProductCode,
+			VariantCode = InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.IsVariant ? InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.ProductCode
+	: string.Empty,
+			WarehouseNumber = InputOutsourceTransferV2BasketModel.OutsourceWarehouseModel.Number,
+			Quantity = InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity,
+			SubUnitsetCode = InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.SubUnitsetCode,
+			ConversionFactor = InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity,
+			OtherConversionFactor = InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity,
+		};
+
+        foreach (var detail in InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.Details)
+        {
+			var seriLotTransactionDto = new SeriLotTransactionDto
+			{
+				StockLocationCode = detail.LocationCode,
+				Quantity = detail.Quantity,
+				ConversionFactor = detail.Quantity,
+				OtherConversionFactor = detail.Quantity,
+				DestinationStockLocationCode = string.Empty,
+			};
+
+			productionTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
+        }
+
+		productionTransactionDto.Lines.Add(productionTransactionLineDto);
+
+		var result = await _productionTransactionService.InsertProductionTransaction(httpClient, productionTransactionDto, _httpClientService.FirmNumber);
+
+		return result;
+    }
+
+
+	private async Task ConsumableTransactionInsert(HttpClient httpClient, ObservableCollection<InputOutsourceTransferSubProductModel> subProducts)
+	{
+		var consumableTrasactionDto = new ConsumableTransactionInsert
+		{
+			Code = string.Empty,
+			CurrentCode = string.Empty,
+			Description = Description,
+			DoCode = DocumentNumber,
+			DocTrackingNumber = DocumentTrackingNumber,
+			TransactionDate = FicheDate,
+			FirmNumber = _httpClientService.FirmNumber,
+			SpeCode = SpecialCode,
+			// TODO: SET Related WarehouseNumber
+		};
+
+        foreach (var subProduct in subProducts)
+        {
+			var consumableTransactionLineDto = new ConsumableTransactionLineDto
+			{
+				ProductCode = subProduct.IsVariant ? subProduct.ProductCode : subProduct.ProductCode,
+				VariantCode = subProduct.IsVariant ? subProduct.ProductCode : string.Empty,
+				WarehouseNumber = subProduct.WarehouseNumber,
+				Quantity = subProduct.OutputQuantity,
+				ConversionFactor = subProduct.OutputQuantity,
+				OtherConversionFactor = subProduct.OutputQuantity,
+				SubUnitsetCode = subProduct.SubUnitsetCode,
+				UnitPrice = 0,
+				VatRate = 0,
+			};
+
+            foreach (var detail in subProduct.Details)
+            {
+				var seriLotTransactionDto = new SeriLotTransactionDto
+				{
+					ConversionFactor = detail.Quantity,
+					OtherConversionFactor = detail.Quantity,
+					StockLocationCode = detail.LocationCode,
+					Quantity = detail.Quantity,
+					SubUnitsetCode = subProduct.SubUnitsetCode,
+					DestinationStockLocationCode = string.Empty, // TODO: set real value
+				};
+
+				consumableTransactionLineDto.SeriLotTransactions.Add(seriLotTransactionDto);
+			}
+
+			consumableTrasactionDto.Lines.Add(consumableTransactionLineDto);
+		}
+    }
 
 	private async Task BackAsync()
 	{
@@ -220,13 +324,10 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 				
 				basketViewModel.InputOutsourceTransferV2BasketModel = null;
 			}
-
-
 		}
 		catch (Exception ex)
 		{
-
-			throw;
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 	}
 
@@ -242,8 +343,7 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 		}
 		catch (Exception ex)
 		{
-
-			throw;
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 	}
 }
