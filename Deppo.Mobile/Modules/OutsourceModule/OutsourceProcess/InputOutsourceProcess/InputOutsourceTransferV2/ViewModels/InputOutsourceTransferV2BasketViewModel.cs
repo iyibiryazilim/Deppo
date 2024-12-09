@@ -120,8 +120,8 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 				foreach (var item in result.Data)
 				{
 					var obj = Mapping.Mapper.Map<InputOutsourceTransferSubProductModel>(item);
-					obj.TotalBOMQuantity = obj.BOMQuantity;
-					obj.OutputQuantity = obj.LocTracking == 1 ? 0 : 0;
+					obj.TotalBOMQuantity = InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.LocTracking == 1 ? obj.BOMQuantity : (obj.BOMQuantity * InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity);
+					obj.OutputQuantity = InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity * obj.BOMQuantity;
 					obj.Details = new List<InputOutsourceTransferSubProductDetailModel>();
 
 					InputOutsourceTransferV2BasketModel.InputOutsourceTransferSubProducts.Add(obj);
@@ -459,7 +459,7 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 
 			if (quantity > item.StockQuantity)
 			{
-				_userDialogs.ShowToast($"Girilen miktar, ürünün stok miktarını ({item.StockQuantity}) geçemez.");
+				_userDialogs.ShowToast($"Girilen miktar ({quantity}), ürünün ({item.ProductCode}) stok miktarını ({item.StockQuantity}) geçemez.");
 				return;
 			}
 

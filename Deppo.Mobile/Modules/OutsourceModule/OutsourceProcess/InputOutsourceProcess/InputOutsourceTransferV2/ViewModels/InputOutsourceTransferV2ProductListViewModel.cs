@@ -295,7 +295,7 @@ public partial class InputOutsourceTransferV2ProductListViewModel : BaseViewMode
 
 			inputOutsourceTransferV2BasketModel.OutsourceWarehouseModel = WarehouseModel;
 			inputOutsourceTransferV2BasketModel.OutsourceModel = OutsourceModel;
-
+			
 			SelectedOutsourceProductModel.InputQuantity = (SelectedOutsourceProductModel.LocTracking == 0) ? 1 : 0;
 			inputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel = SelectedOutsourceProductModel;
 
