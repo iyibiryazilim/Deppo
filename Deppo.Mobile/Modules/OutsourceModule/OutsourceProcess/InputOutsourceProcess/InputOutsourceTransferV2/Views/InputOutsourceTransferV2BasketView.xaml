@@ -66,8 +66,8 @@
                            Text="{Binding InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.ProductName}"
                            TextColor="{StaticResource Gray600}" />
 
-                    <Label HorizontalOptions="Center"
-                           FontSize="16"
+                    <Label FontSize="16"
+                           HorizontalOptions="Center"
                            ToolTipProperties.Text="Planlanan Miktar"
                            VerticalOptions="Center">
                         <Label.FormattedText>
@@ -179,7 +179,7 @@
                                     </Border>
                                     <!--#endregion-->
 
-                                    <!--#region Code, Name-->
+                                    <!--#region Code, Name, WarehouseName-->
                                     <VerticalStackLayout Grid.Column="1" Spacing="2">
                                         <Label FontAttributes="Bold"
                                                LineBreakMode="TailTruncation"
@@ -260,7 +260,7 @@
                                     </VerticalStackLayout>
                                     <!--#endregion-->
 
-                                    <VerticalStackLayout Grid.Column="2" Spacing="10">
+                                    <Grid Grid.Column="2" RowDefinitions="Auto, *">
 
                                         <Grid ColumnDefinitions="Auto, Auto, Auto"
                                               ColumnSpacing="3"
@@ -283,12 +283,13 @@
                                                    TextColor="{Binding TrackingTypeIconColor}" />
                                         </Grid>
 
-                                        <Label FontAttributes="Bold"
+                                        <Label Grid.Row="1"
+                                               FontAttributes="Bold"
                                                FontSize="Large"
-                                               HorizontalOptions="EndAndExpand"
+                                               HorizontalOptions="Center"
                                                Text="{Binding OutputQuantity}"
                                                TextColor="{StaticResource OffBlack}"
-                                               VerticalOptions="CenterAndExpand" />
+                                               VerticalOptions="Center" />
 
 
                                         <!--<Grid ColumnDefinitions="Auto,Auto,Auto"
@@ -332,7 +333,7 @@
                                                        TextColor="{StaticResource White}" />
                                             </Border>
                                         </Grid>-->
-                                    </VerticalStackLayout>
+                                    </Grid>
 
 
                                 </Grid>
@@ -369,9 +370,9 @@
                         <Label Grid.Column="0"
                                FontAttributes="Bold"
                                FontSize="Medium"
-                               VerticalOptions="Center"
                                HorizontalOptions="Start"
-                               Text="{Binding SelectedSubProductModel.WarehouseName, StringFormat='{0} - Stok Yerleri'}" />
+                               Text="{Binding SelectedSubProductModel.WarehouseName, StringFormat='{0} - Stok Yerleri'}"
+                               VerticalOptions="Center" />
                         <ImageButton Grid.Column="1"
                                      Command="{Binding LocationCloseCommand}"
                                      HeightRequest="25"
