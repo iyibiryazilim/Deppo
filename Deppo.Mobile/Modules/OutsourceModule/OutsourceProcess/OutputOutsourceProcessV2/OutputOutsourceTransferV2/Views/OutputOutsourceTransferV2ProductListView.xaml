@@ -95,7 +95,7 @@
                                             
                                             <Span Text=" " />
                                             <Span FontAttributes="Bold"
-                                              Text="{Binding PlanningQuantity, StringFormat='{0:N2}'}"
+                                              Text="{Binding PlanningQantity, StringFormat='{0:N2}'}"
                                               TextColor="{StaticResource Primary}" />
                                             <Span Text="        " />
                                             <Span FontAttributes="Bold"
@@ -105,7 +105,7 @@
                                             <Span Text=" " />
                                             <Span FontAttributes="Bold"
                                                    
-                                                  Text="{Binding PlanningQuantity, StringFormat='{0:N2}'}"
+                                                  Text="{Binding ActualQuantity, StringFormat='{0:N2}'}"
                                                   TextColor="{StaticResource Primary}" />
                                             <Span Text=" " />
 

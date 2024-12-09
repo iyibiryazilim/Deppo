@@ -137,13 +137,17 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
         {
             if (IsBusy)
                 return;
+            if (Items.Count < 18)
+                return;
 
             try
             {
                 IsBusy = true;
-                _userDialogs.Loading("Refreshing Items...");
+               
+                _userDialogs.Loading("Loading Items...");
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _outsourceService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, Items.Count, 20);
+                await Task.Delay(1000);
+                var result = await _outsourceService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, string.Empty, Items.Count, 20);
                 if (result.IsSuccess)
                 {
                     if (result.Data == null)
@@ -152,8 +156,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
                     foreach (var item in result.Data)
                         Items.Add(Mapping.Mapper.Map<OutsourceModel>(item));
 
-                    if (_userDialogs.IsHudShowing)
-                        _userDialogs.Loading().Hide();
+                    _userDialogs.Loading().Hide();
                 }
                 else
                 {

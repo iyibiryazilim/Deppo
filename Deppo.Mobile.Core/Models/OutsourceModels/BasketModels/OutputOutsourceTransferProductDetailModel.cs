@@ -9,5 +9,28 @@ namespace Deppo.Mobile.Core.Models.OutsourceModels.BasketModels
 {
     public partial class OutputOutsourceTransferProductDetailModel :ObservableObject
     {
+        [ObservableProperty]
+        int referenceId;
+
+        [ObservableProperty]
+        int seriLotReferenceId;
+
+        [ObservableProperty]
+        string seriLotCode = string.Empty;
+
+        [ObservableProperty]
+        string seriLotName = string.Empty;
+
+        [ObservableProperty]
+        int locationReferenceId;
+
+        [ObservableProperty]
+        string locationCode = string.Empty;
+
+        [ObservableProperty]
+        string locationName = string.Empty;
+
+        [ObservableProperty]
+        double quantity;
     }
 }
