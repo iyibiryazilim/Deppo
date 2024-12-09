@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MVVMHelper;
@@ -19,6 +20,8 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 	private readonly IHttpClientService _httpClientService;
 	private readonly IUserDialogs _userDialogs;
 	private readonly IServiceProvider _serviceProvider;
+	private readonly IProductionTransactionService _productionTransactionService;
+	private readonly IConsumableTransactionService _consumableTransactionService;
 
 	[ObservableProperty]
 	InputOutsourceTransferV2BasketModel? inputOutsourceTransferV2BasketModel;
@@ -39,11 +42,13 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 	[ObservableProperty]
 	private string description = string.Empty;
 
-	public InputOutsourceTransferV2FormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IServiceProvider serviceProvider)
+	public InputOutsourceTransferV2FormViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IServiceProvider serviceProvider, IProductionTransactionService productionTransactionService, IConsumableTransactionService consumableTransactionService)
 	{
 		_httpClientService = httpClientService;
 		_userDialogs = userDialogs;
 		_serviceProvider = serviceProvider;
+		_productionTransactionService = productionTransactionService;
+		_consumableTransactionService = consumableTransactionService;
 
 		Title = "Fason Kabul Formu";
 
@@ -51,6 +56,7 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 		ShowBasketItemCommand = new Command(async () => await ShowBasketItemAsync());
 		SaveCommand = new Command(async () => await SaveAsync());
 		BackCommand = new Command(async () => await BackAsync());
+		
 	}
 	public Page CurrentPage { get; set; } = null!;
 	public Command ShowBasketItemCommand { get; }
