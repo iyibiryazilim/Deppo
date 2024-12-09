@@ -395,9 +395,7 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 			IsBusy = true;
 
 			_userDialogs.ShowLoading("Loading...");
-
 			SelectedItems.Clear();
-			await Task.Delay(500);
 
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
@@ -595,7 +593,6 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 			IsBusy = true;
 
 			_userDialogs.ShowLoading("Loading...");
-			await Task.Delay(500);
 			foreach (var item in Items.Where(x => x.IsSelected))
 			{
 				if (!SelectedItems.Any(x => x.Code == item.Code))
@@ -695,7 +692,6 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 			IsBusy = true;
 
 			_userDialogs.ShowLoading("Loading...");
-			await Task.Delay(500);
 			CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
 
 			if (_userDialogs.IsHudShowing)

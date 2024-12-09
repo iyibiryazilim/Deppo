@@ -485,7 +485,7 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 
 		try
 		{
-			_userDialogs.Loading("Loading Location Transaction Items...");
+			_userDialogs.Loading("Loading...");
 			Locations.Clear();
 			await Task.Delay(1000);
 
@@ -543,7 +543,7 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
-			_userDialogs.Loading("Loading more Location Transaction Items...");
+			_userDialogs.Loading("Loading...");
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			var result = await _locationService.GetLocationsWithStock(
 				httpClient: httpClient,
