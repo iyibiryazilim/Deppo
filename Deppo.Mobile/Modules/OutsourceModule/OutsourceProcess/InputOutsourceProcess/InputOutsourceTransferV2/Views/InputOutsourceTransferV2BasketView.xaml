@@ -65,6 +65,28 @@
                            MaxLines="1"
                            Text="{Binding InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.ProductName}"
                            TextColor="{StaticResource Gray600}" />
+
+                    <Label FontSize="16"
+                           HorizontalOptions="Center"
+                           ToolTipProperties.Text="Planlanan Miktar"
+                           VerticalOptions="Center">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span FontAttributes="Bold"
+                                      FontFamily="FAS"
+                                      Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                      TextColor="{StaticResource Primary}" />
+                                <Span Text=" " />
+                                <Span FontAttributes="Bold"
+                                      Text="{Binding InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.PlanningQuantity, StringFormat='{0:N2}'}"
+                                      TextColor="{StaticResource Primary}" />
+                                <Span Text=" " />
+                                <Span FontAttributes="Bold"
+                                      Text="{Binding InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.SubUnitsetCode}"
+                                      TextColor="{StaticResource Primary}" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
                 </VerticalStackLayout>
                 <!--#endregion-->
 
@@ -142,6 +164,9 @@
                                     BackgroundColor="Transparent"
                                     StrokeShape="RoundRectangle 10"
                                     StrokeThickness="0.1">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputOutsourceTransferV2BasketViewModel}}, Path=SubProductTappedCommand}" CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
                                 <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="10">
                                     <!--#region Image-->
                                     <Border Grid.Column="0"
@@ -154,7 +179,7 @@
                                     </Border>
                                     <!--#endregion-->
 
-                                    <!--#region Code, Name-->
+                                    <!--#region Code, Name, WarehouseName-->
                                     <VerticalStackLayout Grid.Column="1" Spacing="2">
                                         <Label FontAttributes="Bold"
                                                LineBreakMode="TailTruncation"
@@ -235,7 +260,7 @@
                                     </VerticalStackLayout>
                                     <!--#endregion-->
 
-                                    <VerticalStackLayout Grid.Column="2" Spacing="10">
+                                    <Grid Grid.Column="2" RowDefinitions="Auto, *">
 
                                         <Grid ColumnDefinitions="Auto, Auto, Auto"
                                               ColumnSpacing="3"
@@ -258,12 +283,13 @@
                                                    TextColor="{Binding TrackingTypeIconColor}" />
                                         </Grid>
 
-                                        <Label FontAttributes="Bold"
+                                        <Label Grid.Row="1"
+                                               FontAttributes="Bold"
                                                FontSize="Large"
+                                               HorizontalOptions="Center"
                                                Text="{Binding OutputQuantity}"
                                                TextColor="{StaticResource OffBlack}"
-                                               HorizontalOptions="EndAndExpand"
-                                               VerticalOptions="CenterAndExpand"/>
+                                               VerticalOptions="Center" />
 
 
                                         <!--<Grid ColumnDefinitions="Auto,Auto,Auto"
@@ -307,7 +333,7 @@
                                                        TextColor="{StaticResource White}" />
                                             </Border>
                                         </Grid>-->
-                                    </VerticalStackLayout>
+                                    </Grid>
 
 
                                 </Grid>
@@ -328,7 +354,7 @@
 
 
         <!--#region BottomSheets-->
-        <dx:BottomSheet x:Name="locationTransactionBottomSheet"
+        <dx:BottomSheet x:Name="locationBottomSheet"
                         Grid.Row="1"
                         Padding="10,30,10,10"
                         AllowDismiss="False"
@@ -345,9 +371,10 @@
                                FontAttributes="Bold"
                                FontSize="Medium"
                                HorizontalOptions="Start"
-                               Text="{Binding SelectedSubProductModel.WarehouseName, StringFormat='{0} Stok Yerleri Hareketleri'}" />
+                               Text="{Binding SelectedSubProductModel.WarehouseName, StringFormat='{0} - Stok Yerleri'}"
+                               VerticalOptions="Center" />
                         <ImageButton Grid.Column="1"
-                                     Command="{Binding LocationTransactionCloseCommand}"
+                                     Command="{Binding LocationCloseCommand}"
                                      HeightRequest="25"
                                      HorizontalOptions="End"
                                      VerticalOptions="Center">
@@ -382,14 +409,14 @@
                         </SearchBar>
                     </Border>
                     <CollectionView Grid.Row="1"
-                                    ItemsSource="{Binding LocationTransactions}"
+                                    ItemsSource="{Binding Locations}"
                                     RemainingItemsThreshold="2"
-                                    RemainingItemsThresholdReachedCommand="{Binding LoadMoreLocationTransactionsCommand}">
+                                    RemainingItemsThresholdReachedCommand="{Binding LoadMoreLocationsCommand}">
                         <CollectionView.ItemsLayout>
                             <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="locationModel:GroupLocationTransactionModel">
+                            <DataTemplate x:DataType="locationModel:LocationModel">
                                 <Border Padding="10"
                                         BackgroundColor="{StaticResource WhiteSmoke}"
                                         StrokeShape="RoundRectangle 10"
@@ -398,9 +425,9 @@
                                         <VerticalStackLayout Grid.Column="0">
                                             <Label FontAttributes="Bold"
                                                    LineBreakMode="TailTruncation"
-                                                   Text="{Binding LocationCode}" />
+                                                   Text="{Binding Code}" />
                                             <Label LineBreakMode="TailTruncation"
-                                                   Text="{Binding LocationName}"
+                                                   Text="{Binding Name}"
                                                    TextColor="{StaticResource Gray600}" />
 
                                             <Label>
@@ -412,7 +439,7 @@
                                                               TextColor="{StaticResource Primary}" />
                                                         <Span Text=" " />
                                                         <Span FontAttributes="Bold"
-                                                              Text="{Binding RemainingQuantity, StringFormat='{0:N2}'}"
+                                                              Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
                                                               TextColor="{StaticResource Primary}" />
                                                     </FormattedString>
                                                 </Label.FormattedText>
@@ -434,17 +461,17 @@
                                                        TextColor="{StaticResource Secondary}" />
 
                                                 <Border.GestureRecognizers>
-                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputOutsourceTransferV2BasketViewModel}}, Path=LocationTransactionDecreaseCommand}" CommandParameter="{Binding .}" />
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputOutsourceTransferV2BasketViewModel}}, Path=LocationDecreaseCommand}" CommandParameter="{Binding .}" />
                                                 </Border.GestureRecognizers>
                                             </Border>
                                             <Label Grid.Column="1"
                                                    FontAttributes="Bold"
                                                    FontSize="Large"
-                                                   Text="{Binding OutputQuantity}"
+                                                   Text="{Binding InputQuantity}"
                                                    TextColor="{StaticResource OffBlack}"
                                                    VerticalOptions="Center">
                                                 <Label.GestureRecognizers>
-                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputOutsourceTransferV2BasketViewModel}}, Path=LocationTransactionQuantityTappedCommand}" CommandParameter="{Binding .}" />
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputOutsourceTransferV2BasketViewModel}}, Path=LocationQuantityTappedCommand}" CommandParameter="{Binding .}" />
                                                 </Label.GestureRecognizers>
                                             </Label>
                                             <Border Grid.Column="2"
@@ -458,7 +485,7 @@
                                                        TextColor="{StaticResource White}" />
 
                                                 <Border.GestureRecognizers>
-                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputOutsourceTransferV2BasketViewModel}}, Path=LocationTransactionIncreaseCommand}" CommandParameter="{Binding .}" />
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:InputOutsourceTransferV2BasketViewModel}}, Path=LocationIncreaseCommand}" CommandParameter="{Binding .}" />
                                                 </Border.GestureRecognizers>
                                             </Border>
                                         </Grid>
@@ -468,7 +495,7 @@
                         </CollectionView.ItemTemplate>
                     </CollectionView>
                     <Button Grid.Row="2"
-                            Command="{Binding LocationTransactionConfirmCommand}"
+                            Command="{Binding LocationConfirmCommand}"
                             Text="Tamam" />
                 </Grid>
             </Grid>

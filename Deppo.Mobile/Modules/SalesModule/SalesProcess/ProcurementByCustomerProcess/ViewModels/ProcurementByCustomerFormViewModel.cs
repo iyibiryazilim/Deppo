@@ -466,34 +466,39 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 				//	var httpSysClient = _httpClientSysService.GetOrCreateHttpClient();
 				//	var customerResult = await _customerSysService.GetAllAsync(httpSysClient, $"$filter= Code eq '{ProcurementCustomerBasketModel.CustomerCode}'");
 				//	var warehouseResult = await _warehouseSysService.GetAllAsync(httpSysClient, $"$filter= WarehouseNumber eq {OrderWarehouseModel.Number}");
+
+				//	ProcurementFicheDto procurementFicheDto = new ProcurementFicheDto
+				//	{
+				//		CreatedOn = DateTime.Now,
+				//		Customer = customerResult.FirstOrDefault().Oid,
+				//		ReferenceId = result.Data.ReferenceId,
+				//		FicheNumber = result.Data.Code,
+				//	};
+
 				//	foreach (var item in Items)
-    //                {
-    //                    foreach (var product in item.Products)
-    //                    {
+				//	{
+				//		foreach (var product in item.Products)
+				//		{
+				//			ProcurementFicheTransactionDto procurementFicheTransactionDto = new();
 				//			var productResult = await _productSysService.GetAllAsync(httpSysClient, $"$filter= Code eq '{product.ItemCode}'");
 				//			var subUnitsetResult = await _subunitsetSysService.GetAllAsync(httpSysClient, $"filter= Code eq '{product.SubUnitsetCode}'");
 
-				//			ProcurementFicheDto procurementFicheDto = new ProcurementFicheDto
+				//			foreach (var order in product.Orders)
 				//			{
-				//				CreatedOn = DateTime.Now,
-				//				//Customer = customerResult.FirstOrDefault().Oid,
-				//				//ReferenceId = result.Data.ReferenceId,
-				//				//FicheNumber = result.Data.Code,
-				//			};
-
-				//			ProcurementFicheTransactionDto procurementFicheTransactionDto = new();
-				//			//procurementFicheTransactionDto.Product = productResult.FirstOrDefault().Oid;
-				//			//procurementFicheTransactionDto.SubUnitset = subUnitsetResult.FirstOrDefault().Oid;
-				//			procurementFicheTransactionDto.Quantity = product.Quantity;
-							
+				//				procurementFicheTransactionDto.Product = productResult.FirstOrDefault().Oid;
+				//				procurementFicheTransactionDto.SubUnitset = subUnitsetResult.FirstOrDefault().Oid;
+				//				procurementFicheTransactionDto.Quantity = product.Quantity;
+				//				procurementFicheTransactionDto.Warehouse = warehouseResult.FirstOrDefault().Oid;
+				//				procurementFicheTransactionDto.OrderNumber = order.OrderNumber;
+				//				procurementFicheTransactionDto.OrderReferenceId = order.OrderReferenceId;
+				//			}
 				//			procurementFicheDto.Lines.Add(procurementFicheTransactionDto);
-				//			//await _procurementFicheService.CreateAsync(httpSysClient, procurementFicheDto);
-    //                    }
-    //                }
-    //            }
+				//		}
+				//	}
+				//	await _procurementFicheService.CreateAsync(httpSysClient, procurementFicheDto);
+				//}
 				//catch (Exception ex)
 				//{
-
 				//	throw;
 				//}
 				//#endregion

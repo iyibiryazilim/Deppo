@@ -137,6 +137,11 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 
 			SelectedItem = locationModel;
 
+			if(InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.PlanningQuantity <= locationModel.InputQuantity)
+			{
+				_userDialogs.ShowToast("Ürünün Planlanan miktarı kadar miktar girişi yapabilirsiniz");
+				return;
+			}
 			
 			locationModel.InputQuantity += 1;
 			
@@ -209,6 +214,12 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 			if (quantity < 0)
 			{
 				await _userDialogs.AlertAsync("Miktar sıfırdan küçük olmamalıdır.", "Hata", "Tamam");
+				return;
+			}
+
+			if (InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.PlanningQuantity < quantity)
+			{
+				_userDialogs.ShowToast("Ürünün Planlanan miktarı kadar miktar girişi yapabilirsiniz");
 				return;
 			}
 
@@ -313,6 +324,13 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 
 			_userDialogs.ShowLoading("Loading...");
 
+			if(SelectedItems.Sum(x => x.InputQuantity) > InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.PlanningQuantity)
+			{
+				_userDialogs.ShowToast("Ürünün planlanan miktarı kadar toplam miktar girişi yapabilirsiniz");
+				return;
+			}
+
+
             foreach (var item in SelectedItems.Where(x => x.InputQuantity <= 0))
             {
 				InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel?.Details.Remove(InputOutsourceTransferV2BasketModel?.InputOutsourceTransferMainProductModel?.Details?.FirstOrDefault(x => x.LocationCode == item.Code));
@@ -344,6 +362,8 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 				subProduct.TotalBOMQuantity = InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity == 0 ?
 					1 * subProduct.BOMQuantity :    
 					subProduct.BOMQuantity * InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity;
+
+				subProduct.OutputQuantity = InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.InputQuantity == 0 ? 0 : subProduct.TotalBOMQuantity;
 			}
 
 
@@ -375,9 +395,7 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 			IsBusy = true;
 
 			_userDialogs.ShowLoading("Loading...");
-
 			SelectedItems.Clear();
-			await Task.Delay(500);
 
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
@@ -575,7 +593,6 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 			IsBusy = true;
 
 			_userDialogs.ShowLoading("Loading...");
-			await Task.Delay(500);
 			foreach (var item in Items.Where(x => x.IsSelected))
 			{
 				if (!SelectedItems.Any(x => x.Code == item.Code))
@@ -675,7 +692,6 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 			IsBusy = true;
 
 			_userDialogs.ShowLoading("Loading...");
-			await Task.Delay(500);
 			CurrentPage.FindByName<BottomSheet>("locationBottomSheet").State = BottomSheetState.Hidden;
 
 			if (_userDialogs.IsHudShowing)

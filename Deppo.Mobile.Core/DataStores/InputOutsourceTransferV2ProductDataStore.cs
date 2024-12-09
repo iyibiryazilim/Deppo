@@ -65,8 +65,12 @@ public class InputOutsourceTransferV2ProductDataStore : IInputOutsourceTransferV
 	private string GetWorkOrderByWarehouseAndCurrentQuery(int firmNumber, int periodNumber, int warehouseNumber, int currentReferenceId, string search = "", int skip = 0, int take = 20)
 	{
 		string baseQuery = $@"SELECT 
-[ReferenceId]  =DISPLINE.LOGICALREF,
+[ReferenceId] = DISPLINE.LOGICALREF,
 [ProductionReferenceId] = PRODORD.LOGICALREF,
+[ProductionNumber] = PRODORD.FICHENO, 
+[PlanningStartDate] = PRODORD.PLNBEGDATE,
+[PlanningEndDate] = PRODORD.PLNENDDATE,
+[ActualStartDate] = PRODORD.ACTBEGDATE,
 [ProductReferenceId] = ITEMS.LOGICALREF,
 [ProductCode] = ITEMS.CODE,
 [ProductName] = ITEMS.NAME,
@@ -84,8 +88,8 @@ public class InputOutsourceTransferV2ProductDataStore : IInputOutsourceTransferV
 [OperationName] = OPR.NAME,
 [PlanningQuantity] = PRODORD.PLNAMOUNT,
 [ActualQuantity] = PRODORD.ACTAMOUNT,
-[WarehouseNumber] = POLINE.INVENNO,
-[WarehouseName] = '',
+[WarehouseNumber] = WAREHOUSE.NR,
+[WarehouseName] = WAREHOUSE.NAME,
 [StockQuantity] = ISNULL((SELECT SUM(ONHAND) FROM LV_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STINVTOT AS STINVTOT WITH(NOLOCK) WHERE STINVTOT.STOCKREF = ITEMS.LOGICALREF AND STINVTOT.INVENNO = {warehouseNumber}),0),
 [IsVariant] = ITEMS.CANCONFIGURE,
 [TrackingType] = ITEMS.TRACKTYPE,
@@ -97,15 +101,15 @@ public class InputOutsourceTransferV2ProductDataStore : IInputOutsourceTransferV
                  AND FIRMDOC.DOCNR = 11), '')
 
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_DISPLINE AS DISPLINE WITH(NOLOCK)
-LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_POLINE AS POLINE WITH(NOLOCK) ON POLINE.DISPLINEREF = DISPLINE.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_PRODORD AS PRODORD WITH(NOLOCK) ON DISPLINE.PRODORDREF = PRODORD.LOGICALREF
+LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_POLINE AS POLINE WITH(NOLOCK) ON POLINE.DISPLINEREF = DISPLINE.LOGICALREF AND POLINE.PRODORDREF = PRODORD.LOGICALREF AND POLINE.LINETYPE = 4
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS WITH(NOLOCK) ON DISPLINE.ITEMREF = ITEMS.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(NOLOCK) ON POLINE.UOMREF = UNITSETL.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON POLINE.USREF = UNITSETF.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD WITH(NOLOCK) ON DISPLINE.CLIENTREF = CLCARD.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_OPERTION AS OPR WITH(NOLOCK) ON DISPLINE.OPERATIONREF = OPR.LOGICALREF
 LEFT JOIN L_CAPIWHOUSE AS WAREHOUSE WITH(NOLOCK) ON POLINE.INVENNO = WAREHOUSE.NR AND WAREHOUSE.FIRMNR = {firmNumber}
-WHERE DISPLINE.PRODORDTYP = 2 AND DISPLINE.LINESTATUS = 1  AND DISPLINE.CLIENTREF = {currentReferenceId} AND POLINE.INVENNO = {warehouseNumber}";
+WHERE DISPLINE.PRODORDTYP = 2 AND DISPLINE.LINESTATUS = 1  AND DISPLINE.CLIENTREF = {currentReferenceId} AND WAREHOUSE.NR = {warehouseNumber}";
 
 		if (!string.IsNullOrEmpty(search))
 		{
