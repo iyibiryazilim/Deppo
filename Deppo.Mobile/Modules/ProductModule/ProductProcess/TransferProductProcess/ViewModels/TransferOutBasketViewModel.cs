@@ -593,20 +593,20 @@ public partial class TransferOutBasketViewModel : BaseViewModel
 
 			if (quantity < 0)
 			{
-				_userDialogs.ShowToast("Girilen miktar 0'dan küçük olmamalıdır.");
+				await _userDialogs.AlertAsync("Girilen miktar 0'dan küçük olmamalıdır.", "Uyarı", "Tamam");
 				return;
 			}
 
             if(quantity > item.RemainingQuantity)
             {
-                _userDialogs.ShowToast($"Girilen miktar, kalan miktarı ({item.RemainingQuantity}) aşmamalıdır.");
+                await _userDialogs.AlertAsync($"Girilen miktar, kalan miktarı ({item.RemainingQuantity}) aşmamalıdır.", "Uyarı", "Tamam");
                 return;
 			}
 
 			var totalQuantity = LocationTransactions.Where(x => x.LocationCode != item.LocationCode).Sum(x => (double)x.OutputQuantity);
             if(totalQuantity + quantity > SelectedItem.StockQuantity)
             {
-				_userDialogs.ShowToast($"Toplam girilen miktar ({totalQuantity + quantity}), ürünün ({SelectedItem.ItemCode}) stok miktarını ({SelectedItem.StockQuantity}) aşmamalıdır.");
+				await _userDialogs.AlertAsync($"Toplam girilen miktar ({totalQuantity + quantity}), ürünün ({SelectedItem.ItemCode}) stok miktarını ({SelectedItem.StockQuantity}) aşmamalıdır.", "Uyarı", "Tamam");
 				return;
 			}
 

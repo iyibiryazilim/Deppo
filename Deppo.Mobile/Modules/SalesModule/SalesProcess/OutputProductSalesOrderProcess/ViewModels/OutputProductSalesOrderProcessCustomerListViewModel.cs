@@ -443,7 +443,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
                 return;
             }
 
-			SearchText.Text = string.Empty;
+			//SearchText.Text = string.Empty;
 
 			await Shell.Current.GoToAsync($"{nameof(OutputProductSalesOrderProcessBasketListView)}", new Dictionary<string, object>
             {
