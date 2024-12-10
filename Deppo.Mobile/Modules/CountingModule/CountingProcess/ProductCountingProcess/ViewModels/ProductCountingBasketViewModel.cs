@@ -43,10 +43,6 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
     [ObservableProperty]
     bool isIncrease;
 
-
-
-
-
     public ProductCountingBasketViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IWarehouseCountingService warehouseCountingService, ILocationTransactionService locationTransactionService, ISubUnitsetService subUnitsetService)
 	{
 		_httpClientService = httpClientService;
@@ -61,12 +57,10 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
 		IncreaseCommand = new Command(async () => await IncreaseAsync());
 		DecreaseCommand = new Command(async () => await DecreaseAsync());
 		NextViewCommand = new Command(async () => await NextViewAsync());
+		BackCommand = new Command(async () => await BackAsync());
 
-        UnitActionTappedCommand = new Command(async () => await UnitActionTappedAsync());
+		UnitActionTappedCommand = new Command(async () => await UnitActionTappedAsync());
         SubUnitsetTappedCommand = new Command<SubUnitset>(async (item) => await SubUnitsetTappedAsync(item));
-
-
-
     }
 
     public Page CurrentPage { get; set; } = null!;
@@ -308,39 +302,6 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
         }
     }
 
-
-    private async Task NextViewAsync()
-    {
-        if (IsBusy)
-            return;
-
-        try
-        {
-            IsBusy = true;
-
-            var confirm = await _userDialogs.ConfirmAsync("Miktarı sayılan ürünlerle sayım işlemine devam etmek istiyor musunuz?", "Onay", "Evet", "Hayır");
-            if (!confirm)
-                return;
-
-            await Shell.Current.GoToAsync($"{nameof(ProductCountingFormView)}", new Dictionary<string, object>
-            {
-                [nameof(LocationModel)] = LocationModel,
-                [nameof(ProductCountingBasketModel)] = ProductCountingBasketModel,
-                [nameof(ProductCountingWarehouseModel)] = ProductCountingWarehouseModel
-            });
-
-
-        }
-        catch (Exception ex)
-        {
-            _userDialogs.Alert(ex.Message);
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
 	private async Task UnitActionTappedAsync()
 	{
         if (ProductCountingBasketModel is null)
@@ -438,4 +399,72 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
 			IsBusy = false;
 		}
 	}
+
+	private async Task NextViewAsync()
+	{
+		if (IsBusy)
+			return;
+
+		try
+		{
+			IsBusy = true;
+
+			var confirm = await _userDialogs.ConfirmAsync("Miktarı sayılan ürünlerle sayım işlemine devam etmek istiyor musunuz?", "Onay", "Evet", "Hayır");
+			if (!confirm)
+				return;
+
+			await Shell.Current.GoToAsync($"{nameof(ProductCountingFormView)}", new Dictionary<string, object>
+			{
+				[nameof(LocationModel)] = LocationModel,
+				[nameof(ProductCountingBasketModel)] = ProductCountingBasketModel,
+				[nameof(ProductCountingWarehouseModel)] = ProductCountingWarehouseModel
+			});
+
+
+		}
+		catch (Exception ex)
+		{
+			_userDialogs.Alert(ex.Message);
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            var confirm = await _userDialogs.ConfirmAsync("Miktarınız silinecektir. Devam etmek istediğinize emin misiniz?", "Onay", "Evet", "Hayır");
+			if (!confirm)
+				return;
+
+
+			if (ProductCountingBasketModel is not null)
+            {
+                ProductCountingBasketModel.LocationTransactions.Clear();
+                ProductCountingBasketModel.DifferenceQuantity = 0;
+				ProductCountingBasketModel = null;
+            }
+
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
 }
