@@ -257,6 +257,8 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 				SelectedLocation = null;
 			}
 
+			SearchText.Text = string.Empty;
+
 			await Shell.Current.GoToAsync("..");
 		}
 		catch (Exception ex)

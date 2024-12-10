@@ -497,6 +497,8 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
                 SelectedProduct = null;
             }
 
+            SearchText.Text = string.Empty;
+
             await Shell.Current.GoToAsync("..");
         }
         catch (Exception ex)

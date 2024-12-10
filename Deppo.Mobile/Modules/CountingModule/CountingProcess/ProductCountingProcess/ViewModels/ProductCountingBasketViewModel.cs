@@ -105,9 +105,10 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
 				await _userDialogs.AlertAsync("Miktar sıfırdan küçük olmamalıdır.", "Hata", "Tamam");
 				return;
 			}
-			
-			ProductCountingBasketModel.OutputQuantity = quantity;
 
+            IsIncrease = true;
+
+			ProductCountingBasketModel.OutputQuantity = quantity;
 			if (ProductCountingBasketModel.OutputQuantity - ProductCountingBasketModel.StockQuantity < 0)
 			{
 				ProductCountingBasketModel.DifferenceQuantity = ProductCountingBasketModel.OutputQuantity - ProductCountingBasketModel.StockQuantity;
@@ -249,38 +250,37 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
 
                 if (LocationTransactions.Sum(x => x.RemainingQuantity) > 0)
                 {
+					if (!IsIncrease)
+					{
+						ProductCountingBasketModel.DifferenceQuantity--;
+						ProductCountingBasketModel.OutputQuantity--;
+					}
 
-                    if ((ProductCountingBasketModel.DifferenceQuantity * -1) >= LocationTransactions.Sum(x => x.RemainingQuantity))
+					if ((ProductCountingBasketModel.DifferenceQuantity * -1) > LocationTransactions.Sum(x => x.RemainingQuantity))
                     {
                         await _userDialogs.AlertAsync("Girilen miktarı karşılayacak giriş hareketi bulunamadı", "Uyarı", "Tamam");
-                        return;
+						if (!IsIncrease)
+						{
+							ProductCountingBasketModel.DifferenceQuantity++;
+							ProductCountingBasketModel.OutputQuantity++;
+						}
+
+						return;
                     }
-                    else
+                    ProductCountingBasketModel.LocationTransactions = new();
+
+                    var orderedLocationTransactions = LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
+
+                    var tempQuantity = ProductCountingBasketModel.StockQuantity - ProductCountingBasketModel.OutputQuantity;
+                    foreach (var item in orderedLocationTransactions)
                     {
-                        if (!IsIncrease)
+                        if (item.RemainingQuantity > 0 && tempQuantity > 0)
                         {
-                            ProductCountingBasketModel.DifferenceQuantity--;
-                            ProductCountingBasketModel.OutputQuantity--;
-
+                            item.OutputQuantity = (tempQuantity) >= item.RemainingQuantity ? item.RemainingQuantity : tempQuantity;
+                            tempQuantity -= item.OutputQuantity;
+                            ProductCountingBasketModel.LocationTransactions.Add(item);
                         }
-
-                        ProductCountingBasketModel.LocationTransactions = new();
-
-                        var orderedLocationTransactions = LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
-
-                        var tempQuantity = ProductCountingBasketModel.StockQuantity - ProductCountingBasketModel.OutputQuantity;
-                        foreach (var item in orderedLocationTransactions)
-                        {
-                            if (item.RemainingQuantity > 0 && tempQuantity > 0)
-                            {
-                                item.OutputQuantity = (tempQuantity) >= item.RemainingQuantity ? item.RemainingQuantity : tempQuantity;
-                                tempQuantity -= item.OutputQuantity;
-                                ProductCountingBasketModel.LocationTransactions.Add(item);
-                            }
-                        }
-
                     }
-
                 }
                 else
                 {
@@ -290,7 +290,8 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
 
             }
 
-            _userDialogs.Loading().Hide();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
