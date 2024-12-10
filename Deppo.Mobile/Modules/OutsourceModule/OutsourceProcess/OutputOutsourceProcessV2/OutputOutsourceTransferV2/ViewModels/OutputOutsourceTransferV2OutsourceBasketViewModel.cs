@@ -122,9 +122,6 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
         public Command LeftSwipeShowLocationTransactionCommand { get; }
         public Command RightSwipeShowLocationCommand { get; }
 
-
-
-
         #region  locationTransaction Command
         public Command LoadMoreLocationTransactionsCommand { get; }
         public Command LocationTransactionIncreaseCommand { get; }
@@ -134,8 +131,6 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
         public Command LocationTransactionCloseCommand { get; }
 
         #endregion
-
-
 
 
         private async Task LoadItemsAsync()
@@ -428,12 +423,6 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
             }
 
         }
-
-            
-
-
-
-
 
         private async Task LoadLocationTransactionsAsync(OutputOutsourceTransferV2SubProductModel subProductModel)
         {

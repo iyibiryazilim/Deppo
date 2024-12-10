@@ -63,20 +63,49 @@
                            MaxLines="1"
                            Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.ProductName}"
                            TextColor="{StaticResource Gray600}" />
-                    <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center" HorizontalOptions="Center">
-                        <Label.FormattedText>
-                            <FormattedString>
-                                <Span FontAttributes="Bold"
-                           FontFamily="FAS"
-                           Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                           TextColor="{StaticResource Primary}" />
-                                <Span Text=" " />
-                                <Span FontAttributes="Bold"
-                           Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.PlanningQantity, StringFormat='{0:N2}'}"
-                           TextColor="{StaticResource Primary}" />
-                            </FormattedString>
-                        </Label.FormattedText>
-                    </Label>
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
+                        <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center" HorizontalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontAttributes="Bold"
+                                          FontFamily="FAS"
+                                          Text="{x:Static fontAwesome:FontAwesomeIcons.Clock}"
+                                          ToolTipProperties.Text="Planlanan"
+                                          TextColor="{StaticResource Primary}" />
+                                    <Span Text=" " />
+                                    <Span FontAttributes="Bold"
+                  
+                                          Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.PlanningQuantity, StringFormat='{0:N2}'}"
+                                          TextColor="{StaticResource Primary}" />
+                                    <Span Text=" " />
+                                    <Span Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.SubUnitsetCode}"
+                                          TextColor="{StaticResource Primary}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+
+
+                        <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center" HorizontalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontAttributes="Bold"
+                                          FontFamily="FAS"
+                                          Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                          ToolTipProperties.Text="Stok"    
+                                          TextColor="{StaticResource Primary}" />
+                                    <Span Text=" " />
+                                    <Span FontAttributes="Bold"
+                  
+                                          Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.StockQuantity, StringFormat='{0:N2}'}"
+                                          TextColor="{StaticResource Primary}" />
+                                    <Span Text=" " />
+                                    <Span Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.SubUnitsetCode}"
+                  TextColor="{StaticResource Primary}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+
+                    </HorizontalStackLayout>
                 </VerticalStackLayout>
                 <!--#endregion-->
 
@@ -154,7 +183,7 @@
                                 <!-- Sol kaydırma -->
                                 <SwipeView.LeftItems>
                                     <SwipeItems Mode="Execute">
-                                        <SwipeItemView BackgroundColor="{StaticResource Primary}"
+                                        <SwipeItemView BackgroundColor="{StaticResource RedMonza}"
                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferV2OutsourceBasketViewModel}}, Path=LeftSwipeShowLocationTransactionCommand}"
                                        CommandParameter="{Binding .}">
                                             <Label HorizontalOptions="Center"
@@ -182,7 +211,7 @@
                                 <!-- Sağ kaydırma -->
                                 <SwipeView.RightItems>
                                     <SwipeItems Mode="Execute">
-                                        <SwipeItemView BackgroundColor="{StaticResource Secondary}"
+                                        <SwipeItemView BackgroundColor="{StaticResource GreenEmerald}"
                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:OutputOutsourceTransferV2OutsourceBasketViewModel}}, Path= RightSwipeShowLocationCommand}"
                                        CommandParameter="{Binding .}">
                                             <Label HorizontalOptions="Center"
@@ -218,7 +247,7 @@
                                    WidthRequest="60" />
                                         </Border>
 
-                                        <!-- Code, Name -->
+                                        <!-- Code, Name,BomQuantity -->
                                         <VerticalStackLayout Grid.Column="1" Spacing="2">
                                             <Label FontAttributes="Bold"
                                    LineBreakMode="TailTruncation"
@@ -245,10 +274,92 @@
                                                     </FormattedString>
                                                 </Label.FormattedText>
                                             </Label>
+
+                                            <Grid ColumnDefinitions="Auto, Auto, Auto" ColumnSpacing="5">
+                                                <Label Grid.Column="0"
+                                 TextColor="{StaticResource Gray600}"
+                                 ToolTipProperties.Text="Stok Miktarı"
+                                 VerticalOptions="Center">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span FontAttributes="Bold"
+                                            FontFamily="FAS"
+                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                            TextColor="{StaticResource Primary}" />
+                                                            <Span Text=" " />
+                                                            <Span FontAttributes="Bold"
+                                            Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                            TextColor="{StaticResource Primary}" />
+                                                            <Span Text=" " />
+                                                            <!--<Span FontAttributes="Bold" Text="{Binding SubUnitsetCode}" TextColor="{StaticResource Primary}" />-->
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+
+                                                <Label Grid.Column="1"
+                                 TextColor="{StaticResource Gray600}"
+                                 ToolTipProperties.Text="Toplam Çarpan Miktarı"
+                                 VerticalOptions="Center">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span FontAttributes="Bold"
+                                            FontFamily="FAS"
+                                            Text="{x:Static fontAwesome:FontAwesomeIcons.BoxesStacked}"
+                                            TextColor="{StaticResource Primary}" />
+                                                            <Span Text=" " />
+                                                            <Span FontAttributes="Bold"
+                                            Text="{Binding BOMQuantity, StringFormat='{0:N2}'}"
+                                            TextColor="{StaticResource Primary}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+
+                                                <Label Grid.Column="2"
+                                 TextColor="{StaticResource Gray600}"
+                                 ToolTipProperties.Text="Çarpan"
+                                 VerticalOptions="Center">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span FontAttributes="Bold"
+                                            FontFamily="FAS"
+                                            Text="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                                            TextColor="{StaticResource Primary}" />
+                                                            <Span Text="" />
+                                                            <Span FontAttributes="Bold"
+                                            Text="{Binding Quantity, StringFormat='{0:N1}'}"
+                                            TextColor="{StaticResource Primary}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+
+                                            </Grid>
+
                                         </VerticalStackLayout>
 
                                         <!-- Quantity Information -->
                                         <VerticalStackLayout Grid.Column="2" Spacing="10">
+                                            <Grid ColumnDefinitions="Auto, Auto, Auto"
+                                                  ColumnSpacing="3"
+                                                  HorizontalOptions="End"
+                                                  VerticalOptions="Start">
+                                                <Label Grid.Column="0"
+                                                  FontFamily="FAS"
+                                                  FontSize="10"
+                                                  Text="{Binding VariantIcon}"
+                                                  TextColor="{Binding VariantIconColor}" />
+                                                <Label Grid.Column="1"
+                                                  FontFamily="FAS"
+                                                  FontSize="10"
+                                                  Text="{Binding LocTrackingIcon}"
+                                                  TextColor="{Binding LocTrackingIconColor}" />
+                                                <Label Grid.Column="2"
+                                                  FontFamily="FAS"
+                                                  FontSize="10"
+                                                  Text="{Binding TrackingTypeIcon}"
+                                                  TextColor="{Binding TrackingTypeIconColor}" />
+                                            </Grid>
+
+
                                             <Label FontAttributes="Bold"
                                    FontSize="Large"
                                    Text="{Binding Quantity}"
@@ -256,6 +367,8 @@
                                    HorizontalOptions="EndAndExpand"
                                    VerticalOptions="CenterAndExpand" />
                                         </VerticalStackLayout>
+
+
                                     </Grid>
                                 </Border>
 

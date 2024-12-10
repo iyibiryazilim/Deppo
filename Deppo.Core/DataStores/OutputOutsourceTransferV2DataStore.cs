@@ -133,7 +133,7 @@ namespace Deppo.Core.DataStores
 [OperationReferenceId] = OPR.LOGICALREF,
 [OperationCode] = OPR.CODE,
 [OperationName] = OPR.NAME,
-[PlanningQantity] = PRODORD.PLNAMOUNT,
+[PlanningQuantity] = PRODORD.PLNAMOUNT,
 [ActualQuantity] = PRODORD.ACTAMOUNT,
 [WarehouseNumber] = POLINE.INVENNO,
 [WarehouseName] = '',

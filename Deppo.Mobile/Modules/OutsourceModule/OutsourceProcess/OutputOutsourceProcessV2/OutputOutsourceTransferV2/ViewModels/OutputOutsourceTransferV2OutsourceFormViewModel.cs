@@ -4,6 +4,7 @@ using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.OutsourceModels;
+using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
 using Deppo.Mobile.Core.Models.ShipAddressModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
@@ -19,10 +20,8 @@ using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcessV2.OutputOutsourceTransferV2.ViewModels
 {
-    [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
-    [QueryProperty(name: nameof(OutsourceModel), queryId: nameof(OutsourceModel))]
-    [QueryProperty(name: nameof(ShipAddressModel), queryId: nameof(ShipAddressModel))]
-    [QueryProperty(name: nameof(OutputOutsourceTransferV2ProductModel), queryId: nameof(OutputOutsourceTransferV2ProductModel))]
+  
+    [QueryProperty(name: nameof(OutputOutsourceTransferV2BasketModel), queryId: nameof(OutputOutsourceTransferV2BasketModel))]
 
     public partial class OutputOutsourceTransferV2OutsourceFormViewModel :BaseViewModel
     {
@@ -32,36 +31,15 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
         private readonly IDriverService _driverService;
         private readonly IServiceProvider _serviceProvider;
 
-        [ObservableProperty]
-        WarehouseModel? warehouseModel;
 
         [ObservableProperty]
-        OutsourceModel? outsourceModel;
-
-        [ObservableProperty]
-        ShipAddressModel? shipAddressModel;
-
-        [ObservableProperty]
-        OutputOutsourceTransferV2ProductModel? outputOutsourceTransferV2ProductModel;
-        public ObservableCollection<Carrier> Carriers { get; } = new();
-        public ObservableCollection<Driver> Drivers { get; } = new();
-
-        [ObservableProperty]
-        OutsourceModel? selectedOutsource;
-        [ObservableProperty]
-        ShipAddressModel? selectedShipAddress;
+        OutputOutsourceTransferV2BasketModel? outputOutsourceTransferV2BasketModel;
 
         [ObservableProperty]
         Carrier? selectedCarrier;
 
         [ObservableProperty]
         Driver? selectedDriver;
-
-        [ObservableProperty]
-        WarehouseModel selectedInWarehouse = null!;
-
-        [ObservableProperty]
-        LocationModel selectedInlocationModel = null!;
 
         [ObservableProperty]
         DateTime transactionDate = DateTime.Now;
@@ -81,8 +59,10 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
         [ObservableProperty]
         string cargoTrackingNumber = string.Empty;
 
-        [ObservableProperty]
-        WarehouseModel inWarehouse = null!;
+
+     
+        public ObservableCollection<Carrier> Carriers { get; } = new();
+        public ObservableCollection<Driver> Drivers { get; } = new();
 
 
         public OutputOutsourceTransferV2OutsourceFormViewModel(IHttpClientService httpClientService, 
@@ -439,10 +419,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
                 Description = string.Empty;
                 SelectedCarrier = null;
                 SelectedDriver = null;
-                SelectedOutsource = null;
-                SelectedShipAddress = null;
-                SelectedInWarehouse = null;
-                SelectedInlocationModel = null;
+               
 
             }
             catch (Exception ex)
