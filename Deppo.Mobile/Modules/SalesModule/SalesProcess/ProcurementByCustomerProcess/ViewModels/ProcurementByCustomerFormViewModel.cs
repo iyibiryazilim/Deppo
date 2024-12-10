@@ -679,6 +679,9 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 			Description = string.Empty;
 			TransactionDate = DateTime.Now;
 
+			DispatchLocationTransactions.Clear();
+			LocationTransactions.Clear();
+
 			await Shell.Current.GoToAsync("..");
 		}
 		catch (Exception ex)

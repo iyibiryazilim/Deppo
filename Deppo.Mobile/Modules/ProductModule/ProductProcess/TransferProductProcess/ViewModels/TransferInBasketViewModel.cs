@@ -240,7 +240,19 @@ public partial class TransferInBasketViewModel : BaseViewModel
 
 		var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-		var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, TransferBasketModel.InWarehouse.Number, productReferenceId: SelectedInputProductModel.IsVariant ? SelectedInputProductModel.MainItemReferenceId : SelectedInputProductModel.ItemReferenceId, 0, string.Empty, 0, 20);
+		var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, TransferBasketModel.InWarehouse.Number, productReferenceId: SelectedInputProductModel.IsVariant ? SelectedInputProductModel.MainItemReferenceId : SelectedInputProductModel.ItemReferenceId, 0, LocationSearchText.Text, 0, 99999);
+
+		if(result.IsSuccess)
+		{
+			if (result.Data is null)
+				return;
+
+            foreach (var item in result.Data)
+            {
+				var obj = Mapping.Mapper.Map<LocationModel>(item);
+
+			}
+        }
 	}
 	private async Task LocationPerformEmptySearchAsync()
 	{
@@ -369,7 +381,7 @@ public partial class TransferInBasketViewModel : BaseViewModel
 
 				if (totalLocationQuantity != SelectedInputProductModel.OutputQuantity)
 				{
-					await _userDialogs.AlertAsync($"Girilen miktar, seçilen ürünün {SelectedInputProductModel.OutputQuantity} miktarına eşit olmalıdır.", "Hata", "Tamam");
+					await _userDialogs.AlertAsync($"Toplam girilen miktar ({totalLocationQuantity}), seçilen ürünün {SelectedInputProductModel.OutputQuantity} miktarına eşit olmalıdır.", "Uyarı", "Tamam");
 					return;
 				}
 
