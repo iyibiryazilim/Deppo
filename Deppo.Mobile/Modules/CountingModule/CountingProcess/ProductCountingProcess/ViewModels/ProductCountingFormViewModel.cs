@@ -92,7 +92,6 @@ public partial class ProductCountingFormViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            //Title = GetEnumDescription(OutputProductProcessType);
             CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
         }
         catch (Exception ex)
@@ -131,23 +130,6 @@ public partial class ProductCountingFormViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
-
-
-    public static string GetEnumDescription(Enum value)
-    {
-        FieldInfo fi = value.GetType().GetField(value.ToString());
-
-        DescriptionAttribute[] attributes = fi.GetCustomAttributes(typeof(DescriptionAttribute), false) as DescriptionAttribute[];
-
-        if (attributes != null && attributes.Any())
-        {
-            return attributes.First().Description;
-        }
-
-        return value.ToString();
-    }
-
 
     private async Task SaveAsync()
     {
@@ -325,9 +307,6 @@ public partial class ProductCountingFormViewModel : BaseViewModel
 
         inCountingTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
 
-
-
-
         inCountingTransactionDto.Lines.Add(inCountingTransactionLineDto);
 
         var result = await _inCountingTransactionService.InsertInCountingTransaction(httpClient, inCountingTransactionDto, _httpClientService.FirmNumber);
@@ -353,14 +332,15 @@ public partial class ProductCountingFormViewModel : BaseViewModel
         }
         else
         {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
             resultModel.Message = "Başarısız";
             resultModel.PageTitle = Title;
             resultModel.PageCountToBack = 1;
             resultModel.ErrorMessage = result.Message;
-            await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
             {
                 [nameof(ResultModel)] = resultModel
             });
@@ -379,13 +359,8 @@ public partial class ProductCountingFormViewModel : BaseViewModel
             if (!confirm)
                 return;
 
-            DocumentNumber = string.Empty;
-            DocumentTrackingNumber = string.Empty;
-            Description = string.Empty;
-            SpecialCode = string.Empty;
-            TransactionDate = DateTime.Now;
-
-            await Shell.Current.GoToAsync("..");
+            await ClearFormAsync();
+			await Shell.Current.GoToAsync("..");
         }
         catch (Exception ex)
         {
@@ -418,40 +393,31 @@ public partial class ProductCountingFormViewModel : BaseViewModel
             var warehouseTotalListViewModel = _serviceProvider.GetRequiredService<ProductCountingWarehouseTotalListViewModel>();
             var basketViewModel = _serviceProvider.GetRequiredService<ProductCountingBasketViewModel>();
 
-            if(productListViewModel is not null)
-            {
-                if(productListViewModel.SelectedProduct is not null)
-                {
-                    productListViewModel.SelectedProduct.IsSelected = false;
-					productListViewModel.SelectedProduct = null;
-				}   
+            if(productListViewModel is not null && productListViewModel.SelectedProduct is not null)
+            {        
+                productListViewModel.SelectedProduct.IsSelected = false;
+				productListViewModel.SelectedProduct = null;
+                productListViewModel.SearchText.Text = string.Empty;
             }
 
-            if(warehouseTotalListViewModel is not null)
-            {
-                if(warehouseTotalListViewModel.SelectedWarehouse is not null)
-                {
-                    warehouseTotalListViewModel.SelectedWarehouse.IsSelected = false;
-                    warehouseTotalListViewModel.SelectedWarehouse = null;
-                }
+            if(warehouseTotalListViewModel is not null && warehouseTotalListViewModel.SelectedWarehouse is not null)
+            {        
+                warehouseTotalListViewModel.SelectedWarehouse.IsSelected = false;
+                warehouseTotalListViewModel.SelectedWarehouse = null;   
             }
 
-            if(locationListViewModel is not null)
+            if(locationListViewModel is not null && locationListViewModel.SelectedLocation is not null)
             {
-                if(locationListViewModel.SelectedLocation is not null)
-                {
-                    locationListViewModel.SelectedLocation.IsSelected = false;
-                    locationListViewModel.SelectedLocation = null;
-                }
+                locationListViewModel.SelectedLocation.IsSelected = false;
+                locationListViewModel.SelectedLocation = null;
+                locationListViewModel.SearchText.Text = string.Empty;
             }
 
-            if(basketViewModel is not null)
+            if(basketViewModel is not null && basketViewModel.ProductCountingBasketModel is not null)
             {
                 basketViewModel.ProductCountingBasketModel.LocationTransactions.Clear();
-
+                basketViewModel.ProductCountingBasketModel.DifferenceQuantity = 0;
 			}
-            
-
         }
         catch (Exception ex)
         {

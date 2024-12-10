@@ -43,10 +43,6 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
     [ObservableProperty]
     bool isIncrease;
 
-
-
-
-
     public ProductCountingBasketViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, IWarehouseCountingService warehouseCountingService, ILocationTransactionService locationTransactionService, ISubUnitsetService subUnitsetService)
 	{
 		_httpClientService = httpClientService;
@@ -61,12 +57,10 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
 		IncreaseCommand = new Command(async () => await IncreaseAsync());
 		DecreaseCommand = new Command(async () => await DecreaseAsync());
 		NextViewCommand = new Command(async () => await NextViewAsync());
+		BackCommand = new Command(async () => await BackAsync());
 
-        UnitActionTappedCommand = new Command(async () => await UnitActionTappedAsync());
+		UnitActionTappedCommand = new Command(async () => await UnitActionTappedAsync());
         SubUnitsetTappedCommand = new Command<SubUnitset>(async (item) => await SubUnitsetTappedAsync(item));
-
-
-
     }
 
     public Page CurrentPage { get; set; } = null!;
@@ -111,9 +105,10 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
 				await _userDialogs.AlertAsync("Miktar sıfırdan küçük olmamalıdır.", "Hata", "Tamam");
 				return;
 			}
-			
-			ProductCountingBasketModel.OutputQuantity = quantity;
 
+            IsIncrease = true;
+
+			ProductCountingBasketModel.OutputQuantity = quantity;
 			if (ProductCountingBasketModel.OutputQuantity - ProductCountingBasketModel.StockQuantity < 0)
 			{
 				ProductCountingBasketModel.DifferenceQuantity = ProductCountingBasketModel.OutputQuantity - ProductCountingBasketModel.StockQuantity;
@@ -255,38 +250,37 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
 
                 if (LocationTransactions.Sum(x => x.RemainingQuantity) > 0)
                 {
+					if (!IsIncrease)
+					{
+						ProductCountingBasketModel.DifferenceQuantity--;
+						ProductCountingBasketModel.OutputQuantity--;
+					}
 
-                    if ((ProductCountingBasketModel.DifferenceQuantity * -1) >= LocationTransactions.Sum(x => x.RemainingQuantity))
+					if ((ProductCountingBasketModel.DifferenceQuantity * -1) > LocationTransactions.Sum(x => x.RemainingQuantity))
                     {
                         await _userDialogs.AlertAsync("Girilen miktarı karşılayacak giriş hareketi bulunamadı", "Uyarı", "Tamam");
-                        return;
+						if (!IsIncrease)
+						{
+							ProductCountingBasketModel.DifferenceQuantity++;
+							ProductCountingBasketModel.OutputQuantity++;
+						}
+
+						return;
                     }
-                    else
+                    ProductCountingBasketModel.LocationTransactions = new();
+
+                    var orderedLocationTransactions = LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
+
+                    var tempQuantity = ProductCountingBasketModel.StockQuantity - ProductCountingBasketModel.OutputQuantity;
+                    foreach (var item in orderedLocationTransactions)
                     {
-                        if (!IsIncrease)
+                        if (item.RemainingQuantity > 0 && tempQuantity > 0)
                         {
-                            ProductCountingBasketModel.DifferenceQuantity--;
-                            ProductCountingBasketModel.OutputQuantity--;
-
+                            item.OutputQuantity = (tempQuantity) >= item.RemainingQuantity ? item.RemainingQuantity : tempQuantity;
+                            tempQuantity -= item.OutputQuantity;
+                            ProductCountingBasketModel.LocationTransactions.Add(item);
                         }
-
-                        ProductCountingBasketModel.LocationTransactions = new();
-
-                        var orderedLocationTransactions = LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
-
-                        var tempQuantity = ProductCountingBasketModel.StockQuantity - ProductCountingBasketModel.OutputQuantity;
-                        foreach (var item in orderedLocationTransactions)
-                        {
-                            if (item.RemainingQuantity > 0 && tempQuantity > 0)
-                            {
-                                item.OutputQuantity = (tempQuantity) >= item.RemainingQuantity ? item.RemainingQuantity : tempQuantity;
-                                tempQuantity -= item.OutputQuantity;
-                                ProductCountingBasketModel.LocationTransactions.Add(item);
-                            }
-                        }
-
                     }
-
                 }
                 else
                 {
@@ -296,44 +290,12 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
 
             }
 
-            _userDialogs.Loading().Hide();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
-
-    private async Task NextViewAsync()
-    {
-        if (IsBusy)
-            return;
-
-        try
-        {
-            IsBusy = true;
-
-            var confirm = await _userDialogs.ConfirmAsync("Miktarı sayılan ürünlerle sayım işlemine devam etmek istiyor musunuz?", "Onay", "Evet", "Hayır");
-            if (!confirm)
-                return;
-
-            await Shell.Current.GoToAsync($"{nameof(ProductCountingFormView)}", new Dictionary<string, object>
-            {
-                [nameof(LocationModel)] = LocationModel,
-                [nameof(ProductCountingBasketModel)] = ProductCountingBasketModel,
-                [nameof(ProductCountingWarehouseModel)] = ProductCountingWarehouseModel
-            });
-
-
-        }
-        catch (Exception ex)
-        {
-            _userDialogs.Alert(ex.Message);
         }
         finally
         {
@@ -438,4 +400,72 @@ public partial class ProductCountingBasketViewModel : BaseViewModel
 			IsBusy = false;
 		}
 	}
+
+	private async Task NextViewAsync()
+	{
+		if (IsBusy)
+			return;
+
+		try
+		{
+			IsBusy = true;
+
+			var confirm = await _userDialogs.ConfirmAsync("Miktarı sayılan ürünlerle sayım işlemine devam etmek istiyor musunuz?", "Onay", "Evet", "Hayır");
+			if (!confirm)
+				return;
+
+			await Shell.Current.GoToAsync($"{nameof(ProductCountingFormView)}", new Dictionary<string, object>
+			{
+				[nameof(LocationModel)] = LocationModel,
+				[nameof(ProductCountingBasketModel)] = ProductCountingBasketModel,
+				[nameof(ProductCountingWarehouseModel)] = ProductCountingWarehouseModel
+			});
+
+
+		}
+		catch (Exception ex)
+		{
+			_userDialogs.Alert(ex.Message);
+		}
+		finally
+		{
+			IsBusy = false;
+		}
+	}
+
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            var confirm = await _userDialogs.ConfirmAsync("Miktarınız silinecektir. Devam etmek istediğinize emin misiniz?", "Onay", "Evet", "Hayır");
+			if (!confirm)
+				return;
+
+
+			if (ProductCountingBasketModel is not null)
+            {
+                ProductCountingBasketModel.LocationTransactions.Clear();
+                ProductCountingBasketModel.DifferenceQuantity = 0;
+				ProductCountingBasketModel = null;
+            }
+
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
 }

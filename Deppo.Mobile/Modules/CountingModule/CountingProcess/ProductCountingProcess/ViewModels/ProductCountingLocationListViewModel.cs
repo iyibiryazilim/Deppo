@@ -75,6 +75,7 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 			_userDialogs.ShowLoading("Loading...");
 			Items.Clear();
 			await Task.Delay(1000);
+
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 			var result = await _locationService.GetObjects(
 				httpClient: httpClient,
@@ -89,14 +90,19 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 
 			if (result.IsSuccess)
 			{
-				if (result.Data is not null)
+				if (result.Data is null)
+					return;
+				
+				foreach (var item in result.Data)
 				{
-					foreach (var item in result.Data)
-						Items.Add(Mapping.Mapper.Map<LocationModel>(item));
+					var obj = Mapping.Mapper.Map<LocationModel>(item);
+					obj.IsSelected = (SelectedLocation != null && SelectedLocation.ReferenceId == obj.ReferenceId) ? SelectedLocation.IsSelected : false;
+					Items.Add(obj);
 				}
 			}
 
-			_userDialogs.HideHud();
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 		}
 		catch (Exception ex)
 		{
@@ -114,6 +120,8 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 	private async Task LoadMoreItemsAsync()
 	{
 		if (IsBusy)
+			return;
+		if (Items.Count < 18)
 			return;
 
 		try
@@ -135,14 +143,19 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 
 			if (result.IsSuccess)
 			{
-				if (result.Data is not null)
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
 				{
-					foreach (var item in result.Data)
-						Items.Add(Mapping.Mapper.Map<LocationModel>(item));
+					var obj = Mapping.Mapper.Map<LocationModel>(item);
+					obj.IsSelected = (SelectedLocation != null && SelectedLocation.ReferenceId == obj.ReferenceId) ? SelectedLocation.IsSelected : false;
+					Items.Add(obj);
 				}
 			}
 
-			_userDialogs.HideHud();
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 		}
 		catch (Exception ex)
 		{
@@ -177,9 +190,11 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 				{
 					SelectedLocation.IsSelected = false;
 				}
-
+				
 				SelectedLocation = item;
 				SelectedLocation.IsSelected = true;
+
+				Items.Where(x => x.ReferenceId != item.ReferenceId).ToList().ForEach(x => x.IsSelected = false);
 			}
 		}
 		catch (Exception ex)
@@ -199,24 +214,21 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 	{
 		if (IsBusy)
 			return;
+
+		if (SelectedLocation is null)
+			return;
 		try
 		{
 			IsBusy = true;
 
-			if (SelectedLocation is not null)
+			ProductCountingBasketModel.OutputQuantity = SelectedLocation.StockQuantity;
+            ProductCountingBasketModel.StockQuantity = SelectedLocation.StockQuantity;
+            await Shell.Current.GoToAsync($"{nameof(ProductCountingBasketView)}", new Dictionary<string, object>
 			{
-				ProductCountingBasketModel.OutputQuantity = SelectedLocation.StockQuantity;
-                ProductCountingBasketModel.StockQuantity = SelectedLocation.StockQuantity;
-                await Shell.Current.GoToAsync($"{nameof(ProductCountingBasketView)}", new Dictionary<string, object>
-				{
-					[nameof(LocationModel)] = SelectedLocation,
-					[nameof(ProductCountingWarehouseModel)] = ProductCountingWarehouseModel,
-					[nameof(ProductCountingBasketModel)] = ProductCountingBasketModel
-                });
-
-				SearchText.Text = string.Empty;
-
-			}
+				[nameof(LocationModel)] = SelectedLocation,
+				[nameof(ProductCountingWarehouseModel)] = ProductCountingWarehouseModel,
+				[nameof(ProductCountingBasketModel)] = ProductCountingBasketModel
+            });			
 		}
 		catch (Exception ex)
 		{
@@ -246,6 +258,7 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 			}
 
 			SearchText.Text = string.Empty;
+
 			await Shell.Current.GoToAsync("..");
 		}
 		catch (Exception ex)
@@ -290,21 +303,22 @@ public partial class ProductCountingLocationListViewModel : BaseViewModel
 
             if (result.IsSuccess)
             {
-                if (result.Data is not null)
-                {
-                    foreach (var item in result.Data)
-                        Items.Add(Mapping.Mapper.Map<LocationModel>(item));
-                }
-            }
-            else
-            {
-                _userDialogs.Alert(result.Message, "Hata");
-                return;
-            }
+				if (result.Data is null)
+					return;
 
+                foreach (var item in result.Data)
+				{
+					var obj = Mapping.Mapper.Map<LocationModel>(item);
+					obj.IsSelected = (SelectedLocation != null && SelectedLocation.ReferenceId == obj.ReferenceId) ? SelectedLocation.IsSelected : false;
+					Items.Add(obj);
+				}                
+            }
         }
         catch (System.Exception ex)
         {
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
             _userDialogs.Alert(ex.Message, "Hata");
         }
         finally

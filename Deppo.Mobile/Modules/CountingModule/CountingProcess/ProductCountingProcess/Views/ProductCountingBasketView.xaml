@@ -41,15 +41,17 @@
                 StrokeThickness="0.1">
             <Grid ColumnDefinitions=".20*, .80*" ColumnSpacing="10">
                 <Border Grid.Column="0"
+                        HeightRequest="{OnIdiom 100,
+                                                Phone=70,
+                                                Tablet=100}"
                         StrokeShape="RoundRectangle 5"
                         StrokeThickness="0.5"
-                        WidthRequest="{OnIdiom 100, Phone=70, Tablet=100}"
-                        HeightRequest="{OnIdiom 100, Phone=70, Tablet=100}"
-                        >
+                        WidthRequest="{OnIdiom 100,
+                                               Phone=70,
+                                               Tablet=100}">
                     <Image Grid.Column="0"
-                           Aspect="AspectFill"    
-                           Source="{Binding ProductCountingBasketModel.Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
- />
+                           Aspect="AspectFill"
+                           Source="{Binding ProductCountingBasketModel.Image, Converter={StaticResource ByteArrayToImageSourceConverter}}" />
                 </Border>
 
                 <VerticalStackLayout Grid.Column="1">
@@ -78,31 +80,28 @@
                            Text="{Binding ProductCountingBasketModel.ItemName}"
                            TextColor="{StaticResource Gray600}" />
 
-                    
-                        <Label TextColor="{StaticResource Gray600}"
-                               VerticalOptions="Center">
-                            <Label.FormattedText>
-                                <FormattedString>
-                                    <Span FontAttributes="Bold"
-                                          FontFamily="FAS"
-                                          Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                                          TextColor="{StaticResource Primary}" />
-                                    <Span Text=" " />
+
+                    <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span FontAttributes="Bold"
+                                      FontFamily="FAS"
+                                      Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                      TextColor="{StaticResource Primary}" />
+                                <Span Text=" " />
                                 <Span FontAttributes="Bold"
                                       Text="{Binding LocationModel.StockQuantity}"
-                                      TextColor="{StaticResource Primary}"
-                                      />
+                                      TextColor="{StaticResource Primary}" />
                                 <Span Text=" " />
-                                    <Span FontAttributes="Bold"
-                                          Text="{Binding ProductCountingBasketModel.SubUnitsetCode}"
-                                          TextColor="{StaticResource Primary}" />
-                                    
-                                </FormattedString>
-                            </Label.FormattedText>
-                        </Label>
-                        <!--#region Counting Status Border-->
-                    <Label TextColor="{StaticResource Gray600}"
-                           VerticalOptions="Center">
+                                <Span FontAttributes="Bold"
+                                      Text="{Binding ProductCountingBasketModel.SubUnitsetCode}"
+                                      TextColor="{StaticResource Primary}" />
+
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <!--#region Counting Status Border-->
+                    <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
                         <Label.FormattedText>
                             <FormattedString>
                                 <Span FontAttributes="Bold"
@@ -122,7 +121,7 @@
                         </Label.FormattedText>
                     </Label>
                     <!--#endregion-->
-                   
+
 
                     <Grid ColumnDefinitions="Auto, *">
                         <Grid Grid.Column="0"

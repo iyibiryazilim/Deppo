@@ -91,6 +91,7 @@ public partial class TransferOutBasketViewModel : BaseViewModel
 		LoadMoreLocationTransactionsCommand = new Command(async () => await LoadMoreLocationTransactionsAsync());
 		LocationTransactionIncreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionIncreaseAsync(item));
 		LocationTransactionDecreaseCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionDecreaseAsync(item));
+		LocationTransactionQuantityTappedCommand = new Command<LocationTransactionModel>(async (item) => await LocationTransactionQuantityTappedAsync(item));
 		ConfirmLocationTransactionCommand = new Command(ConfirmLocationTransactionAsync);
 		LocationTransactionCloseCommand = new Command(async () => await LocationTransactionCloseAsync());
 
@@ -118,6 +119,7 @@ public partial class TransferOutBasketViewModel : BaseViewModel
     public Command LoadMoreLocationTransactionsCommand { get; }
     public Command LocationTransactionIncreaseCommand { get; }
     public Command LocationTransactionDecreaseCommand { get; }
+    public Command LocationTransactionQuantityTappedCommand { get; }
     public Command ConfirmLocationTransactionCommand { get; }
     public Command LocationTransactionCloseCommand { get; }
 
@@ -307,34 +309,34 @@ public partial class TransferOutBasketViewModel : BaseViewModel
     {
         if (IsBusy)
             return;
+        if (item is null)
+            return;
         try
         {
             IsBusy = true;
 
-            if (item is not null)
+            SelectedItem = item;
+            if (item.OutputQuantity > 0)
             {
-                SelectedItem = item;
-                if (item.OutputQuantity > 1)
+                // Stok Yeri takipli ise locationTransactionBottomSheet aç
+                if (item.LocTracking == 1)
                 {
-                    // Stok Yeri takipli ise locationTransactionBottomSheet aç
-                    if (item.LocTracking == 1)
-                    {
-                        await LoadLocationTransactionsAsync();
-                        CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.FullExpanded;
-                    }
-                    // Sadece SeriLot takipli ise serilotTransactionBottomSheet aç
-                    else if (item.LocTracking == 0 && (item.TrackingType == 1 || item.TrackingType == 2))
-                    {
-                        await LoadSeriLotTransactionsAsync();
-                        CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.FullExpanded;
-                    }
-                    // Stok yeri ve SeriLot takipli değilse
-                    else
-                    {
-                        item.OutputQuantity--;
-                    }
+                    await LoadLocationTransactionsAsync();
+                    CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.FullExpanded;
+                }
+                // Sadece SeriLot takipli ise serilotTransactionBottomSheet aç
+                else if (item.LocTracking == 0 && (item.TrackingType == 1 || item.TrackingType == 2))
+                {
+                    await LoadSeriLotTransactionsAsync();
+                    CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.FullExpanded;
+                }
+                // Stok yeri ve SeriLot takipli değilse
+                else
+                {
+                    item.OutputQuantity--;
                 }
             }
+           
         }
         catch (Exception ex)
         {
@@ -510,9 +512,6 @@ public partial class TransferOutBasketViewModel : BaseViewModel
                     if (item.OutputQuantity < item.RemainingQuantity && SelectedItem.StockQuantity > totalQuantity)
                         item.OutputQuantity++;
                 }
-
-                if (item.OutputQuantity > 0 && !item.IsSelected)
-                    item.IsSelected = true;
             }
         }
         catch (Exception ex)
@@ -567,6 +566,66 @@ public partial class TransferOutBasketViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+    private async Task LocationTransactionQuantityTappedAsync(LocationTransactionModel item)
+    {
+        if (IsBusy)
+            return;
+        if (item is null)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            var result = await CurrentPage.DisplayPromptAsync(
+                title: item.LocationCode,
+                message: "Miktarı giriniz",
+                cancel: "Vazgeç",
+                accept: "Tamam",
+                placeholder: item.OutputQuantity.ToString(),
+                keyboard: Keyboard.Numeric
+            );
+
+			if (string.IsNullOrEmpty(result))
+				return;
+
+			var quantity = Convert.ToDouble(result);
+
+			if (quantity < 0)
+			{
+				_userDialogs.ShowToast("Girilen miktar 0'dan küçük olmamalıdır.");
+				return;
+			}
+
+            if(quantity > item.RemainingQuantity)
+            {
+                _userDialogs.ShowToast($"Girilen miktar, kalan miktarı ({item.RemainingQuantity}) aşmamalıdır.");
+                return;
+			}
+
+			var totalQuantity = LocationTransactions.Where(x => x.LocationCode != item.LocationCode).Sum(x => (double)x.OutputQuantity);
+            if(totalQuantity + quantity > SelectedItem.StockQuantity)
+            {
+				_userDialogs.ShowToast($"Toplam girilen miktar ({totalQuantity + quantity}), ürünün ({SelectedItem.ItemCode}) stok miktarını ({SelectedItem.StockQuantity}) aşmamalıdır.");
+				return;
+			}
+
+			item.OutputQuantity = quantity;
+
+		}
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
 
     private void ConfirmLocationTransactionAsync()
     {

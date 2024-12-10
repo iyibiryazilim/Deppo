@@ -32,7 +32,7 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-        ItemTappedCommand = new Command<ProductCountingWarehouseModel>(ItemTappedAsync);
+        ItemTappedCommand = new Command<ProductCountingWarehouseModel>(async (x) => await ItemTappedAsync(x));
         NextViewCommand = new Command(async () => await NextViewAsync());
 		BackCommand = new Command(async () => await BackAsync());
 	}
@@ -70,10 +70,9 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
 
 
             _userDialogs.Loading("Loading Items...");
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
-          
             await Task.Delay(1000);
-
+            
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
             if (ProductCountingBasketModel.IsVariant)
             {
                 var result = await _productCountingService.GetWarehousesByVariant(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, variantReferenceId:ProductCountingBasketModel.ItemReferenceId, string.Empty, 0, 20);
@@ -84,20 +83,8 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
 
                     foreach (var item in result.Data)
                     {
-
                         Items.Add(Mapping.Mapper.Map<ProductCountingWarehouseModel>(item));
-
                     }
-                    _userDialogs.Loading().Hide();
-                }
-                else
-                {
-                    if (_userDialogs.IsHudShowing)
-                        _userDialogs.Loading().Hide();
-
-                    Debug.WriteLine(result.Message);
-                    _userDialogs.Alert(message: result.Message, title: "Load Items");
-
                 }
             }
             else
@@ -110,29 +97,18 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
 
                     foreach (var item in result.Data)
                     {
-
                         Items.Add(Mapping.Mapper.Map<ProductCountingWarehouseModel>(item));
-
                     }
-                    _userDialogs.Loading().Hide();
-                }
-                else
-                {
-                    if (_userDialogs.IsHudShowing)
-                        _userDialogs.Loading().Hide();
-
-                    Debug.WriteLine(result.Message);
-                    _userDialogs.Alert(message: result.Message, title: "Load Items");
-
                 }
             }
 
-           
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+                _userDialogs.HideHud();
 
             _userDialogs.Alert(message: ex.Message, title: "Load Items Error");
         }
@@ -146,12 +122,15 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
     {
         if (IsBusy)
             return;
+        if (Items.Count < 18)
+            return;
 
         try
         {
             IsBusy = true;
 
             _userDialogs.Loading("Loading More Items...");
+
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
             if (ProductCountingBasketModel.IsVariant)
@@ -164,22 +143,9 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
 
                     foreach (var item in result.Data)
                     {
-
                         Items.Add(Mapping.Mapper.Map<ProductCountingWarehouseModel>(item));
-
                     }
-					if (_userDialogs.IsHudShowing)
-						_userDialogs.HideHud();
 				}
-                else
-                {
-                    if (_userDialogs.IsHudShowing)
-                        _userDialogs.HideHud();
-
-                    Debug.WriteLine(result.Message);
-                    _userDialogs.Alert(message: result.Message, title: "Load Items");
-
-                }
             }
             else
             {
@@ -191,34 +157,21 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
 
                     foreach (var item in result.Data)
                     {
-
                         Items.Add(Mapping.Mapper.Map<ProductCountingWarehouseModel>(item));
-
-                    }
-					if (_userDialogs.IsHudShowing)
-						_userDialogs.HideHud();
+                    }	
 				}
-                else
-                {
-                    if (_userDialogs.IsHudShowing)
-						_userDialogs.HideHud();
-
-					Debug.WriteLine(result.Message);
-                    _userDialogs.Alert(message: result.Message, title: "Load Items");
-
-                }
             }
-            
 
-           
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
 
             if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+				_userDialogs.HideHud();
 
-            _userDialogs.Alert(message: ex.Message, title: "Load Items Error");
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
         finally
         {
@@ -226,7 +179,7 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
         }
     }
 
-    private void ItemTappedAsync(ProductCountingWarehouseModel item)
+    private async Task ItemTappedAsync(ProductCountingWarehouseModel item)
     {
         if (IsBusy)
             return;
@@ -253,7 +206,10 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            _userDialogs.Alert(ex.Message);
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
@@ -270,31 +226,28 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            if (SelectedWarehouse is not null)
+            if(SelectedWarehouse is null)
             {
+				await _userDialogs.AlertAsync("Lütfen bir ambar seçiniz.");
+                return;
+			}
 
-                if (SelectedWarehouse.LocationCount > 0)
+            if (SelectedWarehouse.LocationCount > 0)
+            {
+                await Shell.Current.GoToAsync($"{nameof(ProductCountingLocationListView)}", new Dictionary<string, object>
                 {
-                    await Shell.Current.GoToAsync($"{nameof(ProductCountingLocationListView)}", new Dictionary<string, object>
-                    {
-                        [nameof(ProductCountingWarehouseModel)] = SelectedWarehouse,
-                        [nameof(ProductCountingBasketModel)] = ProductCountingBasketModel
-                    });
-                }
-                else
-                {
-                    await Shell.Current.GoToAsync($"{nameof(ProductCountingBasketView)}", new Dictionary<string, object>
-                    {
-                        [nameof(ProductCountingWarehouseModel)] = SelectedWarehouse,
-                        [nameof(ProductCountingBasketModel)] = ProductCountingBasketModel
-
-                    });
-                }
-
+                    [nameof(ProductCountingWarehouseModel)] = SelectedWarehouse,
+                    [nameof(ProductCountingBasketModel)] = ProductCountingBasketModel
+                });
             }
             else
             {
-                await _userDialogs.AlertAsync("Lütfen bir ürün seçiniz.");
+                await Shell.Current.GoToAsync($"{nameof(ProductCountingBasketView)}", new Dictionary<string, object>
+                {
+                    [nameof(ProductCountingWarehouseModel)] = SelectedWarehouse,
+                    [nameof(ProductCountingBasketModel)] = ProductCountingBasketModel
+
+                });
             }
         }
         catch (Exception ex)
@@ -309,8 +262,12 @@ public partial class ProductCountingWarehouseTotalListViewModel : BaseViewModel
 
     private async Task BackAsync()
     {
+        if (IsBusy)
+            return;
         try
         {
+            IsBusy = true;
+
             if(SelectedWarehouse is not null)
             {
                 SelectedWarehouse.IsSelected = false;

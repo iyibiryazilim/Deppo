@@ -83,11 +83,12 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            Items.Clear();
 
             _userDialogs.Loading("Loading Items...");
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            Items.Clear();
             await Task.Delay(1000);
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, 0, 20);
             if (result.IsSuccess)
             {
@@ -95,26 +96,23 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
                     return;
 
                 foreach (var item in result.Data)
-                    Items.Add(Mapping.Mapper.Map<ProductModel>(item));
+                {
+                    var obj = Mapping.Mapper.Map<ProductModel>(item);
+                    obj.IsSelected = (SelectedProduct != null && obj.ReferenceId == SelectedProduct.ReferenceId) ? SelectedProduct.IsSelected : false;
 
-                _userDialogs.Loading().Hide();
+					Items.Add(obj);
+				}
             }
-            else
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
-
-                Debug.WriteLine(result.Message);
-                _userDialogs.Alert(message: result.Message, title: "Load Items");
-
-            }
+           
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+				_userDialogs.HideHud();
 
-            _userDialogs.Alert(message: ex.Message, title: "Load Items Error");
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
         finally
         {
@@ -132,7 +130,7 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            _userDialogs.Loading("Refreshing Items...");
+            _userDialogs.Loading("Loading...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, Items.Count, 20);
             if (result.IsSuccess)
@@ -141,27 +139,25 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
                     return;
 
                 foreach (var item in result.Data)
-                    Items.Add(Mapping.Mapper.Map<ProductModel>(item));
+                {
+					var obj = Mapping.Mapper.Map<ProductModel>(item);
+					obj.IsSelected = SelectedProduct != null && obj.ReferenceId == SelectedProduct.ReferenceId ? SelectedProduct.IsSelected : false;
 
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
+					Items.Add(obj);
+				}
             }
-            else
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.Loading().Hide();
-
-                _userDialogs.Alert(message: result.Message, title: "Load Items");
-            }
-        }
-        catch (Exception ex)
-        {
 
             if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+                _userDialogs.HideHud();
 
-            _userDialogs.Alert(message: ex.Message, title: "Load Items Error");
-        }
+		}
+        catch (Exception ex)
+        {
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
+		}
         finally
         {
             IsBusy = false;
@@ -191,15 +187,15 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
                     return;
 
                 foreach (var item in result.Data)
-                    Items.Add(Mapping.Mapper.Map<ProductModel>(item));
+                {
+					var obj = Mapping.Mapper.Map<ProductModel>(item);
+					obj.IsSelected = SelectedProduct != null && obj.ReferenceId == SelectedProduct.ReferenceId ? SelectedProduct.IsSelected : false;
+					Items.Add(obj);
+				}
+            }
 
-                _userDialogs.Loading().Hide();
-            }
-            else
-            {
-                _userDialogs.Alert(result.Message, "Hata");
-                return;
-            }
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
         }
         catch (System.Exception ex)
@@ -280,6 +276,9 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
              _userDialogs.Alert(ex.Message);
         }
         finally
@@ -393,18 +392,15 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.Loading().Hide();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            _userDialogs.Loading().Dispose();
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
     }
 
@@ -421,6 +417,7 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
             IsBusy = true;
 
             _userDialogs.Loading("Loading More Variant Items...");
+
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _variantService
                                 .GetVariants(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SelectedProduct.ReferenceId, string.Empty, ItemVariants.Count, 20);
@@ -437,19 +434,19 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.Loading().Hide();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
             IsBusy = false;
-            _userDialogs.Loading().Dispose();
         }
     }
 
@@ -457,25 +454,27 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
     {
         if (IsBusy)
             return;
+        if (SelectedProduct is null)
+        {
+			await _userDialogs.AlertAsync("Lütfen bir ürün seçiniz.");
+            return;
+		}
 
         try
         {
             IsBusy = true;
 
-            if (SelectedProduct is not null)
+            await Shell.Current.GoToAsync($"{nameof(ProductCountingWarehouseTotalListView)}", new Dictionary<string, object>
             {
-                await Shell.Current.GoToAsync($"{nameof(ProductCountingWarehouseTotalListView)}", new Dictionary<string, object>
-                {
-                    [nameof(ProductCountingBasketModel)] = ProductCountingBasketModel,
-                });
-            }
-            else
-            {
-                await _userDialogs.AlertAsync("Lütfen bir ürün seçiniz.");
-            }
+                [nameof(ProductCountingBasketModel)] = ProductCountingBasketModel,
+            });
+            
         }
         catch (Exception ex)
         {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
             _userDialogs.Alert(ex.Message);
         }
         finally
@@ -497,6 +496,8 @@ public partial class ProductCountingProductListViewModel : BaseViewModel
                 SelectedProduct.IsSelected = false;
                 SelectedProduct = null;
             }
+
+            SearchText.Text = string.Empty;
 
             await Shell.Current.GoToAsync("..");
         }

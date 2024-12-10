@@ -142,7 +142,7 @@
                                               TextColor="{StaticResource Primary}" />
                                         <Span Text=" " />
                                         <Span FontAttributes="Bold"
-                                              Text="{Binding LocationModel.StockQuantity, StringFormat='{0:N2}'}"
+                                              Text="{Binding ProductCountingBasketModel.StockQuantity, StringFormat='{0:N2}'}"
                                               TextColor="{StaticResource Primary}" />
                                         <Span Text=" " />
                                         <Span FontAttributes="Bold"
