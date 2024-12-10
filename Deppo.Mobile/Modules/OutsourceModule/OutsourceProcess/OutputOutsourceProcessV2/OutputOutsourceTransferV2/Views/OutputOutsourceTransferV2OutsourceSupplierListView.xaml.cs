@@ -10,5 +10,8 @@ public partial class OutputOutsourceTransferV2OutsourceSupplierListView : Conten
 		InitializeComponent();
         _viewModel = viewModel;
         BindingContext = _viewModel;
+        _viewModel.CurrentPage = this;
+
+
     }
 }

@@ -66,7 +66,7 @@ namespace Deppo.Mobile.Core.Models.OutsourceModels
         private string operationName = string.Empty;
 
         [ObservableProperty]
-        private double planningQantity;
+        private double planningQuantity;
 
         [ObservableProperty]
         private double actualQuantity;

@@ -11,6 +11,7 @@
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcessV2.OutputOutsourceTransferV2.ViewModels"
              xmlns:warehouseModel="clr-namespace:Deppo.Mobile.Core.Models.WarehouseModels;assembly=Deppo.Mobile.Core"
              Title="{Binding Title}"
+             x:DataType="viewModel:OutputOutsourceTransferV2OutsourceFormViewModel"
              Shell.TabBarIsVisible="False"
              >
     <Shell.BackButtonBehavior>
@@ -68,26 +69,28 @@
                                              IsReadOnly="True"
                                              LabelText="Çıkış Ambarı"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding WarehouseModel.Name}" />
+                                             Text="{Binding OutputOutsourceTransferV2BasketModel.OutsourceWarehouseModel.Name}" />
 
                                     <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
                                              IsReadOnly="True"
                                              LabelText="Giriş Ambarı"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="giriş ambarı" />
+                                             Text="{Binding OutputOutsourceTransferV2BasketModel.OutsourceModel.Name}" />
 
                                     <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
                                              LabelText="Fason Cari"
-                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding OutsourceModel.Title}" />
-                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
-                                             FocusedBorderColor="{StaticResource Primary}"
-                                             LabelText="Sevk Adresi"
                                              IsReadOnly="True"
                                              StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
-                                             Text="{Binding ShipAddressModel.City}" />
+                                             Text="{Binding OutputOutsourceTransferV2BasketModel.OutsourceModel.Title}" />
+                                    <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
+                                             FocusedBorderColor="{StaticResource Primary}"
+                                             IsReadOnly="True"
+                                             LabelText="Sevk Adresi"
+                                             
+                                             StartIcon="{x:Static fontAwesome:FontAwesomeIcons.Calendar}"
+                                             Text="{Binding OutputOutsourceTransferV2BasketModel.OutsourceModel.ShipAddressName}" />
 
                                     <dx:TextEdit BorderColor="{StaticResource PrimaryLight}"
                                              FocusedBorderColor="{StaticResource Primary}"
@@ -314,98 +317,234 @@
             VerticalOptions="End" />
         <!--#region BasketItem BottomSheet-->
         <dx:BottomSheet x:Name="basketItemBottomSheet"
-                    AllowDismiss="True"
-                    Grid.Row="1"
-                    BackgroundColor="White"
-                    CornerRadius="15"
-                    HalfExpandedRatio="0.5"
-                    IsModal="True"
-                    ShowGrabber="True">
-            <!--#region BottomSheetContent-->
+                 Grid.Row="1"
+                 AllowDismiss="True"
+                 BackgroundColor="{StaticResource White}"
+                 CornerRadius="15"
+                 HalfExpandedRatio="0.5"
+                 IsModal="True"
+                 ShowGrabber="True">
             <Grid Padding="10"
-              RowDefinitions="Auto,*"
-              RowSpacing="20">
-
+           RowDefinitions="Auto, *"
+           RowSpacing="15">
                 <VerticalStackLayout Grid.Row="0" Spacing="5">
                     <Label FontAttributes="Bold"
-                       FontSize="Subtitle"
-                       Text="Malzeme Listesi" />
-                    <BoxView HeightRequest="2" Color="{StaticResource OffBlack}" />
+                    FontSize="16"
+                    Text="Ana Ürün" />
+                    <Border Padding="10"
+                     BackgroundColor="Transparent"
+                     StrokeShape="RoundRectangle 10"
+                     StrokeThickness="0.1">
+                        <Grid ColumnDefinitions="Auto,*, Auto" ColumnSpacing="10">
+                            <Border StrokeShape="RoundRectangle 5" StrokeThickness="0.5">
+                                <Image Grid.Column="0"
+                                HeightRequest="60"
+                                Source="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                WidthRequest="60" />
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label FontAttributes="Bold"
+                                LineBreakMode="TailTruncation"
+                                Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.ProductCode}" />
+                                <Label LineBreakMode="TailTruncation"
+                                Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.ProductName}"
+                                TextColor="{StaticResource Gray600}" />
+
+                                <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span FontAttributes="Bold"
+                                           FontFamily="FAS"
+                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                           TextColor="{StaticResource Primary}" />
+                                            <Span Text=" " />
+                                            <Span FontAttributes="Bold"
+                                           Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.PlanningQuantity, StringFormat='{0:N2}'}"
+                                           TextColor="{StaticResource Primary}" />
+                                            <Span Text=" " />
+                                            <Span FontAttributes="Bold"
+                                           Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.SubUnitsetCode}"
+                                           TextColor="{StaticResource Primary}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </VerticalStackLayout>
+
+                            <Grid Grid.Column="2" RowDefinitions="Auto, *">
+                                <Grid Grid.Row="0"
+                               ColumnDefinitions="Auto, Auto, Auto"
+                               ColumnSpacing="3"
+                               HorizontalOptions="End"
+                               VerticalOptions="Start">
+                                    <Label Grid.Column="0"
+                                    FontFamily="FAS"
+                                    FontSize="10"
+                                    Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.VariantIcon}"
+                                    TextColor="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.VariantIconColor}" />
+                                    <Label Grid.Column="1"
+                                    FontFamily="FAS"
+                                    FontSize="10"
+                                    Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.LocTrackingIcon}"
+                                    TextColor="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.LocTrackingIconColor}" />
+                                    <Label Grid.Column="2"
+                                    FontFamily="FAS"
+                                    FontSize="10"
+                                    Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.TrackingTypeIcon}"
+                                    TextColor="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.TrackingTypeIconColor}" />
+                                </Grid>
+
+                                <Label Grid.Row="1"
+                                FontAttributes="Bold"
+                                FontSize="Large"
+                                HorizontalOptions="Center"
+                                Text="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.InputQuantity}"
+                                TextColor="{StaticResource OffBlack}"
+                                VerticalOptions="Center" />
+                            </Grid>
+                        </Grid>
+                    </Border>
                 </VerticalStackLayout>
 
-                <CollectionView Grid.Row="1" ItemsSource="{Binding Items}">
-                    <!--<CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="basketModel:OutputOutsourceTransferBasketModel">
-                            <Border Padding="10"
-                                BackgroundColor="Transparent"
-                                StrokeShape="RoundRectangle 10"
-                                StrokeThickness="0.1">
-                                <Grid ColumnDefinitions="Auto,*, Auto" ColumnSpacing="10">
-                                    <Border StrokeShape="RoundRectangle 5"
-                                        StrokeThickness="0.5">
-                                        <Image Grid.Column="0"
-                                           HeightRequest="50"
-                                           Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
-                                           WidthRequest="50" />
-                                    </Border>
+                <Grid Grid.Row="1"
+               RowDefinitions="Auto, *"
+               RowSpacing="5">
+                    <Label Grid.Row="0"
+                    FontAttributes="Bold"
+                    FontSize="16"
+                    Text="Sarf Malzemeler" />
+                    <CollectionView Grid.Row="1" ItemsSource="{Binding OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferSubProducts}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="outsourceModel:OutputOutsourceTransferV2SubProductModel">
+                                <Border Padding="10"
+                                 BackgroundColor="Transparent"
+                                 StrokeShape="RoundRectangle 10"
+                                 StrokeThickness="0.1">
+                                    <Grid ColumnDefinitions="Auto,*, Auto" ColumnSpacing="10">
+                                        <Border StrokeShape="RoundRectangle 5" StrokeThickness="0.5">
+                                            <Image Grid.Column="0"
+                                            HeightRequest="50"
+                                            Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                            WidthRequest="60" />
+                                        </Border>
 
-                                    <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                        <VerticalStackLayout Grid.Column="1" Spacing="2">
 
-                                        <Label FontAttributes="Bold"
-                                           LineBreakMode="TailTruncation"
-                                           Text="{Binding ItemCode}" />
-                                        <Label LineBreakMode="TailTruncation"
-                                           Text="{Binding ItemName}"
-                                           TextColor="{StaticResource Gray600}" />
+                                            <Label FontAttributes="Bold"
+                                            LineBreakMode="TailTruncation"
+                                            MaxLines="1"
+                                            Text="{Binding ProductCode}" />
+                                            <Label LineBreakMode="TailTruncation"
+                                            MaxLines="1"
+                                            Text="{Binding ProductName}"
+                                            TextColor="{StaticResource Gray600}" />
 
-                                        <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
-                                            <Label.FormattedText>
-                                                <FormattedString>
-                                                    <Span FontAttributes="Bold"
-                                                      FontFamily="FAS"
-                                                      Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                                                      TextColor="{StaticResource Primary}" />
-                                                    <Span Text=" " />
-                                                    <Span FontAttributes="Bold"
-                                                      Text="{Binding Quantity, StringFormat='{0:N2}'}"
-                                                      TextColor="{StaticResource Primary}" />
-                                                    <Span Text=" " />
-                                                    <Span FontAttributes="Bold"
-                                                      Text="{Binding SubUnitsetCode}"
-                                                      TextColor="{StaticResource Primary}" />
-                                                </FormattedString>
-                                            </Label.FormattedText>
-                                        </Label>
-                                    </VerticalStackLayout>
+                                            <Label LineBreakMode="TailTruncation"
+                                            MaxLines="1"
+                                            Text="{Binding InWarehouseName}"
+                                            TextColor="{StaticResource Gray500}" />
 
-                                    <Grid Grid.Column="2"
-                                      ColumnDefinitions="Auto, Auto, Auto"
-                                      ColumnSpacing="3"
-                                      HorizontalOptions="End"
-                                      VerticalOptions="Start">
-                                        <Label Grid.Column="0"
-                                           FontFamily="FAS"
-                                           FontSize="10"
-                                           Text="{Binding VariantIcon}"
-                                           TextColor="{Binding VariantIconColor}" />
-                                        <Label Grid.Column="1"
-                                           FontFamily="FAS"
-                                           FontSize="10"
-                                           Text="{Binding LocTrackingIcon}"
-                                           TextColor="{Binding LocTrackingIconColor}" />
-                                        <Label Grid.Column="2"
-                                           FontFamily="FAS"
-                                           FontSize="10"
-                                           Text="{Binding TrackingTypeIcon}"
-                                           TextColor="{Binding TrackingTypeIconColor}" />
+                                            <Grid ColumnDefinitions="Auto, Auto, Auto" ColumnSpacing="5">
+                                                <Label Grid.Column="0"
+                                                TextColor="{StaticResource Gray600}"
+                                                ToolTipProperties.Text="Stok Miktarı"
+                                                VerticalOptions="Center">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span FontAttributes="Bold"
+                                                           FontFamily="FAS"
+                                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                           TextColor="{StaticResource Primary}" />
+                                                            <Span Text=" " />
+                                                            <Span FontAttributes="Bold"
+                                                           Text="{Binding StockQuantity, StringFormat='{0:N2}'}"
+                                                           TextColor="{StaticResource Primary}" />
+                                                            <Span Text=" " />
+                                                            <Span FontAttributes="Bold"
+                                                           Text="{Binding SubUnitsetCode}"
+                                                           TextColor="{StaticResource Primary}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+
+                                                <Label Grid.Column="1"
+                                                TextColor="{StaticResource Gray600}"
+                                                ToolTipProperties.Text="Toplam Çarpan Miktarı"
+                                                VerticalOptions="Center">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span FontAttributes="Bold"
+                                                           FontFamily="FAS"
+                                                           Text="{x:Static fontAwesome:FontAwesomeIcons.BoxesStacked}"
+                                                           TextColor="{StaticResource Primary}" />
+                                                            <Span Text=" " />
+                                                            <Span FontAttributes="Bold"
+                                                           Text="{Binding Quantity, StringFormat='{0:N2}'}"
+                                                           TextColor="{StaticResource Primary}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+
+                                                <Label Grid.Column="2"
+                                                TextColor="{StaticResource Gray600}"
+                                                ToolTipProperties.Text="Çarpan"
+                                                VerticalOptions="Center">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span FontAttributes="Bold"
+                                                           FontFamily="FAS"
+                                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Xmark}"
+                                                           TextColor="{StaticResource Primary}" />
+                                                            <Span Text="" />
+                                                            <Span FontAttributes="Bold"
+                                                           Text="{Binding BOMQuantity, StringFormat='{0:N1}'}"
+                                                           TextColor="{StaticResource Primary}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+
+                                            </Grid>
+                                        </VerticalStackLayout>
+
+                                        <Grid Grid.Column="2" RowDefinitions="Auto, *">
+                                            <Grid Grid.Row="0"
+                                           ColumnDefinitions="Auto, Auto, Auto"
+                                           ColumnSpacing="3"
+                                           HorizontalOptions="End"
+                                           VerticalOptions="Start">
+                                                <Label Grid.Column="0"
+                                                FontFamily="FAS"
+                                                FontSize="10"
+                                                Text="{Binding VariantIcon}"
+                                                TextColor="{Binding VariantIconColor}" />
+                                                <Label Grid.Column="1"
+                                                FontFamily="FAS"
+                                                FontSize="10"
+                                                Text="{Binding LocTrackingIcon}"
+                                                TextColor="{Binding LocTrackingIconColor}" />
+                                                <Label Grid.Column="2"
+                                                FontFamily="FAS"
+                                                FontSize="10"
+                                                Text="{Binding TrackingTypeIcon}"
+                                                TextColor="{Binding TrackingTypeIconColor}" />
+                                            </Grid>
+
+                                            <Label Grid.Row="1"
+                                            FontAttributes="Bold"
+                                            FontSize="Large"
+                                            HorizontalOptions="Center"
+                                            Text="{Binding Quantity}"
+                                            TextColor="{StaticResource OffBlack}"
+                                            VerticalOptions="Center" />
+                                        </Grid>
                                     </Grid>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>-->
-                </CollectionView>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Grid>
+
             </Grid>
-            <!--#endregion-->
         </dx:BottomSheet>
         <!--#endregion-->
     </Grid>

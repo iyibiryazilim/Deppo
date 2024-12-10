@@ -262,6 +262,10 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
                     {
                         await LoadShipAddressesAsync(outsourceModel);
                         CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
+
+                        // Ship adresleri yüklendikten sonra ana veriyi seçili hale getir
+                        outsourceModel.IsSelected = true;
+                        SelectedOutsource = outsourceModel;
                     }
                     else
                     {
@@ -298,7 +302,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
                 await Task.Delay(1000);
 
                 var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _shipAddressService.GetObjectsByOrder(
+                var result = await _shipAddressService.GetObjects(
                     httpClient: httpClient,
                     firmNumber: _httpClientService.FirmNumber,
                     periodNumber: _httpClientService.PeriodNumber,
@@ -380,10 +384,15 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
                     //PurchaseSupplier.ShipAddressReferenceId = selectedShipAddress.ReferenceId;
                     //PurchaseSupplier.ShipAddressCode = selectedShipAddress.Code;
                     //PurchaseSupplier.ShipAddressName = selectedShipAddress.Name;
+                    SelectedOutsource.ShipAddressReferenceId = selectedShipAddress.ReferenceId;
+                    SelectedOutsource.ShipAddressCode = selectedShipAddress.Code;
+                    SelectedOutsource.ShipAddressName = selectedShipAddress.Name;
+
 
                     Items.ToList().ForEach(x => x.IsSelected = false);
 
-                    //PurchaseSupplier.IsSelected = true;
+                    
+                    SelectedOutsource.IsSelected = true;
 
                     CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.Hidden;
                 }
