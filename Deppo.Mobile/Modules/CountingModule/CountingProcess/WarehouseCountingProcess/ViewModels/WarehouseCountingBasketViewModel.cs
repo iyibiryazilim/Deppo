@@ -200,7 +200,7 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            _userDialogs.ShowLoading("Loading...");
+            //_userDialogs.ShowLoading("Loading...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             if (ProductVariantType == ProductVariantType.Variant)
             {
@@ -467,6 +467,8 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
 				return;
 			}
 
+            IsIncrease = true;
+
 			SelectedItem = item;
 
 			if (SelectedItem is not null)
@@ -619,8 +621,6 @@ public partial class WarehouseCountingBasketViewModel : BaseViewModel
                 {
                     LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
                 }
-
-
 
                 if (LocationTransactions.Sum(x => x.RemainingQuantity) > 0)
                 {
