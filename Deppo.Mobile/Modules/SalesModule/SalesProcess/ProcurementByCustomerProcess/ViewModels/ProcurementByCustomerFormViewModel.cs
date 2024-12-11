@@ -305,6 +305,273 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 	}
 
 
+	private async Task<DataResult<ResponseModel>> TransferTransactionInsertAsync(HttpClient httpClient)
+	{
+		var transferTransactionInsertDto = new TransferTransactionInsert();
+		transferTransactionInsertDto.Code = string.Empty;
+		transferTransactionInsertDto.IsEDispatch = 0;
+		transferTransactionInsertDto.SpeCode = SpecialCode;
+		transferTransactionInsertDto.CurrentCode = ProcurementCustomerBasketModel.CustomerCode ?? string.Empty;
+		transferTransactionInsertDto.DoCode = DocumentNumber;
+		transferTransactionInsertDto.TransactionDate = TransactionDate.AddMinutes(-1);
+		transferTransactionInsertDto.Description = Description;
+		transferTransactionInsertDto.DestinationWarehouseNumber = OrderWarehouseModel.Number;
+		transferTransactionInsertDto.FirmNumber = _httpClientService.FirmNumber;
+		transferTransactionInsertDto.ShipInfoCode = ProcurementCustomerBasketModel.ShipAddressCode ?? string.Empty;
+		transferTransactionInsertDto.WarehouseNumber = Items.FirstOrDefault().WarehouseNumber;
+
+
+		foreach (var item in ProcurementCustomerFormModel.Products)
+		{
+			var tempProductQuantity = item.Quantity;
+
+			var lineDto = new TransferTransactionLineDto();
+			lineDto.ProductCode = item.ItemCode;
+			lineDto.WarehouseNumber = Items.FirstOrDefault().WarehouseNumber;
+			lineDto.DestinationWarehouseNumber = OrderWarehouseModel.Number;
+			lineDto.Quantity = item.Quantity;
+			lineDto.ConversionFactor = lineDto.Quantity;
+			lineDto.OtherConversionFactor = lineDto.Quantity;
+			lineDto.SubUnitsetCode = item.SubUnitsetCode;
+
+			foreach (var location in item.Locations)
+			{
+				await LoadLocationTransactionAsync(item, location);
+				var tempLocationQuanity = location.InputQuantity;
+				var locationTransactionList = LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
+
+				foreach (var locationTransaction in locationTransactionList)
+				{
+					var tempLocationTransactionQuantity = locationTransaction.RemainingQuantity;
+					while (tempLocationTransactionQuantity > 0 && tempProductQuantity > 0 && tempLocationQuanity > 0)
+					{
+						var serilotTransactionDto = new SeriLotTransactionDto
+						{
+							StockLocationCode = locationTransaction.LocationCode,
+							InProductTransactionLineReferenceId = locationTransaction.TransactionReferenceId,
+							OutProductTransactionLineReferenceId = locationTransaction.ReferenceId,
+							SubUnitsetCode = item.SubUnitsetCode,
+							DestinationStockLocationCode = item.DestinationLocationCode,
+							ConversionFactor = tempLocationQuanity > tempLocationTransactionQuantity ? tempLocationTransactionQuantity : tempLocationQuanity,
+							OtherConversionFactor = tempLocationQuanity > tempLocationTransactionQuantity ? tempLocationTransactionQuantity : tempLocationQuanity,
+							Quantity = tempLocationQuanity > tempLocationTransactionQuantity ? tempLocationTransactionQuantity : tempLocationQuanity,
+						};
+
+						lineDto.SeriLotTransactions.Add(serilotTransactionDto);
+						tempLocationTransactionQuantity -= (double)serilotTransactionDto.Quantity;
+						tempProductQuantity -= (double)serilotTransactionDto.Quantity;
+						tempLocationQuanity -= (double)serilotTransactionDto.Quantity;
+					}
+				}
+
+			}
+
+			transferTransactionInsertDto.Lines.Add(lineDto);
+		}
+
+
+		var result = await _transferTransactionService.InsertTransferTransaction(httpClient, transferTransactionInsertDto, _httpClientService.FirmNumber);
+		return result;
+	}
+
+	private async Task ProcurementAuditCustomerInsertAsync()
+	{
+		try
+		{
+			var httpSysClient = _httpClientSysService.GetOrCreateHttpClient();
+
+			foreach (var item in Items)
+			{
+				foreach (var item1 in item.Products.Where(x => x.RejectionCode != string.Empty))
+				{
+					ProcurementAuditCustomerDto procurementAuditCustomerDto = new ProcurementAuditCustomerDto
+					{
+						ApplicationUser = _httpClientSysService.UserOid,
+						ReasonsForRejectionProcurement = item1.RejectionOid,
+						CurrentCode = ProcurementCustomerBasketModel.CustomerCode ?? string.Empty,
+						CurrentName = ProcurementCustomerBasketModel.CustomerName ?? string.Empty,
+						CurrentReferenceId = ProcurementCustomerBasketModel.CustomerReferenceId,
+						IsVariant = item1.IsVariant,
+						Quantity = item1.Quantity,
+						ProcurementQuantity = item1.ProcurementQuantity,
+						ProductName = item1.IsVariant ? item1.MainItemName : item1.ItemName,
+						ProductReferenceId = item1.IsVariant ? item1.MainItemReferenceId : item1.ItemReferenceId,
+						CreatedOn = DateTime.Now,
+						LocationCode = item.LocationCode,
+						LocationReferenceId = item.LocationReferenceId,
+						LocationName = item.LocationName,
+						WarehouseName = ProcurementCustomerBasketModel.WarehouseName,
+						WarehouseNumber = ProcurementCustomerBasketModel.WarehouseNumber,
+					};
+
+					await _procurementAuditCustomerService.CreateAsync(
+						httpClient: httpSysClient,
+						dto: procurementAuditCustomerDto
+					);
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+	}
+
+
+	private async Task SaveAsyncContinueWith()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			var confirm = await _userDialogs.ConfirmAsync("İşlemi onaylıyor musunuz?", "Onay", "Evet", "Hayır");
+			if (!confirm)
+				return;
+
+			IsBusy = true;
+
+			_userDialogs.ShowLoading("İşlem Tamamlanıyor...");
+			await Task.Delay(500);
+
+			ResultModel resultModel = new ResultModel();
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			
+			Task<DataResult<ResponseModel>> transferTransactionInsertTask = TransferTransactionInsertAsync(httpClient);
+
+			await transferTransactionInsertTask.ContinueWith(async transferTransactionTask =>
+			{
+				if (transferTransactionTask.IsCompletedSuccessfully)
+				{
+					var result = transferTransactionTask.Result;
+					if(result.IsSuccess && result.Data is not null)
+					{
+						await ProcurementAuditCustomerInsertAsync();
+
+						Task<DataResult<ResponseModel>> wholeSalesDispatchTask = WholeSalesDispatchInsert(httpClient, result.Data.ReferenceId, result.Data.Code);
+						await wholeSalesDispatchTask.ContinueWith(async wholeSalesTask =>
+						{
+							var wholeSalesDispatchResult = wholeSalesTask.Result;
+							if (wholeSalesDispatchResult.IsSuccess && wholeSalesDispatchResult.Data is not null)
+							{
+								await ClearFormAsync();
+								await ClearDataAsync();
+
+								resultModel.Message = "Başarılı";
+								resultModel.Code = result.Data.Code;
+								resultModel.PageTitle = "Ürün Toplama İşlemi";
+								resultModel.PageCountToBack = 7;
+
+								await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
+								{
+									[nameof(ResultModel)] = resultModel
+								});
+
+								if (_userDialogs.IsHudShowing)
+									_userDialogs.HideHud();
+
+								return;
+							}
+						});
+					}
+					else
+					{
+						resultModel.Message = "Başarısız";
+						resultModel.PageTitle = "Ürün Toplama";
+						resultModel.PageCountToBack = 1;
+						resultModel.ErrorMessage = result.Message;
+
+						await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+						{
+							[nameof(ResultModel)] = resultModel
+						});
+
+						if (_userDialogs.IsHudShowing)
+							_userDialogs.HideHud();
+
+						return;
+					}	
+				}
+				else if(transferTransactionTask.IsFaulted)
+				{
+					resultModel.Message = "Başarısız";
+					resultModel.PageTitle = "Ürün Toplama";
+					resultModel.PageCountToBack = 7;
+					resultModel.ErrorMessage = "Sistem Hatası";
+
+					await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+					{
+						[nameof(ResultModel)] = resultModel
+					});
+
+					if (_userDialogs.IsHudShowing)
+						_userDialogs.HideHud();
+
+					return;
+				}
+			});
+			
+
+			//	//#region ProcurementFiche Insert
+			//	//try
+			//	//{
+			//	//	var httpSysClient = _httpClientSysService.GetOrCreateHttpClient();
+			//	//	var customerResult = await _customerSysService.GetAllAsync(httpSysClient, $"$filter= Code eq '{ProcurementCustomerBasketModel.CustomerCode}'");
+			//	//	var warehouseResult = await _warehouseSysService.GetAllAsync(httpSysClient, $"$filter= WarehouseNumber eq {OrderWarehouseModel.Number}");
+
+			//	//	ProcurementFicheDto procurementFicheDto = new ProcurementFicheDto
+			//	//	{
+			//	//		CreatedOn = DateTime.Now,
+			//	//		Customer = customerResult.FirstOrDefault().Oid,
+			//	//		ReferenceId = result.Data.ReferenceId,
+			//	//		FicheNumber = result.Data.Code,
+			//	//	};
+
+			//	//	foreach (var item in Items)
+			//	//	{
+			//	//		foreach (var product in item.Products)
+			//	//		{
+			//	//			ProcurementFicheTransactionDto procurementFicheTransactionDto = new();
+			//	//			var productResult = await _productSysService.GetAllAsync(httpSysClient, $"$filter= Code eq '{product.ItemCode}'");
+			//	//			var subUnitsetResult = await _subunitsetSysService.GetAllAsync(httpSysClient, $"filter= Code eq '{product.SubUnitsetCode}'");
+
+			//	//			foreach (var order in product.Orders)
+			//	//			{
+			//	//				procurementFicheTransactionDto.Product = productResult.FirstOrDefault().Oid;
+			//	//				procurementFicheTransactionDto.SubUnitset = subUnitsetResult.FirstOrDefault().Oid;
+			//	//				procurementFicheTransactionDto.Quantity = product.Quantity;
+			//	//				procurementFicheTransactionDto.Warehouse = warehouseResult.FirstOrDefault().Oid;
+			//	//				procurementFicheTransactionDto.OrderNumber = order.OrderNumber;
+			//	//				procurementFicheTransactionDto.OrderReferenceId = order.OrderReferenceId;
+			//	//			}
+			//	//			procurementFicheDto.Lines.Add(procurementFicheTransactionDto);
+			//	//		}
+			//	//	}
+			//	//	await _procurementFicheService.CreateAsync(httpSysClient, procurementFicheDto);
+			//	//}
+			//	//catch (Exception ex)
+			//	//{
+			//	//	throw;
+			//	//}
+			//	//#endregion
+
+		}
+		catch (Exception ex)
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			IsBusy = false;
+		}
+	}
+
 	private async Task SaveAsync()
 	{
 		if (IsBusy)
@@ -319,209 +586,61 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 
 			_userDialogs.ShowLoading("İşlem Tamamlanıyor...");
 			await Task.Delay(500);
-			
+
+			ResultModel resultModel = new ResultModel();
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			var transferTransactionInsertDto = new TransferTransactionInsert();
-			transferTransactionInsertDto.Code = string.Empty;
-			transferTransactionInsertDto.IsEDispatch = 0;
-			transferTransactionInsertDto.SpeCode = SpecialCode;
-			transferTransactionInsertDto.CurrentCode = ProcurementCustomerBasketModel.CustomerCode ?? string.Empty;
-			transferTransactionInsertDto.DoCode = DocumentNumber;
-			transferTransactionInsertDto.TransactionDate = TransactionDate.AddMinutes(-1);
-			transferTransactionInsertDto.Description = Description;
-			transferTransactionInsertDto.DestinationWarehouseNumber = OrderWarehouseModel.Number;
-			transferTransactionInsertDto.FirmNumber = _httpClientService.FirmNumber;
-			transferTransactionInsertDto.ShipInfoCode = ProcurementCustomerBasketModel.ShipAddressCode ?? string.Empty;
-			transferTransactionInsertDto.WarehouseNumber = Items.FirstOrDefault().WarehouseNumber;
+			var transferResult = await TransferTransactionInsertAsync(httpClient);
 
-
-			foreach (var item in ProcurementCustomerFormModel.Products)
+			if (transferResult.IsSuccess && transferResult.Data is not null)
 			{
-				var tempProductQuantity = item.Quantity;
+				await ProcurementAuditCustomerInsertAsync();
 
-				var lineDto = new TransferTransactionLineDto();
-				lineDto.ProductCode = item.ItemCode;
-				lineDto.WarehouseNumber = Items.FirstOrDefault().WarehouseNumber;
-				lineDto.DestinationWarehouseNumber = OrderWarehouseModel.Number;
-				lineDto.Quantity = item.Quantity;
-				lineDto.ConversionFactor = lineDto.Quantity;
-				lineDto.OtherConversionFactor = lineDto.Quantity;
-				lineDto.SubUnitsetCode = item.SubUnitsetCode;
-
-				foreach (var location in item.Locations)
+				var wholeSalesDispatchResult = await WholeSalesDispatchInsert(httpClient, transferResult.Data.ReferenceId, transferResult.Data.Code);
+				if (wholeSalesDispatchResult.IsSuccess && wholeSalesDispatchResult.Data is not null)
 				{
-					await LoadLocationTransactionAsync(item, location);
-					var tempLocationQuanity = location.InputQuantity;
-					var locationTransactionList = LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
+					await ClearFormAsync();
+					await ClearDataAsync();
 
-					foreach (var locationTransaction in locationTransactionList)
+					resultModel.Message = "Başarılı";
+					resultModel.Code = transferResult.Data.Code;
+					resultModel.PageTitle = "Ürün Toplama İşlemi";
+					resultModel.PageCountToBack = 7;
+
+					await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
 					{
-						var tempLocationTransactionQuantity = locationTransaction.RemainingQuantity;
-						while (tempLocationTransactionQuantity > 0 && tempProductQuantity > 0 && tempLocationQuanity > 0)
-						{
-							var serilotTransactionDto = new SeriLotTransactionDto
-							{
-								StockLocationCode = locationTransaction.LocationCode,
-								InProductTransactionLineReferenceId = locationTransaction.TransactionReferenceId,
-								OutProductTransactionLineReferenceId = locationTransaction.ReferenceId,
-								SubUnitsetCode = item.SubUnitsetCode,
-								DestinationStockLocationCode = item.DestinationLocationCode,
-								ConversionFactor = tempLocationQuanity > tempLocationTransactionQuantity ? tempLocationTransactionQuantity : tempLocationQuanity,
-								OtherConversionFactor = tempLocationQuanity > tempLocationTransactionQuantity ? tempLocationTransactionQuantity : tempLocationQuanity,
-								Quantity = tempLocationQuanity > tempLocationTransactionQuantity ? tempLocationTransactionQuantity : tempLocationQuanity,
-							};
+						[nameof(ResultModel)] = resultModel
+					});
 
-							lineDto.SeriLotTransactions.Add(serilotTransactionDto);
-							tempLocationTransactionQuantity -= (double)serilotTransactionDto.Quantity;
-							tempProductQuantity -= (double)serilotTransactionDto.Quantity;
-							tempLocationQuanity -= (double)serilotTransactionDto.Quantity;
-						}
-					}
-
+					if (_userDialogs.IsHudShowing)
+						_userDialogs.HideHud();
 				}
-
-				transferTransactionInsertDto.Lines.Add(lineDto);
-			}
-
-
-			var result = await _transferTransactionService.InsertTransferTransaction(httpClient, transferTransactionInsertDto, _httpClientService.FirmNumber);
-
-			ResultModel resultModel = new();
-
-			if (result.IsSuccess)
-			{
-				resultModel.Message = "Başarılı";
-				resultModel.Code = result.Data.Code;
-				resultModel.PageTitle = "Ürün Toplama İşlemi";
-				resultModel.PageCountToBack = 7;
-
-				foreach (var item in Items)
+				else
 				{
-					foreach (var item1 in item.Products.Where(x => x.RejectionCode != string.Empty))
+					resultModel.Message = "Başarısız";
+					resultModel.PageTitle = "Toptan Satış İrsaliyesi";
+					resultModel.PageCountToBack = 7;
+					resultModel.ErrorMessage = wholeSalesDispatchResult.Message;
+
+					await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
 					{
-						var httpSysClient = _httpClientSysService.GetOrCreateHttpClient();
+						[nameof(ResultModel)] = resultModel
+					});
 
-						ProcurementAuditCustomerDto procurementAuditCustomerDto = new ProcurementAuditCustomerDto
-						{
-							ApplicationUser = _httpClientSysService.UserOid,
-							ReasonsForRejectionProcurement = item1.RejectionOid,
-							CurrentCode = ProcurementCustomerBasketModel.CustomerCode ?? string.Empty,
-							CurrentName = ProcurementCustomerBasketModel.CustomerName ?? string.Empty,
-							CurrentReferenceId = ProcurementCustomerBasketModel.CustomerReferenceId,
-							IsVariant = item1.IsVariant,
-							Quantity = item1.Quantity,
-							ProcurementQuantity = item1.ProcurementQuantity,
-							ProductName = item1.IsVariant ? item1.MainItemName : item1.ItemName,
-							ProductReferenceId = item1.IsVariant ? item1.MainItemReferenceId : item1.ItemReferenceId,
-							CreatedOn = DateTime.Now,
-							LocationCode = item.LocationCode,
-							LocationReferenceId = item.LocationReferenceId,
-							LocationName = item.LocationName,
-							WarehouseName = ProcurementCustomerBasketModel.WarehouseName,
-							WarehouseNumber = ProcurementCustomerBasketModel.WarehouseNumber,
-						};
-
-						await _procurementAuditCustomerService.CreateAsync(
-							httpClient: httpSysClient,
-							dto: procurementAuditCustomerDto
-						);
-					}
+					if (_userDialogs.IsHudShowing)
+						_userDialogs.HideHud();
 				}
-
-
-
-				try
-				{
-					var wholeResult = await WholeSalesDispatchInsert(httpClient, result.Data.ReferenceId, result.Data.Code);
-					if(!wholeResult.IsSuccess)
-					{
-						resultModel.Message = "Başarısız";
-						resultModel.PageTitle = "Toptan Satış İrsaliyesi";
-						resultModel.PageCountToBack = 7;
-						resultModel.ErrorMessage = wholeResult.Message;
-
-						await ClearFormAsync();
-						await ClearDataAsync();
-
-						await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
-						{
-							[nameof(ResultModel)] = resultModel
-						});
-
-						if (_userDialogs.IsHudShowing)
-							_userDialogs.HideHud();
-
-						return;
-					}
-				}
-				catch (Exception ex)
-				{
-					await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-				}
-
-				//#region ProcurementFiche Insert
-				//try
-				//{
-				//	var httpSysClient = _httpClientSysService.GetOrCreateHttpClient();
-				//	var customerResult = await _customerSysService.GetAllAsync(httpSysClient, $"$filter= Code eq '{ProcurementCustomerBasketModel.CustomerCode}'");
-				//	var warehouseResult = await _warehouseSysService.GetAllAsync(httpSysClient, $"$filter= WarehouseNumber eq {OrderWarehouseModel.Number}");
-
-				//	ProcurementFicheDto procurementFicheDto = new ProcurementFicheDto
-				//	{
-				//		CreatedOn = DateTime.Now,
-				//		Customer = customerResult.FirstOrDefault().Oid,
-				//		ReferenceId = result.Data.ReferenceId,
-				//		FicheNumber = result.Data.Code,
-				//	};
-
-				//	foreach (var item in Items)
-				//	{
-				//		foreach (var product in item.Products)
-				//		{
-				//			ProcurementFicheTransactionDto procurementFicheTransactionDto = new();
-				//			var productResult = await _productSysService.GetAllAsync(httpSysClient, $"$filter= Code eq '{product.ItemCode}'");
-				//			var subUnitsetResult = await _subunitsetSysService.GetAllAsync(httpSysClient, $"filter= Code eq '{product.SubUnitsetCode}'");
-
-				//			foreach (var order in product.Orders)
-				//			{
-				//				procurementFicheTransactionDto.Product = productResult.FirstOrDefault().Oid;
-				//				procurementFicheTransactionDto.SubUnitset = subUnitsetResult.FirstOrDefault().Oid;
-				//				procurementFicheTransactionDto.Quantity = product.Quantity;
-				//				procurementFicheTransactionDto.Warehouse = warehouseResult.FirstOrDefault().Oid;
-				//				procurementFicheTransactionDto.OrderNumber = order.OrderNumber;
-				//				procurementFicheTransactionDto.OrderReferenceId = order.OrderReferenceId;
-				//			}
-				//			procurementFicheDto.Lines.Add(procurementFicheTransactionDto);
-				//		}
-				//	}
-				//	await _procurementFicheService.CreateAsync(httpSysClient, procurementFicheDto);
-				//}
-				//catch (Exception ex)
-				//{
-				//	throw;
-				//}
-				//#endregion
-
-
-				await ClearFormAsync();
-				await ClearDataAsync();
-
-				await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
-				{
-					[nameof(ResultModel)] = resultModel
-				});
-
-				if (_userDialogs.IsHudShowing)
-					_userDialogs.HideHud();
 			}
 			else
 			{
-
 				resultModel.Message = "Başarısız";
 				resultModel.PageTitle = "Ürün Toplama";
 				resultModel.PageCountToBack = 1;
-				resultModel.ErrorMessage = result.Message;
+				resultModel.ErrorMessage = transferResult.Message;
+
+				Locations.Clear();
+				DispatchLocationTransactions.Clear();
+
 
 				await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
 				{
@@ -531,22 +650,19 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 				if (_userDialogs.IsHudShowing)
 					_userDialogs.HideHud();
 			}
-
-
 		}
 		catch (Exception ex)
 		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
-
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
 			IsBusy = false;
 		}
 	}
-
 
 	private async Task<DataResult<ResponseModel>> WholeSalesDispatchInsert(HttpClient httpClient, int ficheReferenceId, string code)
 	{
