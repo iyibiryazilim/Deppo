@@ -28,6 +28,12 @@ public partial class InputOutsourceTransferSubProductModel : ObservableObject
 	string productName = string.Empty;
 
 	[ObservableProperty]
+	double conversionFactor = 1;
+
+	[ObservableProperty]
+	double otherConversionFactor = 1;
+
+	[ObservableProperty]
 	int inWarehouseNumber;
 
 	[ObservableProperty]
