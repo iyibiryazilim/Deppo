@@ -43,7 +43,43 @@ public partial class InsertFailurePageViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
-			await Shell.Current.GoToAsync($"..");
+			if (ResultModel.PageCountToBack != 0)
+			{
+				switch (ResultModel.PageCountToBack)
+				{
+					case 1:
+						await Shell.Current.GoToAsync("..");
+						break;
+					case 2:
+						await Shell.Current.GoToAsync("../..");
+						break;
+					case 3:
+						await Shell.Current.GoToAsync("../../..");
+						break;
+					case 4:
+						await Shell.Current.GoToAsync("../../../..");
+						break;
+					case 5:
+						await Shell.Current.GoToAsync("../../../../..");
+						break;
+					case 6:
+						await Shell.Current.GoToAsync("../../../../../..");
+						break;
+					case 7:
+						await Shell.Current.GoToAsync("../../../../../../..");
+						break;
+					case 8:
+						await Shell.Current.GoToAsync("../../../../../../../..");
+						break;
+					default:
+						await Shell.Current.GoToAsync("..");
+						break;
+				}
+			}
+			else
+			{
+				await Shell.Current.GoToAsync("..");
+			}
 		}
 		catch (Exception ex)
 		{

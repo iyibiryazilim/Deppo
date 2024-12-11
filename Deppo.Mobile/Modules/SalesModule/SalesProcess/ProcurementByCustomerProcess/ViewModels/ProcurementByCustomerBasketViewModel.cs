@@ -839,6 +839,7 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 
 	private async Task ConvertItems(List<ProcurementCustomerBasketModel> items)
 	{
+		ProcurementCustomerFormModel.Products.Clear();
 		foreach (var item in items)
 		{
 			foreach (var product in item.Products)
@@ -897,8 +898,6 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 				}
 			}
 		}
-
-
 	}
 
 	private async Task BackAsync()
