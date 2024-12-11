@@ -311,15 +311,15 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 			return;
 		try
 		{
-			IsBusy = true;
-
 			var confirm = await _userDialogs.ConfirmAsync("İşlemi onaylıyor musunuz?", "Onay", "Evet", "Hayır");
 			if (!confirm)
 				return;
 
+			IsBusy = true;
 
 			_userDialogs.ShowLoading("İşlem Tamamlanıyor...");
 			await Task.Delay(500);
+			
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
 			var transferTransactionInsertDto = new TransferTransactionInsert();
@@ -444,13 +444,13 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 						await ClearFormAsync();
 						await ClearDataAsync();
 
-						if (_userDialogs.IsHudShowing)
-							_userDialogs.HideHud();
-
 						await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
 						{
 							[nameof(ResultModel)] = resultModel
 						});
+
+						if (_userDialogs.IsHudShowing)
+							_userDialogs.HideHud();
 
 						return;
 					}
@@ -507,13 +507,13 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 				await ClearFormAsync();
 				await ClearDataAsync();
 
-				if (_userDialogs.IsHudShowing)
-					_userDialogs.HideHud();
-
 				await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
 				{
 					[nameof(ResultModel)] = resultModel
 				});
+
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
 			}
 			else
 			{
@@ -523,13 +523,13 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 				resultModel.PageCountToBack = 1;
 				resultModel.ErrorMessage = result.Message;
 
-				if (_userDialogs.IsHudShowing)
-					_userDialogs.HideHud();
-
 				await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
 				{
 					[nameof(ResultModel)] = resultModel
 				});
+
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
 			}
 
 
@@ -718,7 +718,13 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 			if (warehouseListViewModel.SelectedWarehouseModel is not null)
 			{
 				warehouseListViewModel.SelectedWarehouseModel.IsSelected = false;
-				warehouseListViewModel.SelectedWarehouseModel = null;
+				warehouseListViewModel.SelectedWarehouseModel = null;			
+			}
+
+			if(warehouseListViewModel.SelectedLocationModel is not null)
+			{
+				warehouseListViewModel.SelectedLocationModel.IsSelected = false;
+				warehouseListViewModel.SelectedLocationModel = null;
 			}
 
 			if (procurementWarehouseListViewModel.SelectedWarehouseModel is not null)

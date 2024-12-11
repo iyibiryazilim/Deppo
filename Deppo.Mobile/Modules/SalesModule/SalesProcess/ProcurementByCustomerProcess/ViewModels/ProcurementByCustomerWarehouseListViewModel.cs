@@ -517,6 +517,13 @@ public partial class ProcurementByCustomerWarehouseListViewModel : BaseViewModel
 				SelectedWarehouseModel.IsSelected = false;
 				SelectedWarehouseModel = null;
 			}
+
+            if (SelectedLocationModel is not null)
+            {
+                SelectedLocationModel.IsSelected = false;
+				SelectedLocationModel = null;
+			}
+
             Items.ForEach(x => x.IsSelected = false);
 			await Shell.Current.GoToAsync("..");
         }

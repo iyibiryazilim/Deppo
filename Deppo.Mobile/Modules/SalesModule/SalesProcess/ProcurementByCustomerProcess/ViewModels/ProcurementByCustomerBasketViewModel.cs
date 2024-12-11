@@ -408,6 +408,8 @@ public partial class ProcurementByCustomerBasketViewModel : BaseViewModel
 		{
 			if(_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
 		}
 		finally
 		{

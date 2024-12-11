@@ -157,18 +157,13 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
             return;
         try
         {
-			IsBusy = true;
-
-            //await _userDialogs.ConfirmAsync("Fiş oluşturulacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır").ContinueWith((x) =>
-            //{
-            //    x.
-            //});
-
 			var confirm = await _userDialogs.ConfirmAsync("Fiş oluşturulacaktır. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
             if (!confirm)
                 return;
-            
-			
+
+			IsBusy = true;
+
+
 			_userDialogs.Loading("İşlem tamamlanıyor");
             await Task.Delay(1000);
 
@@ -274,20 +269,16 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
             await ClearFormAsync();
             await ClearDataAsync();
 
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
-
 			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
             {
                 [nameof(ResultModel)] = resultModel
             });
-        }
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
         else
         {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
             resultModel.Message = "Başarısız";
             resultModel.PageTitle = Title;
             resultModel.ErrorMessage = result.Message;
@@ -297,7 +288,10 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
             {
                 [nameof(ResultModel)] = resultModel
             });
-        }
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
     }
 
     private async Task InCountingTransactionInsertAsync(HttpClient httpClient)
@@ -374,21 +368,18 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
 			await ClearFormAsync();
             await ClearDataAsync();
 			
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
             await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
             {
                 [nameof(ResultModel)] = resultModel
             });
 
-           
-        }
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+
+		}
         else
         {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
             resultModel.Message = "Başarısız";
             resultModel.PageTitle = Title;
             resultModel.ErrorMessage = result.Message;
@@ -398,7 +389,10 @@ public partial class InputProductProcessFormViewModel : BaseViewModel
             {
                 [nameof(ResultModel)] = resultModel
             });
-        }
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
     }
 
     private async Task BackAsync()

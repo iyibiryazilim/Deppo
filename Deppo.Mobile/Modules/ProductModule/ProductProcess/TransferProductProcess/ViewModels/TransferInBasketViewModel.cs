@@ -172,7 +172,8 @@ public partial class TransferInBasketViewModel : BaseViewModel
                 }
 			}
 
-			_userDialogs.HideHud();
+			if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 		}
 		catch (System.Exception ex)
 		{
@@ -236,23 +237,45 @@ public partial class TransferInBasketViewModel : BaseViewModel
 		{
 			await LoadWarehouseLocationsAsync(SelectedInputProductModel);
 		}
-		IsBusy = true;
-
-		var httpClient = _httpClientService.GetOrCreateHttpClient();
-
-		var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, TransferBasketModel.InWarehouse.Number, productReferenceId: SelectedInputProductModel.IsVariant ? SelectedInputProductModel.MainItemReferenceId : SelectedInputProductModel.ItemReferenceId, 0, LocationSearchText.Text, 0, 99999);
-
-		if(result.IsSuccess)
+		else
 		{
-			if (result.Data is null)
-				return;
+			IsBusy = true;
 
-            foreach (var item in result.Data)
-            {
-				var obj = Mapping.Mapper.Map<LocationModel>(item);
+			var retainedLocations = Locations.Where(x => x.InputQuantity > 0).ToList();
 
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			var result = await _locationService.GetObjects(
+				httpClient: httpClient, 
+				firmNumber: _httpClientService.FirmNumber, 
+				periodNumber: _httpClientService.PeriodNumber, 
+				warehouseNumber: TransferBasketModel.InWarehouse.Number, 
+				productReferenceId: SelectedInputProductModel.IsVariant ? SelectedInputProductModel.MainItemReferenceId : SelectedInputProductModel.ItemReferenceId, 
+				variantReferenceId: 0, 
+				search: LocationSearchText.Text, 
+				skip: 0, 
+				take: 99999);
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+				{
+					var obj = Mapping.Mapper.Map<LocationModel>(item);
+					var matchingItem = SelectedInputProductModel.Locations.FirstOrDefault(item => item.ReferenceId == obj.ReferenceId);
+					if (matchingItem != null)
+					{
+						obj.InputQuantity = matchingItem.InputQuantity;
+					}
+
+					Locations.Add(obj);
+
+				}
 			}
-        }
+		}
+		
 	}
 	private async Task LocationPerformEmptySearchAsync()
 	{
