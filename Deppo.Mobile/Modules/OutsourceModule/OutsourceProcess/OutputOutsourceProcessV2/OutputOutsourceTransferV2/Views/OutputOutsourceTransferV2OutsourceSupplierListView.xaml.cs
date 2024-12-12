@@ -11,7 +11,10 @@ public partial class OutputOutsourceTransferV2OutsourceSupplierListView : Conten
         _viewModel = viewModel;
         BindingContext = _viewModel;
         _viewModel.CurrentPage = this;
+        _viewModel.SearchText = searchBar;
 
+
+       
 
     }
 }

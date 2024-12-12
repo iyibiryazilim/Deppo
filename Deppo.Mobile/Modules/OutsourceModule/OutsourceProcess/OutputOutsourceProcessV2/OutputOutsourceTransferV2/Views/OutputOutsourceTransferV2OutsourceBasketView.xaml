@@ -262,7 +262,7 @@
                                             <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
                                                 <Label.FormattedText>
                                                     <FormattedString>
-                                                        <Span Text="{Binding OutWarehouseName}" TextColor="{StaticResource OffBlack}" />
+                                                        <Span Text="{Binding OutWarehouseName }" TextColor="{StaticResource OffBlack}" />
                                                         <Span Text=" " />
                                                         <Span FontAttributes="Bold"
                                               FontFamily="FAS"

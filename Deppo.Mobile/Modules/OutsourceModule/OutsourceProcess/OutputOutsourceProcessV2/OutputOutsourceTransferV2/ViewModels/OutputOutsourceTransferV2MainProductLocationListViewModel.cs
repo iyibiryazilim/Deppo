@@ -75,6 +75,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
         public Command ConfirmCommand { get; }
         public Command CancelCommand { get; }
 
+
         #region Location BottomSheet Commands
         public Command ShowLocationsCommand { get; }
         public Command CloseLocationsCommand { get; }
@@ -371,6 +372,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
                 IsBusy = false;
             }
         }
+
 
         private async Task CancelAsync()
         {

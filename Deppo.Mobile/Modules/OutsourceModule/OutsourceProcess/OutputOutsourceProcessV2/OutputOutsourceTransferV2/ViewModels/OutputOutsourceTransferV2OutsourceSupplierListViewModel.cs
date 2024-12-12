@@ -447,6 +447,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
 
                 Items.ForEach(x => x.IsSelected = false);
 
+                SearchText.Text = string.Empty;
                 await Shell.Current.GoToAsync("..");
             }
             catch (Exception ex)

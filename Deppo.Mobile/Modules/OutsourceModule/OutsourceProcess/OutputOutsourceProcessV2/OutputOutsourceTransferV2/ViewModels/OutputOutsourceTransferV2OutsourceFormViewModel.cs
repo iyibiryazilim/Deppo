@@ -1,15 +1,19 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.DTOs.SeriLotTransactionDto;
+using Deppo.Core.DTOs.TransferTransaction;
 using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.OutsourceModels;
 using Deppo.Mobile.Core.Models.OutsourceModels.BasketModels;
+using Deppo.Mobile.Core.Models.ProcurementModels.ByCustomerModels;
 using Deppo.Mobile.Core.Models.ShipAddressModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
+using Deppo.Mobile.Modules.ResultModule;
 using DevExpress.Maui.Controls;
 using System;
 using System.Collections.Generic;
@@ -17,11 +21,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Android.Provider.CallLog;
 
 namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcessV2.OutputOutsourceTransferV2.ViewModels
 {
   
     [QueryProperty(name: nameof(OutputOutsourceTransferV2BasketModel), queryId: nameof(OutputOutsourceTransferV2BasketModel))]
+    [QueryProperty(name: nameof(OutputOutsourceTransferV2SubProductModel), queryId: nameof(OutputOutsourceTransferV2SubProductModel))]
+
 
     public partial class OutputOutsourceTransferV2OutsourceFormViewModel :BaseViewModel
     {
@@ -30,10 +37,16 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
         private readonly ICarrierService _carrierService;
         private readonly IDriverService _driverService;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ITransferTransactionService _transferTransactionService;
+        private readonly ILocationService _locationService;
+        private readonly ILocationTransactionService _locationTransactionService;
 
 
         [ObservableProperty]
         OutputOutsourceTransferV2BasketModel? outputOutsourceTransferV2BasketModel;
+
+        [ObservableProperty]
+        OutputOutsourceTransferV2BasketModel? outputOutsourceTransferV2SubProductModel;
 
         [ObservableProperty]
         Carrier? selectedCarrier;
@@ -65,11 +78,21 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
         public ObservableCollection<Driver> Drivers { get; } = new();
 
 
-        public OutputOutsourceTransferV2OutsourceFormViewModel(IHttpClientService httpClientService, 
+        public ObservableCollection<LocationTransactionModel> LocationTransactions { get; } = new();
+        private ObservableCollection<LocationTransactionModel> DispatchLocationTransactions { get; } = new();
+
+        public ObservableCollection<LocationModel> Locations { get; } = new();
+
+
+        public OutputOutsourceTransferV2OutsourceFormViewModel(IHttpClientService httpClientService,
             IUserDialogs userDialogs,
             ICarrierService carrierService,
             IDriverService driverService,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            ITransferTransactionService transferTransactionService,
+            ILocationService locationService,
+            ILocationTransactionService locationTransactionService
+            )
         {
 
             _httpClientService = httpClientService;
@@ -77,6 +100,9 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
             _carrierService = carrierService;
             _driverService = driverService;
             _serviceProvider= serviceProvider;
+            _transferTransactionService= transferTransactionService;
+            _locationService= locationService;
+            _locationTransactionService = locationTransactionService;
 
             Title = "Fason Sevk Transfer İşlemi";
 
@@ -180,9 +206,6 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
             }
         }
 
-     
-        
-
         private async Task LoadCarriersAsync()
         {
             if (IsBusy)
@@ -268,143 +291,202 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
                     _userDialogs.HideHud();
             }
         }
-      
+
+        public async Task LoadLocationsAsync()
+        {
+            if (IsBusy)
+                return;
+            try
+            {
+                IsBusy = true;
+
+                Locations.Clear();
+
+
+                var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+                var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferSubProducts.FirstOrDefault().InWarehouseNumber, "", 0, 9999);
+
+                if (result.IsSuccess)
+                {
+                    if (result.Data is null)
+                        return;
+
+                    foreach (var item in result.Data)
+                    {
+                        var obj = Mapping.Mapper.Map<LocationModel>(item);
+                        Locations.Add(obj);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        public async Task LoadLocationTransactionAsync(OutputOutsourceTransferV2SubProductModel product, LocationModel locationModel)
+        {
+            try
+            {
+                LocationTransactions.Clear();
+                var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+                var result = await _locationTransactionService.GetInputObjectsAsync(
+                    httpClient: httpClient,
+                    firmNumber: _httpClientService.FirmNumber,
+                    periodNumber: _httpClientService.PeriodNumber,
+                    productReferenceId: product.ProductReferenceId,
+                    warehouseNumber: product.OutWarehouseNumber,
+                    locationRef: locationModel.ReferenceId,
+                    skip: 0,
+                    take: 99999,
+                    search: string.Empty
+                );
+
+                if (result.IsSuccess)
+                {
+                    if (result.Data is null)
+                        return;
+
+                    foreach (var item in result.Data)
+                    {
+                        LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+            }
+        }
+
         private async Task SaveAsync()
         {
-            //if (IsBusy)
-            //    return;
-            //try
-            //{
-            //    IsBusy = true;
-            //    _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
-            //    await Task.Delay(1000);
+            if (IsBusy)
+                return;
 
-            //    var httpClient = _httpClientService.GetOrCreateHttpClient();
+            try
+            {
+                IsBusy = true;
 
-            //    var transferTransactionInsertDto = new TransferTransactionInsert
-            //    {
-            //        SpeCode = SpecialCode,
-            //        CurrentCode = SelectedOutsource?.Code ?? string.Empty,
-            //        CarrierCode = SelectedCarrier?.Code ?? string.Empty,
-            //        DriverFirstName = SelectedDriver?.Name ?? string.Empty,
-            //        DriverLastName = SelectedDriver?.Surname ?? string.Empty,
-            //        Plaque = SelectedDriver?.PlateNumber ?? string.Empty,
-            //        ShipInfoCode = SelectedShipAddress?.Code ?? string.Empty,
-            //        IdentityNumber = SelectedDriver?.IdentityNumber ?? string.Empty,
-            //        IsEDispatch = (bool)SelectedOutsource?.IsEDispatch ? 1 : 0,
-            //        Code = string.Empty,
-            //        DocTrackingNumber = DocumentTrackingNumber,
-            //        DoCode = DocumentNumber,
-            //        TransactionDate = TransactionDate,
-            //        FirmNumber = _httpClientService.FirmNumber,
-            //        WarehouseNumber = WarehouseModel.Number,
-            //        DestinationWarehouseNumber = SelectedInWarehouse.Number,
-            //        Description = Description,
-            //    };
+                var confirm = await _userDialogs.ConfirmAsync("İşlemi onaylıyor musunuz?", "Onay", "Evet", "Hayır");
+                if (!confirm)
+                    return;
 
-            //    foreach (var item in Items)
-            //    {
-            //        var tempItemQuantity = item.Quantity;
-            //        var transferTransactionLineDto = new TransferTransactionLineDto
-            //        {
-            //            ProductCode = item.IsVariant ? item.MainItemCode : item.ItemCode,
-            //            VariantCode = item.IsVariant ? item.ItemCode : "",
-            //            WarehouseNumber = WarehouseModel.Number,
-            //            DestinationWarehouseNumber = SelectedInWarehouse.Number,
-            //            Quantity = item.Quantity,
-            //            ConversionFactor = 1,
-            //            OtherConversionFactor = 1,
-            //            SubUnitsetCode = item.SubUnitsetCode,
-            //        };
+                _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
+                await Task.Delay(1000);
 
-            //        foreach (var detail in item.Details)
-            //        {
-            //            var tempDetailQuantity = detail.Quantity;
-            //            await LoadLocationTransaction(item, detail);
-            //            LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
-            //            foreach (var locationTransaction in LocationTransactions)
-            //            {
-            //                var tempLocationRemainingQuantity = locationTransaction.RemainingQuantity;
-            //                while (tempLocationRemainingQuantity > 0 && tempItemQuantity > 0 && tempDetailQuantity > 0)
-            //                {
-            //                    var serilotTransactionDto = new SeriLotTransactionDto
-            //                    {
-            //                        StockLocationCode = detail.LocationCode,
-            //                        InProductTransactionLineReferenceId = locationTransaction.TransactionReferenceId,
-            //                        OutProductTransactionLineReferenceId = locationTransaction.ReferenceId,
-            //                        Quantity = tempDetailQuantity > tempLocationRemainingQuantity ? tempLocationRemainingQuantity : tempDetailQuantity,
-            //                        SubUnitsetCode = item.SubUnitsetCode,
-            //                        DestinationStockLocationCode = SelectedInlocationModel.Code,
-            //                        ConversionFactor = 1,
-            //                        OtherConversionFactor = 1,
-            //                    };
-            //                    tempLocationRemainingQuantity -= (double)serilotTransactionDto.Quantity;
-            //                    tempDetailQuantity -= (double)serilotTransactionDto.Quantity;
-            //                    transferTransactionLineDto.SeriLotTransactions.Add(serilotTransactionDto);
-            //                    tempItemQuantity -= (double)serilotTransactionDto.Quantity;
-            //                }
-            //            }
-            //        }
+                var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            //        transferTransactionInsertDto.Lines.Add(transferTransactionLineDto);
-            //    }
+                var transferTransactionInsertDto = new TransferTransactionInsert();
 
-            //    var result = await _transferTransactionService.InsertTransferTransaction(httpClient, transferTransactionInsertDto, _httpClientService.FirmNumber);
-            //    Console.WriteLine(result);
-            //    ResultModel resultModel = new();
+                transferTransactionInsertDto.Code = string.Empty;
+                transferTransactionInsertDto.IsEDispatch = OutputOutsourceTransferV2BasketModel.OutsourceModel.IsEDispatch ? 1 : 0;
+                transferTransactionInsertDto.SpeCode = SpecialCode;
+                transferTransactionInsertDto.CurrentCode = OutputOutsourceTransferV2BasketModel.OutsourceModel.Code;
+                transferTransactionInsertDto.DoCode = DocumentNumber;
+                transferTransactionInsertDto.TransactionDate = TransactionDate.AddMinutes(-1);
+                transferTransactionInsertDto.Description = Description;
+                transferTransactionInsertDto.DestinationWarehouseNumber = OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferSubProducts.FirstOrDefault().OutWarehouseNumber;
+                transferTransactionInsertDto.FirmNumber = _httpClientService.FirmNumber;
+                transferTransactionInsertDto.ShipInfoCode = OutputOutsourceTransferV2BasketModel.OutsourceModel.ShipAddressCode ?? string.Empty;
+                transferTransactionInsertDto.WarehouseNumber = OutputOutsourceTransferV2BasketModel.OutsourceWarehouseModel.Number;
+                transferTransactionInsertDto.CarrierCode = SelectedCarrier?.Code ?? string.Empty;
+                transferTransactionInsertDto.DriverFirstName = SelectedDriver?.Surname ?? string.Empty;
+                transferTransactionInsertDto.DriverLastName = SelectedDriver?.Surname ?? string.Empty;
+                transferTransactionInsertDto.Plaque = SelectedDriver?.PlateNumber ?? string.Empty;
 
-            //    if (result.IsSuccess)
-            //    {
-            //        resultModel.Message = "Başarılı";
-            //        resultModel.Code = result.Data.Code;
-            //        resultModel.PageTitle = "Fason Çıkış Transferi";
-            //        resultModel.PageCountToBack = 4;
+                foreach (var item in OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferSubProducts)
+                {
+                    var tempProductQuantity = item.Quantity;
 
-            //        var warehouseListViewModel = _serviceProvider.GetRequiredService<OutputOutsourceTransferWarehouseListViewModel>();
-            //        var productListViewModel = _serviceProvider.GetRequiredService<OutputOutsourceTransferProductListViewModel>();
-            //        var basketViewModel = _serviceProvider.GetRequiredService<OutputOutsourceTransferBasketListViewModel>();
+                    var lineDto = new TransferTransactionLineDto();
+                    lineDto.ProductCode = item.ProductCode;
+                    lineDto.WarehouseNumber = OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferSubProducts.FirstOrDefault().InWarehouseNumber;
+                    lineDto.DestinationWarehouseNumber = OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferSubProducts.FirstOrDefault().OutWarehouseNumber;
+                    lineDto.Quantity = item.Quantity;
+                    lineDto.ConversionFactor = lineDto.Quantity;
+                    lineDto.OtherConversionFactor = lineDto.Quantity;
+                    lineDto.SubUnitsetCode = item.SubUnitsetCode;
 
-            //        await Task.WhenAll(ClearFormAsync(), warehouseListViewModel?.ClearPageAsync(), productListViewModel?.ClearPageAsync(), basketViewModel?.ClearPageAsync());
+                    foreach (var location in item.Locations)
+                    {
+                        await LoadLocationTransactionAsync( item, location);
+                        var tempLocationQuanity = location.InputQuantity;
+                        var locationTransactionList = LocationTransactions.OrderBy(x => x.TransactionDate).ToList();
+
+                        foreach (var locationTransaction in locationTransactionList)
+                        {
+                            var tempLocationTransactionQuantity = locationTransaction.RemainingQuantity;
+                            while (tempLocationTransactionQuantity > 0 && tempProductQuantity > 0 && tempLocationQuanity > 0)
+                            {
+                                var serilotTransactionDto = new SeriLotTransactionDto
+                                {
+                                    StockLocationCode = locationTransaction.LocationCode,
+                                    InProductTransactionLineReferenceId = locationTransaction.TransactionReferenceId,
+                                    OutProductTransactionLineReferenceId = locationTransaction.ReferenceId,
+                                    SubUnitsetCode = item.SubUnitsetCode,
+                                    //DestinationStockLocationCode = item.DestinationLocationCode,
+                                    ConversionFactor = tempLocationQuanity > tempLocationTransactionQuantity ? tempLocationTransactionQuantity : tempLocationQuanity,
+                                    OtherConversionFactor = tempLocationQuanity > tempLocationTransactionQuantity ? tempLocationTransactionQuantity : tempLocationQuanity,
+                                    Quantity = tempLocationQuanity > tempLocationTransactionQuantity ? tempLocationTransactionQuantity : tempLocationQuanity,
+                                };
+
+                                lineDto.SeriLotTransactions.Add(serilotTransactionDto);
+                                tempLocationTransactionQuantity -= (double)serilotTransactionDto.Quantity;
+                                tempProductQuantity -= (double)serilotTransactionDto.Quantity;
+                                tempLocationQuanity -= (double)serilotTransactionDto.Quantity;
+                            }
+                        }
+
+                    }
+
+                    transferTransactionInsertDto.Lines.Add(lineDto);
+                }
 
 
-            //        if (_userDialogs.IsHudShowing)
-            //            _userDialogs.HideHud();
+                var result = await _transferTransactionService.InsertTransferTransaction(httpClient, transferTransactionInsertDto, _httpClientService.FirmNumber);
 
-            //        await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
-            //        {
-            //            [nameof(ResultModel)] = resultModel
-            //        });
-            //    }
-            //    else
-            //    {
+                ResultModel resultModel = new();
 
-            //        if (_userDialogs.IsHudShowing)
-            //            _userDialogs.HideHud();
-
-            //        resultModel.Message = "Başarısız";
-            //        resultModel.PageTitle = "Fason Çıkış Transferi";
-            //        resultModel.PageCountToBack = 1;
-            //        resultModel.ErrorMessage = result.Message;
-
-            //        await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
-            //        {
-            //            [nameof(ResultModel)] = resultModel
-            //        });
-            //    }
+                if (result.IsSuccess)
+                {
+                    resultModel.Message = "Başarılı";
+                    resultModel.Code = result.Data.Code;
+                    resultModel.PageTitle = "Fason Sevk İşlemi";
 
 
-            //}
-            //catch (Exception ex)
-            //{
-            //    if (_userDialogs.IsHudShowing)
-            //        _userDialogs.HideHud();
 
-            //    _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-            //}
-            //finally
-            //{
-            //    IsBusy = false;
-            //}
+                }
+
+            }
+
+
+            catch (Exception ex)
+            {
+                if (_userDialogs.IsHudShowing)
+                    _userDialogs.HideHud();
+
+                _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+
+
+
         }
 
         private async Task ClearFormAsync()
