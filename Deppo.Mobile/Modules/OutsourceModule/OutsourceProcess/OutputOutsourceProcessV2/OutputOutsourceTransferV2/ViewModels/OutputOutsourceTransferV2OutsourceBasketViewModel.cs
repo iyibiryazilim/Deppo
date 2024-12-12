@@ -40,16 +40,16 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
 
 
         [ObservableProperty]
-        OutputOutsourceTransferV2BasketModel outputOutsourceTransferV2BasketModel = null!;
+        OutputOutsourceTransferV2BasketModel? outputOutsourceTransferV2BasketModel = null!;
 
         [ObservableProperty]
-        private OutputOutsourceTransferV2ProductModel selectedProduct;
+        private OutputOutsourceTransferV2ProductModel? selectedProduct;
 
         [ObservableProperty]
         GroupLocationTransactionModel? selectedLocationTransaction;
 
         [ObservableProperty]
-        OutputOutsourceTransferV2SubProductModel outputOutsourceTransferV2SubProductModel;
+        OutputOutsourceTransferV2SubProductModel? outputOutsourceTransferV2SubProductModel;
 
         [ObservableProperty]
         OutputOutsourceTransferV2SubProductModel selectedSubProductModel;
@@ -69,9 +69,6 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
 
         [ObservableProperty]
         public SearchBar searchText;
-
-
-
 
         public OutputOutsourceTransferV2OutsourceBasketViewModel(IHttpClientService httpClientService, IUserDialogs userDialogs, ILocationTransactionService locationTransactionService, IOutputOutsourceTransferV2Service outputOutsourceTransferV2Service, IServiceProvider serviceProvider)
         {
@@ -191,39 +188,40 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
                 return;
             try
             {
+                IsBusy = true;
 
-                if (OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.LocTracking == 1)
+                //if (OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.LocTracking == 1)
+                //{
+
+                //    var locationListViewModel = _serviceProvider.GetRequiredService<OutputOutsourceTransferV2MainProductLocationListViewModel>();
+                //    locationListViewModel.OutputOutsourceTransferV2BasketModel = OutputOutsourceTransferV2BasketModel;
+
+                //    await locationListViewModel.LoadSelectedItemsAsync();
+
+                //    await Shell.Current.GoToAsync($"{nameof(OutputOutsourceTransferV2MainProductLocationListView)}", new Dictionary<string, object>
+                //    {
+                //        [nameof(OutputOutsourceTransferV2BasketModel)] = OutputOutsourceTransferV2BasketModel
+                //    });
+
+                //}
+                //else
+                //{
+                //    //raf takipli değilse
+                //    OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity++;
+
+                //    foreach (var subProduct in OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferSubProducts)
+                //    {
+                //        subProduct.Quantity = subProduct.BOMQuantity * OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity;
+                //    }
+                //}
+
+                OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity++;
+                // Alt ürünlerin miktarlarını güncelleme
+                foreach (var subProduct in OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferSubProducts)
                 {
-
-                    var locationListViewModel = _serviceProvider.GetRequiredService<OutputOutsourceTransferV2MainProductLocationListViewModel>();
-                    locationListViewModel.OutputOutsourceTransferV2BasketModel = OutputOutsourceTransferV2BasketModel;
-                   
-                    await locationListViewModel.LoadSelectedItemsAsync();
-
-                    await Shell.Current.GoToAsync($"{nameof(OutputOutsourceTransferV2MainProductLocationListView)}", new Dictionary<string, object>
-                    {
-                        [nameof(OutputOutsourceTransferV2BasketModel)] = OutputOutsourceTransferV2BasketModel
-                    });
-                    //show fason ambar raf takipleri
-                    //var locationQuantity = 
-
-
-                    //OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity = locationQuantity;
-                    //foreach (var subProduct in OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferSubProducts)
-                    //{
-                    //    subProduct.Quantity = subProduct.BomQuantity * OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity;
-                    //}
+                    subProduct.Quantity = subProduct.BOMQuantity * OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity;
                 }
-                else
-                {
-                    //raf takipli değilse
-                    OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity++;
-                   
-                    foreach (var subProduct in OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferSubProducts)
-                    {
-                        subProduct.Quantity = subProduct.BOMQuantity * OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity;
-                    }
-                }
+
 
 
             }
@@ -247,37 +245,63 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
 
             try
             {
-                if (OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.LocTracking == 1 && OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity>0)
+                IsBusy = true;
+
+                //if (OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.LocTracking == 1 && OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity>0)
+                //{
+
+                //    var locationListViewModel = _serviceProvider.GetRequiredService<OutputOutsourceTransferV2MainProductLocationListViewModel>();
+                //    locationListViewModel.OutputOutsourceTransferV2BasketModel = OutputOutsourceTransferV2BasketModel;
+                //    await locationListViewModel.LoadSelectedItemsAsync();
+
+                //    await Shell.Current.GoToAsync($"{nameof(OutputOutsourceTransferV2MainProductLocationListView)}", new Dictionary<string, object>
+                //    {
+                //        [nameof(OutputOutsourceTransferV2BasketModel)] = OutputOutsourceTransferV2BasketModel
+                //    });
+                //    //show fason ambar raf takipleri
+                //    //var locationQuantity = 
+
+
+                //    //OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity = locationQuantity;
+                //    //foreach (var subProduct in OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferSubProducts)
+                //    //{
+                //    //    subProduct.Quantity = subProduct.BomQuantity * OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity;
+                //    //}
+                //}
+                //else
+                //{
+                //    //raf takipli değilse
+                //    OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity--;
+
+                //    foreach (var subProduct in OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferSubProducts)
+                //    {
+                //        subProduct.Quantity = subProduct.BOMQuantity * OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity;
+                //    }
+                //}
+
+
+                // Ana ürünün miktarını azaltma
+                
+
+                // 0'dan küçük olup olmadığını kontrol etme
+
+                if (OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity > 0)
                 {
 
-                    var locationListViewModel = _serviceProvider.GetRequiredService<OutputOutsourceTransferV2MainProductLocationListViewModel>();
-                    locationListViewModel.OutputOutsourceTransferV2BasketModel = OutputOutsourceTransferV2BasketModel;
-                    await locationListViewModel.LoadSelectedItemsAsync();
-
-                    await Shell.Current.GoToAsync($"{nameof(OutputOutsourceTransferV2MainProductLocationListView)}", new Dictionary<string, object>
-                    {
-                        [nameof(OutputOutsourceTransferV2BasketModel)] = OutputOutsourceTransferV2BasketModel
-                    });
-                    //show fason ambar raf takipleri
-                    //var locationQuantity = 
-
-
-                    //OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity = locationQuantity;
-                    //foreach (var subProduct in OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferSubProducts)
-                    //{
-                    //    subProduct.Quantity = subProduct.BomQuantity * OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity;
-                    //}
-                }
-                else
-                {
-                    //raf takipli değilse
                     OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity--;
-
+                    // Alt ürünlerin miktarlarını güncelleme
                     foreach (var subProduct in OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferSubProducts)
                     {
                         subProduct.Quantity = subProduct.BOMQuantity * OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity;
                     }
+
                 }
+                else if(OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferMainProductModel.Quantity < 0)
+                {
+                    _userDialogs.AlertAsync("Girilen miktar 0'dan küçük olamaz", "Uyarı", "Tamam");
+                }
+
+               
 
             }
             catch (Exception ex)
@@ -306,9 +330,28 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
             {
                 IsBusy = true;
 
+                foreach (var subProduct in OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferSubProducts)
+                {
+                    if (subProduct.StockQuantity <= subProduct.Quantity)
+                    {
+                        await _userDialogs.AlertAsync(
+                   $"{subProduct.ProductName} ürününde yeterli stok bulunmamaktadır.\n" +
+                   $"Sarf Edilmek İstenen: {subProduct.Quantity}, Stok Miktarı: {subProduct.StockQuantity}",
+                   "Uyarı", "Tamam");
+                        return;
+                    }
+                    
+
+                }
+
+                OutputOutsourceTransferV2SubProductModel = SelectedSubProductModel;
+
                 await Shell.Current.GoToAsync($"{nameof(OutputOutsourceTransferV2OutsourceFormView)}", new Dictionary<string, object>
                 {
+
                     [nameof(OutputOutsourceTransferV2BasketModel)] = OutputOutsourceTransferV2BasketModel,
+                    [nameof(OutputOutsourceTransferV2SubProductModel)] = OutputOutsourceTransferV2SubProductModel,
+
 
                 });
 

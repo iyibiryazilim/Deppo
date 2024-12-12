@@ -73,6 +73,7 @@
                             <Border StrokeShape="RoundRectangle 5" StrokeThickness="0.5">
                                 <Image Grid.Column="0"
                                    HeightRequest="50"
+                                       Aspect="AspectFill"
                                    Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                    WidthRequest="50" />
                             </Border>

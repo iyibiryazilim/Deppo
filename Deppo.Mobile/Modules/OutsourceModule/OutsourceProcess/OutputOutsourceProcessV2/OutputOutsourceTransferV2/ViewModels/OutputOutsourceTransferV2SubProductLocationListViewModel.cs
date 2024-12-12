@@ -223,6 +223,11 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
                 }
 
                 locationModel.InputQuantity = quantity;
+
+                if(quantity < OutputOutsourceTransferV2SubProductModel.Quantity)
+                {
+                    await _userDialogs.AlertAsync("Miktar reçete miktarından büyük olamaz","Hata","Tamam");
+                }
             }
             catch (Exception ex)
             {
@@ -357,22 +362,24 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
                     }
                 }
 
-
                 // locationModel.InputQuantity değerini hesaplama
                 var totalInputQuantity = SelectedItems.Sum(x => x.InputQuantity);
+                if (totalInputQuantity ==OutputOutsourceTransferV2SubProductModel.Quantity)
+                {
+                   
+                    await Shell.Current.GoToAsync("..");
 
-                // OutputOutsourceTransferV2SubProductModel.Quantity değerini güncelleme
-                OutputOutsourceTransferV2SubProductModel.Quantity = totalInputQuantity;
+                }
 
+                else
+                {
+                    _userDialogs.AlertAsync("Girilen miktar reçete miktarıyla aynı olmalı", "Uyarı", "Tamam");
 
-
-
-
+                }
 
                 if (_userDialogs.IsHudShowing)
                     _userDialogs.HideHud();
 
-                await Shell.Current.GoToAsync("..");
             }
             catch (Exception ex)
             {
@@ -712,8 +719,6 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
                 IsBusy = false;
             }
         }
-
-
 
 
 
