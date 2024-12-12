@@ -93,6 +93,11 @@ public partial class InputOutsourceTransferProductModel : ObservableObject
 	[ObservableProperty]
 	string warehouseName = string.Empty;
 
+	[ObservableProperty]
+	double conversionFactor = 1;
+
+	[ObservableProperty]
+	double otherConversionFactor = 1;
 
 	[ObservableProperty]
 	string image = string.Empty;

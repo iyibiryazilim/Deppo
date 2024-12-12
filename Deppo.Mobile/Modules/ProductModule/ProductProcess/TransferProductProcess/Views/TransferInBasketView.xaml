@@ -246,7 +246,7 @@
                                 Stroke="{StaticResource Primary}"
                                 StrokeShape="RoundRectangle 5"
                                 StrokeThickness="0.5">
-                            <SearchBar x:Name="locationTransactionSearchBar"
+                            <SearchBar x:Name="locationSearchBar"
                                        Placeholder="Ara..."
                                        PlaceholderColor="{StaticResource OffBlack}"
                                        TextColor="{StaticResource OffBlack}">
@@ -321,7 +321,11 @@
                                                        FontSize="Large"
                                                        Text="{Binding InputQuantity}"
                                                        TextColor="{StaticResource OffBlack}"
-                                                       VerticalOptions="Center" />
+                                                       VerticalOptions="Center">
+                                                    <Label.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:TransferInBasketViewModel}}, Path=LocationQuantityTappedCommand}" CommandParameter="{Binding .}" />
+                                                    </Label.GestureRecognizers>
+                                                </Label>
                                                 <Border Grid.Column="2"
                                                         Padding="5"
                                                         BackgroundColor="{StaticResource Secondary}"

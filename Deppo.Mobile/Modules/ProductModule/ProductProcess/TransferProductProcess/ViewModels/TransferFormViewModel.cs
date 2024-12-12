@@ -120,7 +120,11 @@ public partial class TransferFormViewModel : BaseViewModel
             return;
         try
         {
-            IsBusy = true;
+			var confirm = await _userDialogs.ConfirmAsync("Kaydetmek istediğinize emin misiniz?", "Onay", "Evet", "Hayır");
+			if (!confirm)
+				return;
+
+			IsBusy = true;
             _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
             await Task.Delay(1000);
 
@@ -201,7 +205,6 @@ public partial class TransferFormViewModel : BaseViewModel
             }
 
             var result = await _transferTransactionService.InsertTransferTransaction(httpClient, transferTransactionInsertDto, _httpClientService.FirmNumber);
-            Console.WriteLine(result);
             ResultModel resultModel = new();
 
             if (result.IsSuccess)
@@ -234,14 +237,14 @@ public partial class TransferFormViewModel : BaseViewModel
                 await ClearFormAsync();
                 await ClearDataAsync();
 
-				if (_userDialogs.IsHudShowing)
-					_userDialogs.HideHud();
-
 				await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
                 {
                     [nameof(ResultModel)] = resultModel
                 });
-            }
+
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
+			}
             else
             {
                 resultModel.Message = "Başarısız";
@@ -249,14 +252,14 @@ public partial class TransferFormViewModel : BaseViewModel
                 resultModel.PageCountToBack = 1;
                 resultModel.ErrorMessage = result.Message;
 
-				if (_userDialogs.IsHudShowing)
-					_userDialogs.HideHud();
-
 				await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
                 {
                     [nameof(ResultModel)] = resultModel
                 });
-            }
+
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
+			}
         }
         catch (Exception ex)
         {

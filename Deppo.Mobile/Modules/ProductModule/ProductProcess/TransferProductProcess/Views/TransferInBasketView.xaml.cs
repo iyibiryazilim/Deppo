@@ -11,5 +11,6 @@ public partial class TransferInBasketView : ContentPage
         _viewModel = viewModel;
         BindingContext = _viewModel;
         _viewModel.CurrentPage = this;
+        _viewModel.LocationSearchText = locationSearchBar;
     }
 }

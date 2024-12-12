@@ -193,10 +193,6 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
         {
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
-        finally
-        {
-            IsBusy = false;
-        }
     }
 
     private async Task SaveAsync()

@@ -21,6 +21,7 @@
         <ResourceDictionary>
             <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
             <toolkit:IsNotEqualConverter x:Key="IsNotEqualConverter" />
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -140,6 +141,7 @@
         <Button Grid.Row="1"
                 Margin="5,10,5,20"
                 Command="{Binding SaveCommand}"
+                IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
                 Text="Kaydet"
                 VerticalOptions="End" />
 
