@@ -463,6 +463,12 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 				return;
 			}
 
+			if (quantity > item.OutputQuantity)
+			{
+				_userDialogs.ShowToast($"Girilen miktar ({quantity}), ürünün ({item.ProductCode}) toplam çarpan miktarını ({item.OutputQuantity}) geçemez.");
+				return;
+			}
+
 			item.OutputQuantity = quantity;
 		}
 		catch (Exception ex)
@@ -598,8 +604,34 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
-			if (item.StockQuantity <= item.InputQuantity)
+			if (item.InputQuantity >= item.StockQuantity)
 				return;
+
+			if(item.InputQuantity >= SelectedSubProductModel.StockQuantity)
+			{
+				await _userDialogs.AlertAsync($"Girilen miktar, ilgili ürünün ({SelectedSubProductModel.ProductCode}) stok miktarını ({SelectedSubProductModel.StockQuantity}) geçemez.", "Uyarı", "Tamam");
+				return;
+			}
+
+			if(item.InputQuantity >= SelectedSubProductModel.OutputQuantity)
+			{
+				await _userDialogs.AlertAsync($"Girilen miktar, ilgili ürünün ({SelectedSubProductModel.ProductCode}) toplam çarpan miktarını ({SelectedSubProductModel.OutputQuantity}) geçemez.", "Uyarı", "Tamam");
+				return;
+			}
+
+			var totalLocationsQuantity = Locations.Sum(x => x.InputQuantity);
+			if(totalLocationsQuantity >= SelectedSubProductModel.StockQuantity)
+			{
+				await _userDialogs.AlertAsync($"Toplam girilen raf miktarı ({totalLocationsQuantity}), ilgili ürünün ({SelectedSubProductModel.ProductCode}) stok miktarını ({SelectedSubProductModel.StockQuantity}) geçemez.", "Uyarı", "Tamam");
+				return;
+			}
+
+			if(totalLocationsQuantity >= SelectedSubProductModel.OutputQuantity)
+			{
+				await _userDialogs.AlertAsync($"Toplam girilen raf miktarı ({totalLocationsQuantity}), ilgili ürünün ({SelectedSubProductModel.ProductCode}) toplam çarpan miktarını ({SelectedSubProductModel.OutputQuantity}) geçemez.", "Uyarı", "Tamam");
+				return;
+			}
+
 
 			item.InputQuantity += 1;
 		}
@@ -670,26 +702,38 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 
 			if (quantity < 0)
 			{
-				_userDialogs.ShowToast("Girilen miktar 0'dan küçük olmamalıdır.");
+				await _userDialogs.AlertAsync("Girilen miktar 0'dan küçük olmamalıdır.", "Uyarı", "Tamam");
 				return;
 			}
 
 			if (quantity > item.StockQuantity)
 			{
-				_userDialogs.ShowToast($"Girilen miktar, rafın stok miktarını ({item.StockQuantity}) geçemez.");
+				await _userDialogs.AlertAsync($"Girilen miktar, rafın stok miktarını ({item.StockQuantity}) geçemez.", "Uyarı", "Tamam");
 				return;
 			}
 
 			if (quantity > SelectedSubProductModel?.StockQuantity)
 			{
-				_userDialogs.ShowToast($"Girilen miktar, ilgili ürünün ({SelectedSubProductModel.ProductCode}) stok miktarını {SelectedSubProductModel.StockQuantity} aşmamalıdır.");
+				await _userDialogs.AlertAsync($"Girilen miktar, ilgili ürünün ({SelectedSubProductModel.ProductCode}) stok miktarını ({SelectedSubProductModel.StockQuantity}) aşmamalıdır.", "Uyarı", "Tamam");
+				return;
+			}
+
+			if(quantity > SelectedSubProductModel?.OutputQuantity)
+			{
+				await _userDialogs.AlertAsync($"Girilen miktar, ilgili ürünün ({SelectedSubProductModel.ProductCode}) toplam çarpan miktarını ({SelectedSubProductModel.OutputQuantity}) geçemez.", "Uyarı", "Tamam");
 				return;
 			}
 
 			var totalQuantity = Locations.Where(x => x.Code != item.Code).Sum(x => x.InputQuantity);
 			if (totalQuantity + quantity > SelectedSubProductModel?.StockQuantity)
 			{
-				_userDialogs.ShowToast($"Toplam girilen miktar, ilgili ürünün ({SelectedSubProductModel.ProductCode}) stok miktarını ({SelectedSubProductModel.StockQuantity}) aşmamalıdır.");
+				await _userDialogs.AlertAsync($"Toplam girilen miktar, ilgili ürünün ({SelectedSubProductModel.ProductCode}) stok miktarını ({SelectedSubProductModel.StockQuantity}) aşmamalıdır.", "Uyarı", "Tamam");
+				return;
+			}
+
+			if (totalQuantity + quantity > SelectedSubProductModel?.OutputQuantity)
+			{
+				await _userDialogs.AlertAsync($"Toplam girilen miktar, ilgili ürünün ({SelectedSubProductModel.ProductCode}) toplam çarpan miktarını ({SelectedSubProductModel.StockQuantity}) aşmamalıdır.", "Uyarı", "Tamam");
 				return;
 			}
 
@@ -806,7 +850,7 @@ public partial class InputOutsourceTransferV2BasketViewModel : BaseViewModel
 				var itemDetailTotalQuantity = item.Details.Sum(x => x.Quantity);
 				if (item.TotalBOMQuantity > item.StockQuantity)
 				{
-					_userDialogs.ShowToast($"Toplam katsayı miktarı ({item.TotalBOMQuantity}), ilgili sarf malzemenin stok miktarını ({item.StockQuantity}) geçemez!");
+					_userDialogs.ShowToast($"Toplam katsayı miktarı ({item.TotalBOMQuantity}), ilgili sarf malzemenin ({item.ProductCode}) stok miktarını ({item.StockQuantity}) geçemez!");
 					return;
 				}
 				else if(item.OutputQuantity > item.StockQuantity)
