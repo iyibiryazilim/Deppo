@@ -419,17 +419,27 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 			{
 				supplierListViewModel.SelectedOutsourceModel.IsSelected = false;
 				supplierListViewModel.SelectedOutsourceModel = null;
+
+				if(supplierListViewModel.SearchText is not null)
+					supplierListViewModel.SearchText.Text = string.Empty;
 			}
 
 			if(productListViewModel is not null && productListViewModel.SelectedOutsourceProductModel is not null)
 			{
 				productListViewModel.SelectedOutsourceProductModel.IsSelected = false;
 				productListViewModel.SelectedOutsourceProductModel = null;
+
+				if (productListViewModel.SearchText is not null)
+					productListViewModel.SearchText.Text = string.Empty;
 			}
 
 			if(locationListViewModel is not null)
 			{
+				locationListViewModel.Items.Where(x => x.IsSelected).ToList().ForEach(x => x.IsSelected = false);
 				locationListViewModel.SelectedItems.Clear();
+
+				if(locationListViewModel.SearchText is not null)
+					locationListViewModel.SearchText.Text = string.Empty;
 			}
 
 			if(basketViewModel is not null && basketViewModel.InputOutsourceTransferV2BasketModel is not null)
@@ -446,7 +456,6 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 
 				basketViewModel.SelectedSubProductModel = null;
 				basketViewModel.Locations.Clear();
-				
 				basketViewModel.InputOutsourceTransferV2BasketModel = null;
 			}
 		}
