@@ -267,36 +267,39 @@ public partial class TransferOutBasketViewModel : BaseViewModel
     {
         if (IsBusy)
             return;
+        if (item is null)
+            return;
 
         try
         {
             IsBusy = true;
-
-            if (item is not null)
+            
+            SelectedItem = item;
+            // Stok Yeri takipli ise locationTransactionBottomSheet aç
+            if (item.LocTracking == 1)
             {
-                SelectedItem = item;
-                // Stok Yeri takipli ise locationTransactionBottomSheet aç
-                if (item.LocTracking == 1)
-                {
-                    await LoadLocationTransactionsAsync();
-                    CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.FullExpanded;
-                }
-                // Sadece SeriLot takipli ise serilotTransactionBottomSheet aç
-                else if (item.LocTracking == 0 && (item.TrackingType == 1 || item.TrackingType == 2))
-                {
-                    await LoadSeriLotTransactionsAsync();
-                    CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.FullExpanded;
-                }
-                // Stok yeri ve SeriLot takipli değilse
-                else
-                {
-                    if (item.OutputQuantity < item.StockQuantity)
-                        item.OutputQuantity++;
-                }
+                await LoadLocationTransactionsAsync();
+                CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.FullExpanded;
             }
+            // Sadece SeriLot takipli ise serilotTransactionBottomSheet aç
+            else if (item.LocTracking == 0 && (item.TrackingType == 1 || item.TrackingType == 2))
+            {
+                await LoadSeriLotTransactionsAsync();
+                CurrentPage.FindByName<BottomSheet>("serilotTransactionBottomSheet").State = BottomSheetState.FullExpanded;
+            }
+            // Stok yeri ve SeriLot takipli değilse
+            else
+            {
+                if (item.OutputQuantity < item.StockQuantity)
+                    item.OutputQuantity++;
+            }
+            
         }
         catch (Exception ex)
         {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
@@ -375,10 +378,14 @@ public partial class TransferOutBasketViewModel : BaseViewModel
             if (product is not null)
                 product.IsSelected = false;
 
+            item.LocationTransactions.Clear();
             TransferBasketModel.OutProducts.Remove(item);
         }
         catch (Exception ex)
         {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
@@ -392,8 +399,8 @@ public partial class TransferOutBasketViewModel : BaseViewModel
         try
         {
             _userDialogs.ShowLoading("Load Location Items...");
-            await Task.Delay(1000);
             LocationTransactions.Clear();
+            await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _locationTransactionService.GetInputObjectsAsync(
@@ -426,7 +433,8 @@ public partial class TransferOutBasketViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.Loading().Hide();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {

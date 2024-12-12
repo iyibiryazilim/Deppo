@@ -96,6 +96,8 @@ public partial class TransferInBasketViewModel : BaseViewModel
 	{
 		if (IsBusy)
 			return;
+		if (item.LocTracking == 0)
+			return;
 
 		try
 		{
@@ -118,6 +120,8 @@ public partial class TransferInBasketViewModel : BaseViewModel
 	private async Task DecreaseAsync(InProductModel item)
 	{
 		if (IsBusy)
+			return;
+		if (item.LocTracking == 0)
 			return;
 		try
 		{
@@ -624,11 +628,14 @@ public partial class TransferInBasketViewModel : BaseViewModel
 
             foreach (var item in TransferBasketModel.InProducts)
             {
-                double totalInputQuantity = item.Locations.Sum(location => location.InputQuantity);
-                item.IsCompleted = totalInputQuantity == item.OutputQuantity;
+				if(item.LocTracking == 1)
+				{
+					double totalInputQuantity = item.Locations.Sum(location => location.InputQuantity);
+					item.IsCompleted = totalInputQuantity == item.OutputQuantity;
+				}
             }
 
-            if (TransferBasketModel.InProducts.Any(x => x.IsCompleted == false))
+            if (TransferBasketModel.InProducts.Where(x => x.LocTracking == 1).Any(x => x.IsCompleted == false))
             {
                 await _userDialogs.AlertAsync("Lütfen tüm ürünlerin raflarını belirtiniz.", "Hata", "Tamam");
                 return;
