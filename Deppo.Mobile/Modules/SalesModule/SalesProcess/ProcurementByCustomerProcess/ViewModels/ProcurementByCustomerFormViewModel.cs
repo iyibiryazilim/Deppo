@@ -622,6 +622,9 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 					resultModel.PageCountToBack = 7;
 					resultModel.ErrorMessage = wholeSalesDispatchResult.Message;
 
+					await ClearFormAsync();
+					await ClearDataAsync();
+
 					await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
 					{
 						[nameof(ResultModel)] = resultModel
