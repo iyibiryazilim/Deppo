@@ -148,6 +148,8 @@ using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProce
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceProcessV2.OutputOutsourceTransferV2.ViewModels;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransferV2.ViewModels;
 using Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.InputOutsourceProcess.InputOutsourceTransferV2.Views;
+using Deppo.Mobile.Modules.VariantModule.Views;
+using Deppo.Mobile.Modules.VariantModule.ViewModels;
 
 namespace Deppo.Mobile;
 
@@ -901,6 +903,14 @@ InputProductPurchaseProcessBasketLocationListViewModel>(nameof(InputProductPurch
         builder.Services.AddSingletonWithShellRoute<TaskListView, TaskListViewModel>(nameof(TaskListView));
 
         #endregion Task Module
+
+        #region VariantModule
+        builder.Services.AddScopedWithShellRoute<VariantListView, VariantListViewModel>(nameof(VariantListView));  
+        #endregion
+
+
+
+
 
         return builder.Build();
     }

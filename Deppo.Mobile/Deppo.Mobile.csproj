@@ -798,6 +798,9 @@
 	  <MauiXaml Update="Modules\TransactionSchedulerModule\Views\TransactionSchedulerView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Modules\VariantModule\Views\VariantListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 
 	<ItemGroup>
