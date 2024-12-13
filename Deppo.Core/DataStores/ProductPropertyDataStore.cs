@@ -11,9 +11,10 @@ namespace Deppo.Core.DataStores
     public class ProductPropertyDataStore : IProductPropertyService
     {
         private string postUrl = "gateway/customQuery/CustomQuery";
+
         public Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
         {
-            
+            throw new NotImplementedException();
         }
     }
 }

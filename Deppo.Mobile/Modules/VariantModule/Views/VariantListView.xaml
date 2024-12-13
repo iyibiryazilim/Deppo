@@ -144,17 +144,17 @@
                                     <Label Grid.Column="0"
                                        FontFamily="FAS"
                                        FontSize="10"
-                                       Text="{Binding VariantIcon}"
+                                       Text="{Binding .}"
                                        TextColor="{Binding VariantIconColor}" />
                                     <Label Grid.Column="1"
                                        FontFamily="FAS"
                                        FontSize="10"
-                                       Text="{Binding LocTrackingIcon}"
+                                       Text="{Binding .}"
                                        TextColor="{Binding LocTrackingIconColor}" />
                                     <Label Grid.Column="2"
                                        FontFamily="FAS"
                                        FontSize="10"
-                                       Text="{Binding TrackingTypeIcon}"
+                                       Text="{Binding .}"
                                        TextColor="{Binding TrackingTypeIconColor}" />
                                 </Grid>
                             </Grid>
