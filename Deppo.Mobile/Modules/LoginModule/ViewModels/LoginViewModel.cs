@@ -227,7 +227,9 @@ public partial class LoginViewModel : BaseViewModel
                 if (ApplicationUser is not null)
                 {
                     _httpClientSysService.UserOid = ApplicationUser.Oid;
-                    isLoggedIn = true;
+                    _httpClientSysService.UserName = UserName;
+                    _httpClientSysService.Password = Password;
+					isLoggedIn = true;
                 }
                 else
                 {

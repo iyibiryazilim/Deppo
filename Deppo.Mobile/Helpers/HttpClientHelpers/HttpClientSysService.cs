@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Permissions;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Deppo.Mobile.Helpers.HttpClientHelpers;
@@ -27,8 +29,9 @@ public class HttpClientSysService : IHttpClientSysService
     public int FirmNumber { get; set; }
     public int PeriodNumber { get; set; }
     public string UserName { get; set; } = string.Empty;
+	public string Password { get; set; } = string.Empty;
 
-    public HttpClient GetOrCreateHttpClient()
+	public HttpClient GetOrCreateHttpClient()
     {
         var httpClient = _httpClient.Value;
         if (httpClient.BaseAddress == null)
@@ -39,8 +42,34 @@ public class HttpClientSysService : IHttpClientSysService
             if (!string.IsNullOrEmpty(Token))
             {
                 var token = Token.Trim('"');
-                if (httpClient.DefaultRequestHeaders.Authorization == null)
-                    httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+
+				if (IsValid(token))
+				{
+					if (httpClient.DefaultRequestHeaders.Authorization == null)
+						httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+				}
+				else
+				{
+					var refreshToken = RefreshToken(httpClient, UserName, Password).Result;
+
+					if (!string.IsNullOrEmpty(refreshToken))
+					{
+						if (httpClient.DefaultRequestHeaders.Authorization == null)
+						{
+							Token = refreshToken.Trim('"');
+							httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + Token);
+
+						}
+						else
+						{
+							Token = refreshToken.Trim('"');
+						}
+					}
+					else
+					{
+						httpClient.DefaultRequestHeaders.Authorization = null;
+					}
+				}
             }
             else
                 httpClient.DefaultRequestHeaders.Authorization = null;
@@ -48,4 +77,52 @@ public class HttpClientSysService : IHttpClientSysService
 
         return httpClient;
     }
+
+	private bool IsValid(string token)
+	{
+		JwtSecurityToken jwtSecurityToken;
+		try
+		{
+			jwtSecurityToken = new(token);
+		}
+		catch (Exception)
+		{
+			return false;
+		}
+
+		return jwtSecurityToken.ValidTo > DateTime.UtcNow;
+
+	}
+
+	public Task<string> RefreshToken(HttpClient httpClient, string username, string password)
+	{
+		return Task.Run(async () =>
+		{
+			string token = string.Empty;
+			try
+			{
+				var serilazeData = JsonSerializer.Serialize(new { username, password });
+				StringContent content = new StringContent(serilazeData, Encoding.UTF8, "application/json");
+				HttpResponseMessage response = await httpClient.PostAsync($"api/Authentication/Authenticate", content);
+				if (response.IsSuccessStatusCode)
+				{
+					var responseContent = await response.Content.ReadAsStringAsync();
+					if (response.StatusCode == System.Net.HttpStatusCode.OK)
+					{
+						token = responseContent;
+					}
+					else
+						token = string.Empty;
+				}
+				else
+					token = string.Empty;
+			}
+			catch (Exception ex)
+			{
+				throw new Exception(ex.Message);
+			}
+
+			return token;
+		});
+	}
 }
