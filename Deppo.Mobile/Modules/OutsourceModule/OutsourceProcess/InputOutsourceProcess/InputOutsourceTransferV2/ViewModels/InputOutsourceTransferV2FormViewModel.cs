@@ -270,7 +270,6 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 		return productionTransactionInsertDto;
 	}
 
-
 	private async Task<ConsumableTransactionInsert> CreateConsumableTransactionInsertDTO(HttpClient httpClient, ObservableCollection<InputOutsourceTransferSubProductModel> subProducts)
 	{
 		var consumableTransactionDto = new ConsumableTransactionInsert
@@ -283,7 +282,7 @@ public partial class InputOutsourceTransferV2FormViewModel : BaseViewModel
 			TransactionDate = FicheDate,
 			FirmNumber = _httpClientService.FirmNumber,
 			SpeCode = SpecialCode,
-			WarehouseNumber = InputOutsourceTransferV2BasketModel.OutsourceWarehouseModel.Number
+			WarehouseNumber = subProducts.FirstOrDefault().WarehouseNumber,
 		};
 
         foreach (var subProduct in subProducts)
