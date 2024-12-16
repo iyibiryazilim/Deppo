@@ -8,6 +8,7 @@
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels"
              x:Class="Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.Views.OutsourceDetailView"
              x:DataType="viewModel:OutsourceDetailViewModel"
+             Shell.TabBarIsVisible="False"
              Title="{Binding Title}">
 
     <ContentPage.Behaviors>
@@ -331,13 +332,13 @@
                                               ColumnSpacing="10">
                                             <Border Grid.Column="0"
                                                     Padding="5"
-                                                    BackgroundColor="{StaticResource Secondary}"
+                                                    BackgroundColor="Transparent"
                                                     StrokeShape="RoundRectangle 10">
                                                 <VerticalStackLayout Spacing="1"
                                                                      VerticalOptions="Center">
                                                     <Image Grid.Column="0"
                                                            HeightRequest="50"
-                                                           Source="dotnet_bot.png"
+                                                           Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                                            WidthRequest="50" />
                                                 </VerticalStackLayout>
                                             </Border>

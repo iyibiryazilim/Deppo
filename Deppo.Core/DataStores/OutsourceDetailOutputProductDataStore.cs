@@ -86,7 +86,7 @@ namespace Deppo.Core.DataStores
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON STLINE.STOCKREF = ITEMS.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
-        WHERE STFICHE.TRCODE IN (25)AND STLINE.IOCODE IN (3)
+        WHERE STFICHE.TRCODE IN (25) AND STLINE.IOCODE IN (3)
           AND STLINE.LINETYPE = 0 AND STLINE.CLIENTREF = {outsourcereReferenceId}";
 
             if (!string.IsNullOrEmpty(search))

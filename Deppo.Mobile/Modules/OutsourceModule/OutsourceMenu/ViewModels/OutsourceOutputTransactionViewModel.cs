@@ -108,6 +108,8 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
         {
             if (IsBusy)
                 return;
+            if (Items.Count < 18)
+                return;
             try
             {
                 IsBusy = true;
