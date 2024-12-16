@@ -688,11 +688,11 @@ WHERE DD.OrderReferenceCount > 0
 		string baseQuery = $@"SELECT
 
     [ReferenceId] = ORFLINE.LOGICALREF,
-    [OrderReferenceId] = ORFICHE.LOGICALREF,
-    [OrderNumber] = ORFICHE.FICHENO,
-    [SupplierReferenceId] = CLCARD.LOGICALREF,
-    [SupplierCode] = CLCARD.CODE,
-    [SupplierName] = CLCARD.DEFINITION_,
+    [OrderReferenceId] = ISNULL(ORFICHE.LOGICALREF, 0),
+    [OrderNumber] = ISNULL(ORFICHE.FICHENO, ''),
+    [SupplierReferenceId] = ISNULL(CLCARD.LOGICALREF, 0),
+    [SupplierCode] = ISNULL(CLCARD.CODE, ''),
+    [SupplierName] = ISNULL(CLCARD.DEFINITION_, ''),
     [ShipInfoCode] = ISNULL(SHIP.CODE, ''),
     [ProductReferenceId] = ORFLINE.STOCKREF,
     [ProductCode] = ISNULL(ITEMS.CODE, ''),
@@ -730,7 +730,7 @@ FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft
             LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_SHIPINFO AS SHIP on ORFICHE.SHIPINFOREF = SHIP.LOGICALREF
 			LEFT JOIN L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 			WHERE ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 2
- AND ITEMS.UNITSETREF <> 0 AND CLCARD.LOGICALREF = {supplierReferenceId} AND ORFICHE.SHIPINFOREF = {shipInfoReferenceId}";
+ AND ITEMS.UNITSETREF <> 0 AND CLCARD.LOGICALREF = {supplierReferenceId} AND ORFICHE.SHIPINFOREF = {shipInfoReferenceId} OR ORFICHE.SHIPINFOREF IS NULL";
 
 		if (!string.IsNullOrEmpty(search))
 			baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%' OR ITEMS.NAME LIKE '%{search}%')";

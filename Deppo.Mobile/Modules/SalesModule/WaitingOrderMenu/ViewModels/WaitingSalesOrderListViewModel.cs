@@ -107,6 +107,7 @@ public partial class WaitingSalesOrderListViewModel : BaseViewModel
 
 			_userDialogs.Loading("Loading Customers...");
             Customers.Clear();
+            SelectedShipAddressModel = null;
             SelectedCustomerModel = null;
             await Task.Delay(500);
 
