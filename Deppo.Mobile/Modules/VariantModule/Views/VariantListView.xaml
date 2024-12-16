@@ -145,22 +145,22 @@
                                        FontFamily="FAS"
                                        FontSize="10"
                                        Text="{Binding .}"
-                                       TextColor="{Binding VariantIconColor}" />
+                                       TextColor="{Binding .}" />
                                     <Label Grid.Column="1"
                                        FontFamily="FAS"
                                        FontSize="10"
                                        Text="{Binding .}"
-                                       TextColor="{Binding LocTrackingIconColor}" />
+                                       TextColor="{Binding .}" />
                                     <Label Grid.Column="2"
                                        FontFamily="FAS"
                                        FontSize="10"
                                        Text="{Binding .}"
-                                       TextColor="{Binding TrackingTypeIconColor}" />
+                                       TextColor="{Binding .}" />
                                 </Grid>
                             </Grid>
 
                             <Border.Triggers>
-                                <DataTrigger Binding="{Binding IsSelected}"
+                                <DataTrigger Binding="{Binding .}"
                                          TargetType="Border"
                                          Value="True">
                                     <Setter Property="BackgroundColor"
