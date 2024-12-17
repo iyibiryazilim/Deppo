@@ -332,6 +332,8 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
 
                 foreach (var subProduct in OutputOutsourceTransferV2BasketModel.OutputOutsourceTransferSubProducts)
                 {
+                    var itemDetailTotalQuantity = subProduct.Details.Sum(x => x.Quantity);
+
                     if (subProduct.StockQuantity <= subProduct.Quantity)
                     {
                         await _userDialogs.AlertAsync(
@@ -340,7 +342,12 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceProcess.OutputOutsourceP
                    "Uyarı", "Tamam");
                         return;
                     }
-                    
+
+                    else if (subProduct.LocTracking == 1 && subProduct.Quantity != itemDetailTotalQuantity)
+                    {
+                        _userDialogs.ShowToast($"Ürünün ({subProduct.ProductCode})  miktarı ({subProduct.Quantity}) alt ürünün girilen raf miktarına ({itemDetailTotalQuantity}) eşit olmalıdır!");
+                        return;
+                    }
 
                 }
 

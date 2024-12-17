@@ -32,6 +32,7 @@ public class Variant : INotifyPropertyChanged, IDisposable
     private string _brandCode = string.Empty;
     private string _brandName = string.Empty;
     private string _groupCode = string.Empty;
+    private bool _isVariant;
     private Product? _product;
 
     public Variant()
@@ -303,6 +304,20 @@ public class Variant : INotifyPropertyChanged, IDisposable
             NotifyPropertyChanged();
         }
     }
+
+    [DisplayName("Varyant")]
+    public bool IsVariant
+    {
+        get => _isVariant;
+        set
+        {
+            if (_isVariant == value) return;
+            _isVariant = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

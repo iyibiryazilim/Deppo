@@ -25,7 +25,7 @@ public class JwtTokenProviderService : IAuthenticationTokenProvider {
                 //issuer: configuration["Authentication:Jwt:Issuer"],
                 //audience: configuration["Authentication:Jwt:Audience"],
                 claims: user.Claims,
-                expires: DateTime.Now.AddHours(2),
+                expires: DateTime.Now.AddHours(23),
                 signingCredentials: new SigningCredentials(issuerSigningKey, SecurityAlgorithms.HmacSha256)
                 );
             return new JwtSecurityTokenHandler().WriteToken(token);
