@@ -66,10 +66,10 @@ public class WarehouseDataStore : IWarehouseService
         }
     }
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsAsync(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsAsync(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
     {
 
-        var content = new StringContent(JsonConvert.SerializeObject(WarehouseListQuery(firmNumber, periodNumber, search, skip, take)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(WarehouseListQuery(firmNumber, periodNumber, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(customPostUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -121,9 +121,9 @@ public class WarehouseDataStore : IWarehouseService
         }
     }
 
-	public async Task<DataResult<dynamic>> GetObjectById(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber)
+	public async Task<DataResult<dynamic>> GetObjectById(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string externalDb = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(WarehouseQueryByNumber(firmNumber, periodNumber, warehouseNumber)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(WarehouseQueryByNumber(firmNumber, periodNumber, warehouseNumber, externalDb)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<dynamic> dataResult = new DataResult<dynamic>();
@@ -172,7 +172,7 @@ public class WarehouseDataStore : IWarehouseService
 	}
 
 
-	private string WarehouseListQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+	private string WarehouseListQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
     {
          string baseQuery = $@"SELECT 
 [ReferenceId] = WHOUSE.LOGICALREF,
@@ -183,7 +183,7 @@ public class WarehouseDataStore : IWarehouseService
 [Quantity] = 0,
 [LocationCount] = (SELECT ISNULL(COUNT(*),0) FROM LG_{firmNumber.ToString().PadLeft(3,'0')}_LOCATION AS LOC WITH(NOLOCK) WHERE LOC.INVENNR = WHOUSE.NR)
 
-FROM L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) 
+FROM {externalDb}L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) 
 WHERE WHOUSE.FIRMNR = {firmNumber}";
 
         if (!string.IsNullOrEmpty(search))
@@ -195,7 +195,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
         return baseQuery;
     }
 
-	private string WarehouseQueryByNumber(int firmNumber, int periodNumber, int warehouseNumber)
+	private string WarehouseQueryByNumber(int firmNumber, int periodNumber, int warehouseNumber, string externalDb = "")
 	{
 		string baseQuery = $@"SELECT 
 [ReferenceId] = WHOUSE.LOGICALREF,
@@ -206,7 +206,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 [Quantity] = 0,
 [LocationCount] = (SELECT ISNULL(COUNT(*),0) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_LOCATION AS LOC WITH(NOLOCK) WHERE LOC.INVENNR = WHOUSE.NR)
 
-FROM L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) 
+FROM {externalDb}L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) 
 WHERE WHOUSE.FIRMNR = {firmNumber} AND WHOUSE.NR = {warehouseNumber}";
 
 
