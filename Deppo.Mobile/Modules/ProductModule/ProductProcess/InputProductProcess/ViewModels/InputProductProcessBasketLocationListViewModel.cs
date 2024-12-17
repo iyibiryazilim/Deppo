@@ -180,7 +180,8 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
                 variantReferenceId: InputProductBasketModel.IsVariant == true ? InputProductBasketModel.ItemReferenceId : 0,
                 search: SearchText.Text,
                 skip: 0,
-                take: 20);
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase);
 
             if (result.IsSuccess)
             {
@@ -229,7 +230,8 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
                 variantReferenceId: InputProductBasketModel.IsVariant == true ? InputProductBasketModel.ItemReferenceId : 0,
                 search: SearchText.Text,
                 skip: Items.Count,
-                take: 20);
+                take: 20, 
+                externalDb: _httpClientService.ExternalDatabase);
 
             if (result.IsSuccess)
             {
@@ -282,7 +284,8 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
                 variantReferenceId: InputProductBasketModel.IsVariant == true ? InputProductBasketModel.ItemReferenceId : 0,
                 search: SearchText.Text,
                 skip: 0,
-                take: 20
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase
             );
 
 			if (result.IsSuccess)
@@ -547,7 +550,8 @@ public partial class InputProductProcessBasketLocationListViewModel : BaseViewMo
                         variantReferenceId: InputProductBasketModel.IsVariant ? InputProductBasketModel.ItemReferenceId : 0,
 						search: barcodeEntry.Text,
                         skip: 0,
-                        take: 1);
+                        take: 1,
+                        externalDb: _httpClientService.ExternalDatabase);
 
             if (result.IsSuccess)
             {

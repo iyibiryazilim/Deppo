@@ -63,9 +63,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsWorkOrder(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsWorkOrder(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(ProductQueryWorkOrder(firmNumber, periodNumber, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(ProductQueryWorkOrder(firmNumber, periodNumber, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -113,9 +113,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsWorkSubProducts(HttpClient httpClient, int firmNumber, int mainProductReferenceId, int periodNumber, string search = "", int skip = 0, int take = 20)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsWorkSubProducts(HttpClient httpClient, int firmNumber, int mainProductReferenceId, int periodNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(ProductQueryWorkSubProducts(firmNumber, periodNumber, mainProductReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(ProductQueryWorkSubProducts(firmNumber, periodNumber, mainProductReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -202,7 +202,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
             return baseQuery;
         }
 
-        private string ProductQueryWorkOrder(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+        private string ProductQueryWorkOrder(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
             string baseQuery = $@"SELECT
 [ReferenceId] = ITEMS.LOGICALREF,
@@ -235,7 +235,7 @@ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(N
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_FIRMDOC AS FIRMDOC ON FIRMDOC.INFOREF = ITEMS.LOGICALREF AND FIRMDOC.INFOTYP = 20  AND FIRMDOC.DOCNR = 11
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_MARK AS BRAND WITH(NOLOCK) ON ITEMS.MARKREF = BRAND.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITMFACTP AS ITMFACTP WITH(NOLOCK) ON ITMFACTP.ITEMREF = ITEMS.LOGICALREF AND VARIANTREF = 0
-LEFT JOIN L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON ITEMS.QPRODSRCINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON ITEMS.QPRODSRCINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 WHERE ITEMS.ACTIVE = 0 AND ITEMS.MOLD = 0 AND TOOL = 0 AND ITEMS.UNITSETREF <> 0 AND ITEMS.QPRODAMNT > 0 ";
 
             if (!string.IsNullOrEmpty(search))
@@ -248,7 +248,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
         }
 
         //Amount'lar falan
-        private string ProductQueryWorkSubProducts(int firmNumber, int periodNumber, int mainProductReferenceId, string search = "", int skip = 0, int take = 20)
+        private string ProductQueryWorkSubProducts(int firmNumber, int periodNumber, int mainProductReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
             string baseQuery = $@"SELECT
 	[MainProductReferenceId] = ISNULL(ITEMS2.LOGICALREF, 0),
@@ -285,7 +285,7 @@ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS WITH(NOLOCK)
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_MARK AS BRAND WITH(NOLOCK) ON ITEMS.MARKREF = BRAND.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(NOLOCK) ON STCOMPLN.UOMREF = UNITSETL.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON UNITSETL.UNITSETREF = UNITSETF.LOGICALREF
-LEFT JOIN L_CAPIWHOUSE AS WAREHOUSE WITH(NOLOCK) ON STCOMPLN.SOURCEINDEX = WAREHOUSE.NR AND WAREHOUSE.FIRMNR = {firmNumber}
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS WAREHOUSE WITH(NOLOCK) ON STCOMPLN.SOURCEINDEX = WAREHOUSE.NR AND WAREHOUSE.FIRMNR = {firmNumber}
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS2 WITH(NOLOCK) ON STCOMPLN.MAINCREF = ITEMS2.LOGICALREF
 WHERE  ITEMS2.LOGICALREF = {mainProductReferenceId}";
 

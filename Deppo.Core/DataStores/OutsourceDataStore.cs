@@ -110,9 +110,9 @@ public class OutsourceDataStore : IOutsourceService
 		}
 	}
 
-	public async Task<DataResult<IEnumerable<dynamic>>> GetOutsourceWarehousesAsync(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetOutsourceWarehousesAsync(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
     {
-        var content = new StringContent(JsonConvert.SerializeObject(OutsourceWarehouseQuery(firmNumber, periodNumber, search, skip, take)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(OutsourceWarehouseQuery(firmNumber, periodNumber, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -160,7 +160,7 @@ public class OutsourceDataStore : IOutsourceService
         }
     }
 
-    private string OutsourceWarehouseQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+    private string OutsourceWarehouseQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
     {
         string baseQuery = $@"SELECT
 [ReferenceId] = WAREHOUSE.LOGICALREF,
@@ -170,7 +170,7 @@ public class OutsourceDataStore : IOutsourceService
 [County] = WAREHOUSE.TOWN,
 [Quantity] = 0
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS OUTSOURCE WITH(NOLOCK)
-LEFT JOIN L_CAPIWHOUSE AS WAREHOUSE WITH(NOLOCK) ON (OUTSOURCE.OUTINVENNR = WAREHOUSE.NR) AND WAREHOUSE.FIRMNR = {firmNumber}
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS WAREHOUSE WITH(NOLOCK) ON (OUTSOURCE.OUTINVENNR = WAREHOUSE.NR) AND WAREHOUSE.FIRMNR = {firmNumber}
 WHERE SUBCONT = 1
 GROUP BY WAREHOUSE.LOGICALREF,WAREHOUSE.NR,WAREHOUSE.NAME,WAREHOUSE.CITY,WAREHOUSE.TOWN";
 

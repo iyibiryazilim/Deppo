@@ -64,7 +64,8 @@ public partial class ProductInputTransactionViewModel : BaseViewModel
             var query = ProductQuery.InputTransactionListQuery(
                 FirmNumber: _httpClientService.FirmNumber,
                 PeriodNumber: _httpClientService.PeriodNumber,
-                ProductReferenceId: Product.ReferenceId
+                ProductReferenceId: Product.ReferenceId,
+                ExternalDb: _httpClientService.ExternalDatabase
                 );
 
             _userDialogs.Loading("Loading Items...");
@@ -120,7 +121,8 @@ public partial class ProductInputTransactionViewModel : BaseViewModel
                 ProductReferenceId: Product.ReferenceId,
                 Sorting: "DESC",
                 Skip: Items.Count,
-                Take: 20
+                Take: 20,
+                ExternalDb: _httpClientService.ExternalDatabase
             );
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();

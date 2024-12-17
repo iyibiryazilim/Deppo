@@ -13,9 +13,9 @@ public class CustomerDetailDataStore : ICustomerDetailService
 {
     private string postUrl = "/gateway/customQuery/CustomQuery";
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetLastFichesByCustomer(HttpClient httpClient, int firmNumber, int periodNumber, int customerReferenceId)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetLastFichesByCustomer(HttpClient httpClient, int firmNumber, int periodNumber, int customerReferenceId, string externalDb = "")
     {
-        var content = new StringContent(JsonConvert.SerializeObject(GetLastFichesByCustomer(firmNumber, periodNumber, customerReferenceId)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(GetLastFichesByCustomer(firmNumber, periodNumber, customerReferenceId, externalDb)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -63,9 +63,9 @@ public class CustomerDetailDataStore : ICustomerDetailService
         }
     }
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetLastTransaction(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetLastTransaction(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId, string externalDb = "")
     {
-        var content = new StringContent(JsonConvert.SerializeObject(CustomerTransaction(firmNumber, periodNumber, ficheReferenceId)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(CustomerTransaction(firmNumber, periodNumber, ficheReferenceId, externalDb)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -314,7 +314,7 @@ public class CustomerDetailDataStore : ICustomerDetailService
         }
     }
 
-    private string GetLastFichesByCustomer(int firmNumber, int periodNumber, int customerReferenceId)
+    private string GetLastFichesByCustomer(int firmNumber, int periodNumber, int customerReferenceId, string externalDb = "")
     {
         string baseQuery = $@"SELECT TOP 5
             [ReferenceId] = STFICHE.LOGICALREF,
@@ -332,14 +332,14 @@ public class CustomerDetailDataStore : ICustomerDetailService
 			[Description] =  ISNULL (STFICHE.GENEXP1, '')
 			From LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
 			left join LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
-			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
+			LEFT JOIN {externalDb}L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
 			WHERE  STFICHE.PRODSTAT = 0 AND CLCARD.LOGICALREF={customerReferenceId}
 			ORDER BY STFICHE.DATE_ DESC";
 
         return baseQuery;
     }
 
-    private string CustomerTransaction(int firmNumber, int periodNumber, int ficheReferenceId)
+    private string CustomerTransaction(int firmNumber, int periodNumber, int ficheReferenceId, string externalDb = "")
     {
         string baseQuery = $@"Select
             [ReferenceId] = STLINE.LOGICALREF,
@@ -379,7 +379,7 @@ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_FIRMDOC AS FIRMDOC ON FIRMD
 Left Join LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD as CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
 left join LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS subunitset ON STLINE.UOMREF = subunitset.LOGICALREF
 left join LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS unitset ON STLINE.USREF = unitset.LOGICALREF
-LEFT JOIN L_CAPIWHOUSE AS capiwhouse ON STLINE.SOURCEINDEX = capiwhouse.NR AND capiwhouse.FIRMNR = {firmNumber}
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS capiwhouse ON STLINE.SOURCEINDEX = capiwhouse.NR AND capiwhouse.FIRMNR = {firmNumber}
 where STLINE.LINETYPE = 0 AND STFICHE.LOGICALREF = {ficheReferenceId}
 order by STLINE.DATE_ desc;";
 

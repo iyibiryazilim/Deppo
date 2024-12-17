@@ -6,6 +6,7 @@ using Deppo.Core.Models;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using static Deppo.Mobile.Core.Helpers.DeppoEnums;
@@ -65,23 +66,25 @@ public partial class InputProductProcessWarehouseListViewModel : BaseViewModel
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, 0, 20, _httpClientService.FirmNumber);
-            if (result.IsSuccess)
-            {
-                if (result.Data is not null)
-                {
-                    foreach (var item in result.Data)
-                        Items.Add(new WarehouseModel
-                        {
-                            ReferenceId = item.ReferenceId,
-                            Name = item.Name,
-                            Number = item.Number,
-                            City = item.City,
-                            Country = item.Country,
-                            IsSelected = false
-                        });
+            var result = await _warehouseService.GetObjectsAsync(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                search: string.Empty,
+                skip: 0,
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase
+			);
 
-                }
+            if(result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+                
+				foreach (var item in result.Data)
+                {
+					Items.Add(Mapping.Mapper.Map<WarehouseModel>(item));
+				}
             }
 
 			if (_userDialogs.IsHudShowing)
@@ -111,28 +114,29 @@ public partial class InputProductProcessWarehouseListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, Items.Count, 20, _httpClientService.FirmNumber);
-            if (result.IsSuccess)
-            {
-                if (result.Data is not null)
-                {
-					_userDialogs.ShowLoading("Loading...");
-					foreach (var item in result.Data)
-                    {
-						Items.Add(new WarehouseModel
-						{
-							ReferenceId = item.ReferenceId,
-							Name = item.Name,
-							Number = item.Number,
-							City = item.City,
-							Country = item.Country,
-							IsSelected = false
-						});
-					}
-                }
-            }
+			var result = await _warehouseService.GetObjectsAsync(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				search: string.Empty,
+				skip: Items.Count,
+				take: 20,
+				externalDb: _httpClientService.ExternalDatabase
+			);
+
+            _userDialogs.Loading("Loading More...");
+
+			if (result.IsSuccess)
+			{
+				if (result.Data is null)
+					return;
+
+				foreach (var item in result.Data)
+				{
+					Items.Add(Mapping.Mapper.Map<WarehouseModel>(item));
+				}
+			}
 
 			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();

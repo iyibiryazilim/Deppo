@@ -347,7 +347,8 @@ public partial class CountingPanelViewModel : BaseViewModel
             var result = await _countingPanelService.GetLastCountingFiches(
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
-                periodNumber: _httpClientService.PeriodNumber
+                periodNumber: _httpClientService.PeriodNumber,
+                externalDb: _httpClientService.ExternalDatabase
             );
 
             if (result.IsSuccess)
