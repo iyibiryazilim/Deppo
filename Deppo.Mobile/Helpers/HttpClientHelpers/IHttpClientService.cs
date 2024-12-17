@@ -10,4 +10,5 @@ public interface IHttpClientService
     string Token { get; set; }
     int FirmNumber { get; set; }
     int PeriodNumber { get; set; }
+    string ExternalDatabase { get; set; } 
 }
