@@ -8,10 +8,10 @@ namespace Deppo.Core.DataStores
     public class VariantWarehouseTotalDataStore : IVariantWarehouseTotalService
     {
         private string postUrl = "/gateway/customQuery/CustomQuery";
-        public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber,int productReferenceId, string search = "", int skip = 0, int take = 20)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber,int productReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
 
-            var content = new StringContent(JsonConvert.SerializeObject(VariantWarehouseTotalQuery(firmNumber, periodNumber, warehouseNumber,productReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(VariantWarehouseTotalQuery(firmNumber, periodNumber, warehouseNumber,productReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -63,7 +63,7 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        private string VariantWarehouseTotalQuery(int firmNumber, int periodNumber, int warehouseNumber,int productReferenceId, string search = "", int skip = 0, int take = 20)
+        private string VariantWarehouseTotalQuery(int firmNumber, int periodNumber, int warehouseNumber,int productReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
             string baseQuery = $@"SELECT 
 [ReferenceId] = NEWID(),
@@ -90,7 +90,7 @@ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT WITH(NOL
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS WITH(NOLOCK) ON VARIANT.ITEMREF= ITEMS.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON VARIANT.UNITSETREF = UNITSETF.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(NOLOCK) ON UNITSETL.UNITSETREF = UNITSETF.LOGICALREF AND UNITSETL.MAINUNIT = 1
-LEFT JOIN L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON VRNTINVTOT.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON VRNTINVTOT.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_INVDEF AS INVDEF WITH(NOLOCK) ON VRNTINVTOT.INVENNO = INVDEF.INVENNO AND VRNTINVTOT.VARIANTREF = INVDEF.VARIANTREF
 WHERE VRNTINVTOT.STOCKREF = {productReferenceId}
 ";

@@ -12,9 +12,9 @@ namespace Deppo.Mobile.Core.DataStores;
 public class InputOutsourceTransferV2SubProductDataStore : IInputOutsourceTransferV2SubProductService
 {
 	string postUrl = "gateway/customQuery/CustomQuery";
-	public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int mainProductReferenceId)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int mainProductReferenceId, string externalDb = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(GetObjectsQuery(firmNumber, periodNumber, mainProductReferenceId)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(GetObjectsQuery(firmNumber, periodNumber, mainProductReferenceId, externalDb)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -62,7 +62,7 @@ public class InputOutsourceTransferV2SubProductDataStore : IInputOutsourceTransf
 		}
 	}
 
-	string GetObjectsQuery(int firmNumber, int periodNumber, int mainProductReferenceId)
+	string GetObjectsQuery(int firmNumber, int periodNumber, int mainProductReferenceId, string externalDb = "")
 	{
 		string baseQuery = @$"
 		SELECT 
@@ -94,7 +94,7 @@ public class InputOutsourceTransferV2SubProductDataStore : IInputOutsourceTransf
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(NOLOCK) ON BOMLINE.UOMREF = UNITSETL.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON BOMLINE.USREF = UNITSETF.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD WITH(NOLOCK) ON BOMASTER.CLIENTREF = CLCARD.LOGICALREF
-		LEFT JOIN L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON CLCARD.OUTINVENNR = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+		LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON CLCARD.OUTINVENNR = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 		WHERE BOMASTER.MAINPRODREF = {mainProductReferenceId} AND BOMLINE.BOMTYPE = 2 AND BOMLINE.LINETYPE <> 4
 		";
 

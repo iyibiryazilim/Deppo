@@ -13,9 +13,9 @@ namespace Deppo.Core.DataStores;
 public class WorkOrderProductDataStore : IWorkOrderProductService
 {
 	string postUrl = "/gateway/customQuery/CustomQuery";
-	public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int currentReferenceId = 0, string search = "", int skip = 0, int take = 20)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int currentReferenceId = 0, string search = "", int skip = 0, int take = 20, string externalDb = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(GetWorkOrderByWarehouseAndCurrentQuery(firmNumber, periodNumber, warehouseNumber, currentReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(GetWorkOrderByWarehouseAndCurrentQuery(firmNumber, periodNumber, warehouseNumber, currentReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -63,7 +63,7 @@ public class WorkOrderProductDataStore : IWorkOrderProductService
 		}
 	}
 
-	private string GetWorkOrderByWarehouseAndCurrentQuery(int firmNumber, int periodNumber, int warehouseNumber, int currentReferenceId, string search = "", int skip = 0, int take = 20)
+	private string GetWorkOrderByWarehouseAndCurrentQuery(int firmNumber, int periodNumber, int warehouseNumber, int currentReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
 	{
 		string baseQuery = $@"SELECT 
 [ReferenceId]  =DISPLINE.LOGICALREF,
@@ -105,7 +105,7 @@ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(N
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON POLINE.USREF = UNITSETF.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD WITH(NOLOCK) ON DISPLINE.CLIENTREF = CLCARD.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_OPERTION AS OPR WITH(NOLOCK) ON DISPLINE.OPERATIONREF = OPR.LOGICALREF
-LEFT JOIN L_CAPIWHOUSE AS WAREHOUSE WITH(NOLOCK) ON POLINE.INVENNO = WAREHOUSE.NR AND WAREHOUSE.FIRMNR = {firmNumber}
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS WAREHOUSE WITH(NOLOCK) ON POLINE.INVENNO = WAREHOUSE.NR AND WAREHOUSE.FIRMNR = {firmNumber}
 WHERE DISPLINE.PRODORDTYP = 2 AND DISPLINE.LINESTATUS = 0  AND DISPLINE.CLIENTREF = {currentReferenceId} AND POLINE.INVENNO = {warehouseNumber}";
 
 		if (!string.IsNullOrEmpty(search))

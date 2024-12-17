@@ -9,5 +9,5 @@ namespace Deppo.Mobile.Core.Services;
 
 public interface IInputOutsourceTransferV2SubProductService
 {
-	Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int mainProductReferenceId);
+	Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int mainProductReferenceId, string externalDb = "");
 }

@@ -8,9 +8,9 @@ namespace Deppo.Core.DataStores;
 public class SupplierTransactionDataStore : ISupplierTransactionService
 {
 	private string postUrl = "/gateway/customQuery/CustomQuery";
-	public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int supplierReferenceId, string search = "", int skip = 0, int take = 20)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int supplierReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(SupplierTransactionQuery(firmNumber, periodNumber, supplierReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(SupplierTransactionQuery(firmNumber, periodNumber, supplierReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -58,7 +58,7 @@ public class SupplierTransactionDataStore : ISupplierTransactionService
 		}
 	}
 
-	private string SupplierTransactionQuery(int firmNumber, int periodNumber, int supplierReferenceId, string search = "", int skip = 0, int take = 20)
+	private string SupplierTransactionQuery(int firmNumber, int periodNumber, int supplierReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
 	{
 		var baseQuery = @$" SELECT 
             [ReferenceId] = STLINE.LOGICALREF,
@@ -88,7 +88,7 @@ public class SupplierTransactionDataStore : ISupplierTransactionService
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
-        LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
+        LEFT JOIN {externalDb}L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
         WHERE STLINE.IOCODE IN (1,2,3,4) AND STFICHE.TRCODE IN (1,2,3,7,6,8) AND STLINE.STFICHEREF <> 0 AND STLINE.USREF <> 0 AND STLINE.UOMREF <> 0 AND CLCARD.LOGICALREF = {supplierReferenceId}
 		";
 

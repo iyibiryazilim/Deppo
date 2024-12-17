@@ -59,9 +59,9 @@ public class ShipAddressDataStore : IShipAddressService
         }
     }
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsByOrder(HttpClient httpClient, int firmNumber, int periodNumber, int currentReferenceId, string search = "", int skip = 0, int take = 20)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsByOrder(HttpClient httpClient, int firmNumber, int periodNumber, int currentReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
     {
-        var content = new StringContent(JsonConvert.SerializeObject(GetObjectsByOrderQuery(firmNumber, periodNumber, currentReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(GetObjectsByOrderQuery(firmNumber, periodNumber, currentReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -131,7 +131,7 @@ public class ShipAddressDataStore : IShipAddressService
         return baseQuery;
     }
 
-    private string GetObjectsByOrderQuery(int firmNumber, int periodNumber, int currentReferenceId, string search = "", int skip = 0, int take = 20)
+    private string GetObjectsByOrderQuery(int firmNumber, int periodNumber, int currentReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
     {
         string baseQuery = @$"SELECT
 [ReferenceId] = ISNULL(SHIP.LOGICALREF, 0),
@@ -144,7 +144,7 @@ public class ShipAddressDataStore : IShipAddressService
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_ORFICHE AS ORFICHE ON ORFLINE.ORDFICHEREF = ORFICHE.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON ORFICHE.CLIENTREF = CLCARD.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_SHIPINFO AS SHIP ON ORFICHE.SHIPINFOREF=SHIP.LOGICALREF
-        LEFT JOIN L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+        LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 		WHERE ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 1 AND
 		 CLCARD.LOGICALREF = {currentReferenceId}  GROUP BY SHIP.LOGICALREF,SHIP.CODE,SHIP.NAME,SHIP.ADDR1,SHIP.CITY,SHIP.COUNTRY
 		";
