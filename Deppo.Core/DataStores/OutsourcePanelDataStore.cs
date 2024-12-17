@@ -615,6 +615,7 @@ END
         [ProductReferenceId] = STLINE.STOCKREF,
         [ProductCode] = ITEMS.CODE,
         [ProductName] = ITEMS.NAME,
+        [Image] = ISNULL(FIRMDOC.LDATA, ''),
         [SubUnitsetCode] = SUBUNITSET.CODE,
         [SubUnitsetName] = SUBUNITSET.NAME,
         [SubUnitsetReferenceId] = SUBUNITSET.LOGICALREF,
@@ -633,6 +634,7 @@ END
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
+        LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_FIRMDOC AS FIRMDOC ON FIRMDOC.INFOREF = ITEMS.LOGICALREF AND FIRMDOC.INFOTYP = 20  AND FIRMDOC.DOCNR = 11
 		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
 		WHERE STFICHE.TRCODE = 25 AND STLINE.IOCODE = 2 AND STFICHE.LOGICALREF = {ficheReferenceId} AND STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0
 		ORDER BY STLINE.DATE_ DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
@@ -673,7 +675,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
     private string GetOutsourceOutProductCountQueryByProduct(int firmNumber, int periodNumber, int outsourceReferenceId)
     {
         string baseQuery = $@"SELECT
-        [OutProductCount] = ISNULL(COUNT(DISTINCT STLINE.STOCKREF),0)
+        [OutputQuantity] = ISNULL(COUNT(DISTINCT STLINE.STOCKREF),0)
         FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD WITH(NOLOCK) ON STLINE.CLIENTREF = CLCARD.LOGICALREF
         WHERE CLCARD.LOGICALREF={outsourceReferenceId} AND CLCARD.SUBCONT = 1 AND STLINE.TRCODE = 25 AND STLINE.IOCODE = 4 AND STLINE.LPRODSTAT = 0";
@@ -684,7 +686,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
     private string GetOutsourceInProductCountQueryByProduct(int firmNumber, int periodNumber, int outsourceReferenceId)
     {
         string baseQuery = $@"SELECT
-        [InProductCount] = ISNULL(COUNT(DISTINCT STLINE.STOCKREF),0)
+        [InputQuantity] = ISNULL(COUNT(DISTINCT STLINE.STOCKREF),0)
         FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD WITH(NOLOCK) ON STLINE.CLIENTREF = CLCARD.LOGICALREF
         WHERE CLCARD.LOGICALREF={outsourceReferenceId} AND CLCARD.SUBCONT = 1 AND STLINE.TRCODE = 25 AND STLINE.IOCODE = 2 AND STLINE.LPRODSTAT = 0";

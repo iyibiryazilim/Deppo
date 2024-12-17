@@ -92,6 +92,7 @@ public partial class WaitingPurchaseOrderListViewModel : BaseViewModel
 
             _userDialogs.Loading("Loading Suppliers...");
             Suppliers.Clear();
+			SelectedShipAddressModel = null;
             SelectedSupplierModel = null;
             await Task.Delay(500);
             var httpClient = _httpClientService.GetOrCreateHttpClient();

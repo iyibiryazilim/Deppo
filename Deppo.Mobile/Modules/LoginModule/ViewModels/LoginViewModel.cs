@@ -227,7 +227,9 @@ public partial class LoginViewModel : BaseViewModel
                 if (ApplicationUser is not null)
                 {
                     _httpClientSysService.UserOid = ApplicationUser.Oid;
-                    isLoggedIn = true;
+                    _httpClientSysService.UserName = UserName;
+                    _httpClientSysService.Password = Password;
+					isLoggedIn = true;
                 }
                 else
                 {
@@ -276,6 +278,7 @@ public partial class LoginViewModel : BaseViewModel
         {
             var gatewayUri = "";
             var gatewayPort = "";
+            var externalDatabase = "";
 
             var httpSysClient = _httpClientSysService.GetOrCreateHttpClient();
             var result = await _connectionParameterService.GetAllAsync(httpSysClient);
@@ -285,11 +288,19 @@ public partial class LoginViewModel : BaseViewModel
                 {
                     gatewayUri = item.GatewayUri;
                     gatewayPort = item.GatewayPort;
+                    externalDatabase = item.ExternalDatabase;
                 }
             }
 
+            if(string.IsNullOrEmpty(externalDatabase))
+				await SecureStorage.SetAsync("ExternalDB", "");
+            else
+			    await SecureStorage.SetAsync("ExternalDB", $"[{externalDatabase ?? string.Empty}].dbo.");
+
             string baseUri = $"{gatewayUri}:{gatewayPort}";          
             _httpClientService.BaseUri = baseUri;
+
+            var externalDatabaseString = await SecureStorage.GetAsync("ExternalDB");
 
 			_userDialogs.Loading("Loading...");
             await Task.Delay(1000);
@@ -299,6 +310,7 @@ public partial class LoginViewModel : BaseViewModel
             if (!string.IsNullOrEmpty(token))
             {
                 _httpClientService.Token = token;
+                _httpClientService.ExternalDatabase = externalDatabaseString;
                 isLoggedIn = true;
             }
         }

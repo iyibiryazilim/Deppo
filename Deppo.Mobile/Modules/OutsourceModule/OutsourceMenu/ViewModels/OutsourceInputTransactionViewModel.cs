@@ -99,6 +99,8 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
         {
             if (IsBusy)
                 return;
+            if (Items.Count < 18)
+                return;
             try
             {
                 IsBusy = true;
@@ -211,7 +213,7 @@ namespace Deppo.Mobile.Modules.OutsourceModule.OutsourceMenu.ViewModels
 
                 await Task.Delay(300);
                 await Shell.Current.GoToAsync("..");
-                //SearchText.Text = string.Empty;
+                SearchText.Text = string.Empty;
             }
             catch (Exception ex)
             {

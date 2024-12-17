@@ -139,7 +139,7 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 
 			if(InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.PlanningQuantity <= locationModel.InputQuantity)
 			{
-				_userDialogs.ShowToast("Ürünün Planlanan miktarı kadar miktar girişi yapabilirsiniz");
+				_userDialogs.ShowToast($"Ürünün Planlanan miktarı ({InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.PlanningQuantity}) kadar miktar girişi yapabilirsiniz");
 				return;
 			}
 			
@@ -219,7 +219,7 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 
 			if (InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.PlanningQuantity < quantity)
 			{
-				_userDialogs.ShowToast("Ürünün Planlanan miktarı kadar miktar girişi yapabilirsiniz");
+				_userDialogs.ShowToast($"Ürünün Planlanan miktarı ({InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.PlanningQuantity}) kadar miktar girişi yapabilirsiniz");
 				return;
 			}
 
@@ -326,7 +326,7 @@ public partial class InputOutsourceTransferV2MainProductLocationListViewModel : 
 
 			if(SelectedItems.Sum(x => x.InputQuantity) > InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.PlanningQuantity)
 			{
-				_userDialogs.ShowToast("Ürünün planlanan miktarı kadar toplam miktar girişi yapabilirsiniz");
+				_userDialogs.ShowToast($"Ürünün planlanan miktarı ({InputOutsourceTransferV2BasketModel.InputOutsourceTransferMainProductModel.PlanningQuantity}) kadar toplam miktar girişi yapabilirsiniz");
 				return;
 			}
 

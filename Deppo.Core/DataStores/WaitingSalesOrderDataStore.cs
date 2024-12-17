@@ -771,11 +771,11 @@ WHERE DD.OrderReferenceCount > 0
 	{
 		string baseQuery = @$"SELECT
 			[ReferenceId] = ORFLINE.LOGICALREF,
-            [OrderNumber] = ORFICHE.FICHENO,
-            [OrderReferenceId] = ORFICHE.LOGICALREF,
-            [CustomerReferenceId] = CLCARD.LOGICALREF,
-            [CustomerCode] = CLCARD.CODE,
-            [CustomerName] = CLCARD.DEFINITION_,
+            [OrderNumber] = ISNULL(ORFICHE.FICHENO, ''),
+            [OrderReferenceId] = ISNULL(ORFICHE.LOGICALREF, 0),
+            [CustomerReferenceId] = ISNULL(CLCARD.LOGICALREF, 0),
+            [CustomerCode] = ISNULL(CLCARD.CODE, ''),
+            [CustomerName] = ISNULL(CLCARD.DEFINITION_, ''),
             [ShipInfoCode] = ISNULL(SHIP.CODE, ''),
             [ProductReferenceId] = ORFLINE.STOCKREF,
             [ProductCode] = ISNULL(ITEMS.CODE, ''),

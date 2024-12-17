@@ -8,5 +8,6 @@ namespace Deppo.Core.Services
     {
         Task<DataResult<ResponseModel>> InsertTransferTransaction(HttpClient httpClient, TransferTransactionInsert dto, int firmNumber);
         Task<DataResult<dynamic>> UpdateDocumentTrackingNumber(HttpClient httpClient, int firmNumber, int periodNumber,string ficheNumber, int ficheReferenceId);
+        Task<DataResult<ResponseModel>> DeleteTransferTransaction(HttpClient httpClient, int referenceId, int firmNumber);
     }
 }

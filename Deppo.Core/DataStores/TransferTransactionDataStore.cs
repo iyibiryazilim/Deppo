@@ -10,7 +10,7 @@ namespace Deppo.Core.DataStores
 {
     public class TransferTransactionDataStore : ITransferTransactionService
     {
-        public async Task<DataResult<ResponseModel>> InsertTransferTransaction(HttpClient httpClient, TransferTransactionInsert dto, int firmNumber)
+		public async Task<DataResult<ResponseModel>> InsertTransferTransaction(HttpClient httpClient, TransferTransactionInsert dto, int firmNumber)
         {
 
             var postUrl = $"/gateway/product/TransferTransaction/Tiger?firmNumber={firmNumber}";
@@ -56,7 +56,57 @@ namespace Deppo.Core.DataStores
 
         }
 
-        public async Task<DataResult<dynamic>> UpdateDocumentTrackingNumber(HttpClient httpClient, int firmNumber, int periodNumber, string ficheNumber, int ficheReferenceId)
+		public async Task<DataResult<ResponseModel>> DeleteTransferTransaction(HttpClient httpClient, int referenceId, int firmNumber)
+		{
+			var postUrl = $"/gateway/product/TransferTransaction/Tiger?firmNumber={firmNumber}";
+			DataResult<ResponseModel> dataResult = new DataResult<ResponseModel>();
+
+            try
+            {
+                var jsonBody = new StringContent(
+                    System.Text.Json.JsonSerializer.Serialize(new { referenceId }),
+                    Encoding.UTF8,
+                    "application/json"
+                );
+
+                var request = new HttpRequestMessage(HttpMethod.Delete, postUrl)
+                {
+                    Content = jsonBody
+                };
+
+                var responseMessage = await httpClient.SendAsync(request);
+
+                if (responseMessage.IsSuccessStatusCode)
+                {
+                    var data = await responseMessage.Content.ReadAsStringAsync();
+                    var dtos = data.Trim('"').Replace("\\\"", "\"").Replace("\\", "");
+                    var dtos2 = JsonConvert.DeserializeObject<DataResult<ResponseModel>>(dtos);
+                    dataResult.Message = dtos2.Message;
+                    dataResult.IsSuccess = dtos2.IsSuccess;
+                    dataResult.Data = dtos2.Data;
+                    return dataResult;
+                }
+                else
+                {
+                    var message = await responseMessage.Content.ReadAsStringAsync();
+                    Debug.WriteLine($"Received non-successful HTTP status code: {responseMessage.StatusCode}");
+                    dataResult.Message = message;
+                    dataResult.IsSuccess = false;
+                    return dataResult;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return new DataResult<ResponseModel>
+                {
+                    IsSuccess = false,
+                    Message = $"An error occurred: {ex.Message}"
+                };
+            }
+		}
+
+		public async Task<DataResult<dynamic>> UpdateDocumentTrackingNumber(HttpClient httpClient, int firmNumber, int periodNumber, string ficheNumber, int ficheReferenceId)
         {
             var postUrl = $"/gateway/customQuery/CustomQuery";
             var content = new StringContent(JsonConvert.SerializeObject(UpdateQuery(firmNumber, periodNumber, ficheNumber, ficheReferenceId)), Encoding.UTF8, "application/json");

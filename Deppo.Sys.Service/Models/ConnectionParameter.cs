@@ -10,6 +10,7 @@ namespace Deppo.Sys.Service.Models
     {
         public string GatewayUri { get; set; } = string.Empty;
         public string GatewayPort { get; set; } = string.Empty;
+        public string ExternalDatabase { get; set; } = string.Empty;
 
         public bool IsActive { get; set; }
     }

@@ -55,13 +55,14 @@ public partial class CompanyListViewModel : BaseViewModel
 			_userDialogs.Loading("Loading Items...");
 			await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var externalDB = await SecureStorage.GetAsync("ExternalDB");
 
-            var query = @$"SELECT
+			var query = @$"SELECT
                 [ReferenceId] = LOGICALREF,
                 [Number] = NR,
 				[Name] = NAME,
                 [PeriodNumber] = PERNR   
-             FROM L_CAPIFIRM
+             FROM {externalDB}L_CAPIFIRM
             ";
 
 			var result = await _customQueryService.GetObjectsAsync(httpClient, query);

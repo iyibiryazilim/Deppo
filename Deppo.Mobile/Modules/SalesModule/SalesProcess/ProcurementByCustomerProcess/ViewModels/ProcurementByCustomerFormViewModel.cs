@@ -622,6 +622,8 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 					resultModel.PageCountToBack = 7;
 					resultModel.ErrorMessage = wholeSalesDispatchResult.Message;
 
+					//var transferTransactionDeleteResult = await _transferTransactionService.DeleteTransferTransaction(httpClient, transferResult.Data.ReferenceId, _httpClientService.FirmNumber);
+
 					await ClearFormAsync();
 					await ClearDataAsync();
 

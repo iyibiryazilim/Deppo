@@ -7,6 +7,7 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.ProductModels;
 using Deppo.Mobile.Helpers.CompanyHelper;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductMenu.Views;
 using Deppo.Mobile.Modules.ProductModule.WarehouseMenu.Views;
@@ -65,14 +66,22 @@ public partial class WarehouseListViewModel : BaseViewModel
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _warehouseService.GetObjects(httpClient, search: SearchText.Text, orderBy: null, page: 0, pageSize: 20, firmNumber: _httpClientService.FirmNumber);
+            var result = await _warehouseService.GetObjectsAsync(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+				search: SearchText.Text,
+				skip: 0,
+				take: 20,
+				externalDb: _httpClientService.ExternalDatabase
+            );
             if (result.IsSuccess)
             {
                 if (result.Data == null)
                     return;
 
                 foreach (var item in result.Data)
-                    Items.Add(item);
+                    Items.Add(Mapping.Mapper.Map<Warehouse>(item));
 
                 _userDialogs.Loading().Hide();
             }
@@ -109,16 +118,24 @@ public partial class WarehouseListViewModel : BaseViewModel
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseService.GetObjects(httpClient, SearchText.Text, null, Items.Count, 20, _httpClientService.FirmNumber);
-            if (result.IsSuccess)
+            var result = await _warehouseService.GetObjectsAsync(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				search: SearchText.Text,
+				skip: Items.Count,
+				take: 20,
+				externalDb: _httpClientService.ExternalDatabase
+			);
+			if (result.IsSuccess)
             {
                 if (result.Data == null)
                     return;
                 _userDialogs.Loading("Load more Items...");
                 foreach (var item in result.Data)
-                    Items.Add(item);
+					Items.Add(Mapping.Mapper.Map<Warehouse>(item));
 
-                if (_userDialogs.IsHudShowing)
+				if (_userDialogs.IsHudShowing)
                     _userDialogs.Loading().Hide();
             }
             else
@@ -158,8 +175,16 @@ public partial class WarehouseListViewModel : BaseViewModel
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseService.GetObjects(httpClient, SearchText.Text, null, 0, 20, _httpClientService.FirmNumber);
-            if (!result.IsSuccess)
+			var result = await _warehouseService.GetObjectsAsync(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				search: SearchText.Text,
+				skip: 0,
+				take: 20,
+				externalDb: _httpClientService.ExternalDatabase
+			);
+			if (!result.IsSuccess)
             {
                 _userDialogs.Alert(result.Message, "Hata");
                 return;
@@ -167,8 +192,8 @@ public partial class WarehouseListViewModel : BaseViewModel
 
             Items.Clear();
             foreach (var item in result.Data)
-                Items.Add(item);
-        }
+				Items.Add(Mapping.Mapper.Map<Warehouse>(item));
+		}
         catch (Exception ex)
         {
             _userDialogs.Alert(message: ex.Message, title: "Hata");

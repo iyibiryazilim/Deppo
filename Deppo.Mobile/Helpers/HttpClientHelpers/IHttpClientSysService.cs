@@ -16,4 +16,5 @@ public interface IHttpClientSysService
     int FirmNumber { get; set; }
     int PeriodNumber { get; set; }
     string UserName { get; set; }
+    string Password { get; set; }
 }

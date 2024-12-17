@@ -638,9 +638,8 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
         try
         {
             _userDialogs.ShowLoading("Yükleniyor...");
-            await Task.Delay(1000);
-
             LocationTransactions.Clear();
+            await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SelectedItem.ItemReferenceId, warehouseNumber: WarehouseModel.Number, 0, 20, LocationTransactionSearchText.Text);
@@ -924,6 +923,7 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
         }
         finally
         {
+            LocationTransactionSearchText.Text = string.Empty;
             IsBusy = false;
         }
     }
@@ -998,7 +998,8 @@ public partial class OutputProductSalesOrderProcessBasketListViewModel : BaseVie
     {
         await MainThread.InvokeOnMainThreadAsync(() =>
         {
-            CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.Hidden;
+			LocationTransactionSearchText.Text = string.Empty;
+			CurrentPage.FindByName<BottomSheet>("locationTransactionBottomSheet").State = BottomSheetState.Hidden;
         });
     }
 
