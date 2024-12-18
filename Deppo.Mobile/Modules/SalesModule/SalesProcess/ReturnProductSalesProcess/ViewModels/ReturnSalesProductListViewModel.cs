@@ -106,7 +106,15 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, 0, 20);
+            var result = await _productService.GetObjects(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                search: SearchText.Text, 
+                skip: 0, 
+                take: 20
+            );
+
             if (result.IsSuccess)
             {
                 if(result.Data is not null)
@@ -123,7 +131,9 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
                     }
                 }
             }
-            _userDialogs.HideHud();
+
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
            
         }
         catch (Exception ex)
@@ -143,13 +153,24 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
         if (IsBusy)
             return;
 
+        if (Items.Count < 18)
+            return;
+
         try
         {
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _productService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, SearchText.Text, Items.Count, 20);
+            var result = await _productService.GetObjects(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                search: SearchText.Text, 
+                skip: Items.Count, 
+                take: 20
+            );
+
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -167,8 +188,9 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
                 }
             }
 
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
-
         catch (Exception ex)
         {
             if(_userDialogs.IsHudShowing)
@@ -245,61 +267,70 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            SelectedProduct = item;
 
-            if (item is not null)
-                if (item.IsVariant)
+			if (!item.IsSelected)
+            {
+                if(item.IsVariant)
                 {
-                    SelectedProduct = item;
                     await LoadVariantItemsAsync(item);
-                    CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.HalfExpanded;
-                }
+					CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.HalfExpanded;
+				}
                 else
                 {
-                    if (!item.IsSelected)
+					Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = true;
+
+					var basketItem = new ReturnSalesBasketModel
                     {
-                        Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = true;
+                        ItemReferenceId = item.ReferenceId,
+                        ItemCode = item.Code,
+                        ItemName = item.Name,
+                        UnitsetReferenceId = item.UnitsetReferenceId,
+                        UnitsetCode = item.UnitsetCode,
+                        UnitsetName = item.UnitsetName,
+                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                        SubUnitsetCode = item.SubUnitsetCode,
+                        SubUnitsetName = item.SubUnitsetName,
+                        IsSelected = false,
+                        MainItemCode = item.Code,
+                        MainItemName = item.Name,
+                        MainItemReferenceId = item.ReferenceId,
+                        Image = item.ImageData,
+                        StockQuantity = item.StockQuantity,
+                        Quantity = item.LocTracking == 0 ? 1 : 0,
+                        InputQuantity = item.LocTracking == 0 ? 1 : 0,
+                        LocTracking = item.LocTracking,
+                        TrackingType = item.TrackingType,
+                        IsVariant = item.IsVariant,
+                    };
 
-                        SelectedProduct = item;
-                        SelectedItems.Add(item);
+                    SelectedProducts.Add(basketItem);
+                    SelectedItems.Add(item);
+				}
+            }
+            else
+            {
+				if (SelectedProduct is not null)
+				{
+					SelectedProduct.IsSelected = false;
+					SelectedProduct = null;
+				}
 
-                        var basketItem = new ReturnSalesBasketModel
-                        {
-                            ItemReferenceId = item.ReferenceId,
-                            ItemCode = item.Code,
-                            ItemName = item.Name,
-                            UnitsetReferenceId = item.UnitsetReferenceId,
-                            UnitsetCode = item.UnitsetCode,
-                            UnitsetName = item.UnitsetName,
-                            SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                            SubUnitsetCode = item.SubUnitsetCode,
-                            SubUnitsetName = item.SubUnitsetName,
-                            IsSelected = false,
-                            MainItemCode = string.Empty,
-                            MainItemName = string.Empty,
-                            MainItemReferenceId = default,
-                            Image = item.ImageData,
-                            StockQuantity = item.StockQuantity,
-                            Quantity = item.LocTracking == 0 ? 1 : 0,
-                            InputQuantity = item.LocTracking == 0 ? 1 : 0,
-                            LocTracking = item.LocTracking,
-                            TrackingType = item.TrackingType,
-                            IsVariant = item.IsVariant
-                        };
+				var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ReferenceId);
 
-                        SelectedProducts.Add(basketItem);
-                    }
-                    else
-                    {
-                        SelectedProduct = null;
-                        var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ReferenceId);
-                        if (selectedItem != null)
-                        {
-                            SelectedProducts.Remove(selectedItem);
-                            Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = false;
-                            SelectedItems.Remove(item);
-                        }
-                    }
-                }
+				if (item.IsVariant)
+				{
+					selectedItem = SelectedProducts.FirstOrDefault(x => x.MainItemReferenceId == item.ReferenceId);
+				}
+
+				if (selectedItem is not null)
+				{
+					SelectedProducts.Remove(selectedItem);
+					Items.ToList().FirstOrDefault(x => x.ReferenceId == item.ReferenceId).IsSelected = false;
+					SelectedItems.Remove(item);
+				}
+			}
+                
         }
         catch (Exception ex)
         {
@@ -440,12 +471,15 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
 		{
 			IsBusy = true;
 
-			ItemVariants.ToList().ForEach(x => x.IsSelected = false);
-			var selectedItem = ItemVariants.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-			if (selectedItem != null)
-				selectedItem.IsSelected = true;
-
-
+			if (item.IsSelected)
+			{
+				item.IsSelected = false;
+			}
+			else
+			{
+				item.IsSelected = true;
+				ItemVariants.Where(x => x.ReferenceId != item.ReferenceId).ToList().ForEach(x => x.IsSelected = false);
+			}
 		}
 		catch (Exception ex)
 		{
@@ -466,6 +500,12 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
 			IsBusy = true;
 
 			var item = ItemVariants.FirstOrDefault(x => x.IsSelected);
+
+            if(item is null)
+            {
+				CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.Hidden;
+				return;
+            }
 
 
 			var basketItem = new ReturnSalesBasketModel
@@ -524,7 +564,22 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            await Shell.Current.GoToAsync($"..");
+			if (SelectedProducts.Count > 0)
+			{
+				var result = await _userDialogs.ConfirmAsync("Seçtiğiniz ürünler silinecektir. Devam etmek istiyor musunuz?", "Uyarı", "Evet", "Hayır");
+				if (!result)
+				{
+					return;
+				}
+				SelectedProducts.Clear();
+			}
+
+			SelectedItems.ToList().ForEach(x => x.IsSelected = false);
+			SelectedItems.Clear();
+
+            SearchText.Text = string.Empty;
+
+			await Shell.Current.GoToAsync($"..");
         }
         catch (Exception ex)
         {

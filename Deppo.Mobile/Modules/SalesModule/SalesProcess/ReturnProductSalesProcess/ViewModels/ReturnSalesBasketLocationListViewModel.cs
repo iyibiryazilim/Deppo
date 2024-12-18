@@ -184,7 +184,8 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
 				variantReferenceId: ReturnSalesBasketModel.IsVariant == true ? ReturnSalesBasketModel.ItemReferenceId : 0,
 				search: SearchText.Text,
 				skip: 0,
-				take: 20);
+				take: 20,
+                externalDb: _httpClientService.ExternalDatabase);
 
 			if (result.IsSuccess)
             {
@@ -195,7 +196,8 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.HideHud();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
@@ -210,6 +212,8 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
     private async Task LoadMoreItemsAsync()
     {
         if (IsBusy)
+            return;
+        if (Items.Count < 18)
             return;
 
         try
@@ -228,7 +232,8 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
 				variantReferenceId: ReturnSalesBasketModel.IsVariant == true ? ReturnSalesBasketModel.ItemReferenceId : 0,
                 search: SearchText.Text,
 				skip: Items.Count,
-				take: 20);
+				take: 20,
+                externalDb: _httpClientService.ExternalDatabase);
 
 			if (result.IsSuccess)
             {
@@ -239,7 +244,8 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.HideHud();
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
@@ -315,8 +321,6 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
 
             _userDialogs.ShowLoading("Loading...");
             await Task.Delay(500);
-
-
 
             foreach (var item in Items.Where(x => x.IsSelected))
             {
@@ -480,7 +484,8 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
 				variantReferenceId: ReturnSalesBasketModel.IsVariant == true ? ReturnSalesBasketModel.ItemReferenceId : 0,
 				search: SearchText.Text,
 				skip: Items.Count,
-				take: 20
+				take: 20,
+                externalDb: _httpClientService.ExternalDatabase
             );
 			
             if (result.IsSuccess)
@@ -538,7 +543,8 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
 				variantReferenceId: ReturnSalesBasketModel.IsVariant == true ? ReturnSalesBasketModel.ItemReferenceId : 0,
 				search: barcodeEntry.Text,
                 skip: 0,
-                take: 1
+                take: 1,
+                externalDb: _httpClientService.ExternalDatabase
             );
 
             if (result.IsSuccess)
@@ -636,7 +642,8 @@ public partial class ReturnSalesBasketLocationListViewModel : BaseViewModel
             }
 
             await Shell.Current.GoToAsync("..");
-            _userDialogs.HideHud();
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
