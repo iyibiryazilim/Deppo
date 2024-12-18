@@ -66,8 +66,9 @@ public partial class ProductOutputTransactionViewModel : BaseViewModel
                 ProductReferenceId: Product.ReferenceId,
                 Sorting: "DESC",
                 Skip: 0,
-                Take: 20
-            );
+                Take: 20,
+                ExternalDb: _httpClientService.ExternalDatabase
+			);
 
             Items.Clear();
 
@@ -124,8 +125,9 @@ public partial class ProductOutputTransactionViewModel : BaseViewModel
                 ProductReferenceId: Product.ReferenceId,
                 Sorting: "DESC",
                 Skip: Items.Count,
-                Take: 20
-            );
+                Take: 20,
+				ExternalDb: _httpClientService.ExternalDatabase
+			);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _customQueryService.GetObjectsAsync(httpClient, query);

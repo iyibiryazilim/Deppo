@@ -10,10 +10,10 @@ public class LocationDataStore : ILocationService
 {
     private string postUrl = "/gateway/customQuery/CustomQuery";
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int productReferenceId,int variantReferenceId = 0, string search = "", int skip = 0, int take = 20)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int productReferenceId,int variantReferenceId = 0, string search = "", int skip = 0, int take = 20, string externalDb = "")
     {
         var content = new StringContent(JsonConvert.SerializeObject(LocationQuery(firmNumber, periodNumber, warehouseNumber, productReferenceId,variantReferenceId,
-            search, skip, take)), Encoding.UTF8, "application/json");
+            search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -61,10 +61,10 @@ public class LocationDataStore : ILocationService
         }
     }
 
-	public async Task<DataResult<IEnumerable<dynamic>>> GetLocationsWithStock(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int productReferenceId, int variantReferenceId = 0, string search = "", int skip = 0, int take = 20)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetLocationsWithStock(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int productReferenceId, int variantReferenceId = 0, string search = "", int skip = 0, int take = 20, string externalDb = "")
 	{
 		var content = new StringContent(JsonConvert.SerializeObject(LocationWithStockQuery(firmNumber, periodNumber, warehouseNumber, productReferenceId, variantReferenceId,
-			search, skip, take)), Encoding.UTF8, "application/json");
+			search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -112,9 +112,9 @@ public class LocationDataStore : ILocationService
 		}
 	}
 
-	public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
     {
-        var content = new StringContent(JsonConvert.SerializeObject(LocationQuery(firmNumber, periodNumber, warehouseNumber, search, skip, take)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(LocationQuery(firmNumber, periodNumber, warehouseNumber, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -162,7 +162,7 @@ public class LocationDataStore : ILocationService
         }
     }
 
-    private string LocationQuery(int firmNumber, int periodNumber, int warehouseNumber, int productReferenceId, int variantReferenceId = 0, string search = "", int skip = 0, int take = 20)
+    private string LocationQuery(int firmNumber, int periodNumber, int warehouseNumber, int productReferenceId, int variantReferenceId = 0, string search = "", int skip = 0, int take = 20, string externalDb = "")
     {
         string baseQuery = $@"SELECT 
 [ReferenceId] = LOC.LOGICALREF,
@@ -174,7 +174,7 @@ public class LocationDataStore : ILocationService
 [StockQuantity] = ISNULL((SELECT SUM(REMAMOUNT) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_SLTRANS AS SLTRANS WITH(NOLOCK) WHERE SLTRANS.INVENNO = WHOUSE.NR AND SLTRANS.LOCREF = LOC.LOGICALREF AND SLTRANS.ITEMREF = {productReferenceId} AND SLTRANS.VARIANTREF = {variantReferenceId}),0)
 
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_LOCATION AS LOC WITH(NOLOCK)
-LEFT JOIN L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON LOC.INVENNR = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON LOC.INVENNR = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 WHERE WHOUSE.NR = {warehouseNumber}";
 
         if (!string.IsNullOrEmpty(search))
@@ -190,7 +190,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 	/// Stoðu 0'dan büyük olan raflarý getirir
 	/// </summary>
 
-	private string LocationWithStockQuery(int firmNumber, int periodNumber, int warehouseNumber, int productReferenceId, int variantReferenceId = 0, string search = "", int skip = 0, int take = 20)
+	private string LocationWithStockQuery(int firmNumber, int periodNumber, int warehouseNumber, int productReferenceId, int variantReferenceId = 0, string search = "", int skip = 0, int take = 20, string externalDb = "")
 	{
 		string baseQuery = $@"SELECT 
 [ReferenceId] = LOC.LOGICALREF,
@@ -204,7 +204,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
                           WHERE SLTRANS.INVENNO = WHOUSE.NR AND SLTRANS.LOCREF = LOC.LOGICALREF AND SLTRANS.ITEMREF = {productReferenceId} AND SLTRANS.VARIANTREF = {variantReferenceId}),0)
 
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_LOCATION AS LOC WITH(NOLOCK)
-LEFT JOIN L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON LOC.INVENNR = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON LOC.INVENNR = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 WHERE WHOUSE.NR = {warehouseNumber}
 AND ISNULL((SELECT SUM(REMAMOUNT) 
             FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_SLTRANS AS SLTRANS WITH(NOLOCK) 
@@ -221,7 +221,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 
 
 
-	private string LocationQuery(int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20)
+	private string LocationQuery(int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
     {
         string baseQuery = $@"SELECT 
 [ReferenceId] = LOC.LOGICALREF,
@@ -233,7 +233,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
 [StockQuantity] = ISNULL((SELECT COUNT(DISTINCT ITEMREF) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_SLTRANS AS SLTRANS WITH(NOLOCK) WHERE SLTRANS.INVENNO = WHOUSE.NR AND SLTRANS.LOCREF = LOC.LOGICALREF ),0)
 
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_LOCATION AS LOC WITH(NOLOCK)
-LEFT JOIN L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON LOC.INVENNR = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON LOC.INVENNR = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 WHERE WHOUSE.NR = {warehouseNumber}";
 
         if (!string.IsNullOrEmpty(search))

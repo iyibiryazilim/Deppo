@@ -9,19 +9,19 @@ namespace Deppo.Core.Services
 {
     public interface IWarehouseDetailService
     {
-        public Task<DataResult<IEnumerable<dynamic>>> GetLastFiches(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseReferenceId);
+        public Task<DataResult<IEnumerable<dynamic>>> GetLastFiches(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseReferenceId, string externalDb = "");
 
-        Task<DataResult<IEnumerable<dynamic>>> GetLastTransaction(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId, int warehouseNumber);
+        Task<DataResult<IEnumerable<dynamic>>> GetLastTransaction(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId, int warehouseNumber, string externalDb = "");
 
-        Task<DataResult<dynamic>> GetInputQuantity(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber);
+        Task<DataResult<dynamic>> GetInputQuantity(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string externalDb = "");
 
-        Task<DataResult<dynamic>> GetOutputQuantity(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber);
+        Task<DataResult<dynamic>> GetOutputQuantity(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string externalDb = "");
 
         Task<DataResult<IEnumerable<dynamic>>> ProductInputOutputReferences(HttpClient httpClient, int firmNumber, int periodNumber, DateTime dateTime, int warehouseNumber);
 
-        Task<DataResult<dynamic>> WarehouseReferenceCount(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber);
+        Task<DataResult<dynamic>> WarehouseReferenceCount(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string externalDb = "");
 
-        Task<DataResult<dynamic>> WarehouseLastTransactionDate(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber);
+        Task<DataResult<dynamic>> WarehouseLastTransactionDate(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string externalDb = "");
 
 
 

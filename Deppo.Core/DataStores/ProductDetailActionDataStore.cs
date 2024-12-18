@@ -1,6 +1,7 @@
 ﻿using Deppo.Core.DataResultModel;
 using Deppo.Core.Services;
 using Newtonsoft.Json;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 
 namespace Deppo.Core.DataStores
@@ -9,9 +10,9 @@ namespace Deppo.Core.DataStores
     {
         private string postUrl = "/gateway/customQuery/CustomQuery";
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetWarehouses(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetWarehouses(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetWarehousesQuery(firmNumber, periodNumber, productReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetWarehousesQuery(firmNumber, periodNumber, productReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -59,9 +60,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetWaitingSalesOrders(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetWaitingSalesOrders(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(WaitingSalesOrderQuery(firmNumber, periodNumber, productReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(WaitingSalesOrderQuery(firmNumber, periodNumber, productReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -109,9 +110,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetWaitingPurchaseOrders(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetWaitingPurchaseOrders(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(WaitingPurchaseOrderQuery(firmNumber, periodNumber, productReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(WaitingPurchaseOrderQuery(firmNumber, periodNumber, productReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -159,9 +160,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetVariantTotals(HttpClient httpClient, int firmNumber, int periodNumber, int variantReferenceId, string search = "", int skip = 0, int take = 20)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetVariantTotals(HttpClient httpClient, int firmNumber, int periodNumber, int variantReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetVariantTotalsQuery(firmNumber, periodNumber, variantReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetVariantTotalsQuery(firmNumber, periodNumber, variantReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -209,9 +210,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetLocationTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int skip = 0, int take = 20, string search = "")
+        public async Task<DataResult<IEnumerable<dynamic>>> GetLocationTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int skip = 0, int take = 20, string search = "", string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(LocationTransactionQuery(firmNumber, periodNumber, productReferenceId, skip, take, search)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(LocationTransactionQuery(firmNumber, periodNumber, productReferenceId, skip, take, search, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -360,7 +361,7 @@ namespace Deppo.Core.DataStores
 		}
 
 
-		private string GetWarehousesQuery(int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
+		private string GetWarehousesQuery(int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
             var baseQuery = @$"SELECT
 			[ReferenceId] = LGMAIN.LOGICALREF,
@@ -371,7 +372,7 @@ namespace Deppo.Core.DataStores
 			[City] = LGMAIN.CITY,
 			[Country] = LGMAIN.COUNTRY,
 			[Quantity] = ISNULL((SELECT SUM(ONHAND) FROM LV_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STINVTOT AS STINVTOT WITH(NOLOCK) WHERE STINVTOT.STOCKREF = {productReferenceId} AND STINVTOT.INVENNO = LGMAIN.NR),0)
-			FROM L_CAPIWHOUSE AS LGMAIN WITH (NOLOCK)
+			FROM {externalDb}L_CAPIWHOUSE AS LGMAIN WITH (NOLOCK)
 
             WHERE LGMAIN.FIRMNR = {firmNumber}";
 
@@ -389,7 +390,7 @@ FETCH NEXT {take} ROWS ONLY;";
             return baseQuery;
         }
 
-        private string WaitingSalesOrderQuery(int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
+        private string WaitingSalesOrderQuery(int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
             string baseQuery = @$"SELECT
 			[ReferenceId] = ORFLINE.LOGICALREF,
@@ -425,7 +426,7 @@ FETCH NEXT {take} ROWS ONLY;";
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT ON ORFLINE.VARIANTREF = VARIANT.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON ORFLINE.UOMREF = SUBUNITSET.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON ORFLINE.USREF = UNITSET.LOGICALREF
-        LEFT JOIN L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+        LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 		WHERE ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 1
 		AND ITEMS.UNITSETREF <> 0 AND ITEMS.LOGICALREF = {productReferenceId}
 		";
@@ -440,7 +441,7 @@ FETCH NEXT {take} ROWS ONLY;";
             return baseQuery;
         }
 
-        private string WaitingPurchaseOrderQuery(int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
+        private string WaitingPurchaseOrderQuery(int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
             string baseQuery = @$"SELECT
 			[ReferenceId] = ORFLINE.LOGICALREF,
@@ -476,7 +477,7 @@ FETCH NEXT {take} ROWS ONLY;";
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT ON ORFLINE.VARIANTREF = VARIANT.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON ORFLINE.UOMREF = SUBUNITSET.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON ORFLINE.USREF = UNITSET.LOGICALREF
-        LEFT JOIN L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+        LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 		WHERE ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 2
 		AND ITEMS.UNITSETREF <> 0 AND ITEMS.LOGICALREF = {productReferenceId}
 		";
@@ -491,7 +492,7 @@ FETCH NEXT {take} ROWS ONLY;";
             return baseQuery;
         }
 
-        private string LocationTransactionQuery(int firmNumber, int periodNumber, int productReferenceId, int skip = 0, int take = 20, string search = "")
+        private string LocationTransactionQuery(int firmNumber, int periodNumber, int productReferenceId, int skip = 0, int take = 20, string search = "", string externalDb = "")
         {
             var baseQuery = @$"SELECT
     [LocationReferenceId] = ISNULL(LGMAIN.LOCREF, 0),
@@ -511,7 +512,7 @@ FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft
 LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS ITEMS WITH(NOLOCK) ON (LGMAIN.ITEMREF  =  ITEMS.LOGICALREF)
 LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_LOCATION INVLOC WITH(NOLOCK) ON (LGMAIN.LOCREF  =  INVLOC.LOGICALREF)
 LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF UNITSET WITH(NOLOCK) ON (ITEMS.UNITSETREF  =  UNITSET.LOGICALREF)
-LEFT OUTER JOIN L_CAPIWHOUSE WHOUSE WITH(NOLOCK) ON (LGMAIN.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber})
+LEFT OUTER JOIN {externalDb}L_CAPIWHOUSE WHOUSE WITH(NOLOCK) ON (LGMAIN.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber})
 WHERE
     LGMAIN.CANCELLED = 0 AND
     LGMAIN.LPRODSTAT = 0 AND
@@ -544,7 +545,7 @@ FETCH NEXT {take} ROWS ONLY;";
             return baseQuery;
         }
 
-        private string GetVariantTotalsQuery(int firmNumber, int periodNumber, int variantReferenceId, string search = "", int skip = 0, int take = 20)
+        private string GetVariantTotalsQuery(int firmNumber, int periodNumber, int variantReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
             string baseQuery = @$"SELECT
 			[ReferenceId] = LGMAIN.LOGICALREF,
@@ -555,7 +556,7 @@ FETCH NEXT {take} ROWS ONLY;";
 			[City] = LGMAIN.CITY,
 			[Country] = LGMAIN.COUNTRY,
 			[Quantity] = ISNULL((SELECT SUM(ONHAND) FROM LV_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_VRNTINVTOT AS VRNTINVTOT WITH(NOLOCK) WHERE VRNTINVTOT.VARIANTREF = {variantReferenceId} AND VRNTINVTOT.INVENNO = LGMAIN.NR),0)
-			FROM L_CAPIWHOUSE AS LGMAIN WITH (NOLOCK)
+			FROM {externalDb}L_CAPIWHOUSE AS LGMAIN WITH (NOLOCK)
 
             WHERE LGMAIN.FIRMNR = {firmNumber}";
 

@@ -13,9 +13,9 @@ namespace Deppo.Core.DataStores
     {
         private string postUrl = "/gateway/customQuery/CustomQuery";
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int currentReferenceId, string search = "", int skip = 0, int take = 20)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int currentReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(OutsourceProductQuery(firmNumber, periodNumber, warehouseNumber, currentReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(OutsourceProductQuery(firmNumber, periodNumber, warehouseNumber, currentReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -63,9 +63,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetObjectSubProducts(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetObjectSubProducts(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(OutsourceSubProductQuery(firmNumber, periodNumber,productReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(OutsourceSubProductQuery(firmNumber, periodNumber,productReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -113,7 +113,7 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        private string OutsourceProductQuery(int firmNumber, int periodNumber, int warehouseNumber,int currentReferenceId, string search = "", int skip = 0, int take = 20)
+        private string OutsourceProductQuery(int firmNumber, int periodNumber, int warehouseNumber,int currentReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
             string baseQuery = $@"SELECT 
 [ReferenceId]  =DISPLINE.LOGICALREF,
@@ -154,8 +154,8 @@ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(N
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON POLINE.USREF = UNITSETF.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD WITH(NOLOCK) ON DISPLINE.CLIENTREF = CLCARD.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_OPERTION AS OPR WITH(NOLOCK) ON DISPLINE.OPERATIONREF = OPR.LOGICALREF
-LEFT JOIN L_CAPIWHOUSE AS WAREHOUSE WITH(NOLOCK) ON POLINE.INVENNO = WAREHOUSE.NR AND WAREHOUSE.FIRMNR = {firmNumber}
-WHERE DISPLINE.PRODORDTYP = 2 AND DISPLINE.LINESTATUS = 0 AND POLINE.INVENNO={warehouseNumber} AND CLCARD.LOGICALREF={currentReferenceId}"  ;
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS WAREHOUSE WITH(NOLOCK) ON POLINE.INVENNO = WAREHOUSE.NR AND WAREHOUSE.FIRMNR = {firmNumber}
+WHERE DISPLINE.PRODORDTYP = 2 AND DISPLINE.LINESTATUS = 0 AND POLINE.INVENNO={warehouseNumber} AND CLCARD.LOGICALREF={currentReferenceId}";
 
             if (!string.IsNullOrEmpty(search))
                 baseQuery += $@" AND (ITEMS.CODE LIKE '{search}%'
@@ -167,7 +167,7 @@ WHERE DISPLINE.PRODORDTYP = 2 AND DISPLINE.LINESTATUS = 0 AND POLINE.INVENNO={wa
             return baseQuery;
         }
 
-        private string OutsourceSubProductQuery(int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20)
+        private string OutsourceSubProductQuery(int firmNumber, int periodNumber, int productReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
             string baseQuery = $@"SELECT 
 [ReferenceId] = ITEMS.LOGICALREF,
@@ -202,8 +202,8 @@ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS WITH(NOLOCK)
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(NOLOCK) ON BOMLINE.UOMREF = UNITSETL.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON BOMLINE.USREF = UNITSETF.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD WITH(NOLOCK) ON BOMASTER.CLIENTREF = CLCARD.LOGICALREF
-LEFT JOIN L_CAPIWHOUSE AS OUTWHOUSE WITH(NOLOCK) ON CLCARD.ININVENNR = OUTWHOUSE.NR AND OUTWHOUSE.FIRMNR = {firmNumber}
-LEFT JOIN L_CAPIWHOUSE AS INWHOUSE WITH(NOLOCK) ON CLCARD.OUTINVENNR = INWHOUSE.NR AND INWHOUSE.FIRMNR = {firmNumber}
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS OUTWHOUSE WITH(NOLOCK) ON CLCARD.ININVENNR = OUTWHOUSE.NR AND OUTWHOUSE.FIRMNR = {firmNumber}
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS INWHOUSE WITH(NOLOCK) ON CLCARD.OUTINVENNR = INWHOUSE.NR AND INWHOUSE.FIRMNR = {firmNumber}
 WHERE BOMLINE.BOMTYPE = 2 AND BOMLINE.LINETYPE <> 4 AND BOMASTER.MAINPRODREF = {productReferenceId}";
 
             if (!string.IsNullOrEmpty(search))

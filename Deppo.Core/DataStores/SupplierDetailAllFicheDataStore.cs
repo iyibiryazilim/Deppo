@@ -9,9 +9,9 @@ public class SupplierDetailAllFicheDataStore : ISupplierDetailAllFicheService
 {
     private string postUrl = "/gateway/customQuery/CustomQuery";
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetAllFichesBySupplier(HttpClient httpClient, int firmNumber, int periodNumber, int supplierReferenceId, string search = "", int skip = 0, int take = 20)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetAllFichesBySupplier(HttpClient httpClient, int firmNumber, int periodNumber, int supplierReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
     {
-        var content = new StringContent(JsonConvert.SerializeObject(GetAllFichesBySupplierQuery(firmNumber, periodNumber, supplierReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(GetAllFichesBySupplierQuery(firmNumber, periodNumber, supplierReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -59,9 +59,9 @@ public class SupplierDetailAllFicheDataStore : ISupplierDetailAllFicheService
         }
     }
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetTransactionsByFiche(HttpClient httpClient, int firmNumber, int periodNumber, int ficheRefenceId)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetTransactionsByFiche(HttpClient httpClient, int firmNumber, int periodNumber, int ficheRefenceId, string externalDb = "")
     {
-        var content = new StringContent(JsonConvert.SerializeObject(GetTransactionsByFicheQuery(firmNumber, periodNumber, ficheRefenceId)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(GetTransactionsByFicheQuery(firmNumber, periodNumber, ficheRefenceId, externalDb)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -109,7 +109,7 @@ public class SupplierDetailAllFicheDataStore : ISupplierDetailAllFicheService
         }
     }
 
-    private string GetAllFichesBySupplierQuery(int firmNumber, int periodNumber, int supplierReferenceId, string search, int skip, int take)
+    private string GetAllFichesBySupplierQuery(int firmNumber, int periodNumber, int supplierReferenceId, string search, int skip, int take, string externalDb = "")
     {
         string baseQuery = $@"SELECT
             [ReferenceId] = STFICHE.LOGICALREF,
@@ -127,7 +127,7 @@ public class SupplierDetailAllFicheDataStore : ISupplierDetailAllFicheService
 			[Description] =  ISNULL (STFICHE.GENEXP1, '')
 			From LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
 			left join LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
-			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
+			LEFT JOIN {externalDb}L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
 			WHERE STFICHE.PRODSTAT = 0 AND CLCARD.LOGICALREF={supplierReferenceId}";
 
         if (!string.IsNullOrEmpty(search))
@@ -139,7 +139,7 @@ public class SupplierDetailAllFicheDataStore : ISupplierDetailAllFicheService
         return baseQuery;
     }
 
-    private string GetTransactionsByFicheQuery(int firmNumber, int periodNumber, int ficheReferenceId)
+    private string GetTransactionsByFicheQuery(int firmNumber, int periodNumber, int ficheReferenceId, string externalDb = "")
     {
         string baseQuery = $@"SELECT
             [ReferenceId] = STLINE.LOGICALREF,
@@ -179,7 +179,7 @@ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD WITH(NOLOC
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_FIRMDOC AS FIRMDOC ON FIRMDOC.INFOREF = ITEMS.LOGICALREF AND FIRMDOC.INFOTYP = 20
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET WITH(NOLOCK) ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET WITH(NOLOCK) ON STLINE.USREF = UNITSET.LOGICALREF
-LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE WITH(NOLOCK) ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS CAPIWHOUSE WITH(NOLOCK) ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
 WHERE STLINE.LINETYPE = 0 AND STFICHE.LOGICALREF = {ficheReferenceId}
 ORDER BY STLINE.DATE_ DESC";
 

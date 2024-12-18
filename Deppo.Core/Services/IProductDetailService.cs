@@ -4,9 +4,9 @@ namespace Deppo.Core.Services
 {
     public interface IProductDetailService
     {
-        public Task<DataResult<IEnumerable<dynamic>>> GetLastFichesByProduct(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId);
+        public Task<DataResult<IEnumerable<dynamic>>> GetLastFichesByProduct(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string externalDb = "");
 
-        Task<DataResult<IEnumerable<dynamic>>> GetLastTransaction(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId, int productReferenceId);
+        Task<DataResult<IEnumerable<dynamic>>> GetLastTransaction(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId, int productReferenceId, string externalDb = "");
 
         Task<DataResult<dynamic>> GetProductMeasure(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId);
 

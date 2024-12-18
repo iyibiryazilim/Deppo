@@ -8,9 +8,9 @@ namespace Deppo.Core.DataStores;
 public class LocationTransactionDataStore : ILocationTransactionService
 {
 	string postUrl = "/gateway/customQuery/CustomQuery";
-	public async Task<DataResult<IEnumerable<dynamic>>> GetInputObjectsAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "", int locationRef = 0, int serilotRef = 0, int variantReferenceId = 0)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetInputObjectsAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "", int locationRef = 0, int serilotRef = 0, int variantReferenceId = 0, string externalDb = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(LocationInputTransactionQuery(firmNumber, periodNumber, productReferenceId, warehouseNumber, skip, take, search, locationRef, serilotRef, variantReferenceId)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(LocationInputTransactionQuery(firmNumber, periodNumber, productReferenceId, warehouseNumber, skip, take, search, locationRef, serilotRef, variantReferenceId, externalDb)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -60,9 +60,9 @@ public class LocationTransactionDataStore : ILocationTransactionService
 		}
 	}
 
-	public async Task<DataResult<IEnumerable<dynamic>>> GetLocationTransactionsInputObjectsAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "", int locationRef = 0, int serilotRef = 0, int variantReferenceId = 0)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetLocationTransactionsInputObjectsAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "", int locationRef = 0, int serilotRef = 0, int variantReferenceId = 0, string externalDb = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(GroupedLocationTransactionInputQuery(firmNumber, periodNumber, productReferenceId, warehouseNumber, skip, take, search, locationRef, serilotRef, variantReferenceId)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(GroupedLocationTransactionInputQuery(firmNumber, periodNumber, productReferenceId, warehouseNumber, skip, take, search, locationRef, serilotRef, variantReferenceId, externalDb)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -112,9 +112,9 @@ public class LocationTransactionDataStore : ILocationTransactionService
 		}
 	}
 
-	public async Task<DataResult<IEnumerable<dynamic>>> GetOutputObjectsAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "", int locationRef = 0, int serilotRef = 0)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetOutputObjectsAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "", int locationRef = 0, int serilotRef = 0, string externalDb = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(LocationOutputTransactionQuery(firmNumber, periodNumber, productReferenceId, warehouseNumber, skip, take, search, locationRef, serilotRef)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(LocationOutputTransactionQuery(firmNumber, periodNumber, productReferenceId, warehouseNumber, skip, take, search, locationRef, serilotRef, externalDb)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -164,9 +164,9 @@ public class LocationTransactionDataStore : ILocationTransactionService
 		}
 	}
 
-	public async Task<DataResult<IEnumerable<dynamic>>> GetLineLocationTransactionsAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int locationRef, int ficheReferenceId, int lineReferenceId, int skip = 0, int take = 20, string search = "")
+	public async Task<DataResult<IEnumerable<dynamic>>> GetLineLocationTransactionsAsync(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int locationRef, int ficheReferenceId, int lineReferenceId, int skip = 0, int take = 20, string search = "", string externalDb = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(GetLineLocationTransactionsQuery(firmNumber, periodNumber, productReferenceId, warehouseNumber, locationRef , ficheReferenceId, lineReferenceId, skip, take, search)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(GetLineLocationTransactionsQuery(firmNumber, periodNumber, productReferenceId, warehouseNumber, locationRef , ficheReferenceId, lineReferenceId, skip, take, search, externalDb)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -316,7 +316,7 @@ public class LocationTransactionDataStore : ILocationTransactionService
 		}
 	}
 
-	private string LocationInputTransactionQuery(int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "", int locationRef = 0, int serilotRef = 0, int variantReferenceId = 0)
+	private string LocationInputTransactionQuery(int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "", int locationRef = 0, int serilotRef = 0, int variantReferenceId = 0, string externalDb = "")
 	{
 		var baseQuery = @$"SELECT
         [ReferenceId] = LGMAIN.LOGICALREF,
@@ -349,7 +349,7 @@ public class LocationTransactionDataStore : ILocationTransactionService
         LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_SERILOTN SERILOT WITH(NOLOCK) ON (LGMAIN.SLREF = SERILOT.LOGICALREF)
 		LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE STFIC WITH(NOLOCK) ON (LGMAIN.STFICHEREF  =  STFIC.LOGICALREF) 
 		LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF UNITSET WITH(NOLOCK) ON (ITEMS.UNITSETREF  =  UNITSET.LOGICALREF)
-		LEFT OUTER JOIN L_CAPIWHOUSE WHOUSE WITH(NOLOCK) ON (LGMAIN.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber})
+		LEFT OUTER JOIN {externalDb}L_CAPIWHOUSE WHOUSE WITH(NOLOCK) ON (LGMAIN.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber})
         WHERE (LGMAIN.CANCELLED = 0) AND 
               (LGMAIN.LPRODSTAT = 0) AND 
               (LGMAIN.ITEMREF = {productReferenceId}) AND
@@ -376,7 +376,7 @@ public class LocationTransactionDataStore : ILocationTransactionService
 		return baseQuery;
 	}
 
-	private string GroupedLocationTransactionInputQuery(int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "", int locationRef = 0, int serilotRef = 0, int variantReferenceId = 0)
+	private string GroupedLocationTransactionInputQuery(int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "", int locationRef = 0, int serilotRef = 0, int variantReferenceId = 0, string externalDb = "")
 	{
 		var baseQuery = @$"SELECT
     [ReferenceId] = NEWID(),
@@ -402,7 +402,7 @@ LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_LOCATION INVLOC WITH(
 LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_SERILOTN SERILOT WITH(NOLOCK) ON (LGMAIN.SLREF = SERILOT.LOGICALREF)
 LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE STFIC WITH(NOLOCK) ON (LGMAIN.STFICHEREF = STFIC.LOGICALREF) 
 LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF UNITSET WITH(NOLOCK) ON (ITEMS.UNITSETREF = UNITSET.LOGICALREF)
-LEFT OUTER JOIN L_CAPIWHOUSE WHOUSE WITH(NOLOCK) ON (LGMAIN.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber})
+LEFT OUTER JOIN {externalDb}L_CAPIWHOUSE WHOUSE WITH(NOLOCK) ON (LGMAIN.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber})
 WHERE (LGMAIN.CANCELLED = 0) AND 
       (LGMAIN.LPRODSTAT = 0) AND 
       (LGMAIN.ITEMREF = {productReferenceId}) AND
@@ -442,7 +442,7 @@ WHERE (LGMAIN.CANCELLED = 0) AND
 		return baseQuery;
 	}
 
-	private string LocationOutputTransactionQuery(int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "", int locationRef = 0, int serilotRef = 0)
+	private string LocationOutputTransactionQuery(int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "", int locationRef = 0, int serilotRef = 0, string externalDb = "")
 	{
 		var baseQuery = @$"SELECT
         [ReferenceId] = LGMAIN.LOGICALREF,
@@ -474,7 +474,7 @@ WHERE (LGMAIN.CANCELLED = 0) AND
         LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_SERILOTN SERILOT WITH(NOLOCK) ON (LGMAIN.SLREF = SERILOT.LOGICALREF)
 		LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE STFIC WITH(NOLOCK) ON (LGMAIN.STFICHEREF  =  STFIC.LOGICALREF) 
 		LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF UNITSET WITH(NOLOCK) ON (ITEMS.UNITSETREF  =  UNITSET.LOGICALREF)
-		LEFT OUTER JOIN L_CAPIWHOUSE WHOUSE WITH(NOLOCK) ON (LGMAIN.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber})
+		LEFT OUTER JOIN {externalDb}L_CAPIWHOUSE WHOUSE WITH(NOLOCK) ON (LGMAIN.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber})
         WHERE (LGMAIN.CANCELLED = 0) AND 
               (LGMAIN.LPRODSTAT = 0) AND 
               (LGMAIN.ITEMREF = {productReferenceId}) AND
@@ -496,7 +496,7 @@ WHERE (LGMAIN.CANCELLED = 0) AND
 	}
 
 
-	private string GetLineLocationTransactionsQuery(int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int locationRef,int ficheReferenceId, int lineReferenceId, int skip = 0, int take = 20, string search = "")                                                           
+	private string GetLineLocationTransactionsQuery(int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int locationRef,int ficheReferenceId, int lineReferenceId, int skip = 0, int take = 20, string search = "", string externalDb = "")                                                           
 	{
 		var baseQuery = @$"SELECT
         [ReferenceId] = LGMAIN.LOGICALREF,
@@ -529,7 +529,7 @@ WHERE (LGMAIN.CANCELLED = 0) AND
         LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_SERILOTN SERILOT WITH(NOLOCK) ON (LGMAIN.SLREF = SERILOT.LOGICALREF)
 		LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE STFIC WITH(NOLOCK) ON (LGMAIN.STFICHEREF  =  STFIC.LOGICALREF) 
 		LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF UNITSET WITH(NOLOCK) ON (ITEMS.UNITSETREF  =  UNITSET.LOGICALREF)
-		LEFT OUTER JOIN L_CAPIWHOUSE WHOUSE WITH(NOLOCK) ON (LGMAIN.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber})
+		LEFT OUTER JOIN {externalDb}L_CAPIWHOUSE WHOUSE WITH(NOLOCK) ON (LGMAIN.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber})
         WHERE (LGMAIN.CANCELLED = 0) AND 
               (LGMAIN.LPRODSTAT = 0) AND 
               (LGMAIN.ITEMREF = {productReferenceId}) AND

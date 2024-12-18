@@ -8,9 +8,9 @@ namespace Deppo.Core.DataStores
     public class DemandProcessVariantDataStore : IDemandProcessVariantService
     {
         private string postUrl = "/gateway/customQuery/CustomQuery";
-        public async Task<DataResult<IEnumerable<dynamic>>> GetVariants(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetVariants(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetVariantsByWarehouseQuery(firmNumber, periodNumber, warehouseNumber, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetVariantsByWarehouseQuery(firmNumber, periodNumber, warehouseNumber, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -60,7 +60,7 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        private string GetVariantsByWarehouseQuery(int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20)
+        private string GetVariantsByWarehouseQuery(int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
             string baseQuery = $@"SELECT 
 [ReferenceId] = NEWID(),
@@ -91,7 +91,7 @@ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT WITH(NOL
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS WITH(NOLOCK) ON VARIANT.ITEMREF= ITEMS.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON VARIANT.UNITSETREF = UNITSETF.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(NOLOCK) ON UNITSETL.UNITSETREF = UNITSETF.LOGICALREF AND UNITSETL.MAINUNIT = 1
-LEFT JOIN L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON VRNTINVTOT.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON VRNTINVTOT.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_INVDEF AS INVDEF WITH(NOLOCK) ON VRNTINVTOT.INVENNO = INVDEF.INVENNO AND VRNTINVTOT.VARIANTREF = INVDEF.VARIANTREF
 ";
 

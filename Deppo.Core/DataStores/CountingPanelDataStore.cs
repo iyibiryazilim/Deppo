@@ -10,9 +10,9 @@ public class CountingPanelDataStore : ICountingPanelService
 {
     private string postUrl = "/gateway/customQuery/CustomQuery";
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetLastCountingFiches(HttpClient httpClient, int firmNumber, int periodNumber)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetLastCountingFiches(HttpClient httpClient, int firmNumber, int periodNumber, string externalDb = "")
     {
-        var content = new StringContent(JsonConvert.SerializeObject(GetLastCountingFichesQuery(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(GetLastCountingFichesQuery(firmNumber, periodNumber, externalDb)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -110,9 +110,9 @@ public class CountingPanelDataStore : ICountingPanelService
         }
     }
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetLastCountingTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetLastCountingTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId, string externalDb = "")
     {
-        var content = new StringContent(JsonConvert.SerializeObject(GetLastCountingTransactionsQuery(firmNumber, periodNumber, ficheReferenceId)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(GetLastCountingTransactionsQuery(firmNumber, periodNumber, ficheReferenceId, externalDb)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -360,9 +360,9 @@ public class CountingPanelDataStore : ICountingPanelService
         }
     }
 
-    public async Task<DataResult<dynamic>> GetInCountingTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId)
+    public async Task<DataResult<dynamic>> GetInCountingTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string externalDb = "")
     {
-        var content = new StringContent(JsonConvert.SerializeObject(GetInCountingTransactionsQuery(firmNumber, periodNumber, productReferenceId)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(GetInCountingTransactionsQuery(firmNumber, periodNumber, productReferenceId, externalDb)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<dynamic> dataResult = new DataResult<dynamic>();
@@ -460,9 +460,9 @@ public class CountingPanelDataStore : ICountingPanelService
         }
     }
 
-    public async Task<DataResult<dynamic>> GetOutCountingTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId)
+    public async Task<DataResult<dynamic>> GetOutCountingTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string externalDb = "")
     {
-        var content = new StringContent(JsonConvert.SerializeObject(GetOutCountingTransactionsQuery(firmNumber, periodNumber, productReferenceId)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(GetOutCountingTransactionsQuery(firmNumber, periodNumber, productReferenceId, externalDb)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<dynamic> dataResult = new DataResult<dynamic>();
@@ -510,9 +510,9 @@ public class CountingPanelDataStore : ICountingPanelService
         }
     }
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetAllCountingTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId, int skip = 0, int take = 20)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetAllCountingTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId, int skip = 0, int take = 20, string externalDb = "")
     {
-        var content = new StringContent(JsonConvert.SerializeObject(GetAllCountingTransactionsQuery(firmNumber, periodNumber, ficheReferenceId)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(GetAllCountingTransactionsQuery(firmNumber, periodNumber, ficheReferenceId, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -560,9 +560,9 @@ public class CountingPanelDataStore : ICountingPanelService
         }
     }
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetCountingFiches(HttpClient httpClient, int firmNumber, int periodNumber, int skip = 0, int take = 20)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetCountingFiches(HttpClient httpClient, int firmNumber, int periodNumber, int skip = 0, int take = 20, string externalDb = "")
     {
-        var content = new StringContent(JsonConvert.SerializeObject(GetCountingFichesQuery(firmNumber, periodNumber)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(GetCountingFichesQuery(firmNumber, periodNumber, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -640,7 +640,7 @@ WHERE STLINE.TRCODE IN(50,51) AND STLINE.LPRODSTAT = 0";
         return baseQuery;
     }
 
-    private string GetLastCountingFichesQuery(int firmNumber, int periodNumber)
+    private string GetLastCountingFichesQuery(int firmNumber, int periodNumber, string externalDb = "")
     {
         string baseQuery = $@"Select TOP 5
             [ReferenceId] = STFICHE.LOGICALREF,
@@ -658,7 +658,7 @@ WHERE STLINE.TRCODE IN(50,51) AND STLINE.LPRODSTAT = 0";
 			[Description] =  ISNULL (STFICHE.GENEXP1, '')
 			From LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
 			left join LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
-			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
+			LEFT JOIN {externalDb}L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
 			WHERE STFICHE.TRCODE IN(50,51) AND STFICHE.PRODSTAT = 0
 			ORDER BY STFICHE.DATE_ DESC;";
 
@@ -722,7 +722,7 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
         return baseQuery;
     }
 
-    private string GetLastCountingTransactionsQuery(int firmNumber, int periodNumber, int ficheReferenceId)
+    private string GetLastCountingTransactionsQuery(int firmNumber, int periodNumber, int ficheReferenceId, string externalDb = "")
     {
         string baseQuery = $@"SELECT
         [ReferenceId] = STLINE.LOGICALREF,
@@ -754,7 +754,7 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_FIRMDOC AS FIRMDOC ON FIRMDOC.INFOREF = ITEMS.LOGICALREF AND FIRMDOC.INFOTYP = 20
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
-		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
+		LEFT JOIN {externalDb}L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
 		WHERE STFICHE.TRCODE IN(50,51) AND STFICHE.LOGICALREF = {ficheReferenceId} AND STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0
 		ORDER BY STLINE.DATE_ DESC";
 
@@ -821,7 +821,7 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
         return baseQuery;
     }
 
-    private string GetInCountingTransactionsQuery(int firmNumber, int periodNumber, int itemReferenceId)
+    private string GetInCountingTransactionsQuery(int firmNumber, int periodNumber, int itemReferenceId, string externalDb = "")
     {
         string baseQuery = $@"SELECT
         [ReferenceId] = STLINE.LOGICALREF,
@@ -851,7 +851,7 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
-		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
+		LEFT JOIN {externalDb}L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
 		WHERE STFICHE.TRCODE = 50 AND ITEMS.LOGICALREF = {itemReferenceId} AND STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0
 		ORDER BY STLINE.DATE_ DESC";
 
@@ -927,7 +927,7 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
         return baseQuery;
     }
 
-    private string GetOutCountingTransactionsQuery(int firmNumber, int periodNumber, int itemReferenceId)
+    private string GetOutCountingTransactionsQuery(int firmNumber, int periodNumber, int itemReferenceId, string externalDb = "")
     {
         string baseQuery = $@"SELECT
         [ReferenceId] = STLINE.LOGICALREF,
@@ -957,14 +957,14 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
-		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
+		LEFT JOIN {externalDb}L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
 		WHERE STFICHE.TRCODE = 51 AND ITEMS.LOGICALREF = {itemReferenceId} AND STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0
 		ORDER BY STLINE.DATE_ DESC";
 
         return baseQuery;
     }
 
-    private string GetAllCountingTransactionsQuery(int firmNumber, int periodNumber, int ficheReferenceId, int skip = 0, int take = 20)
+    private string GetAllCountingTransactionsQuery(int firmNumber, int periodNumber, int ficheReferenceId, int skip = 0, int take = 20, string externalDb = "")
     {
         string baseQuery = $@"SELECT
         [ReferenceId] = STLINE.LOGICALREF,
@@ -999,13 +999,13 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
-		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
+		LEFT JOIN {externalDb}L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
 		WHERE STFICHE.TRCODE IN(50,51) AND STFICHE.LOGICALREF = {ficheReferenceId} AND  STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0
 		ORDER BY STLINE.DATE_ DESC OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
         return baseQuery;
     }
 
-    private string GetCountingFichesQuery(int firmNumber, int periodNumber, int skip = 0, int take = 20)
+    private string GetCountingFichesQuery(int firmNumber, int periodNumber, int skip = 0, int take = 20, string externalDb = "")
     {
         string baseQuery = $@"Select
             [ReferenceId] = STFICHE.LOGICALREF,
@@ -1023,7 +1023,7 @@ ORDER BY MAX(STLINE.DATE_) DESC;";
 			[Description] =  ISNULL (STFICHE.GENEXP1, '')
 			From LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
 			left join LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
-			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
+			LEFT JOIN {externalDb}L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
 			WHERE STFICHE.TRCODE IN(50,51) AND STFICHE.PRODSTAT = 0
 			ORDER BY STFICHE.DATE_ DESC  OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY;";
 

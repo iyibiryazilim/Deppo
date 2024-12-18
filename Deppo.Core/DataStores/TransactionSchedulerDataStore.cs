@@ -13,9 +13,9 @@ namespace Deppo.Core.DataStores
     {
         private string postUrl = "/gateway/customQuery/CustomQuery";
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetAllFiches(HttpClient httpClient, int firmNumber, int periodNumber, DateTime selectedDate, string search = "", int skip = 0, int take = 20)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetAllFiches(HttpClient httpClient, int firmNumber, int periodNumber, DateTime selectedDate, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetAllFichesQuery(firmNumber, periodNumber, selectedDate, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetAllFichesQuery(firmNumber, periodNumber, selectedDate, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -63,9 +63,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetLastTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetLastTransactions(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetLastTransactionsQuery(firmNumber, periodNumber, ficheReferenceId)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetLastTransactionsQuery(firmNumber, periodNumber, ficheReferenceId, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -113,7 +113,7 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        private string GetAllFichesQuery(int firmNumber, int periodNumber, DateTime selectedDate, string search = "", int skip = 0, int take = 20)
+        private string GetAllFichesQuery(int firmNumber, int periodNumber, DateTime selectedDate, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
             string baseQuery = $@"
             SELECT
@@ -132,7 +132,7 @@ namespace Deppo.Core.DataStores
 			    [Description] =  ISNULL (STFICHE.GENEXP1, '')
 			FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
 			LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
-			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
+			LEFT JOIN {externalDb}L_CAPIWHOUSE AS CAPIWHOUSE on CAPIWHOUSE.NR = STFICHE.SOURCEINDEX AND CAPIWHOUSE.FIRMNR = {firmNumber}
 			WHERE STFICHE.DATE_ ='{selectedDate.Year}-{selectedDate.Month.ToString().PadLeft(2, '0')}-{selectedDate.Day.ToString().PadLeft(2, '0')}' AND  STFICHE.PRODSTAT = 0";
 
             if (!string.IsNullOrEmpty(search))
@@ -145,7 +145,7 @@ namespace Deppo.Core.DataStores
             return baseQuery;
         }
 
-        private string GetLastTransactionsQuery(int firmNumber, int periodNumber, int ficheReferenceId)
+        private string GetLastTransactionsQuery(int firmNumber, int periodNumber, int ficheReferenceId, string externalDb = "")
         {
             string baseQuery = $@"SELECT TOP 5
         [ReferenceId] = STLINE.LOGICALREF,
@@ -177,7 +177,7 @@ namespace Deppo.Core.DataStores
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_FIRMDOC AS FIRMDOC ON FIRMDOC.INFOREF = ITEMS.LOGICALREF AND FIRMDOC.INFOTYP = 20 AND FIRMDOC.DOCNR = 11
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
-		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
+		LEFT JOIN {externalDb}L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
 		WHERE STFICHE.GRPCODE = 3 AND STFICHE.LOGICALREF = {ficheReferenceId} AND STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0
 		ORDER BY STLINE.DATE_ DESC";
 

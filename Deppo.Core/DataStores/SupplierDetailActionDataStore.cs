@@ -63,9 +63,9 @@ public class SupplierDetailActionDataStore : ISupplierDetailActionService
         }
     }
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetWaitingPurchaseOrdersBySupplier(HttpClient httpClient, int firmNumber, int periodNumber, int supplierReferenceId, string search = "", int skip = 0, int take = 20)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetWaitingPurchaseOrdersBySupplier(HttpClient httpClient, int firmNumber, int periodNumber, int supplierReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
     {
-        var content = new StringContent(JsonConvert.SerializeObject(GetWaitingPurchaseOrderBySupplierReferenceIdQuery(firmNumber, periodNumber, supplierReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonConvert.SerializeObject(GetWaitingPurchaseOrderBySupplierReferenceIdQuery(firmNumber, periodNumber, supplierReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
         HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
         DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -185,7 +185,7 @@ public class SupplierDetailActionDataStore : ISupplierDetailActionService
         return baseQuery;
     }
 
-    private string GetWaitingPurchaseOrderBySupplierReferenceIdQuery(int firmNumber, int periodNumber, int supplierReferenceId, string search = "", int skip = 0, int take = 20)
+    private string GetWaitingPurchaseOrderBySupplierReferenceIdQuery(int firmNumber, int periodNumber, int supplierReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
     {
         string baseQuery = $@"SELECT
 
@@ -223,7 +223,7 @@ FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft
             LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT ON ORFLINE.VARIANTREF = VARIANT.LOGICALREF
 			LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON ORFLINE.UOMREF = SUBUNITSET.LOGICALREF
 			LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON ORFLINE.USREF = UNITSET.LOGICALREF
-			LEFT JOIN L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+			LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 			WHERE ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 2
  AND ITEMS.UNITSETREF <> 0 AND CLCARD.LOGICALREF = {supplierReferenceId}";
 

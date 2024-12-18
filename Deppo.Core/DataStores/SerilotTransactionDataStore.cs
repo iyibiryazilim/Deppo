@@ -9,9 +9,9 @@ public class SeriLotTransactionDataStore : ISeriLotTransactionService
 {
 	string postUrl = "/gateway/customQuery/CustomQuery";
 
-	public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "")
+	public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "", string externalDb = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(SeriLotTransactionQuery(firmNumber, periodNumber, productReferenceId, warehouseNumber, skip, take, search)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(SeriLotTransactionQuery(firmNumber, periodNumber, productReferenceId, warehouseNumber, skip, take, search, externalDb)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -61,7 +61,7 @@ public class SeriLotTransactionDataStore : ISeriLotTransactionService
 		}
 	}
 
-	private string SeriLotTransactionQuery(int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "")
+	private string SeriLotTransactionQuery(int firmNumber, int periodNumber, int productReferenceId, int warehouseNumber, int skip = 0, int take = 20, string search = "", string externalDb = "")
 	{
 		var baseQuery = $@"SELECT
         [ReferenceId] = LGMAIN.LOGICALREF,
@@ -93,7 +93,7 @@ public class SeriLotTransactionDataStore : ISeriLotTransactionService
         LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_SERILOTN SERILOT WITH(NOLOCK) ON (LGMAIN.SLREF = SERILOT.LOGICALREF)
 		LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE STFIC WITH(NOLOCK) ON (LGMAIN.STFICHEREF  =  STFIC.LOGICALREF) 
 		LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF UNITSET WITH(NOLOCK) ON (ITEMS.UNITSETREF  =  UNITSET.LOGICALREF)
-		LEFT OUTER JOIN L_CAPIWHOUSE WHOUSE WITH(NOLOCK) ON (LGMAIN.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber})
+		LEFT OUTER JOIN {externalDb}L_CAPIWHOUSE WHOUSE WITH(NOLOCK) ON (LGMAIN.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber})
         WHERE (LGMAIN.CANCELLED = 0) AND 
               (LGMAIN.LPRODSTAT = 0) AND 
               (LGMAIN.ITEMREF = {productReferenceId}) AND

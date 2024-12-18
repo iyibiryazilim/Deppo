@@ -15,7 +15,7 @@ public class WarehouseQuery
     /// <param name="Skip">Sayfa Başlangıcı</param>
     /// <param name="Take">Sayfa Sayısı</param>
     /// <returns></returns>
-    public static string InputTransactionListQuery(int FirmNumber, int PeriodNumber, int WarehouseNumber, string Sorting = "DESC", int Skip = 0, int Take = 20)
+    public static string InputTransactionListQuery(int FirmNumber, int PeriodNumber, int WarehouseNumber, string Sorting = "DESC", int Skip = 0, int Take = 20, string ExternalDb = "")
     {
         string baseQuery = @$"SELECT
         [ReferenceId] = STLINE.LOGICALREF,
@@ -42,7 +42,7 @@ public class WarehouseQuery
 		LEFT JOIN LG_{FirmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
         LEFT JOIN LG_{FirmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
         LEFT JOIN LG_{FirmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
-		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {FirmNumber}
+		LEFT JOIN {ExternalDb}L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {FirmNumber}
 		WHERE STLINE.IOCODE IN (1,2) AND CAPIWHOUSE.NR = {WarehouseNumber}";
 
         if (!string.IsNullOrEmpty(Sorting))
@@ -62,7 +62,7 @@ public class WarehouseQuery
     /// <param name="Skip">Sayfa Başlangıcı</param>
     /// <param name="Take">Sayfa Sayısı</param>
     /// <returns></returns>
-    public static string OutputTransactionListQuery(int FirmNumber, int PeriodNumber, int WarehouseNumber, string Sorting = "DESC", int Skip = 0, int Take = 20)
+    public static string OutputTransactionListQuery(int FirmNumber, int PeriodNumber, int WarehouseNumber, string Sorting = "DESC", int Skip = 0, int Take = 20, string ExternalDb = "")
     {
         string baseQuery = @$"SELECT
         [ReferenceId] = STLINE.LOGICALREF,
@@ -89,7 +89,7 @@ public class WarehouseQuery
 		LEFT JOIN LG_{FirmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON STLINE.CLIENTREF = CLCARD.LOGICALREF
         LEFT JOIN LG_{FirmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
         LEFT JOIN LG_{FirmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
-		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {FirmNumber}
+		LEFT JOIN {ExternalDb}L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {FirmNumber}
 		WHERE STLINE.IOCODE IN (3,4) AND CAPIWHOUSE.NR = {WarehouseNumber}";
 
         if (!string.IsNullOrEmpty(Sorting))

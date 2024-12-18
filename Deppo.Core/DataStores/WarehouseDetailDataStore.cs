@@ -13,9 +13,9 @@ namespace Deppo.Core.DataStores
     {
         private string postUrl = "/gateway/customQuery/CustomQuery";
 
-        public async Task<DataResult<dynamic>> GetInputQuantity(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber)
+        public async Task<DataResult<dynamic>> GetInputQuantity(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetInputQuantityQuery(firmNumber, periodNumber, warehouseNumber)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetInputQuantityQuery(firmNumber, periodNumber, warehouseNumber, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<dynamic> dataResult = new DataResult<dynamic>();
@@ -63,9 +63,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<dynamic>> GetOutputQuantity(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber)
+        public async Task<DataResult<dynamic>> GetOutputQuantity(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetOutputQuantityQuery(firmNumber, periodNumber, warehouseNumber)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetOutputQuantityQuery(firmNumber, periodNumber, warehouseNumber, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<dynamic> dataResult = new DataResult<dynamic>();
@@ -113,9 +113,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetLastFiches(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetLastFiches(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetLastFichesQuery(firmNumber, periodNumber, warehouseNumber)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetLastFichesQuery(firmNumber, periodNumber, warehouseNumber, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -163,9 +163,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetLastTransaction(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferendeId, int warehouseNumber)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetLastTransaction(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferendeId, int warehouseNumber, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetLastTransactionQuery(firmNumber, periodNumber, ficheReferendeId, warehouseNumber)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetLastTransactionQuery(firmNumber, periodNumber, ficheReferendeId, warehouseNumber, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -263,9 +263,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<dynamic>> WarehouseReferenceCount(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber)
+        public async Task<DataResult<dynamic>> WarehouseReferenceCount(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(WarehouseReferenceCountQuery(firmNumber, periodNumber, warehouseNumber)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(WarehouseReferenceCountQuery(firmNumber, periodNumber, warehouseNumber, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<dynamic> dataResult = new DataResult<dynamic>();
@@ -313,9 +313,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<dynamic>> WarehouseLastTransactionDate(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber)
+        public async Task<DataResult<dynamic>> WarehouseLastTransactionDate(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(WarehouseLastTransactionDateQuery(firmNumber, periodNumber, warehouseNumber)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(WarehouseLastTransactionDateQuery(firmNumber, periodNumber, warehouseNumber, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<dynamic> dataResult = new DataResult<dynamic>();
@@ -364,7 +364,7 @@ namespace Deppo.Core.DataStores
         }
 
 
-        private string GetLastFichesQuery(int firmNumber, int periodNumber, int warehouseNumber)
+        private string GetLastFichesQuery(int firmNumber, int periodNumber, int warehouseNumber, string externalDb = "")
         {
             string baseQuery = $@"SELECT TOP 5
             [ReferenceId] = STFICHE.LOGICALREF,
@@ -382,14 +382,14 @@ namespace Deppo.Core.DataStores
 			[Description] =  ISNULL (STFICHE.GENEXP1, '')
 			From LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE
 			LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_CLCARD AS CLCARD ON CLCARD.LOGICALREF = STFICHE.CLIENTREF
-			LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STFICHE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
+			LEFT JOIN {externalDb}L_CAPIWHOUSE AS CAPIWHOUSE ON STFICHE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
 			WHERE STFICHE.SOURCEINDEX={warehouseNumber}  AND STFICHE.PRODSTAT = 0
 			ORDER BY STFICHE.DATE_ DESC ";
 
             return baseQuery;
         }
 
-        private string GetLastTransactionQuery(int firmNumber, int periodNumber, int ficheReferenceId, int warehouseNumber)
+        private string GetLastTransactionQuery(int firmNumber, int periodNumber, int ficheReferenceId, int warehouseNumber, string externalDb = "")
         {
             string baseQuery = $@"SELECT
         [ReferenceId] = STLINE.LOGICALREF,
@@ -421,14 +421,14 @@ namespace Deppo.Core.DataStores
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON STLINE.UOMREF = SUBUNITSET.LOGICALREF
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_FIRMDOC AS FIRMDOC ON FIRMDOC.INFOREF = ITEMS.LOGICALREF AND FIRMDOC.INFOTYP = 20
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON STLINE.USREF = UNITSET.LOGICALREF
-		LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
+		LEFT JOIN {externalDb}L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
 		WHERE  STFICHE.LOGICALREF = {ficheReferenceId} AND  STLINE.SOURCEINDEX={warehouseNumber} AND  STFICHE.PRODSTAT = 0 AND STLINE.LPRODSTAT = 0
 		ORDER BY STLINE.DATE_ DESC";
 
             return baseQuery;
         }
 
-        private string GetInputQuantityQuery(int firmNumber, int periodNumber, int warehouseNumber)
+        private string GetInputQuantityQuery(int firmNumber, int periodNumber, int warehouseNumber, string externalDb = "")
         {
             var baseQuery = @$"SELECT
 [InputQuantity] = ISNULL(COUNT(DISTINCT STLINE.STOCKREF),0)
@@ -436,7 +436,7 @@ namespace Deppo.Core.DataStores
 FROM
     LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
 LEFT JOIN
-    L_CAPIWHOUSE AS CAPIWHOUSE
+    {externalDb}L_CAPIWHOUSE AS CAPIWHOUSE
     ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR
     AND CAPIWHOUSE.FIRMNR = {firmNumber}
 WHERE STLINE.SOURCEINDEX = {warehouseNumber} AND STLINE.IOCODE IN (1, 2);";
@@ -444,7 +444,7 @@ WHERE STLINE.SOURCEINDEX = {warehouseNumber} AND STLINE.IOCODE IN (1, 2);";
             return baseQuery;
         }
 
-        private string GetOutputQuantityQuery(int firmNumber, int periodNumber, int warehouseNumber)
+        private string GetOutputQuantityQuery(int firmNumber, int periodNumber, int warehouseNumber, string externalDb = "")
         {
             var baseQuery = @$"SELECT
 [OutputQuantity] = ISNULL(COUNT(DISTINCT STLINE.STOCKREF),0)
@@ -452,7 +452,7 @@ WHERE STLINE.SOURCEINDEX = {warehouseNumber} AND STLINE.IOCODE IN (1, 2);";
 FROM
     LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
 LEFT JOIN
-    L_CAPIWHOUSE AS CAPIWHOUSE
+    {externalDb}L_CAPIWHOUSE AS CAPIWHOUSE
     ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR
     AND CAPIWHOUSE.FIRMNR ={firmNumber}
 WHERE STLINE.SOURCEINDEX ={warehouseNumber} AND STLINE.IOCODE IN (3, 4)";
@@ -492,20 +492,20 @@ UNION All ";
             return baseQuery;
         }
 
-        private string WarehouseReferenceCountQuery(int firmNumber, int periodNumber, int warehouseNumber)
+        private string WarehouseReferenceCountQuery(int firmNumber, int periodNumber, int warehouseNumber, string externalDb = "")
         {
             string baseQuery = $@"SELECT
     [WarehouseReferenceCount] = ISNULL(COUNT(DISTINCT STINVTOT.STOCKREF), 0)
 
 FROM LV_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STINVTOT AS STINVTOT WITH(NOLOCK)
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS WITH(NOLOCK) ON STINVTOT.STOCKREF = ITEMS.LOGICALREF
-LEFT JOIN L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON STINVTOT.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON STINVTOT.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_INVDEF AS INVDEF WITH(NOLOCK) ON STINVTOT.INVENNO = INVDEF.INVENNO AND STINVTOT.STOCKREF = INVDEF.ITEMREF AND INVDEF.VARIANTREF = 0
 WHERE INVDEF.OUTCTRL <> 2 AND STINVTOT.INVENNO ={warehouseNumber}";
 
             return baseQuery;
         }
-        private string WarehouseLastTransactionDateQuery(int firmNumber, int periodNumber, int warehouseNumber)
+        private string WarehouseLastTransactionDateQuery(int firmNumber, int periodNumber, int warehouseNumber, string externalDb = "")
         {
             string baseQuery = $@"SELECT TOP 1
     STLINE.LOGICALREF AS [ReferenceId],
@@ -517,7 +517,7 @@ WHERE INVDEF.OUTCTRL <> 2 AND STINVTOT.INVENNO ={warehouseNumber}";
     CAPIWHOUSE.NAME AS [WarehouseName]
 FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STLINE AS STLINE
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft(2, '0')}_STFICHE AS STFICHE ON STLINE.STFICHEREF = STFICHE.LOGICALREF
-LEFT JOIN L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS CAPIWHOUSE ON STLINE.SOURCEINDEX = CAPIWHOUSE.NR AND CAPIWHOUSE.FIRMNR = {firmNumber}
 WHERE STLINE.SOURCEINDEX ={warehouseNumber}
     AND STFICHE.PRODSTAT = 0 
     AND STLINE.LPRODSTAT = 0
