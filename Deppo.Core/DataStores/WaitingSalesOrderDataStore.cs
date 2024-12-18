@@ -9,9 +9,9 @@ namespace Deppo.Core.DataStores;
 public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
 {
 	private string postUrl = "/gateway/customQuery/CustomQuery";
-	public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(WaitingSalesOrderQuery(firmNumber, periodNumber, search, skip, take)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(WaitingSalesOrderQuery(firmNumber, periodNumber, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -59,9 +59,9 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
 		}
 	}
 
-	public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsByCustomerAndShipInfo(HttpClient httpClient, int firmNumber, int periodNumber, int customerReferenceId, int shipInfoReferenceId = 0, string search = "", int skip = 0, int take = 0)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsByCustomerAndShipInfo(HttpClient httpClient, int firmNumber, int periodNumber, int customerReferenceId, int shipInfoReferenceId = 0, string search = "", int skip = 0, int take = 20, string externalDb = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(WaitingSalesOrderQueryByCustomerAndShipInfo(firmNumber, periodNumber, customerReferenceId, shipInfoReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(WaitingSalesOrderQueryByCustomerAndShipInfo(firmNumber, periodNumber, customerReferenceId, shipInfoReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -109,9 +109,9 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
 		}
 	}
 
-	public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(WaitingSalesOrderQueryByWarehouse(firmNumber, periodNumber,warehouseNumber, search, skip, take)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(WaitingSalesOrderQueryByWarehouse(firmNumber, periodNumber,warehouseNumber, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -159,9 +159,9 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
 		}
 	}
 
-	public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int customerReferenceId, string search = "", int skip = 0, int take = 20)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int customerReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(WaitingSalesOrderQueryByCustomerAndWarehouse(firmNumber, periodNumber, warehouseNumber, customerReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(WaitingSalesOrderQueryByCustomerAndWarehouse(firmNumber, periodNumber, warehouseNumber, customerReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -209,9 +209,9 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
 		}
 	}
 
-	public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int customerReferenceId, int shipInfoReferenceId = 0, string search = "", int skip = 0, int take = 20)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int customerReferenceId, int shipInfoReferenceId = 0, string search = "", int skip = 0, int take = 20, string externalDb = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(WaitingSalesOrderQueryByCustomerAndWarehouseAndAShipInfo(firmNumber, periodNumber, warehouseNumber, customerReferenceId, shipInfoReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(WaitingSalesOrderQueryByCustomerAndWarehouseAndAShipInfo(firmNumber, periodNumber, warehouseNumber, customerReferenceId, shipInfoReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -259,9 +259,9 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
 		}
 	}
 
-	public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsByCustomer(HttpClient httpClient, int firmNumber, int periodNumber, int customerReferenceId, string search = "", int skip = 0, int take = 20)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsByCustomer(HttpClient httpClient, int firmNumber, int periodNumber, int customerReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(WaitingSalesOrderQueryByCustomer(firmNumber, periodNumber, customerReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(WaitingSalesOrderQueryByCustomer(firmNumber, periodNumber, customerReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -309,9 +309,9 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
 		}
 	}
 
-	public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsByProduct(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int customerReferenceId, int productReferenceId, int shipInfoReferenceId = 0 ,string search = "", int skip = 0, int take = 20)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetObjectsByProduct(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int customerReferenceId, int productReferenceId, int shipInfoReferenceId = 0 ,string search = "", int skip = 0, int take = 20, string externalDb = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(WaitingSalesOrderQueryByCustomerAndWarehouseAndProduct(firmNumber, periodNumber, warehouseNumber, customerReferenceId, productReferenceId, shipInfoReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(WaitingSalesOrderQueryByCustomerAndWarehouseAndProduct(firmNumber, periodNumber, warehouseNumber, customerReferenceId, productReferenceId, shipInfoReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -359,7 +359,7 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
 		}
 	}
 
-	public async Task<DataResult<IEnumerable<dynamic>>> GetCustomers(HttpClient httpClient,int firmNumber,int periodNumber,string search="",int skip=0,int take = 0)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetCustomers(HttpClient httpClient,int firmNumber,int periodNumber,string search="",int skip=0,int take = 20)
 	{
         var content = new StringContent(JsonConvert.SerializeObject(GetCustomersQuery(firmNumber, periodNumber, search, skip, take)), Encoding.UTF8, "application/json");
 
@@ -409,7 +409,7 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
         }
     }
 
-	private string WaitingSalesOrderQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+	private string WaitingSalesOrderQuery(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
 	{
 		string baseQuery = @$"SELECT
 			[ReferenceId] = ORFLINE.LOGICALREF,
@@ -445,7 +445,7 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT ON ORFLINE.VARIANTREF = VARIANT.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON ORFLINE.UOMREF = SUBUNITSET.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON ORFLINE.USREF = UNITSET.LOGICALREF 
-        LEFT JOIN L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+        LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 		WHERE ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 1
 		AND ITEMS.UNITSETREF <> 0
 		";
@@ -460,7 +460,7 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
 		return baseQuery;
 	}
 
-	private string WaitingSalesOrderQueryByWarehouse(int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20)
+	private string WaitingSalesOrderQueryByWarehouse(int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
 	{
 		string baseQuery = @$"SELECT
 			[ReferenceId] = ORFLINE.LOGICALREF,
@@ -496,7 +496,7 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT ON ORFLINE.VARIANTREF = VARIANT.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON ORFLINE.UOMREF = SUBUNITSET.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON ORFLINE.USREF = UNITSET.LOGICALREF 
-        LEFT JOIN L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+        LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 		WHERE ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 1 AND ORFLINE.SOURCEINDEX = {warehouseNumber}
 		AND ITEMS.UNITSETREF <> 0
 		";
@@ -511,7 +511,7 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
 		return baseQuery;
 	}
 
-	private string WaitingSalesOrderQueryByCustomer(int firmNumber, int periodNumber, int customerReferenceId, string search = "", int skip = 0, int take = 20)
+	private string WaitingSalesOrderQueryByCustomer(int firmNumber, int periodNumber, int customerReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
 	{
 		string baseQuery = @$"SELECT
 			[ReferenceId] = ORFLINE.LOGICALREF,
@@ -549,7 +549,7 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON ORFLINE.UOMREF = SUBUNITSET.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON ORFLINE.USREF = UNITSET.LOGICALREF 
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_SHIPINFO AS SHIP ON ORFICHE.SHIPINFOREF = SHIP.LOGICALREF
-        LEFT JOIN L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+        LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 		WHERE ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 1
 		AND ITEMS.UNITSETREF <> 0 AND CLCARD.LOGICALREF = {customerReferenceId}
 		";
@@ -564,7 +564,7 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
 		return baseQuery;
 	}
 
-	private string WaitingSalesOrderQueryByCustomerAndWarehouse(int firmNumber, int periodNumber, int warehouseNumber, int customerReferenceId, string search = "", int skip = 0, int take = 20)
+	private string WaitingSalesOrderQueryByCustomerAndWarehouse(int firmNumber, int periodNumber, int warehouseNumber, int customerReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
 	{
 		string baseQuery = @$"SELECT
 			[ReferenceId] = ORFLINE.LOGICALREF,
@@ -600,7 +600,7 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT ON ORFLINE.VARIANTREF = VARIANT.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON ORFLINE.UOMREF = SUBUNITSET.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON ORFLINE.USREF = UNITSET.LOGICALREF 
-        LEFT JOIN L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+        LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 		WHERE ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 1
 		AND ITEMS.UNITSETREF <> 0 AND CLCARD.LOGICALREF = {customerReferenceId} AND ORFLINE.SOURCEINDEX = {warehouseNumber}
 		";
@@ -615,7 +615,7 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
 		return baseQuery;
 	}
 
-	private string WaitingSalesOrderQueryByCustomerAndWarehouseAndProduct(int firmNumber, int periodNumber, int warehouseNumber, int customerReferenceId, int productReferenceId, int shipInfoReferenceId = 0, string search = "", int skip = 0, int take = 20)
+	private string WaitingSalesOrderQueryByCustomerAndWarehouseAndProduct(int firmNumber, int periodNumber, int warehouseNumber, int customerReferenceId, int productReferenceId, int shipInfoReferenceId = 0, string search = "", int skip = 0, int take = 20, string externalDb = "")
 	{
 		string baseQuery = @$"SELECT
 			[ReferenceId] = ORFLINE.LOGICALREF,
@@ -653,7 +653,7 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT ON ORFLINE.VARIANTREF = VARIANT.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON ORFLINE.UOMREF = SUBUNITSET.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON ORFLINE.USREF = UNITSET.LOGICALREF 
-        LEFT JOIN L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+        LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 		WHERE ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 1
 		AND ITEMS.UNITSETREF <> 0 AND CLCARD.LOGICALREF = {customerReferenceId} AND ORFLINE.SOURCEINDEX = {warehouseNumber} AND ORFLINE.STOCKREF = {productReferenceId} AND ORFICHE.SHIPINFOREF = {shipInfoReferenceId}
 		";
@@ -668,7 +668,7 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
 		return baseQuery;
 	}
 
-	private string WaitingSalesOrderQueryByCustomerAndWarehouseAndAShipInfo(int firmNumber, int periodNumber, int warehouseNumber, int customerReferenceId, int shipInfoReferenceId, string search = "", int skip = 0, int take = 20) {
+	private string WaitingSalesOrderQueryByCustomerAndWarehouseAndAShipInfo(int firmNumber, int periodNumber, int warehouseNumber, int customerReferenceId, int shipInfoReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "") {
 		string baseQuery = @$"SELECT
 			[ReferenceId] = ORFLINE.LOGICALREF,
             [OrderReferenceId] = ORFICHE.LOGICALREF,
@@ -710,7 +710,7 @@ public class WaitingSalesOrderDataStore : IWaitingSalesOrderService
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT ON ORFLINE.VARIANTREF = VARIANT.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON ORFLINE.UOMREF = SUBUNITSET.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON ORFLINE.USREF = UNITSET.LOGICALREF 
-        LEFT JOIN L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+        LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 		WHERE ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 1
 		AND ITEMS.UNITSETREF <> 0 AND CLCARD.LOGICALREF = {customerReferenceId} AND ORFLINE.SOURCEINDEX = {warehouseNumber} AND ORFICHE.SHIPINFOREF = {shipInfoReferenceId}
 		";
@@ -767,7 +767,7 @@ WHERE DD.OrderReferenceCount > 0
         return baseQuery;
     }
 
-	private string WaitingSalesOrderQueryByCustomerAndShipInfo(int firmNumber, int periodNumber, int customerReferenceId, int shipInfoReferenceId = 0, string search = "", int skip = 0, int take = 20)
+	private string WaitingSalesOrderQueryByCustomerAndShipInfo(int firmNumber, int periodNumber, int customerReferenceId, int shipInfoReferenceId = 0, string search = "", int skip = 0, int take = 20, string externalDb = "")
 	{
 		string baseQuery = @$"SELECT
 			[ReferenceId] = ORFLINE.LOGICALREF,
@@ -805,7 +805,7 @@ WHERE DD.OrderReferenceCount > 0
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON ORFLINE.UOMREF = SUBUNITSET.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON ORFLINE.USREF = UNITSET.LOGICALREF 
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_SHIPINFO AS SHIP ON ORFICHE.SHIPINFOREF = SHIP.LOGICALREF
-        LEFT JOIN L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+        LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 		WHERE ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 1
 		AND ITEMS.UNITSETREF <> 0 AND CLCARD.LOGICALREF = {customerReferenceId} AND ORFICHE.SHIPINFOREF = {shipInfoReferenceId} OR ORFICHE.SHIPINFOREF IS NULL
 		";

@@ -64,9 +64,9 @@ public class WaitingSalesProductDataStore : IWaitingSalesProductService
 		}
 	}
 
-	public async Task<DataResult<IEnumerable<dynamic>>> GetOrderById(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId)
+	public async Task<DataResult<IEnumerable<dynamic>>> GetOrderById(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string externalDb = "")
 	{
-		var content = new StringContent(JsonConvert.SerializeObject(GetOrderObjects(firmNumber, periodNumber, productReferenceId)), Encoding.UTF8, "application/json");
+		var content = new StringContent(JsonConvert.SerializeObject(GetOrderObjects(firmNumber, periodNumber, productReferenceId, externalDb)), Encoding.UTF8, "application/json");
 
 		HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
 		DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -179,7 +179,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
         return baseQuery;
     }
 
-	private string GetOrderObjects(int firmNumber, int periodNumber, int productReferenceId)
+	private string GetOrderObjects(int firmNumber, int periodNumber, int productReferenceId, string externalDb = "")
 	{
 		string baseQuery = @$"SELECT
 			[ReferenceId] = ORFLINE.LOGICALREF,
@@ -215,7 +215,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
         LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT ON ORFLINE.VARIANTREF = VARIANT.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS SUBUNITSET ON ORFLINE.UOMREF = SUBUNITSET.LOGICALREF
 		LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSET ON ORFLINE.USREF = UNITSET.LOGICALREF
-        LEFT JOIN L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR ={firmNumber}
+        LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE ON ORFLINE.SOURCEINDEX = WHOUSE.NR AND WHOUSE.FIRMNR ={firmNumber}
 		WHERE ORFLINE.CLOSED = 0 AND (ORFLINE.AMOUNT - ORFLINE.SHIPPEDAMOUNT) > 0 AND ORFLINE.TRCODE = 1
 		AND ITEMS.UNITSETREF <> 0 AND ITEMS.LOGICALREF = {productReferenceId}";
 

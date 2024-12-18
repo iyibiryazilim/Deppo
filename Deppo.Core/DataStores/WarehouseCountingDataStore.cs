@@ -60,9 +60,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetNegativeWarehousesByProductReferenceId(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetNegativeWarehousesByProductReferenceId(HttpClient httpClient, int firmNumber, int periodNumber, int productReferenceId, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetNegativeWarehouses(firmNumber, periodNumber, productReferenceId)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetNegativeWarehouses(firmNumber, periodNumber, productReferenceId, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -111,9 +111,9 @@ namespace Deppo.Core.DataStores
         }
 
         //Ambara Bağlı Menüsündeki Ambar Listesi
-        public async Task<DataResult<IEnumerable<dynamic>>> GetWarehouses(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetWarehouses(HttpClient httpClient, int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetWarehouses(firmNumber, periodNumber, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetWarehouses(firmNumber, periodNumber, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -161,9 +161,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetProductsByWarehouseAndLocation(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int locationReferenceId, string search = "", int skip = 0, int take = 20)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetProductsByWarehouseAndLocation(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int locationReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetProductsByWarehouseAndLocation(firmNumber, periodNumber, warehouseNumber, locationReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetProductsByWarehouseAndLocation(firmNumber, periodNumber, warehouseNumber, locationReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -211,9 +211,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetVariantsByWarehouseAndLocation(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int locationReferenceId, string search = "", int skip = 0, int take = 20)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetVariantsByWarehouseAndLocation(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, int locationReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetVariantsByWarehouseAndLocation(firmNumber, periodNumber, warehouseNumber, locationReferenceId, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetVariantsByWarehouseAndLocation(firmNumber, periodNumber, warehouseNumber, locationReferenceId, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -261,9 +261,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetProductsByWarehouse(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetProductsByWarehouse(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetProductsByWarehouse(firmNumber, periodNumber, warehouseNumber, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetProductsByWarehouse(firmNumber, periodNumber, warehouseNumber, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -311,9 +311,9 @@ namespace Deppo.Core.DataStores
             }
         }
 
-        public async Task<DataResult<IEnumerable<dynamic>>> GetVariantsByWarehouse(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20)
+        public async Task<DataResult<IEnumerable<dynamic>>> GetVariantsByWarehouse(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
-            var content = new StringContent(JsonConvert.SerializeObject(GetVariantsByWarehouse(firmNumber, periodNumber, warehouseNumber, search, skip, take)), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(GetVariantsByWarehouse(firmNumber, periodNumber, warehouseNumber, search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(postUrl, content);
             DataResult<IEnumerable<dynamic>> dataResult = new DataResult<IEnumerable<dynamic>>();
@@ -415,7 +415,7 @@ FETCH NEXT {take} ROWS ONLY;";
             return baseQuery;
         }
 
-        private string GetWarehouses(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20)
+        private string GetWarehouses(int firmNumber, int periodNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
             var baseQuery = @$"SELECT
 			[ReferenceId] = LGMAIN.LOGICALREF,
@@ -426,7 +426,7 @@ FETCH NEXT {take} ROWS ONLY;";
 			[City] = LGMAIN.CITY,
 			[Country] = LGMAIN.COUNTRY,
             [LocationCount] = (SELECT ISNULL(COUNT(*),0) FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_LOCATION INVLOC WHERE INVLOC.INVENNR = LGMAIN.NR)
-			FROM L_CAPIWHOUSE AS LGMAIN WITH (NOLOCK)
+			FROM {externalDb}L_CAPIWHOUSE AS LGMAIN WITH (NOLOCK)
 
             WHERE LGMAIN.FIRMNR = {firmNumber}";
 
@@ -444,7 +444,7 @@ FETCH NEXT {take} ROWS ONLY;";
             return baseQuery;
         }
 
-        private string GetProductsByWarehouseAndLocation(int firmNumber, int periodNumber, int warehouseNumber, int locationReferenceId, string search = "", int skip = 0, int take = 20)
+        private string GetProductsByWarehouseAndLocation(int firmNumber, int periodNumber, int warehouseNumber, int locationReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
             var baseQuery = @$"SELECT
     [MainItemReferenceId] = CASE
@@ -488,7 +488,7 @@ FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft
 LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_LOCATION INVLOC WITH(NOLOCK) ON (LGMAIN.LOCREF = INVLOC.LOGICALREF)
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON LGMAIN.ITEMREF = ITEMS.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT ON LGMAIN.VARIANTREF = VARIANT.LOGICALREF
-LEFT JOIN L_CAPIWHOUSE AS WHOUSE ON LGMAIN.INVENNO = WHOUSE.NR AND FIRMNR = {firmNumber}
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE ON LGMAIN.INVENNO = WHOUSE.NR AND FIRMNR = {firmNumber}
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON ITEMS.UNITSETREF = UNITSETF.LOGICALREF
 WHERE LGMAIN.CANCELLED = 0
   AND LGMAIN.LPRODSTAT = 0
@@ -514,7 +514,7 @@ FETCH NEXT {take} ROWS ONLY;";
             return baseQuery;
         }
 
-        private string GetVariantsByWarehouseAndLocation(int firmNumber, int periodNumber, int warehouseNumber, int locationReferenceId, string search = "", int skip = 0, int take = 20)
+        private string GetVariantsByWarehouseAndLocation(int firmNumber, int periodNumber, int warehouseNumber, int locationReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
             var baseQuery = @$"SELECT
     [MainItemReferenceId] = CASE
@@ -553,7 +553,7 @@ FROM LG_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft
 LEFT OUTER JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_LOCATION INVLOC WITH(NOLOCK) ON (LGMAIN.LOCREF = INVLOC.LOGICALREF)
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS ON LGMAIN.ITEMREF = ITEMS.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT ON LGMAIN.VARIANTREF = VARIANT.LOGICALREF
-LEFT JOIN L_CAPIWHOUSE AS WHOUSE ON LGMAIN.INVENNO = WHOUSE.NR AND FIRMNR = {firmNumber}
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE ON LGMAIN.INVENNO = WHOUSE.NR AND FIRMNR = {firmNumber}
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON ITEMS.UNITSETREF = UNITSETF.LOGICALREF
 WHERE LGMAIN.CANCELLED = 0
   AND LGMAIN.LPRODSTAT = 0
@@ -578,7 +578,7 @@ FETCH NEXT {take} ROWS ONLY;";
             return baseQuery;
         }
 
-        private string GetProductsByWarehouse(int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20)
+        private string GetProductsByWarehouse(int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
             var baseQuery = @$"SELECT
 [ItemReferenceId] =  ITEMS.LOGICALREF,
@@ -602,7 +602,7 @@ FROM LV_{firmNumber.ToString().PadLeft(3, '0')}_{periodNumber.ToString().PadLeft
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS WITH(NOLOCK) ON STINVTOT.STOCKREF = ITEMS.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON ITEMS.UNITSETREF = UNITSETF.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(NOLOCK) ON UNITSETL.UNITSETREF = UNITSETF.LOGICALREF AND UNITSETL.MAINUNIT = 1
-LEFT JOIN L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON STINVTOT.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}";
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON STINVTOT.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}";
 
             if (!string.IsNullOrEmpty(search))
             {
@@ -623,7 +623,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
             return baseQuery;
         }
 
-        private string GetVariantsByWarehouse(int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20)
+        private string GetVariantsByWarehouse(int firmNumber, int periodNumber, int warehouseNumber, string search = "", int skip = 0, int take = 20, string externalDb = "")
         {
             var baseQuery = @$"
 SELECT
@@ -646,7 +646,7 @@ LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_VARIANT AS VARIANT ON VRNTI
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_ITEMS AS ITEMS WITH(NOLOCK) ON VARIANT.ITEMREF = ITEMS.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON VARIANT.UNITSETREF = UNITSETF.LOGICALREF
 LEFT JOIN LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(NOLOCK) ON UNITSETL.UNITSETREF = UNITSETF.LOGICALREF AND UNITSETL.MAINUNIT = 1
-LEFT JOIN L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON VRNTINVTOT.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}";
+LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE WITH(NOLOCK) ON VRNTINVTOT.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}";
 
             if (!string.IsNullOrEmpty(search))
             {
@@ -667,7 +667,7 @@ OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
             return baseQuery;
         }
 
-        private string GetNegativeWarehouses(int firmNumber, int periodNumber, int productReferenceId)
+        private string GetNegativeWarehouses(int firmNumber, int periodNumber, int productReferenceId, string externalDb = "")
         {
             var baseQuery = @$"SELECT
     [ReferenceId] = NEWID(),
@@ -692,7 +692,7 @@ LEFT JOIN
     LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETF AS UNITSETF WITH(NOLOCK) ON ITEMS.UNITSETREF = UNITSETF.LOGICALREF
 LEFT JOIN
     LG_{firmNumber.ToString().PadLeft(3, '0')}_UNITSETL AS UNITSETL WITH(NOLOCK) ON UNITSETL.UNITSETREF = UNITSETF.LOGICALREF AND UNITSETL.MAINUNIT = 1
-	LEFT JOIN L_CAPIWHOUSE AS WHOUSE ON STINVTOT.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
+	LEFT JOIN {externalDb}L_CAPIWHOUSE AS WHOUSE ON STINVTOT.INVENNO = WHOUSE.NR AND WHOUSE.FIRMNR = {firmNumber}
 WHERE
     STINVTOT.INVENNO <> -1 GROUP BY
     STINVTOT.INVENNO, WHOUSE.NR, WHOUSE.NAME, WHOUSE.LOGICALREF,
