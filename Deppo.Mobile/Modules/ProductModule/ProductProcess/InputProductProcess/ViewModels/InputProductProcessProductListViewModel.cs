@@ -283,9 +283,9 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                             SubUnitsetCode = item.SubUnitsetCode,
                             SubUnitsetName = item.SubUnitsetName,
                             IsSelected = false,
-                            MainItemCode = string.Empty,
-                            MainItemName = string.Empty,
-                            MainItemReferenceId = default,
+                            MainItemCode = item.Code,
+                            MainItemName = item.Name,
+                            MainItemReferenceId = item.ReferenceId,
                             StockQuantity = item.StockQuantity,
                             Quantity = item.LocTracking == 0 ? 1 : 0,
                             LocTracking = item.LocTracking,
@@ -304,7 +304,11 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                 else
                 {
                     SelectedProduct = null;
-                    var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ReferenceId);
+
+					var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ReferenceId);
+					if (productModel.IsVariant) { 
+                        selectedItem = SelectedProducts.FirstOrDefault(x => x.MainItemReferenceId == item.ReferenceId);
+					}
                     if (selectedItem != null)
                     {
                         SelectedProducts.Remove(selectedItem);
@@ -434,10 +438,15 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
         {
             IsBusy = true;
 
-            ItemVariants.ToList().ForEach(x => x.IsSelected = false);
-            var selectedItem = ItemVariants.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-            if (selectedItem != null)
-                selectedItem.IsSelected = true;
+            if(item.IsSelected)
+            {
+                item.IsSelected = false;
+            }
+            else
+            {
+                item.IsSelected = true;
+                ItemVariants.Where(x => x.ReferenceId != item.ReferenceId).ToList().ForEach(x => x.IsSelected = false);
+			}
         }
         catch (Exception ex)
         {
@@ -459,6 +468,12 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
             IsBusy = true;
 
             var item = ItemVariants.FirstOrDefault(x => x.IsSelected);
+            if(item is null)
+            {
+				CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.Hidden;
+                return;
+			}
+
 
             var basketItem = new InputProductBasketModel
             {
@@ -621,7 +636,8 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.Loading().Hide();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
