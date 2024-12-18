@@ -3,6 +3,7 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.InputProductProcess.Views;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views;
@@ -37,8 +38,8 @@ public partial class InputProductPurchaseProcessWarehouseListViewModel : BaseVie
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-        ItemTappedCommand = new Command<WarehouseModel>(ItemTappedAsync);
-        NextViewCommand = new Command(async () => await NextViewAsync());
+		ItemTappedCommand = new Command<WarehouseModel>(async (x) => await ItemTappedAsync(x));
+		NextViewCommand = new Command(async () => await NextViewAsync());
     }
 
     public Command LoadItemsCommand { get; }
@@ -61,25 +62,27 @@ public partial class InputProductPurchaseProcessWarehouseListViewModel : BaseVie
             Items.Clear();
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, 0, 20, _httpClientService.FirmNumber);
-            if (result.IsSuccess)
+            var result = await _warehouseService.GetObjectsAsync(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                search: string.Empty,
+				skip: 0,
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase
+			);
+
+            if(result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
                     foreach (var item in result.Data)
-                        Items.Add(new WarehouseModel
-                        {
-                            ReferenceId = item.ReferenceId,
-                            Name = item.Name,
-                            Number = item.Number,
-                            City = item.City,
-                            Country = item.Country,
-                            IsSelected = false
-                        });
+                        Items.Add(Mapping.Mapper.Map<WarehouseModel>(item));
                 }
             }
 
-            _userDialogs.HideHud();
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
@@ -108,22 +111,23 @@ public partial class InputProductPurchaseProcessWarehouseListViewModel : BaseVie
 
             _userDialogs.ShowLoading("Loading...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, Items.Count, 20, _httpClientService.FirmNumber);
-            if (result.IsSuccess)
+			var result = await _warehouseService.GetObjectsAsync(
+				 httpClient: httpClient,
+				 firmNumber: _httpClientService.FirmNumber,
+				 periodNumber: _httpClientService.PeriodNumber,
+				 search: string.Empty,
+				 skip: Items.Count,
+				 take: 20,
+				 externalDb: _httpClientService.ExternalDatabase
+			);
+
+			if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
-                    foreach (var item in result.Data)
-                        Items.Add(new WarehouseModel
-                        {
-                            ReferenceId = item.ReferenceId,
-                            Name = item.Name,
-                            Number = item.Number,
-                            City = item.City,
-                            Country = item.Country,
-                            IsSelected = false
-                        });
-                }
+					foreach (var item in result.Data)
+						Items.Add(Mapping.Mapper.Map<WarehouseModel>(item));
+				}
             }
 
 			if (_userDialogs.IsHudShowing)
@@ -142,7 +146,7 @@ public partial class InputProductPurchaseProcessWarehouseListViewModel : BaseVie
         }
     }
 
-    private void ItemTappedAsync(WarehouseModel item)
+    private async Task ItemTappedAsync(WarehouseModel item)
     {
         if (IsBusy)
             return;
@@ -151,17 +155,27 @@ public partial class InputProductPurchaseProcessWarehouseListViewModel : BaseVie
         {
             IsBusy = true;
 
-            Items.ToList().ForEach(x => x.IsSelected = false);
-
-            var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-            if (selectedItem != null)
-                selectedItem.IsSelected = true;
-
-            SelectedWarehouseModel = item;
+            if(SelectedWarehouseModel == item)
+            {
+                SelectedWarehouseModel.IsSelected = false;
+                SelectedWarehouseModel = null;
+			}
+            else
+            {
+                if(SelectedWarehouseModel is not null)
+                {
+                    SelectedWarehouseModel.IsSelected = false;
+                }
+                SelectedWarehouseModel = item;
+				SelectedWarehouseModel.IsSelected = true;
+			}
         }
         catch (Exception ex)
         {
-            _userDialogs.Alert(ex.Message);
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
