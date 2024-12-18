@@ -650,11 +650,11 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
                 currentReferenceId: SelectedCustomer.ReferenceId,
                 currentCode: SelectedCustomer.Code,
                 currentName: SelectedCustomer.Name,
-                shipAddressReferenceId: SelectedShipAddress.ReferenceId,
-                shipAddressCode: SelectedShipAddress.Code,
-                shipAddressName: SelectedShipAddress.Name
+			    shipAddressReferenceId: SelectedShipAddress != null ? SelectedShipAddress.ReferenceId : 0,
+				shipAddressCode: SelectedShipAddress != null ? SelectedShipAddress.Code : "",
+				shipAddressName: SelectedShipAddress != null ? SelectedShipAddress.Name : ""
 
-               );
+			   );
             }
             catch (Exception ex)
             {
@@ -664,14 +664,14 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
             await ClearFormAsync();
             await ClearDataAsync();
 
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
-
 			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
             {
                 [nameof(ResultModel)] = resultModel
             });
-        }
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
         else
         {
             resultModel.Message = "Başarısız";
@@ -679,13 +679,14 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
             resultModel.ErrorMessage = result.Message;
             resultModel.PageCountToBack = 1;
 
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
 			await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
             {
                 [nameof(ResultModel)] = resultModel
             });
-        }
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
     }
 
     private async Task RetailSalesDispatchTransactionInsertAsync(HttpClient httpClient)
@@ -788,9 +789,9 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
 				currentReferenceId: SelectedCustomer.ReferenceId,
 				currentCode: SelectedCustomer.Code,
 				currentName: SelectedCustomer.Name,
-				shipAddressReferenceId: SelectedShipAddress.ReferenceId,
-				shipAddressCode: SelectedShipAddress.Code,
-				shipAddressName: SelectedShipAddress.Name
+				shipAddressReferenceId: SelectedShipAddress != null ? SelectedShipAddress.ReferenceId : 0,
+				shipAddressCode: SelectedShipAddress != null ? SelectedShipAddress.Code: "",
+				shipAddressName: SelectedShipAddress != null ? SelectedShipAddress.Name: ""
 
 			   );
 			}
@@ -802,14 +803,14 @@ public partial class OutputProductSalesProcessFormViewModel : BaseViewModel
             await ClearFormAsync();
             await ClearDataAsync();
 
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
-
 			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
             {
                 [nameof(ResultModel)] = resultModel
             });
-        }
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
         else
         {
             resultModel.Message = "Başarısız";
