@@ -60,7 +60,7 @@ public class WaitingPurchaseOrderDataStore : IWaitingPurchaseOrderService
         }
     }
 
-    public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber,int supplierReferenceId, string search = "", int skip = 0, int take = 20, string externalDb)
+    public async Task<DataResult<IEnumerable<dynamic>>> GetObjects(HttpClient httpClient, int firmNumber, int periodNumber, int warehouseNumber,int supplierReferenceId, string search = "", int skip = 0, int take = 20, string externalDb= "")
     {
         var content = new StringContent(JsonConvert.SerializeObject(WaitingPurchaseOrderQueryBySupplierWarehouse(firmNumber, periodNumber, supplierReferenceId, warehouseNumber,search, skip, take, externalDb)), Encoding.UTF8, "application/json");
 
