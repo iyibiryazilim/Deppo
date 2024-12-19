@@ -15,7 +15,7 @@ using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.ViewModels;
 
-//fiş
+
 [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
 [QueryProperty(name: nameof(SalesCustomer), queryId: nameof(SalesCustomer))]
 public partial class ReturnSalesDispatchListViewModel : BaseViewModel
@@ -39,15 +39,17 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
         _httpClientService = httpClientService;
         _userDialogs = userDialogs;
         _salesDispatchTransactionService = salesDispatchTransactionService;
+        _serviceProvider = serviceProvider;
+
         Title = "İrsaliye Listesi";
+
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         PerformSearchCommand = new Command(async () => await PerformSearchAsync());
         PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
         ItemTappedCommand = new Command<SalesFicheModel>(async (x) => await ItemTappedAsync(x));
-
-        NextViewCommand = new Command(async () => await NextViewAsync());
-        _serviceProvider = serviceProvider;
+		BackCommand = new Command(async () => await BackAsync());
+		NextViewCommand = new Command(async () => await NextViewAsync());
     }
 
     public Command LoadItemsCommand { get; }
@@ -56,6 +58,7 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
     public Command PerformEmptySearchCommand { get; }
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
+    public Command BackCommand { get; }
 
     public ObservableCollection<SalesFicheModel> Items { get; } = new();
 
@@ -75,7 +78,18 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _salesDispatchTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, SalesCustomer.ReferenceId, SearchText.Text, 0, 20);
+            var result = await _salesDispatchTransactionService.GetObjects(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                warehouseNumber: WarehouseModel.Number, 
+                customerReferenceId: SalesCustomer.ReferenceId, 
+                search: SearchText.Text, 
+                skip: 0, 
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase
+            );
+
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -88,8 +102,9 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.HideHud();
-        }
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
         catch (System.Exception ex)
         {
             if (_userDialogs.IsHudShowing)
@@ -114,7 +129,17 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
             _userDialogs.ShowLoading("Yükleniyor...");
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _salesDispatchTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, SalesCustomer.ReferenceId, SearchText.Text, Items.Count, 20);
+            var result = await _salesDispatchTransactionService.GetObjects(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber, 
+                warehouseNumber: WarehouseModel.Number, 
+                customerReferenceId: SalesCustomer.ReferenceId, 
+                search: SearchText.Text,
+                skip: Items.Count, 
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase);
+
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -124,11 +149,12 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
                         var item = Mapping.Mapper.Map<SalesFicheModel>(fiche);
                         Items.Add(item);
                     }
-
-                    _userDialogs.HideHud();
                 }
             }
-        }
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
         catch (System.Exception ex)
         {
             if (_userDialogs.IsHudShowing)
@@ -192,8 +218,6 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
 
             if (SalesFicheModel is not null)
             {
-                var viewModel = _serviceProvider.GetRequiredService<ReturnSalesDispatchProductListViewModel>();
-                //await viewModel.LoadPageAsync();
                 await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchProductListView)}", new Dictionary<string, object>
                 {
                     [nameof(SalesFicheModel)] = SalesFicheModel,
@@ -247,7 +271,16 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
             Items.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _salesDispatchTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, SalesCustomer.ReferenceId, SearchText.Text, 0, 20);
+            var result = await _salesDispatchTransactionService.GetObjects(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber,
+                warehouseNumber: WarehouseModel.Number, 
+                customerReferenceId: SalesCustomer.ReferenceId,
+                search: SearchText.Text, 
+                skip: 0, 
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -280,6 +313,35 @@ public partial class ReturnSalesDispatchListViewModel : BaseViewModel
         if (string.IsNullOrWhiteSpace(SearchText.Text))
         {
             await PerformSearchAsync();
+        }
+    }
+
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            if(SalesFicheModel is not null)
+            {
+                SalesFicheModel.IsSelected = false;
+                SalesFicheModel = null;
+            }
+
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 }
