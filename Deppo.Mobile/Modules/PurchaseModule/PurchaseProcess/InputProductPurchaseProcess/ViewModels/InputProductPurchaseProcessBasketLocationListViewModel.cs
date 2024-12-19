@@ -170,7 +170,17 @@ public partial class InputProductPurchaseProcessBasketLocationListViewModel : Ba
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, InputPurchaseBasketModel.ItemReferenceId,0, SearchText.Text, 0, 20);
+            var result = await _locationService.GetObjects(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                warehouseNumber: WarehouseModel.Number, 
+                productReferenceId: InputPurchaseBasketModel.IsVariant ? InputPurchaseBasketModel.MainItemReferenceId : InputPurchaseBasketModel.ItemReferenceId,
+                variantReferenceId: InputPurchaseBasketModel.IsVariant ? InputPurchaseBasketModel.ItemReferenceId : 0, 
+                search: SearchText.Text, 
+                skip: 0, 
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase);
 
             if (result.IsSuccess)
             {
@@ -215,10 +225,12 @@ public partial class InputProductPurchaseProcessBasketLocationListViewModel : Ba
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
                 warehouseNumber: WarehouseModel.Number,
-                productReferenceId: InputPurchaseBasketModel.ItemReferenceId,
+                productReferenceId: InputPurchaseBasketModel.IsVariant ? InputPurchaseBasketModel.MainItemReferenceId : InputPurchaseBasketModel.ItemReferenceId,
+                variantReferenceId: InputPurchaseBasketModel.IsVariant ? InputPurchaseBasketModel.ItemReferenceId : 0,
                 skip: Items.Count,
                 search: SearchText.Text,
-				take: 20);
+				take: 20,
+                externalDb: _httpClientService.ExternalDatabase);
 
             if (result.IsSuccess)
             {
@@ -263,7 +275,17 @@ public partial class InputProductPurchaseProcessBasketLocationListViewModel : Ba
 			_userDialogs.Loading("Searching...");
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			var result = await _locationService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, InputPurchaseBasketModel.ItemReferenceId, 0, SearchText.Text, 0, 20);
+			var result = await _locationService.GetObjects(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                warehouseNumber: WarehouseModel.Number, 
+                productReferenceId: InputPurchaseBasketModel.IsVariant ? InputPurchaseBasketModel.MainItemReferenceId : InputPurchaseBasketModel.ItemReferenceId, 
+                variantReferenceId: InputPurchaseBasketModel.IsVariant ? InputPurchaseBasketModel.ItemReferenceId : 0,
+                search: SearchText.Text,
+                skip: 0, 
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase);
 
 			if (result.IsSuccess)
 			{

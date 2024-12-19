@@ -252,33 +252,33 @@ public partial class InputProductPurchaseProcessFormViewModel : BaseViewModel
                     shipAddressCode: ShipAddressModel?.Code ?? string.Empty,     // Default değer veya kontrol
                     shipAddressName: ShipAddressModel?.Name ?? string.Empty);
 
-               
-
-                await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
-                {
-                    [nameof(ResultModel)] = resultModel
-                });
 
 				await ClearFormAsync();
 				await ClearPageAsync();
 
+
+				await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
+                {
+                    [nameof(ResultModel)] = resultModel
+                });
+
 				if (_userDialogs.IsHudShowing)
 					_userDialogs.HideHud();
-
 			}
             else
             {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.HideHud();
-
                 resultModel.Message = "Başarısız";
                 resultModel.PageTitle = Title;
                 resultModel.PageCountToBack = 4;
+
                 await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
                 {
                     [nameof(ResultModel)] = resultModel
                 });
-            }
+
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
+			}
         }
         catch (Exception ex)
         {
@@ -347,6 +347,7 @@ public partial class InputProductPurchaseProcessFormViewModel : BaseViewModel
 			var basketViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseProcessBasketListViewModel>();
 			var productListViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseProcessProductListViewModel>();
             var locationListViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseProcessBasketLocationListViewModel>();
+            var supplierListViewModel = _serviceProvider.GetRequiredService<InputProductPurchaseProcessSupplierListViewModel>();
 			
             if(warehouseListViewModel is not null)
             {
@@ -356,6 +357,19 @@ public partial class InputProductPurchaseProcessFormViewModel : BaseViewModel
                     warehouseListViewModel.SelectedWarehouseModel = null;
                 }
 			}
+
+            if(supplierListViewModel is not null && supplierListViewModel.SelectedSupplier is not null)
+            {
+                supplierListViewModel.SelectedSupplier.IsSelected = false;
+                supplierListViewModel.SelectedSupplier = null;
+
+                if(supplierListViewModel.SelectedShipAddressModel is not null)
+                {
+                    supplierListViewModel.SelectedShipAddressModel.IsSelected = false;
+                    supplierListViewModel.SelectedShipAddressModel = null;
+				}
+			}
+
 
 			foreach (var item in productListViewModel.Items)
 				item.IsSelected = false;
