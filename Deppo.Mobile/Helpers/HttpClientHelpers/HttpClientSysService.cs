@@ -17,8 +17,9 @@ public class HttpClientSysService : IHttpClientSysService
        var httpClient = new HttpClient();
        //httpClient.BaseAddress = new Uri("http://172.16.1.25:1923");
        httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+	   httpClient.Timeout = TimeSpan.FromMinutes(5);
 
-       return httpClient;
+	   return httpClient;
    }
 
    , LazyThreadSafetyMode.None);
