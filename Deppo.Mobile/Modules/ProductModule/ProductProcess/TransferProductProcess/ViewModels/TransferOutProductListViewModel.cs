@@ -525,7 +525,7 @@ public partial class TransferOutProductListViewModel : BaseViewModel
             {
                 foreach (var item in SelectedProducts)
                 {
-                    if(!previousViewModel.TransferBasketModel.OutProducts.Any(x => x.ItemCode == item.ItemCode))
+                    if(!previousViewModel.TransferBasketModel.OutProducts.Any(x => x.ItemReferenceId == item.ItemReferenceId))
                     {
 						previousViewModel.TransferBasketModel.OutProducts.Add(item);
 					}

@@ -355,7 +355,7 @@ public partial class ReturnSalesProductListViewModel : BaseViewModel
             if (previouseViewModel is not null)
             {
                 foreach (var item in SelectedProducts)
-                    if (!previouseViewModel.Items.Any(x => x.ItemCode == item.ItemCode))
+                    if (!previouseViewModel.Items.Any(x => x.ItemReferenceId == item.ItemReferenceId))
                         previouseViewModel.Items.Add(item);
 
                 await Shell.Current.GoToAsync($"..");
