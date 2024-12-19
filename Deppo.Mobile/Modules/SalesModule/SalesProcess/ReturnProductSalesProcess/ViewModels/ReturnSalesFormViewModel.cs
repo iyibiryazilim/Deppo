@@ -184,8 +184,8 @@ public partial class ReturnSalesFormViewModel : BaseViewModel
             _userDialogs.ShowLoading("İşlem Tamamlanıyor...");
             await Task.Delay(1000);
 
-            SelectedCustomer.ShipAddressCode = SelectedShipAddress.Code;
-            SelectedCustomer.ShipAddressReferenceId = SelectedShipAddress.ReferenceId;
+            SelectedCustomer.ShipAddressCode = SelectedShipAddress != null ? SelectedShipAddress.Code : "";
+            SelectedCustomer.ShipAddressReferenceId = SelectedShipAddress != null ? SelectedShipAddress.ReferenceId : 0;
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             DataResult<ResponseModel> result = new();
             if (SalesReturnEnumType == SalesReturnEnumType.Retail)

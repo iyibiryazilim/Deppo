@@ -8,6 +8,8 @@ using Deppo.Mobile.Modules.ProductModule.ProductProcess.OutputProductProcess.Vie
 using static Deppo.Mobile.Core.Helpers.DeppoEnums;
 using System.Collections.ObjectModel;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.Views;
+using Deppo.Mobile.Helpers.MappingHelper;
+using Microsoft.Maui.Layouts;
 
 namespace Deppo.Mobile.Modules.ProductModule.ProductProcess.DemandProcess.ViewModels;
 
@@ -63,29 +65,32 @@ public partial class DemandProcessWarehouseListViewModel : BaseViewModel
             _userDialogs.ShowLoading("Loading...");
             Items.Clear();
             await Task.Delay(1000);
+
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, 0, 20, _httpClientService.FirmNumber);
+            var result = await _warehouseService.GetObjectsAsync(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                search: "",
+				skip: 0,
+				take: 20,
+				externalDb: _httpClientService.ExternalDatabase
+			);
+
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
                     foreach (var item in result.Data)
                     {
-                        Items.Add(new WarehouseModel
-                        {
-                            ReferenceId = item.ReferenceId,
-                            Name = item.Name,
-                            Number = item.Number,
-                            City = item.City,
-                            Country = item.Country,
-                            IsSelected = false
-                        });
+                        Items.Add(Mapping.Mapper.Map<WarehouseModel>(item));
                     }
                 }
             }
 
-            _userDialogs.HideHud();
-        }
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
@@ -111,29 +116,31 @@ public partial class DemandProcessWarehouseListViewModel : BaseViewModel
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, Items.Count, 20, _httpClientService.FirmNumber);
-            if (result.IsSuccess)
+			var result = await _warehouseService.GetObjectsAsync(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				search: "",
+				skip: Items.Count,
+				take: 20,
+				externalDb: _httpClientService.ExternalDatabase
+			);
+
+			if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
-						_userDialogs.ShowLoading("Loading...");
-						foreach (var item in result.Data)
-                        Items.Add(new WarehouseModel
-                        {
-                            ReferenceId = item.ReferenceId,
-                            Name = item.Name,
-                            Number = item.Number,
-                            City = item.City,
-                            Country = item.Country,
-                            IsSelected = false
-                        });
+					_userDialogs.ShowLoading("Loading...");
+
+					foreach (var item in result.Data) { 
+					    Items.Add(Mapping.Mapper.Map<WarehouseModel>(item));
+					}
                 }
             }
 
-				if (_userDialogs.IsHudShowing)
-					_userDialogs.HideHud();
-
-			}
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
@@ -157,13 +164,20 @@ public partial class DemandProcessWarehouseListViewModel : BaseViewModel
             IsBusy = true;
 
 
-            Items.ToList().ForEach(x => x.IsSelected = false);
-
-            var selectedItem = Items.FirstOrDefault(x => x.ReferenceId == item.ReferenceId);
-            if (selectedItem != null)
-                selectedItem.IsSelected = true;
-
-            SelectedWarehouseModel = item;
+            if (SelectedWarehouseModel == item)
+            {
+                SelectedWarehouseModel.IsSelected = false;
+                SelectedWarehouseModel = null;
+            }
+            else
+            {
+                if(SelectedWarehouseModel is not null)
+                {
+                    SelectedWarehouseModel.IsSelected = false;
+				}
+				SelectedWarehouseModel = item;
+				SelectedWarehouseModel.IsSelected = true;
+			}
 
         }
         catch (Exception ex)
@@ -179,6 +193,8 @@ public partial class DemandProcessWarehouseListViewModel : BaseViewModel
     private async Task NextViewAsync()
     {
         if (IsBusy)
+            return;
+        if (SelectedWarehouseModel is null)
             return;
         try
         {

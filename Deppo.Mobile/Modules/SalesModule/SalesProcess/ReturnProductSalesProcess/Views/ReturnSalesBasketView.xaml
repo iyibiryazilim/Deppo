@@ -36,8 +36,7 @@
     </ContentPage.ToolbarItems>
 
     <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
-                                   StatusBarStyle="Default" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -49,15 +48,13 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android"
-                Value="artboard.png" />
+            <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
     <Grid RowDefinitions="*,Auto">
 
-        <Grid RowDefinitions="Auto,*,Auto"
-              RowSpacing="10">
+        <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
             <Border Grid.Row="0"
                     Margin="5,0,5,0"
                     Padding="0"
@@ -78,8 +75,7 @@
                 </Entry>
             </Border>
 
-            <CollectionView Grid.Row="1"
-                            ItemsSource="{Binding Items}">
+            <CollectionView Grid.Row="1" ItemsSource="{Binding Items}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="salesBasketModel:ReturnSalesBasketModel">
                         <SwipeView Threshold="100">
@@ -112,16 +108,17 @@
                             <Border Padding="5"
                                     BackgroundColor="Transparent"
                                     StrokeThickness="0.1">
-                                <Grid ColumnDefinitions=".20*,.80*"
-                                      ColumnSpacing="10">
+                                <Grid ColumnDefinitions=".20*,.80*" ColumnSpacing="10">
                                     <Border Grid.Column="0"
+                                            HeightRequest="{OnIdiom 100,
+                                                                    Phone=70,
+                                                                    Tablet=100}"
                                             StrokeShape="RoundRectangle 5"
                                             StrokeThickness="0.5"
-                                            WidthRequest="{OnIdiom 100, Phone=70, Tablet=100}"
-                                            HeightRequest="{OnIdiom 100, Phone=70, Tablet=100}"
-                                            >
-                                        <Image Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
-                                               Aspect="AspectFill" />
+                                            WidthRequest="{OnIdiom 100,
+                                                                   Phone=70,
+                                                                   Tablet=100}">
+                                        <Image Aspect="AspectFill" Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}" />
                                     </Border>
 
                                     <VerticalStackLayout Grid.Column="1">
@@ -134,8 +131,7 @@
 
                                             <Image Grid.Column="1">
                                                 <Image.GestureRecognizers>
-                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnSalesBasketViewModel}}, Path=UnitActionTappedCommand}"
-                                                                          CommandParameter="{Binding .}" />
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnSalesBasketViewModel}}, Path=UnitActionTappedCommand}" CommandParameter="{Binding .}" />
                                                 </Image.GestureRecognizers>
                                                 <Image.Source>
                                                     <FontImageSource FontFamily="FAS"
@@ -168,51 +164,75 @@
                                             </Label.FormattedText>
                                         </Label>
 
-                                        <Grid ColumnDefinitions="Auto,Auto,Auto"
-                                              ColumnSpacing="10"
-                                              HorizontalOptions="EndAndExpand">
-                                            <Border Grid.Column="0"
-                                                    Padding="5"
-                                                    BackgroundColor="Transparent"
-                                                    Stroke="{StaticResource Secondary}"
-                                                    StrokeShape="RoundRectangle 2">
-                                                <Label FontFamily="FAS"
-                                                       FontSize="Medium"
-                                                       Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
-                                                       TextColor="{StaticResource Secondary}" />
+                                        <Grid ColumnDefinitions="Auto, *">
+                                            <Grid Grid.Column="0"
+                                                  ColumnDefinitions="Auto, Auto,Auto"
+                                                  ColumnSpacing="3"
+                                                  HorizontalOptions="Start"
+                                                  VerticalOptions="End">
+                                                <Label Grid.Column="0"
+                                                       FontFamily="FAS"
+                                                       FontSize="10"
+                                                       Text="{Binding VariantIcon}"
+                                                       TextColor="{Binding VariantIconColor}" />
+                                                <Label Grid.Column="1"
+                                                       FontFamily="FAS"
+                                                       FontSize="10"
+                                                       Text="{Binding LocTrackingIcon}"
+                                                       TextColor="{Binding LocTrackingIconColor}" />
+                                                <Label Grid.Column="2"
+                                                       FontFamily="FAS"
+                                                       FontSize="10"
+                                                       Text="{Binding TrackingTypeIcon}"
+                                                       TextColor="{Binding TrackingTypeIconColor}" />
+                                            </Grid>
 
-                                                <Border.GestureRecognizers>
-                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnSalesBasketViewModel}}, Path=DecreaseCommand}"
-                                                                          CommandParameter="{Binding .}" />
-                                                </Border.GestureRecognizers>
-                                            </Border>
-                                            <Label Grid.Column="1"
-                                                   FontAttributes="Bold"
-                                                   FontSize="Large"
-                                                   Text="{Binding Quantity}"
-                                                   TextColor="{StaticResource OffBlack}"
-                                                   VerticalOptions="Center">
-                                                <Label.GestureRecognizers>
-                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnSalesBasketViewModel}}, Path=QuantityTappedCommand}"
-                                                                          CommandParameter="{Binding .}" />
-                                                </Label.GestureRecognizers>
-                                            </Label>
-                                            <Border Grid.Column="2"
-                                                    Padding="5"
-                                                    BackgroundColor="{StaticResource Secondary}"
-                                                    Stroke="{StaticResource Secondary}"
-                                                    StrokeShape="RoundRectangle 2">
-                                                <Label FontFamily="FAS"
-                                                       FontSize="Medium"
-                                                       Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
-                                                       TextColor="{StaticResource White}" />
+                                            <Grid Grid.Column="1"
+                                                  ColumnDefinitions="Auto,Auto,Auto"
+                                                  ColumnSpacing="10"
+                                                  HorizontalOptions="EndAndExpand">
+                                                <Border Grid.Column="0"
+                                                        Padding="5"
+                                                        BackgroundColor="Transparent"
+                                                        Stroke="{StaticResource Secondary}"
+                                                        StrokeShape="RoundRectangle 2">
+                                                    <Label FontFamily="FAS"
+                                                           FontSize="Medium"
+                                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Minus}"
+                                                           TextColor="{StaticResource Secondary}" />
 
-                                                <Border.GestureRecognizers>
-                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnSalesBasketViewModel}}, Path=IncreaseCommand}"
-                                                                          CommandParameter="{Binding .}" />
-                                                </Border.GestureRecognizers>
-                                            </Border>
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnSalesBasketViewModel}}, Path=DecreaseCommand}" CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
+                                                </Border>
+                                                <Label Grid.Column="1"
+                                                       FontAttributes="Bold"
+                                                       FontSize="Large"
+                                                       Text="{Binding Quantity}"
+                                                       TextColor="{StaticResource OffBlack}"
+                                                       VerticalOptions="Center">
+                                                    <Label.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnSalesBasketViewModel}}, Path=QuantityTappedCommand}" CommandParameter="{Binding .}" />
+                                                    </Label.GestureRecognizers>
+                                                </Label>
+                                                <Border Grid.Column="2"
+                                                        Padding="5"
+                                                        BackgroundColor="{StaticResource Secondary}"
+                                                        Stroke="{StaticResource Secondary}"
+                                                        StrokeShape="RoundRectangle 2">
+                                                    <Label FontFamily="FAS"
+                                                           FontSize="Medium"
+                                                           Text="{x:Static fontAwesome:FontAwesomeIcons.Plus}"
+                                                           TextColor="{StaticResource White}" />
+
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnSalesBasketViewModel}}, Path=IncreaseCommand}" CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
+                                                </Border>
+                                            </Grid>
                                         </Grid>
+
+
                                     </VerticalStackLayout>
                                 </Grid>
                             </Border>
@@ -236,10 +256,8 @@
                         HalfExpandedRatio="0.5"
                         IsModal="True"
                         ShowGrabber="True">
-            <Grid RowDefinitions="Auto, Auto, *"
-                  RowSpacing="10">
-                <VerticalStackLayout Grid.Row="0"
-                                     Spacing="5">
+            <Grid RowDefinitions="Auto, Auto, *" RowSpacing="10">
+                <VerticalStackLayout Grid.Row="0" Spacing="5">
 
                     <Label Grid.Column="0"
                            FontAttributes="Bold"
@@ -247,15 +265,13 @@
                            HorizontalOptions="Start"
                            Text="{Binding SelectedReturnSalesBasketModel.ItemCode, StringFormat='{0} Ürünü'}" />
 
-                    <BoxView HeightRequest="2"
-                             Color="{StaticResource Primary}" />
+                    <BoxView HeightRequest="2" Color="{StaticResource Primary}" />
                 </VerticalStackLayout>
                 <Grid Grid.Row="1"
                       Padding="0,5,0,10"
                       RowDefinitions="Auto, Auto"
                       RowSpacing="10">
-                    <Grid Grid.Row="0"
-                          ColumnDefinitions=".40*, .25*, .25*">
+                    <Grid Grid.Row="0" ColumnDefinitions=".40*, .25*, .25*">
                         <Label Grid.Column="0"
                                FontAttributes="Bold"
                                FontSize="Subtitle"
@@ -275,11 +291,9 @@
                              HeightRequest="2"
                              Color="{StaticResource Primary}" />
                 </Grid>
-                <CollectionView Grid.Row="2"
-                                ItemsSource="{Binding SelectedReturnSalesBasketModel.SubUnitsets}">
+                <CollectionView Grid.Row="2" ItemsSource="{Binding SelectedReturnSalesBasketModel.SubUnitsets}">
                     <CollectionView.ItemsLayout>
-                        <LinearItemsLayout ItemSpacing="5"
-                                           Orientation="Vertical" />
+                        <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
                     </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="models:SubUnitset">
@@ -287,12 +301,10 @@
                                     BackgroundColor="WhiteSmoke"
                                     StrokeShape="RoundRectangle 5">
                                 <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnSalesBasketViewModel}}, Path=SubUnitsetTappedCommand}"
-                                                          CommandParameter="{Binding .}" />
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnSalesBasketViewModel}}, Path=SubUnitsetTappedCommand}" CommandParameter="{Binding .}" />
                                 </Border.GestureRecognizers>
                                 <Grid ColumnDefinitions=".40*,.25*,.25*">
-                                    <Label Grid.Column="0"
-                                           Text="{Binding Code}" />
+                                    <Label Grid.Column="0" Text="{Binding Code}" />
                                     <Label Grid.Column="1"
                                            HorizontalOptions="Center"
                                            Text="{Binding ConversionValue}" />

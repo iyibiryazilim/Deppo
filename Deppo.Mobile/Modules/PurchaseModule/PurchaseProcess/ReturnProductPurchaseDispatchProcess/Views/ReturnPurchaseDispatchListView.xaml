@@ -39,10 +39,8 @@
                        PlaceholderColor="{StaticResource OffBlack}"
                        TextColor="{StaticResource OffBlack}">
                 <SearchBar.Behaviors>
-                    <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
-                                                    EventName="SearchButtonPressed" />
-                    <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}"
-                                                    EventName="TextChanged" />
+                    <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}" EventName="SearchButtonPressed" />
+                    <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}" EventName="TextChanged" />
                 </SearchBar.Behaviors>
             </SearchBar>
         </Border>
@@ -63,20 +61,18 @@
                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnPurchaseDispatchListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>
                         <Border.Triggers>
-                            <DataTrigger TargetType="Border"
-                                         Binding="{Binding IsSelected}"
+                            <DataTrigger Binding="{Binding IsSelected}"
+                                         TargetType="Border"
                                          Value="True">
-                                <Setter Property="BackgroundColor"
-                                        Value="{StaticResource SecondaryLight}" />
+                                <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
                             </DataTrigger>
                         </Border.Triggers>
                         <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10">
 
                             <Border Grid.Column="0"
-                                   
                                     BackgroundColor="{StaticResource Secondary}"
-                                    StrokeThickness="0"
-                                    StrokeShape="RoundRectangle 10">
+                                    StrokeShape="RoundRectangle 10"
+                                    StrokeThickness="0">
                                 <VerticalStackLayout Grid.Column="0"
                                                      Padding="5"
                                                      Spacing="1"
@@ -86,9 +82,8 @@
                                            HorizontalOptions="Center"
                                            Text="{Binding FicheDate, StringFormat='{0:dd}'}"
                                            TextColor="{StaticResource OffBlack}" />
-                                    <Label 
+                                    <Label FontSize="14"
                                            HorizontalOptions="Center"
-                                        FontSize="14"
                                            Text="{Binding FicheDate, StringFormat='{0:MM/yyyy}'}"
                                            TextColor="{StaticResource OffBlack}" />
                                     <Label HorizontalOptions="Center"

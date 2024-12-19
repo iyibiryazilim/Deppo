@@ -69,8 +69,9 @@ public partial class InputProductPurchaseProcessSupplierListViewModel : BaseView
         ShipAddressTappedCommand = new Command<ShipAddressModel>(async (shipAddress) => await ShipAddressTappedAsync(shipAddress));
         ConfirmShipAddressCommand = new Command(async () => await ConfirmShipAddressAsync());
         ShipAddressCloseCommand = new Command(async () => await ShipAddressCloseAsync());
+		BackCommand = new Command(async () => await BackAsync());
 
-        NextViewCommand = new Command(async () => await NextViewAsync());
+		NextViewCommand = new Command(async () => await NextViewAsync());
     }
 
     public ObservableCollection<SupplierModel> Items { get; } = new();
@@ -243,26 +244,29 @@ public partial class InputProductPurchaseProcessSupplierListViewModel : BaseView
         {
             IsBusy = true;
 
-            // Eğer seçili değilse
-            if (!supplier.IsSelected)
+            if(SelectedSupplier == supplier)
             {
-                // Diğer tüm tedarikçilerin IsSelected alanını false yap
-                Items.ToList().ForEach(x => x.IsSelected = false);
+                SelectedSupplier.IsSelected = false;
+				SelectedSupplier = null;
+			}
+            else
+            {
+                if(SelectedSupplier is not null)
+                {
+                    SelectedSupplier.IsSelected = false;
+				}
 
-                // Eğer sevk adresi varsa, sevk adreslerini yükle ve bottom sheet'i aç
-                if (supplier.ShipAddressCount > 0)
+				SelectedSupplier = supplier;
+				
+                if(SelectedSupplier.ShipAddressCount > 0)
                 {
-                    SelectedSupplier = supplier;
-                    await LoadShipAddressesAsync(supplier);
-                    CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
-                }
-                else
-                {
-                    // Sevk adresi yoksa sadece seçili hale getir
-                    supplier.IsSelected = true;
-                    SelectedSupplier = supplier;
-                }
-            }
+                    await LoadShipAddressesAsync(SelectedSupplier);
+					CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.HalfExpanded;
+                    return;
+				}
+                SelectedSupplier.IsSelected = true;
+			}
+            
         }
         catch (Exception ex)
         {
@@ -288,9 +292,7 @@ public partial class InputProductPurchaseProcessSupplierListViewModel : BaseView
                 await Shell.Current.GoToAsync($"{nameof(InputProductPurchaseProcessBasketListView)}", new Dictionary<string, object>
                 {
                     [nameof(WarehouseModel)] = WarehouseModel,
-
                     [nameof(SupplierModel)] = SelectedSupplier,
-
                     [nameof(ShipAddressModel)] = SelectedShipAddressModel,
                 });
             }
@@ -305,7 +307,6 @@ public partial class InputProductPurchaseProcessSupplierListViewModel : BaseView
         }
     }
 
-    //shipAddresses
     private async Task LoadShipAddressesAsync(SupplierModel supplierModel)
     {
         try
@@ -322,7 +323,8 @@ public partial class InputProductPurchaseProcessSupplierListViewModel : BaseView
                 currentReferenceId: supplierModel.ReferenceId,
                 search: "",
                 skip: 0,
-                take: 99999
+                take: 99999,
+                externalDb: _httpClientService.ExternalDatabase
             );
 
             if (result.IsSuccess)
@@ -334,8 +336,10 @@ public partial class InputProductPurchaseProcessSupplierListViewModel : BaseView
                     ShipAddresses.Add(Mapping.Mapper.Map<ShipAddressModel>(item));
             }
 
-            _userDialogs.HideHud();
-        }
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+		}
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
@@ -428,5 +432,40 @@ public partial class InputProductPurchaseProcessSupplierListViewModel : BaseView
         {
             CurrentPage.FindByName<BottomSheet>("shipAddressBottomSheet").State = BottomSheetState.Hidden;
         });
+    }
+
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            if(SelectedSupplier is not null)
+            {
+                SelectedSupplier.IsSelected = false;
+                SelectedSupplier = null;
+
+                if(SelectedShipAddressModel is not null)
+                {
+                    SelectedShipAddressModel.IsSelected = false;
+                    SelectedShipAddressModel = null;
+                }
+            }
+
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+        finally
+        {
+            IsBusy = false;
+        }
     }
 }

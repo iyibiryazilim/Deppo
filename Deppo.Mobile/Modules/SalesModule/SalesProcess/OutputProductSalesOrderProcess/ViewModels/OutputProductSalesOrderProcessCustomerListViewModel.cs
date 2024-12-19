@@ -286,6 +286,7 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
                 }
                 else
                 {
+                    Items.Where(x => x.ReferenceId != item.ReferenceId).ForEach(x => x.IsSelected = false);
                     item.IsSelected = true;
                     SalesCustomer = item;
                 }
@@ -325,7 +326,8 @@ public partial class OutputProductSalesOrderProcessCustomerListViewModel : BaseV
                 currentReferenceId: customer.ReferenceId,
                 search: "",
                 skip: 0,
-                take: 99999
+                take: 99999,
+                externalDb: _httpClientService.ExternalDatabase
             );
 
             if (result.IsSuccess)

@@ -29,7 +29,6 @@ public partial class ReturnPurchaseDispatchSupplierListViewModel : BaseViewModel
 	public ObservableCollection<PurchaseSupplier> Items { get; } = new();
 
 	public ReturnPurchaseDispatchSupplierListViewModel(IHttpClientService httpClientService,
-
     IUserDialogs userDialogs,
     IPurchaseSupplierService purchaseSupplierService)
     {
@@ -45,7 +44,8 @@ public partial class ReturnPurchaseDispatchSupplierListViewModel : BaseViewModel
         PerformSearchCommand = new Command(async () => await PerformSearchAsync());
         PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
         NextViewCommand = new Command(async () => await NextViewAsync());
-    }
+		BackCommand = new Command(async () => await BackAsync());
+	}
 
     public Page CurrentPage { get; set; } = null!;
 
@@ -55,6 +55,7 @@ public partial class ReturnPurchaseDispatchSupplierListViewModel : BaseViewModel
     public Command PerformEmptySearchCommand { get; }
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
+    public Command BackCommand { get; }
 
     [ObservableProperty]
     public SearchBar searchText;
@@ -67,25 +68,32 @@ public partial class ReturnPurchaseDispatchSupplierListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            Items.Clear();
 
             _userDialogs.ShowLoading("Yükleniyor...");
+            Items.Clear();
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _purchaseSupplierService.GetSuppliersWithDispatch(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, SearchText.Text, 0, 20);
+            var result = await _purchaseSupplierService.GetSuppliersWithDispatch(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                warehouseNumber: WarehouseModel.Number, 
+                search: SearchText.Text, 
+                skip: 0, 
+                take: 20
+            );
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
                     foreach (var item in result.Data)
                         Items.Add(Mapping.Mapper.Map<PurchaseSupplier>(item));
-
-
-                    _userDialogs.HideHud();
-
                 }
             }
+
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
         }
         catch (System.Exception ex)
@@ -106,24 +114,32 @@ public partial class ReturnPurchaseDispatchSupplierListViewModel : BaseViewModel
         if (IsBusy)
             return;
 
+        if (Items.Count < 18)
+            return;
+
         try
         {
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _purchaseSupplierService.GetSuppliersWithDispatch(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, SearchText.Text, Items.Count, 20);
+            var result = await _purchaseSupplierService.GetSuppliersWithDispatch(
+               httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                warehouseNumber: WarehouseModel.Number, 
+                search: SearchText.Text, 
+                skip: Items.Count, 
+                take: 20);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
                     foreach (var item in result.Data)
                         Items.Add(Mapping.Mapper.Map<PurchaseSupplier>(item));
-
-
-                    _userDialogs.HideHud();
-
                 }
             }
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
         }
         catch (System.Exception ex)
@@ -132,30 +148,6 @@ public partial class ReturnPurchaseDispatchSupplierListViewModel : BaseViewModel
                 _userDialogs.HideHud();
 
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
-	private async Task LoadPageAsync()
-	{
-        if (IsBusy)
-            return;
-        try
-        {
-            IsBusy = true;
-
-            if (Items.Count > 0)
-                Items.Clear();
-        }
-        catch (Exception ex)
-        {
-            if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
-
-			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
@@ -245,17 +237,23 @@ public partial class ReturnPurchaseDispatchSupplierListViewModel : BaseViewModel
             Items.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _purchaseSupplierService.GetSuppliersWithDispatch(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, WarehouseModel.Number, SearchText.Text, 0, 20);
+            var result = await _purchaseSupplierService.GetSuppliersWithDispatch(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                warehouseNumber: WarehouseModel.Number, 
+                search: SearchText.Text, 
+                skip: 0, 
+                take: 20
+            );
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
                     foreach (var item in result.Data)
+                    {
                         Items.Add(Mapping.Mapper.Map<PurchaseSupplier>(item));
-
-
-                    _userDialogs.HideHud();
-
+                    }
                 }
             }
             if (!result.IsSuccess)
@@ -264,9 +262,14 @@ public partial class ReturnPurchaseDispatchSupplierListViewModel : BaseViewModel
                 return;
             }
 
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
         }
         catch (System.Exception ex)
         {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
             _userDialogs.Alert(ex.Message, "Hata");
         }
         finally
@@ -280,6 +283,35 @@ public partial class ReturnPurchaseDispatchSupplierListViewModel : BaseViewModel
         if (string.IsNullOrWhiteSpace(SearchText.Text))
         {
             await PerformSearchAsync();
+        }
+    }
+
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            if(PurchaseSupplier is not null)
+            {
+                PurchaseSupplier.IsSelected = false;
+				PurchaseSupplier = null;
+			}
+
+            await Shell.Current.GoToAsync("..");
+		}
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+        finally
+        {
+            IsBusy = false;
         }
     }
 

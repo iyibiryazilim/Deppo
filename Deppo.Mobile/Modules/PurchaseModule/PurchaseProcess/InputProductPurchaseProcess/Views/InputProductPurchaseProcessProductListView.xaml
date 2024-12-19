@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentPage x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views.InputProductPurchaseProcessProductListView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:productModel="clr-namespace:Deppo.Mobile.Core.Models.ProductModels;assembly=Deppo.Mobile.Core"
-             xmlns:variantModel="clr-namespace:Deppo.Mobile.Core.Models.VariantModels;assembly=Deppo.Mobile.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.Views.InputProductPurchaseProcessProductListView"
+             xmlns:variantModel="clr-namespace:Deppo.Mobile.Core.Models.VariantModels;assembly=Deppo.Mobile.Core"
              xmlns:viewModels="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.InputProductPurchaseProcess.ViewModels"
              Title="{Binding Title}"
              x:DataType="viewModels:InputProductPurchaseProcessProductListViewModel"
              Shell.PresentationMode="Modal"
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
-                                        EventName="Loaded" />
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
-                                   StatusBarStyle="Default" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
 
     <ContentPage.Resources>
@@ -27,8 +25,7 @@
 
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android"
-                Value="artboard.png" />
+            <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
@@ -62,10 +59,8 @@
                            PlaceholderColor="{StaticResource OffBlack}"
                            TextColor="{StaticResource OffBlack}">
                     <SearchBar.Behaviors>
-                        <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
-                                                        EventName="SearchButtonPressed" />
-                        <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}"
-                                                        EventName="TextChanged" />
+                        <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}" EventName="SearchButtonPressed" />
+                        <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}" EventName="TextChanged" />
                     </SearchBar.Behaviors>
                 </SearchBar>
             </Border>
@@ -81,22 +76,17 @@
                                 StrokeShape="RoundRectangle 10"
                                 StrokeThickness="0.1">
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductPurchaseProcessProductListViewModel}}, Path=ItemTappedCommand}"
-                                                      CommandParameter="{Binding .}">
-                                </TapGestureRecognizer>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductPurchaseProcessProductListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
                             </Border.GestureRecognizers>
-                            <Grid ColumnDefinitions="Auto,*"
-                                  ColumnSpacing="10">
-                                <Border StrokeShape="RoundRectangle 5"
-                                        StrokeThickness="0.5">
+                            <Grid ColumnDefinitions="Auto,*, Auto" ColumnSpacing="10">
+                                <Border StrokeShape="RoundRectangle 5" StrokeThickness="0.5">
                                     <Image Grid.Column="0"
                                            HeightRequest="50"
                                            Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                            WidthRequest="50" />
                                 </Border>
 
-                                <VerticalStackLayout Grid.Column="1"
-                                                     Spacing="2">
+                                <VerticalStackLayout Grid.Column="1" Spacing="2">
                                     <Label FontAttributes="Bold"
                                            LineBreakMode="TailTruncation"
                                            Text="{Binding Code}"
@@ -105,8 +95,7 @@
                                            Text="{Binding Name}"
                                            TextColor="{StaticResource Gray600}" />
 
-                                    <Label TextColor="{StaticResource Gray500}"
-                                           VerticalOptions="Center">
+                                    <Label TextColor="{StaticResource Gray500}" VerticalOptions="Center">
                                         <Label.FormattedText>
                                             <FormattedString>
                                                 <Span FontAttributes="Bold"
@@ -125,14 +114,35 @@
                                         </Label.FormattedText>
                                     </Label>
                                 </VerticalStackLayout>
+
+                                <Grid Grid.Column="2"
+                                      ColumnDefinitions="Auto, Auto, Auto"
+                                      ColumnSpacing="3"
+                                      HorizontalOptions="End"
+                                      VerticalOptions="Start">
+                                    <Label Grid.Column="0"
+                                           FontFamily="FAS"
+                                           FontSize="10"
+                                           Text="{Binding VariantIcon}"
+                                           TextColor="{Binding VariantIconColor}" />
+                                    <Label Grid.Column="1"
+                                           FontFamily="FAS"
+                                           FontSize="10"
+                                           Text="{Binding LocTrackingIcon}"
+                                           TextColor="{Binding LocTrackingIconColor}" />
+                                    <Label Grid.Column="2"
+                                           FontFamily="FAS"
+                                           FontSize="10"
+                                           Text="{Binding TrackingTypeIcon}"
+                                           TextColor="{Binding TrackingTypeIconColor}" />
+                                </Grid>
                             </Grid>
 
                             <Border.Triggers>
                                 <DataTrigger Binding="{Binding IsSelected}"
                                              TargetType="Border"
                                              Value="True">
-                                    <Setter Property="BackgroundColor"
-                                            Value="{StaticResource SecondaryLight}" />
+                                    <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
                                 </DataTrigger>
                             </Border.Triggers>
                         </Border>
@@ -141,9 +151,9 @@
             </CollectionView>
 
             <Button Grid.Row="3"
-                    Command="{Binding ConfirmCommand}"
                     Margin="5,10,5,20"
-                    Text="{Binding SelectedProducts.Count,StringFormat='Sepete Ekle : {0} '}" />
+                    Command="{Binding ConfirmCommand}"
+                    Text="{Binding SelectedProducts.Count, StringFormat='Sepete Ekle : {0} '}" />
         </Grid>
 
         <dx:BottomSheet x:Name="variantBottomSheet"
@@ -156,15 +166,12 @@
                         IsModal="True"
                         ShowGrabber="True">
             <!--#region BottomSheetContent-->
-            <Grid RowDefinitions="Auto, *"
-                  RowSpacing="20">
-                <VerticalStackLayout Grid.Row="0"
-                                     Spacing="5">
+            <Grid RowDefinitions="Auto, *" RowSpacing="20">
+                <VerticalStackLayout Grid.Row="0" Spacing="5">
                     <Label FontAttributes="Bold"
                            FontSize="Subtitle"
                            Text="Varyantlar " />
-                    <BoxView HeightRequest="2"
-                             Color="{StaticResource OffBlack}" />
+                    <BoxView HeightRequest="2" Color="{StaticResource OffBlack}" />
                 </VerticalStackLayout>
 
                 <Grid Grid.Row="1"
@@ -176,8 +183,7 @@
                                     RemainingItemsThreshold="2"
                                     RemainingItemsThresholdReachedCommand="{Binding LoadMoreVariantItemsCommand}">
                         <CollectionView.ItemsLayout>
-                            <LinearItemsLayout ItemSpacing="5"
-                                               Orientation="Vertical" />
+                            <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="variantModel:VariantModel">
@@ -186,11 +192,9 @@
                                         StrokeShape="RoundRectangle 10"
                                         StrokeThickness="0.1">
                                     <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductPurchaseProcessProductListViewModel}}, Path=VariantTappedCommand}"
-                                                              CommandParameter="{Binding .}" />
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:InputProductPurchaseProcessProductListViewModel}}, Path=VariantTappedCommand}" CommandParameter="{Binding .}" />
                                     </Border.GestureRecognizers>
-                                    <Grid ColumnDefinitions="Auto,*, Auto"
-                                          ColumnSpacing="10">
+                                    <Grid ColumnDefinitions="Auto,*, Auto" ColumnSpacing="10">
                                         <Border BackgroundColor="{StaticResource Secondary}"
                                                 StrokeShape="RoundRectangle 5"
                                                 StrokeThickness="0.5">
@@ -200,8 +204,7 @@
                                                    WidthRequest="50" />
                                         </Border>
 
-                                        <VerticalStackLayout Grid.Column="1"
-                                                             Spacing="2">
+                                        <VerticalStackLayout Grid.Column="1" Spacing="2">
 
                                             <Label FontAttributes="Bold"
                                                    LineBreakMode="TailTruncation"
@@ -210,8 +213,7 @@
                                                    Text="{Binding Name}"
                                                    TextColor="{StaticResource Gray600}" />
 
-                                            <Label TextColor="{StaticResource Gray600}"
-                                                   VerticalOptions="Center">
+                                            <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
                                                 <Label.FormattedText>
                                                     <FormattedString>
                                                         <Span FontAttributes="Bold"
@@ -235,8 +237,7 @@
                                         <DataTrigger Binding="{Binding IsSelected}"
                                                      TargetType="Border"
                                                      Value="True">
-                                            <Setter Property="BackgroundColor"
-                                                    Value="{StaticResource SecondaryLight}" />
+                                            <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
                                         </DataTrigger>
                                     </Border.Triggers>
                                 </Border>

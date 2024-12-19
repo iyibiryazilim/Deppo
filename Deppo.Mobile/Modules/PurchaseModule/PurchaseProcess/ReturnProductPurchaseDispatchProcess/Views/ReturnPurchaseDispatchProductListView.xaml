@@ -10,10 +10,8 @@
              x:DataType="viewModel:ReturnPurchaseDispatchProductListViewModel"
              Shell.TabBarIsVisible="False">
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}"
-                                        EventName="Loaded" />
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}"
-                                   StatusBarStyle="Default" />
+        <toolkit:EventToCommandBehavior Command="{Binding LoadItemsCommand}" EventName="Loaded" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Primary}" StatusBarStyle="Default" />
     </ContentPage.Behaviors>
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -23,13 +21,15 @@
     </ContentPage.Resources>
     <ContentPage.BackgroundImageSource>
         <OnPlatform x:TypeArguments="ImageSource">
-            <On Platform="Android"
-                Value="artboard.png" />
+            <On Platform="Android" Value="artboard.png" />
         </OnPlatform>
     </ContentPage.BackgroundImageSource>
 
-    <Grid RowDefinitions="Auto, *, Auto"
-          RowSpacing="10">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding BackCommand}" />
+    </Shell.BackButtonBehavior>
+
+    <Grid RowDefinitions="Auto, *, Auto" RowSpacing="10">
         <Border Grid.Row="0"
                 Margin="5,0,5,0"
                 Padding="0"
@@ -43,10 +43,8 @@
                        PlaceholderColor="{StaticResource OffBlack}"
                        TextColor="{StaticResource OffBlack}">
                 <SearchBar.Behaviors>
-                    <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}"
-                                                    EventName="SearchButtonPressed" />
-                    <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}"
-                                                    EventName="TextChanged" />
+                    <toolkit:EventToCommandBehavior Command="{Binding PerformSearchCommand}" EventName="SearchButtonPressed" />
+                    <toolkit:EventToCommandBehavior Command="{Binding PerformEmptySearchCommand}" EventName="TextChanged" />
                 </SearchBar.Behaviors>
             </SearchBar>
         </Border>
@@ -56,8 +54,7 @@
                         RemainingItemsThreshold="2"
                         RemainingItemsThresholdReachedCommand="{Binding LoadMoreItemsCommand}">
             <CollectionView.ItemsLayout>
-                <LinearItemsLayout ItemSpacing="0"
-                                   Orientation="Vertical" />
+                <LinearItemsLayout ItemSpacing="0" Orientation="Vertical" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="purchaseModel:PurchaseTransactionModel">
@@ -66,29 +63,24 @@
                             StrokeShape="RoundRectangle 10"
                             StrokeThickness="0.1">
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnPurchaseDispatchProductListViewModel}}, Path=ItemTappedCommand}"
-                                                  CommandParameter="{Binding .}" />
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:ReturnPurchaseDispatchProductListViewModel}}, Path=ItemTappedCommand}" CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>
                         <Border.Triggers>
                             <DataTrigger Binding="{Binding IsSelected}"
                                          TargetType="Border"
                                          Value="True">
-                                <Setter Property="BackgroundColor"
-                                        Value="{StaticResource SecondaryLight}" />
+                                <Setter Property="BackgroundColor" Value="{StaticResource SecondaryLight}" />
                             </DataTrigger>
                         </Border.Triggers>
-                        <Grid ColumnDefinitions="Auto, *, Auto"
-                              ColumnSpacing="10">
-                            <Border StrokeShape="RoundRectangle 5"
-                                    StrokeThickness="0.5">
+                        <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="10">
+                            <Border StrokeShape="RoundRectangle 5" StrokeThickness="0.5">
                                 <Image Grid.Column="0"
                                        HeightRequest="50"
                                        Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                        WidthRequest="50" />
                             </Border>
 
-                            <VerticalStackLayout Grid.Column="1"
-                                                 Spacing="2">
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
                                 <Label FontAttributes="Bold"
                                        LineBreakMode="TailTruncation"
                                        Text="{Binding ProductCode}" />
@@ -96,8 +88,7 @@
                                        Text="{Binding ProductName}"
                                        TextColor="{StaticResource Gray600}" />
 
-                                <Label TextColor="{StaticResource Gray600}"
-                                       VerticalOptions="Center">
+                                <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
                                     <Label.FormattedText>
                                         <FormattedString>
                                             <Span FontAttributes="Bold"

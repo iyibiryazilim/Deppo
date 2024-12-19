@@ -57,7 +57,8 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
         NextViewCommand = new Command(async () => await NextViewAsync());
         PerformSearchCommand = new Command(async () => await PerformSearchAsync());
         PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
-    }
+		BackCommand = new Command(async () => await BackAsync());
+	}
 
     public Page CurrentPage { get; set; } = null!;
 
@@ -67,6 +68,7 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
     public Command NextViewCommand { get; }
     public Command PerformSearchCommand { get; }
     public Command PerformEmptySearchCommand { get; }
+    public Command BackCommand { get; }
 
     [ObservableProperty]
     public SearchBar searchText;
@@ -84,7 +86,15 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _purchaseDispatchTransactionService.GetTransactionsByFicheReferenceId(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseFicheModel.ReferenceId, SearchText.Text, 0, 20);
+            var result = await _purchaseDispatchTransactionService.GetTransactionsByFicheReferenceId(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                ficheReferenceId: PurchaseFicheModel.ReferenceId, 
+                search: SearchText.Text, 
+                skip: 0, 
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -102,7 +112,8 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.HideHud();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (System.Exception ex)
         {
@@ -121,13 +132,23 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
     {
         if (IsBusy)
             return;
+        if (Items.Count < 18)
+            return;
 
         try
         {
             IsBusy = true;
             _userDialogs.ShowLoading("Yükleniyor...");
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _purchaseDispatchTransactionService.GetTransactionsByFicheReferenceId(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseFicheModel.ReferenceId, SearchText.Text, Items.Count, 20);
+            var result = await _purchaseDispatchTransactionService.GetTransactionsByFicheReferenceId(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                ficheReferenceId: PurchaseFicheModel.ReferenceId, 
+                search: SearchText.Text, 
+                skip: Items.Count, 
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -142,11 +163,12 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
                             item.IsSelected = false;
                         Items.Add(item);
                     }
-
-                    _userDialogs.HideHud();
                 }
             }
-        }
+
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+		}
         catch (System.Exception ex)
         {
             if (_userDialogs.IsHudShowing)
@@ -292,7 +314,15 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
             Items.Clear();
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _purchaseDispatchTransactionService.GetTransactionsByFicheReferenceId(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, PurchaseFicheModel.ReferenceId, SearchText.Text, 0, 20);
+            var result = await _purchaseDispatchTransactionService.GetTransactionsByFicheReferenceId(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber, 
+                ficheReferenceId: PurchaseFicheModel.ReferenceId, 
+                search: SearchText.Text, 
+                skip: 0, 
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase);
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
@@ -318,6 +348,9 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
         }
         catch (System.Exception ex)
         {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
             _userDialogs.Alert(ex.Message, "Hata");
         }
         finally
@@ -331,6 +364,29 @@ public partial class ReturnPurchaseDispatchProductListViewModel : BaseViewModel
         if (string.IsNullOrWhiteSpace(SearchText.Text))
         {
             await PerformSearchAsync();
+        }
+    }
+
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (Exception ex)
+        {
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+        finally
+        {
+            IsBusy = false;
         }
     }
 }

@@ -16,323 +16,357 @@ using Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesProcess.Vi
 using DevExpress.Maui.Controls;
 using System.Collections.ObjectModel;
 
-namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.ViewModels
+namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ReturnProductSalesDispatchProcess.ViewModels;
+
+[QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
+public partial class ReturnSalesDispatchCustomerListViewModel : BaseViewModel
 {
-    [QueryProperty(name: nameof(WarehouseModel), queryId: nameof(WarehouseModel))]
-    public partial class ReturnSalesDispatchCustomerListViewModel : BaseViewModel
+    private readonly IHttpClientService _httpClientService;
+    private readonly ISalesCustomerService _salesCustomerService;
+    private readonly ISalesCustomerProductService _salesCustomerProductService;
+    private readonly IUserDialogs _userDialogs;
+    private readonly IServiceProvider _serviceProvider;
+
+    [ObservableProperty]
+    WarehouseModel warehouseModel = null!;
+
+    [ObservableProperty]
+    SalesCustomer selectedSalesCustomer = null!;
+
+
+    #region Collections
+    public ObservableCollection<SalesCustomer> Items { get; } = new();
+
+    #endregion
+
+    public ReturnSalesDispatchCustomerListViewModel(IHttpClientService httpClientService,
+    ISalesCustomerService salesCustomerService,
+    IUserDialogs userDialogs,
+    ISalesCustomerProductService salesCustomerProductService,
+    IServiceProvider serviceProvider)
     {
-        private readonly IHttpClientService _httpClientService;
-        private readonly ISalesCustomerService _salesCustomerService;
-        private readonly ISalesCustomerProductService _salesCustomerProductService;
-        private readonly IUserDialogs _userDialogs;
-        private readonly IServiceProvider _serviceProvider;
+        _httpClientService = httpClientService;
+        _salesCustomerService = salesCustomerService;
+        _userDialogs = userDialogs;
+        _salesCustomerProductService = salesCustomerProductService;
+        _serviceProvider = serviceProvider;
 
-        [ObservableProperty]
-        WarehouseModel warehouseModel = null!;
+        Title = "Müşteri Listesi";
 
-        [ObservableProperty]
-        SalesCustomer selectedSalesCustomer = null!;
+        LoadItemsCommand = new Command(async () => await LoadItemsAsync());
+        LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
+        ItemTappedCommand = new Command<SalesCustomer>(async (customer) => ItemTappedAsync(customer));
+        NextViewCommand = new Command(async () => await NextViewAsync());
+        ShowOrdersCommand = new Command<SalesCustomer>(async (customer) => await ShowOrdersAsync(customer));
+        PerformSearchCommand = new Command(async () => await PerformSearchAsync());
+        PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
+		BackCommand = new Command(async () => await BackAsync());
+	}
 
+    #region Commands
+    public Command LoadItemsCommand { get; }
+    public Command LoadMoreItemsCommand { get; }
+    public Command ItemTappedCommand { get; }
+    public Command ShowOrdersCommand { get; }
+    public Command NextViewCommand { get; }
+    public Command PerformSearchCommand { get; }
+    public Command PerformEmptySearchCommand { get; }
+    public Command BackCommand { get; }
+    #endregion
 
-        #region Collections
-        public ObservableCollection<SalesCustomer> Items { get; } = new();
+    [ObservableProperty]
+    public SearchBar searchText;
 
-        #endregion
-
-        public ReturnSalesDispatchCustomerListViewModel(IHttpClientService httpClientService,
-        ISalesCustomerService salesCustomerService,
-        IUserDialogs userDialogs,
-        ISalesCustomerProductService salesCustomerProductService,
-        IServiceProvider serviceProvider)
+    private async Task LoadItemsAsync()
+    {
+        if (IsBusy)
+            return;
+        try
         {
-            _httpClientService = httpClientService;
-            _salesCustomerService = salesCustomerService;
-            _userDialogs = userDialogs;
-            _salesCustomerProductService = salesCustomerProductService;
-            _serviceProvider = serviceProvider;
+            IsBusy = true;
 
-            Title = "Müşteri Listesi";
+            _userDialogs.ShowLoading("Loading Items...");
+            Items.Clear();
+            await Task.Delay(1000);
 
-            LoadItemsCommand = new Command(async () => await LoadItemsAsync());
-            LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-            ItemTappedCommand = new Command<SalesCustomer>(async (customer) => ItemTappedAsync(customer));
-            NextViewCommand = new Command(async () => await NextViewAsync());
-            ShowOrdersCommand = new Command<SalesCustomer>(async (customer) => await ShowOrdersAsync(customer));
-            PerformSearchCommand = new Command(async () => await PerformSearchAsync());
-            PerformEmptySearchCommand = new Command(async () => await PerformEmptySearchAsync());
-        }
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _salesCustomerService.SalesCustomerQueryFiche(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                warehouseNumber: WarehouseModel.Number, 
+                skip: 0, 
+                take: 20, 
+                search: SearchText.Text
+            );
 
-        #region Commands
-        public Command LoadItemsCommand { get; }
-        public Command LoadMoreItemsCommand { get; }
-        public Command ItemTappedCommand { get; }
-        public Command ShowOrdersCommand { get; }
-        public Command NextViewCommand { get; }
-        public Command PerformSearchCommand { get; }
-        public Command PerformEmptySearchCommand { get; }
-        #endregion
-
-        [ObservableProperty]
-        public SearchBar searchText;
-
-        private async Task LoadItemsAsync()
-        {
-            if (IsBusy)
-                return;
-            try
+            if (result.IsSuccess)
             {
-                IsBusy = true;
+                if (result.Data is null)
+                    return;
 
-                _userDialogs.ShowLoading("Loading Items...");
-                Items.Clear();
-                await Task.Delay(1000);
+                foreach (var item in result.Data)
+                    Items.Add(Mapping.Mapper.Map<SalesCustomer>(item));
+            }
 
-                var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _salesCustomerService.SalesCustomerQueryFiche(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: 0, take: 20, search: SearchText.Text);
-                if (result.IsSuccess)
-                {
-                    if (result.Data is null)
-                        return;
-
-                    foreach (var item in result.Data)
-                        Items.Add(Mapping.Mapper.Map<SalesCustomer>(item));
-                }
-
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.HideHud();
 
-                _userDialogs.Alert(ex.Message);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            _userDialogs.Alert(ex.Message);
         }
-
-        private async Task LoadMoreItemsAsync()
+        finally
         {
-            if (IsBusy)
-                return;
-            try
+            IsBusy = false;
+        }
+    }
+
+    private async Task LoadMoreItemsAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+            _userDialogs.Loading("Loading Items...");
+
+            var result = await _salesCustomerService.SalesCustomerQueryFiche(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber, 
+                warehouseNumber: WarehouseModel.Number, 
+                skip: Items.Count, 
+                take: 20, 
+                search: SearchText.Text
+            );
+
+            if (result.IsSuccess)
             {
-                IsBusy = true;
+                if (result.Data is null)
+                    return;
 
-                var httpClient = _httpClientService.GetOrCreateHttpClient();
+                foreach (var item in result.Data)
+                    Items.Add(Mapping.Mapper.Map<SalesCustomer>(item));
+            }
 
-                _userDialogs.Loading("Loading Items...");
-                var result = await _salesCustomerService.SalesCustomerQueryFiche(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: Items.Count, take: 20, search: SearchText.Text);
-                if (result.IsSuccess)
-                {
-                    if (result.Data is null)
-                        return;
-
-                    foreach (var item in result.Data)
-                        Items.Add(Mapping.Mapper.Map<SalesCustomer>(item));
-                }
-
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
                 _userDialogs.HideHud();
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.HideHud();
 
-                _userDialogs.Alert(ex.Message);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            _userDialogs.Alert(ex.Message);
         }
-
-        private async Task ShowOrdersAsync(SalesCustomer selectedItem)
+        finally
         {
-            if (IsBusy)
-                return;
-            try
+            IsBusy = false;
+        }
+    }
+
+    private async Task ShowOrdersAsync(SalesCustomer selectedItem)
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var customerOrders = await _salesCustomerProductService.GetObjects(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				customerReferenceId: selectedItem.ReferenceId,
+				warehouseNumber: WarehouseModel.Number,
+                search: "",
+				skip: 0,
+				take: 20
+			);
+
+            if (customerOrders.IsSuccess)
             {
-                IsBusy = true;
+                if (customerOrders.Data is null)
+                    return;
 
-                var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var customerOrders = await _salesCustomerProductService.GetObjects(
-					httpClient: httpClient,
-					firmNumber: _httpClientService.FirmNumber,
-					periodNumber: _httpClientService.PeriodNumber,
-					customerReferenceId: selectedItem.ReferenceId,
-					warehouseNumber: WarehouseModel.Number,
-                    search: "",
-					skip: 0,
-					take: 20
-				);
-
-                if (customerOrders.IsSuccess)
+                foreach (var item in customerOrders.Data)
                 {
-                    if (customerOrders.Data is null)
-                        return;
+                    Items.FirstOrDefault(x => x.ReferenceId == selectedItem.ReferenceId)?
+                    .Products.Add(Mapping.Mapper.Map<SalesCustomerProduct>(item));
 
-                    foreach (var item in customerOrders.Data)
-                    {
-                        Items.FirstOrDefault(x => x.ReferenceId == selectedItem.ReferenceId)?
-                        .Products.Add(Mapping.Mapper.Map<SalesCustomerProduct>(item));
-
-                    }
                 }
             }
-            catch (Exception ex)
-            {
-                _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
         }
-
-        private void ItemTappedAsync(SalesCustomer item)
+        catch (Exception ex)
         {
-            if (IsBusy)
-                return;
-            try
-            {
-                IsBusy = true;
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-                if (item == SelectedSalesCustomer)
+    private async Task ItemTappedAsync(SalesCustomer item)
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            if (item == SelectedSalesCustomer)
+            {
+                SelectedSalesCustomer.IsSelected = false;
+                SelectedSalesCustomer = null;
+            }
+            else
+            {
+                if (SelectedSalesCustomer != null)
                 {
                     SelectedSalesCustomer.IsSelected = false;
-                    SelectedSalesCustomer = null;
-                }
-                else
-                {
-                    if (SelectedSalesCustomer != null)
-                    {
-                        SelectedSalesCustomer.IsSelected = false;
-                    }
-
-                    SelectedSalesCustomer = item;
-                    SelectedSalesCustomer.IsSelected = true;
-
                 }
 
-            }
-            catch (Exception ex)
-            {
-                _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-            }
-            finally
-            {
-                IsBusy = false;
+                SelectedSalesCustomer = item;
+                SelectedSalesCustomer.IsSelected = true;
             }
         }
-
-        private async Task NextViewAsync()
+        catch (Exception ex)
         {
-            if (IsBusy)
-                return;
-            try
-            {
-                IsBusy = true;
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-                if (SelectedSalesCustomer is not null)
-                {
-                    var viewModel = _serviceProvider.GetRequiredService<ReturnSalesDispatchListViewModel>();
-                    await viewModel.LoadPageAsync();
-                    await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchListView)}", new Dictionary<string, object>
-                    {
-                        [nameof(SalesCustomer)] = SelectedSalesCustomer,
-                        [nameof(WarehouseModel)] = WarehouseModel,
-                    });
-                }
-                else
-                {
-                    _userDialogs.Alert("Lütfen bir müşteri seçiniz.", "Hata", "Tamam");
-                }
-
-
-
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.HideHud();
-
-                _userDialogs.Alert(ex.Message, "Hata", "Tamam");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
-        public async Task LoadPageAsync()
+        finally
         {
-            try
-            {
-
-
-                if (Items?.Count > 0)
-                    Items.Clear();
-            }
-            catch (Exception ex)
-            {
-                if (_userDialogs.IsHudShowing)
-                    _userDialogs.HideHud();
-
-                await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-            }
-
+            IsBusy = false;
         }
-        private async Task PerformSearchAsync()
+    }
+
+    private async Task NextViewAsync()
+    {
+        if (IsBusy)
+            return;
+        try
         {
-            if (IsBusy)
-                return;
+            IsBusy = true;
 
-            try
+            if (SelectedSalesCustomer is not null)
             {
-                if (string.IsNullOrWhiteSpace(SearchText.Text))
+                var viewModel = _serviceProvider.GetRequiredService<ReturnSalesDispatchListViewModel>();
+                await viewModel.LoadPageAsync();
+                await Shell.Current.GoToAsync($"{nameof(ReturnSalesDispatchListView)}", new Dictionary<string, object>
                 {
-                    await LoadItemsAsync();
-                    SearchText.Unfocus();
-                    return;
-                }
-                IsBusy = true;
-
-                Items.Clear();
-                var httpClient = _httpClientService.GetOrCreateHttpClient();
-                var result = await _salesCustomerService.SalesCustomerQueryFiche(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: 0, take: 20, search: SearchText.Text);
-                if (result.IsSuccess)
-                {
-                    if (result.Data is null)
-                        return;
-
-                    foreach (var item in result.Data)
-                        Items.Add(Mapping.Mapper.Map<SalesCustomer>(item));
-                }
-                if (!result.IsSuccess)
-                {
-                    _userDialogs.Alert(result.Message, "Hata");
-                    return;
-                }
-
+                    [nameof(SalesCustomer)] = SelectedSalesCustomer,
+                    [nameof(WarehouseModel)] = WarehouseModel,
+                });
             }
-            catch (System.Exception ex)
+            else
             {
-                _userDialogs.Alert(ex.Message, "Hata");
-            }
-            finally
-            {
-                IsBusy = false;
+                _userDialogs.Alert("Lütfen bir müşteri seçiniz.", "Hata", "Tamam");
             }
         }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
 
-        private async Task PerformEmptySearchAsync()
+            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+   
+    private async Task PerformSearchAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
         {
             if (string.IsNullOrWhiteSpace(SearchText.Text))
             {
-                await PerformSearchAsync();
+                await LoadItemsAsync();
+                SearchText.Unfocus();
+                return;
             }
+            IsBusy = true;
+
+            Items.Clear();
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
+            var result = await _salesCustomerService.SalesCustomerQueryFiche(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, skip: 0, take: 20, search: SearchText.Text);
+            if (result.IsSuccess)
+            {
+                if (result.Data is null)
+                    return;
+
+                foreach (var item in result.Data)
+                    Items.Add(Mapping.Mapper.Map<SalesCustomer>(item));
+            }
+            if (!result.IsSuccess)
+            {
+                _userDialogs.Alert(result.Message, "Hata");
+                return;
+            }
+
+        }
+        catch (System.Exception ex)
+        {
+            _userDialogs.Alert(ex.Message, "Hata");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task PerformEmptySearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText.Text))
+        {
+            await PerformSearchAsync();
+        }
+    }
+
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            if(SelectedSalesCustomer is not null)
+            {
+                SelectedSalesCustomer.IsSelected = false;
+                SelectedSalesCustomer = null;
+            }
+
+            SearchText.Text = "";
+
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+        finally
+        {
+            IsBusy = false;
         }
     }
 }

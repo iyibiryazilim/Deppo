@@ -13,6 +13,7 @@ using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using DevExpress.Maui.Controls;
+using DevExpress.Maui.Core.Internal;
 using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.OutputProductSalesProcess.ViewModels;
@@ -93,13 +94,14 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _warehouseTotalService.GetObjects(
-                httpClient,
-                _httpClientService.FirmNumber,
-                _httpClientService.PeriodNumber,
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
                 warehouseNumber: WarehouseModel.Number,
                 search: SearchText.Text,
                 skip: 0,
-                take: 20);
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase);
 
             if (result.IsSuccess)
             {
@@ -139,14 +141,15 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
                 }
             }
 
-            _userDialogs.Loading().Hide();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 
-            _userDialogs.Alert(ex.Message, "Hata", "Tamam");
+			_userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
         finally
         {
@@ -167,13 +170,14 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _warehouseTotalService.GetObjects(
-                httpClient,
-                _httpClientService.FirmNumber,
-                _httpClientService.PeriodNumber,
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
                 warehouseNumber: WarehouseModel.Number,
                 search: SearchText.Text,
                 skip: Items.Count,
-                take: 20);
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase);
 
             if (result.IsSuccess)
             {
@@ -213,12 +217,13 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
                 }
             }
 
-            _userDialogs.HideHud();
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+                _userDialogs.HideHud();
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
@@ -231,73 +236,81 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
     private async Task ItemTappedAsync(WarehouseTotalModel item)
     {
         if (IsBusy) return;
+        if (item is null) return;
 
         try
         {
             IsBusy = true;
+            SelectedProduct = item;
 
-            if (item is not null)
+            if(!item.IsSelected)
             {
-                if (item.IsVariant)
+                if(item.IsVariant)
                 {
-                    SelectedProduct = item;
                     await LoadVariantItemsAsync(item);
-                    CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.HalfExpanded;
-                }
+					CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.HalfExpanded;
+				}
                 else
                 {
-                    if (!item.IsSelected)
+					Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
+					
+					var basketItem = new OutputSalesBasketModel
                     {
-                        Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = true;
-                        SelectedProduct = item;
-                        SelectedItems.Add(item);
+                        ItemReferenceId = item.ProductReferenceId,
+                        ItemCode = item.ProductCode,
+                        ItemName = item.ProductName,
+                        UnitsetReferenceId = item.UnitsetReferenceId,
+                        UnitsetCode = item.UnitsetCode,
+                        UnitsetName = item.UnitsetName,
+                        SubUnitsetReferenceId = item.SubUnitsetReferenceId,
+                        SubUnitsetCode = item.SubUnitsetCode,
+                        SubUnitsetName = item.SubUnitsetName,
+                        MainItemReferenceId = default,  //
+                        MainItemCode = string.Empty,    //
+                        MainItemName = string.Empty,    //
+                        StockQuantity = item.StockQuantity,
+                        IsSelected = false,   //
+                        IsVariant = item.IsVariant,
+                        LocTracking = item.LocTracking,
+                        TrackingType = item.TrackingType,
+                        Quantity = item.LocTracking == 0 ? 1 : 0,
+                        LocTrackingIcon = item.LocTrackingIcon,
+                        VariantIcon = item.VariantIcon,
+                        TrackingTypeIcon = item.TrackingTypeIcon,
+                        Image = item.ImageData
+                    };
 
-                        var basketItem = new OutputSalesBasketModel
-                        {
-                            ItemReferenceId = item.ProductReferenceId,
-                            ItemCode = item.ProductCode,
-                            ItemName = item.ProductName,
-                            UnitsetReferenceId = item.UnitsetReferenceId,
-                            UnitsetCode = item.UnitsetCode,
-                            UnitsetName = item.UnitsetName,
-                            SubUnitsetReferenceId = item.SubUnitsetReferenceId,
-                            SubUnitsetCode = item.SubUnitsetCode,
-                            SubUnitsetName = item.SubUnitsetName,
-                            MainItemReferenceId = default,  //
-                            MainItemCode = string.Empty,    //
-                            MainItemName = string.Empty,    //
-                            StockQuantity = item.StockQuantity,
-                            IsSelected = false,   //
-                            IsVariant = item.IsVariant,
-                            LocTracking = item.LocTracking,
-                            TrackingType = item.TrackingType,
-                            Quantity = item.LocTracking == 0 ? 1 : 0,
-                            LocTrackingIcon = item.LocTrackingIcon,
-                            VariantIcon = item.VariantIcon,
-                            TrackingTypeIcon = item.TrackingTypeIcon,
-                            Image = item.ImageData
-                        };
+					SelectedItems.Add(item);
+                    SelectedProducts.Add(basketItem);
+				}
+			}
+            else
+            {
+                if(SelectedProduct is not null)
+                {
+					SelectedProduct.IsSelected = false;
+					SelectedProduct = null;
+				}
 
-                        SelectedProducts.Add(basketItem);
-                    }
-                    else
-                    {
-                        SelectedProduct = null;
-                        var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ProductReferenceId);
-                        if (selectedItem is not null)
-                        {
-                            SelectedProducts.Remove(selectedItem);
-                            Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
-                            SelectedItems.Remove(item);
-                        }
-                    }
-                }
-            }
+				var selectedItem = SelectedProducts.FirstOrDefault(x => x.ItemReferenceId == item.ProductReferenceId);
+
+				if (item.IsVariant)
+				{
+					selectedItem = SelectedProducts.FirstOrDefault(x => x.MainItemReferenceId == item.ProductReferenceId);
+				}
+
+				if (selectedItem is not null)
+				{
+					SelectedProducts.Remove(selectedItem);
+					Items.ToList().FirstOrDefault(x => x.ProductReferenceId == item.ProductReferenceId).IsSelected = false;
+					SelectedItems.Remove(item);
+				}
+			}            
         }
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+                _userDialogs.HideHud();
 
             _userDialogs.Alert(ex.Message, "Hata", "Tamam");
         }
@@ -312,7 +325,8 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
         try
         {
             _userDialogs.Loading("Loading Variant Items...");
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
+			ItemVariants.Clear();
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _variantWarehouseTotalService.GetObjects(
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
@@ -321,14 +335,15 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
                 productReferenceId: item.ProductReferenceId,
                 search: string.Empty,
                 skip: 0,
-                take: 20
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase
             );
 
             if (result.IsSuccess)
             {
                 if (result.Data == null)
                     return;
-                ItemVariants.Clear();
+                
                 foreach (var variant in result.Data)
                 {
                     var obj = Mapping.Mapper.Map<VariantWarehouseTotalModel>(variant);
@@ -336,18 +351,15 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
                 }
             }
 
-            _userDialogs.Loading().Hide();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+				_userDialogs.HideHud();
 
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            _userDialogs.Loading().Dispose();
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
     }
 
@@ -372,8 +384,9 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
                 productReferenceId: SelectedProduct.ProductReferenceId,
                 search: string.Empty,
                 skip: ItemVariants.Count,
-                take: 20
-            );
+                take: 20,
+				externalDb: _httpClientService.ExternalDatabase
+			);
 
             if (result.IsSuccess)
             {
@@ -387,12 +400,13 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
                 }
             }
 
-            _userDialogs.Loading().Hide();
-        }
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+                _userDialogs.HideHud();
 
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
@@ -412,10 +426,15 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
         {
             IsBusy = true;
 
-            ItemVariants.ToList().ForEach(x => x.IsSelected = false);
-            var selectedItem = ItemVariants.FirstOrDefault(x => x.VariantReferenceId == item.VariantReferenceId);
-            if (selectedItem != null)
-                selectedItem.IsSelected = true;
+			if (item.IsSelected)
+			{
+				item.IsSelected = false;
+			}
+			else
+			{
+				item.IsSelected = true;
+				ItemVariants.Where(x => x.VariantReferenceId != item.VariantReferenceId).ToList().ForEach(x => x.IsSelected = false);
+			}
         }
         catch (Exception ex)
         {
@@ -438,7 +457,10 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
 
             var item = ItemVariants.FirstOrDefault(x => x.IsSelected);
             if (item is null)
+            {
+				CurrentPage.FindByName<BottomSheet>("variantBottomSheet").State = BottomSheetState.Hidden;
                 return;
+			}
 
             var basketItem = new OutputSalesBasketModel
             {
@@ -502,7 +524,7 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
                 if (SelectedProducts.Any())
                 {
                     foreach (var item in SelectedProducts)
-                        if (!previousViewModel.Items.Any(x => x.ItemCode == item.ItemCode))
+                        if (!previousViewModel.Items.Any(x => x.ItemReferenceId == item.ItemReferenceId))
                             previousViewModel.Items.Add(item);
 
                     SelectedProducts.Clear();
@@ -544,10 +566,14 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
                 {
                     return;
                 }
+
                 SelectedProducts.Clear();
             }
 
-            SearchText.Text = string.Empty;
+            SelectedItems.ForEach(x => x.IsSelected = false);
+			SelectedItems.Clear();
+
+			SearchText.Text = string.Empty;
             await Shell.Current.GoToAsync("..");
         }
         catch (Exception ex)
@@ -580,13 +606,14 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
             Items.Clear();
             var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _warehouseTotalService.GetObjects(
-                httpClient,
-                _httpClientService.FirmNumber,
-                _httpClientService.PeriodNumber,
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
                 warehouseNumber: WarehouseModel.Number,
                 search: SearchText.Text,
                 skip: 0,
-                take: 20);
+                take: 20, 
+                externalDb: _httpClientService.ExternalDatabase);
 
             if (result.IsSuccess)
             {
@@ -623,6 +650,9 @@ public partial class OutputProductSalesProcessProductListViewModel : BaseViewMod
                     Items.Add(item);
                 }
             }
+
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (System.Exception ex)
         {
