@@ -168,7 +168,7 @@
             </CollectionView>
 
             <Button Grid.Row="3"
-                    Margin="5,0,5,30"
+                    Margin="5,0,5,20"
                     Command="{Binding ConfirmCommand}"
                     Text="{Binding SelectedProducts.Count, StringFormat='Sepete Ekle : {0} '}" />
         </Grid>

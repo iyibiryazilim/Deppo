@@ -39,15 +39,17 @@ public partial class ReturnSalesWarehouseListViewModel : BaseViewModel
 
         LoadItemsCommand = new Command(async () => await LoadItemsAsync());
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
-        ItemTappedCommand = new Command<WarehouseModel>(ItemTappedAsync);
+        ItemTappedCommand = new Command<WarehouseModel>(async (x) => await ItemTappedAsync(x));
         NextViewCommand = new Command(async () => await NextViewAsync());
-        _serviceProvider = serviceProvider;
+		BackCommand = new Command(async () => await BackAsync());
+		_serviceProvider = serviceProvider;
     }
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
+    public Command BackCommand { get; }
 
     public ObservableCollection<WarehouseModel> Items { get; } = new();
 
@@ -154,7 +156,7 @@ public partial class ReturnSalesWarehouseListViewModel : BaseViewModel
         }
     }
 
-    private void ItemTappedAsync(WarehouseModel item)
+    private async Task ItemTappedAsync(WarehouseModel item)
     {
         if (IsBusy)
             return;
@@ -181,7 +183,10 @@ public partial class ReturnSalesWarehouseListViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            _userDialogs.Alert(ex.Message);
+            if(_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
@@ -212,6 +217,35 @@ public partial class ReturnSalesWarehouseListViewModel : BaseViewModel
             _userDialogs.Alert(ex.Message);
 
         }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+        try
+        {
+            IsBusy = true;
+
+            if(SelectedWarehouseModel is not null)
+            {
+                SelectedWarehouseModel.IsSelected = false;
+				SelectedWarehouseModel = null;
+			}
+
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
         finally
         {
             IsBusy = false;
