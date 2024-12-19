@@ -79,15 +79,17 @@ public partial class OutputProductSalesOrderProcessOrderListViewModel : BaseView
 			await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _waitingSalesOrderService.GetObjects(httpClient,
-                _httpClientService.FirmNumber,
-                _httpClientService.PeriodNumber,
+            var result = await _waitingSalesOrderService.GetObjects(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
                 warehouseNumber: WarehouseModel.Number,
                 customerReferenceId: SalesCustomer.ReferenceId,
                 shipInfoReferenceId: SalesCustomer.ShipAddressReferenceId,
-                SearchText.Text,
-                0,
-                20);
+                search: SearchText.Text,
+                skip: 0,
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase);
 
             if (result.IsSuccess)
             {
@@ -131,15 +133,17 @@ public partial class OutputProductSalesOrderProcessOrderListViewModel : BaseView
             _userDialogs.ShowLoading("Loading More Orders...");
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _waitingSalesOrderService.GetObjects(httpClient,
-                _httpClientService.FirmNumber,
-                _httpClientService.PeriodNumber,
+            var result = await _waitingSalesOrderService.GetObjects(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
                 warehouseNumber: WarehouseModel.Number,
                 customerReferenceId: SalesCustomer.ReferenceId,
                 shipInfoReferenceId: SalesCustomer.ShipAddressReferenceId,
-                SearchText.Text,
-                Items.Count,
-                20);
+                search: SearchText.Text,
+                skip: Items.Count,
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase);
 
             if (result.IsSuccess)
             {
@@ -190,7 +194,17 @@ public partial class OutputProductSalesOrderProcessOrderListViewModel : BaseView
             Items.Clear();
             var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-            var result = await _waitingSalesOrderService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, warehouseNumber: WarehouseModel.Number, customerReferenceId: SalesCustomer.ReferenceId, shipInfoReferenceId: SalesCustomer.ShipAddressReferenceId, SearchText.Text, 0, 20);
+            var result = await _waitingSalesOrderService.GetObjects(
+                httpClient: httpClient, 
+                firmNumber: _httpClientService.FirmNumber, 
+                periodNumber: _httpClientService.PeriodNumber,
+                warehouseNumber: WarehouseModel.Number,
+                customerReferenceId: SalesCustomer.ReferenceId, 
+                shipInfoReferenceId: SalesCustomer.ShipAddressReferenceId,
+                search: SearchText.Text,
+                skip: 0, 
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase);
 
             if (result.IsSuccess)
             {
