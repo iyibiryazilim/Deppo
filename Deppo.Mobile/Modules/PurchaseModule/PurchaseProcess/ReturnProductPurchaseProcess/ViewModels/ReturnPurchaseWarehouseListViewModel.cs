@@ -3,6 +3,7 @@ using Controls.UserDialogs.Maui;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseProcess.Views;
 using System.Collections.ObjectModel;
@@ -34,12 +35,14 @@ public partial class ReturnPurchaseWarehouseListViewModel : BaseViewModel
         LoadMoreItemsCommand = new Command(async () => await LoadMoreItemsAsync());
         ItemTappedCommand = new Command<WarehouseModel>(ItemTappedAsync);
         NextViewCommand = new Command(async () => await NextViewAsync());
-    }
+		BackCommand = new Command(async () => await BackAsync());
+	}
 
     public Command LoadItemsCommand { get; }
     public Command LoadMoreItemsCommand { get; }
     public Command ItemTappedCommand { get; }
     public Command NextViewCommand { get; }
+    public Command BackCommand { get; }
 
     private async Task LoadItemsAsync()
     {
@@ -54,25 +57,28 @@ public partial class ReturnPurchaseWarehouseListViewModel : BaseViewModel
             Items.Clear();
             await Task.Delay(1000);
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, 0, 20, _httpClientService.FirmNumber);
+            var result = await _warehouseService.GetObjectsAsync(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                search: "",
+                skip: 0,
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase
+            );
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
                     foreach (var item in result.Data)
-                        Items.Add(new WarehouseModel
-                        {
-                            ReferenceId = item.ReferenceId,
-                            Name = item.Name,
-                            Number = item.Number,
-                            City = item.City,
-                            Country = item.Country,
-                            IsSelected = false
-                        });
+                    {
+                        Items.Add(Mapping.Mapper.Map<WarehouseModel>(item));
+                    }
                 }
             }
 
-            _userDialogs.HideHud();
+            if(_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
@@ -100,23 +106,26 @@ public partial class ReturnPurchaseWarehouseListViewModel : BaseViewModel
 
            
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, Items.Count, 20, _httpClientService.FirmNumber);
-            if (result.IsSuccess)
+			var result = await _warehouseService.GetObjectsAsync(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				search: "",
+				skip: Items.Count,
+				take: 20,
+				externalDb: _httpClientService.ExternalDatabase
+			);
+			if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
 					_userDialogs.ShowLoading("Loading...");
+
 					foreach (var item in result.Data)
-                        Items.Add(new WarehouseModel
-                        {
-                            ReferenceId = item.ReferenceId,
-                            Name = item.Name,
-                            Number = item.Number,
-                            City = item.City,
-                            Country = item.Country,
-                            IsSelected = false
-                        });
-                }
+					{
+						Items.Add(Mapping.Mapper.Map<WarehouseModel>(item));
+					}
+				}
             }
 
             if(_userDialogs.IsHudShowing)
@@ -191,6 +200,36 @@ public partial class ReturnPurchaseWarehouseListViewModel : BaseViewModel
         {
             _userDialogs.Alert(ex.Message);
         }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task BackAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+
+            if(SelectedWarehouseModel is not null)
+            {
+                SelectedWarehouseModel.IsSelected = false;
+				SelectedWarehouseModel = null;
+			}
+
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (Exception ex)
+        {
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
+
+            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
         finally
         {
             IsBusy = false;
