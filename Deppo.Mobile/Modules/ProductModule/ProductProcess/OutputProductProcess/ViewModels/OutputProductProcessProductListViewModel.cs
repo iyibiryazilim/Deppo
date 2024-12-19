@@ -522,7 +522,7 @@ public partial class OutputProductProcessProductListViewModel : BaseViewModel
                 {
                     foreach (var item in SelectedProducts)
                     {
-                        if (!previousViewModel.Items.Any(x => x.ItemCode == item.ItemCode))
+                        if (!previousViewModel.Items.Any(x => x.ItemReferenceId == item.ItemReferenceId))
                             previousViewModel.Items.Add(item);
                     }
                 }

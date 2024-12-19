@@ -160,19 +160,19 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.Loading().Hide();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+				_userDialogs.HideHud();
 
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
             IsBusy = false;
-            _userDialogs.Loading().Dispose();
         }
     }
 
@@ -224,19 +224,19 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.Loading().Hide();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
             if (_userDialogs.IsHudShowing)
-                _userDialogs.Loading().Hide();
+				_userDialogs.HideHud();
 
-            await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
         }
         finally
         {
             IsBusy = false;
-            _userDialogs.Loading().Dispose();
         }
     }
 
@@ -530,7 +530,7 @@ public partial class InputProductProcessProductListViewModel : BaseViewModel
             var previouseViewModel = _serviceProvider.GetRequiredService<InputProductProcessBasketListViewModel>();
           
             foreach (var item in SelectedProducts)
-                if (!previouseViewModel.Items.Any(x => x.ItemCode == item.ItemCode))
+                if (!previouseViewModel.Items.Any(x => x.ItemReferenceId == item.ItemReferenceId))
                     previouseViewModel.Items.Add(item);
 
             SearchText.Text = string.Empty;
