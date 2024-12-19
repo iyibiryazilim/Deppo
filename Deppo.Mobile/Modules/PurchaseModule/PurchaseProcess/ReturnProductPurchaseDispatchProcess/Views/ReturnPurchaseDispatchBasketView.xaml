@@ -93,12 +93,15 @@
                                         StrokeThickness="0.1">
                                     <Grid ColumnDefinitions=".20*,.80*" ColumnSpacing="10">
                                         <Border Grid.Column="0"
+                                                HeightRequest="{OnIdiom 100,
+                                                                        Phone=70,
+                                                                        Tablet=100}"
                                                 Stroke="{StaticResource Primary}"
                                                 StrokeShape="RoundRectangle 5"
                                                 StrokeThickness="0.5"
-                                                WidthRequest="{OnIdiom 100, Phone=70, Tablet=100}"
-                                                HeightRequest="{OnIdiom 100, Phone=70, Tablet=100}"
-                                                >
+                                                WidthRequest="{OnIdiom 100,
+                                                                       Phone=70,
+                                                                       Tablet=100}">
                                             <Image Aspect="AspectFill" Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}" />
                                         </Border>
 
