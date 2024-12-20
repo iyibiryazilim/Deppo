@@ -58,21 +58,22 @@ namespace Deppo.Core.DataStores
 
 		public async Task<DataResult<ResponseModel>> DeleteTransferTransaction(HttpClient httpClient, int referenceId, int firmNumber)
 		{
-			var postUrl = $"/gateway/product/TransferTransaction/Tiger?firmNumber={firmNumber}";
+			var postUrl = $"/gateway/product/TransferTransaction/Tiger/Delete?firmNumber={firmNumber}";
 			DataResult<ResponseModel> dataResult = new DataResult<ResponseModel>();
 
-            try
+
+			try
             {
                 var jsonBody = new StringContent(
-                    System.Text.Json.JsonSerializer.Serialize(new { referenceId }),
+                    System.Text.Json.JsonSerializer.Serialize(new { referenceId, firmNumber }),
                     Encoding.UTF8,
                     "application/json"
                 );
 
-                var request = new HttpRequestMessage(HttpMethod.Delete, postUrl)
+                var request = new HttpRequestMessage(HttpMethod.Post, postUrl)
                 {
                     Content = jsonBody
-                };
+				};
 
                 var responseMessage = await httpClient.SendAsync(request);
 
@@ -82,7 +83,7 @@ namespace Deppo.Core.DataStores
                     var dtos = data.Trim('"').Replace("\\\"", "\"").Replace("\\", "");
                     var dtos2 = JsonConvert.DeserializeObject<DataResult<ResponseModel>>(dtos);
                     dataResult.Message = dtos2.Message;
-                    dataResult.IsSuccess = dtos2.IsSuccess;
+                    dataResult.IsSuccess = true;
                     dataResult.Data = dtos2.Data;
                     return dataResult;
                 }
