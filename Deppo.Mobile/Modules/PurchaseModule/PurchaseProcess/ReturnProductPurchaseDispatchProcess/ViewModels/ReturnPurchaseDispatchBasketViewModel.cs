@@ -992,8 +992,8 @@ public partial class ReturnPurchaseDispatchBasketViewModel : BaseViewModel
             }
             SelectedLocationTransactions.Clear();
             SelectedSeriLotTransactions.Clear();
-            SelectedPurchaseTransactions.Clear();
-            Items.Clear();
+            //SelectedPurchaseTransactions.Clear();
+            //Items.Clear();
             await Shell.Current.GoToAsync("..");
         }
         catch (Exception ex)
