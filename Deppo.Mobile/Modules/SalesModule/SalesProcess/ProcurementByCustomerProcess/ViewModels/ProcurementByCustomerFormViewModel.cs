@@ -1,19 +1,13 @@
-﻿using AndroidX.Camera.Video;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Controls.UserDialogs.Maui;
+using Deppo.Core.DataResultModel;
 using Deppo.Core.DTOs.SalesDispatchTransaction;
 using Deppo.Core.DTOs.SeriLotTransactionDto;
 using Deppo.Core.DTOs.TransferTransaction;
-using Deppo.Core.Models;
 using Deppo.Core.ResponseResultModels;
 using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.LocationModels;
 using Deppo.Mobile.Core.Models.ProcurementModels.ByCustomerModels;
-using Deppo.Mobile.Core.Models.ProductModels;
-using Deppo.Mobile.Core.Models.SalesModels.BasketModels;
-using Deppo.Mobile.Core.Models.SalesModels;
-using Deppo.Mobile.Core.Models.TransferModels;
-using Deppo.Mobile.Core.Models.VariantModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
 using Deppo.Mobile.Helpers.MappingHelper;
@@ -23,19 +17,8 @@ using Deppo.Mobile.Modules.ResultModule.Views;
 using Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByProductProcess.ViewModels;
 using Deppo.Sys.Service.DTOs;
 using Deppo.Sys.Service.Services;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static DevExpress.Data.Filtering.Helpers.SubExprHelper.UiThreadRowStubSubExpressive;
-using System.Net.Http;
-using Android.Net.Wifi.Rtt;
-using Microsoft.Maui.Controls.Shapes;
-using Deppo.Core.DataResultModel;
 using DevExpress.Maui.Controls;
-using Xamarin.Google.ErrorProne.Annotations;
+using System.Collections.ObjectModel;
 
 namespace Deppo.Mobile.Modules.SalesModule.SalesProcess.ProcurementByCustomerProcess.ViewModels;
 
@@ -151,7 +134,7 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 		}
 		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -172,9 +155,9 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 
 			CurrentPage.FindByName<BottomSheet>("basketItemBottomSheet").State = BottomSheetState.HalfExpanded;
 		}
-		catch (Exception ex) 
+		catch (Exception ex)
 		{
-			if(_userDialogs.IsHudShowing)
+			if (_userDialogs.IsHudShowing)
 				_userDialogs.HideHud();
 
 			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
@@ -436,7 +419,7 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 			ResultModel resultModel = new ResultModel();
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
 
-			
+
 			Task<DataResult<ResponseModel>> transferTransactionInsertTask = TransferTransactionInsertAsync(httpClient);
 
 			await transferTransactionInsertTask.ContinueWith(async transferTransactionTask =>
@@ -444,7 +427,7 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 				if (transferTransactionTask.IsCompletedSuccessfully)
 				{
 					var result = transferTransactionTask.Result;
-					if(result.IsSuccess && result.Data is not null)
+					if (result.IsSuccess && result.Data is not null)
 					{
 						await ProcurementAuditCustomerInsertAsync();
 
@@ -490,9 +473,9 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 							_userDialogs.HideHud();
 
 						return;
-					}	
+					}
 				}
-				else if(transferTransactionTask.IsFaulted)
+				else if (transferTransactionTask.IsFaulted)
 				{
 					resultModel.Message = "Başarısız";
 					resultModel.PageTitle = "Ürün Toplama";
@@ -510,7 +493,7 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 					return;
 				}
 			});
-			
+
 
 			//	//#region ProcurementFiche Insert
 			//	//try
@@ -619,13 +602,13 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 				{
 					resultModel.Message = "Başarısız";
 					resultModel.PageTitle = "Toptan Satış İrsaliyesi";
-					resultModel.PageCountToBack = 7;
+					resultModel.PageCountToBack = 1;
 					resultModel.ErrorMessage = wholeSalesDispatchResult.Message;
 
 					//var transferTransactionDeleteResult = await _transferTransactionService.DeleteTransferTransaction(httpClient, transferResult.Data.ReferenceId, _httpClientService.FirmNumber);
 
-					await ClearFormAsync();
-					await ClearDataAsync();
+					Locations.Clear();
+					DispatchLocationTransactions.Clear();
 
 					await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
 					{
@@ -639,6 +622,77 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 			else
 			{
 				resultModel.Message = "Başarısız";
+				resultModel.PageTitle = "Ürün Toplama";
+				resultModel.PageCountToBack = 1;
+				resultModel.ErrorMessage = transferResult.Message;
+
+				Locations.Clear();
+				DispatchLocationTransactions.Clear();
+
+
+				await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
+				{
+					[nameof(ResultModel)] = resultModel
+				});
+
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
+			}
+		}
+		catch (Exception ex)
+		{
+			await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
+		}
+		finally
+		{
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+
+			IsBusy = false;
+		}
+	}
+
+	private async Task DenemeAsync()
+	{
+		if (IsBusy)
+			return;
+		try
+		{
+			var confirm = await _userDialogs.ConfirmAsync("İşlemi onaylıyor musunuz?", "Onay", "Evet", "Hayır");
+			if (!confirm)
+				return;
+
+			IsBusy = true;
+
+			_userDialogs.ShowLoading("İşlem Tamamlanıyor...");
+			await Task.Delay(500);
+
+			ResultModel resultModel = new ResultModel();
+			var httpClient = _httpClientService.GetOrCreateHttpClient();
+
+			var transferResult = await TransferTransactionInsertAsync(httpClient);
+
+			if (transferResult.IsSuccess && transferResult.Data is not null)
+			{
+				var deleteResult = await _transferTransactionService.DeleteTransferTransaction(httpClient, transferResult.Data.ReferenceId, _httpClientService.FirmNumber);
+				if (deleteResult.IsSuccess)
+				{
+					if (_userDialogs.IsHudShowing)
+						_userDialogs.HideHud();
+
+					await _userDialogs.AlertAsync($"Ambar Transferi Silinme İşlemi Başarılı, silinen transfer fiş no: {transferResult.Data.ReferenceId}");
+				}
+				else
+				{
+					if (_userDialogs.IsHudShowing)
+						_userDialogs.HideHud();
+
+					await _userDialogs.AlertAsync($"Ambar Transferi Silinme İşlemi Başarısız, transfer fiş no: {transferResult.Data.ReferenceId}\n hata: {transferResult.Message}");
+				}
+			}
+			else
+			{
+				resultModel.Message = "Ambar Transferi Başarısız";
 				resultModel.PageTitle = "Ürün Toplama";
 				resultModel.PageCountToBack = 1;
 				resultModel.ErrorMessage = transferResult.Message;
@@ -839,10 +893,10 @@ public partial class ProcurementByCustomerFormViewModel : BaseViewModel
 			if (warehouseListViewModel.SelectedWarehouseModel is not null)
 			{
 				warehouseListViewModel.SelectedWarehouseModel.IsSelected = false;
-				warehouseListViewModel.SelectedWarehouseModel = null;			
+				warehouseListViewModel.SelectedWarehouseModel = null;
 			}
 
-			if(warehouseListViewModel.SelectedLocationModel is not null)
+			if (warehouseListViewModel.SelectedLocationModel is not null)
 			{
 				warehouseListViewModel.SelectedLocationModel.IsSelected = false;
 				warehouseListViewModel.SelectedLocationModel = null;
