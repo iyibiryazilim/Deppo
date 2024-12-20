@@ -4,6 +4,7 @@ using Deppo.Core.Services;
 using Deppo.Mobile.Core.Models.TransferModels;
 using Deppo.Mobile.Core.Models.WarehouseModels;
 using Deppo.Mobile.Helpers.HttpClientHelpers;
+using Deppo.Mobile.Helpers.MappingHelper;
 using Deppo.Mobile.Helpers.MVVMHelper;
 using Deppo.Mobile.Modules.ProductModule.ProductProcess.TransferProductProcess.Views;
 using System.Collections.ObjectModel;
@@ -63,22 +64,22 @@ public partial class TransferOutWarehouseListViewModel : BaseViewModel
             await Task.Delay(1000);
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, 0, 20, _httpClientService.FirmNumber);
+            var result = await _warehouseService.GetObjectsAsync(
+                httpClient: httpClient,
+                firmNumber: _httpClientService.FirmNumber,
+                periodNumber: _httpClientService.PeriodNumber,
+                search: "",
+                skip: 0,
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase
+            );
             if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
                     foreach (var item in result.Data)
                     {
-                        Items.Add(new WarehouseModel
-                        {
-                            ReferenceId = item.ReferenceId,
-                            Name = item.Name,
-                            Number = item.Number,
-                            City = item.City,
-                            Country = item.Country,
-                            IsSelected = false
-                        });
+                        Items.Add(Mapping.Mapper.Map<WarehouseModel>(item));
                     }
                 }
             }
@@ -112,23 +113,26 @@ public partial class TransferOutWarehouseListViewModel : BaseViewModel
 
             
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _warehouseService.GetObjects(httpClient, string.Empty, null, Items.Count, 20, _httpClientService.FirmNumber);
-            if (result.IsSuccess)
+			var result = await _warehouseService.GetObjectsAsync(
+				httpClient: httpClient,
+				firmNumber: _httpClientService.FirmNumber,
+				periodNumber: _httpClientService.PeriodNumber,
+				search: "",
+				skip: 0,
+				take: 20,
+				externalDb: _httpClientService.ExternalDatabase
+			);
+
+			if (result.IsSuccess)
             {
                 if (result.Data is not null)
                 {
 					_userDialogs.Loading("Loading...");
 					foreach (var item in result.Data)
-                        Items.Add(new WarehouseModel
-                        {
-                            ReferenceId = item.ReferenceId,
-                            Name = item.Name,
-                            Number = item.Number,
-                            City = item.City,
-                            Country = item.Country,
-                            IsSelected = false
-                        });
-                }
+                    {
+						Items.Add(Mapping.Mapper.Map<WarehouseModel>(item));
+                    }
+				}
             }
 
             if (_userDialogs.IsHudShowing)

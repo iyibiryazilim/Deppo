@@ -588,7 +588,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
                 warehouseNumber: WarehouseModel.Number,
 				skip: 0,
 				take: 20,
-				search:LocationTransactionSearchText.Text
+				search:LocationTransactionSearchText.Text,
+				externalDb: _httpClientService.ExternalDatabase
 			);
 
 			if (result.IsSuccess)
@@ -608,11 +609,10 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
                         locationTransaction.OutputQuantity = matchingItem.Quantity;
                     }
                 }
-
-
             }
 
-            _userDialogs.Loading().Hide();
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 		}
 		catch (Exception ex)
 		{
@@ -628,6 +628,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 	{
 		if (IsBusy)
 			return;
+		if (LocationTransactions.Count < 18)
+			return;
 		try
 		{
 			IsBusy = true;
@@ -641,7 +643,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
                 warehouseNumber: WarehouseModel.Number,
 				skip: LocationTransactions.Count,
 				take: 20,
-                search:LocationTransactionSearchText.Text);
+                search:LocationTransactionSearchText.Text,
+				externalDb: _httpClientService.ExternalDatabase);
 
 			if (result.IsSuccess)
 			{
@@ -700,7 +703,8 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
                 warehouseNumber: WarehouseModel.Number,
                 skip: 0,
                 take: 20,
-                search: LocationTransactionSearchText.Text
+                search: LocationTransactionSearchText.Text,
+				externalDb: _httpClientService.ExternalDatabase
             );
 
             if (result.IsSuccess)
@@ -980,7 +984,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 			await Task.Delay(1000);
 			SeriLotTransactions.Clear();
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _serilotTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: SelectedItem.ItemReferenceId, warehouseNumber: WarehouseModel.Number, search: string.Empty);
+			var result = await _serilotTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: SelectedItem.ItemReferenceId, warehouseNumber: WarehouseModel.Number, search: string.Empty, externalDb: _httpClientService.ExternalDatabase);
 
 			if (result.IsSuccess)
 			{
@@ -1019,7 +1023,7 @@ public partial class OutputProductProcessBasketListViewModel : BaseViewModel
 			IsBusy = true;
 
 			var httpClient = _httpClientService.GetOrCreateHttpClient();
-			var result = await _serilotTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: SelectedItem.ItemReferenceId, warehouseNumber: WarehouseModel.Number, skip: SeriLotTransactions.Count, take: 20);
+			var result = await _serilotTransactionService.GetObjects(httpClient, _httpClientService.FirmNumber, _httpClientService.PeriodNumber, productReferenceId: SelectedItem.ItemReferenceId, warehouseNumber: WarehouseModel.Number, skip: SeriLotTransactions.Count, take: 20, externalDb: _httpClientService.ExternalDatabase);
 
 			if (result.IsSuccess)
 			{

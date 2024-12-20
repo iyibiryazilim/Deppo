@@ -174,7 +174,8 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
                 locationRef: outputProductBasketDetailModel.LocationReferenceId,
                 skip: 0,
                 take: 999999,
-                search: ""
+                search: "",
+                externalDb: _httpClientService.ExternalDatabase
             );
 
             if (result.IsSuccess)
@@ -336,20 +337,16 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
             await ClearFormAsync();
             await ClearPageAsync();
 
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
-
-
 			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
             {
                 [nameof(ResultModel)] = resultModel
             });
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 		}
         else
         {
-            if (_userDialogs.IsHudShowing)
-                _userDialogs.HideHud();
-
             resultModel.Message = "Başarısız";
             resultModel.PageTitle = Title;
             resultModel.PageCountToBack = 1;
@@ -358,7 +355,10 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
             {
                 [nameof(ResultModel)] = resultModel
             });
-        }
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
     }
 
     private async Task WastageTransactionInsertAsync(HttpClient httpClient)
@@ -458,19 +458,16 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 			await ClearFormAsync();
 			await ClearPageAsync();
 
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
-
 			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
 			{
 				[nameof(ResultModel)] = resultModel
-			});	
+			});
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 		}
 		else
 		{
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
-
 			resultModel.Message = "Başarısız";
 			resultModel.PageTitle = Title;
 			resultModel.PageCountToBack = 1;
@@ -480,6 +477,9 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 			{
 				[nameof(ResultModel)] = resultModel
 			});
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 		}
 	}
 
@@ -580,13 +580,13 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
 			await ClearFormAsync();
 			await ClearPageAsync();
 
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
-
 			await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
             {
                 [nameof(ResultModel)] = resultModel
             });
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
 		}
         else
         {
@@ -595,14 +595,14 @@ public partial class OutputProductProcessFormViewModel : BaseViewModel
             resultModel.PageCountToBack = 1;
 			resultModel.ErrorMessage = result.Message;
 
-			if (_userDialogs.IsHudShowing)
-				_userDialogs.HideHud();
-
 			await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
             {
                 [nameof(ResultModel)] = resultModel
             });
-        }
+
+			if (_userDialogs.IsHudShowing)
+				_userDialogs.HideHud();
+		}
     }
 
     private async Task BackAsync()

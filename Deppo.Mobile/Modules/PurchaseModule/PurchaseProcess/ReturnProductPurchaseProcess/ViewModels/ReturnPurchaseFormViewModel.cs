@@ -345,8 +345,9 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
     {
         try
         {
-            var httpClient = _httpClientService.GetOrCreateHttpClient();
             LocationTransactions.Clear();
+
+            var httpClient = _httpClientService.GetOrCreateHttpClient();
             var result = await _locationTransactionService.GetInputObjectsAsync(
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
@@ -357,7 +358,8 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
                 locationRef: returnPurchaseBasketDetailModel.LocationReferenceId,
                 skip: 0,
                 take: 999999,
-                search: ""
+                search: "",
+                externalDb: _httpClientService.ExternalDatabase
             );
 
             if (result.IsSuccess)
@@ -369,16 +371,10 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
                     LocationTransactions.Add(Mapping.Mapper.Map<LocationTransactionModel>(item));
                 }
             }
-
-            _userDialogs.Loading().Hide();
         }
         catch (Exception ex)
         {
             await _userDialogs.AlertAsync(ex.Message, "Hata", "Tamam");
-        }
-        finally
-        {
-            IsBusy = false;
         }
     }
 
@@ -524,14 +520,16 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
                 await ClearFormAsync();
 				await ClearDataAsync();
 
-				if (_userDialogs.IsHudShowing)
-					_userDialogs.HideHud();
+				
 
 				await Shell.Current.GoToAsync($"{nameof(InsertSuccessPageView)}", new Dictionary<string, object>
                 {
                     [nameof(ResultModel)] = resultModel
                 });
-            }
+
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
+			}
             else
             {
                 resultModel.Message = "Başarısız";
@@ -539,14 +537,14 @@ public partial class ReturnPurchaseFormViewModel : BaseViewModel
                 resultModel.PageCountToBack = 1;
                 resultModel.ErrorMessage = result.Message;
 
-				if (_userDialogs.IsHudShowing)
-					_userDialogs.HideHud();
-
 				await Shell.Current.GoToAsync($"{nameof(InsertFailurePageView)}", new Dictionary<string, object>
                 {
                     [nameof(ResultModel)] = resultModel
                 });
-            }
+
+				if (_userDialogs.IsHudShowing)
+					_userDialogs.HideHud();
+			}
         }
         catch (Exception ex)
         {

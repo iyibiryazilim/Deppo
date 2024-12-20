@@ -2,11 +2,11 @@
 <ContentPage x:Class="Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.Views.ReturnPurchaseDispatchFormView"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:basketModel="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;assembly=Deppo.Mobile.Core"
              xmlns:dx="http://schemas.devexpress.com/maui"
              xmlns:fontAwesome="clr-namespace:Deppo.Mobile.Helpers.FontAwesomeHelper"
              xmlns:models="clr-namespace:Deppo.Core.Models;assembly=Deppo.Core"
              xmlns:purchaseModel="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels;assembly=Deppo.Mobile.Core"
-              xmlns:basketModel="clr-namespace:Deppo.Mobile.Core.Models.PurchaseModels.BasketModels;assembly=Deppo.Mobile.Core"
              xmlns:shipAddressModel="clr-namespace:Deppo.Mobile.Core.Models.ShipAddressModels;assembly=Deppo.Mobile.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:Deppo.Mobile.Modules.PurchaseModule.PurchaseProcess.ReturnProductPurchaseDispatchProcess.ViewModels"
@@ -33,8 +33,8 @@
         <ToolbarItem Command="{Binding LoadPageCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="FAS"
-                         Glyph="{x:Static fontAwesome:FontAwesomeIcons.BasketShopping}"
-                         Size="Large" />
+                                 Glyph="{x:Static fontAwesome:FontAwesomeIcons.BasketShopping}"
+                                 Size="Large" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </ContentPage.ToolbarItems>
@@ -185,21 +185,21 @@
                 VerticalOptions="End" />
 
         <dx:BottomSheet x:Name="basketItemBottomSheet"
-                 AllowDismiss="True"
-                 BackgroundColor="White"
-                 CornerRadius="15"
-                 HalfExpandedRatio="0.5"
-                 IsModal="True"
-                 ShowGrabber="True">
+                        AllowDismiss="True"
+                        BackgroundColor="White"
+                        CornerRadius="15"
+                        HalfExpandedRatio="0.5"
+                        IsModal="True"
+                        ShowGrabber="True">
             <!--#region BottomSheetContent-->
             <Grid Padding="10"
-           RowDefinitions="Auto,*"
-           RowSpacing="20">
+                  RowDefinitions="Auto,*"
+                  RowSpacing="20">
 
                 <VerticalStackLayout Grid.Row="0" Spacing="5">
                     <Label FontAttributes="Bold"
-                    FontSize="Subtitle"
-                    Text="Malzeme Listesi" />
+                           FontSize="Subtitle"
+                           Text="Malzeme Listesi" />
                     <BoxView HeightRequest="2" Color="{StaticResource OffBlack}" />
                 </VerticalStackLayout>
 
@@ -207,67 +207,66 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="basketModel:ReturnPurchaseBasketModel">
                             <Border Padding="10"
-                             BackgroundColor="Transparent"
-                             StrokeShape="RoundRectangle 10"
-                             StrokeThickness="0.1">
+                                    BackgroundColor="Transparent"
+                                    StrokeShape="RoundRectangle 10"
+                                    StrokeThickness="0.1">
                                 <Grid ColumnDefinitions="Auto,*, Auto" ColumnSpacing="10">
-                                    <Border StrokeShape="RoundRectangle 5"
-                                            StrokeThickness="0.5">
+                                    <Border StrokeShape="RoundRectangle 5" StrokeThickness="0.5">
                                         <Image Grid.Column="0"
-                                        HeightRequest="50"
-                                        Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
-                                        WidthRequest="50" />
+                                               HeightRequest="50"
+                                               Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                               WidthRequest="50" />
                                     </Border>
 
                                     <VerticalStackLayout Grid.Column="1" Spacing="2">
 
                                         <Label FontAttributes="Bold"
-                                        LineBreakMode="TailTruncation"
-                                        Text="{Binding ItemCode}" />
+                                               LineBreakMode="TailTruncation"
+                                               Text="{Binding ItemCode}" />
                                         <Label LineBreakMode="TailTruncation"
-                                        Text="{Binding ItemName}"
-                                        TextColor="{StaticResource Gray600}" />
+                                               Text="{Binding ItemName}"
+                                               TextColor="{StaticResource Gray600}" />
 
                                         <Label TextColor="{StaticResource Gray600}" VerticalOptions="Center">
                                             <Label.FormattedText>
                                                 <FormattedString>
                                                     <Span FontAttributes="Bold"
-                                                   FontFamily="FAS"
-                                                   Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
-                                                   TextColor="{StaticResource Primary}" />
+                                                          FontFamily="FAS"
+                                                          Text="{x:Static fontAwesome:FontAwesomeIcons.Box}"
+                                                          TextColor="{StaticResource Primary}" />
                                                     <Span Text=" " />
                                                     <Span FontAttributes="Bold"
-                                                   Text="{Binding Quantity, StringFormat='{0:N2}'}"
-                                                   TextColor="{StaticResource Primary}" />
+                                                          Text="{Binding Quantity, StringFormat='{0:N2}'}"
+                                                          TextColor="{StaticResource Primary}" />
                                                     <Span Text=" " />
                                                     <Span FontAttributes="Bold"
-                                                   Text="{Binding SubUnitsetCode}"
-                                                   TextColor="{StaticResource Primary}" />
+                                                          Text="{Binding SubUnitsetCode}"
+                                                          TextColor="{StaticResource Primary}" />
                                                 </FormattedString>
                                             </Label.FormattedText>
                                         </Label>
                                     </VerticalStackLayout>
 
                                     <Grid Grid.Column="2"
-                                   ColumnDefinitions="Auto, Auto, Auto"
-                                   ColumnSpacing="3"
-                                   HorizontalOptions="End"
-                                   VerticalOptions="Start">
+                                          ColumnDefinitions="Auto, Auto, Auto"
+                                          ColumnSpacing="3"
+                                          HorizontalOptions="End"
+                                          VerticalOptions="Start">
                                         <Label Grid.Column="0"
-                                        FontFamily="FAS"
-                                        FontSize="10"
-                                        Text="{Binding VariantIcon}"
-                                        TextColor="{Binding VariantIconColor}" />
+                                               FontFamily="FAS"
+                                               FontSize="10"
+                                               Text="{Binding VariantIcon}"
+                                               TextColor="{Binding VariantIconColor}" />
                                         <Label Grid.Column="1"
-                                        FontFamily="FAS"
-                                        FontSize="10"
-                                        Text="{Binding LocTrackingIcon}"
-                                        TextColor="{Binding LocTrackingIconColor}" />
+                                               FontFamily="FAS"
+                                               FontSize="10"
+                                               Text="{Binding LocTrackingIcon}"
+                                               TextColor="{Binding LocTrackingIconColor}" />
                                         <Label Grid.Column="2"
-                                        FontFamily="FAS"
-                                        FontSize="10"
-                                        Text="{Binding TrackingTypeIcon}"
-                                        TextColor="{Binding TrackingTypeIconColor}" />
+                                               FontFamily="FAS"
+                                               FontSize="10"
+                                               Text="{Binding TrackingTypeIcon}"
+                                               TextColor="{Binding TrackingTypeIconColor}" />
                                     </Grid>
                                 </Grid>
                             </Border>

@@ -549,9 +549,15 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
                 httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
-                productReferenceId: SelectedItem.ItemReferenceId,
-                warehouseNumber: WarehouseModel.Number
+                productReferenceId: SelectedItem.IsVariant ? SelectedItem.MainItemReferenceId : SelectedItem.ItemReferenceId,
+                warehouseNumber: WarehouseModel.Number,
+                search: string.Empty,
+                skip: 0,
+                take: 20,
+                variantReferenceId: SelectedItem.IsVariant ? SelectedItem.ItemReferenceId : 0,
+                externalDb: _httpClientService.ExternalDatabase
             );
+			
 
             if (result.IsSuccess)
             {
@@ -572,7 +578,8 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
                 }
             }
 
-            _userDialogs.Loading().Hide();
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {
@@ -595,13 +602,17 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
             IsBusy = true;
 
             var httpClient = _httpClientService.GetOrCreateHttpClient();
-            var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(httpClient: httpClient,
+            var result = await _locationTransactionService.GetLocationTransactionsInputObjectsAsync(
+                httpClient: httpClient,
                 firmNumber: _httpClientService.FirmNumber,
                 periodNumber: _httpClientService.PeriodNumber,
-                productReferenceId: SelectedItem.ItemReferenceId,
-                warehouseNumber: WarehouseModel.Number,
+                productReferenceId: SelectedItem.IsVariant ? SelectedItem.MainItemReferenceId : SelectedItem.ItemReferenceId,
+                variantReferenceId: SelectedItem.IsVariant ? SelectedItem.ItemReferenceId : 0,
+				warehouseNumber: WarehouseModel.Number,
                 skip: LocationTransactions.Count,
-                take: 20);
+                take: 20,
+                externalDb: _httpClientService.ExternalDatabase
+            );
 
             if (result.IsSuccess)
             {
@@ -622,6 +633,9 @@ public partial class ReturnPurchaseBasketViewModel : BaseViewModel
                     }
                 }
             }
+
+            if (_userDialogs.IsHudShowing)
+                _userDialogs.HideHud();
         }
         catch (Exception ex)
         {

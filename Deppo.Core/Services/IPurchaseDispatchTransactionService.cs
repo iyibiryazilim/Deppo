@@ -16,4 +16,5 @@ public interface IPurchaseDispatchTransactionService
 
     Task<DataResult<IEnumerable<dynamic>>> GetTransactionsByFicheReferenceId(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "");
 
+	Task<DataResult<IEnumerable<dynamic>>> GetVariantsByTransaction(HttpClient httpClient, int firmNumber, int periodNumber, int ficheReferenceId, int productReferenceId, string search = "", int skip = 0, int take = 20, string externalDb = "");
 }

@@ -163,6 +163,7 @@
                                     </Grid>
                                 </Border>
                                 <Border Grid.Row="2"
+                                        IsVisible="False"
                                         Padding="5"
                                         HeightRequest="55"
                                         StrokeShape="RoundRectangle 5"

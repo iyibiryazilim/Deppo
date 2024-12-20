@@ -123,6 +123,7 @@ public class MappingProfile : Profile
         CreateMap<OutputOutsourceTransferV2ProductModel, dynamic>();
         CreateMap<InputOutsourceTransferSubProductModel, dynamic>();
         CreateMap<OutputOutsourceTransferV2SubProductModel, dynamic>();
+        CreateMap<PurchaseTransactionVariantModel, dynamic>();
 
         
 
